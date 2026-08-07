@@ -29,7 +29,6 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySharedPrivateDnsZones: false
                 deployPsqlFlexibleServer: false
                 deployContainerApp: false
                 deployDataProcessor: false
@@ -51,7 +50,6 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                deploySharedPrivateDnsZones: $(deploySharedPrivateDnsZones)
                 deployPsqlFlexibleServer: $(deployPsqlFlexibleServer)
                 deployContainerApp: $(deployContainerApp)
                 deployDataProcessor: $(deployDataProcessor)

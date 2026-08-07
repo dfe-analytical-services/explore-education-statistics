@@ -11,14 +11,3 @@ type FirewallRule = {
   priority: int
   tag: string
 }
-
-@export()
-type PrivateDnsZone =
-  | 'blobStorage'
-  | 'eventGridTopic'
-  | 'fileService'
-  | 'postgres'
-  | 'queue'
-  | 'sites'
-  | 'tableStorage'
-  | 'custom'

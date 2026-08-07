@@ -1222,7 +1222,6 @@
       }
     ],
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
-    "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",
     "adminSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('adminSubnetName'))]",
     "importerSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-importer')]",
@@ -3300,27 +3299,6 @@
         "name": "networkRuleLoop",
         "count": "[length(variables('publicSqlAllowedSubnets'))]"
       }
-    },
-    {
-      "type": "Microsoft.Network/privateDnsZones",
-      "apiVersion": "2024-06-01",
-      "name": "privatelink.database.windows.net",
-      "location": "global"
-    },
-    {
-      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-      "apiVersion": "2024-06-01",
-      "name": "[concat('privatelink.database.windows.net/', variables('vNetName'), '-database-vnetlink')]",
-      "location": "global",
-      "properties": {
-        "registrationEnabled": true,
-        "virtualNetwork": {
-          "id": "[variables('vNetRef')]"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.database.windows.net')]"
-      ]
     },
     {
       "type": "Microsoft.Network/privateEndpoints",

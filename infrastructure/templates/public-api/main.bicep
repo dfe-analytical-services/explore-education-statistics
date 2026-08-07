@@ -94,9 +94,6 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Do the shared Private DNS Zones need creating or updating?')
-param deploySharedPrivateDnsZones bool = false
-
 @description('Does the PostgreSQL Flexible Server need creating or updating?')
 param deployPsqlFlexibleServer bool = false
 
@@ -259,14 +256,6 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule '../common/application/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
-  name: 'privateDnsZonesApplicationModuleDeploy'
-  params: {
-    vnetName: resourceNames.existingResources.vNet
-    tagValues: tagValues
-  }
-}
-
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
@@ -311,9 +300,6 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     deployBackupVaultRegistration: deployPsqlBackupVaultRegistration
     tagValues: tagValues
   }
-  dependsOn: [
-    privateDnsZonesModule
-  ]
 }
 
 module recoveryVaultModule 'application/shared/recoveryVault.bicep' = if (deployRecoveryVault) {
@@ -437,7 +423,6 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     tagValues: tagValues
   }
   dependsOn: [
-    privateDnsZonesModule
     publicApiStorageModule
   ]
 }

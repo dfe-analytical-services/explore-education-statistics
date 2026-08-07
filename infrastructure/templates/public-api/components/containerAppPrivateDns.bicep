@@ -10,7 +10,7 @@ param ipAddress string
 @description('Tags to assign to resources')
 param tagValues object
 
-module privateDnsZoneModule '../../common/components/privateDnsZone.bicep' = {
+module privateDnsZoneModule '../../common/components/private-dns-zone/private-dns-zone.bicep' = {
   name: '${domain}Deploy'
   params: {
     vnetName: vnetName
