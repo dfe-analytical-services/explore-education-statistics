@@ -127,6 +127,7 @@
     "variables": {
       "runAfter": {},
       "type": "Compose",
+      "description": "Capture low-level variables from the JSON payload.",
       "inputs": {
         "alertName": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
         "severity": "@{triggerBody()?['data']?['essentials']?['severity']}",
@@ -145,6 +146,7 @@
         ]
       },
       "type": "Compose",
+      "description": "Construct reusable text fragments based on the low-level variables captured from the JSON payload.",
       "inputs": {
         "outsideThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{outputs('variables')?['metricValue']}, which is @{outputs('variables')?['operator']} the threshold of @{outputs('variables')?['threshold']}",
         "withinThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{if(empty(outputs('variables')?['metricValue']), 'an acceptable value again', concat(outputs('variables')?['metricValue'], ' and is no longer ', outputs('variables')?['operator'], ' the ', outputs('variables')?['threshold'], ' threshold'))}",
@@ -161,6 +163,7 @@
         ]
       },
       "type": "Compose",
+      "description": "Create the textual field values for the messages being sent to Slack and Teams.",
       "inputs": {
         "alertTime": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
         "colour": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColour'])}",
@@ -172,7 +175,7 @@
         "alertLinkTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('fragments')?['alertTargetResourceUrl']})"
       }
     },
-    "HTTP_Webhook": {
+    "Post message to Slack": {
       "runAfter": {
         "fields": [
           "Succeeded"
@@ -232,7 +235,7 @@
         "unsubscribe": {}
       }
     },
-    "HTTP_Teams": {
+    "Post message to Teams": {
       "runAfter": {
         "fields": [
           "Succeeded"

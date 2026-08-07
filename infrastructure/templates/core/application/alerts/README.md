@@ -14,7 +14,7 @@ The [alerts.bicep](alerts.bicep) file is responsible for putting this all togeth
 ## Logic app
 
 The [Logic App](alerts-logic-app.bicep) receives JSON payloads from metric alerts. It captures important
-information using `InitializeVariables` actions, and then 2 individual actions, one for Teams and one for
+information using a series of `Compose` actions, and then 2 HTTP actions, one for Teams and one for
 Slack, take those variables and construct POSTs in the correct format for their target platforms.
 
 The [Logic App definition](alerts-logic-app-definition.json) defines the workflow.
