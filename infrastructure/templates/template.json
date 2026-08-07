@@ -909,7 +909,6 @@
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
     "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
-    "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
