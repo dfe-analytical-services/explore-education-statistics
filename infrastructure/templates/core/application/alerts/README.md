@@ -41,10 +41,9 @@ Generic tests can be run directly from the Action Group in Azure Portal.
 More low-level tests can be run from the Logic App itself using custom JSON payloads.
 
 1. Visit the Logic App in Azure Portal.
-2. Go to "Development tools" > "Logic app designer".
-3. Click the "Run draft" button with the cog icon.
-4. Enter a test JSON payload in the "Body" textarea.
-5. Click "Run draft with payload".
-6. Check in Teams and Slack for the generated messages.
+2. On the Overview page, click the "Run" dropdown at the top and select "Run with payload".
+3. Enter a test JSON payload in the "Response body" textarea.
+4. Click "Run".
+5. Check in Teams and Slack for the generated messages.
 
 Some example JSON payloads are available in the [test data folder](test-data).
