@@ -181,58 +181,55 @@
           "Succeeded"
         ]
       },
-      "type": "HttpWebhook",
+      "type": "Http",
       "inputs": {
-        "subscribe": {
-          "method": "POST",
-          "uri": "https://slack.com/api/chat.postMessage",
-          "body": {
-            "channel": "@parameters('slackAlertsChannel')",
-            "text": "@outputs('fields')?['titleSlack']",
-            "attachments": [
-              {
-                "color": "@outputs('fields')?['colour']",
-                "fields": [
-                  {
-                    "title": "Alert",
-                    "value": "@outputs('variables')?['alertName']",
-                    "short": true
-                  },
-                  {
-                    "title": "Severity",
-                    "value": "@outputs('fields')?['severity']",
-                    "short": true
-                  },
-                  {
-                    "title": "@{outputs('variables')?['monitorCondition']} at",
-                    "value": "@outputs('fields')?['alertTime']",
-                    "short": false
-                  },
-                  {
-                    "title": "Window start",
-                    "value": "@outputs('fields')?['windowStart']",
-                    "short": true
-                  },
-                  {
-                    "title": "Window end",
-                    "value": "@outputs('fields')?['windowEnd']",
-                    "short": true
-                  },
-                  {
-                    "title": "Logic App workflow version",
-                    "value": "1.0",
-                    "short": true
-                  }
-                ]
-              }
-            ]
-          },
-          "headers": {
-            "Content-Type": "application/json",
-            "Authorization": "@{concat('Bearer ', parameters('slackAppToken'))}"
-          }
+        "method": "POST",
+        "uri": "https://slack.com/api/chat.postMessage",
+        "body": {
+          "channel": "@parameters('slackAlertsChannel')",
+          "text": "@outputs('fields')?['titleSlack']",
+          "attachments": [
+            {
+              "color": "@outputs('fields')?['colour']",
+              "fields": [
+                {
+                  "title": "Alert",
+                  "value": "@outputs('variables')?['alertName']",
+                  "short": true
+                },
+                {
+                  "title": "Severity",
+                  "value": "@outputs('fields')?['severity']",
+                  "short": true
+                },
+                {
+                  "title": "@{outputs('variables')?['monitorCondition']} at",
+                  "value": "@outputs('fields')?['alertTime']",
+                  "short": false
+                },
+                {
+                  "title": "Window start",
+                  "value": "@outputs('fields')?['windowStart']",
+                  "short": true
+                },
+                {
+                  "title": "Window end",
+                  "value": "@outputs('fields')?['windowEnd']",
+                  "short": true
+                },
+                {
+                  "title": "Logic App workflow version",
+                  "value": "1.0",
+                  "short": true
+                }
+              ]
+            }
+          ]
         },
-        "unsubscribe": {}
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "@{concat('Bearer ', parameters('slackAppToken'))}"
+        }
       }
     },
     "Post message to Teams": {

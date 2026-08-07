@@ -42,7 +42,7 @@ More low-level tests can be run from the Logic App itself using custom JSON payl
 
 1. Visit the Logic App in Azure Portal.
 2. On the Overview page, click the "Run" dropdown at the top and select "Run with payload".
-3. Enter a test JSON payload in the "Response body" textarea.
+3. Enter a test JSON payload in the "Body" textarea.
 4. Click "Run".
 5. Check in Teams and Slack for the generated messages.
 
