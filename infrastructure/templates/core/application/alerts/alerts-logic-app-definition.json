@@ -124,204 +124,38 @@
     }
   },
   "actions": {
-    "Initialize severity variable": {
+    "Capture raw variables": {
       "runAfter": {},
-      "type": "InitializeVariable",
+      "type": "Compose",
       "inputs": {
-        "variables": [
-          {
-            "name": "severity",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['essentials']?['severity']}"
-          }
-        ]
+        "severity": "@{triggerBody()?['data']?['essentials']?['severity']}",
+        "operator": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']}",
+        "metricName": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']}",
+        "timeAggregation": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']}",
+        "metricValue": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}",
+        "threshold": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}",
+        "monitorCondition": "@{triggerBody()?['data']?['essentials']?['monitorCondition']}",
+
       }
     },
-    "Initialize operator variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "operator",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']}"
-          }
-        ]
-      }
-    },
-    "Initialize metricName variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "metricName",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']}"
-          }
-        ]
-      }
-    },
-    "Initialize timeAggregation variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "timeAggregation",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']}"
-          }
-        ]
-      }
-    },
-    "Initialize metricValue variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "metricValue",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}"
-          }
-        ]
-      }
-    },
-    "Initialize threshold variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "threshold",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}"
-          }
-        ]
-      }
-    },
-    "Initialize monitorCondition variable": {
-      "runAfter": {},
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "monitorCondition",
-            "type": "string",
-            "value": "@{triggerBody()?['data']?['essentials']?['monitorCondition']}"
-          }
-        ]
-      }
-    },
-    "Initialize outsideThresholdMessage variable": {
+    "Compose message fragments": {
       "runAfter": {
-        "Initialize operator variable": [
-          "Succeeded"
-        ],
-        "Initialize metricName variable": [
-          "Succeeded"
-        ],
-        "Initialize timeAggregation variable": [
-          "Succeeded"
-        ],
-        "Initialize metricValue variable": [
-          "Succeeded"
-        ],
-        "Initialize threshold variable": [
+        "Capture raw variables": [
           "Succeeded"
         ]
       },
-      "type": "InitializeVariable",
+      "type": "Compose",
       "inputs": {
-        "variables": [
-          {
-            "name": "outsideThresholdMessage",
-            "type": "string",
-            "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{variables('metricValue')}, which is @{variables('operator')} the threshold of @{variables('threshold')}"
-          }
-        ]
-      }
-    },
-    "Initialize withinThresholdMessage variable": {
-      "runAfter": {
-        "Initialize operator variable": [
-          "Succeeded"
-        ],
-        "Initialize metricName variable": [
-          "Succeeded"
-        ],
-        "Initialize timeAggregation variable": [
-          "Succeeded"
-        ],
-        "Initialize metricValue variable": [
-          "Succeeded"
-        ],
-        "Initialize threshold variable": [
-          "Succeeded"
-        ]
-      },
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "withinThresholdMessage",
-            "type": "string",
-            "value": "The @{variables('timeAggregation')} of @{variables('metricName')} is at @{if(empty(variables('metricValue')), 'an acceptable value again', concat(variables('metricValue'), ' and is no longer ', variables('operator'), ' the ', variables('threshold'), ' threshold'))}"
-          }
-        ]
-      }
-    },
-    "Initialize severityDisplay variable": {
-      "runAfter": {
-        "Initialize severity variable": [
-          "Succeeded"
-        ]
-      },
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "severityDisplay",
-            "type": "string",
-            "value": "@{if(equals(variables('severity'), 'Sev0'), 'CRITICAL!', '')}@{if(equals(variables('severity'), 'Sev1'), 'Error!', '')}@{if(equals(variables('severity'), 'Sev2'), 'Warning', '')}@{if(equals(variables('severity'), 'Sev3'), 'Information', '')}@{if(equals(variables('severity'), 'Sev4'), 'Verbose', '')}"
-          }
-        ]
-      }
-    },
-    "Initialize severityColour variable": {
-      "runAfter": {
-        "Initialize severity variable": [
-          "Succeeded"
-        ]
-      },
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "severityColour",
-            "type": "string",
-            "value": "@{if(equals(variables('severity'), 'Sev0'), 'danger', '')}@{if(equals(variables('severity'), 'Sev1'), 'danger', '')}@{if(equals(variables('severity'), 'Sev2'), 'warning', '')}@{if(equals(variables('severity'), 'Sev3'), 'good', '')}@{if(equals(variables('severity'), 'Sev4'), 'good', '')}"
-          }
-        ]
+        "outsideThresholdMessage": "The @{outputs('Capture_raw_variables')?['timeAggregation']} of @{outputs('Capture_raw_variables')?['metricName']} is at @{outputs('Capture_raw_variables')?['metricValue']}, which is @{outputs('Capture_raw_variables')?['operator']} the threshold of @{outputs('Capture_raw_variables')?['threshold']}",
+        "withinThresholdMessage": "The @{outputs('Capture_raw_variables')?['timeAggregation']} of @{outputs('Capture_raw_variables')?['metricName']} is at @{if(empty(outputs('Capture_raw_variables')?['metricValue']), 'an acceptable value again', concat(outputs('Capture_raw_variables')?['metricValue'], ' and is no longer ', outputs('Capture_raw_variables')?['operator'], ' the ', outputs('Capture_raw_variables')?['threshold'], ' threshold'))}",
+        "severityDisplay": "@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev0'), 'CRITICAL!', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev1'), 'Error!', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev2'), 'Warning', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev3'), 'Information', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev4'), 'Verbose', '')}",
+        "severityColour": "@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev0'), 'danger', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev1'), 'danger', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev2'), 'warning', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev3'), 'good', '')}@{if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev4'), 'good', '')}",
+        "alertRuleUrl": "@{concat('https://portal.azure.com.mcas.ms/#@platform.education.gov.uk/resource', first(split(triggerBody()?['data']?['essentials']?['alertTargetIDs'][0], '/providers/')), '/providers/microsoft.insights/metricAlerts/', triggerBody()?['data']?['essentials']?['alertRule'], '/overview')}"
       }
     },
     "HTTP_Webhook": {
       "runAfter": {
-        "Initialize monitorCondition variable": [
-          "Succeeded"
-        ],
-        "Initialize severityColour variable": [
-          "Succeeded"
-        ],
-        "Initialize severityDisplay variable": [
-          "Succeeded"
-        ],
-        "Initialize withinThresholdMessage variable": [
-          "Succeeded"
-        ],
-        "Initialize outsideThresholdMessage variable": [
+        "Compose message fragments": [
           "Succeeded"
         ]
       },
@@ -332,10 +166,10 @@
           "uri": "https://slack.com/api/chat.postMessage",
           "body": {
             "channel": "@parameters('slackAlertsChannel')",
-            "text": "*Alert @{variables('monitorCondition')}!*\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{if(equals(variables('monitorCondition'), 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n<https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/@parameters('subscription')/resourceGroups/@parameters('resourceGroup')/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory|Link to alert>\n<https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}|Link to resource>",
+            "text": "*Alert @{outputs('Capture_raw_variables')?['monitorCondition']}!*\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), outputs('Compose_message_fragments')?['withinThresholdMessage'), variables('outsideThresholdMessage'))}\n<https://portal.azure.com/#@platform.education.gov.uk/resource/subscriptions/@parameters('subscription')/resourceGroups/@parameters('resourceGroup']/providers/Microsoft.Insights/metricalerts/@{triggerBody()?['data']?['essentials']?['alertRule']}/ViewAlertRuleHistory|Link to alert>\n<https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}|Link to resource>",
             "attachments": [
               {
-                "color": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'good', variables('severityColour'))}",
+                "color": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), 'good', outputs('Compose_message_fragments')?['severityColour'])}",
                 "fields": [
                   {
                     "title": "Alert",
@@ -344,12 +178,12 @@
                   },
                   {
                     "title": "Severity",
-                    "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}",
+                    "value": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), 'Resolved', outputs('Compose_message_fragments')?['severityDisplay'])}",
                     "short": true
                   },
                   {
-                    "title": "@{variables('monitorCondition')} at",
-                    "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+                    "title": "@{outputs('Capture_raw_variables')?['monitorCondition']} at",
+                    "value": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
                     "short": false
                   },
                   {
@@ -374,23 +208,6 @@
         "unsubscribe": {}
       }
     },
-    "Initialize alertRuleUrl variable": {
-      "type": "InitializeVariable",
-      "inputs": {
-        "variables": [
-          {
-            "name": "alertRuleUrl",
-            "type": "string",
-            "value": "@{concat('https://portal.azure.com.mcas.ms/#@platform.education.gov.uk/resource', first(split(triggerBody()?['data']?['essentials']?['alertTargetIDs'][0], '/providers/')), '/providers/microsoft.insights/metricAlerts/', triggerBody()?['data']?['essentials']?['alertRule'], '/overview')}"
-          }
-        ]
-      },
-      "runAfter": {
-        "Initialize severity variable": [
-          "Succeeded"
-        ]
-      }
-    },
     "HTTP_Teams": {
       "type": "Http",
       "inputs": {
@@ -412,14 +229,14 @@
                 "body": [
                   {
                     "type": "TextBlock",
-                    "text": "@{concat('Alert ', triggerBody()?['data']?['essentials']?['alertRule'], ' ', toLower(variables('monitorCondition')), if(equals(variables('monitorCondition'), 'Resolved'), '', '!'))}",
+                    "text": "@{concat('Alert ', triggerBody()?['data']?['essentials']?['alertRule'], ' ', toLower(outputs('Capture_raw_variables')?['monitorCondition']), if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), '', '!'))}",
                     "weight": "Bolder",
                     "size": "Medium",
-                    "color": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'good', if(or(equals(variables('severity'), 'Sev0'), equals(variables('severity'), 'Sev1')), 'attention', if(equals(variables('severity'), 'Sev2'), 'warning', 'good')))}"
+                    "color": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), 'good', if(or(equals(outputs('Capture_raw_variables')?['severity'], 'Sev0'), equals(outputs('Capture_raw_variables')?['severity'], 'Sev1')), 'attention', if(equals(outputs('Capture_raw_variables')?['severity'], 'Sev2'), 'warning', 'good')))}"
                   },
                   {
                     "type": "TextBlock",
-                    "text": "@{if(equals(variables('monitorCondition'), 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(variables('monitorCondition'), 'Resolved'), variables('withinThresholdMessage'), variables('outsideThresholdMessage'))}\n[Link to alert](@{variables('alertRuleUrl')})\n[Link to resource](https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]})",
+                    "text": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), outputs('Compose_message_fragments')?['withinThresholdMessage'), variables('outsideThresholdMessage'))}\n[Link to alert](@{variables('alertRuleUrl']})\n[Link to resource](https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]})",
                     "wrap": true
                   },
                   {
@@ -431,11 +248,11 @@
                       },
                       {
                         "title": "Severity",
-                        "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), 'Resolved', variables('severityDisplay'))}"
+                        "value": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), 'Resolved', outputs('Compose_message_fragments')?['severityDisplay'])}"
                       },
                       {
-                        "title": "@{variables('monitorCondition')} at",
-                        "value": "@{if(equals(variables('monitorCondition'), 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}"
+                        "title": "@{outputs('Capture_raw_variables')?['monitorCondition']} at",
+                        "value": "@{if(equals(outputs('Capture_raw_variables')?['monitorCondition'], 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}"
                       },
                       {
                         "title": "Window Start",
@@ -454,19 +271,7 @@
         }
       },
       "runAfter": {
-        "Initialize monitorCondition variable": [
-          "Succeeded"
-        ],
-        "Initialize severityDisplay variable": [
-          "Succeeded"
-        ],
-        "Initialize withinThresholdMessage variable": [
-          "Succeeded"
-        ],
-        "Initialize outsideThresholdMessage variable": [
-          "Succeeded"
-        ],
-        "Initialize alertRuleUrl variable": [
+        "Compose message fragments": [
           "Succeeded"
         ]
       },
