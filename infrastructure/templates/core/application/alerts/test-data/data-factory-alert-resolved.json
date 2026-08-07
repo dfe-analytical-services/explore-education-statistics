@@ -2,14 +2,14 @@
   "schemaId": "azureMonitorCommonAlertSchema",
   "data": {
     "essentials": {
-      "alertId": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.AlertsManagement/alerts/abcdef12-3456-7890-abcd-ef1234567890",
+      "alertId": "/subscriptions/12340000-0000-0000-0000-000000000000/providers/Microsoft.AlertsManagement/alerts/abcdef12-3456-7890-abcd-ef1234567890",
       "alertRule": "ADF Critical Pipeline Failure",
       "severity": "Sev1",
       "signalType": "Metric",
       "monitorCondition": "Resolved",
       "monitoringService": "Platform",
       "alertTargetIDs": [
-        "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/data-platform-rg/providers/microsoft.datafactory/factories/my-production-adf"
+        "/subscriptions/12340000-0000-0000-0000-000000000000/resourcegroups/data-platform-rg/providers/microsoft.datafactory/factories/my-production-adf"
       ],
       "originAlertId": "00000000-0000-0000-0000-000000000000_88888",
       "firedDateTime": "2026-08-07T08:50:00.0000000Z",

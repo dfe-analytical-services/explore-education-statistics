@@ -2,14 +2,14 @@
   "schemaId": "azureMonitorCommonAlertSchema",
   "data": {
     "essentials": {
-      "alertId": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.AlertsManagement/alerts/12345678-1234-1234-1234-1234567890ab",
+      "alertId": "/subscriptions/12340000-0000-0000-0000-000000000000/providers/Microsoft.AlertsManagement/alerts/12345678-1234-1234-1234-1234567890ab",
       "alertRule": "High CPU Usage Alert",
       "severity": "Sev2",
       "signalType": "Metric",
       "monitorCondition": "Resolved",
       "monitoringService": "Platform",
       "alertTargetIDs": [
-        "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/my-production-rg/providers/microsoft.compute/virtualmachines/my-web-server"
+        "/subscriptions/12340000-0000-0000-0000-000000000000/resourcegroups/my-production-rg/providers/microsoft.compute/virtualmachines/my-web-server"
       ],
       "originAlertId": "00000000-0000-0000-0000-000000000000_12345",
       "firedDateTime": "2026-08-07T08:30:00.0000000Z",
