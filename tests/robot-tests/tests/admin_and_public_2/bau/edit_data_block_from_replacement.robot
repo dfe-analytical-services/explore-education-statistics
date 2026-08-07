@@ -109,12 +109,11 @@ Upload a replacement data set and verify replacement details and data block erro
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
     user checks headed table body row cell contains    Data file import status    2    Complete
-    user waits until h3 is visible    Data blocks: ERROR
 
-Edit data block from the pending data replacement page
-    user opens details dropdown    edit data block from replacement data block name
+    user waits until h3 is visible    Data blocks: OK
+    user waits until h3 is visible    Footnotes: OK
 
-    user clicks link containing text    Edit data block
-    user waits until h2 is visible    Edit data block
-    user clicks link    Back to data replacement page
-    user waits until h2 is visible    Pending data replacement
+    # No confirm button because the replacement data set contains an additional filter and there is a data block
+    # so `hasDataBlockAndReplacementHasAdditionalFilter` is true, and hence the replacement-plan is `valid: false`.
+    # The UI doesn't make this clear, which will be fixed in EES-7524
+    user checks page does not contain button    Confirm data replacement
