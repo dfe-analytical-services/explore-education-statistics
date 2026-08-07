@@ -22,6 +22,7 @@ import {
 import reorder from '@common/utils/reorder';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryTextStatTile';
+import EditableApiQueryStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableApiQueryStatTileForm';
 
 interface Props {
   block: EinTileGroupBlock;
@@ -43,8 +44,13 @@ const EditableTileGroupBlock = ({
   onSave,
 }: Props) => {
   const { pageVersion } = useEducationInNumbersPageContentState();
-  const { addTile, updateFreeTextStatTile, deleteTile, reorderTiles } =
-    useEducationInNumbersPageContentActions();
+  const {
+    addTile,
+    updateFreeTextStatTile,
+    updateApiQueryStatTile,
+    deleteTile,
+    reorderTiles,
+  } = useEducationInNumbersPageContentActions();
 
   const [groupTiles, setGroupTiles] = useState(block.tiles);
 
@@ -284,23 +290,22 @@ const EditableTileGroupBlock = ({
                   return (
                     <div key={tile.id}>
                       {isEditingStatTile === tile.id ? (
-                        <p>EditableApiQueryStatTileForm</p> // @MarkFix
+                        <EditableApiQueryStatTileForm
+                          apiQueryStatTile={tile}
+                          testId="freeTextStatTile-editForm"
+                          onSubmit={async values => {
+                            await updateApiQueryStatTile({
+                              educationInNumbersPageId,
+                              blockId: block.id,
+                              sectionId,
+                              tileId: tile.id,
+                              values,
+                            });
+                            setIsEditingStatTile(null);
+                          }}
+                          onCancel={() => setIsEditingStatTile(null)}
+                        />
                       ) : (
-                        // <EditableApiQueryStatTileForm
-                        //   apiQueryStatTile={tile}
-                        //   testId="freeTextStatTile-editForm"
-                        //   onSubmit={async values => {
-                        //     await updateApiQueryStatTile({
-                        //       educationInNumbersPageId,
-                        //       blockId: block.id,
-                        //       sectionId,
-                        //       tileId: tile.id,
-                        //       values,
-                        //     });
-                        //     setIsEditingStatTile(null);
-                        //   }}
-                        //   onCancel={() => setIsEditingStatTile(null)}
-                        // />
                         <>
                           <ApiQueryStatTile key={tile.id} tile={tile} />
                           {!isEditingStatTile && (

@@ -2,6 +2,7 @@ import { FreeTextStatTileFormValues } from '@admin/pages/education-in-numbers/co
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
 import {
+  EinApiQueryStatTile,
   EinBlockType,
   EinContentBlock,
   EinFreeTextStatTile,
@@ -10,6 +11,7 @@ import {
   EinTileGroupBlock,
   EinTileType,
 } from '@common/services/types/einBlocks';
+import { ApiQueryStatTileFormValues } from '@admin/pages/education-in-numbers/content/components/EditableApiQueryStatTileForm';
 
 // ContentSection is shared with release/methodology too
 export type EinEditableContentSection = ContentSection<EinContentBlock>;
@@ -144,7 +146,20 @@ const educationInNumbersContentService = {
     );
   },
 
-  // @MarkFix updateApiQueryStatTile goes here
+  updateApiQueryStatTile({
+    educationInNumbersPageId,
+    tileId,
+    values,
+  }: {
+    educationInNumbersPageId: string;
+    tileId: string;
+    values: ApiQueryStatTileFormValues;
+  }): Promise<EinApiQueryStatTile> {
+    return client.put(
+      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/api-stat`,
+      values,
+    );
+  },
 
   reorderTiles({
     educationInNumbersPageId,

@@ -222,7 +222,7 @@ In Linux:
   - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
     `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
     using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
-  - The Docker container user needs ownership fo the ees-mssql folder. Run  
+  - The Docker container user needs ownership of the ees-mssql folder. Run
   `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
    permissions.
 
@@ -827,7 +827,7 @@ If you're using a custom BaseIntermediateOutputPath or MSBuildProjectExtensionsP
 Use the --msbuildprojectextensionspath option
 ```
 Then what you should do is set the value of the option parameter `msbuildprojectextensionspath` to the `artifacts` folder of the application you are making changes to; for example:
-1) for the Admin applcation (ContentDbContext):
+1) for the Admin application (ContentDbContext):
 ```sh
 dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context ContentDbContext --output-dir Migrations/ContentMigrations -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Admin\
 ```
@@ -891,7 +891,7 @@ docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.jso
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 
-During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthly
+During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthy
 period before the scheduled Publisher Functions run. For this, we provide 2 Functions that can be triggered by HTTP requests; one stages scheduled Releases, whilst the other completes the
 publishing process for any staged Releases and makes them live.
 

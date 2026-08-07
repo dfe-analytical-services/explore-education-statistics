@@ -221,7 +221,7 @@ describe('EducationInNumbersPageContentContext', () => {
   });
 
   test('ADD_TILE_TO_BLOCK adds a tile to a block', () => {
-    // @MarkFix want a version of this with ApiQueryStatTile?
+    // @MarkFix want a version of this with ApiQueryStatTile - same for all other tests that test EinFreeStatTile I think?
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
     const newTile: EinFreeTextStatTile = {
@@ -292,6 +292,8 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(updatedBlock.tiles[0].id).toEqual(tileToUpdate.id);
     expect(updatedBlock.tiles[0].statistic).toEqual(newStatistic);
   });
+
+  // @MarkFix copies of UPDATE_FREE_TEXT tests but for UPDATE_API_QUERY ?
 
   test('REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK reorders tiles in a block', () => {
     const section = testEinPageContent.content[2];

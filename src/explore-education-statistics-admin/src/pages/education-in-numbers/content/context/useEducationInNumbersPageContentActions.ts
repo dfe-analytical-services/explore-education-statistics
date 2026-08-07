@@ -6,6 +6,7 @@ import {
   EinTile,
   EinTileType,
 } from '@common/services/types/einBlocks';
+import { ApiQueryStatTileFormValues } from '@admin/pages/education-in-numbers/content/components/EditableApiQueryStatTileForm';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
 
@@ -280,6 +281,35 @@ export default function useEducationInNumbersPageContentActions() {
     return newTile;
   }
 
+  async function updateApiQueryStatTile({
+    educationInNumbersPageId,
+    blockId,
+    sectionId,
+    tileId,
+    values,
+  }: {
+    educationInNumbersPageId: string;
+    blockId: string;
+    sectionId: string;
+    tileId: string;
+    values: ApiQueryStatTileFormValues;
+  }) {
+    const newTile =
+      await educationInNumbersContentService.updateApiQueryStatTile({
+        educationInNumbersPageId,
+        tileId,
+        values,
+      });
+    dispatch({
+      type: 'UPDATE_API_QUERY_STAT_TILE_IN_BLOCK',
+      payload: {
+        meta: { blockId, sectionId, tileId },
+        tile: newTile,
+      },
+    });
+    return newTile;
+  }
+
   async function reorderTiles({
     educationInNumbersPageId,
     blockId,
@@ -332,6 +362,7 @@ export default function useEducationInNumbersPageContentActions() {
   return {
     addTile,
     updateFreeTextStatTile,
+    updateApiQueryStatTile,
     deleteTile,
     reorderTiles,
     deleteContentSectionBlock,
