@@ -150,7 +150,7 @@
         "withinThresholdMessage": "The @{outputs('Capture raw variables')?['timeAggregation']} of @{outputs('Capture raw variables')?['metricName']} is at @{if(empty(outputs('Capture raw variables')?['metricValue']), 'an acceptable value again', concat(outputs('Capture raw variables')?['metricValue'], ' and is no longer ', outputs('Capture raw variables')?['operator'], ' the ', outputs('Capture raw variables')?['threshold'], ' threshold'))}",
         "severityDisplay": "@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev0'), 'CRITICAL!', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev1'), 'Error!', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev2'), 'Warning', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev3'), 'Information', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev4'), 'Verbose', '')}",
         "severityColour": "@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev0'), 'danger', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev1'), 'danger', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev2'), 'warning', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev3'), 'good', '')}@{if(equals(outputs('Capture raw variables')?['severity'], 'Sev4'), 'good', '')}",
-        "alertRuleUrl": "@{concat('https://portal.azure.com.mcas.ms/#@platform.education.gov.uk/resource', first(split(triggerBody()?['data']?['essentials']?['alertTargetIDs'][0], '/providers/')), '/providers/microsoft.insights/metricAlerts/', outputs('Capture raw variables')?['alertName'], '/overview')}",
+        "alertRuleUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertId']}",
         "alertTargetResourceUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}"
       }
     },
@@ -169,7 +169,7 @@
         "windowEnd": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
         "titleSlack": "*Alert @{outputs('Capture raw variables')?['monitorCondition']}!*\n@{outputs('Capture raw variables')?['alertName']}\n@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), outputs('Compose message fragments')?['withinThresholdMessage'], outputs('Compose message fragments')?['outsideThresholdMessage'])}\n<@{outputs('Compose message fragments')?['alertRuleUrl']}|Link to alert>\n<@{outputs('Compose message fragments')?['alertTargetResourceUrl']}|Link to resource>",
         "titleTeams": "@{concat('Alert ', outputs('Capture raw variables')?['alertName'], ' ', toLower(outputs('Capture raw variables')?['monitorCondition']), if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), '', '!'))}",
-        "alertLinkTeams": "@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), outputs('Compose message fragments')?['withinThresholdMessage'], outputs('Compose message fragments')?['outsideThresholdMessage'])}\n[Link to alert](outputs('Compose message fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('Compose message fragments')?['alertTargetResourceUrl']})"
+        "alertLinkTeams": "@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('Capture raw variables')?['monitorCondition'], 'Resolved'), outputs('Compose message fragments')?['withinThresholdMessage'], outputs('Compose message fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('Compose message fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('Compose message fragments')?['alertTargetResourceUrl']})"
       }
     },
     "HTTP_Webhook": {
@@ -213,6 +213,11 @@
                   {
                     "title": "Window end",
                     "value": "@outputs('Compose message fields')?['windowEnd']",
+                    "short": true
+                  },
+                  {
+                    "title": "Logic App workflow version",
+                    "value": "1.0",
                     "short": true
                   }
                 ]
@@ -285,6 +290,10 @@
                       {
                         "title": "Window End",
                         "value": "@outputs('Compose message fields')?['windowEnd']"
+                      },
+                      {
+                        "title": "Logic App workflow version",
+                        "value": "1.0"
                       }
                     ]
                   }
