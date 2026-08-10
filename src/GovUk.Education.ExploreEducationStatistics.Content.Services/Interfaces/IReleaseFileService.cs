@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,19 @@ public interface IReleaseFileService
     );
 
     Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId, Guid fileId);
+
+    Task<Either<ActionResult, ZipDelivery>> GetZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        IEnumerable<Guid>? fileIds,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, FileStreamResult>> StreamCachedAllFilesZip(
+        Guid releaseVersionId,
+        int formatVersion,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Pipe a zip file containing some release files to a stream.

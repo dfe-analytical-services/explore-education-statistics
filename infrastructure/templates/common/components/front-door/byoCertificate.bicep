@@ -19,7 +19,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
 }
 
 module keyVaultRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${frontDoorName}KeyVaultRoleAssignmentModuleDeploy'
+  name: '${replace(certificateName, '-', '')}KeyVaultRoleAssignmentModuleDeploy'
   params: {
     principalIds: [frontDoor.identity.principalId]
     keyVaultName: keyVaultName
