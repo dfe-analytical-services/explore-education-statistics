@@ -2,21 +2,61 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import ProtectedRoute from '@admin/components/ProtectedRoute';
+import ProtectedRoute, {
+  ProtectedRouteProps,
+} from '@admin/components/ProtectedRoute';
 import { useAuthContext } from '@admin/contexts/AuthContext';
+import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
+import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
+import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
+import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
+import ReleaseApiDataSetFiltersMappingPage from '@admin/pages/release/data/ReleaseApiDataSetFiltersMappingPage';
+import ReleaseApiDataSetIndicatorsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetIndicatorsMappingPage';
+import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
+import ReleaseApiDataSetPreviewPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewPage';
+import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenLogPage';
+import ReleaseApiDataSetPreviewTokenPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenPage';
+import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
+import ReleaseDataFileReplacePage from '@admin/pages/release/data/ReleaseDataFileReplacePage';
+import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
+import ReleaseDataPage from '@admin/pages/release/data/ReleaseDataPage';
+import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
+import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
+import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
+import ReleaseTableToolPage from '@admin/pages/release/datablocks/ReleaseTableToolPage';
+import ReleaseFootnoteCreatePage from '@admin/pages/release/footnotes/ReleaseFootnoteCreatePage';
+import ReleaseFootnoteEditPage from '@admin/pages/release/footnotes/ReleaseFootnoteEditPage';
+import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
+import ReleasePreReleaseAccessPage from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
+import ReleasePublishChecklistPage from '@admin/pages/release/ReleaseChecklistPage';
+import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
+import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
+import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import {
+  releaseAncillaryFileRoute,
+  releaseAncillaryFilesRoute,
+  releaseApiDataSetChangelogRoute,
+  releaseApiDataSetDetailsRoute,
+  releaseApiDataSetFiltersMappingRoute,
+  releaseApiDataSetIndicatorsMappingRoute,
+  releaseApiDataSetLocationsMappingRoute,
+  releaseApiDataSetPreviewRoute,
+  releaseApiDataSetPreviewTokenLogRoute,
+  releaseApiDataSetPreviewTokenRoute,
+  releaseApiDataSetVersionHistoryRoute,
+  releaseApiDataSetsRoute,
+  releaseChecklistRoute,
   releaseContentRoute,
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
   releaseDataBlocksRoute,
+  releaseDataFileReplaceRoute,
   releaseDataFileReplacementCompleteRoute,
   releaseDataRoute,
-  releaseAncillaryFilesRoute,
-  releaseAncillaryFileRoute,
-  releaseDataFileReplaceRoute,
   releaseFootnotesCreateRoute,
   releaseFootnotesEditRoute,
   releaseFootnotesRoute,
@@ -26,26 +66,14 @@ import {
   releaseSummaryEditRoute,
   releaseSummaryRoute,
   releaseTableToolRoute,
-  releaseApiDataSetsRoute,
-  releaseApiDataSetDetailsRoute,
-  releaseApiDataSetFiltersMappingRoute,
-  releaseApiDataSetLocationsMappingRoute,
-  releaseApiDataSetPreviewRoute,
-  releaseApiDataSetPreviewTokenRoute,
-  releaseApiDataSetPreviewTokenLogRoute,
-  releaseApiDataSetVersionHistoryRoute,
-  releaseApiDataSetChangelogRoute,
-  releaseChecklistRoute,
-  releaseApiDataSetIndicatorsMappingRoute,
 } from '@admin/routes/releaseRoutes';
+import { PublicationRouteParams } from '@admin/routes/routes';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 import { generatePath, RouteComponentProps, Switch } from 'react-router';
-import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
-import { PublicationRouteParams } from '@admin/routes/routes';
-import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 
 const allNavRoutes = [
   releaseSummaryRoute,
@@ -58,28 +86,119 @@ const allNavRoutes = [
   releasePreReleaseAccessRoute,
 ];
 
-const routes = [
-  ...allNavRoutes,
-  releaseAncillaryFilesRoute,
-  releaseAncillaryFileRoute,
-  releaseDataFileReplaceRoute,
-  releaseDataFileReplacementCompleteRoute,
-  releaseApiDataSetsRoute,
-  releaseApiDataSetDetailsRoute,
-  releaseApiDataSetFiltersMappingRoute,
-  releaseApiDataSetLocationsMappingRoute,
-  releaseApiDataSetIndicatorsMappingRoute,
-  releaseApiDataSetPreviewRoute,
-  releaseApiDataSetPreviewTokenRoute,
-  releaseApiDataSetPreviewTokenLogRoute,
-  releaseApiDataSetVersionHistoryRoute,
-  releaseApiDataSetChangelogRoute,
-  releaseSummaryEditRoute,
-  releaseFootnotesCreateRoute,
-  releaseFootnotesEditRoute,
-  releaseTableToolRoute,
-  releaseDataBlockCreateRoute,
-  releaseDataBlockEditRoute,
+const routes: ProtectedRouteProps[] = [
+  {
+    ...releaseSummaryRoute,
+    component: ReleaseSummaryPage,
+  },
+  {
+    ...releaseDataRoute,
+    component: ReleaseDataPage,
+  },
+  {
+    ...releaseFootnotesRoute,
+    component: ReleaseFootnotesPage,
+  },
+  {
+    ...releaseDataBlocksRoute,
+    component: ReleaseDataBlocksPage,
+  },
+  {
+    ...releaseContentRoute,
+    component: ReleaseContentPage,
+  },
+  {
+    ...releaseChecklistRoute,
+    component: ReleasePublishChecklistPage,
+  },
+  {
+    ...releaseStatusRoute,
+    component: ReleasePublishStatusPage,
+  },
+  {
+    ...releasePreReleaseAccessRoute,
+    component: ReleasePreReleaseAccessPage,
+  },
+  {
+    ...releaseAncillaryFilesRoute,
+    component: ReleaseDataPage,
+  },
+  {
+    ...releaseAncillaryFileRoute,
+    component: ReleaseAncillaryFilePage,
+  },
+  {
+    ...releaseDataFileReplaceRoute,
+    component: ReleaseDataFileReplacePage,
+  },
+  {
+    ...releaseDataFileReplacementCompleteRoute,
+    component: ReleaseDataFileReplacementCompletePage,
+  },
+  {
+    ...releaseApiDataSetsRoute,
+    component: ReleaseDataPage,
+  },
+  {
+    ...releaseApiDataSetDetailsRoute,
+    component: ReleaseApiDataSetDetailsPage,
+  },
+  {
+    ...releaseApiDataSetFiltersMappingRoute,
+    component: ReleaseApiDataSetFiltersMappingPage,
+  },
+  {
+    ...releaseApiDataSetLocationsMappingRoute,
+    component: ReleaseApiDataSetLocationsMappingPage,
+  },
+  {
+    ...releaseApiDataSetIndicatorsMappingRoute,
+    component: ReleaseApiDataSetIndicatorsMappingPage,
+  },
+  {
+    ...releaseApiDataSetPreviewRoute,
+    component: ReleaseApiDataSetPreviewPage,
+  },
+  {
+    ...releaseApiDataSetPreviewTokenRoute,
+    component: ReleaseApiDataSetPreviewTokenPage,
+  },
+  {
+    ...releaseApiDataSetPreviewTokenLogRoute,
+    component: ReleaseApiDataSetPreviewTokenLogPage,
+  },
+  {
+    ...releaseApiDataSetVersionHistoryRoute,
+    component: ReleaseApiDataSetVersionHistoryPage,
+  },
+  {
+    ...releaseApiDataSetChangelogRoute,
+    component: ReleaseApiDataSetChangelogPage,
+  },
+  {
+    ...releaseSummaryEditRoute,
+    component: ReleaseSummaryEditPage,
+  },
+  {
+    ...releaseFootnotesCreateRoute,
+    component: ReleaseFootnoteCreatePage,
+  },
+  {
+    ...releaseFootnotesEditRoute,
+    component: ReleaseFootnoteEditPage,
+  },
+  {
+    ...releaseTableToolRoute,
+    component: ReleaseTableToolPage,
+  },
+  {
+    ...releaseDataBlockCreateRoute,
+    component: ReleaseDataBlockCreatePage,
+  },
+  {
+    ...releaseDataBlockEditRoute,
+    component: ReleaseDataBlockEditPage,
+  },
 ];
 
 interface MatchProps {

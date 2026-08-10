@@ -2,6 +2,12 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
+import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
+import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
+import MethodologySummaryEditPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryEditPage';
+import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 import {
   methodologyContentRoute,
   MethodologyRouteParams,
@@ -11,15 +17,13 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
-import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
+import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
-import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
-import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -28,8 +32,22 @@ const navRoutes: MethodologyRouteProps[] = [
 ];
 
 const routes: MethodologyRouteProps[] = [
-  ...navRoutes,
-  methodologySummaryEditRoute,
+  {
+    ...methodologySummaryRoute,
+    component: MethodologySummaryPage,
+  },
+  {
+    ...methodologyContentRoute,
+    component: MethodologyContentPage,
+  },
+  {
+    ...methodologyStatusRoute,
+    component: MethodologyStatusPage,
+  },
+  {
+    ...methodologySummaryEditRoute,
+    component: MethodologySummaryEditPage,
+  },
 ];
 
 const MethodologyPage = ({

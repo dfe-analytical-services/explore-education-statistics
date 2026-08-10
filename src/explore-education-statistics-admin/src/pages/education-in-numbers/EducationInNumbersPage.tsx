@@ -2,12 +2,11 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import Tag from '@common/components/Tag';
-import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import EducationInNumbersContentPage from '@admin/pages/education-in-numbers/content/EducationInNumbersContentPage';
+import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
+import EducationInNumbersSignOffPage from '@admin/pages/education-in-numbers/sign-off/EducationInNumbersSignOffPage';
+import EducationInNumbersSummaryEditPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryEditPage';
+import EducationInNumbersSummaryPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryPage';
 import {
   educationInNumbersContentRoute,
   EducationInNumbersRouteParams,
@@ -19,8 +18,13 @@ import {
 import educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
-import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tag from '@common/components/Tag';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import React from 'react';
+import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
 const navRoutes: EducationInNumbersRouteProps[] = [
   educationInNumbersSummaryRoute,
@@ -29,8 +33,22 @@ const navRoutes: EducationInNumbersRouteProps[] = [
 ];
 
 const routes: EducationInNumbersRouteProps[] = [
-  ...navRoutes,
-  educationInNumbersSummaryEditRoute,
+  {
+    ...educationInNumbersSummaryRoute,
+    component: EducationInNumbersSummaryPage,
+  },
+  {
+    ...educationInNumbersContentRoute,
+    component: EducationInNumbersContentPage,
+  },
+  {
+    ...educationInNumbersSignOffRoute,
+    component: EducationInNumbersSignOffPage,
+  },
+  {
+    ...educationInNumbersSummaryEditRoute,
+    component: EducationInNumbersSummaryEditPage,
+  },
 ];
 
 const EducationInNumbersPage = ({
