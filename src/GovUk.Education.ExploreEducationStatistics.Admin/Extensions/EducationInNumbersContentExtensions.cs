@@ -71,6 +71,7 @@ public static class EducationInNumbersContentExtensions
                 DecimalPlaces = statTile.DecimalPlaces,
                 QueryResult = statTile.QueryResult,
                 ReleaseId = statTile.ReleaseId,
+                Version = statTile.Version,
             },
             _ => throw new Exception($"{nameof(EinTile)} type {tile.GetType()} not found"),
         };
