@@ -31,6 +31,12 @@ param publicApiApplicationGatewayFqdn string = ''
 @description('Certificate type for Azure Front Door.')
 param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
+@description('Certificate type for the Content API Azure Front Door domain.')
+param contentApiCertificateType FrontDoorCertificateType = 'BringYourOwn'
+
+@description('Whether to associate the validated Content API custom domain with its Azure Front Door routes and WAF policy.')
+param associateContentApiDomain bool = false
+
 @description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
 param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
 
@@ -47,7 +53,7 @@ param deploySubnets bool = false
 param deployPrivateDnsZones bool = false
 
 @description('Whether or not to deploy Azure Front Door.')
-param deployAzureFrontDoor bool = true
+param deployAzureFrontDoor bool = false
 
 @description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
@@ -179,6 +185,8 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
     publicSiteUrl: publicSiteUrl
     contentApiUrl: contentApiUrl
     certificateType: certificateType
+    contentApiCertificateType: contentApiCertificateType
+    associateContentApiDomain: associateContentApiDomain
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
     deployAlerts: deployAlerts

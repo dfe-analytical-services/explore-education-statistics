@@ -1,4 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
+import { FrontDoorCertificateType } from '../../../common/components/front-door/types.bicep'
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
@@ -22,7 +23,13 @@ param publicSiteUrl string
 param contentApiUrl string
 
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
-param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
+param certificateType FrontDoorCertificateType = 'BringYourOwn'
+
+@description('Choose whether the Content API uses a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
+param contentApiCertificateType FrontDoorCertificateType = 'BringYourOwn'
+
+@description('Whether to associate the validated Content API custom domain with its Azure Front Door routes and WAF policy.')
+param associateContentApiDomain bool = false
 
 @description('Name of the Key Vault instance in which to store certificates.')
 param keyVaultName string
@@ -86,7 +93,8 @@ module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
     keyVaultName: keyVaultName
     contentApiHostName: contentApiHostName
     contentApiOriginHostName: '${subscription}-as-ees-content.azurewebsites.net'
-    certificateType: certificateType
+    certificateType: contentApiCertificateType
+    associateCustomDomain: associateContentApiDomain
   }
   dependsOn: [
     frontDoorModule
