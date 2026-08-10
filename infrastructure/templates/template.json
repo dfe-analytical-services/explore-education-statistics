@@ -8,6 +8,13 @@
     "contentApiUrl": {
       "type": "string"
     },
+    "restrictContentApiOriginToFrontDoor": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Restrict the Content API App Service origin to requests from this environment's Azure Front Door profile. Enable only after the Content API custom domain has been cut over to Front Door."
+      }
+    },
     "dataApiUrl": {
       "type": "string"
     },
@@ -1668,6 +1675,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
+          "ipSecurityRestrictions": "[if(parameters('restrictContentApiOriginToFrontDoor'), array(createObject('ipAddress', 'AzureFrontDoor.Backend', 'action', 'Allow', 'priority', 100, 'name', 'Allow Azure Front Door', 'description', 'Only allow requests routed through this environment Azure Front Door profile.', 'tag', 'ServiceTag', 'headers', createObject('x-azure-fdid', array(reference(resourceId('Microsoft.Cdn/profiles', variables('frontDoorName')), '2025-04-15').frontDoorId)))), createArray())]",
+          "ipSecurityRestrictionsDefaultAction": "[if(parameters('restrictContentApiOriginToFrontDoor'), 'Deny', 'Allow')]",
           "cors": {
             "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
