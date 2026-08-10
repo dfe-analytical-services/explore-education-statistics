@@ -22,6 +22,9 @@ param contentApiOriginHostName string
 @description('Certificate type used by Azure Front Door.')
 param certificateType FrontDoorCertificateType
 
+@description('Whether to associate the validated custom domain with the Content API routes and WAF policy.')
+param associateCustomDomain bool = false
+
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
 var certificateName = '${subscription}-as-ees-content-certificate'
@@ -103,7 +106,7 @@ resource customDomainWithManagedCertificate 'Microsoft.Cdn/profiles/customdomain
   }
 }
 
-resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
+resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = if (associateCustomDomain) {
   parent: endpoint
   name: '${contentApiResourcePrefix}-${abbreviations.frontDoorRoutes}'
   properties: {
@@ -133,7 +136,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   ]
 }
 
-resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
+resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = if (associateCustomDomain) {
   parent: endpoint
   name: '${contentApiResourcePrefix}-all-files-cache-${abbreviations.frontDoorRoutes}'
   properties: {
@@ -170,7 +173,7 @@ resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-
   ]
 }
 
-module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
+module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = if (associateCustomDomain) {
   name: '${contentApiResourcePrefix}WafSecurityPolicyModuleDeploy'
   params: {
     securityPolicyName: '${replace(contentApiResourcePrefix, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'

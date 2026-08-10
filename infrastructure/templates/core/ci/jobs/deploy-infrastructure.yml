@@ -32,6 +32,7 @@ jobs:
                 deploySubnets: false
                 deployPrivateDnsZones: false
                 deployAzureFrontDoor: false
+                associateContentApiDomain: false
                 deployApplicationGateway: false
                 deployAlerts: false
 
@@ -44,5 +45,6 @@ jobs:
                 deploySubnets: $(deploySubnets)
                 deployPrivateDnsZones: $(deployPrivateDnsZones)
                 deployAzureFrontDoor: $(deployAzureFrontDoor)
+                associateContentApiDomain: $(associateContentApiDomain)
                 deployApplicationGateway: $(deployApplicationGateway)
                 deployAlerts: $(deployAlerts)
