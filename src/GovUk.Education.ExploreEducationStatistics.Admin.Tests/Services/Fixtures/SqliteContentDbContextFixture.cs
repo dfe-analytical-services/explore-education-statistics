@@ -23,9 +23,18 @@ public sealed class SqliteContentDbContextFixture : IDisposable
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<ContentDbContext> _options;
 
-    public SqliteContentDbContextFixture()
+    /// <param name="enforceForeignKeys">
+    /// Foreign keys are enforced by default, so that tests surface the referential integrity failures that a
+    /// real database would raise.
+    /// <para>
+    /// Only pass <c>false</c> where a test's data does not yet include the related entities that the model
+    /// requires, and prefer completing the entity graph over opting out. Opting out means the test cannot
+    /// catch a whole class of bug that only appears against a real database.
+    /// </para>
+    /// </param>
+    public SqliteContentDbContextFixture(bool enforceForeignKeys = true)
     {
-        _connection = new SqliteConnection("DataSource=:memory:;Foreign Keys=False"); // Disable foreign keys until all tests have been updated to include related entities
+        _connection = new SqliteConnection($"DataSource=:memory:;Foreign Keys={enforceForeignKeys}");
         _connection.Open();
 
         _options = new DbContextOptionsBuilder<ContentDbContext>()

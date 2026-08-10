@@ -357,7 +357,7 @@ public class ThemeServiceTests
         publication1.LatestPublishedReleaseVersion = null;
         publication1.LatestPublishedReleaseVersionId = null;
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -486,7 +486,7 @@ public class ThemeServiceTests
             )
             .GenerateList();
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -574,7 +574,7 @@ public class ThemeServiceTests
 
         ReleaseVersion release2Version2 = _fixture.DefaultReleaseVersion().WithVersion(1).WithRelease(release2);
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -666,7 +666,7 @@ public class ThemeServiceTests
             Contact = NewContact(),
         };
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -774,7 +774,7 @@ public class ThemeServiceTests
             .DefaultMethodology()
             .WithOwningPublication(otherReleaseVersion.Release.Publication);
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -861,7 +861,7 @@ public class ThemeServiceTests
             Publications = [standardTitleThemePublication],
         };
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var context = fixture.CreateContext())
         {
@@ -936,7 +936,7 @@ public class ThemeServiceTests
         var theme2 = new Theme { Id = Guid.NewGuid(), Title = "Theme 2 to delete" };
         var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "Theme to retain" };
 
-        using var fixture = new SqliteContentDbContextFixture();
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
 
         await using (var context = fixture.CreateContext())
         {
