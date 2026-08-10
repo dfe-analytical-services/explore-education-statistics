@@ -22,15 +22,17 @@ const ApiQueryStatTile = ({
     releaseSlug,
   } = tile;
 
+  // @MarkFix ask Marv/Rich how to display this
   const releaseUrl = `${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`;
 
+  // @MarkFix statistic needs to be formatted using indicatorUnit/decimalPlaces
   return (
     <div className={styles.tile} data-testid={`${testId}-tile`}>
       <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
-        {title ?? '@MarkFix ApiQueryStatTile title is missing'}
+        {title ?? 'No title available'}
       </h4>
       <p className="govuk-heading-m" data-testid={`${testId}-statistic`}>
-        {statistic ?? '@MarkFix missing stat - needs formatting too'}
+        {statistic ?? 'No statistic available'}
       </p>
       <a
         href={releaseUrl}

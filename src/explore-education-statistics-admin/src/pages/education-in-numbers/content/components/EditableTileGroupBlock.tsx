@@ -13,9 +13,7 @@ import ReorderableList from '@common/components/ReorderableList';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
-import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
 import {
-  EinFreeTextStatTile,
   EinTile,
   EinTileGroupBlock,
   EinTileType,
@@ -183,25 +181,10 @@ const EditableTileGroupBlock = ({
             <ReorderableList
               heading="Reorder tiles"
               id="reorder-stat-tiles"
-              list={groupTiles.map(tile => {
-                switch (tile.type) {
-                  case 'FreeTextStatTile':
-                    return {
-                      id: tile.id,
-                      label: `${tile.title} ${tile.statistic} ${tile.trend}`,
-                    };
-                  case 'ApiQueryStatTile':
-                    return {
-                      id: tile.id,
-                      label:
-                        tile.title !== undefined
-                          ? `${tile.title} ${tile.statistic}`
-                          : 'New api query stat tile', // @MarkFix
-                    };
-                  default:
-                    return { id: 'uh oh', label: 'uh oh' }; // @MarkFix
-                }
-              })}
+              list={groupTiles.map(tile => ({
+                id: tile.id,
+                label: getTileReorderLabel(tile),
+              }))}
               onCancel={() => {
                 setGroupTiles(block.tiles);
                 toggleIsReordering.off();
@@ -351,7 +334,7 @@ const EditableTileGroupBlock = ({
                     </div>
                   );
                 default:
-                  return 'This should never happen'; // @MarkFix
+                  return null;
               }
             })
           )}
@@ -364,5 +347,22 @@ const EditableTileGroupBlock = ({
     </EditableBlockWrapper>
   );
 };
+
+function getTileReorderLabel(tile: EinTile): string {
+  switch (tile.type) {
+    case 'FreeTextStatTile':
+      return (
+        `${tile.title} ${tile.statistic} ${tile.trend}`.trim() ||
+        'Unset free text stat tile'
+      );
+    case 'ApiQueryStatTile':
+      return (
+        `${tile.title} ${tile.statistic ?? ''}`.trim() ||
+        'Unset API query stat tile'
+      );
+    default:
+      return 'Unknown tile';
+  }
+}
 
 export default EditableTileGroupBlock;

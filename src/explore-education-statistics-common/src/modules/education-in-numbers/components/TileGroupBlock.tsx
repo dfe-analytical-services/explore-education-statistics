@@ -41,7 +41,7 @@ const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
               </FreeTextStatTileWrapper>
             );
           default:
-            return null; // @MarkFix
+            return null;
         }
       })}
     </div>
