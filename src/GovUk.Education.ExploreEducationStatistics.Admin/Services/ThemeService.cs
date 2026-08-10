@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -149,16 +148,10 @@ public class ThemeService(
                     }
                 }
 
-                // Persisted before reporting any failure, so that the Themes which were deleted successfully
-                // do not have to be deleted again on a retry.
                 await contentDbContext.SaveChangesAsync(cancellationToken);
+                await publishingService.TaxonomyChanged(cancellationToken);
 
-                if (failures.Count > 0)
-                {
-                    return failures[0];
-                }
-
-                return await publishingService.TaxonomyChanged(cancellationToken);
+                return failures.Count > 0 ? failures[0] : Unit.Instance;
             });
     }
 
