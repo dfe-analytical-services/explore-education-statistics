@@ -5,16 +5,17 @@ import React from 'react';
 
 interface Props {
   block: EinContentBlock;
+  publicAppUrl: string;
 }
 
-const EinContentBlockRenderer = ({ block }: Props) => {
+const EinContentBlockRenderer = ({ block, publicAppUrl }: Props) => {
   const { type } = block;
 
   switch (type) {
     case 'HtmlBlock':
       return <ContentHtml html={block.body} />;
     case 'TileGroupBlock':
-      return <TileGroupBlock block={block} />;
+      return <TileGroupBlock block={block} publicAppUrl={publicAppUrl} />;
     default:
       return null;
   }

@@ -210,7 +210,9 @@ const EducationInNumbersAccordionSection = ({
         blocks={blocks}
         isReordering={isReordering}
         onBlocksChange={setBlocks}
-        renderBlock={block => <EinContentBlockRenderer block={block} />}
+        renderBlock={block => (
+          <EinContentBlockRenderer block={block} publicAppUrl={publicAppUrl} />
+        )}
         renderEditableBlock={(block, contentBlockNumber) => {
           const { editLabel, groupButtonsLabel, removeLabel } =
             getBlockButtonLabels(block);

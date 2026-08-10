@@ -4,12 +4,14 @@ import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
 
 export interface ApiQueryStatTileProps {
   tile: EinApiQueryStatTile;
+  publicAppUrl: string;
   testId?: string;
 }
 
 const ApiQueryStatTile = ({
   testId = 'api-query-stat-tile',
   tile,
+  publicAppUrl,
 }: ApiQueryStatTileProps) => {
   const {
     title,
@@ -20,6 +22,8 @@ const ApiQueryStatTile = ({
     releaseSlug,
   } = tile;
 
+  const releaseUrl = `${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`;
+
   return (
     <div className={styles.tile} data-testid={`${testId}-tile`}>
       <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
@@ -29,11 +33,11 @@ const ApiQueryStatTile = ({
         {statistic ?? '@MarkFix missing stat - needs formatting too'}
       </p>
       <a
-        href={`ees.blah/${publicationSlug}/${releaseSlug}`}
+        href={releaseUrl}
         data-testid={`${testId}-link`}
         className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
       >
-        {`ees.blah/${publicationSlug}/${releaseSlug}`}
+        {releaseUrl}
       </a>
     </div>
   );

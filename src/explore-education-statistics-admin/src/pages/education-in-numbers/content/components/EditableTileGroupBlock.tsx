@@ -1,4 +1,5 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import EditableFreeTextStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
 import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
@@ -43,6 +44,7 @@ const EditableTileGroupBlock = ({
   onDelete,
   onSave,
 }: Props) => {
+  const { publicAppUrl } = useConfig();
   const { pageVersion } = useEducationInNumbersPageContentState();
   const {
     addTile,
@@ -307,7 +309,11 @@ const EditableTileGroupBlock = ({
                         />
                       ) : (
                         <>
-                          <ApiQueryStatTile key={tile.id} tile={tile} />
+                          <ApiQueryStatTile
+                            key={tile.id}
+                            tile={tile}
+                            publicAppUrl={publicAppUrl}
+                          />
                           {!isEditingStatTile && (
                             <ButtonGroup className="govuk-!-margin-top-2">
                               <Button

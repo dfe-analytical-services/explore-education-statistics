@@ -11,7 +11,11 @@ const EducationInNumbersSectionBlocks = ({ blocks }: Props) => {
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => (
-        <EinContentBlockRenderer key={block.id} block={block} />
+        <EinContentBlockRenderer
+          key={block.id}
+          block={block}
+          publicAppUrl={process.env.PUBLIC_URL}
+        />
       ))}
     </>
   ) : (

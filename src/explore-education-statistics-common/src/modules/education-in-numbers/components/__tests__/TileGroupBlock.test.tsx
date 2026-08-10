@@ -7,6 +7,7 @@ describe('TileGroupBlock', () => {
   test('Renders correctly', () => {
     render(
       <TileGroupBlock
+        publicAppUrl="https://example.com"
         block={{
           type: 'TileGroupBlock',
           id: 'tile-group-block-1',
@@ -48,6 +49,7 @@ describe('TileGroupBlock', () => {
   test('Renders correctly with no title and one tile', () => {
     render(
       <TileGroupBlock
+        publicAppUrl="https://example.com"
         block={{
           type: 'TileGroupBlock',
           id: 'tile-group-block-1',

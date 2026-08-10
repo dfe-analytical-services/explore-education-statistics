@@ -6,9 +6,10 @@ import ApiQueryStatTile from '@common/modules/education-in-numbers/components/Ap
 
 export interface TileGroupBlockProps {
   block: EinTileGroupBlock;
+  publicAppUrl: string;
 }
 
-const TileGroupBlock = ({ block }: TileGroupBlockProps) => {
+const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
   const { title, tiles } = block;
 
   return (
@@ -31,7 +32,11 @@ const TileGroupBlock = ({ block }: TileGroupBlockProps) => {
               <FreeTextStatTileWrapper>
                 {' '}
                 {/* @MarkFix generic wrapper? */}
-                <ApiQueryStatTile key={tile.id} tile={tile} />{' '}
+                <ApiQueryStatTile
+                  key={tile.id}
+                  tile={tile}
+                  publicAppUrl={publicAppUrl}
+                />{' '}
                 {/* // @MarkFix */}
               </FreeTextStatTileWrapper>
             );
