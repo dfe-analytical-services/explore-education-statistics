@@ -1,5 +1,5 @@
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
-import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
+import TileWrapper from '@common/modules/education-in-numbers/components/TileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import React from 'react';
 import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryTextStatTile';
@@ -23,16 +23,15 @@ const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
         switch (tile.type) {
           case 'FreeTextStatTile':
             return (
-              <FreeTextStatTileWrapper key={tile.id}>
+              <TileWrapper key={tile.id}>
                 <FreeTextStatTile tile={tile} />
-              </FreeTextStatTileWrapper>
+              </TileWrapper>
             );
           case 'ApiQueryStatTile':
             return (
-              // @MarkFix generic wrapper?
-              <FreeTextStatTileWrapper key={tile.id}>
+              <TileWrapper key={tile.id}>
                 <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />
-              </FreeTextStatTileWrapper>
+              </TileWrapper>
             );
           default:
             return null;
