@@ -46,6 +46,10 @@ var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
 var contentApiHostName = replace(contentApiUrl, 'https://', '')
 
 var certificateName = '${subscription}-as-ees-public-site-certificate'
+var publicSiteCustomDomainName = '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+var contentApiCustomDomainName = '${subscription}-ees-content-${abbreviations.frontDoorDomains}'
+var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
+var wafSecurityPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
 
 var nextJsRuleSetName = 'nextjsruleset'
 
@@ -57,12 +61,13 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     keyVaultName: keyVaultName
     siteHostName: publicSiteHostName
     originHostName: '${subscription}-as-ees-public-site.azurewebsites.net'
-    customDomainName: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+    customDomainName: publicSiteCustomDomainName
     certificateType: certificateType
     certificateName: certificateType == 'BringYourOwn' ? certificateName : null
     ruleSetNames: [nextJsRuleSetName]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployWaf: true
+    deployWafSecurityPolicy: false
     alerts: deployAlerts ? {
       latency: true
       originHealth: true
@@ -90,6 +95,23 @@ module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
   }
   dependsOn: [
     frontDoorModule
+  ]
+}
+
+module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
+  name: '${frontDoorProfileName}WafSecurityPolicyModule'
+  params: {
+    securityPolicyName: wafSecurityPolicyName
+    wafPolicyName: wafPolicyName
+    customDomainNames: [
+      publicSiteCustomDomainName
+      contentApiCustomDomainName
+    ]
+    frontDoorProfileName: frontDoorProfileName
+  }
+  dependsOn: [
+    frontDoorModule
+    contentApiFrontDoorModule
   ]
 }
 

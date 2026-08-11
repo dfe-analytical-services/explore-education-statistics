@@ -7,8 +7,8 @@ param wafPolicyName string
 @description('Name of the Azure Front Door profile.')
 param frontDoorProfileName string
 
-@description('Name of the custom domain to associate this policy with.')
-param customDomainName string
+@description('Names of the custom domains to associate this policy with.')
+param customDomainNames string[]
 
 resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@2025-10-01' existing = {
   name: wafPolicyName
@@ -16,11 +16,6 @@ resource wafPolicy 'Microsoft.Network/frontdoorwebapplicationfirewallpolicies@20
 
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
-}
-
-resource customDomain 'Microsoft.Cdn/profiles/customdomains@2025-04-15' existing = {
-  parent: frontDoorProfile
-  name: customDomainName
 }
 
 resource securityPolicy 'Microsoft.Cdn/profiles/securitypolicies@2025-09-01-preview' = {
@@ -35,8 +30,8 @@ resource securityPolicy 'Microsoft.Cdn/profiles/securitypolicies@2025-09-01-prev
       associations: [
         {
           domains: [
-            {
-              id: customDomain.id
+            for customDomainName in customDomainNames: {
+              id: resourceId('Microsoft.Cdn/profiles/customdomains', frontDoorProfileName, customDomainName)
             }
           ]
           patternsToMatch: [

@@ -21,7 +21,6 @@ param contentApiOriginHostName string
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
 var certificateName = '${subscription}-as-ees-content-afd-certificate'
-var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
@@ -150,18 +149,5 @@ resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-
   }
   dependsOn: [
     origin
-  ]
-}
-
-module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
-  name: '${contentApiResourcePrefix}WafSecurityPolicyModuleDeploy'
-  params: {
-    securityPolicyName: '${replace(contentApiResourcePrefix, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
-    wafPolicyName: wafPolicyName
-    customDomainName: customDomainName
-    frontDoorProfileName: frontDoorProfileName
-  }
-  dependsOn: [
-    customDomainWithCertificate
   ]
 }
