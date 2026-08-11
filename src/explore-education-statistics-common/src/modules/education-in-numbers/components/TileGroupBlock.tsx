@@ -23,21 +23,15 @@ const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
         switch (tile.type) {
           case 'FreeTextStatTile':
             return (
-              <FreeTextStatTileWrapper>
-                <FreeTextStatTile key={tile.id} tile={tile} />
+              <FreeTextStatTileWrapper key={tile.id}>
+                <FreeTextStatTile tile={tile} />
               </FreeTextStatTileWrapper>
             );
           case 'ApiQueryStatTile':
             return (
-              <FreeTextStatTileWrapper>
-                {' '}
-                {/* @MarkFix generic wrapper? */}
-                <ApiQueryStatTile
-                  key={tile.id}
-                  tile={tile}
-                  publicAppUrl={publicAppUrl}
-                />{' '}
-                {/* // @MarkFix */}
+              // @MarkFix generic wrapper?
+              <FreeTextStatTileWrapper key={tile.id}>
+                <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />
               </FreeTextStatTileWrapper>
             );
           default:

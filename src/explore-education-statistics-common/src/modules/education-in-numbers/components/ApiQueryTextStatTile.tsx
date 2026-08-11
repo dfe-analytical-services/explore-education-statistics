@@ -4,6 +4,10 @@ import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
 
 export interface ApiQueryStatTileProps {
   tile: EinApiQueryStatTile;
+  /**
+   * Must not end with a slash. Both apps normalise this
+   * where they load their config.
+   */
   publicAppUrl: string;
   testId?: string;
 }
@@ -23,11 +27,7 @@ const ApiQueryStatTile = ({
   } = tile;
 
   // @MarkFix ask Marv/Rich how to display this
-  // publicAppUrl may or may not end with a slash, depending on how it's configured
-  const releaseUrl = `${publicAppUrl.replace(
-    /\/$/,
-    '',
-  )}/find-statistics/${publicationSlug}/${releaseSlug}`;
+  const releaseUrl = `${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`;
 
   // @MarkFix statistic needs to be formatted using indicatorUnit/decimalPlaces
   return (
