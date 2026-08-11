@@ -1,7 +1,6 @@
 #!/usr/bin/env ts-node
 
 import { Argument, Command, Option } from '@commander-js/extra-typings';
-import chalk, { ChalkInstance } from 'chalk';
 import { $, ExecaChildProcess } from 'execa';
 import fs from 'node:fs';
 import { EOL } from 'node:os';
@@ -13,205 +12,26 @@ import kill from 'tree-kill';
 import delay from './utils/delay';
 import exitProcess from './utils/exitProcess';
 import { logColours, logError, logInfo } from './utils/logging';
-import { getDirname, getFilename } from './utils/nodeGlobals';
+import { getDirname } from './utils/nodeGlobals';
 import onExitSignal from './utils/onExitSignal';
 import createFileLock from './utils/createFileLock';
 import { ExecaChildProcessWithoutNullStreams } from './utils/types';
+import {
+  buildRunCommand,
+  DockerService,
+  dotnetBuildLockFile,
+  projectRoot,
+  ServiceName,
+  serviceSchemas,
+} from './services';
 
 const __dirname = getDirname(import.meta.url);
-const __filename = getFilename(import.meta.url);
 const accountRoot = path.resolve(__dirname, '../..');
-const projectRoot = path.resolve(__dirname, '..');
 
 const screenerRepositoryName = 'ees-screener-api';
 const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
 const screenerRepoUrl =
   'https://github.com/dfe-analytical-services/ees-screener-api';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const allowedDockerServices = [
-  'db',
-  'data-storage',
-  'idp',
-  'public-api-db',
-  'data-screener',
-] as const;
-
-type DockerService = (typeof allowedDockerServices)[number];
-
-type ServiceSchema = {
-  colour: ChalkInstance;
-  type: 'dotnet' | 'func' | 'docker' | 'command';
-} & (
-  | {
-      type: 'dotnet';
-      root: string;
-      dockerServices?: ServiceSchemaDockerServices;
-    }
-  | {
-      type: 'func';
-      root: string;
-      port: number;
-      dockerServices?: ServiceSchemaDockerServices;
-    }
-  | {
-      type: 'docker';
-      service: DockerService;
-    }
-  | {
-      type: 'command';
-      root: string;
-      command: string | ((options: ProgramOptions) => string);
-      checkReady?: (line: string) => boolean;
-      dockerServices?: ServiceSchemaDockerServices;
-    }
-);
-
-type ServiceSchemaDockerServices =
-  DockerService[] | ((options: ProgramOptions) => DockerService[]);
-
-// Annoyingly, need to define these separately from schemas,
-// or we run into various circular reference issues in the types.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const allowedServiceNames = [
-  'admin',
-  'analytics',
-  'content',
-  'data',
-  'frontend',
-  'frontendProd',
-  'processor',
-  'publicApiDb',
-  'publicData',
-  'publicProcessor',
-  'publisher',
-  'notifier',
-  'idp',
-  'db',
-  'dataStorage',
-  'searchFunctionApp',
-  'dataScreener',
-] as const;
-
-type ServiceName = (typeof allowedServiceNames)[number];
-
-const serviceSchemas: Record<ServiceName, ServiceSchema> = {
-  admin: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Admin',
-    colour: chalk.green,
-    type: 'dotnet',
-    dockerServices() {
-      return fs.existsSync(
-        path.join(projectRoot, this.root, 'appsettings.Idp.json'),
-      )
-        ? ['db', 'data-storage', 'public-api-db', 'data-screener']
-        : ['db', 'data-storage', 'public-api-db', 'idp', 'data-screener'];
-    },
-  },
-  analytics: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Analytics.Consumer',
-    colour: chalk.rgb(165, 158, 255),
-    port: 7076,
-    type: 'func',
-    dockerServices: ['data-storage'],
-  },
-  content: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Api',
-    colour: chalk.cyan,
-    type: 'dotnet',
-    dockerServices: ['db', 'data-storage'],
-  },
-  data: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Api',
-    colour: chalk.magenta,
-    type: 'dotnet',
-    dockerServices: ['db', 'data-storage'],
-  },
-  frontend: {
-    root: 'src/explore-education-statistics-frontend',
-    command: 'pnpm dev',
-    colour: chalk.greenBright,
-    checkReady: line => line.startsWith('Server started on '),
-    type: 'command',
-  },
-  frontendProd: {
-    root: 'src/explore-education-statistics-frontend',
-    command(options) {
-      return options.skipBuild ? 'pnpm start' : 'pnpm build && pnpm start';
-    },
-    colour: chalk.greenBright,
-    checkReady: line => line.startsWith('Server started on '),
-    type: 'command',
-  },
-  publicData: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api',
-    colour: chalk.magentaBright,
-    type: 'dotnet',
-    dockerServices: ['public-api-db'],
-  },
-  processor: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Processor',
-    colour: chalk.rgb(255, 158, 165),
-    port: 7071,
-    type: 'func',
-    dockerServices: ['db', 'data-storage'],
-  },
-  publisher: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Publisher',
-    colour: chalk.yellow,
-    port: 7072,
-    type: 'func',
-    dockerServices: ['db', 'data-storage', 'public-api-db'],
-  },
-  notifier: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Notifier',
-    colour: chalk.blue,
-    port: 7073,
-    type: 'func',
-    dockerServices: ['data-storage'],
-  },
-  publicProcessor: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor',
-    colour: chalk.blue,
-    port: 7074,
-    type: 'func',
-    dockerServices: ['db', 'public-api-db', 'data-storage'],
-  },
-  searchFunctionApp: {
-    root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp',
-    colour: chalk.rgb(255, 102, 0),
-    port: 7075,
-    type: 'func',
-    dockerServices: ['data-storage'],
-  },
-  dataScreener: {
-    colour: chalk.rgb(0, 255, 221),
-    service: 'data-screener',
-    type: 'docker',
-  },
-  idp: {
-    service: 'idp',
-    colour: chalk.gray,
-    type: 'docker',
-  },
-  db: {
-    service: 'db',
-    colour: chalk.blue,
-    type: 'docker',
-  },
-  dataStorage: {
-    service: 'data-storage',
-    colour: chalk.green,
-    type: 'docker',
-  },
-  publicApiDb: {
-    service: 'public-api-db',
-    colour: chalk.blue,
-    type: 'docker',
-  },
-};
-
-type ProgramOptions = ReturnType<(typeof program)['opts']>;
 
 const program = new Command()
   .description(
@@ -385,70 +205,36 @@ async function startService(service: ServiceName): Promise<void> {
   let beforeTask: (() => void | Promise<void>) | undefined;
   let checkReady: ((line: string) => boolean) | undefined;
 
-  const env = {
+  let env: NodeJS.ProcessEnv = {
     ...process.env,
   };
 
-  switch (schema.type) {
-    case 'dotnet': {
-      command = 'dotnet run';
+  if (schema.type === 'docker') {
+    command = 'docker compose logs';
+    args = ['-f', '--no-log-prefix'];
 
-      env.ASPNETCORE_ENVIRONMENT ??= 'Development';
-      env.MSBUILDDISABLENODEREUSE = '1';
-
-      lockUntilReady = true;
-      checkReady = line => line.startsWith('Server listening on address:');
-
-      break;
+    if (programOpts.rebuildDocker) {
+      args.push('--build', '--force-recreate');
     }
-    case 'func': {
-      command = 'dotnet run';
-      args = ['--port', `${schema.port}`, '--pause-on-error'];
 
-      env.ASPNETCORE_ENVIRONMENT ??= 'Development';
-      env.MSBUILDDISABLENODEREUSE = '1';
+    args.push(schema.service);
+  } else {
+    const runCommand = buildRunCommand(service, programOpts, env);
 
-      lockUntilReady = true;
-      checkReady = line => line.startsWith('Function Runtime Version:');
-
-      break;
-    }
-    case 'command': {
-      command =
-        typeof schema.command === 'function'
-          ? schema.command.call(schema, programOpts)
-          : schema.command;
-
-      checkReady = schema.checkReady;
-
-      break;
-    }
-    case 'docker': {
-      command = 'docker compose logs';
-      args = ['-f', '--no-log-prefix'];
-
-      if (programOpts.rebuildDocker) {
-        args.push('--build', '--force-recreate');
-      }
-
-      args.push(schema.service);
-
-      break;
-    }
-    default:
-      throw new Error('Unknown service definition type');
+    command = runCommand.command;
+    args = runCommand.args;
+    env = runCommand.env;
+    checkReady = runCommand.checkReady;
+    lockUntilReady = runCommand.lockUntilReady;
   }
 
-  const lockFile = __filename;
   const message = logColours.info(
-    `Waiting for another process to finish with lock on '${path.basename(
-      lockFile,
-    )}'...`,
+    'Waiting for another build to finish (started from the CLI or the dashboard)...',
   );
 
   const unlock = lockUntilReady
     ? await createFileLock({
-        lockFile,
+        lockFile: dotnetBuildLockFile,
         lockTimeout: 300_000,
         waitTimeout: 300_000,
         onExistingLock: () => logService(service, message),

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EES Local Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>EES Local Dashboard</h1>
+      <p class="subtitle">
+        Services started here are tracked live. Anything started separately via
+        <code>pnpm start</code> in a terminal won't show as running here.
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Docker services</h2>
+        <div id="docker-services" class="card-grid"></div>
+      </section>
+
+      <section>
+        <h2>App processes</h2>
+        <div id="app-services" class="card-grid"></div>
+      </section>
+
+      <section>
+        <h2>Backups</h2>
+        <div id="backup-stores" class="backup-grid"></div>
+      </section>
+    </main>
+
+    <div id="log-panel" class="log-panel hidden">
+      <div class="log-panel-header">
+        <span id="log-panel-title"></span>
+        <button id="log-panel-close">Close</button>
+      </div>
+      <pre id="log-panel-content" class="log-panel-content"></pre>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

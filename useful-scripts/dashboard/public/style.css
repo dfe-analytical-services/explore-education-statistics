@@ -1,0 +1,284 @@
+:root {
+  color-scheme: dark;
+  --bg: #14171c;
+  --panel: #1c2028;
+  --border: #2c313c;
+  --text: #e4e7ec;
+  --muted: #8a91a0;
+  --green: #3fbf6a;
+  --red: #e5534b;
+  --amber: #d9a441;
+  --blue: #4d8ff0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.4rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+main {
+  padding: 1.5rem 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-name {
+  font-weight: 600;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+}
+
+.status-running {
+  background: var(--green);
+}
+
+.status-stopped {
+  background: var(--muted);
+}
+
+.status-starting,
+.status-stopping {
+  background: var(--amber);
+}
+
+.status-error {
+  background: var(--red);
+}
+
+.status-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.card-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+button {
+  background: #262b35;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--blue);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.danger:hover {
+  border-color: var(--red);
+}
+
+.primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #0a0f1a;
+  font-weight: 600;
+}
+
+.backup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.backup-store {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.backup-store h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.backup-create-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.backup-create-row input {
+  flex: 1;
+  background: #10131a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.backup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.backup-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: #10131a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.backup-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.backup-item-label {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.backup-item-meta {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.backup-item-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.empty-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.log-panel {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(560px, calc(100vw - 2rem));
+  height: min(360px, calc(100vh - 2rem));
+  background: #0b0d12;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.log-panel.hidden {
+  display: none;
+}
+
+.log-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.log-panel-content {
+  margin: 0;
+  padding: 0.75rem;
+  overflow-y: auto;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+  }
+}
