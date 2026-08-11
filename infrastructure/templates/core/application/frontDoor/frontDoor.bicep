@@ -25,12 +25,6 @@ param contentApiUrl string
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
 param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
-@description('Choose whether the Content API uses a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
-param contentApiCertificateType FrontDoorCertificateType = 'BringYourOwn'
-
-@description('Whether to associate the validated Content API custom domain with its Azure Front Door routes and WAF policy.')
-param associateContentApiDomain bool = false
-
 @description('Name of the Key Vault instance in which to store certificates.')
 param keyVaultName string
 
@@ -93,8 +87,6 @@ module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
     keyVaultName: keyVaultName
     contentApiHostName: contentApiHostName
     contentApiOriginHostName: '${subscription}-as-ees-content.azurewebsites.net'
-    certificateType: contentApiCertificateType
-    associateCustomDomain: associateContentApiDomain
   }
   dependsOn: [
     frontDoorModule

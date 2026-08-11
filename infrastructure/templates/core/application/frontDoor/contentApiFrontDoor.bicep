@@ -1,5 +1,4 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
-import { FrontDoorCertificateType } from '../../../common/components/front-door/types.bicep'
 
 @description('Environment subscription prefix.')
 param subscription string
@@ -18,12 +17,6 @@ param contentApiHostName string
 
 @description('App Service hostname used as the Content API origin.')
 param contentApiOriginHostName string
-
-@description('Certificate type used by Azure Front Door.')
-param certificateType FrontDoorCertificateType
-
-@description('Whether to associate the validated custom domain with the Content API routes and WAF policy.')
-param associateCustomDomain bool = false
 
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
@@ -67,7 +60,7 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
   }
 }
 
-module certificateModule '../../../common/components/front-door/byoCertificate.bicep' = if (certificateType == 'BringYourOwn') {
+module certificateModule '../../../common/components/front-door/byoCertificate.bicep' = {
   name: '${contentApiResourcePrefix}CertificateModuleDeploy'
   params: {
     keyVaultName: keyVaultName
@@ -77,7 +70,7 @@ module certificateModule '../../../common/components/front-door/byoCertificate.b
   }
 }
 
-resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'BringYourOwn') {
+resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
   parent: frontDoor
   name: customDomainName
   properties: {
@@ -93,26 +86,13 @@ resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-
   }
 }
 
-resource customDomainWithManagedCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = if (certificateType == 'Provisioned') {
-  parent: frontDoor
-  name: customDomainName
-  properties: {
-    hostName: contentApiHostName
-    tlsSettings: {
-      certificateType: 'ManagedCertificate'
-      minimumTlsVersion: 'TLS12'
-      cipherSuiteSetType: 'TLS12_2023'
-    }
-  }
-}
-
-resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = if (associateCustomDomain) {
+resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
   name: '${contentApiResourcePrefix}-${abbreviations.frontDoorRoutes}'
   properties: {
     customDomains: [
       {
-        id: certificateType == 'BringYourOwn' ? customDomainWithCertificate.id : customDomainWithManagedCertificate.id
+        id: customDomainWithCertificate.id
       }
     ]
     originGroup: {
@@ -136,13 +116,13 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = if (ass
   ]
 }
 
-resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = if (associateCustomDomain) {
+resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
   name: '${contentApiResourcePrefix}-all-files-cache-${abbreviations.frontDoorRoutes}'
   properties: {
     customDomains: [
       {
-        id: certificateType == 'BringYourOwn' ? customDomainWithCertificate.id : customDomainWithManagedCertificate.id
+        id: customDomainWithCertificate.id
       }
     ]
     originGroup: {
@@ -173,7 +153,7 @@ resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-
   ]
 }
 
-module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = if (associateCustomDomain) {
+module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
   name: '${contentApiResourcePrefix}WafSecurityPolicyModuleDeploy'
   params: {
     securityPolicyName: '${replace(contentApiResourcePrefix, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
@@ -183,6 +163,5 @@ module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurit
   }
   dependsOn: [
     customDomainWithCertificate
-    customDomainWithManagedCertificate
   ]
 }
