@@ -20,7 +20,7 @@ param contentApiOriginHostName string
 
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
-var certificateName = '${subscription}-as-ees-content-certificate'
+var certificateName = '${subscription}-as-ees-content-afd-certificate'
 var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
