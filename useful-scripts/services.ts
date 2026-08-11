@@ -12,8 +12,17 @@ export const projectRoot = path.resolve(__dirname, '..');
  * Shared lock file used to serialize `dotnet build`s across every tool that
  * can start services (the `start` CLI and the dashboard), since concurrent
  * builds risk https://github.com/dotnet/sdk/issues/9487.
+ *
+ * `cross-process-lock` requires its target file to already exist, so it's
+ * created here (once, on module load) rather than relying on some source
+ * file happening to exist at this path, the way `start.ts` used to rely on
+ * its own `__filename`.
  */
 export const dotnetBuildLockFile = path.join(__dirname, '.dotnet-build');
+
+if (!fs.existsSync(dotnetBuildLockFile)) {
+  fs.writeFileSync(dotnetBuildLockFile, '');
+}
 
 export const allowedDockerServices = [
   'db',

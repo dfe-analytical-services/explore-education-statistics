@@ -28,9 +28,17 @@ export async function getDockerStatuses(): Promise<
     .map(line => line.trim())
     .filter(Boolean)
     .forEach(line => {
-      const entry = JSON.parse(line) as ComposePsEntry;
-      statuses[entry.Service as DockerService] =
-        entry.State === 'running' ? 'running' : 'stopped';
+      // `compose ps` output can be interleaved with unrelated warning lines
+      // (e.g. while another `compose up`/`stop` is running concurrently), so
+      // a line failing to parse as JSON shouldn't take down the whole
+      // request - just skip it and let the next poll pick up the real state.
+      try {
+        const entry = JSON.parse(line) as ComposePsEntry;
+        statuses[entry.Service as DockerService] =
+          entry.State === 'running' ? 'running' : 'stopped';
+      } catch {
+        // Ignore malformed lines.
+      }
     });
 
   return statuses;
