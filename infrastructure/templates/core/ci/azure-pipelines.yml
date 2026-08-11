@@ -33,13 +33,6 @@ parameters:
       - Yes
       - No
     default: No
-  - name: associateContentApiDomain
-    displayName: Has the Content API domain been validated and should it be associated with Azure Front Door routes?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
   - name: deployApplicationGateway
     displayName: Does Application Gateway need creating or updating?
     type: string
@@ -84,8 +77,6 @@ variables:
     value: ${{ iif(eq(parameters.deployPrivateDnsZones, 'Yes'), true, false) }}
   - name: deployAzureFrontDoor
     value: ${{ iif(eq(parameters.deployAzureFrontDoor, 'Yes'), true, false) }}
-  - name: associateContentApiDomain
-    value: ${{ iif(eq(parameters.associateContentApiDomain, 'Yes'), true, false) }}
   - name: deployApplicationGateway
     value: ${{ iif(eq(parameters.deployApplicationGateway, 'Yes'), true, false) }}
   - name: deployAlerts

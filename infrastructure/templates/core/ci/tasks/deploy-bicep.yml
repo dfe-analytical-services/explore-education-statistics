@@ -17,8 +17,6 @@ parameters:
     type: string
   - name: deployAzureFrontDoor
     type: string
-  - name: associateContentApiDomain
-    type: string
   - name: deployApplicationGateway
     type: string
   - name: deployAlerts
@@ -46,7 +44,6 @@ steps:
               deploySubnets=${{ parameters.deploySubnets }} \
               deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
               deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
-              associateContentApiDomain=${{ parameters.associateContentApiDomain }} \
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'
