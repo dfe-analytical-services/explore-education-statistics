@@ -8,7 +8,10 @@
   </head>
   <body>
     <header>
-      <h1>EES Local Dashboard</h1>
+      <div class="section-header">
+        <h1>EES Local Dashboard</h1>
+        <button id="stop-all-btn" class="danger">Stop everything</button>
+      </div>
       <p class="subtitle">
         Services started here are tracked live. Anything started separately via
         <code>pnpm start</code> in a terminal won't show as running here.
@@ -28,10 +31,36 @@
 
       <section>
         <h2>Backups</h2>
-        <div id="backup-stores" class="backup-grid"></div>
+        <div id="backup-panel"></div>
+      </section>
+
+      <section>
+        <h2>Test data</h2>
+        <div id="test-data-panel" class="backup-store">
+          <p class="card-meta">
+            Latest <code>ees-mssql-data-xx.zip</code> snapshots are shared in
+            <a
+              href="https://drive.google.com/drive/u/0/folders/1hqsOGQWPQSmxiRwEfarT2meTw9DsfMv8"
+              target="_blank"
+              rel="noopener noreferrer"
+              >this Google Drive folder</a
+            >.
+          </p>
+          <div class="backup-create-row">
+            <input id="mssql-import-input" type="file" accept=".zip" />
+            <button id="mssql-import-btn" class="primary">Import</button>
+          </div>
+          <p class="card-meta">
+            Stops the db and any running app processes, extracts the zip over
+            <code>data/ees-mssql</code>, then restarts the db.
+          </p>
+        </div>
       </section>
     </main>
 
+    <div id="alert-toasts" class="alert-toasts"></div>
+
+    <div id="log-panel-backdrop" class="log-panel-backdrop hidden"></div>
     <div id="log-panel" class="log-panel hidden">
       <div class="log-panel-header">
         <span id="log-panel-title"></span>

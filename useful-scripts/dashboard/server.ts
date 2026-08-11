@@ -1,39 +1,46 @@
 import express from 'express';
+import multer from 'multer';
+import os from 'node:os';
 import path from 'node:path';
+import fsp from 'node:fs/promises';
 import process from 'node:process';
 import {
   allowedServiceNames,
   resolveDockerServices,
+  resolveServiceDependencies,
   ServiceName,
   serviceSchemas,
 } from '../services';
 import { getDirname } from '../utils/nodeGlobals';
 import onExitSignal from '../utils/onExitSignal';
 import {
-  BackupStore,
-  createBackup,
-  deleteBackup,
-  listBackups,
-  restoreBackup,
+  createUnifiedBackup,
+  deleteUnifiedBackup,
+  listUnifiedBackups,
+  restoreUnifiedBackup,
 } from './backups';
 import {
   getDockerStatuses,
   startDockerServices,
+  stopAllDockerServices,
   stopDockerServices,
 } from './dockerManager';
 import {
+  getAlerts,
   getError,
   getLogs,
   getStatus,
   startProcess,
   stopAllProcesses,
+  stopAllStartedProcesses,
   stopProcess,
+  subscribeAlerts,
   subscribeLogs,
 } from './processManager';
+import importMssqlDataZip from './testData';
 
 const __dirname = getDirname(import.meta.url);
 const PORT = Number(process.env.DASHBOARD_PORT ?? 4300);
-const BACKUP_STORES: BackupStore[] = ['mssql', 'postgres', 'azurite'];
 
 // Node treats an unhandled rejection as fatal by default, which would
 // otherwise take down this long-running server (and any dev processes it's
@@ -47,10 +54,6 @@ process.on('uncaughtException', err => {
 
 function isServiceName(value: string): value is ServiceName {
   return (allowedServiceNames as readonly string[]).includes(value);
-}
-
-function isBackupStore(value: string): value is BackupStore {
-  return (BACKUP_STORES as string[]).includes(value);
 }
 
 function errorMessage(err: unknown): string {
@@ -76,6 +79,15 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const uploadZip = multer({
+  storage: multer.diskStorage({
+    destination: os.tmpdir(),
+    filename: (_req, _file, cb) =>
+      cb(null, `ees-mssql-import-${Date.now()}.zip`),
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 * 1024 },
+});
+
 app.get(
   '/api/services',
   asyncHandler(async (_req, res) => {
@@ -90,6 +102,7 @@ app.get(
           kind: 'docker' as const,
           dockerService: schema.service,
           status: dockerStatuses[schema.service] ?? 'stopped',
+          url: schema.url,
         };
       }
 
@@ -99,7 +112,11 @@ app.get(
         processType: schema.type,
         status: getStatus(name),
         error: getError(name),
+        dependsOnServices: resolveServiceDependencies(name),
         dependsOn: resolveDockerServices(name, {}),
+        url: schema.url,
+        group: schema.group,
+        conflictsWith: schema.conflictsWith,
       };
     });
 
@@ -151,6 +168,15 @@ app.post(
   }),
 );
 
+app.post(
+  '/api/services/stop-all',
+  asyncHandler(async (_req, res) => {
+    await stopAllStartedProcesses();
+    await stopAllDockerServices();
+    res.json({ ok: true });
+  }),
+);
+
 app.get('/api/services/:name/logs', (req, res) => {
   const { name } = req.params;
 
@@ -175,20 +201,27 @@ app.get('/api/services/:name/logs', (req, res) => {
   req.on('close', () => unsubscribe());
 });
 
+app.get('/api/alerts', (_req, res) => {
+  res.json({ alerts: getAlerts() });
+});
+
+app.get('/api/alerts/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const unsubscribe = subscribeAlerts(alert => {
+    res.write(`data: ${JSON.stringify(alert)}\n\n`);
+  });
+
+  req.on('close', () => unsubscribe());
+});
+
 app.get(
   '/api/backups',
-  asyncHandler(async (req, res) => {
-    const { store } = req.query;
-
-    if (typeof store === 'string' && !isBackupStore(store)) {
-      res.status(400).json({ error: `Unknown backup store '${store}'` });
-      return;
-    }
-
-    const backups = await listBackups(
-      typeof store === 'string' ? store : undefined,
-    );
-
+  asyncHandler(async (_req, res) => {
+    const backups = await listUnifiedBackups();
     res.json({ backups });
   }),
 );
@@ -196,15 +229,9 @@ app.get(
 app.post(
   '/api/backups',
   asyncHandler(async (req, res) => {
-    const { store, label } = req.body ?? {};
+    const { label } = req.body ?? {};
 
-    if (typeof store !== 'string' || !isBackupStore(store)) {
-      res.status(400).json({ error: `Unknown backup store '${store}'` });
-      return;
-    }
-
-    const backup = await createBackup(
-      store,
+    const backup = await createUnifiedBackup(
       typeof label === 'string' ? label : '',
     );
     res.json({ backup });
@@ -212,33 +239,57 @@ app.post(
 );
 
 app.post(
-  '/api/backups/:store/:id/restore',
+  '/api/backups/:id/restore',
   asyncHandler(async (req, res) => {
-    const { store, id } = req.params;
+    const { id } = req.params;
 
-    if (!isBackupStore(store)) {
-      res.status(400).json({ error: `Unknown backup store '${store}'` });
-      return;
-    }
-
-    await restoreBackup(store, id);
+    await restoreUnifiedBackup(id);
     res.json({ ok: true });
   }),
 );
 
 app.delete(
-  '/api/backups/:store/:id',
+  '/api/backups/:id',
   asyncHandler(async (req, res) => {
-    const { store, id } = req.params;
+    const { id } = req.params;
 
-    if (!isBackupStore(store)) {
-      res.status(400).json({ error: `Unknown backup store '${store}'` });
+    await deleteUnifiedBackup(id);
+    res.json({ ok: true });
+  }),
+);
+
+app.post(
+  '/api/mssql-data/import',
+  uploadZip.single('file'),
+  asyncHandler(async (req, res) => {
+    if (!req.file) {
+      res.status(400).json({ error: 'No file uploaded' });
       return;
     }
 
-    await deleteBackup(store, id);
-    res.json({ ok: true });
+    try {
+      await importMssqlDataZip(req.file.path);
+      res.json({ ok: true });
+    } finally {
+      await fsp.unlink(req.file.path).catch(() => {});
+    }
   }),
+);
+
+// Must be defined last, and with 4 args, for Express to treat it as an
+// error handler - catches errors from middleware (e.g. multer) that run
+// before asyncHandler gets a chance to wrap the route.
+// eslint-disable-next-line no-unused-vars
+app.use(
+  (
+    err: unknown,
+    _req: express.Request,
+    res: express.Response,
+    _: express.NextFunction,
+  ) => {
+    console.error('Unhandled request error:', err);
+    res.status(500).json({ error: errorMessage(err) });
+  },
 );
 
 const server = app.listen(PORT, '127.0.0.1', () => {

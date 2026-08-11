@@ -21,6 +21,7 @@ import {
   DockerService,
   dotnetBuildLockFile,
   projectRoot,
+  resolveServiceDependencies,
   ServiceName,
   serviceSchemas,
 } from './services';
@@ -95,7 +96,30 @@ program.parse();
 
 const programOpts = program.opts();
 
-const [servicesToStart] = program.processedArgs;
+const [requestedServices] = program.processedArgs;
+
+// Expand with any app-process services these depend on (e.g. `frontend`
+// needs `content`/`data` running, since it calls them directly over HTTP),
+// dependencies-first, so they're already up by the time a dependent starts.
+function expandServicesWithDependencies(
+  services: readonly ServiceName[],
+): ServiceName[] {
+  const seen = new Set<ServiceName>();
+  const expanded: ServiceName[] = [];
+
+  services.forEach(service => {
+    if (seen.has(service)) {
+      return;
+    }
+
+    expanded.push(...resolveServiceDependencies(service, seen), service);
+    seen.add(service);
+  });
+
+  return expanded;
+}
+
+const servicesToStart = expandServicesWithDependencies(requestedServices);
 
 await startDockerServices();
 

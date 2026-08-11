@@ -1,5 +1,5 @@
 import { $ } from 'execa';
-import { DockerService, projectRoot } from '../services';
+import { allowedDockerServices, DockerService, projectRoot } from '../services';
 
 export type DockerStatus = 'running' | 'stopped' | 'unknown';
 
@@ -62,6 +62,10 @@ export async function stopDockerServices(
   }
 
   await $$`docker compose stop ${services}`;
+}
+
+export async function stopAllDockerServices(): Promise<void> {
+  await stopDockerServices([...allowedDockerServices]);
 }
 
 export async function execInService(

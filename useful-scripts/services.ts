@@ -52,6 +52,25 @@ export type ServiceSchemaDockerServices =
 export type ServiceSchema = {
   colour: ChalkInstance;
   type: 'dotnet' | 'func' | 'docker' | 'command';
+  /**
+   * Other app-process services (as opposed to Docker services) that this
+   * service talks to and so must also be started alongside it - e.g. the
+   * frontend calling the content/data APIs directly over HTTP.
+   */
+  dependsOnServices?: ServiceName[];
+  /** Where to open this service in a browser once it's running. */
+  url?: string;
+  /**
+   * Services that can't run at the same time as this one (e.g. `frontend`
+   * and `frontendProd` bind the same port from the same project root).
+   * Starting this service is rejected while any of these are running.
+   */
+  conflictsWith?: ServiceName[];
+  /**
+   * Services sharing this value are presented as one tile with a mode
+   * selector in the dashboard, rather than as separate cards.
+   */
+  group?: string;
 } & (
   | {
       type: 'dotnet';
@@ -101,17 +120,137 @@ export const allowedServiceNames = [
 
 export type ServiceName = (typeof allowedServiceNames)[number];
 
+/**
+ * Reads a config value the same way .NET's configuration layering would:
+ * appsettings.json, then appsettings.{env}.json, then appsettings.Local.json
+ * (a gitignored per-developer override), each overriding the last.
+ */
+function readLayeredAppSetting<T>(
+  root: string,
+  key: string,
+  env = 'Development',
+): T | undefined {
+  const files = [
+    'appsettings.json',
+    `appsettings.${env}.json`,
+    'appsettings.Local.json',
+  ];
+
+  let value: T | undefined;
+
+  files.forEach(file => {
+    const filePath = path.join(projectRoot, root, file);
+
+    if (!fs.existsSync(filePath)) {
+      return;
+    }
+
+    try {
+      const settings = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+      if (key in settings) {
+        value = settings[key];
+      }
+    } catch {
+      // Ignore malformed/unparseable appsettings files.
+    }
+  });
+
+  return value;
+}
+
+interface DotnetLaunchProfile {
+  commandName?: string;
+  applicationUrl?: string;
+}
+
+interface DotnetLaunchSettings {
+  profiles?: Record<string, DotnetLaunchProfile>;
+}
+
+function getDotnetLaunchPort(root: string): number | undefined {
+  const filePath = path.join(
+    projectRoot,
+    root,
+    'Properties/launchSettings.json',
+  );
+
+  if (!fs.existsSync(filePath)) {
+    return undefined;
+  }
+
+  try {
+    // launchSettings.json files in this repo are saved with a UTF-8 BOM.
+    const raw = fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, '');
+    const settings = JSON.parse(raw) as DotnetLaunchSettings;
+    const profiles = Object.values(settings.profiles ?? {});
+    // `dotnet run` uses the "Project" profile, not "IIS Express".
+    const projectProfile = profiles.find(
+      profile => profile.commandName === 'Project',
+    );
+    const urls = (projectProfile?.applicationUrl ?? '').split(';');
+    const httpUrl = urls.find(url => url.startsWith('http://'));
+    const match = httpUrl?.match(/:(\d+)$/);
+
+    return match ? Number(match[1]) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The port a service will try to bind to, where known - used to proactively
+ * free up the port from a stale/orphaned process before starting.
+ */
+export function getServicePort(service: ServiceName): number | undefined {
+  const schema = serviceSchemas[service];
+
+  if (schema.type === 'func') {
+    return schema.port;
+  }
+
+  if (schema.type === 'dotnet') {
+    return getDotnetLaunchPort(schema.root);
+  }
+
+  if (schema.type === 'command' && schema.url) {
+    const match = schema.url.match(/:(\d+)$/);
+    return match ? Number(match[1]) : undefined;
+  }
+
+  return undefined;
+}
+
 export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
   admin: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Admin',
     colour: chalk.green,
     type: 'dotnet',
+    url: 'http://localhost:5020',
+    dependsOnServices: ['processor', 'publisher'],
     dockerServices() {
-      return fs.existsSync(
+      const usesIdpContainer = !fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
-      )
-        ? ['db', 'data-storage', 'public-api-db', 'data-screener']
-        : ['db', 'data-storage', 'public-api-db', 'idp', 'data-screener'];
+      );
+      // Mirrors Startup.cs's own `PublicDataDbExists` check, so the
+      // dashboard/CLI only spin up `public-api-db` when admin is actually
+      // configured to use it (set `PublicDataDbExists: false` in
+      // appsettings.Local.json to run admin without the public API).
+      const usesPublicDataDb =
+        readLayeredAppSetting<boolean>(this.root, 'PublicDataDbExists') ??
+        false;
+
+      const services: DockerService[] = ['db', 'data-storage', 'data-screener'];
+
+      if (usesPublicDataDb) {
+        services.push('public-api-db');
+      }
+
+      if (usesIdpContainer) {
+        services.push('idp');
+      }
+
+      return services;
     },
   },
   analytics: {
@@ -139,6 +278,13 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.greenBright,
     checkReady: line => line.startsWith('Server started on '),
     type: 'command',
+    url: 'http://localhost:3000',
+    // Calls these directly over HTTP (see CONTENT_API_BASE_URL/
+    // DATA_API_BASE_URL in .env) rather than through Docker.
+    dependsOnServices: ['content', 'data'],
+    // Same port, same project root as frontendProd - can't run both.
+    conflictsWith: ['frontendProd'],
+    group: 'frontend',
   },
   frontendProd: {
     root: 'src/explore-education-statistics-frontend',
@@ -148,6 +294,10 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.greenBright,
     checkReady: line => line.startsWith('Server started on '),
     type: 'command',
+    url: 'http://localhost:3000',
+    dependsOnServices: ['content', 'data'],
+    conflictsWith: ['frontend'],
+    group: 'frontend',
   },
   publicData: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api',
@@ -199,6 +349,7 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     service: 'idp',
     colour: chalk.gray,
     type: 'docker',
+    url: 'http://localhost:5030',
   },
   db: {
     service: 'db',
@@ -289,7 +440,7 @@ export function buildRunCommand(
   }
 }
 
-export function resolveDockerServices(
+function resolveOwnDockerServices(
   service: ServiceName,
   options: StartOptions,
 ): DockerService[] {
@@ -308,4 +459,48 @@ export function resolveDockerServices(
   return typeof dockerServices === 'function'
     ? dockerServices.call(schema, options)
     : dockerServices;
+}
+
+/**
+ * The transitive closure of `dependsOnServices` for a service, i.e. every
+ * other app-process service that must also be started alongside it - not
+ * including the service itself.
+ */
+export function resolveServiceDependencies(
+  service: ServiceName,
+  seen: Set<ServiceName> = new Set(),
+): ServiceName[] {
+  const dependencies = serviceSchemas[service].dependsOnServices ?? [];
+  const result: ServiceName[] = [];
+
+  dependencies.forEach(dependency => {
+    if (seen.has(dependency)) {
+      return;
+    }
+
+    seen.add(dependency);
+    result.push(...resolveServiceDependencies(dependency, seen), dependency);
+  });
+
+  return result;
+}
+
+/**
+ * All Docker services a service needs, including those needed by any
+ * app-process services it transitively depends on (e.g. the frontend
+ * doesn't declare any Docker services itself, but needs `db`/`data-storage`
+ * because it depends on `content`/`data`, which do).
+ */
+export function resolveDockerServices(
+  service: ServiceName,
+  options: StartOptions,
+): DockerService[] {
+  const services = [service, ...resolveServiceDependencies(service)];
+  const dockerServices = new Set<DockerService>();
+
+  services.forEach(s => {
+    resolveOwnDockerServices(s, options).forEach(d => dockerServices.add(d));
+  });
+
+  return Array.from(dockerServices);
 }

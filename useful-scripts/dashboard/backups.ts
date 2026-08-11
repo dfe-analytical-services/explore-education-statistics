@@ -6,10 +6,13 @@ import { pipeline } from 'node:stream/promises';
 import { projectRoot } from '../services';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices, stopDockerServices } from './dockerManager';
+import { stopAllStartedProcesses } from './processManager';
 
 export type BackupStore = 'mssql' | 'postgres' | 'azurite';
 
-export interface BackupInfo {
+const BACKUP_STORES: BackupStore[] = ['mssql', 'postgres', 'azurite'];
+
+interface BackupInfo {
   id: string;
   store: BackupStore;
   label: string;
@@ -17,6 +20,59 @@ export interface BackupInfo {
   timestamp: string;
   sizeBytes: number;
   files: string[];
+}
+
+/**
+ * One backup covering all three stores together, sharing a single
+ * label/timestamp, since they're really one snapshot of "local dev data"
+ * rather than three independent things to manage.
+ */
+export interface UnifiedBackupInfo {
+  id: string;
+  label: string;
+  timestamp: string;
+  stores: Partial<Record<BackupStore, { sizeBytes: number }>>;
+}
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
+/**
+ * Runs an operation for every store concurrently and returns the fulfilled
+ * results, but throws a combined error naming every store that failed if
+ * any did - so e.g. a Postgres failure doesn't silently swallow the fact
+ * that MSSQL/Azurite still need attention, and vice versa.
+ */
+async function forEachStoreOrThrow<T>(
+  operation: (store: BackupStore) => Promise<T>,
+  stores: BackupStore[] = BACKUP_STORES,
+): Promise<Partial<Record<BackupStore, T>>> {
+  const results = await Promise.allSettled(
+    stores.map(store => operation(store)),
+  );
+
+  const failures = results
+    .map((result, index) =>
+      result.status === 'rejected'
+        ? `${stores[index]}: ${errorMessage(result.reason)}`
+        : null,
+    )
+    .filter((message): message is string => message !== null);
+
+  if (failures.length > 0) {
+    throw new Error(failures.join('; '));
+  }
+
+  const values: Partial<Record<BackupStore, T>> = {};
+
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      values[stores[index]] = result.value;
+    }
+  });
+
+  return values;
 }
 
 const MSSQL_DATABASES = ['content', 'statistics'] as const;
@@ -161,35 +217,17 @@ async function listMssqlBackups(): Promise<BackupInfo[]> {
   );
 }
 
-export async function listBackups(store?: BackupStore): Promise<BackupInfo[]> {
-  const stores: BackupStore[] = store
-    ? [store]
-    : ['mssql', 'postgres', 'azurite'];
-
-  const results = await Promise.all(
-    stores.map(async s => {
-      switch (s) {
-        case 'mssql':
-          return listMssqlBackups();
-        case 'postgres':
-          return listSingleFileBackups(
-            'postgres',
-            POSTGRES_BACKUP_DIR,
-            '.dump',
-          );
-        case 'azurite':
-          return listSingleFileBackups(
-            'azurite',
-            AZURITE_BACKUP_DIR,
-            '.tar.gz',
-          );
-        default:
-          return [];
-      }
-    }),
-  );
-
-  return results.flat().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+async function listBackupsByStore(store: BackupStore): Promise<BackupInfo[]> {
+  switch (store) {
+    case 'mssql':
+      return listMssqlBackups();
+    case 'postgres':
+      return listSingleFileBackups('postgres', POSTGRES_BACKUP_DIR, '.dump');
+    case 'azurite':
+      return listSingleFileBackups('azurite', AZURITE_BACKUP_DIR, '.tar.gz');
+    default:
+      return [];
+  }
 }
 
 async function ensureMssqlBackupDir(): Promise<void> {
@@ -275,12 +313,10 @@ async function createAzuriteBackup(id: string): Promise<BackupInfo> {
   };
 }
 
-export async function createBackup(
+async function createBackupForStore(
   store: BackupStore,
-  label: string,
+  id: string,
 ): Promise<BackupInfo> {
-  const id = buildId(label);
-
   switch (store) {
     case 'mssql':
       return createMssqlBackup(id);
@@ -291,6 +327,33 @@ export async function createBackup(
     default:
       throw new Error(`Unknown backup store '${store}'`);
   }
+}
+
+export async function createUnifiedBackup(
+  label: string,
+): Promise<UnifiedBackupInfo> {
+  // Stop app processes first so nothing is actively writing to the
+  // databases/storage mid-backup. Each store's own create function already
+  // brings up (or, for Azurite, stops/starts) whichever Docker service it
+  // needs, so there's no need to do that here too.
+  await stopAllStartedProcesses();
+
+  const id = buildId(label);
+  const { label: parsedLabel, timestamp } = parseId(id);
+
+  const results = await forEachStoreOrThrow(store =>
+    createBackupForStore(store, id),
+  );
+
+  const stores: UnifiedBackupInfo['stores'] = {};
+  BACKUP_STORES.forEach(store => {
+    const result = results[store];
+    if (result) {
+      stores[store] = { sizeBytes: result.sizeBytes };
+    }
+  });
+
+  return { id, label: parsedLabel, timestamp, stores };
 }
 
 async function restoreMssqlBackup(id: string): Promise<void> {
@@ -364,7 +427,7 @@ async function restoreAzuriteBackup(id: string): Promise<void> {
   }
 }
 
-export async function restoreBackup(
+async function restoreBackupForStore(
   store: BackupStore,
   id: string,
 ): Promise<void> {
@@ -380,16 +443,72 @@ export async function restoreBackup(
   }
 }
 
-export async function deleteBackup(
-  store: BackupStore,
-  id: string,
-): Promise<void> {
-  const backups = await listBackups(store);
-  const backup = backups.find(b => b.id === id);
+export async function listUnifiedBackups(): Promise<UnifiedBackupInfo[]> {
+  const byStore = await Promise.all(
+    BACKUP_STORES.map(store => listBackupsByStore(store)),
+  );
+
+  const byId = new Map<string, UnifiedBackupInfo>();
+
+  byStore.flat().forEach(backup => {
+    let unified = byId.get(backup.id);
+
+    if (!unified) {
+      unified = {
+        id: backup.id,
+        label: backup.label,
+        timestamp: backup.timestamp,
+        stores: {},
+      };
+      byId.set(backup.id, unified);
+    }
+
+    unified.stores[backup.store] = { sizeBytes: backup.sizeBytes };
+  });
+
+  return Array.from(byId.values()).sort((a, b) =>
+    b.timestamp.localeCompare(a.timestamp),
+  );
+}
+
+export async function restoreUnifiedBackup(id: string): Promise<void> {
+  const backup = (await listUnifiedBackups()).find(b => b.id === id);
 
   if (!backup) {
-    throw new Error(`Backup '${id}' not found in ${store}`);
+    throw new Error(`Backup '${id}' not found`);
   }
 
-  await Promise.all(backup.files.map(file => fsp.unlink(file)));
+  // Same reasoning as createUnifiedBackup: don't restore underneath live
+  // app connections. MSSQL/Postgres restores handle their own exclusivity
+  // (SINGLE_USER / pg_restore against a live server); only Azurite needs
+  // its container stopped, which its own restore function already does.
+  await stopAllStartedProcesses();
+
+  const presentStores = BACKUP_STORES.filter(store => backup.stores[store]);
+
+  await forEachStoreOrThrow(
+    store => restoreBackupForStore(store, id),
+    presentStores,
+  );
+}
+
+export async function deleteUnifiedBackup(id: string): Promise<void> {
+  const backup = (await listUnifiedBackups()).find(b => b.id === id);
+
+  if (!backup) {
+    throw new Error(`Backup '${id}' not found`);
+  }
+
+  const presentStores = BACKUP_STORES.filter(store => backup.stores[store]);
+
+  const backupsByStore = await Promise.all(
+    presentStores.map(store => listBackupsByStore(store)),
+  );
+
+  const files = backupsByStore
+    .flat()
+    .filter(b => b.id === id)
+    .flatMap(b => b.files);
+
+  await Promise.all(files.map(file => fsp.unlink(file)));
 }
