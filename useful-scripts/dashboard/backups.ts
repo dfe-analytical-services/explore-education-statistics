@@ -6,7 +6,7 @@ import { pipeline } from 'node:stream/promises';
 import { projectRoot } from '../services';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices, stopDockerServices } from './dockerManager';
-import { stopAllStartedProcesses } from './processManager';
+import { startProcess, stopAllStartedProcesses } from './processManager';
 
 export type BackupStore = 'mssql' | 'postgres' | 'azurite';
 
@@ -336,24 +336,28 @@ export async function createUnifiedBackup(
   // databases/storage mid-backup. Each store's own create function already
   // brings up (or, for Azurite, stops/starts) whichever Docker service it
   // needs, so there's no need to do that here too.
-  await stopAllStartedProcesses();
+  const stoppedServices = await stopAllStartedProcesses();
 
   const id = buildId(label);
   const { label: parsedLabel, timestamp } = parseId(id);
 
-  const results = await forEachStoreOrThrow(store =>
-    createBackupForStore(store, id),
-  );
+  try {
+    const results = await forEachStoreOrThrow(store =>
+      createBackupForStore(store, id),
+    );
 
-  const stores: UnifiedBackupInfo['stores'] = {};
-  BACKUP_STORES.forEach(store => {
-    const result = results[store];
-    if (result) {
-      stores[store] = { sizeBytes: result.sizeBytes };
-    }
-  });
+    const stores: UnifiedBackupInfo['stores'] = {};
+    BACKUP_STORES.forEach(store => {
+      const result = results[store];
+      if (result) {
+        stores[store] = { sizeBytes: result.sizeBytes };
+      }
+    });
 
-  return { id, label: parsedLabel, timestamp, stores };
+    return { id, label: parsedLabel, timestamp, stores };
+  } finally {
+    await Promise.all(stoppedServices.map(service => startProcess(service)));
+  }
 }
 
 async function restoreMssqlBackup(id: string): Promise<void> {
@@ -369,8 +373,13 @@ async function restoreMssqlBackup(id: string): Promise<void> {
       const fileName = path.basename(file);
       const dbName = fileName.split('__')[2]?.replace(/\.bak$/, '');
 
+      // SET SINGLE_USER only applies if the database already exists (e.g.
+      // restoring onto a fresh/reset MSSQL data directory that never had
+      // it) - skipping that guard would otherwise abort the whole restore
+      // even though RESTORE DATABASE itself doesn't require the target to
+      // pre-exist.
       return execSqlcmd(
-        `ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; ` +
+        `IF DB_ID(N'${dbName}') IS NOT NULL ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; ` +
           `RESTORE DATABASE [${dbName}] FROM DISK = N'${MSSQL_CONTAINER_BACKUP_DIR}/${fileName}' WITH REPLACE; ` +
           `ALTER DATABASE [${dbName}] SET MULTI_USER;`,
       );
@@ -482,14 +491,18 @@ export async function restoreUnifiedBackup(id: string): Promise<void> {
   // app connections. MSSQL/Postgres restores handle their own exclusivity
   // (SINGLE_USER / pg_restore against a live server); only Azurite needs
   // its container stopped, which its own restore function already does.
-  await stopAllStartedProcesses();
+  const stoppedServices = await stopAllStartedProcesses();
 
   const presentStores = BACKUP_STORES.filter(store => backup.stores[store]);
 
-  await forEachStoreOrThrow(
-    store => restoreBackupForStore(store, id),
-    presentStores,
-  );
+  try {
+    await forEachStoreOrThrow(
+      store => restoreBackupForStore(store, id),
+      presentStores,
+    );
+  } finally {
+    await Promise.all(stoppedServices.map(service => startProcess(service)));
+  }
 }
 
 export async function deleteUnifiedBackup(id: string): Promise<void> {

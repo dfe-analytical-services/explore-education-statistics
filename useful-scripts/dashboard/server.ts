@@ -26,7 +26,6 @@ import {
   stopDockerServices,
 } from './dockerManager';
 import {
-  getAlerts,
   getError,
   getLogs,
   getStatus,
@@ -34,7 +33,6 @@ import {
   stopAllProcesses,
   stopAllStartedProcesses,
   stopProcess,
-  subscribeAlerts,
   subscribeLogs,
 } from './processManager';
 import importMssqlDataZip from './testData';
@@ -196,23 +194,6 @@ app.get('/api/services/:name/logs', (req, res) => {
 
   const unsubscribe = subscribeLogs(name, line => {
     res.write(`data: ${JSON.stringify(line)}\n\n`);
-  });
-
-  req.on('close', () => unsubscribe());
-});
-
-app.get('/api/alerts', (_req, res) => {
-  res.json({ alerts: getAlerts() });
-});
-
-app.get('/api/alerts/stream', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
-
-  const unsubscribe = subscribeAlerts(alert => {
-    res.write(`data: ${JSON.stringify(alert)}\n\n`);
   });
 
   req.on('close', () => unsubscribe());

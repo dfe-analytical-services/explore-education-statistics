@@ -1,7 +1,6 @@
 const dockerServicesEl = document.getElementById('docker-services');
 const appServicesEl = document.getElementById('app-services');
 const backupPanelEl = document.getElementById('backup-panel');
-const alertToastsEl = document.getElementById('alert-toasts');
 const stopAllBtn = document.getElementById('stop-all-btn');
 
 stopAllBtn.addEventListener('click', async () => {
@@ -9,12 +8,14 @@ stopAllBtn.addEventListener('click', async () => {
     return;
   }
   stopAllBtn.disabled = true;
+  stopAllBtn.textContent = 'Stopping...';
   try {
     await api('/api/services/stop-all', { method: 'POST' });
   } catch (err) {
     window.alert(err.message);
   }
   stopAllBtn.disabled = false;
+  stopAllBtn.textContent = 'Stop everything';
   refreshServices();
 });
 
@@ -522,49 +523,6 @@ async function refreshBackups() {
   backupPanelEl.replaceChildren(renderBackupPanel(backups));
 }
 
-function dismissToast(toast) {
-  toast.remove();
-}
-
-function addAlertToast(alert) {
-  const toast = document.createElement('div');
-  toast.className = 'alert-toast';
-  toast.addEventListener('click', () => openLogPanel(alert.service));
-
-  const header = document.createElement('div');
-  header.className = 'alert-toast-header';
-
-  const title = document.createElement('span');
-  title.textContent = `⚠ ${alert.service}`;
-  header.appendChild(title);
-
-  const dismissBtn = document.createElement('button');
-  dismissBtn.className = 'alert-toast-dismiss';
-  dismissBtn.textContent = '✕';
-  dismissBtn.addEventListener('click', event => {
-    event.stopPropagation();
-    dismissToast(toast);
-  });
-  header.appendChild(dismissBtn);
-
-  toast.appendChild(header);
-
-  const line = document.createElement('div');
-  line.className = 'alert-toast-line';
-  line.textContent = alert.line;
-  toast.appendChild(line);
-
-  alertToastsEl.prepend(toast);
-}
-
-function subscribeToAlerts() {
-  const source = new EventSource('/api/alerts/stream');
-  source.onmessage = event => {
-    addAlertToast(JSON.parse(event.data));
-  };
-}
-
 refreshServices();
 refreshBackups();
-subscribeToAlerts();
 setInterval(refreshServices, 3000);

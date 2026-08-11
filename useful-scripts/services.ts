@@ -226,7 +226,7 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Admin',
     colour: chalk.green,
     type: 'dotnet',
-    url: 'http://localhost:5020',
+    url: 'https://localhost:5021',
     dependsOnServices: ['processor', 'publisher'],
     dockerServices() {
       const usesIdpContainer = !fs.existsSync(
