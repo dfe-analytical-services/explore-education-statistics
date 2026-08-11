@@ -14,7 +14,7 @@ public interface IThemeService
 
     Task<Either<ActionResult, List<ThemeViewModel>>> GetThemes();
 
-    Task<Either<ActionResult, Unit>> DeleteTheme(Guid themeId, CancellationToken cancellationToken = default);
+    Task<Either<ActionResult, Unit>> DeleteThemes(List<Guid> themeIds, CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default);
 }

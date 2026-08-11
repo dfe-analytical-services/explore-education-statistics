@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -113,22 +112,46 @@ public class ThemeService(
             .OnSuccess(list => list.Select(mapper.Map<ThemeViewModel>).OrderBy(theme => theme.Title).ToList());
     }
 
-    public async Task<Either<ActionResult, Unit>> DeleteTheme(
-        Guid themeId,
+    public async Task<Either<ActionResult, Unit>> DeleteThemes(
+        List<Guid> themeIds,
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckCanManageAllTaxonomy()
-            .OnSuccess(() => contentDbContext.Themes.FirstOrNotFoundAsync(t => t.Id == themeId, cancellationToken))
-            .OnSuccessDo(CheckCanDeleteTheme)
-            .OnSuccessDo(() => DeletePublicationsForTheme(themeId, cancellationToken))
-            .OnSuccessVoid(async theme =>
+        // This deliberately runs without a transaction. Deleting a Theme cascades into deletions across the
+        // content and statistics databases, the Public API's PostgreSQL database, Azure blob storage and Azure
+        // storage tables, and reaches the latter three via a blocking HTTP call out to the Public Data
+        // Processor. That call reads and writes the same content database rows as this operation, so holding a
+        // transaction open across it makes the Processor wait on locks that cannot be released until the
+        // Processor itself responds, which SQL Server cannot detect as a deadlock and which therefore blocks
+        // until the command timeout expires. A transaction could not have made the operation atomic in any
+        // case, as the blob and Public API deletions are already irreversible by the time it would roll back.
+        // Instead, ReleaseVersions are deleted in a dependency-safe order so that a partial deletion can be
+        // completed by retrying.
+        return await CheckCanDeleteThemes()
+            .OnSuccess(async _ => await userService.CheckCanManageAllTaxonomy())
+            .OnSuccess<ActionResult, Unit, Unit>(async _ =>
             {
-                contentDbContext.Themes.Remove(theme);
-                await contentDbContext.SaveChangesAsync(cancellationToken);
+                var themes = await contentDbContext
+                    .Themes.Where(t => themeIds.Contains(t.Id))
+                    .ToListAsync(cancellationToken);
 
+                var failures = new List<ActionResult>();
+
+                foreach (var theme in themes)
+                {
+                    var result = await DeletePublicationsForTheme(theme.Id, cancellationToken)
+                        .OnSuccessDo(() => contentDbContext.Themes.Remove(theme));
+
+                    if (result.IsLeft)
+                    {
+                        failures.AddRange(result.Left);
+                    }
+                }
+
+                await contentDbContext.SaveChangesAsync(cancellationToken);
                 await publishingService.TaxonomyChanged(cancellationToken);
+
+                return failures.Count > 0 ? failures[0] : Unit.Instance;
             });
     }
 
@@ -222,7 +245,6 @@ public class ThemeService(
             {
                 contentDbContext.Publications.Remove(publication);
                 contentDbContext.Contacts.Remove(publication.Contact);
-                await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
             });
@@ -230,28 +252,16 @@ public class ThemeService(
 
     public async Task<Either<ActionResult, Unit>> DeleteUITestThemes(CancellationToken cancellationToken = default)
     {
-        return !_themeDeletionAllowed
-            ? new ForbidResult()
-            : await userService
-                .CheckCanManageAllTaxonomy()
-                .OnSuccess(async _ =>
-                    (await contentDbContext.Themes.ToListAsync(cancellationToken)).Where(theme =>
-                        theme.IsTestOrSeedTheme()
-                    )
-                )
-                .OnSuccessVoid(async themes =>
-                {
-                    foreach (var theme in themes)
-                    {
-                        await DeleteTheme(theme.Id, cancellationToken);
-                    }
+        var themes = await contentDbContext.Themes.ToListAsync(cancellationToken);
 
-                    await contentDbContext.SaveChangesAsync(cancellationToken);
-                    await publishingService.TaxonomyChanged(cancellationToken);
-                });
+        var testThemeIds = themes.Where(theme => theme.IsTestOrSeedTheme()).Select(theme => theme.Id).ToList();
+
+        return themes.Count > 0
+            ? await DeleteThemes(testThemeIds, cancellationToken)
+            : new OkObjectResult("No test themes to delete.");
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckCanDeleteTheme(Theme theme)
+    private async Task<Either<ActionResult, Unit>> CheckCanDeleteThemes()
     {
         if (!_themeDeletionAllowed)
         {

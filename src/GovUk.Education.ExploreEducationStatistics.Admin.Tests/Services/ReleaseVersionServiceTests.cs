@@ -1943,6 +1943,21 @@ public abstract class ReleaseVersionServiceTests
                 PublicationId = releaseVersion.Publication.Id,
             };
 
+            // A DataBlock on the ReleaseVersion being deleted, which is also used as a KeyStatistic. The
+            // KeyStatistic has to be removed before the DataBlock.
+            var dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(
+                    _dataFixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
+                )
+                .Generate();
+
+            var keyStatistic = new KeyStatisticDataBlock
+            {
+                DataBlock = dataBlockParent.LatestPublishedVersion!.ContentBlock,
+                ReleaseVersionId = releaseVersion.Id,
+            };
+
             // This Methodology is scheduled to go out with the Release being deleted.
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
@@ -1974,6 +1989,8 @@ public abstract class ReleaseVersionServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseVersions.AddRange(releaseVersion, anotherReleaseVersion);
+                context.DataBlockParents.Add(dataBlockParent);
+                context.KeyStatisticsDataBlock.Add(keyStatistic);
                 context.MethodologyVersions.AddRange(
                     methodologyScheduledWithRelease,
                     methodologyScheduledWithAnotherRelease
@@ -2120,6 +2137,17 @@ public abstract class ReleaseVersionServiceTests
                     methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId
                 );
+
+                // Assert that the DataBlock and the KeyStatistic using it have both been deleted.
+                // NOTE: this does not guard the order they are deleted in. The KeyStatistic must be deleted
+                // before the DataBlock because their foreign key is configured with DeleteBehavior.NoAction,
+                // but the in-memory provider does not enforce foreign keys, and cascades the KeyStatistic away
+                // with the ReleaseVersion regardless. Only a relational provider with foreign keys enforced
+                // would catch a regression in the ordering.
+                Assert.Empty(contentDbContext.KeyStatisticsDataBlock);
+                Assert.Empty(contentDbContext.KeyStatistics);
+                Assert.Empty(contentDbContext.DataBlockVersions);
+                Assert.Empty(contentDbContext.DataBlockParents);
 
                 // We expect the Statistics ReleaseVersion to be deleted immediately for test ReleaseVersions,
                 // as they do not use Subjects large enough to warrant using the stored procedure that cleans up
