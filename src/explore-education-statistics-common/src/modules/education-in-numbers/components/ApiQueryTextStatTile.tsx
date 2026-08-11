@@ -23,7 +23,11 @@ const ApiQueryStatTile = ({
   } = tile;
 
   // @MarkFix ask Marv/Rich how to display this
-  const releaseUrl = `${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`;
+  // publicAppUrl may or may not end with a slash, depending on how it's configured
+  const releaseUrl = `${publicAppUrl.replace(
+    /\/$/,
+    '',
+  )}/find-statistics/${publicationSlug}/${releaseSlug}`;
 
   // @MarkFix statistic needs to be formatted using indicatorUnit/decimalPlaces
   return (
