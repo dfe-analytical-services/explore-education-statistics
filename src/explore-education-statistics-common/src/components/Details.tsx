@@ -11,13 +11,6 @@ import VisuallyHidden from './VisuallyHidden';
 let hasNativeDetails: boolean;
 let idCounter = 0;
 
-// added to prevent eslint react-hooks/globals error
-const getNextValue = () => {
-  const id = idCounter;
-  idCounter += 1;
-  return id;
-};
-
 export type DetailsToggleHandler = (isOpen: boolean) => void;
 
 export interface DetailsProps {
@@ -50,7 +43,7 @@ export interface DetailsProps {
 const Details = ({
   className,
   children,
-  id: propId = `details-content-${getNextValue()}`,
+  id: propId = `details-content-${(idCounter += 1)}`,
   detailsId,
   jsRequired = false,
   open: defaultOpen = false,
