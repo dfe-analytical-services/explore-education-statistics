@@ -63,7 +63,7 @@ resource keyVaultLinkedService 'Microsoft.DataFactory/factories/linkedServices@2
     annotations: []
     type: 'AzureKeyVault'
     typeProperties: {
-      baseUrl: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/'
+      baseUrl: 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/'
     }
   }
 }
