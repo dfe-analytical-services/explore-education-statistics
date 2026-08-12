@@ -909,7 +909,6 @@
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
     "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
-    "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
@@ -4201,8 +4200,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-        "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
       ]
     },
     {
@@ -4519,76 +4517,12 @@
       }
     },
     {
-      "name": "logicAppTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "properties": {
-        "mode": "incremental",
-        "templateLink": {
-          "uri": "[concat(variables('templateBaseUrl'), 'logic-app-template.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "logicAppName": {
-            "value": "[variables('logicAppSlackAlerts')]"
-          },
-          "slackAlertsChannel": {
-            "value": "[parameters('slackAlertsChannel')]"
-          },
-          "slackAppToken": {
-            "reference": {
-              "keyVault": {
-                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-              },
-              "secretName": "ees-alerts-slackapptoken"
-            }
-          },
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "resourceGroup": {
-            "value": "[resourceGroup().name]"
-          },
-          "workspaceResourceId": {
-            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-          },
-          "teamsPowerAutomateWebhookUrl": {
-            "reference": {
-              "keyVault": {
-                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-              },
-              "secretName": "ees-alerts-teamswebhookurl"
-            }
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Insights/actionGroups",
-      "apiVersion": "2019-06-01",
-      "name": "[variables('actionGroupAlerts')]",
-      "location": "global",
-      "properties": {
-        "groupShortName": "alertAG",
-        "enabled": "true",
-        "logicAppReceivers": [
-          {
-            "name": "[variables('logicAppSlackAlerts')]",
-            "resourceId": "[resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts'))]",
-            "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows', variables('logicAppSlackAlerts')), '/triggers/manual'), '2017-07-01').value]",
-            "useCommonAlertSchema": true
-          }
-        ]
-      }
-    },
-    {
       "type": "Microsoft.Insights/metricAlerts",
       "apiVersion": "2018-03-01",
       "name": "[variables('metricAlerts')[copyIndex()].name]",
       "location": "global",
       "dependsOn": [
-        "[variables('metricAlerts')[copyIndex()].resourceId]",
-        "[resourceId('Microsoft.Insights/actionGroups', variables('actionGroupAlerts'))]"
+        "[variables('metricAlerts')[copyIndex()].resourceId]"
       ],
       "copy": {
         "name": "metricAlertsCopy",
