@@ -151,7 +151,8 @@
         "outsideThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{outputs('variables')?['metricValue']}, which is @{outputs('variables')?['operator']} the threshold of @{outputs('variables')?['threshold']}",
         "withinThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{if(empty(outputs('variables')?['metricValue']), 'an acceptable value again', concat(outputs('variables')?['metricValue'], ' and is no longer ', outputs('variables')?['operator'], ' the ', outputs('variables')?['threshold'], ' threshold'))}",
         "severityDisplay": "@{if(equals(outputs('variables')?['severity'], 'Sev0'), 'CRITICAL!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev1'), 'Error!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev2'), 'Warning', '')}@{if(equals(outputs('variables')?['severity'], 'Sev3'), 'Information', '')}@{if(equals(outputs('variables')?['severity'], 'Sev4'), 'Verbose', '')}",
-        "severityColour": "@{if(equals(outputs('variables')?['severity'], 'Sev0'), 'danger', '')}@{if(equals(outputs('variables')?['severity'], 'Sev1'), 'danger', '')}@{if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', '')}@{if(equals(outputs('variables')?['severity'], 'Sev3'), 'good', '')}@{if(equals(outputs('variables')?['severity'], 'Sev4'), 'good', '')}",
+        "severityColourSlack": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'danger',    if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
+        "severityColourTeams": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'attention', if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
         "alertRuleUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertId']}",
         "alertTargetResourceUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}"
       }
@@ -166,7 +167,8 @@
       "description": "Create the textual field values for the messages being sent to Slack and Teams.",
       "inputs": {
         "alertTime": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
-        "colour": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColour'])}",
+        "colourSlack": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourSlack'])}",
+        "colourTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourTeams'])}",
         "severity": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'Resolved', outputs('fragments')?['severityDisplay'])}",
         "windowStart": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}",
         "windowEnd": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
@@ -190,7 +192,7 @@
           "text": "@outputs('fields')?['titleSlack']",
           "attachments": [
             {
-              "color": "@outputs('fields')?['colour']",
+              "color": "@outputs('fields')?['colourSlack']",
               "fields": [
                 {
                   "title": "Alert",
@@ -261,7 +263,7 @@
                     "text": "@outputs('fields')?['titleTeams']",
                     "weight": "Bolder",
                     "size": "Medium",
-                    "color": "@outputs('fields')?['colour']"
+                    "color": "@outputs('fields')?['colourTeams']"
                   },
                   {
                     "type": "TextBlock",
