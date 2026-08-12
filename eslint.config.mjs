@@ -198,17 +198,11 @@ export default defineConfig([
       },
     },
 
-    plugins: {
-      //  "@next/next": nextPlugin,
-    },
-
     extends: [
       nextPlugin.configs.recommended
     ],
 
     rules: {
-      // ...nextPlugin.configs.recommended.rules,
-
       "@next/next/no-img-element": "off",
 
       "@next/next/no-html-link-for-pages": [

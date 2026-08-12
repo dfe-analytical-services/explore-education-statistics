@@ -63,7 +63,6 @@
     "@types/react-lazyload": "^3.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/sanitize-html": "^2.16.1",
-    "@types/govuk-frontend": "^5.11.0",
     "eslint": "^9.39.5",
     "intersection-observer": "^0.12.2",
     "jest": "^30.4.2",
