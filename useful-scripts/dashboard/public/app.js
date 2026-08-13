@@ -207,16 +207,14 @@ function renderServiceCard(service) {
   });
   actions.appendChild(toggleBtn);
 
-  if (service.kind === 'process') {
-    const logsBtn = document.createElement('button');
-    logsBtn.textContent =
-      currentLogService === service.name ? 'Hide logs' : 'Logs';
-    logsBtn.addEventListener('click', () => {
-      openLogPanel(service.name);
-      refreshServices();
-    });
-    actions.appendChild(logsBtn);
-  }
+  const logsBtn = document.createElement('button');
+  logsBtn.textContent =
+    currentLogService === service.name ? 'Hide logs' : 'Logs';
+  logsBtn.addEventListener('click', () => {
+    openLogPanel(service.name);
+    refreshServices();
+  });
+  actions.appendChild(logsBtn);
 
   card.appendChild(actions);
   return card;

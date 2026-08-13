@@ -24,6 +24,7 @@ import {
   startDockerServices,
   stopAllDockerServices,
   stopDockerServices,
+  subscribeDockerLogs,
 } from './dockerManager';
 import {
   ensureMssqlVolumePermissions,
@@ -269,6 +270,14 @@ app.get('/api/services/:name/logs', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
+
+  if (serviceSchemas[name].type === 'docker') {
+    const unsubscribe = subscribeDockerLogs(name, line => {
+      res.write(`data: ${JSON.stringify(line)}\n\n`);
+    });
+    req.on('close', unsubscribe);
+    return;
+  }
 
   getLogs(name).forEach(line => {
     res.write(`data: ${JSON.stringify(line)}\n\n`);
