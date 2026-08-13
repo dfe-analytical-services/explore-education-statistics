@@ -24,9 +24,9 @@ resource trigger 'Microsoft.DataFactory/factories/triggers@2018-06-01' = {
           type: 'PipelineReference'
         }
         parameters: {
-          TotalObservationLimit: '${removeSoftDeletedSubjectsObservationLimit}'
-          ObservationCommitBatchSize: '${removeSoftDeletedSubjectsObservationCommitBatchSize}'
-          ObservationFilterItemCommitBatchSize: '${removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize}'
+          TotalObservationLimit: removeSoftDeletedSubjectsObservationLimit
+          ObservationCommitBatchSize: removeSoftDeletedSubjectsObservationCommitBatchSize
+          ObservationFilterItemCommitBatchSize: removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize
         }
       }
     ]

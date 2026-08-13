@@ -25,7 +25,7 @@ resource statisticsDatabaseLinkedService 'Microsoft.DataFactory/factories/linked
   }
 }
 
-resource statisticsDatabaseSataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
+resource statisticsDatabaseDataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
   name: '${dataFactoryName}/ds_sql_statistics'
   properties: {
     linkedServiceName: {

@@ -330,15 +330,15 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
     parameters: {
       TotalObservationLimit: {
         type: 'int'
-        defaultValue: '${removeSoftDeletedSubjectsObservationLimit}'
+        defaultValue: removeSoftDeletedSubjectsObservationLimit
       }
       ObservationCommitBatchSize: {
         type: 'int'
-        defaultValue: '${removeSoftDeletedSubjectsObservationCommitBatchSize}'
+        defaultValue: removeSoftDeletedSubjectsObservationCommitBatchSize
       }
       ObservationFilterItemCommitBatchSize: {
         type: 'int'
-        defaultValue: '${removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize}'
+        defaultValue: removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize
       }
     }
     annotations: []

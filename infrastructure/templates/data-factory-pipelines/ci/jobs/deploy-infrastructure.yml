@@ -11,10 +11,14 @@ jobs:
     displayName: Deploy Data Factory pipelines
     environment: ${{ parameters.environment }}
     variables:
-      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/data-factory-pipelines
-      templateFile: $(templateDirectory)/main.bicep
-      paramDirectory: $(templateDirectory)/parameters
-      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+      - name: templateDirectory
+        value: $(Build.SourcesDirectory)/infrastructure/templates/data-factory-pipelines
+      - name: templateFile
+        value: $(templateDirectory)/main.bicep
+      - name: paramDirectory
+        value: $(templateDirectory)/parameters
+      - name: paramFile
+        value: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
     strategy:
       runOnce:
         deploy:
@@ -30,9 +34,24 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
 
+            # Note that we need to stop pipeline triggers if making updates
+            # to trigger configuration.  We restart them after deploy.
+            - template: ../tasks/pipeline-triggers.yml
+              parameters:
+                action: stop
+                serviceConnection: ${{ parameters.serviceConnection }}
+                dataFactoryName: $(dataFactoryName)
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Deploy Bicep template
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+
+            - template: ../tasks/pipeline-triggers.yml
+              parameters:
+                action: start
+                condition: succeededOrFailed()
+                serviceConnection: ${{ parameters.serviceConnection }}
+                dataFactoryName: '$(dataFactoryName)'
