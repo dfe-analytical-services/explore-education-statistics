@@ -5,6 +5,7 @@ import path from 'node:path';
 import fsp from 'node:fs/promises';
 import process from 'node:process';
 import {
+  adminUsesPublicDataDb,
   allowedServiceNames,
   resolveDockerServices,
   resolveServiceDependencies,
@@ -34,6 +35,7 @@ import {
 import {
   getError,
   getLogs,
+  getPublicDataDbOverride,
   getStatus,
   startProcess,
   stopAllProcesses,
@@ -173,7 +175,8 @@ app.get(
         processType: schema.type,
         status: getStatus(name),
         error: getError(name),
-        dependsOnServices: resolveServiceDependencies(name),
+        publicDataDbExists: getPublicDataDbOverride(name),
+        dependsOnServices: resolveServiceDependencies(name, {}),
         dependsOn: resolveDockerServices(name, {}),
         url: schema.url,
         group: schema.group,
@@ -199,10 +202,40 @@ app.post(
 
     if (schema.type === 'docker') {
       await startDockerServices([schema.service]);
-    } else {
-      await startProcess(name);
+      res.json({ ok: true });
+      return;
     }
 
+    if (name === 'admin' && req.body?.startPublicData) {
+      // Start the public API alongside admin, overriding the usual
+      // `PublicDataDbExists: false` appsetting via an env var (which .NET
+      // treats as higher-priority than appsettings).
+      await startProcess('admin', { env: { PublicDataDbExists: 'true' } });
+      await startProcess('publicData');
+      res.json({ ok: true });
+      return;
+    }
+
+    if (name === 'publicData') {
+      // Admin talks to the public API via the public data database, so if
+      // it's running but was started without it (PublicDataDbExists: false),
+      // restart it with the override so the two actually work together.
+      const adminStatus = getStatus('admin');
+
+      if (
+        (adminStatus === 'running' || adminStatus === 'starting') &&
+        !adminUsesPublicDataDb()
+      ) {
+        await stopProcess('admin');
+        await startProcess('admin', { env: { PublicDataDbExists: 'true' } });
+      }
+
+      await startProcess('publicData');
+      res.json({ ok: true });
+      return;
+    }
+
+    await startProcess(name);
     res.json({ ok: true });
   }),
 );

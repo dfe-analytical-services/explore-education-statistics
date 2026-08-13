@@ -189,6 +189,27 @@ function renderServiceCard(service) {
   const isRunning = service.status === 'running';
   const isBusy = service.status === 'starting' || service.status === 'stopping';
 
+  if (service.name === 'admin') {
+    const option = document.createElement('label');
+    option.className = 'admin-option';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    // Prefer what admin was actually started with (survives page refreshes);
+    // fall back to the in-session choice only when the server has no record.
+    checkbox.checked = service.publicDataDbExists ?? startPublicDataWithAdmin;
+    checkbox.disabled = isRunning || isBusy;
+    option.classList.toggle('disabled', isRunning || isBusy);
+    checkbox.addEventListener('change', () => {
+      startPublicDataWithAdmin = checkbox.checked;
+      renderApp();
+    });
+    option.appendChild(checkbox);
+    option.appendChild(document.createTextNode('Start with PublicData'));
+
+    card.appendChild(option);
+  }
+
   const toggleBtn = document.createElement('button');
   toggleBtn.className = isRunning ? 'danger' : 'primary';
   toggleBtn.textContent = isRunning ? 'Stop' : 'Start';
@@ -196,9 +217,17 @@ function renderServiceCard(service) {
   toggleBtn.addEventListener('click', async () => {
     toggleBtn.disabled = true;
     try {
+      const startPublicData =
+        service.name === 'admin' && !isRunning && startPublicDataWithAdmin;
+
       await api(
         `/api/services/${service.name}/${isRunning ? 'stop' : 'start'}`,
-        { method: 'POST' },
+        {
+          method: 'POST',
+          ...(startPublicData
+            ? { body: JSON.stringify({ startPublicData: true }) }
+            : {}),
+        },
       );
     } catch (err) {
       window.alert(err.message);
@@ -338,6 +367,9 @@ function groupServices(services) {
 
 let lastServices = [];
 let fixingIssueId = null;
+// Whether starting admin should also start the public API (and force admin's
+// PublicDataDbExists setting), chosen via a checkbox on the Admin card.
+let startPublicDataWithAdmin = false;
 
 // Issues are rendered in the banner at the top. Each one may name the service
 // it's associated with (e.g. the db container), shown as a chip that scrolls

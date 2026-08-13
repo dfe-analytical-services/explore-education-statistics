@@ -112,7 +112,10 @@ function expandServicesWithDependencies(
       return;
     }
 
-    expanded.push(...resolveServiceDependencies(service, seen), service);
+    expanded.push(
+      ...resolveServiceDependencies(service, programOpts, seen),
+      service,
+    );
     seen.add(service);
   });
 

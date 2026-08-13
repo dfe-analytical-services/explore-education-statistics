@@ -176,7 +176,30 @@ h2 {
 .card-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+.admin-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.admin-option input {
+  accent-color: var(--blue);
+}
+
+.admin-option input:disabled {
+  cursor: default;
+}
+
+.admin-option.disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 button {

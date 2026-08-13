@@ -44,10 +44,19 @@ export interface StartOptions {
   skipDocker?: boolean;
   restartDocker?: boolean;
   rebuildDocker?: boolean;
+  /**
+   * Extra environment variables for the spawned process, taking precedence
+   * over the process's inherited environment (and, for .NET services, over
+   * appsettings - mirroring .NET's own configuration precedence).
+   */
+  env?: NodeJS.ProcessEnv;
 }
 
 export type ServiceSchemaDockerServices =
   DockerService[] | ((options: StartOptions) => DockerService[]);
+
+export type ServiceSchemaDependsOnServices =
+  ServiceName[] | ((options: StartOptions) => ServiceName[]);
 
 export type ServiceSchema = {
   colour: ChalkInstance;
@@ -57,7 +66,7 @@ export type ServiceSchema = {
    * service talks to and so must also be started alongside it - e.g. the
    * frontend calling the content/data APIs directly over HTTP.
    */
-  dependsOnServices?: ServiceName[];
+  dependsOnServices?: ServiceSchemaDependsOnServices;
   /** Where to open this service in a browser once it's running. */
   url?: string;
   /**
@@ -159,6 +168,34 @@ function readLayeredAppSetting<T>(
   return value;
 }
 
+/**
+ * Whether admin is configured (via the layered `PublicDataDbExists` appsetting)
+ * to use the public data database, ignoring any env override passed at start
+ * time. Mirrors Startup.cs's own `PublicDataDbExists` check.
+ */
+export function adminUsesPublicDataDb(): boolean {
+  const { admin } = serviceSchemas;
+
+  if (admin.type === 'docker') {
+    return false;
+  }
+
+  return (
+    readLayeredAppSetting<boolean>(admin.root, 'PublicDataDbExists') ?? false
+  );
+}
+
+/**
+ * Whether admin is starting configured to use the public data database,
+ * preferring an env override (e.g. the dashboard's "Start with PublicData"
+ * checkbox) over the layered appsetting, exactly as .NET's own configuration
+ * precedence would.
+ */
+function resolveAdminUsesPublicDataDb(options: StartOptions): boolean {
+  const envValue = options.env?.PublicDataDbExists;
+  return envValue !== undefined ? envValue === 'true' : adminUsesPublicDataDb();
+}
+
 interface DotnetLaunchProfile {
   commandName?: string;
   applicationUrl?: string;
@@ -227,22 +264,35 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.green,
     type: 'dotnet',
     url: 'https://localhost:5021',
-    dependsOnServices: ['processor', 'publisher'],
-    dockerServices() {
+    dependsOnServices(options) {
+      // `processor`/`publisher` are talked to over Azure Storage Queues
+      // (fire-and-forget), not HTTP, so admin works fine without them
+      // running - but they're included anyway since without them nothing
+      // ever picks the queued work up. `publicProcessor`/`publicData` are
+      // real synchronous HTTP dependencies (see `IProcessorClient`/
+      // `IPublicDataApiClient` in Startup.cs), only wired up at all when
+      // admin is configured to use the public data database.
+      const services: ServiceName[] = ['processor', 'publisher'];
+
+      if (resolveAdminUsesPublicDataDb(options)) {
+        services.push('publicProcessor', 'publicData');
+      }
+
+      return services;
+    },
+    dockerServices(options) {
       const usesIdpContainer = !fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
       );
       // Mirrors Startup.cs's own `PublicDataDbExists` check, so the
       // dashboard/CLI only spin up `public-api-db` when admin is actually
       // configured to use it (set `PublicDataDbExists: false` in
-      // appsettings.Local.json to run admin without the public API).
-      const usesPublicDataDb =
-        readLayeredAppSetting<boolean>(this.root, 'PublicDataDbExists') ??
-        false;
-
+      // appsettings.Local.json to run admin without the public API). An env
+      // override wins where present (e.g. the dashboard starting admin
+      // alongside the public API), exactly as it would for .NET.
       const services: DockerService[] = ['db', 'data-storage', 'data-screener'];
 
-      if (usesPublicDataDb) {
+      if (resolveAdminUsesPublicDataDb(options)) {
         services.push('public-api-db');
       }
 
@@ -304,6 +354,8 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.magentaBright,
     type: 'dotnet',
     dockerServices: ['public-api-db'],
+    // Calls this directly over HTTP (see `IContentApiClient` in Startup.cs).
+    dependsOnServices: ['content'],
   },
   processor: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Processor',
@@ -317,14 +369,26 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.yellow,
     port: 7072,
     type: 'func',
-    dockerServices: ['db', 'data-storage', 'public-api-db'],
+    // Only bring up the public data database when being started "with
+    // PublicData" (the override set when admin and PublicData start together,
+    // e.g. via the dashboard's "Start with PublicData" checkbox). A plain
+    // `start admin` shouldn't pull in public-api-db it doesn't need.
+    dockerServices(options) {
+      const services: DockerService[] = ['db', 'data-storage'];
+
+      if (options.env?.PublicDataDbExists === 'true') {
+        services.push('public-api-db');
+      }
+
+      return services;
+    },
   },
   notifier: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Notifier',
     colour: chalk.blue,
     port: 7073,
     type: 'func',
-    dockerServices: ['data-storage'],
+    dockerServices: ['db', 'data-storage'],
   },
   publicProcessor: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor',
@@ -339,6 +403,9 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     port: 7075,
     type: 'func',
     dockerServices: ['data-storage'],
+    // Calls this directly over HTTP (see `IContentApiClient` in
+    // HostBuilderExtension.cs).
+    dependsOnServices: ['content'],
   },
   dataScreener: {
     colour: chalk.rgb(0, 255, 221),
@@ -392,7 +459,7 @@ export function buildRunCommand(
   baseEnv: NodeJS.ProcessEnv = process.env,
 ): RunCommand {
   const schema = serviceSchemas[service];
-  const env: NodeJS.ProcessEnv = { ...baseEnv };
+  const env: NodeJS.ProcessEnv = { ...baseEnv, ...options.env };
 
   switch (schema.type) {
     case 'dotnet': {
@@ -461,6 +528,21 @@ function resolveOwnDockerServices(
     : dockerServices;
 }
 
+function resolveOwnServiceDependencies(
+  service: ServiceName,
+  options: StartOptions,
+): ServiceName[] {
+  const { dependsOnServices } = serviceSchemas[service];
+
+  if (!dependsOnServices) {
+    return [];
+  }
+
+  return typeof dependsOnServices === 'function'
+    ? dependsOnServices(options)
+    : dependsOnServices;
+}
+
 /**
  * The transitive closure of `dependsOnServices` for a service, i.e. every
  * other app-process service that must also be started alongside it - not
@@ -468,9 +550,10 @@ function resolveOwnDockerServices(
  */
 export function resolveServiceDependencies(
   service: ServiceName,
+  options: StartOptions = {},
   seen: Set<ServiceName> = new Set(),
 ): ServiceName[] {
-  const dependencies = serviceSchemas[service].dependsOnServices ?? [];
+  const dependencies = resolveOwnServiceDependencies(service, options);
   const result: ServiceName[] = [];
 
   dependencies.forEach(dependency => {
@@ -479,7 +562,10 @@ export function resolveServiceDependencies(
     }
 
     seen.add(dependency);
-    result.push(...resolveServiceDependencies(dependency, seen), dependency);
+    result.push(
+      ...resolveServiceDependencies(dependency, options, seen),
+      dependency,
+    );
   });
 
   return result;
@@ -495,7 +581,7 @@ export function resolveDockerServices(
   service: ServiceName,
   options: StartOptions,
 ): DockerService[] {
-  const services = [service, ...resolveServiceDependencies(service)];
+  const services = [service, ...resolveServiceDependencies(service, options)];
   const dockerServices = new Set<DockerService>();
 
   services.forEach(s => {

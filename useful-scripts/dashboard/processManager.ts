@@ -28,6 +28,12 @@ interface ManagedProcess {
   error?: string;
   exited?: Promise<void>;
   settled?: Promise<void>;
+  /**
+   * Whether the process was started with the `PublicDataDbExists` env
+   * override (i.e. admin running alongside the public API), so the dashboard
+   * can report the running state rather than just the configured default.
+   */
+  publicDataDbExists?: boolean;
 }
 
 const MAX_LOG_LINES = 500;
@@ -61,6 +67,12 @@ export function getStatus(service: ServiceName): ProcessStatus {
 
 export function getError(service: ServiceName): string | undefined {
   return registry.get(service)?.error;
+}
+
+export function getPublicDataDbOverride(
+  service: ServiceName,
+): boolean | undefined {
+  return registry.get(service)?.publicDataDbExists;
 }
 
 export function getLogs(service: ServiceName): string[] {
@@ -123,7 +135,7 @@ export async function startProcess(
   await startDockerServices(resolveDockerServices(service, options));
 
   await Promise.all(
-    resolveServiceDependencies(service).map(dependency =>
+    resolveServiceDependencies(service, options).map(dependency =>
       startProcess(dependency, options),
     ),
   );
@@ -135,6 +147,9 @@ export async function startProcess(
   }
 
   const runCommand = buildRunCommand(service, options);
+
+  entry.publicDataDbExists =
+    options.env?.PublicDataDbExists === 'true' ? true : undefined;
 
   const unlock = runCommand.lockUntilReady
     ? await createFileLock({
