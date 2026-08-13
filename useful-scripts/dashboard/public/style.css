@@ -42,6 +42,20 @@ h1 {
   font-size: 0.85rem;
 }
 
+.project-root-banner {
+  background: rgba(217, 164, 65, 0.12);
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin: 1rem 2rem 0;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.project-root-banner.hidden {
+  display: none;
+}
+
 .issues-banner {
   display: flex;
   align-items: center;

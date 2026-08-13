@@ -7,6 +7,7 @@ import process from 'node:process';
 import {
   adminUsesPublicDataDb,
   allowedServiceNames,
+  projectRootOverride,
   resolveDockerServices,
   resolveServiceDependencies,
   ServiceName,
@@ -184,7 +185,7 @@ app.get(
       };
     });
 
-    res.json({ services, issues });
+    res.json({ services, issues, projectRootOverride });
   }),
 );
 

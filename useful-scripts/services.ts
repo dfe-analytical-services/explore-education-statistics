@@ -6,7 +6,17 @@ import { getDirname } from './utils/nodeGlobals';
 
 const __dirname = getDirname(import.meta.url);
 
-export const projectRoot = path.resolve(__dirname, '..');
+// EES_PROJECT_ROOT lets this checkout spawn services from a *different*
+// checkout on disk - useful when running the dashboard from one git worktree
+// (e.g. a branch you're iterating on) while it manages services in another
+// (e.g. a feature branch you're actually developing against). Exposed
+// separately from `projectRoot` so callers (e.g. the dashboard UI) can tell
+// whether it's actually set, rather than just resolving to the default.
+export const projectRootOverride = process.env.EES_PROJECT_ROOT
+  ? path.resolve(process.env.EES_PROJECT_ROOT)
+  : undefined;
+
+export const projectRoot = projectRootOverride ?? path.resolve(__dirname, '..');
 
 /**
  * Shared lock file used to serialize `dotnet build`s across every tool that

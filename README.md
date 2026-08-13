@@ -527,6 +527,30 @@ You would then be able to use this like:
 ees content data
 ```
 
+### Dashboard
+
+As an alternative to the `start` script, a browser-based dashboard is available for starting/stopping services,
+viewing logs, and managing test data and backups:
+
+```bash
+pnpm dashboard
+```
+
+This runs at `http://localhost:4300` by default (override with the `DASHBOARD_PORT` environment variable).
+
+By default, the dashboard runs services from the same checkout it's started from. If you're using
+[git worktrees](https://git-scm.com/docs/git-worktree) to work on multiple branches at once, you can instead point
+it at services in a *different* checkout by setting `EES_PROJECT_ROOT`:
+
+```bash
+EES_PROJECT_ROOT=/path/to/other/checkout pnpm dashboard
+```
+
+This is useful, for example, if you're iterating on the dashboard itself on one branch, but want it to manage
+services from a feature branch checked out elsewhere. Note that Docker Compose's project name defaults to the
+checkout's directory name, so pointing at a different checkout means Docker will manage a separate container
+stack - stop any containers already running under the current checkout first to avoid port clashes.
+
 ### Running Azure Search locally
 
 We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications.

@@ -3,6 +3,7 @@ const appServicesEl = document.getElementById('app-services');
 const backupPanelEl = document.getElementById('backup-panel');
 const stopAllBtn = document.getElementById('stop-all-btn');
 const issuesBannerEl = document.getElementById('issues-banner');
+const projectRootBannerEl = document.getElementById('project-root-banner');
 
 stopAllBtn.addEventListener('click', async () => {
   if (!window.confirm('Stop all app processes AND all Docker services?')) {
@@ -404,6 +405,16 @@ function makeIssueFixButton(issue) {
   return fixBtn;
 }
 
+function renderProjectRootBanner(projectRootOverride) {
+  if (!projectRootOverride) {
+    projectRootBannerEl.classList.add('hidden');
+    return;
+  }
+
+  projectRootBannerEl.textContent = `Managing services from ${projectRootOverride} (EES_PROJECT_ROOT override)`;
+  projectRootBannerEl.classList.remove('hidden');
+}
+
 function renderIssues(issues) {
   issuesBannerEl.replaceChildren();
 
@@ -471,10 +482,15 @@ function renderApp() {
 }
 
 async function refreshServices() {
-  const { services, issues = [] } = await api('/api/services');
+  const {
+    services,
+    issues = [],
+    projectRootOverride,
+  } = await api('/api/services');
   lastServices = services;
   renderApp();
   renderIssues(issues);
+  renderProjectRootBanner(projectRootOverride);
 }
 
 function formatBytes(bytes) {
