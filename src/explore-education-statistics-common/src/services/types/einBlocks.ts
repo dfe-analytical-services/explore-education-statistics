@@ -42,6 +42,8 @@ export interface EinApiQueryStatTile extends EinBaseTile {
   decimalPlaces?: number;
   publicationSlug?: string;
   releaseSlug?: string;
+  publicationLabel?: string;
+  releaseLabel?: string;
 }
 
 export interface EinTileGroupBlock extends EinBaseBlock {
