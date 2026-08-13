@@ -209,8 +209,7 @@ If searching for an IDE to add/edit these tests, consider using IntelliJ, Pychar
 
 IntelliJ / Pycharm:
 
-- [IntelliBot](https://plugins.jetbrains.com/plugin/7386-intellibot)
-- [Robot Plugin](https://plugins.jetbrains.com/plugin/7430-robot-plugin)
+- [Hyper RobotFramework Support](https://plugins.jetbrains.com/plugin/16382-hyper-robotframework-support)
 
 VScode:
 

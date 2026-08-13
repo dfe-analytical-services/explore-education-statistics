@@ -30,6 +30,16 @@ public static class DataSetMappingGeneratorExtensions
         File replacementDataFile
     ) => generator.ForInstance(m => m.SetReplacementDataFile(replacementDataFile));
 
+    public static Generator<DataSetMapping> WithFilterMappings(
+        this Generator<DataSetMapping> generator,
+        Dictionary<Guid, FilterMapping> filterMappings
+    ) => generator.ForInstance(m => m.SetFilterMappings(filterMappings));
+
+    public static Generator<DataSetMapping> WithUnmappedReplacementFilters(
+        this Generator<DataSetMapping> generator,
+        List<UnmappedFilter> unmappedFilters
+    ) => generator.ForInstance(m => m.SetUnmappedReplacementFilters(unmappedFilters));
+
     public static Generator<DataSetMapping> WithIndicatorMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
@@ -52,6 +62,9 @@ public static class DataSetMappingGeneratorExtensions
 
     public static InstanceSetters<DataSetMapping> SetDefaults(this InstanceSetters<DataSetMapping> setters) =>
         setters
+            .SetDefault(m => m.OriginalDataFileId)
+            .SetDefault(m => m.ReplacementDataFileId)
+            .Set(m => m.FilterMappings, new Dictionary<Guid, FilterMapping>())
             .Set(m => m.IndicatorMappings, new Dictionary<Guid, IndicatorMapping>())
             .Set(m => m.LocationMappings, new Dictionary<Guid, LocationMapping>());
 
@@ -74,6 +87,16 @@ public static class DataSetMappingGeneratorExtensions
         this InstanceSetters<DataSetMapping> setters,
         Content.Model.File replacementDataFile
     ) => setters.Set(m => m.ReplacementDataFile, replacementDataFile).SetReplacementDataFileId(replacementDataFile.Id);
+
+    public static InstanceSetters<DataSetMapping> SetFilterMappings(
+        this InstanceSetters<DataSetMapping> setters,
+        Dictionary<Guid, FilterMapping> filterMappings
+    ) => setters.Set(m => m.FilterMappings, filterMappings);
+
+    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementFilters(
+        this InstanceSetters<DataSetMapping> setters,
+        List<UnmappedFilter> unmappedFilters
+    ) => setters.Set(m => m.UnmappedReplacementFilters, unmappedFilters);
 
     public static InstanceSetters<DataSetMapping> SetIndicatorMappings(
         this InstanceSetters<DataSetMapping> setters,

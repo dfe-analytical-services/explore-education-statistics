@@ -18,7 +18,7 @@ export interface FilterReplacement extends TargetReplacement {
 }
 
 export interface FilterGroupReplacement extends TargetReplacement {
-  filters: FilterItemReplacement[];
+  items: FilterItemReplacement[];
 }
 
 export type FilterItemReplacement = TargetReplacement;
@@ -119,7 +119,7 @@ export interface ApiDataSetVersionPlan {
   valid: boolean;
 }
 
-type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet';
+type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet' | 'ParentNotMapped';
 
 export interface ReplacementMapping<TSource> {
   type: MappingType;
@@ -182,8 +182,11 @@ export interface DataReplacementPlan {
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
   apiDataSetVersionPlan?: ApiDataSetVersionPlan;
-  valid: boolean;
   mapping: PlanMappings;
+  // a replacement is invalid if a data blocks exist and an additional filter has been added to the replacement, as
+  // data blocks will be missing a filter item
+  hasDataBlockAndReplacementHasAdditionalFilter: boolean;
+  valid: boolean;
 }
 
 type PlanMappingIndicatorsUpdateResponse = {

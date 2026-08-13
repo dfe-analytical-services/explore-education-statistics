@@ -343,6 +343,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("FilterMappings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("IndicatorMappings")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -356,6 +360,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("ReplacementDataFileId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UnmappedReplacementFilters")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UnmappedReplacementIndicators")
                         .IsRequired()

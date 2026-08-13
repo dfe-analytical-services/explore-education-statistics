@@ -29,6 +29,9 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySubnets: false
+                deployPrivateDnsZones: false
+                deployAzureFrontDoor: false
                 deployApplicationGateway: false
                 deployAlerts: false
 
@@ -38,5 +41,8 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySubnets: $(deploySubnets)
+                deployPrivateDnsZones: $(deployPrivateDnsZones)
+                deployAzureFrontDoor: $(deployAzureFrontDoor)
                 deployApplicationGateway: $(deployApplicationGateway)
                 deployAlerts: $(deployAlerts)

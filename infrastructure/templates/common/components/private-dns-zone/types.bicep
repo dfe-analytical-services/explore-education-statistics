@@ -1,5 +1,21 @@
 @export()
+type PrivateDnsZone =
+  | 'azureSql'
+  | 'blobStorage'
+  | 'eventGridTopic'
+  | 'fileService'
+  | 'postgres'
+  | 'queue'
+  | 'sites'
+  | 'tableStorage'
+  | 'custom'
+
+@export()
 var dnsZones = {
+  azureSql: {
+    zoneName: 'privatelink${environment().suffixes.sqlServerHostname}'
+    dnsGroup: 'sqlServer'
+  }
   blobStorage: {
     zoneName: 'privatelink.blob.${environment().suffixes.storage}'
     dnsGroup: 'blob'
