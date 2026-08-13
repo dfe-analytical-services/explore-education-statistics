@@ -21,9 +21,11 @@ import {
   DockerService,
   dotnetBuildLockFile,
   projectRoot,
+  resolvePublicDataDbAvailability,
   resolveServiceDependencies,
   ServiceName,
   serviceSchemas,
+  StartOptions,
 } from './services';
 
 const __dirname = getDirname(import.meta.url);
@@ -41,6 +43,7 @@ const program = new Command()
 This script will also run prerequisite tasks to ensure that services will be able to startup:
 
 - Starting Docker services that are required for any services to start correctly (e.g. the database)
+- Starting any other app-process services a requested service depends on (e.g. admin also starts processor/publisher; frontend also starts content/data)
 - Run a .NET build will be executed for any .NET services (e.g. admin)
 `,
   )
@@ -64,8 +67,11 @@ Start content and data APIs:
 Start public data API:
   $ start publicData
 
-Start admin and its dependencies:
-  $ start admin processor publisher publicProcessor
+Start admin (processor/publisher are started automatically as dependencies):
+  $ start admin
+
+Start admin together with the frontend:
+  $ start admin frontend
 
 Start services without first starting any Docker services:
   $ start data content --skip-docker
@@ -103,6 +109,7 @@ const [requestedServices] = program.processedArgs;
 // dependencies-first, so they're already up by the time a dependent starts.
 function expandServicesWithDependencies(
   services: readonly ServiceName[],
+  options: StartOptions,
 ): ServiceName[] {
   const seen = new Set<ServiceName>();
   const expanded: ServiceName[] = [];
@@ -113,7 +120,7 @@ function expandServicesWithDependencies(
     }
 
     expanded.push(
-      ...resolveServiceDependencies(service, programOpts, seen),
+      ...resolveServiceDependencies(service, options, seen),
       service,
     );
     seen.add(service);
@@ -122,7 +129,29 @@ function expandServicesWithDependencies(
   return expanded;
 }
 
-const servicesToStart = expandServicesWithDependencies(requestedServices);
+// Resolve whether `public-api-db` will be available once, up front, for the
+// whole invocation - rather than letting each service's schema work it out
+// in isolation, which would make the outcome depend on whether e.g. `admin`
+// happened to be listed before or after `publisher` on the command line.
+const initialServicesToStart = expandServicesWithDependencies(
+  requestedServices,
+  programOpts,
+);
+const publicDataDbAvailable = resolvePublicDataDbAvailability(
+  initialServicesToStart,
+  programOpts,
+);
+const startOptions: StartOptions = publicDataDbAvailable
+  ? { ...programOpts, env: { PublicDataDbExists: 'true' } }
+  : programOpts;
+
+// Re-expand with the resolved options - the override above can itself pull
+// in further dependencies (e.g. admin only depends on publicProcessor/
+// publicData once PublicDataDbExists is known to be true).
+const servicesToStart = expandServicesWithDependencies(
+  requestedServices,
+  startOptions,
+);
 
 await startDockerServices();
 
@@ -162,7 +191,7 @@ async function startDockerServices() {
 
         const services =
           typeof dockerServices === 'function'
-            ? dockerServices.call(serviceSchema, programOpts)
+            ? dockerServices.call(serviceSchema, startOptions)
             : dockerServices;
 
         services?.forEach(dockerService => acc.add(dockerService));
@@ -246,7 +275,7 @@ async function startService(service: ServiceName): Promise<void> {
 
     args.push(schema.service);
   } else {
-    const runCommand = buildRunCommand(service, programOpts, env);
+    const runCommand = buildRunCommand(service, startOptions, env);
 
     command = runCommand.command;
     args = runCommand.args;

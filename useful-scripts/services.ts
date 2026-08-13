@@ -179,31 +179,46 @@ function readLayeredAppSetting<T>(
 }
 
 /**
- * Whether admin is configured (via the layered `PublicDataDbExists` appsetting)
- * to use the public data database, ignoring any env override passed at start
- * time. Mirrors Startup.cs's own `PublicDataDbExists` check.
+ * Whether the given service is configured (via its own layered
+ * `PublicDataDbExists` appsetting) to use the public data database, ignoring
+ * any env override passed at start time. Mirrors that service's own
+ * `PublicDataDbExists` check (see Startup.cs for admin,
+ * PublisherHostBuilderExtensions.cs for publisher).
  */
-export function adminUsesPublicDataDb(): boolean {
-  const { admin } = serviceSchemas;
+function serviceUsesPublicDataDb(service: ServiceName): boolean {
+  const schema = serviceSchemas[service];
 
-  if (admin.type === 'docker') {
+  if (schema.type === 'docker') {
     return false;
   }
 
   return (
-    readLayeredAppSetting<boolean>(admin.root, 'PublicDataDbExists') ?? false
+    readLayeredAppSetting<boolean>(schema.root, 'PublicDataDbExists') ?? false
   );
 }
 
+export function adminUsesPublicDataDb(): boolean {
+  return serviceUsesPublicDataDb('admin');
+}
+
+export function publisherUsesPublicDataDb(): boolean {
+  return serviceUsesPublicDataDb('publisher');
+}
+
 /**
- * Whether admin is starting configured to use the public data database,
+ * Whether a service is starting configured to use the public data database,
  * preferring an env override (e.g. the dashboard's "Start with PublicData"
- * checkbox) over the layered appsetting, exactly as .NET's own configuration
- * precedence would.
+ * checkbox, or the CLI's own cross-service resolution below) over the
+ * layered appsetting, exactly as .NET's own configuration precedence would.
  */
-function resolveAdminUsesPublicDataDb(options: StartOptions): boolean {
+function resolveServiceUsesPublicDataDb(
+  service: ServiceName,
+  options: StartOptions,
+): boolean {
   const envValue = options.env?.PublicDataDbExists;
-  return envValue !== undefined ? envValue === 'true' : adminUsesPublicDataDb();
+  return envValue !== undefined
+    ? envValue === 'true'
+    : serviceUsesPublicDataDb(service);
 }
 
 interface DotnetLaunchProfile {
@@ -284,7 +299,7 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       // admin is configured to use the public data database.
       const services: ServiceName[] = ['processor', 'publisher'];
 
-      if (resolveAdminUsesPublicDataDb(options)) {
+      if (resolveServiceUsesPublicDataDb('admin', options)) {
         services.push('publicProcessor', 'publicData');
       }
 
@@ -302,7 +317,7 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       // alongside the public API), exactly as it would for .NET.
       const services: DockerService[] = ['db', 'data-storage', 'data-screener'];
 
-      if (resolveAdminUsesPublicDataDb(options)) {
+      if (resolveServiceUsesPublicDataDb('admin', options)) {
         services.push('public-api-db');
       }
 
@@ -379,14 +394,14 @@ export const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.yellow,
     port: 7072,
     type: 'func',
-    // Only bring up the public data database when being started "with
-    // PublicData" (the override set when admin and PublicData start together,
-    // e.g. via the dashboard's "Start with PublicData" checkbox). A plain
-    // `start admin` shouldn't pull in public-api-db it doesn't need.
+    // Only bring up the public data database when publisher is actually
+    // configured to use it - mirrors admin's own `PublicDataDbExists` check
+    // (see PublisherHostBuilderExtensions.cs), falling back to publisher's
+    // own layered appsetting when no env override says otherwise.
     dockerServices(options) {
       const services: DockerService[] = ['db', 'data-storage'];
 
-      if (options.env?.PublicDataDbExists === 'true') {
+      if (resolveServiceUsesPublicDataDb('publisher', options)) {
         services.push('public-api-db');
       }
 
@@ -599,4 +614,38 @@ export function resolveDockerServices(
   });
 
   return Array.from(dockerServices);
+}
+
+/**
+ * Whether `public-api-db` will actually be available once every one of the
+ * given services is started - not just one of them considered in isolation.
+ * An explicit `PublicDataDbExists` env override always wins; otherwise it's
+ * true if ANY of the given services would pull `public-api-db` in on its
+ * own (asking for it directly, or via its own schema/appsettings).
+ *
+ * Callers that start several services in one go (e.g. the CLI) should
+ * resolve this once up front and thread the result through as a shared env
+ * override, rather than letting each service's schema work it out
+ * independently - otherwise whether e.g. `publisher` gets `public-api-db`
+ * could depend on whether `admin` happened to be listed before or after it.
+ */
+export function resolvePublicDataDbAvailability(
+  services: readonly ServiceName[],
+  options: StartOptions = {},
+): boolean {
+  const envValue = options.env?.PublicDataDbExists;
+
+  if (envValue !== undefined) {
+    return envValue === 'true';
+  }
+
+  return services.some(service => {
+    const schema = serviceSchemas[service];
+
+    if (schema.type === 'docker') {
+      return schema.service === 'public-api-db';
+    }
+
+    return resolveOwnDockerServices(service, {}).includes('public-api-db');
+  });
 }
