@@ -28,6 +28,9 @@ param publicApiApplicationGatewayFqdn string = ''
 @description('Certificate type for Azure Front Door.')
 param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
+@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
+param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -43,8 +46,8 @@ param deployAzureFrontDoor bool = false
 @description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
 
-@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
-param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+@description('Whether or not to deploy the Container Registry.')
+param deployContainerRegistry bool = false
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
@@ -185,6 +188,13 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
     publicSiteFqdn: replace(publicSiteUrl, 'https://', '')
     publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
     deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
+  name: 'containerRegistryModuleDeploy'
+  params: {
     tagValues: tagValues
   }
 }
