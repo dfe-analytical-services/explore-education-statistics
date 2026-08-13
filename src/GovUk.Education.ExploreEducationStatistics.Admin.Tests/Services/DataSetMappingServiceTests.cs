@@ -2924,6 +2924,16 @@ public class DataSetMappingServiceTests
         IUserService? userService = null
     )
     {
-        return new DataSetMappingService(contentDbContext, userService ?? MockUtils.AlwaysTrueUserService().Object);
+        var filterItemMappingService = new FilterItemMappingService(contentDbContext);
+        var filterGroupMappingService = new FilterGroupMappingService(contentDbContext, filterItemMappingService);
+        var filterMappingService = new FilterMappingService(contentDbContext, filterGroupMappingService);
+
+        return new DataSetMappingService(
+            contentDbContext,
+            userService ?? MockUtils.AlwaysTrueUserService().Object,
+            filterMappingService,
+            filterGroupMappingService,
+            filterItemMappingService
+        );
     }
 }

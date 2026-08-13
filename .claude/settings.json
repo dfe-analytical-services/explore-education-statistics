@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm tsc)",
+      "Bash(pnpm exec jest:*)",
+      "Bash(pnpm jest:*)",
+      "Bash(pnpm exec eslint:*)",
+      "Bash(dotnet test:*)",
+      "Bash(../../node_modules/.bin/tsc --noEmit:*)",
+      "Bash(../../node_modules/.bin/jest:*)",
+      "Bash(./node_modules/.bin/eslint:*)"
+    ]
+  }
+}

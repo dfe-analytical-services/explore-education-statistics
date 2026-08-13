@@ -474,6 +474,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReplacementBatchService, ReplacementBatchService>();
         services.AddTransient<IReplacementPlanService, ReplacementPlanService>();
         services.AddTransient<IDataSetMappingService, DataSetMappingService>();
+        services.AddTransient<IFilterMappingService, FilterMappingService>();
+        services.AddTransient<IFilterGroupMappingService, FilterGroupMappingService>();
+        services.AddTransient<IFilterItemMappingService, FilterItemMappingService>();
         services.AddTransient<IUserRoleService, UserRoleService>();
         services.AddTransient<IPublicationRoleChangesHelper, PublicationRoleChangesHelper>();
         services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
