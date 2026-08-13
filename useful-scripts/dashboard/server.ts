@@ -26,6 +26,11 @@ import {
   stopDockerServices,
 } from './dockerManager';
 import {
+  ensureMssqlVolumePermissions,
+  findMissingDatabaseLoginLine,
+  getMssqlVolumeHealth,
+} from './mssqlVolume';
+import {
   getError,
   getLogs,
   getStatus,
@@ -86,10 +91,67 @@ const uploadZip = multer({
   limits: { fileSize: 5 * 1024 * 1024 * 1024 },
 });
 
+interface ServiceIssue {
+  id: string;
+  message: string;
+  fixLabel: string;
+  fixEndpoint?: string;
+  /**
+   * Optional client-side behaviour for the fix button, for cases where the
+   * "fix" is a user action rather than a server call (e.g. picking a zip to
+   * import). When set, the button performs this instead of POSTing to
+   * `fixEndpoint`.
+   */
+  action?: string;
+  /**
+   * The service the issue is about, so the dashboard can label the banner
+   * with it (and scroll to its card).
+   */
+  serviceName?: string;
+}
+
 app.get(
   '/api/services',
   asyncHandler(async (_req, res) => {
     const dockerStatuses = await getDockerStatuses();
+
+    // The mssql data directory issues are associated with the `db` service,
+    // so the dashboard labels the banner with it and can scroll to its card.
+    const issues: ServiceIssue[] = [];
+
+    const mssqlHealth = await getMssqlVolumeHealth();
+
+    if (mssqlHealth.status === 'error') {
+      if (mssqlHealth.requiresImport) {
+        issues.push({
+          id: 'mssql-missing-data-dir',
+          message: mssqlHealth.message,
+          fixLabel: 'Go to import',
+          action: 'open-import',
+          serviceName: 'db',
+        });
+      } else {
+        issues.push({
+          id: 'mssql-volume-permissions',
+          message: mssqlHealth.message,
+          fixLabel: 'Fix permissions',
+          fixEndpoint: '/api/mssql/fix-permissions',
+          serviceName: 'db',
+        });
+      }
+    }
+
+    const missingLoginLine = findMissingDatabaseLoginLine(getLogs('admin'));
+
+    if (missingLoginLine) {
+      issues.push({
+        id: 'mssql-missing-logins',
+        message: `SQL Server is running but the required databases/logins aren't set up (${missingLoginLine}) - import a db test data zip from the 'Import DB test zip' section to populate the mssql data directory.`,
+        fixLabel: 'Go to import',
+        action: 'open-import',
+        serviceName: 'db',
+      });
+    }
 
     const services = allowedServiceNames.map(name => {
       const schema = serviceSchemas[name];
@@ -118,7 +180,7 @@ app.get(
       };
     });
 
-    res.json({ services });
+    res.json({ services, issues });
   }),
 );
 
@@ -171,6 +233,26 @@ app.post(
   asyncHandler(async (_req, res) => {
     await stopAllStartedProcesses();
     await stopAllDockerServices();
+    res.json({ ok: true });
+  }),
+);
+
+app.post(
+  '/api/mssql/fix-permissions',
+  asyncHandler(async (_req, res) => {
+    // The db container is only stopped so a fresh start re-triggers SQL
+    // Server's bootstrap once the directory's usable again.
+    await stopDockerServices(['db']);
+
+    try {
+      await ensureMssqlVolumePermissions();
+    } catch (err) {
+      await startDockerServices(['db']);
+      throw err;
+    }
+
+    await startDockerServices(['db']);
+
     res.json({ ok: true });
   }),
 );

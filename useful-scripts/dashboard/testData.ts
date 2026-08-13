@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { projectRoot } from '../services';
 import { startDockerServices, stopDockerServices } from './dockerManager';
+import { ensureMssqlVolumePermissions } from './mssqlVolume';
 import {
   startProcess,
   stopAllStartedProcesses,
@@ -56,6 +57,14 @@ export default async function importMssqlDataZip(
   const stoppedServices = await stopAllStartedProcesses();
   await stopDockerServices(['db']);
 
+  // The data directory is the one place it's fine to create: an import is the
+  // only sanctioned way the directory comes into existence, and it's populated
+  // from the zip immediately below. If it already exists (possibly root-owned
+  // from a Docker-created bind mount), sort its permissions out so the
+  // extraction can write into it.
+  await fsp.mkdir(MSSQL_DATA_DIR, { recursive: true });
+  await ensureMssqlVolumePermissions();
+
   const stagingDir = await extractToStagingDir(zipFilePath);
 
   try {
@@ -92,7 +101,7 @@ export default async function importMssqlDataZip(
   // backups directory), so they need to be readable/writable by everyone.
   // `+X` (capital) only adds execute where already executable or on
   // directories, so data files don't spuriously become executable.
-  await $({ reject: false })`chmod -R a+rwX ${MSSQL_DATA_DIR}`;
+  await ensureMssqlVolumePermissions();
 
   await startDockerServices(['db']);
 

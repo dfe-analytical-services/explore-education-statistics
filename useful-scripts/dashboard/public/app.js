@@ -2,6 +2,7 @@ const dockerServicesEl = document.getElementById('docker-services');
 const appServicesEl = document.getElementById('app-services');
 const backupPanelEl = document.getElementById('backup-panel');
 const stopAllBtn = document.getElementById('stop-all-btn');
+const issuesBannerEl = document.getElementById('issues-banner');
 
 stopAllBtn.addEventListener('click', async () => {
   if (!window.confirm('Stop all app processes AND all Docker services?')) {
@@ -159,6 +160,7 @@ function appendOpenLink(card, service) {
 function renderServiceCard(service) {
   const card = document.createElement('div');
   card.className = 'card';
+  card.id = `service-card-${service.name}`;
 
   const titleRow = document.createElement('div');
   titleRow.className = 'card-title-row';
@@ -337,6 +339,79 @@ function groupServices(services) {
 }
 
 let lastServices = [];
+let fixingIssueId = null;
+
+// Issues are rendered in the banner at the top. Each one may name the service
+// it's associated with (e.g. the db container), shown as a chip that scrolls
+// to that service's card.
+async function runIssueFix(issue) {
+  if (issue.action === 'open-import') {
+    mssqlImportInput.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+    mssqlImportInput.click();
+    return;
+  }
+
+  fixingIssueId = issue.id;
+  refreshServices();
+  try {
+    await api(issue.fixEndpoint, { method: 'POST' });
+  } catch (err) {
+    window.alert(err.message);
+  }
+  fixingIssueId = null;
+  refreshServices();
+}
+
+function makeIssueFixButton(issue) {
+  const fixBtn = document.createElement('button');
+  const isFixing = fixingIssueId === issue.id;
+  fixBtn.disabled = isFixing;
+  fixBtn.textContent = isFixing ? 'Fixing...' : issue.fixLabel;
+  fixBtn.addEventListener('click', () => runIssueFix(issue));
+  return fixBtn;
+}
+
+function renderIssues(issues) {
+  issuesBannerEl.replaceChildren();
+
+  if (issues.length === 0) {
+    issuesBannerEl.classList.add('hidden');
+    return;
+  }
+
+  issuesBannerEl.classList.remove('hidden');
+
+  issues.forEach(issue => {
+    const text = document.createElement('span');
+    text.className = 'issue-text';
+
+    if (issue.serviceName) {
+      const chip = document.createElement('button');
+      chip.className = 'issue-service-chip';
+      chip.title = `Scroll to the ${displayName(issue.serviceName)} service`;
+      chip.textContent = displayName(issue.serviceName);
+      chip.addEventListener('click', () => {
+        document
+          .getElementById(`service-card-${issue.serviceName}`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      text.appendChild(chip);
+    }
+
+    const message = document.createElement('span');
+    message.textContent = issue.message;
+    text.appendChild(message);
+
+    issuesBannerEl.appendChild(text);
+
+    if (issue.fixLabel) {
+      issuesBannerEl.appendChild(makeIssueFixButton(issue));
+    }
+  });
+}
 
 function renderApp() {
   const { groups, ungrouped } = groupServices(lastServices);
@@ -366,9 +441,10 @@ function renderApp() {
 }
 
 async function refreshServices() {
-  const { services } = await api('/api/services');
+  const { services, issues = [] } = await api('/api/services');
   lastServices = services;
   renderApp();
+  renderIssues(issues);
 }
 
 function formatBytes(bytes) {
