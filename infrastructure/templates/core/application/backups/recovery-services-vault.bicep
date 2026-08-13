@@ -1,8 +1,3 @@
-import { ResourceNames } from '../../types.bicep'
-
-@description('Common resource naming variables.')
-param resourceNames ResourceNames
-
 @description('The location to create resources in.')
 param location string
 
