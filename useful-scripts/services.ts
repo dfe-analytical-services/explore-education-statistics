@@ -23,14 +23,27 @@ export const projectRoot = projectRootOverride ?? path.resolve(__dirname, '..');
  * can start services (the `start` CLI and the dashboard), since concurrent
  * builds risk https://github.com/dotnet/sdk/issues/9487.
  *
+ * Anchored to `projectRoot` rather than this file's own directory: what the
+ * lock protects is the `src/artifacts` output tree, and with EES_PROJECT_ROOT
+ * set that tree belongs to a *different* checkout from the one running this
+ * code. Keying it to the checkout instead would give a dashboard running out
+ * of one worktree and a `start` CLI run from the managed one two separate
+ * lock files, so they'd build into the same artifacts tree uncoordinated.
+ *
  * `cross-process-lock` requires its target file to already exist, so it's
  * created here (once, on module load) rather than relying on some source
  * file happening to exist at this path, the way `start.ts` used to rely on
  * its own `__filename`.
  */
-export const dotnetBuildLockFile = path.join(__dirname, '.dotnet-build');
+export const dotnetBuildLockFile = path.join(
+  projectRoot,
+  'src/artifacts/.dotnet-build',
+);
 
 if (!fs.existsSync(dotnetBuildLockFile)) {
+  // The artifacts directory won't exist yet in a checkout that's never been
+  // built, and the lock is needed before the build that would create it.
+  fs.mkdirSync(path.dirname(dotnetBuildLockFile), { recursive: true });
   fs.writeFileSync(dotnetBuildLockFile, '');
 }
 

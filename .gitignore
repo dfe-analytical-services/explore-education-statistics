@@ -74,7 +74,6 @@ src/**/TestResults
 ## Scripts
 
 useful-scripts/*.lock
-useful-scripts/.dotnet-build
 useful-scripts/get_data_block_responses/*.csv
 useful-scripts/get_data_block_responses/results*
 
