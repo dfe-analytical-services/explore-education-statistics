@@ -35,13 +35,10 @@ steps:
 
           echo "Handling trigger $trigger..."
 
-          # Note that "|| true" prevents the pipeline from failing if
-          # trying to stop a trigger doesn't exist yet.
-        
           az datafactory trigger ${{parameters.action}} \
             --factory-name ${{parameters.dataFactoryName}} \
             --resource-group $(resourceGroupName) \
-            --name $trigger || true
+            --name $trigger
         done
 
         echo "Pipeline trigger ${{parameters.action}} completed."
