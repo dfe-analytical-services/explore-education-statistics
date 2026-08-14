@@ -26,10 +26,16 @@ steps:
 
         echo "Pipeline trigger ${{parameters.action}} starting..."
 
+        case "${{parameters.action}}" in
+          "stop")  triggerState="Started" ;;
+          "start") triggerState="Stopped" ;;
+        esac
+
         triggers=$(az datafactory trigger list \
           --factory-name ${{parameters.dataFactoryName}} \
           --resource-group $(resourceGroupName) \
-          --query "[].name" -o tsv)
+          --query "[?properties.runtimeState=='${triggerState}'].name" \
+          -o tsv)
 
         for trigger in $triggers; do
 
