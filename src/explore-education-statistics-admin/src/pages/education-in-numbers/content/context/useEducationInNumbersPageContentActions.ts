@@ -272,7 +272,7 @@ export default function useEducationInNumbersPageContentActions() {
         values,
       });
     dispatch({
-      type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK',
+      type: 'UPDATE_TILE_IN_BLOCK',
       payload: {
         meta: { blockId, sectionId, tileId },
         tile: newTile,
@@ -301,7 +301,7 @@ export default function useEducationInNumbersPageContentActions() {
         values,
       });
     dispatch({
-      type: 'UPDATE_API_QUERY_STAT_TILE_IN_BLOCK',
+      type: 'UPDATE_TILE_IN_BLOCK',
       payload: {
         meta: { blockId, sectionId, tileId },
         tile: newTile,

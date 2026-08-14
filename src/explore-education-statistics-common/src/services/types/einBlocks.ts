@@ -19,14 +19,16 @@ export interface EinHtmlBlock extends EinBaseBlock {
 
 export interface EinBaseTile {
   id: string;
-  title: string;
+  // Tiles are created empty and only populated when first edited, so all
+  // user-supplied fields are optional until then.
+  title?: string;
   order: number;
 }
 
 export interface EinFreeTextStatTile extends EinBaseTile {
   type: 'FreeTextStatTile';
-  statistic: string;
-  trend: string;
+  statistic?: string;
+  trend?: string;
   linkUrl?: string;
   linkText?: string;
 }

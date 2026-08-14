@@ -1,10 +1,5 @@
 import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
-import {
-  EinApiQueryStatTile,
-  EinContentBlock,
-  EinFreeTextStatTile,
-  EinTile,
-} from '@common/services/types/einBlocks';
+import { EinContentBlock, EinTile } from '@common/services/types/einBlocks';
 
 type BlockMeta = {
   sectionId: string;
@@ -44,18 +39,10 @@ export type AddTileToBlock = {
   };
 };
 
-export type UpdateFreeTextStatTileInBlock = {
-  type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK';
+export type UpdateTileInBlock = {
+  type: 'UPDATE_TILE_IN_BLOCK';
   payload: {
-    tile: EinFreeTextStatTile;
-    meta: TileMeta;
-  };
-};
-
-export type UpdateApiQueryStatTileInBlock = {
-  type: 'UPDATE_API_QUERY_STAT_TILE_IN_BLOCK';
-  payload: {
-    tile: EinApiQueryStatTile;
+    tile: EinTile;
     meta: TileMeta;
   };
 };
@@ -110,8 +97,7 @@ export type EducationInNumbersPageDispatchAction =
   | UpdateBlockFromSection
   | AddBlockToSection
   | AddTileToBlock
-  | UpdateFreeTextStatTileInBlock
-  | UpdateApiQueryStatTileInBlock
+  | UpdateTileInBlock
   | ReorderTilesInBlock
   | DeleteTileFromBlock
   | UpdateSectionContent

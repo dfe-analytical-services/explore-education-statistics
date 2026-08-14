@@ -7,6 +7,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import ReorderableList from '@common/components/ReorderableList';
+import TileWrapper from '@common/modules/education-in-numbers/components/TileWrapper';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import {
@@ -198,20 +199,22 @@ const EditableTileGroupBlock = ({
               }}
             />
           ) : (
-            tiles.map(tile => (
-              <EditableTile
-                key={tile.id}
-                blockId={block.id}
-                educationInNumbersPageId={educationInNumbersPageId}
-                groupTitle={title}
-                isEditing={isEditingStatTile === tile.id}
-                sectionId={sectionId}
-                showActions={!isEditingStatTile}
-                tile={tile}
-                onEdit={() => setIsEditingStatTile(tile.id)}
-                onEditEnd={() => setIsEditingStatTile(null)}
-              />
-            ))
+            <TileWrapper>
+              {tiles.map(tile => (
+                <EditableTile
+                  key={tile.id}
+                  blockId={block.id}
+                  educationInNumbersPageId={educationInNumbersPageId}
+                  groupTitle={title}
+                  isEditing={isEditingStatTile === tile.id}
+                  sectionId={sectionId}
+                  showActions={!isEditingStatTile}
+                  tile={tile}
+                  onEdit={() => setIsEditingStatTile(tile.id)}
+                  onEditEnd={() => setIsEditingStatTile(null)}
+                />
+              ))}
+            </TileWrapper>
           )}
         </>
       ) : (
@@ -227,12 +230,12 @@ function getTileReorderLabel(tile: EinTile): string {
   switch (tile.type) {
     case 'FreeTextStatTile':
       return (
-        `${tile.title} ${tile.statistic} ${tile.trend}`.trim() ||
+        `${tile.title ?? ''} ${tile.statistic ?? ''} ${tile.trend ?? ''}`.trim() ||
         'Unset free text stat tile'
       );
     case 'ApiQueryStatTile':
       return (
-        `${tile.title} ${tile.statistic ?? ''}`.trim() ||
+        `${tile.title ?? ''} ${tile.statistic ?? ''}`.trim() ||
         'Unset API query stat tile'
       );
     default:

@@ -150,31 +150,7 @@ export const educationInNumbersPageReducer: ImmerReducer<
       }
       return draft;
     }
-    case 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK': {
-      const { tile: newTile, meta } = action.payload;
-      const { blockId, sectionId, tileId } = meta;
-      if (!draft.pageContent.content) {
-        throw new Error(
-          `${action.type}: Error - Section "content" could not be found.`,
-        );
-      }
-      const matchingSection = draft.pageContent.content.find(
-        section => section.id === sectionId,
-      );
-      if (!matchingSection) return draft;
-      const matchingBlock = matchingSection.content.find(
-        block => block.id === blockId,
-      );
-      if (matchingBlock?.type !== 'TileGroupBlock' || !matchingBlock.tiles) {
-        return draft;
-      }
-      matchingBlock.tiles = matchingBlock.tiles.map(tileItem =>
-        tileItem.id === tileId ? newTile : tileItem,
-      );
-      return draft;
-    }
-    case 'UPDATE_API_QUERY_STAT_TILE_IN_BLOCK': {
-      // @MarkFix necessary as it does the same as the update free text stat?
+    case 'UPDATE_TILE_IN_BLOCK': {
       const { tile: newTile, meta } = action.payload;
       const { blockId, sectionId, tileId } = meta;
       if (!draft.pageContent.content) {
