@@ -378,7 +378,7 @@ public class PublishingCompletionServiceTests
                 await sut.CompletePublishing(keys);
 
                 // ASSERT
-                _contentService.Assert.DeletePreviousVersionsDownloadFilesCalled(
+                _contentService.Assert.InvalidatePreviousVersionsDownloadFilesCalled(
                     _releaseVersion1.Id,
                     _releaseVersion2.Id
                 );

@@ -5,6 +5,16 @@
     "domain": {
       "type": "string"
     },
+    "contentApiUrl": {
+      "type": "string"
+    },
+    "azureFrontDoorCachePurgeEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Allow the Publisher Function to purge superseded all-files ZIPs from Azure Front Door. Enable per environment after the AFD role assignment has been deployed."
+      }
+    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -2582,6 +2592,9 @@
         "App__BauEmail": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-bau-email'), '2018-02-14').secretUriWithVersion, ')')]",
         "App__AdminAppUrl": "[variables('adminAppUrl')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
+        "AzureFrontDoor__CachePurgeEnabled": "[parameters('azureFrontDoorCachePurgeEnabled')]",
+        "AzureFrontDoor__EndpointResourceId": "[variables('resourceIds').afdEndpoint]",
+        "AzureFrontDoor__ContentApiHostName": "[parameters('contentApiUrl')]",
         "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
