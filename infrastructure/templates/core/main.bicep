@@ -46,6 +46,9 @@ param deployAzureFrontDoor bool = false
 @description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
 
+@description('Whether or not to deploy Data Factory.')
+param deployDataFactory bool = false
+
 @description('Whether or not to deploy the Container Registry.')
 param deployContainerRegistry bool = false
 
@@ -80,7 +83,6 @@ var resourceNames = {
     publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     publicSiteApp: '${subscription}-as-ees-public-site'
     publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
-    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
   }
 }
 
@@ -145,7 +147,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
     resourcePrefix: resourcePrefix
     resourceNames: {
       adminApp: resourceNames.existingResources.adminApp
-      alertsGroup: resourceNames.existingResources.alertsGroup
+      alertsGroup: alertsModule.outputs.actionGroupName
       publisherFunction: resourceNames.existingResources.publisherFunction
       vNet: vNetModule.outputs.vNetName
       subnets: {
@@ -177,7 +179,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
   params: {
     location: location
     subscription: subscription
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
     publicApiAppName: resourceNames.existingResources.publicApiApp
     publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
@@ -187,6 +189,17 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
     publicApiPublicUrl: publicApiPublicUrl
     publicSiteFqdn: replace(publicSiteUrl, 'https://', '')
     publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (deployDataFactory) {
+  name: 'dataFactoryModuleDeploy'
+  params: {
+    subscription: subscription
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

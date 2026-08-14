@@ -113,9 +113,6 @@
     "maxStatsDbSizeBytes": {
       "value": 1099511627776
     },
-    "dataFactoryConcurrency": {
-      "value": 10
-    },
     "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
       "value": true
     },

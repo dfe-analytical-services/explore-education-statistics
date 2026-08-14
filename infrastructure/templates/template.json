@@ -675,10 +675,6 @@
         "description": "Slack channel to post Azure alerts to"
       }
     },
-    "dataFactoryConcurrency": {
-      "type": "int",
-      "defaultValue": 1
-    },
     "containerRegistryName": {
       "type": "string",
       "defaultValue": "eesacr",
@@ -4127,9 +4123,6 @@
           },
           "dataFactoryName": {
             "value": "[variables('dataFactoryName')]"
-          },
-          "dataFactoryConcurrency": {
-            "value": "[parameters('dataFactoryConcurrency')]"
           },
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"

@@ -33,6 +33,7 @@ jobs:
                 deployPrivateDnsZones: false
                 deployAzureFrontDoor: false
                 deployApplicationGateway: false
+                deployDataFactory: false
                 deployContainerRegistry: false
                 deployAlerts: false
 
@@ -46,5 +47,6 @@ jobs:
                 deployPrivateDnsZones: $(deployPrivateDnsZones)
                 deployAzureFrontDoor: $(deployAzureFrontDoor)
                 deployApplicationGateway: $(deployApplicationGateway)
+                deployDataFactory: $(deployDataFactory)
                 deployContainerRegistry: $(deployContainerRegistry)
                 deployAlerts: $(deployAlerts)

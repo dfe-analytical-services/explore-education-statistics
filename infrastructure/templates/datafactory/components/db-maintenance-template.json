@@ -8,12 +8,6 @@
         "description": "Data Factory name"
       }
     },
-    "keyVaultName": {
-      "type": "string",
-      "metadata": {
-        "description": "The name of the key vault"
-      }
-    },
     "coreSqlServerName": {
       "type": "string",
       "metadata": {
@@ -44,38 +38,6 @@
   },
   "resources": [
     {
-      "name": "[concat(parameters('factoryName'), '/default')]",
-      "type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
-      "apiVersion": "2018-06-01",
-      "properties": {}
-    },
-    {
-      "name": "[concat(parameters('factoryName'), '/vnetIntegrationRuntime')]",
-      "type": "Microsoft.DataFactory/factories/integrationRuntimes",
-      "apiVersion": "2018-06-01",
-      "properties": {
-        "type": "Managed",
-        "typeProperties": {
-          "computeProperties": {
-            "location": "[resourceGroup().location]",
-            "dataFlowProperties": {
-              "computeType": "General",
-              "coreCount": 8,
-              "timeToLive": 10,
-              "cleanup": false
-            }
-          }
-        },
-        "managedVirtualNetwork": {
-          "type": "ManagedVirtualNetworkReference",
-          "referenceName": "default"
-        }
-      },
-      "dependsOn": [
-        "[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-      ]
-    },
-    {
       "name": "[concat(parameters('factoryName'), '/default/', variables('coreSqlServerPrivateEndpointName'))]",
       "type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
       "apiVersion": "2018-06-01",
@@ -83,10 +45,7 @@
         "privateLinkResourceId": "[resourceId('Microsoft.Sql/servers', parameters('coreSqlServerName'))]",
         "groupId": "sqlServer",
         "fqdns": "[createArray(concat(parameters('coreSqlServerName'), '.database.windows.net'))]"
-      },
-      "dependsOn": [
-        "[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-      ]
+      }
     },
     {
       "name": "[concat(parameters('factoryName'), '/ls_sql_statistics')]",
@@ -109,10 +68,7 @@
           "referenceName": "vnetIntegrationRuntime",
           "type": "IntegrationRuntimeReference"
         }
-      },
-      "dependsOn": [
-        "[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
-      ]
+      }
     },
     {
       "name": "[concat(parameters('factoryName'), '/ds_sql_statistics')]",
@@ -142,19 +98,6 @@
       "dependsOn": [
         "[concat(variables('factoryId'), '/linkedServices/ls_sql_statistics')]"
       ]
-    },
-    {
-      "name": "[concat(parameters('factoryName'), '/AzureKeyVault')]",
-      "type": "Microsoft.DataFactory/factories/linkedServices",
-      "apiVersion": "2018-06-01",
-      "properties": {
-        "annotations": [],
-        "type": "AzureKeyVault",
-        "typeProperties": {
-          "baseUrl": "[concat('https://', parameters('keyVaultName'), '.vault.azure.net/')]"
-        }
-      },
-      "dependsOn": []
     },
     {
       "name": "[concat(parameters('factoryName'), '/pl_rebuild_statistics_indexes')]",
