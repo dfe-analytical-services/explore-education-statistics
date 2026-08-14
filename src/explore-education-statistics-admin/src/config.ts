@@ -16,10 +16,6 @@ export interface Config {
   readonly appInsightsKey: string;
   readonly oidc: OidcConfig;
   readonly permittedEmbedUrlDomains: string[];
-  /**
-   * Normalised to never end with a slash, so paths
-   * can safely be appended to it.
-   */
   readonly publicAppUrl: string;
   readonly publicApiUrl: string;
   readonly publicApiDocsUrl: string;
@@ -35,8 +31,7 @@ export async function getConfig(): Promise<Config> {
 
     config = {
       ...fetchedConfig,
-      // May be configured with or without a trailing slash, so normalise it to
-      // never have one, allowing paths to be appended to it safely.
+      // Remove trailing slashes
       publicAppUrl: fetchedConfig.publicAppUrl.replace(/\/+$/, ''),
     };
   }

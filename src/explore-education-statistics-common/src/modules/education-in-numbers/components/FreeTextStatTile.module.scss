@@ -5,8 +5,6 @@
   padding: govuk-spacing(4);
   display: flex;
   flex-direction: column;
-  // Matches ApiQueryStatTile: the two tile types sit side by side in a group,
-  // so both must start their content at the top to stay aligned with each other.
   justify-content: flex-start;
 
   * {

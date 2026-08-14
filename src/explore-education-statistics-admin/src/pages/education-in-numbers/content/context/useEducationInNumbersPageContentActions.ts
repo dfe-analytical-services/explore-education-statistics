@@ -3,12 +3,17 @@ import educationInNumbersContentService, {
 } from '@admin/services/educationInNumbersContentService';
 import {
   EinBlockType,
+  EinContentBlock,
   EinTile,
   EinTileType,
 } from '@common/services/types/einBlocks';
 import { ApiQueryStatTileFormValues } from '@admin/pages/education-in-numbers/content/components/EditableApiQueryStatTileForm';
 import { useEducationInNumbersPageContentDispatch } from './EducationInNumbersPageContentContext';
 import { FreeTextStatTileFormValues } from '../components/EditableFreeTextStatTileForm';
+
+type UpdateTileValues =
+  | { type: 'FreeTextStatTile'; values: FreeTextStatTileFormValues }
+  | { type: 'ApiQueryStatTile'; values: ApiQueryStatTileFormValues };
 
 export default function useEducationInNumbersPageContentActions() {
   const dispatch = useEducationInNumbersPageContentDispatch();
@@ -51,15 +56,21 @@ export default function useEducationInNumbersPageContentActions() {
     content: string;
     type: EinBlockType;
   }) {
-    const updateBlock =
-      type === 'HtmlBlock'
-        ? await educationInNumbersContentService.updateContentSectionHtmlBlock({
+    let updateBlock: EinContentBlock;
+
+    switch (type) {
+      case 'HtmlBlock':
+        updateBlock =
+          await educationInNumbersContentService.updateContentSectionHtmlBlock({
             educationInNumbersPageId,
             sectionId,
             blockId,
             block: { body: content },
-          })
-        : await educationInNumbersContentService.updateContentSectionGroupBlock(
+          });
+        break;
+      case 'TileGroupBlock':
+        updateBlock =
+          await educationInNumbersContentService.updateContentSectionGroupBlock(
             {
               educationInNumbersPageId,
               sectionId,
@@ -67,6 +78,11 @@ export default function useEducationInNumbersPageContentActions() {
               block: { title: content },
             },
           );
+        break;
+      default:
+        throw new Error(`Unsupported block type: ${type}`);
+    }
+
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
@@ -252,54 +268,42 @@ export default function useEducationInNumbersPageContentActions() {
     return newTile;
   }
 
-  async function updateFreeTextStatTile({
-    educationInNumbersPageId,
-    blockId,
-    sectionId,
-    tileId,
-    values,
-  }: {
-    educationInNumbersPageId: string;
-    blockId: string;
-    sectionId: string;
-    tileId: string;
-    values: FreeTextStatTileFormValues;
-  }) {
-    const newTile =
-      await educationInNumbersContentService.updateFreeTextStatTile({
-        educationInNumbersPageId,
-        tileId,
-        values,
-      });
-    dispatch({
-      type: 'UPDATE_TILE_IN_BLOCK',
-      payload: {
-        meta: { blockId, sectionId, tileId },
-        tile: newTile,
-      },
-    });
-    return newTile;
-  }
+  async function updateTile(
+    params: {
+      educationInNumbersPageId: string;
+      blockId: string;
+      sectionId: string;
+      tileId: string;
+    } & UpdateTileValues,
+  ) {
+    const { educationInNumbersPageId, blockId, sectionId, tileId, type } =
+      params;
 
-  async function updateApiQueryStatTile({
-    educationInNumbersPageId,
-    blockId,
-    sectionId,
-    tileId,
-    values,
-  }: {
-    educationInNumbersPageId: string;
-    blockId: string;
-    sectionId: string;
-    tileId: string;
-    values: ApiQueryStatTileFormValues;
-  }) {
-    const newTile =
-      await educationInNumbersContentService.updateApiQueryStatTile({
-        educationInNumbersPageId,
-        tileId,
-        values,
-      });
+    let newTile: EinTile;
+
+    switch (params.type) {
+      case 'FreeTextStatTile':
+        newTile = await educationInNumbersContentService.updateFreeTextStatTile(
+          {
+            educationInNumbersPageId,
+            tileId,
+            values: params.values,
+          },
+        );
+        break;
+      case 'ApiQueryStatTile':
+        newTile = await educationInNumbersContentService.updateApiQueryStatTile(
+          {
+            educationInNumbersPageId,
+            tileId,
+            values: params.values,
+          },
+        );
+        break;
+      default:
+        throw new Error(`Unsupported tile type: ${type}`);
+    }
+
     dispatch({
       type: 'UPDATE_TILE_IN_BLOCK',
       payload: {
@@ -361,8 +365,7 @@ export default function useEducationInNumbersPageContentActions() {
 
   return {
     addTile,
-    updateFreeTextStatTile,
-    updateApiQueryStatTile,
+    updateTile,
     deleteTile,
     reorderTiles,
     deleteContentSectionBlock,

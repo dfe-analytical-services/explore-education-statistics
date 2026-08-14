@@ -148,7 +148,7 @@ const EditableTileGroupBlock = ({
                 variant="secondary"
                 onClick={() => handleAddTile('ApiQueryStatTile')}
               >
-                Add new api query stat tile
+                Add new API query stat tile
                 <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
               </Button>
 
@@ -230,12 +230,12 @@ function getTileReorderLabel(tile: EinTile): string {
   switch (tile.type) {
     case 'FreeTextStatTile':
       return (
-        `${tile.title ?? ''} ${tile.statistic ?? ''} ${tile.trend ?? ''}`.trim() ||
+        [tile.title, tile.statistic, tile.trend].filter(Boolean).join(' ') ||
         'Unset free text stat tile'
       );
     case 'ApiQueryStatTile':
       return (
-        `${tile.title ?? ''} ${tile.statistic ?? ''}`.trim() ||
+        [tile.title, tile.statistic].filter(Boolean).join(' ') ||
         'Unset API query stat tile'
       );
     default:

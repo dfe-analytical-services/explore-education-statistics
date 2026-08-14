@@ -11,7 +11,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryStatTile';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 import { EinTile } from '@common/services/types/einBlocks';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props {
   blockId: string;
@@ -37,8 +37,7 @@ export default function EditableTile({
   onEditEnd,
 }: Props) {
   const { publicAppUrl } = useConfig();
-  const { updateFreeTextStatTile, updateApiQueryStatTile, deleteTile } =
-    useEducationInNumbersPageContentActions();
+  const { updateTile, deleteTile } = useEducationInNumbersPageContentActions();
 
   const tileParams = {
     educationInNumbersPageId,
@@ -47,71 +46,61 @@ export default function EditableTile({
     tileId: tile.id,
   };
 
-  if (isEditing) {
-    switch (tile.type) {
-      case 'FreeTextStatTile':
-        return (
-          <div>
-            <EditableFreeTextStatTileForm
-              freeTextStatTile={tile}
-              testId="freeTextStatTile-editForm"
-              onSubmit={async values => {
-                await updateFreeTextStatTile({ ...tileParams, values });
-                onEditEnd();
-              }}
-              onCancel={onEditEnd}
-            />
-          </div>
-        );
-      case 'ApiQueryStatTile':
-        return (
-          <div>
-            <EditableApiQueryStatTileForm
-              apiQueryStatTile={tile}
-              testId="apiQueryStatTile-editForm"
-              onSubmit={async values => {
-                await updateApiQueryStatTile({ ...tileParams, values });
-                onEditEnd();
-              }}
-              onCancel={onEditEnd}
-            />
-          </div>
-        );
-      default:
-        return null;
-    }
+  let tileContent: ReactNode;
+
+  switch (tile.type) {
+    case 'FreeTextStatTile':
+      tileContent = isEditing ? (
+        <EditableFreeTextStatTileForm
+          freeTextStatTile={tile}
+          testId="freeTextStatTile-editForm"
+          onSubmit={async values => {
+            await updateTile({ ...tileParams, type: tile.type, values });
+            onEditEnd();
+          }}
+          onCancel={onEditEnd}
+        />
+      ) : (
+        <FreeTextStatTile tile={tile} />
+      );
+      break;
+    case 'ApiQueryStatTile':
+      tileContent = isEditing ? (
+        <EditableApiQueryStatTileForm
+          apiQueryStatTile={tile}
+          testId="apiQueryStatTile-editForm"
+          onSubmit={async values => {
+            await updateTile({ ...tileParams, type: tile.type, values });
+            onEditEnd();
+          }}
+          onCancel={onEditEnd}
+        />
+      ) : (
+        <>
+          <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />
+          {!tile.isLatestVersion && (
+            <WarningMessage
+              className="govuk-!-margin-top-2 govuk-!-margin-bottom-0"
+              testId="apiQueryStatTile-notLatestVersionWarning"
+            >
+              A newer version of this tile's API data set has been published.
+              Edit the tile to re-run its query against the latest version.
+            </WarningMessage>
+          )}
+        </>
+      );
+      break;
+    default:
+      return null;
   }
 
-  const tileContent = (() => {
-    switch (tile.type) {
-      case 'FreeTextStatTile':
-        return <FreeTextStatTile tile={tile} />;
-      case 'ApiQueryStatTile':
-        return <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />;
-      default:
-        return null;
-    }
-  })();
-
-  if (!tileContent) {
-    return null;
+  if (isEditing) {
+    return tileContent;
   }
 
   return (
     <div>
       {tileContent}
-
-      {showActions &&
-        tile.type === 'ApiQueryStatTile' &&
-        !tile.isLatestVersion && (
-          <WarningMessage
-            className="govuk-!-margin-top-2 govuk-!-margin-bottom-0"
-            testId="apiQueryStatTile-notLatestVersionWarning"
-          >
-            A newer version of this tile's API data set has been published. Edit
-            the tile to re-run its query against the latest version.
-          </WarningMessage>
-        )}
 
       {showActions && (
         <ButtonGroup className="govuk-!-margin-top-2">

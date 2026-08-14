@@ -7,10 +7,6 @@ import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
 
 export interface ApiQueryStatTileProps {
   tile: EinApiQueryStatTile;
-  /**
-   * Must not end with a slash. Both apps normalise this
-   * where they load their config.
-   */
   publicAppUrl: string;
   testId?: string;
 }
@@ -32,15 +28,13 @@ const ApiQueryStatTile = ({
     releaseLabel,
   } = tile;
 
-  const releaseUrl = `${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`;
-
   return (
     <div className={styles.tile} data-testid={`${testId}-tile`}>
       <h4
         className={classNames('govuk-body-l', styles.title)}
         data-testid={`${testId}-title`}
       >
-        {title ?? 'No title available'}
+        {title || 'No title available'}
       </h4>
       <p
         className={classNames('govuk-heading-m', styles.statistic)}
@@ -68,7 +62,7 @@ const ApiQueryStatTile = ({
             {releaseLabel}
           </span>
           <a
-            href={releaseUrl}
+            href={`${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
             data-testid={`${testId}-link`}
             className={classNames('govuk-link', styles.publication)}
           >

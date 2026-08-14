@@ -8,9 +8,9 @@ import { EinFreeTextStatTile } from '@common/services/types/einBlocks';
 import Yup from '@common/validation/yup';
 import React from 'react';
 
-export type FreeTextStatTileFormValues = Omit<
+export type FreeTextStatTileFormValues = Pick<
   EinFreeTextStatTile,
-  'id' | 'type' | 'order'
+  'title' | 'statistic' | 'trend' | 'linkUrl' | 'linkText'
 >;
 
 interface EditableFreeTextStatTileFormProps {

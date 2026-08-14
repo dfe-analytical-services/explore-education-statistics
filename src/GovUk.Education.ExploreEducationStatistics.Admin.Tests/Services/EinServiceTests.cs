@@ -627,12 +627,8 @@ public class EducationInNumbersServiceTests
             var amendment = await contentDbContext
                 .EinPageVersions.Include(p => p.Content)
                     .ThenInclude(s => s.Content)
+                        .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                 .SingleAsync(p => p.Id == amendmentId);
-
-            foreach (var groupBlock in amendment.Content.SelectMany(s => s.Content).OfType<EinTileGroupBlock>())
-            {
-                await contentDbContext.Entry(groupBlock).Collection(b => b.Tiles).LoadAsync();
-            }
 
             Assert.NotEqual(originalPageVersion.Id, amendment.Id);
             Assert.Equal(originalPageVersion.Content.Count, amendment.Content.Count);

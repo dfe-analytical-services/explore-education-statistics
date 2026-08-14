@@ -8,7 +8,7 @@
 *.ipr
 *.iws
 
-# AI
+## AI
 .claude
 
 ## Application
@@ -110,5 +110,3 @@ src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUse
 ## IDE Files (e.g. local Visual Studio configuration)
 *.user
 *.lscache
-
-data/backups/

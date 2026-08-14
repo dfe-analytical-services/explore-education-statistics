@@ -156,7 +156,7 @@ const educationInNumbersContentService = {
     values: ApiQueryStatTileFormValues;
   }): Promise<EinApiQueryStatTile> {
     return client.put(
-      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/api-stat`,
+      `/education-in-numbers/${educationInNumbersPageId}/content/tile/${tileId}/api-query-stat`,
       values,
     );
   },
@@ -184,7 +184,7 @@ const educationInNumbersContentService = {
     educationInNumbersPageId: string;
     blockId: string;
     tileId: string;
-  }): Promise<EinFreeTextStatTile> {
+  }): Promise<void> {
     return client.delete(
       `/education-in-numbers/${educationInNumbersPageId}/content/block/${blockId}/tile/${tileId}`,
     );

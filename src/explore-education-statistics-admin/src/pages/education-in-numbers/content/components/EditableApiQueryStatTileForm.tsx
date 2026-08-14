@@ -9,9 +9,6 @@ import Yup from '@common/validation/yup';
 import React from 'react';
 import { FormFieldTextArea } from '@common/components/form';
 
-// Only these fields are user-editable; the statistic, indicator unit, decimal
-// places and publication/release details are all derived server-side by running
-// the query.
 export type ApiQueryStatTileFormValues = Pick<
   EinApiQueryStatTile,
   'title' | 'dataSetId' | 'version' | 'query'
@@ -42,9 +39,7 @@ export default function EditableApiQueryStatTileForm({
         validationSchema={Yup.object<ApiQueryStatTileFormValues>({
           title: Yup.string().required('Enter a title').max(100),
           dataSetId: Yup.string().required('Enter the dataSetId').length(36),
-          version: Yup.string().required('Enter data set version').max(230),
-          // The column is nvarchar(max) and a JSON query body has no natural
-          // limit, so this is only a sanity guard against pasted junk.
+          version: Yup.string().required('Enter data set version').max(32),
           query: Yup.string()
             .required('Enter the API query JSON body')
             .max(10000),

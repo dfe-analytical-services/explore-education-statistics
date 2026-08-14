@@ -19,8 +19,7 @@ export interface EinHtmlBlock extends EinBaseBlock {
 
 export interface EinBaseTile {
   id: string;
-  // Tiles are created empty and only populated when first edited, so all
-  // user-supplied fields are optional until then.
+  // Tiles are created empty then updated, hence optionality
   title?: string;
   order: number;
 }
@@ -35,7 +34,7 @@ export interface EinFreeTextStatTile extends EinBaseTile {
 
 export interface EinApiQueryStatTile extends EinBaseTile {
   type: 'ApiQueryStatTile';
-  dataSetId: string;
+  dataSetId?: string;
   version?: string;
   isLatestVersion: boolean;
   query?: string;
