@@ -679,6 +679,20 @@
       "type": "int",
       "defaultValue": 1
     },
+    "containerRegistryName": {
+      "type": "string",
+      "defaultValue": "eesacr",
+      "metadata": {
+        "description": "The name of the Container registry"
+      }
+    },
+    "dockerRegistryServerUrl": {
+      "type": "string",
+      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
+      "metadata": {
+        "description": "The URL of the Container registry"
+      }
+    },
     "dockerRegistryServerUsername": {
       "type": "string",
       "defaultValue": "",
@@ -2214,7 +2228,7 @@
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
         "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
         "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
-        "DOCKER_REGISTRY_SERVER_URL": "https://eesacr.azurecr.io",
+        "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
         "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
         "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
         "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
