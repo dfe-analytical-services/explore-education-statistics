@@ -1,4 +1,4 @@
-import { RouteProps } from 'react-router';
+import { NavRouteProps } from '@admin/routes/types';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -13,10 +13,7 @@ export type PublicationTeamRouteParams = {
   publicationId: string;
 };
 
-export interface PublicationRouteProps extends RouteProps {
-  title: string;
-  path: string;
-}
+export type PublicationRouteProps = NavRouteProps;
 
 export const publicationReleasesRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/releases',
@@ -69,3 +66,16 @@ export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps 
     path: '/publication/:publicationId/releases/legacy/:releaseSeriesItemId/edit',
     title: 'Edit legacy release',
   };
+
+/**
+ * The routes shown in the publication nav bar. Filtered by the publication's
+ * own permissions in `PublicationPageContainer`.
+ */
+export const publicationNavRoutes: PublicationRouteProps[] = [
+  publicationReleasesRoute,
+  publicationMethodologiesRoute,
+  publicationDetailsRoute,
+  publicationContactRoute,
+  publicationTeamAccessRoute,
+  publicationReleaseSeriesRoute,
+];

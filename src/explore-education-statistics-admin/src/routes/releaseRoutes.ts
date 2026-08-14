@@ -1,5 +1,5 @@
-import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
+import { NavRouteProps } from '@admin/routes/types';
 
 export type ReleaseRouteParams = {
   publicationId: string;
@@ -35,10 +35,7 @@ export type ReleaseDataSetChangelogRouteParams = ReleaseDataSetRouteParams & {
   dataSetVersionId: string;
 };
 
-export interface ReleaseRouteProps extends ProtectedRouteProps {
-  title: string;
-  path: string;
-}
+export type ReleaseRouteProps = NavRouteProps;
 
 export const releaseSummaryRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/summary',
@@ -189,3 +186,19 @@ export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/prerelease-access',
   title: 'Pre-release access',
 };
+
+/**
+ * The routes shown in the release nav bar, in the order they are stepped
+ * through by the previous/next links. Filtered by the user's permissions in
+ * `ReleasePageContainer`.
+ */
+export const releaseNavRoutes: ReleaseRouteProps[] = [
+  releaseSummaryRoute,
+  releaseDataRoute,
+  releaseFootnotesRoute,
+  releaseDataBlocksRoute,
+  releaseContentRoute,
+  releaseChecklistRoute,
+  releaseStatusRoute,
+  releasePreReleaseAccessRoute,
+];

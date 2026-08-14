@@ -1,55 +1,25 @@
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
+import RouteSwitch from '@admin/components/RouteSwitch';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import PreReleaseContentPage from '@admin/pages/release/pre-release/PreReleaseContentPage';
-import PreReleaseMethodologiesPage from '@admin/pages/release/pre-release/PreReleaseMethodologiesPage';
-import PreReleaseMethodologyPage from '@admin/pages/release/pre-release/PreReleaseMethodologyPage';
-import PreReleaseTableToolPage from '@admin/pages/release/pre-release/PreReleaseTableToolPage';
-import {
-  preReleaseContentRoute,
-  preReleaseMethodologiesRoute,
-  preReleaseMethodologyRoute,
-  preReleaseNavRoutes,
-  preReleaseTableToolRoute,
-} from '@admin/routes/preReleaseRoutes';
-import {
-  ReleaseRouteParams,
-  ReleaseRouteProps,
-} from '@admin/routes/releaseRoutes';
+import preReleasePageRoutes from '@admin/routes/preReleasePageRoutes';
+import { preReleaseNavRoutes } from '@admin/routes/preReleaseRoutes';
+import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import permissionService, {
   PreReleaseWindowStatus,
 } from '@admin/services/permissionService';
 import preReleaseService, {
   PreReleaseSummary,
 } from '@admin/services/preReleaseService';
+import useNavRoutes from '@admin/hooks/useNavRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { formatInTimeZone } from 'date-fns-tz';
 import React from 'react';
-import { generatePath } from 'react-router';
-import { Route, RouteComponentProps, Switch } from 'react-router-dom';
-
-const routes: ReleaseRouteProps[] = [
-  {
-    ...preReleaseContentRoute,
-    component: PreReleaseContentPage,
-  },
-  {
-    ...preReleaseTableToolRoute,
-    component: PreReleaseTableToolPage,
-  },
-  {
-    ...preReleaseMethodologiesRoute,
-    component: PreReleaseMethodologiesPage,
-  },
-  {
-    ...preReleaseMethodologyRoute,
-    component: PreReleaseMethodologyPage,
-  },
-];
+import { RouteComponentProps } from 'react-router';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
@@ -84,6 +54,11 @@ const PreReleasePageContainer = ({
   const { user } = useAuthContext();
 
   const { errorPages, handleError } = useErrorControl();
+
+  const { navBarRoutes } = useNavRoutes(preReleaseNavRoutes, {
+    publicationId,
+    releaseVersionId,
+  });
 
   const { value: model, isLoading } = useAsyncRetry<
     Model | undefined
@@ -190,21 +165,11 @@ const PreReleasePageContainer = ({
           </NotificationBanner>
           <NavBar
             className="govuk-!-margin-top-0"
-            routes={preReleaseNavRoutes.map(route => ({
-              title: route.title,
-              to: generatePath<ReleaseRouteParams>(route.path, {
-                publicationId,
-                releaseVersionId,
-              }),
-            }))}
+            routes={navBarRoutes}
             label="Pre-release"
           />
 
-          <Switch>
-            {routes.map(route => (
-              <Route key={route.path} {...route} />
-            ))}
-          </Switch>
+          <RouteSwitch routes={preReleasePageRoutes} />
         </>
       );
     }

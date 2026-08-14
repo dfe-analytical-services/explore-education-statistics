@@ -5,10 +5,6 @@ interface PublicRouteProps extends RouteProps {
   path: string;
 }
 
-export type PublicationRouteParams = {
-  publicationId: string;
-};
-
 export type ThemeParams = {
   themeId: string;
 };

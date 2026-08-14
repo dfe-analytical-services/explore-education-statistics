@@ -2,57 +2,25 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
+import RouteSwitch from '@admin/components/RouteSwitch';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
-import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
-import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
-import MethodologySummaryEditPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryEditPage';
-import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
+import methodologyPageRoutes from '@admin/routes/methodologyPageRoutes';
 import {
-  methodologyContentRoute,
+  methodologyNavRoutes,
   MethodologyRouteParams,
-  MethodologyRouteProps,
-  methodologyStatusRoute,
-  methodologySummaryEditRoute,
-  methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
-import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
+import useNavRoutes from '@admin/hooks/useNavRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
-
-const navRoutes: MethodologyRouteProps[] = [
-  methodologySummaryRoute,
-  methodologyContentRoute,
-  methodologyStatusRoute,
-];
-
-const routes: MethodologyRouteProps[] = [
-  {
-    ...methodologySummaryRoute,
-    component: MethodologySummaryPage,
-  },
-  {
-    ...methodologyContentRoute,
-    component: MethodologyContentPage,
-  },
-  {
-    ...methodologyStatusRoute,
-    component: MethodologyStatusPage,
-  },
-  {
-    ...methodologySummaryEditRoute,
-    component: MethodologySummaryEditPage,
-  },
-];
+import { RouteComponentProps } from 'react-router';
 
 const MethodologyPage = ({
   match,
-  location,
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
@@ -64,41 +32,8 @@ const MethodologyPage = ({
     return methodologyService.getMethodology(methodologyId);
   }, [methodologyId]);
 
-  const currentRouteIndex =
-    navRoutes.findIndex(
-      route =>
-        generatePath<MethodologyRouteParams>(route.path, {
-          methodologyId,
-        }) === location.pathname,
-    ) || 0;
-
-  const previousRoute =
-    currentRouteIndex > 0 ? navRoutes[currentRouteIndex - 1] : undefined;
-
-  const nextRoute =
-    currentRouteIndex < navRoutes.length - 1
-      ? navRoutes[currentRouteIndex + 1]
-      : undefined;
-
-  const previousSection = previousRoute
-    ? {
-        label: previousRoute.title,
-        linkTo: generatePath<MethodologyRouteParams>(previousRoute.path, {
-          methodologyId,
-        }),
-      }
-    : undefined;
-
-  const nextSection = nextRoute
-    ? {
-        label: nextRoute.title,
-        linkTo: generatePath<MethodologyRouteParams>(nextRoute.path, {
-          methodologyId,
-        }),
-      }
-    : undefined;
-
-  const pageTitle = useCurrentRouteTitle(navRoutes);
+  const { navBarRoutes, currentRouteTitle, previousSection, nextSection } =
+    useNavRoutes(methodologyNavRoutes, { methodologyId });
 
   return (
     <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
@@ -109,8 +44,8 @@ const MethodologyPage = ({
               <div className="govuk-grid-column-two-thirds">
                 <PageTitle
                   metaTitle={
-                    pageTitle
-                      ? `${pageTitle} - ${methodology.title}`
+                    currentRouteTitle
+                      ? `${currentRouteTitle} - ${methodology.title}`
                       : methodology.title
                   }
                   title={methodology.title}
@@ -129,15 +64,7 @@ const MethodologyPage = ({
               <Tag className="govuk-!-margin-left-2">Amendment</Tag>
             )}
 
-            <NavBar
-              routes={navRoutes.map(route => ({
-                title: route.title,
-                to: generatePath<MethodologyRouteParams>(route.path, {
-                  methodologyId,
-                }),
-              }))}
-              label="Methodology"
-            />
+            <NavBar routes={navBarRoutes} label="Methodology" />
 
             <MethodologyContextProvider
               methodology={methodology}
@@ -145,16 +72,7 @@ const MethodologyPage = ({
                 setMethodology({ value: nextMethodology });
               }}
             >
-              <Switch>
-                {routes.map(route => (
-                  <Route
-                    exact
-                    key={route.path}
-                    path={route.path}
-                    component={route.component}
-                  />
-                ))}
-              </Switch>
+              <RouteSwitch routes={methodologyPageRoutes} />
             </MethodologyContextProvider>
 
             <PreviousNextLinks
