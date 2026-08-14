@@ -127,12 +127,10 @@ public class ReleaseFileService(
             return permissionResult.Left;
         }
 
-        // Temporarily disabled for the AFD-generated ZIP POC. Published all-files
-        // requests always redirect to the versioned endpoint so AFD can cache its response.
-        // if (await FindValidAllFilesZip(releaseVersion, AllFilesZipFormat.CurrentVersion) is null)
-        // {
-        //     return new ZipDelivery.Stream(releaseVersion);
-        // }
+        if (await FindValidAllFilesZip(releaseVersion, AllFilesZipFormat.CurrentVersion) is null)
+        {
+            return new ZipDelivery.Stream(releaseVersion);
+        }
 
         await RecordZipDownloadAnalytics(releaseVersion, releaseFiles: null, fromPage, cancellationToken);
 
@@ -150,69 +148,26 @@ public class ReleaseFileService(
             return new NotFoundResult();
         }
 
-        var releaseVersionResult = await contentDbContext
+        return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(EnsurePublished)
-            .OnSuccess(userService.CheckCanViewReleaseVersion);
-
-        if (releaseVersionResult.IsLeft)
-        {
-            return releaseVersionResult.Left;
-        }
-
-        var releaseVersion = releaseVersionResult.Right;
-
-        // Temporarily disabled for the AFD-generated ZIP POC. The versioned endpoint
-        // generates a fresh ZIP on an AFD cache miss instead of reading the combined ZIP
-        // from Blob Storage.
-        // return await FindValidAllFilesZipOrNotFound(releaseVersion, formatVersion)
-        //     .OnSuccess(allFilesZip =>
-        //         publicBlobStorageService
-        //             .GetDownloadStream(
-        //                 PublicReleaseFiles,
-        //                 allFilesZip.Path,
-        //                 cancellationToken: cancellationToken
-        //             )
-        //             .OnSuccess(stream => new FileStreamResult(stream, MediaTypeNames.Application.Zip)
-        //             {
-        //                 FileDownloadName = releaseVersion.AllFilesZipFileName(),
-        //                 EnableRangeProcessing = true,
-        //             })
-        //     );
-
-        var temporaryZipPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.zip");
-        var temporaryZipStream = new FileStream(
-            temporaryZipPath,
-            FileMode.CreateNew,
-            FileAccess.ReadWrite,
-            FileShare.Read,
-            bufferSize: 81920,
-            FileOptions.Asynchronous | FileOptions.DeleteOnClose
-        );
-
-        try
-        {
-            await ZipAllFilesToStream(
-                releaseVersion,
-                temporaryZipStream,
-                cancellationToken,
-                leaveOutputStreamOpen: true
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccessCombineWith(releaseVersion => FindValidAllFilesZipOrNotFound(releaseVersion, formatVersion))
+            .OnSuccess(releaseVersionAndZip =>
+                publicBlobStorageService
+                    .GetDownloadStream(
+                        PublicReleaseFiles,
+                        releaseVersionAndZip.Item2.Path,
+                        cancellationToken: cancellationToken
+                    )
+                    .OnSuccess(stream => new FileStreamResult(stream, MediaTypeNames.Application.Zip)
+                    {
+                        FileDownloadName = releaseVersionAndZip.Item1.AllFilesZipFileName(),
+                        EnableRangeProcessing = true,
+                    })
             );
-            temporaryZipStream.Position = 0;
-
-            return new FileStreamResult(temporaryZipStream, MediaTypeNames.Application.Zip)
-            {
-                FileDownloadName = releaseVersion.AllFilesZipFileName(),
-                EnableRangeProcessing = true,
-            };
-        }
-        catch
-        {
-            await temporaryZipStream.DisposeAsync();
-            throw;
-        }
     }
 
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
@@ -234,20 +189,16 @@ public class ReleaseFileService(
 
                 if (fileIds is null)
                 {
-                    // Temporarily disabled for the AFD-generated ZIP POC. All-files ZIPs
-                    // are generated rather than read from the combined ZIP Blob.
-                    // var successfullyStreamCachedAllFilesZip = await TryStreamCachedAllFilesZip(
-                    //     releaseVersion,
-                    //     outputStream,
-                    //     cancellationToken
-                    // );
-                    //
-                    // if (!successfullyStreamCachedAllFilesZip)
-                    // {
-                    //     await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
-                    // }
+                    var successfullyStreamCachedAllFilesZip = await TryStreamCachedAllFilesZip(
+                        releaseVersion,
+                        outputStream,
+                        cancellationToken
+                    );
 
-                    await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
+                    if (!successfullyStreamCachedAllFilesZip)
+                    {
+                        await ZipAllFilesToStream(releaseVersion, outputStream, cancellationToken);
+                    }
                 }
                 else
                 {
@@ -334,8 +285,7 @@ public class ReleaseFileService(
     private async Task ZipAllFilesToStream(
         ReleaseVersion releaseVersion,
         Stream outputStream,
-        CancellationToken cancellationToken,
-        bool leaveOutputStreamOpen = false
+        CancellationToken cancellationToken
     )
     {
         var releaseFiles = (
@@ -344,43 +294,38 @@ public class ReleaseFileService(
             .OrderBy(rf => rf.File.ZipFileEntryName())
             .ToList();
 
-        // var path = Path.GetTempPath() + releaseVersion.AllFilesZipFileName();
-        // var fileStream = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        var path = Path.GetTempPath() + releaseVersion.AllFilesZipFileName();
+        var fileStream = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 
-        // await using var multiWriteStream = new MultiWriteStream(outputStream, fileStream);
+        await using var multiWriteStream = new MultiWriteStream(outputStream, fileStream);
 
-        await DoZipFilesToStream(releaseFiles, releaseVersion, outputStream, cancellationToken, leaveOutputStreamOpen);
-
-        if (leaveOutputStreamOpen)
-        {
-            await outputStream.FlushAsync(cancellationToken);
-        }
+        await DoZipFilesToStream(releaseFiles, releaseVersion, multiWriteStream, cancellationToken);
+        await multiWriteStream.FlushAsync(cancellationToken);
 
         // Now cache the All files zip into blob storage
         // so that we can quickly fetch it again.
-        // fileStream.Position = 0;
+        fileStream.Position = 0;
 
-        // await publicBlobStorageService.UploadStream(
-        //     containerName: PublicReleaseFiles,
-        //     path: releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion),
-        //     sourceStream: fileStream,
-        //     contentType: MediaTypeNames.Application.Zip,
-        //     cancellationToken: cancellationToken
-        // );
-        //
-        // await fileStream.DisposeAsync();
-        // File.Delete(path);
+        await publicBlobStorageService.UploadStream(
+            containerName: PublicReleaseFiles,
+            path: releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion),
+            sourceStream: fileStream,
+            contentType: MediaTypeNames.Application.Zip,
+            cancellationToken: cancellationToken
+        );
+
+        await fileStream.DisposeAsync();
+        File.Delete(path);
     }
 
     private async Task DoZipFilesToStream(
         List<ReleaseFile> releaseFiles,
         ReleaseVersion releaseVersion,
         Stream outputStream,
-        CancellationToken cancellationToken,
-        bool leaveOutputStreamOpen = false
+        CancellationToken cancellationToken
     )
     {
-        using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: leaveOutputStreamOpen);
+        using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
         var releaseFilesWithZipEntries = new List<ReleaseFile>();
 
