@@ -115,6 +115,36 @@ async function killPortHolder(port: number): Promise<void> {
   await $({ reject: false })`fuser -k ${port}/tcp`;
 }
 
+/**
+ * Tail of the queue serialising dotnet builds *within this process*.
+ *
+ * The file lock these builds also take only coordinates with other processes
+ * (the `start` CLI): cross-process-lock hands the lock straight over when the
+ * requesting pid matches the one holding it, and every service here is
+ * started from the dashboard's single Node process - so between two services
+ * the dashboard starts, it's a no-op. Anything that starts several at once
+ * (restarting everything after a backup, say) would otherwise build them
+ * concurrently, and concurrent builds corrupt each other through the shared
+ * `src/artifacts` output tree - see https://github.com/dotnet/sdk/issues/9487.
+ */
+let buildQueueTail: Promise<void> = Promise.resolve();
+
+/**
+ * Waits for any in-progress build to finish, resolving to the function that
+ * lets the next one start. Callers must always call it, including on failure,
+ * or every later build queues behind them forever.
+ */
+function enterBuildQueue(): Promise<() => void> {
+  const previous = buildQueueTail;
+
+  let leave!: () => void;
+  buildQueueTail = new Promise<void>(resolve => {
+    leave = resolve;
+  });
+
+  return previous.then(() => leave);
+}
+
 export async function startProcess(
   service: ServiceName,
   options: StartOptions = {},
@@ -149,8 +179,9 @@ export async function startProcess(
   entry.logs = [];
 
   // Hoisted so a failure part-way through can hand the dotnet build
-  // mutex back rather than holding it for the life of the dashboard.
-  let unlock: UnlockCallback | undefined;
+  // mutex back rather than holding it for the life of the dashboard. Clears
+  // itself when called, so the release sites below can't double-release.
+  let releaseBuildMutex: UnlockCallback | undefined;
 
   try {
     await startDockerServices(resolveDockerServices(service, options));
@@ -174,18 +205,35 @@ export async function startProcess(
         ? undefined
         : options.env.PublicDataDbExists === 'true';
 
-    unlock = runCommand.lockUntilReady
-      ? await createFileLock({
+    if (runCommand.lockUntilReady) {
+      const leaveBuildQueue = await enterBuildQueue();
+
+      try {
+        // Generous timeouts because this is held until the service is ready,
+        // not just built, and a queue of cold dotnet builds takes a while.
+        // `lockTimeout` expiring would hand the lock to another process
+        // mid-build, which is the very thing it's here to prevent.
+        const unlockFile = await createFileLock({
           lockFile: dotnetBuildLockFile,
-          lockTimeout: 300_000,
-          waitTimeout: 300_000,
+          lockTimeout: 1_800_000,
+          waitTimeout: 1_800_000,
           onExistingLock: () =>
             appendLog(
               entry,
               '[dashboard] Waiting for another build to finish...',
             ),
-        })
-      : undefined;
+        });
+
+        releaseBuildMutex = async () => {
+          releaseBuildMutex = undefined;
+          await unlockFile();
+          leaveBuildQueue();
+        };
+      } catch (err) {
+        leaveBuildQueue();
+        throw err;
+      }
+    }
 
     const childProcess = $({
       cwd: path.join(projectRoot, schema.root),
@@ -215,7 +263,7 @@ export async function startProcess(
 
       isReady = true;
       entry.status = 'running';
-      await unlock?.();
+      await releaseBuildMutex?.();
       resolveSettled();
     };
 
@@ -239,7 +287,7 @@ export async function startProcess(
 
     childProcess.on('exit', async (code, signal) => {
       if (!isReady) {
-        await unlock?.();
+        await releaseBuildMutex?.();
       }
 
       const wasStopping = entry.status === 'stopping';
@@ -268,7 +316,7 @@ export async function startProcess(
     if (!entry.process) {
       // Never got as far as spawning, so nothing else will hand the dotnet
       // build mutex back or settle these for us.
-      await unlock?.();
+      await releaseBuildMutex?.();
       entry.settled = Promise.resolve();
       entry.exited = Promise.resolve();
     }
