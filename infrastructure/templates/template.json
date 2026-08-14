@@ -2160,60 +2160,6 @@
       }
     },
     {
-      "condition": "[equals(parameters('environmentName'), 'Development')]",
-      "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2022-02-01-preview",
-      "name": "[parameters('containerRegistryName')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Standard",
-        "tier": "Standard"
-      },
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Container Registry",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "adminUserEnabled": false,
-        "policies": {
-          "quarantinePolicy": {
-            "status": "disabled"
-          },
-          "trustPolicy": {
-            "type": "Notary",
-            "status": "disabled"
-          },
-          "exportPolicy": {
-            "status": "enabled"
-          },
-          "azureADAuthenticationAsArmPolicy": {
-            "status": "enabled"
-          },
-          "softDeletePolicy": {
-            "retentionDays": 7,
-            "status": "enabled"
-          }
-        },
-        "encryption": {
-          "status": "disabled"
-        },
-        "dataEndpointEnabled": false,
-        "publicNetworkAccess": "Enabled",
-        "networkRuleBypassOptions": "AzureServices",
-        "zoneRedundancy": "Disabled",
-        "anonymousPullEnabled": false
-      }
-    },
-    {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
       "kind": "app,linux,container",

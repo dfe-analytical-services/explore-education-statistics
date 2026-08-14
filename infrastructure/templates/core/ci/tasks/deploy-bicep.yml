@@ -19,6 +19,8 @@ parameters:
     type: string
   - name: deployApplicationGateway
     type: string
+  - name: deployContainerRegistry
+    type: string  
   - name: deployAlerts
     type: string
 
@@ -45,5 +47,6 @@ steps:
               deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
               deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
+              deployContainerRegistry=${{ parameters.deployContainerRegistry }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'
