@@ -72,12 +72,55 @@ logPanelBackdrop.addEventListener('click', closeLogPanel);
 
 let currentLogSource = null;
 let currentLogService = null;
+let pendingLogLines = [];
+let logFlushHandle = null;
+
+/**
+ * Appends every line buffered since the last flush in one go.
+ *
+ * Opening a Docker service's logs replays up to 500 lines as an immediate
+ * burst of SSE events, so writing each line as it arrives meant re-serialising
+ * the whole panel (`textContent +=` is O(n^2) over the total text) and forcing
+ * a synchronous reflow per line by reading `scrollHeight`. Batching keeps both
+ * costs to once per tick no matter how fast lines arrive.
+ *
+ * Scheduled on a timer rather than `requestAnimationFrame` because rAF doesn't
+ * fire while the tab is hidden - lines would queue up unrendered until you
+ * switched back to it.
+ */
+function flushLogLines() {
+  logFlushHandle = null;
+
+  if (pendingLogLines.length === 0) {
+    return;
+  }
+
+  // Measure before appending, and only stick to the bottom if we were already
+  // there - otherwise a burst yanks the view away while you're reading back.
+  const pinnedToBottom =
+    logPanelContent.scrollHeight - logPanelContent.scrollTop <=
+    logPanelContent.clientHeight + 20;
+
+  logPanelContent.appendChild(
+    document.createTextNode(`${pendingLogLines.join('\n')}\n`),
+  );
+  pendingLogLines = [];
+
+  if (pinnedToBottom) {
+    logPanelContent.scrollTop = logPanelContent.scrollHeight;
+  }
+}
 
 function closeLogPanel() {
   if (currentLogSource) {
     currentLogSource.close();
     currentLogSource = null;
   }
+  if (logFlushHandle !== null) {
+    clearTimeout(logFlushHandle);
+    logFlushHandle = null;
+  }
+  pendingLogLines = [];
   currentLogService = null;
   logPanel.classList.add('hidden');
   logPanelBackdrop.classList.add('hidden');
@@ -98,9 +141,11 @@ function openLogPanel(name) {
 
   currentLogSource = new EventSource(`/api/services/${name}/logs`);
   currentLogSource.onmessage = event => {
-    const line = JSON.parse(event.data);
-    logPanelContent.textContent += `${line}\n`;
-    logPanelContent.scrollTop = logPanelContent.scrollHeight;
+    pendingLogLines.push(JSON.parse(event.data));
+
+    if (logFlushHandle === null) {
+      logFlushHandle = setTimeout(flushLogLines, 16);
+    }
   };
 }
 
