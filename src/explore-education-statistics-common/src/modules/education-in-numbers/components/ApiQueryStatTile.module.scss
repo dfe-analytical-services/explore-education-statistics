@@ -1,0 +1,22 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.tile {
+  background-color: govuk-colour('black', $variant: 'tint-95');
+  padding: govuk-spacing(4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  * {
+    padding-top: 0 !important;
+    margin-bottom: govuk-spacing(1);
+  }
+}
+
+.notLatestTag {
+  // The tile resets padding-top on everything inside it, which would otherwise
+  // knock the tag's text off-centre within its pill.
+  padding-top: 2px !important;
+  // Stops the tag stretching to the full width of the tile's flex column.
+  align-self: flex-start;
+}

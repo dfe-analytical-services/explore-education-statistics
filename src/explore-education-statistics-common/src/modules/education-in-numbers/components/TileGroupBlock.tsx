@@ -2,7 +2,7 @@ import FreeTextStatTile from '@common/modules/education-in-numbers/components/Fr
 import TileWrapper from '@common/modules/education-in-numbers/components/TileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import React from 'react';
-import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryTextStatTile';
+import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryStatTile';
 
 export interface TileGroupBlockProps {
   block: EinTileGroupBlock;
@@ -19,24 +19,24 @@ const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
           {title}
         </h3>
       )}
-      {tiles.map(tile => {
-        switch (tile.type) {
-          case 'FreeTextStatTile':
-            return (
-              <TileWrapper key={tile.id}>
-                <FreeTextStatTile tile={tile} />
-              </TileWrapper>
-            );
-          case 'ApiQueryStatTile':
-            return (
-              <TileWrapper key={tile.id}>
-                <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />
-              </TileWrapper>
-            );
-          default:
-            return null;
-        }
-      })}
+      <TileWrapper>
+        {tiles.map(tile => {
+          switch (tile.type) {
+            case 'FreeTextStatTile':
+              return <FreeTextStatTile key={tile.id} tile={tile} />;
+            case 'ApiQueryStatTile':
+              return (
+                <ApiQueryStatTile
+                  key={tile.id}
+                  tile={tile}
+                  publicAppUrl={publicAppUrl}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
+      </TileWrapper>
     </div>
   );
 };

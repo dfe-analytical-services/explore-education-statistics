@@ -1,4 +1,5 @@
-import styles from '@common/modules/education-in-numbers/components/FreeTextStatTile.module.scss';
+import Tag from '@common/components/Tag';
+import styles from '@common/modules/education-in-numbers/components/ApiQueryStatTile.module.scss';
 import formatPretty from '@common/utils/number/formatPretty';
 import React from 'react';
 import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
@@ -23,6 +24,7 @@ const ApiQueryStatTile = ({
     statistic,
     indicatorUnit,
     decimalPlaces,
+    isLatestVersion,
     publicationSlug,
     releaseSlug,
     publicationLabel,
@@ -41,6 +43,15 @@ const ApiQueryStatTile = ({
           ? formatPretty(statistic, indicatorUnit, decimalPlaces)
           : 'No statistic available'}
       </p>
+      {!isLatestVersion && (
+        <Tag
+          className={styles.notLatestTag}
+          colour="orange"
+          testId={`${testId}-not-latest-tag`}
+        >
+          Not the latest data
+        </Tag>
+      )}
       {publicationSlug && releaseSlug && publicationLabel && releaseLabel && (
         <a
           href={releaseUrl}

@@ -7,7 +7,8 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryTextStatTile';
+import WarningMessage from '@common/components/WarningMessage';
+import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryStatTile';
 import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
 import { EinTile } from '@common/services/types/einBlocks';
 import React from 'react';
@@ -99,6 +100,18 @@ export default function EditableTile({
   return (
     <div>
       {tileContent}
+
+      {showActions &&
+        tile.type === 'ApiQueryStatTile' &&
+        !tile.isLatestVersion && (
+          <WarningMessage
+            className="govuk-!-margin-top-2 govuk-!-margin-bottom-0"
+            testId="apiQueryStatTile-notLatestVersionWarning"
+          >
+            A newer version of this tile's API data set has been published. Edit
+            the tile to re-run its query against the latest version.
+          </WarningMessage>
+        )}
 
       {showActions && (
         <ButtonGroup className="govuk-!-margin-top-2">
