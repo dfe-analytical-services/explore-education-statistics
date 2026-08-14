@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -1035,6 +1036,91 @@ public class ReleaseFileServiceTests : IDisposable
         );
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task GetZipDelivery_SupersededPublishedReleaseVersion_ReturnsNotFound(bool selectedFiles)
+    {
+        var releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(DateTimeOffset.UtcNow.AddDays(-1))
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            )
+            .Generate();
+
+        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+        releaseVersionRepository
+            .Setup(repository =>
+                repository.IsLatestPublishedReleaseVersion(releaseVersion.Id, It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(false);
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+        var service = SetupReleaseFileService(
+            contentDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            analyticsManager: analyticsManager.Object,
+            releaseVersionRepository: releaseVersionRepository.Object
+        );
+
+        var result = await service.GetZipDelivery(
+            releaseVersion,
+            AnalyticsFromPage.ReleaseDownloads,
+            fileIds: selectedFiles ? [Guid.NewGuid()] : null
+        );
+
+        result.AssertNotFound();
+        releaseVersionRepository.VerifyAll();
+        publicBlobStorageService.VerifyNoOtherCalls();
+        analyticsManager.VerifyNoOtherCalls();
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task GetZipDelivery_UnpublishedReleaseVersion_ReturnsNotFound(
+        bool futurePublication,
+        bool selectedFiles
+    )
+    {
+        var releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(futurePublication ? DateTimeOffset.UtcNow.AddDays(1) : null)
+            .Generate();
+        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+        var userService = new Mock<IUserService>(MockBehavior.Strict);
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var service = SetupReleaseFileService(
+            contentDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            userService: userService.Object,
+            analyticsManager: analyticsManager.Object,
+            releaseVersionRepository: releaseVersionRepository.Object
+        );
+
+        var result = await service.GetZipDelivery(
+            releaseVersion,
+            AnalyticsFromPage.ReleaseDownloads,
+            fileIds: selectedFiles ? [Guid.NewGuid()] : null
+        );
+
+        result.AssertNotFound();
+        releaseVersionRepository.VerifyNoOtherCalls();
+        publicBlobStorageService.VerifyNoOtherCalls();
+        userService.VerifyNoOtherCalls();
+        analyticsManager.VerifyNoOtherCalls();
+    }
+
     [Fact]
     public async Task StreamCachedAllFilesZip_CurrentVersion_ReturnsRangeEnabledDownload()
     {
@@ -1082,6 +1168,51 @@ public class ReleaseFileServiceTests : IDisposable
         Assert.Equal(releaseVersion.AllFilesZipFileName(), file.FileDownloadName);
         Assert.Equal(MediaTypeNames.Application.Zip, file.ContentType);
         await file.FileStream.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task StreamCachedAllFilesZip_SupersededPublishedReleaseVersion_ReturnsNotFound()
+    {
+        var releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(DateTimeOffset.UtcNow.AddDays(-1))
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+            )
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+        releaseVersionRepository
+            .Setup(repository =>
+                repository.IsLatestPublishedReleaseVersion(releaseVersion.Id, It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(false);
+
+        await using var testContentDbContext = InMemoryContentDbContext(contentDbContextId);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+        var service = SetupReleaseFileService(
+            testContentDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            analyticsManager: analyticsManager.Object,
+            releaseVersionRepository: releaseVersionRepository.Object
+        );
+
+        var result = await service.StreamCachedAllFilesZip(releaseVersion.Id, AllFilesZipFormat.CurrentVersion);
+
+        result.AssertNotFound();
+        releaseVersionRepository.VerifyAll();
+        publicBlobStorageService.VerifyNoOtherCalls();
+        analyticsManager.VerifyNoOtherCalls();
     }
 
     [Fact]
@@ -1294,6 +1425,7 @@ public class ReleaseFileServiceTests : IDisposable
         IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
         IUserService? userService = null,
         IAnalyticsManager? analyticsManager = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
         ILogger<ReleaseFileService>? logger = null
     )
     {
@@ -1304,6 +1436,11 @@ public class ReleaseFileServiceTests : IDisposable
             dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             analyticsManager ?? Mock.Of<IAnalyticsManager>(),
+            releaseVersionRepository
+                ?? Mock.Of<IReleaseVersionRepository>(repository =>
+                    repository.IsLatestPublishedReleaseVersion(It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+                    == Task.FromResult(true)
+                ),
             logger ?? Mock.Of<ILogger<ReleaseFileService>>(MockBehavior.Strict)
         );
     }

@@ -21,6 +21,11 @@ param contentApiOriginHostName string
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
 var certificateName = '${subscription}-as-ees-content-afd-certificate'
+var publisherFunctionName = '${subscription}-fa-ees-publisher'
+var cdnEndpointContributorRoleDefinitionId = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  '426e0c7f-0c7e-4658-b36f-ff54d6c29b45'
+)
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
@@ -29,6 +34,20 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
 resource endpoint 'Microsoft.Cdn/profiles/afdendpoints@2025-04-15' existing = {
   parent: frontDoor
   name: frontDoorEndpointName
+}
+
+resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
+  name: publisherFunctionName
+}
+
+resource publisherFrontDoorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(endpoint.id, publisherFunction.id, cdnEndpointContributorRoleDefinitionId)
+  scope: endpoint
+  properties: {
+    roleDefinitionId: cdnEndpointContributorRoleDefinitionId
+    principalId: publisherFunction.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
 }
 
 resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {

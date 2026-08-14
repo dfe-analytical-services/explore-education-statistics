@@ -21,6 +21,7 @@ public class ContentService : IContentService
     private readonly IReleaseService _releaseService;
     private readonly IMethodologyCacheService _methodologyCacheService;
     private readonly IPublicationsTreeService _publicationsTreeService;
+    private readonly IFrontDoorCacheService _frontDoorCacheService;
 
     public ContentService(
         ContentDbContext contentDbContext,
@@ -29,7 +30,8 @@ public class ContentService : IContentService
         IBlobStorageService publicBlobStorageService,
         IReleaseService releaseService,
         IMethodologyCacheService methodologyCacheService,
-        IPublicationsTreeService publicationsTreeService
+        IPublicationsTreeService publicationsTreeService,
+        IFrontDoorCacheService frontDoorCacheService
     )
     {
         _contentDbContext = contentDbContext;
@@ -39,6 +41,7 @@ public class ContentService : IContentService
         _releaseService = releaseService;
         _methodologyCacheService = methodologyCacheService;
         _publicationsTreeService = publicationsTreeService;
+        _frontDoorCacheService = frontDoorCacheService;
     }
 
     public async Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds)
@@ -82,22 +85,29 @@ public class ContentService : IContentService
         );
     }
 
-    public async Task DeletePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds)
+    public async Task InvalidatePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds)
     {
         var releaseVersions = await _contentDbContext
             .ReleaseVersions.Where(rv => releaseVersionIds.Contains(rv.Id))
             .Include(rv => rv.PreviousVersion)
             .ToListAsync();
 
-        foreach (var releaseVersion in releaseVersions)
+        var previousReleaseVersionIds = releaseVersions
+            .Where(releaseVersion => releaseVersion.PreviousVersion != null)
+            .Select(releaseVersion => releaseVersion.PreviousVersion!.Id)
+            .ToHashSet();
+
+        foreach (var previousReleaseVersionId in previousReleaseVersionIds)
         {
-            if (releaseVersion.PreviousVersion != null)
-            {
-                await _publicBlobStorageService.DeleteBlobs(
-                    containerName: PublicReleaseFiles,
-                    directoryPath: $"{releaseVersion.PreviousVersion.Id}/"
-                );
-            }
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: PublicReleaseFiles,
+                directoryPath: $"{previousReleaseVersionId}/"
+            );
+        }
+
+        if (previousReleaseVersionIds.Count > 0)
+        {
+            await _frontDoorCacheService.PurgeAllFilesZipCache(previousReleaseVersionIds);
         }
     }
 

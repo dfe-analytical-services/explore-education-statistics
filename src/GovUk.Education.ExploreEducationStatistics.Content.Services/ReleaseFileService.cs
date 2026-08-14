@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -30,6 +31,7 @@ public class ReleaseFileService(
     IDataGuidanceFileWriter dataGuidanceFileWriter,
     IUserService userService,
     IAnalyticsManager analyticsManager,
+    IReleaseVersionRepository releaseVersionRepository,
     ILogger<ReleaseFileService> logger
 ) : IReleaseFileService
 {
@@ -116,17 +118,38 @@ public class ReleaseFileService(
         CancellationToken cancellationToken = default
     )
     {
-        if (fileIds is not null || releaseVersion.Published is null || releaseVersion.Published > DateTimeOffset.UtcNow)
+        return await EnsurePublished(releaseVersion)
+            .OnSuccess(publishedReleaseVersion =>
+                EnsureLatestPublishedReleaseVersion(publishedReleaseVersion, cancellationToken)
+            )
+            .OnSuccess(latestPublishedReleaseVersion =>
+                ResolveZipDelivery(latestPublishedReleaseVersion, fromPage, fileIds, cancellationToken)
+            );
+    }
+
+    private async Task<Either<ActionResult, ZipDelivery>> ResolveZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        IEnumerable<Guid>? fileIds,
+        CancellationToken cancellationToken
+    )
+    {
+        if (fileIds is not null)
         {
             return new ZipDelivery.Stream(releaseVersion);
         }
 
-        var permissionResult = await userService.CheckCanViewReleaseVersion(releaseVersion);
-        if (permissionResult.IsLeft)
-        {
-            return permissionResult.Left;
-        }
+        return await userService
+            .CheckCanViewReleaseVersion(releaseVersion)
+            .OnSuccess(() => GetAllFilesZipDelivery(releaseVersion, fromPage, cancellationToken));
+    }
 
+    private async Task<Either<ActionResult, ZipDelivery>> GetAllFilesZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        CancellationToken cancellationToken
+    )
+    {
         if (await FindValidAllFilesZip(releaseVersion, AllFilesZipFormat.CurrentVersion) is null)
         {
             return new ZipDelivery.Stream(releaseVersion);
@@ -153,6 +176,7 @@ public class ReleaseFileService(
                 .ThenInclude(r => r.Publication)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
             .OnSuccess(EnsurePublished)
+            .OnSuccess(releaseVersion => EnsureLatestPublishedReleaseVersion(releaseVersion, cancellationToken))
             .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccessCombineWith(releaseVersion => FindValidAllFilesZipOrNotFound(releaseVersion, formatVersion))
             .OnSuccess(releaseVersionAndZip =>
@@ -270,6 +294,16 @@ public class ReleaseFileService(
         return releaseVersion.Published is null || releaseVersion.Published > DateTimeOffset.UtcNow
             ? new NotFoundResult()
             : releaseVersion;
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> EnsureLatestPublishedReleaseVersion(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        return await releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id, cancellationToken)
+            ? releaseVersion
+            : new NotFoundResult();
     }
 
     private async Task<Either<ActionResult, BlobInfo>> FindValidAllFilesZipOrNotFound(
