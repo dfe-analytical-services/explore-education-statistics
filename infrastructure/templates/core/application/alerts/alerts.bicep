@@ -32,3 +32,5 @@ module alertsActionGroupModule 'alerts-action-group.bicep' = {
     alertsLogicAppName: alertsLogicAppModule.outputs.alertsLogicAppName
   }
 }
+
+output actionGroupName string = alertsActionGroupModule.outputs.actionGroupName

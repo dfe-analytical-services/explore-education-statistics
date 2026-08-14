@@ -43,6 +43,12 @@ type ContainerAppMetric = {
     | 'RestartCount'
 }
 
+type DataFactoryMetric = {
+  resourceType: 'Microsoft.DataFactory/factories'
+  metric:
+    | 'ActivityFailedRuns'
+}
+
 type EventGridCustomTopicMetric = {
   resourceType: 'Microsoft.EventGrid/topics'
   metric:
@@ -151,6 +157,7 @@ type ResourceMetric =
   | AppServicePlanMetric
   | ContainerAppMetric
   | ContainerAppMetric
+  | DataFactoryMetric
   | EventGridCustomTopicMetric
   | FileServiceMetric
   | FrontDoorMetric
