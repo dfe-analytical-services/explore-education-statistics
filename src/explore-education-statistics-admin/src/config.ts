@@ -37,7 +37,7 @@ export async function getConfig(): Promise<Config> {
       ...fetchedConfig,
       // May be configured with or without a trailing slash, so normalise it to
       // never have one, allowing paths to be appended to it safely.
-      publicAppUrl: fetchedConfig.publicAppUrl.replace(/\/$/, ''),
+      publicAppUrl: fetchedConfig.publicAppUrl.replace(/\/+$/, ''),
     };
   }
   return config;
