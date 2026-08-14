@@ -31,6 +31,9 @@ param certificateType FrontDoorCertificateType = 'BringYourOwn'
 @description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
 param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
 
+@description('Specify if manual deletion of backups is allowed in Recovery Services Vault.')
+param recoveryServicesVaultImmutable bool = false
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -48,6 +51,9 @@ param deployApplicationGateway bool = false
 
 @description('Whether or not to deploy Data Factory.')
 param deployDataFactory bool = false
+
+@description('Whether or not to deploy Recovery Services Vault and its policies.')
+param deployRecoveryServicesVault bool = false
 
 @description('Whether or not to deploy the Container Registry.')
 param deployContainerRegistry bool = false
@@ -73,7 +79,7 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-var resourcePrefix = '${subscription}-ees'
+var commonResourcePrefix = '${subscription}-ees'
 var publicApiResourcePrefix = '${subscription}-ees-papi'
 
 var resourceNames = {
@@ -114,7 +120,7 @@ module keyVaultModule 'application/keyVault/keyVault.bicep' = {
 module logAnalyticsWorkspaceModule 'application/log-analytics-workspace/log-analytics-workspace.bicep' = {
   name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
   params: {
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     location: location
     tagValues: tagValues
   }
@@ -134,8 +140,10 @@ module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    deployRecoveryServicesVault: deployRecoveryServicesVault
+    recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
     tagValues: tagValues
   }
 }
@@ -144,7 +152,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     resourceNames: {
       adminApp: resourceNames.existingResources.adminApp
       alertsGroup: alertsModule.outputs.actionGroupName
@@ -164,7 +172,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
   params: {
     subscription: subscription
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId

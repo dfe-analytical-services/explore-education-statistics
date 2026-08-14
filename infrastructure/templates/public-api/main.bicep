@@ -72,9 +72,6 @@ param acrResourceGroupName string = ''
 @description('Public API docs app : SKU to use.')
 param docsAppSku StaticWebAppSku = 'Free'
 
-@description('Recovery Services Vault : specify if manual deletion of backups is allowed or not.')
-param recoveryVaultImmutable bool = false
-
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
@@ -108,9 +105,6 @@ param deployDocsSite bool = true
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
-
-@description('Does the Recovery Services Vault need creating or updating?')
-param deployRecoveryVault bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -216,7 +210,6 @@ var resourceNames = {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
     recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
-    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
     searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
   }
   publicApi: {
@@ -298,27 +291,6 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     deployAlerts: deployAlerts
     deployBackupVaultRoleAssignment: deployPsqlBackupVaultRoleAssignment
     deployBackupVaultRegistration: deployPsqlBackupVaultRegistration
-    tagValues: tagValues
-  }
-}
-
-module recoveryVaultModule 'application/shared/recoveryVault.bicep' = if (deployRecoveryVault) {
-  name: 'recoveryVaultApplicationModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    immutable: recoveryVaultImmutable
-    tagValues: tagValues
-  }
-}
-
-module publicApiStorageBackupModule 'components/recoveryVaultFileShareRegistration.bicep' = if (deployRecoveryVault) {
-  name: 'publicApiStorageBackupModuleDeploy'
-  params: {
-    vaultName: resourceNames.sharedResources.recoveryVault
-    backupPolicyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
-    storageAccountName: publicApiStorageModule.outputs.publicApiStorageAccountName
-    fileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     tagValues: tagValues
   }
 }

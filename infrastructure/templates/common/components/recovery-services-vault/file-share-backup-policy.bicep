@@ -1,4 +1,4 @@
-import { DayOfWeek, WeekOfMonth, MonthOfYear } from '../types.bicep'
+import { DayOfWeek, WeekOfMonth, MonthOfYear } from '../../types.bicep'
 
 @description('The name of the backup policy')
 param policyName string
