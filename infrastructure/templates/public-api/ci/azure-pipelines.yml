@@ -29,13 +29,6 @@ parameters:
       - Yes
       - No
     default: Yes
-  - name: deployRecoveryVault
-    displayName: Does the Recovery Services Vault need creating or updating?
-    type: string
-    values:
-      - Yes
-      - No
-    default: No
   - name: deployAlerts
     displayName: Do the Azure Monitor alerts need creating or updating?
     type: string
@@ -99,8 +92,6 @@ variables:
     value: ${{ iif(eq(parameters.deployDataProcessor, 'Yes'), true, false) }}
   - name: deployDocsSite
     value: ${{ iif(eq(parameters.deployDocsSite, 'Yes'), true, false) }}
-  - name: deployRecoveryVault
-    value: ${{ iif(eq(parameters.deployRecoveryVault, 'Yes'), true, false) }}
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
   - name: awaitActiveOrchestrations

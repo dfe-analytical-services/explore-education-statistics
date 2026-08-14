@@ -11,3 +11,5 @@ param publicApiApplicationGatewayFqdn = 'statistics.api.education.gov.uk'
 param publicApiPublicUrl = 'https://api.education.gov.uk/statistics'
 
 param slackAlertsChannel = 'C01MCTX47E3'
+
+param recoveryServicesVaultImmutable = true

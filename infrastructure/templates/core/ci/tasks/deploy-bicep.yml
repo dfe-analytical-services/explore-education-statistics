@@ -22,7 +22,9 @@ parameters:
   - name: deployDataFactory
     type: string
   - name: deployContainerRegistry
-    type: string  
+    type: string
+  - name: deployRecoveryServicesVault
+    type: string
   - name: deployAlerts
     type: string
 
@@ -51,5 +53,6 @@ steps:
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
               deployDataFactory=${{ parameters.deployDataFactory }} \
               deployContainerRegistry=${{ parameters.deployContainerRegistry }} \
+              deployRecoveryServicesVault=${{ parameters.deployRecoveryServicesVault }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'

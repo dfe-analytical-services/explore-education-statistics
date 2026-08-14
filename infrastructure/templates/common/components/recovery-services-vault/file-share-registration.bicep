@@ -1,5 +1,5 @@
 @description('The name of the backup policy to register the file share with.')
-param backupPolicyName string
+param backupPolicyName 'DailyPolicy'
 
 @description('The name of the owning Recovery Services Vault.')
 param vaultName string
