@@ -1,6 +1,7 @@
 import Tag from '@common/components/Tag';
 import styles from '@common/modules/education-in-numbers/components/ApiQueryStatTile.module.scss';
 import formatPretty from '@common/utils/number/formatPretty';
+import classNames from 'classnames';
 import React from 'react';
 import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
 
@@ -35,10 +36,16 @@ const ApiQueryStatTile = ({
 
   return (
     <div className={styles.tile} data-testid={`${testId}-tile`}>
-      <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
+      <h4
+        className={classNames('govuk-body-l', styles.title)}
+        data-testid={`${testId}-title`}
+      >
         {title ?? 'No title available'}
       </h4>
-      <p className="govuk-heading-m" data-testid={`${testId}-statistic`}>
+      <p
+        className={classNames('govuk-heading-m', styles.statistic)}
+        data-testid={`${testId}-statistic`}
+      >
         {statistic
           ? formatPretty(statistic, indicatorUnit, decimalPlaces)
           : 'No statistic available'}
@@ -53,24 +60,21 @@ const ApiQueryStatTile = ({
         </Tag>
       )}
       {publicationSlug && releaseSlug && publicationLabel && releaseLabel && (
-        <a
-          href={releaseUrl}
-          data-testid={`${testId}-link`}
-          className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
-        >
+        <div className={styles.meta}>
           <span
-            className="govuk-!-display-block"
-            data-testid={`${testId}-link-publication`}
-          >
-            {publicationLabel}
-          </span>
-          <span
-            className="govuk-!-display-block"
+            className={styles.release}
             data-testid={`${testId}-link-release`}
           >
             {releaseLabel}
           </span>
-        </a>
+          <a
+            href={releaseUrl}
+            data-testid={`${testId}-link`}
+            className={classNames('govuk-link', styles.publication)}
+          >
+            {publicationLabel}
+          </a>
+        </div>
       )}
     </div>
   );

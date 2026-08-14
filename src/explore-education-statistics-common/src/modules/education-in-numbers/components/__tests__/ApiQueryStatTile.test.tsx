@@ -24,17 +24,17 @@ describe('ApiQueryStatTile', () => {
       />,
     );
 
-    expect(
-      screen.getByTestId('api-query-stat-tile-link-publication'),
-    ).toHaveTextContent('Publication title');
-    expect(
-      screen.getByTestId('api-query-stat-tile-link-release'),
-    ).toHaveTextContent('Academic year 2023/24');
+    const link = screen.getByTestId('api-query-stat-tile-link');
 
-    expect(screen.getByTestId('api-query-stat-tile-link')).toHaveAttribute(
+    expect(link).toHaveTextContent('Publication title');
+    expect(link).toHaveAttribute(
       'href',
       'https://example.com/find-statistics/publication-slug/release-slug',
     );
+
+    expect(
+      screen.getByTestId('api-query-stat-tile-link-release'),
+    ).toHaveTextContent('Academic year 2023/24');
   });
 
   test('Formats the statistic using the indicator unit and decimal places', () => {
