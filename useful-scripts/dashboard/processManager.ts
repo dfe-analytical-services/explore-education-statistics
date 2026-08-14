@@ -13,7 +13,7 @@ import {
   serviceSchemas,
   StartOptions,
 } from '../services';
-import createFileLock from '../utils/createFileLock';
+import createFileLock, { UnlockCallback } from '../utils/createFileLock';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices } from './dockerManager';
 
@@ -148,112 +148,137 @@ export async function startProcess(
   entry.error = undefined;
   entry.logs = [];
 
-  await startDockerServices(resolveDockerServices(service, options));
+  // Hoisted so a failure part-way through can hand the dotnet build
+  // mutex back rather than holding it for the life of the dashboard.
+  let unlock: UnlockCallback | undefined;
 
-  await Promise.all(
-    resolveServiceDependencies(service, options).map(dependency =>
-      startProcess(dependency, options),
-    ),
-  );
+  try {
+    await startDockerServices(resolveDockerServices(service, options));
 
-  const port = getServicePort(service);
-
-  if (port) {
-    await killPortHolder(port);
-  }
-
-  const runCommand = buildRunCommand(service, options);
-
-  entry.publicDataDbExists =
-    options.env?.PublicDataDbExists === undefined
-      ? undefined
-      : options.env.PublicDataDbExists === 'true';
-
-  const unlock = runCommand.lockUntilReady
-    ? await createFileLock({
-        lockFile: dotnetBuildLockFile,
-        lockTimeout: 300_000,
-        waitTimeout: 300_000,
-        onExistingLock: () =>
-          appendLog(
-            entry,
-            '[dashboard] Waiting for another build to finish...',
-          ),
-      })
-    : undefined;
-
-  const childProcess = $({
-    cwd: path.join(projectRoot, schema.root),
-    env: runCommand.env,
-    shell: true,
-    cleanup: false,
-  })`${runCommand.command} ${runCommand.args}` as ExecaChildProcessWithoutNullStreams;
-
-  entry.process = childProcess;
-
-  let resolveExited: () => void;
-  entry.exited = new Promise<void>(resolve => {
-    resolveExited = resolve;
-  });
-
-  let resolveSettled: () => void;
-  entry.settled = new Promise<void>(resolve => {
-    resolveSettled = resolve;
-  });
-
-  let isReady = false;
-
-  const markReady = async () => {
-    if (isReady) {
-      return;
-    }
-
-    isReady = true;
-    entry.status = 'running';
-    await unlock?.();
-    resolveSettled();
-  };
-
-  // lockUntilReady only governs the dotnet-build mutex - readiness itself
-  // should wait for checkReady wherever one's defined, regardless of that.
-  if (!runCommand.checkReady) {
-    markReady();
-  }
-
-  childProcess.stdout.pipe(splitLines()).on('data', (line: string) => {
-    appendLog(entry, line);
-
-    if (!isReady && runCommand.checkReady?.(line)) {
-      markReady();
-    }
-  });
-
-  childProcess.stderr.pipe(splitLines()).on('data', (line: string) => {
-    appendLog(entry, line);
-  });
-
-  childProcess.on('exit', async (code, signal) => {
-    if (!isReady) {
-      await unlock?.();
-    }
-
-    const wasStopping = entry.status === 'stopping';
-
-    entry.process = undefined;
-    entry.status = wasStopping || code === 0 || signal ? 'stopped' : 'error';
-
-    if (entry.status === 'error') {
-      entry.error = `Process exited with code ${code}`;
-    }
-
-    appendLog(
-      entry,
-      `[dashboard] Process exited (code=${code}, signal=${signal})`,
+    await Promise.all(
+      resolveServiceDependencies(service, options).map(dependency =>
+        startProcess(dependency, options),
+      ),
     );
 
-    resolveExited();
-    resolveSettled();
-  });
+    const port = getServicePort(service);
+
+    if (port) {
+      await killPortHolder(port);
+    }
+
+    const runCommand = buildRunCommand(service, options);
+
+    entry.publicDataDbExists =
+      options.env?.PublicDataDbExists === undefined
+        ? undefined
+        : options.env.PublicDataDbExists === 'true';
+
+    unlock = runCommand.lockUntilReady
+      ? await createFileLock({
+          lockFile: dotnetBuildLockFile,
+          lockTimeout: 300_000,
+          waitTimeout: 300_000,
+          onExistingLock: () =>
+            appendLog(
+              entry,
+              '[dashboard] Waiting for another build to finish...',
+            ),
+        })
+      : undefined;
+
+    const childProcess = $({
+      cwd: path.join(projectRoot, schema.root),
+      env: runCommand.env,
+      shell: true,
+      cleanup: false,
+    })`${runCommand.command} ${runCommand.args}` as ExecaChildProcessWithoutNullStreams;
+
+    entry.process = childProcess;
+
+    let resolveExited: () => void;
+    entry.exited = new Promise<void>(resolve => {
+      resolveExited = resolve;
+    });
+
+    let resolveSettled: () => void;
+    entry.settled = new Promise<void>(resolve => {
+      resolveSettled = resolve;
+    });
+
+    let isReady = false;
+
+    const markReady = async () => {
+      if (isReady) {
+        return;
+      }
+
+      isReady = true;
+      entry.status = 'running';
+      await unlock?.();
+      resolveSettled();
+    };
+
+    // lockUntilReady only governs the dotnet-build mutex - readiness itself
+    // should wait for checkReady wherever one's defined, regardless of that.
+    if (!runCommand.checkReady) {
+      markReady();
+    }
+
+    childProcess.stdout.pipe(splitLines()).on('data', (line: string) => {
+      appendLog(entry, line);
+
+      if (!isReady && runCommand.checkReady?.(line)) {
+        markReady();
+      }
+    });
+
+    childProcess.stderr.pipe(splitLines()).on('data', (line: string) => {
+      appendLog(entry, line);
+    });
+
+    childProcess.on('exit', async (code, signal) => {
+      if (!isReady) {
+        await unlock?.();
+      }
+
+      const wasStopping = entry.status === 'stopping';
+
+      entry.process = undefined;
+      entry.status = wasStopping || code === 0 || signal ? 'stopped' : 'error';
+
+      if (entry.status === 'error') {
+        entry.error = `Process exited with code ${code}`;
+      }
+
+      appendLog(
+        entry,
+        `[dashboard] Process exited (code=${code}, signal=${signal})`,
+      );
+
+      resolveExited();
+      resolveSettled();
+    });
+  } catch (err) {
+    // Everything above runs with the service already marked 'starting', and
+    // the guard at the top of this function treats 'starting' as "already on
+    // its way up" - so without resetting it here a failure would leave the
+    // service wedged, with every later Start silently doing nothing until the
+    // dashboard was restarted.
+    if (!entry.process) {
+      // Never got as far as spawning, so nothing else will hand the dotnet
+      // build mutex back or settle these for us.
+      await unlock?.();
+      entry.settled = Promise.resolve();
+      entry.exited = Promise.resolve();
+    }
+
+    entry.status = 'error';
+    entry.error = err instanceof Error ? err.message : String(err);
+    appendLog(entry, `[dashboard] Failed to start: ${entry.error}`);
+
+    throw err;
+  }
 }
 
 /**
