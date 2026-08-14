@@ -5,13 +5,13 @@ import path from 'node:path';
 import fsp from 'node:fs/promises';
 import process from 'node:process';
 import {
-  adminUsesPublicDataDb,
   allowedServiceNames,
   projectRootOverride,
   resolveDockerServices,
   resolveServiceDependencies,
   ServiceName,
   serviceSchemas,
+  serviceUsesPublicDataDb,
 } from '../services';
 import { getDirname } from '../utils/nodeGlobals';
 import onExitSignal from '../utils/onExitSignal';
@@ -65,6 +65,26 @@ function isServiceName(value: string): value is ServiceName {
 
 function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
+}
+
+/**
+ * Whether a service is (or, if it isn't started, would be) using the public
+ * data database. While it's up, the env override it was actually started with
+ * wins - that's the dashboard's "Start with PublicData" checkbox forcing
+ * `PublicDataDbExists` - and otherwise we're back to its own appsettings.
+ *
+ * This is the single source of truth for the checkbox and for deciding
+ * whether admin needs restarting to pick the public API up, so that neither
+ * can disagree with what admin is really running with.
+ */
+function usesPublicDataDb(service: ServiceName): boolean {
+  const status = getStatus(service);
+  const isStarted = status === 'running' || status === 'starting';
+
+  return (
+    (isStarted ? getPublicDataDbOverride(service) : undefined) ??
+    serviceUsesPublicDataDb(service)
+  );
 }
 
 /**
@@ -176,7 +196,7 @@ app.get(
         processType: schema.type,
         status: getStatus(name),
         error: getError(name),
-        publicDataDbExists: getPublicDataDbOverride(name),
+        publicDataDbExists: usesPublicDataDb(name),
         dependsOnServices: resolveServiceDependencies(name, {}),
         dependsOn: resolveDockerServices(name, {}),
         url: schema.url,
@@ -207,12 +227,22 @@ app.post(
       return;
     }
 
-    if (name === 'admin' && req.body?.startPublicData) {
-      // Start the public API alongside admin, overriding the usual
-      // `PublicDataDbExists: false` appsetting via an env var (which .NET
-      // treats as higher-priority than appsettings).
-      await startProcess('admin', { env: { PublicDataDbExists: 'true' } });
-      await startProcess('publicData');
+    // The dashboard's "Start with PublicData" checkbox sends this either way
+    // round, so that an explicitly unticked box beats an appsettings default
+    // of `PublicDataDbExists: true` - whatever the checkbox showed is what
+    // admin ends up running with. .NET treats an env var as higher-priority
+    // than appsettings, so the override is all it takes.
+    if (name === 'admin' && typeof req.body?.startPublicData === 'boolean') {
+      const { startPublicData } = req.body;
+
+      await startProcess('admin', {
+        env: { PublicDataDbExists: String(startPublicData) },
+      });
+
+      if (startPublicData) {
+        await startProcess('publicData');
+      }
+
       res.json({ ok: true });
       return;
     }
@@ -225,7 +255,7 @@ app.post(
 
       if (
         (adminStatus === 'running' || adminStatus === 'starting') &&
-        !adminUsesPublicDataDb()
+        !usesPublicDataDb('admin')
       ) {
         await stopProcess('admin');
         await startProcess('admin', { env: { PublicDataDbExists: 'true' } });

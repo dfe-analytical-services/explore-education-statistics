@@ -203,6 +203,30 @@ function appendOpenLink(card, service) {
   card.appendChild(link);
 }
 
+function isStarted(service) {
+  return service?.status === 'running' || service?.status === 'starting';
+}
+
+/**
+ * Whether starting admin should also use (and start) the public API. Once
+ * admin is up this is simply what it's actually running with, as reported by
+ * the server. Before that, the user's explicit choice wins, and otherwise
+ * it's derived: admin's own PublicDataDbExists appsetting, or the public API
+ * already being up - starting admin without the override alongside a running
+ * publicData would leave the two unable to talk to each other.
+ */
+function startsWithPublicData(admin) {
+  if (isStarted(admin)) {
+    return Boolean(admin.publicDataDbExists);
+  }
+
+  return (
+    startPublicDataChoice ??
+    (Boolean(admin.publicDataDbExists) ||
+      isStarted(lastServices.find(s => s.name === 'publicData')))
+  );
+}
+
 function renderServiceCard(service) {
   const card = document.createElement('div');
   card.className = 'card';
@@ -241,13 +265,11 @@ function renderServiceCard(service) {
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    // Prefer what admin was actually started with (survives page refreshes);
-    // fall back to the in-session choice only when the server has no record.
-    checkbox.checked = service.publicDataDbExists ?? startPublicDataWithAdmin;
+    checkbox.checked = startsWithPublicData(service);
     checkbox.disabled = isRunning || isBusy;
     option.classList.toggle('disabled', isRunning || isBusy);
     checkbox.addEventListener('change', () => {
-      startPublicDataWithAdmin = checkbox.checked;
+      startPublicDataChoice = checkbox.checked;
       renderApp();
     });
     option.appendChild(checkbox);
@@ -261,18 +283,35 @@ function renderServiceCard(service) {
   toggleBtn.textContent = isRunning ? 'Stop' : 'Start';
   toggleBtn.disabled = isBusy;
   toggleBtn.addEventListener('click', async () => {
+    // Send admin's checkbox state either way round, so that starting it is
+    // always exactly what the checkbox showed - including deliberately
+    // without the public API when its appsettings would have used it.
+    const startPublicData =
+      service.name === 'admin' && !isRunning
+        ? startsWithPublicData(service)
+        : undefined;
+
+    if (
+      startPublicData === false &&
+      isStarted(lastServices.find(s => s.name === 'publicData')) &&
+      !window.confirm(
+        "'Start with PublicData' is unticked, so Admin will start without " +
+          'using the public API even though PublicData is running. Start it ' +
+          'anyway?',
+      )
+    ) {
+      return;
+    }
+
     toggleBtn.disabled = true;
     try {
-      const startPublicData =
-        service.name === 'admin' && !isRunning && startPublicDataWithAdmin;
-
       await api(
         `/api/services/${service.name}/${isRunning ? 'stop' : 'start'}`,
         {
           method: 'POST',
-          ...(startPublicData
-            ? { body: JSON.stringify({ startPublicData: true }) }
-            : {}),
+          ...(startPublicData === undefined
+            ? {}
+            : { body: JSON.stringify({ startPublicData }) }),
         },
       );
     } catch (err) {
@@ -413,9 +452,10 @@ function groupServices(services) {
 
 let lastServices = [];
 let fixingIssueId = null;
-// Whether starting admin should also start the public API (and force admin's
-// PublicDataDbExists setting), chosen via a checkbox on the Admin card.
-let startPublicDataWithAdmin = false;
+// The user's explicit "Start with PublicData" choice on the Admin card, or
+// null when they haven't touched it and it should follow the state of things
+// (see startsWithPublicData below).
+let startPublicDataChoice = null;
 
 // Issues are rendered in the banner at the top. Each one may name the service
 // it's associated with (e.g. the db container), shown as a chip that scrolls

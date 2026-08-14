@@ -6,6 +6,7 @@ import { projectRoot } from '../services';
 import { startDockerServices, stopDockerServices } from './dockerManager';
 import { ensureMssqlVolumePermissions } from './mssqlVolume';
 import {
+  getRestartOptions,
   startProcess,
   stopAllStartedProcesses,
   waitUntilSettled,
@@ -110,7 +111,7 @@ export default async function importMssqlDataZip(
   // import doesn't report as complete while services are still starting.
   await Promise.all(
     stoppedServices.map(async service => {
-      await startProcess(service);
+      await startProcess(service, getRestartOptions(service));
       await waitUntilSettled(service);
     }),
   );

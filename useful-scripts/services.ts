@@ -185,7 +185,7 @@ function readLayeredAppSetting<T>(
  * `PublicDataDbExists` check (see Startup.cs for admin,
  * PublisherHostBuilderExtensions.cs for publisher).
  */
-function serviceUsesPublicDataDb(service: ServiceName): boolean {
+export function serviceUsesPublicDataDb(service: ServiceName): boolean {
   const schema = serviceSchemas[service];
 
   if (schema.type === 'docker') {
@@ -195,14 +195,6 @@ function serviceUsesPublicDataDb(service: ServiceName): boolean {
   return (
     readLayeredAppSetting<boolean>(schema.root, 'PublicDataDbExists') ?? false
   );
-}
-
-export function adminUsesPublicDataDb(): boolean {
-  return serviceUsesPublicDataDb('admin');
-}
-
-export function publisherUsesPublicDataDb(): boolean {
-  return serviceUsesPublicDataDb('publisher');
 }
 
 /**

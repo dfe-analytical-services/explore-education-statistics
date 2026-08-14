@@ -29,9 +29,11 @@ interface ManagedProcess {
   exited?: Promise<void>;
   settled?: Promise<void>;
   /**
-   * Whether the process was started with the `PublicDataDbExists` env
-   * override (i.e. admin running alongside the public API), so the dashboard
-   * can report the running state rather than just the configured default.
+   * The `PublicDataDbExists` env override the process was started with, if
+   * any (i.e. admin forced to run with or without the public API), so the
+   * dashboard can report what it's actually running with rather than just
+   * the configured default. Only meaningful while it's started - a stale
+   * value from a previous run says nothing about the next one.
    */
   publicDataDbExists?: boolean;
 }
@@ -73,6 +75,20 @@ export function getPublicDataDbOverride(
   service: ServiceName,
 ): boolean | undefined {
   return registry.get(service)?.publicDataDbExists;
+}
+
+/**
+ * The options needed to start a service back up the way it was last started,
+ * for callers that stop services and restore them afterwards (e.g. a backup
+ * restore) - otherwise admin would come back without the `PublicDataDbExists`
+ * override it was running with, silently losing the public API.
+ */
+export function getRestartOptions(service: ServiceName): StartOptions {
+  const override = getPublicDataDbOverride(service);
+
+  return override === undefined
+    ? {}
+    : { env: { PublicDataDbExists: String(override) } };
 }
 
 export function getLogs(service: ServiceName): string[] {
@@ -149,7 +165,9 @@ export async function startProcess(
   const runCommand = buildRunCommand(service, options);
 
   entry.publicDataDbExists =
-    options.env?.PublicDataDbExists === 'true' ? true : undefined;
+    options.env?.PublicDataDbExists === undefined
+      ? undefined
+      : options.env.PublicDataDbExists === 'true';
 
   const unlock = runCommand.lockUntilReady
     ? await createFileLock({

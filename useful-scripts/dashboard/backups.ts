@@ -6,7 +6,11 @@ import { pipeline } from 'node:stream/promises';
 import { projectRoot } from '../services';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices, stopDockerServices } from './dockerManager';
-import { startProcess, stopAllStartedProcesses } from './processManager';
+import {
+  getRestartOptions,
+  startProcess,
+  stopAllStartedProcesses,
+} from './processManager';
 
 export type BackupStore = 'mssql' | 'postgres' | 'azurite';
 
@@ -356,7 +360,11 @@ export async function createUnifiedBackup(
 
     return { id, label: parsedLabel, timestamp, stores };
   } finally {
-    await Promise.all(stoppedServices.map(service => startProcess(service)));
+    await Promise.all(
+      stoppedServices.map(service =>
+        startProcess(service, getRestartOptions(service)),
+      ),
+    );
   }
 }
 
@@ -501,7 +509,11 @@ export async function restoreUnifiedBackup(id: string): Promise<void> {
       presentStores,
     );
   } finally {
-    await Promise.all(stoppedServices.map(service => startProcess(service)));
+    await Promise.all(
+      stoppedServices.map(service =>
+        startProcess(service, getRestartOptions(service)),
+      ),
+    );
   }
 }
 
