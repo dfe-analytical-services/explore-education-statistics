@@ -980,7 +980,7 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetZipDelivery_PublishedCachedZip_ReturnsRedirectAndRecordsAnalyticsOnce()
+    public async Task GetZipDelivery_AfdPoc_PublishedAllFilesRedirectsWithoutCheckingCombinedZipBlob()
     {
         var now = DateTimeOffset.UtcNow;
         ReleaseVersion releaseVersion = _dataFixture
@@ -992,18 +992,7 @@ public class ReleaseFileServiceTests : IDisposable
                     .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
             );
 
-        var allFilesZipPath = releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion);
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
-        publicBlobStorageService.SetupFindBlob(
-            PublicReleaseFiles,
-            allFilesZipPath,
-            new BlobInfo(
-                path: allFilesZipPath,
-                contentType: MediaTypeNames.Application.Zip,
-                contentLength: 1000,
-                updated: now.AddHours(-2)
-            )
-        );
 
         var request = new CaptureZipDownloadRequest
         {
@@ -1032,6 +1021,11 @@ public class ReleaseFileServiceTests : IDisposable
         analyticsManager.Verify(
             manager => manager.Add(ItIs.DeepEqualTo(request), It.IsAny<CancellationToken>()),
             Times.Once
+        );
+        publicBlobStorageService.Verify(
+            service =>
+                service.FindBlob(PublicReleaseFiles, releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion)),
+            Times.Never
         );
     }
 
@@ -1085,7 +1079,7 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task ZipFilesToStream_NoFileIds_PublishedCachedAllFilesZipDoesNotExpire()
+    public async Task ZipFilesToStream_NoFileIds_AfdPoc_DoesNotReadPublishedCachedAllFilesZip()
     {
         var now = DateTimeOffset.UtcNow;
         ReleaseVersion releaseVersion = _dataFixture
@@ -1160,8 +1154,18 @@ public class ReleaseFileServiceTests : IDisposable
             result.AssertRight();
 
             await stream.DisposeAsync();
-            await using var zip = File.OpenRead(path);
-            Assert.Equal("Test cached all files zip", zip.ReadToEnd());
+            using var zip = ZipFile.OpenRead(path);
+            Assert.Empty(zip.Entries);
+
+            publicBlobStorageService.Verify(
+                service => service.FindBlob(PublicReleaseFiles, allFilesZipPath),
+                Times.Never
+            );
+            publicBlobStorageService.Verify(
+                service =>
+                    service.GetDownloadStream(PublicReleaseFiles, allFilesZipPath, true, It.IsAny<CancellationToken>()),
+                Times.Never
+            );
         }
     }
 
