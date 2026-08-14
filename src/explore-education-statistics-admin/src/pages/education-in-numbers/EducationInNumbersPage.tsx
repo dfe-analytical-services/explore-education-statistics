@@ -2,40 +2,26 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PreviousNextLinks from '@admin/components/PreviousNextLinks';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import Tag from '@common/components/Tag';
-import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import RouteSwitch from '@admin/components/RouteSwitch';
+import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
+import educationInNumbersPageRoutes from '@admin/routes/educationInNumbersPageRoutes';
 import {
-  educationInNumbersContentRoute,
+  educationInNumbersNavRoutes,
   EducationInNumbersRouteParams,
-  EducationInNumbersRouteProps,
-  educationInNumbersSignOffRoute,
-  educationInNumbersSummaryEditRoute,
-  educationInNumbersSummaryRoute,
 } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
-import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
-import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
-
-const navRoutes: EducationInNumbersRouteProps[] = [
-  educationInNumbersSummaryRoute,
-  educationInNumbersContentRoute,
-  educationInNumbersSignOffRoute,
-];
-
-const routes: EducationInNumbersRouteProps[] = [
-  ...navRoutes,
-  educationInNumbersSummaryEditRoute,
-];
+import useNavRoutes from '@admin/hooks/useNavRoutes';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import Tag from '@common/components/Tag';
+import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
 
 const EducationInNumbersPage = ({
   match,
-  location,
 }: RouteComponentProps<EducationInNumbersRouteParams>) => {
   const { educationInNumbersPageId } = match.params;
 
@@ -49,44 +35,12 @@ const EducationInNumbersPage = ({
     );
   }, [educationInNumbersPageId]);
 
-  const currentRouteIndex =
-    navRoutes.findIndex(
-      route =>
-        generatePath<EducationInNumbersRouteParams>(route.path, {
-          educationInNumbersPageId,
-        }) === location.pathname,
-    ) || 0;
-
-  const previousRoute =
-    currentRouteIndex > 0 ? navRoutes[currentRouteIndex - 1] : undefined;
-
-  const nextRoute =
-    currentRouteIndex < navRoutes.length - 1
-      ? navRoutes[currentRouteIndex + 1]
-      : undefined;
-
-  const previousSection = previousRoute
-    ? {
-        label: previousRoute.title,
-        linkTo: generatePath<EducationInNumbersRouteParams>(
-          previousRoute.path,
-          {
-            educationInNumbersPageId,
-          },
-        ),
-      }
-    : undefined;
-
-  const nextSection = nextRoute
-    ? {
-        label: nextRoute.title,
-        linkTo: generatePath<EducationInNumbersRouteParams>(nextRoute.path, {
-          educationInNumbersPageId,
-        }),
-      }
-    : undefined;
-
-  const pageRouteTitle = useCurrentRouteTitle(navRoutes);
+  const {
+    navBarRoutes,
+    currentRouteTitle: pageRouteTitle,
+    previousSection,
+    nextSection,
+  } = useNavRoutes(educationInNumbersNavRoutes, { educationInNumbersPageId });
 
   return (
     <Page
@@ -111,15 +65,7 @@ const EducationInNumbersPage = ({
 
             {GetStatusTag(educationInNumbersPage)}
 
-            <NavBar
-              routes={navRoutes.map(route => ({
-                title: route.title,
-                to: generatePath<EducationInNumbersRouteParams>(route.path, {
-                  educationInNumbersPageId,
-                }),
-              }))}
-              label="EducationInNumbers"
-            />
+            <NavBar routes={navBarRoutes} label="EducationInNumbers" />
 
             <EducationInNumbersPageContextProvider
               educationInNumbersPage={educationInNumbersPage}
@@ -129,16 +75,7 @@ const EducationInNumbersPage = ({
                 });
               }}
             >
-              <Switch>
-                {routes.map(route => (
-                  <Route
-                    exact
-                    key={route.path}
-                    path={route.path}
-                    component={route.component}
-                  />
-                ))}
-              </Switch>
+              <RouteSwitch routes={educationInNumbersPageRoutes} />
             </EducationInNumbersPageContextProvider>
 
             <PreviousNextLinks

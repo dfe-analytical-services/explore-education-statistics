@@ -31,14 +31,6 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 const reactRefreshRuntimeEntry = require.resolve('react-refresh/runtime');
 const reactRefreshWebpackPluginRuntimeEntry =
   require.resolve('@pmmmwh/react-refresh-webpack-plugin');
-const babelRuntimeEntry = require.resolve('babel-preset-react-app');
-const babelRuntimeEntryHelpers = require.resolve(
-  '@babel/runtime/helpers/esm/assertThisInitialized',
-  { paths: [babelRuntimeEntry] },
-);
-const babelRuntimeRegenerator = require.resolve('@babel/runtime/regenerator', {
-  paths: [babelRuntimeEntry],
-});
 
 // Some apps do not need the benefits of saving a web request, so not inlining the chunk
 // makes for a smoother build process.
@@ -312,9 +304,6 @@ module.exports = webpackEnv => {
           paths.appPackageJson,
           reactRefreshRuntimeEntry,
           reactRefreshWebpackPluginRuntimeEntry,
-          babelRuntimeEntry,
-          babelRuntimeEntryHelpers,
-          babelRuntimeRegenerator,
           // EES - Add extra allowed files for compatibility
           // with our custom import aliases
           path.dirname(require.resolve('react')),
@@ -391,8 +380,7 @@ module.exports = webpackEnv => {
                 and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
               },
             },
-            // Process application JS with Babel.
-            // The preset includes JSX, Flow, TypeScript, and some ESnext features.
+            // Process application JS/TS with SWC.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: [
@@ -403,63 +391,57 @@ module.exports = webpackEnv => {
                   'explore-education-statistics-common/src',
                 ),
               ],
-              loader: require.resolve('babel-loader'),
+              loader: require.resolve('swc-loader'),
               options: {
-                customize:
-                  require.resolve('babel-preset-react-app/webpack-overrides'),
-                plugins: [
-                  [
-                    require.resolve('babel-plugin-named-asset-import'),
-                    {
-                      loaderMap: {
-                        svg: {
-                          ReactComponent:
-                            '@svgr/webpack?-svgo,+titleProp,+ref![path]',
-                        },
-                      },
+                jsc: {
+                  parser: {
+                    syntax: 'typescript',
+                    tsx: true,
+                    dynamicImport: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: 'automatic',
+                      refresh: isEnvDevelopment,
                     },
-                  ],
-                ],
-                // This is a feature of `babel-loader` for webpack (not Babel itself).
-                // It enables caching results in ./node_modules/.cache/babel-loader/
-                // directory for faster rebuilds.
-                cacheDirectory: true,
-                // See #6846 for context on why cacheCompression is disabled
-                cacheCompression: false,
-                compact: isEnvProduction,
+                  },
+                },
+                env: {
+                  targets: 'defaults',
+                },
               },
             },
-            // Process any JS outside of the app with Babel.
-            // Unlike the application JS, we only compile the standard ES features.
+            // Process any JS outside of the app with SWC.
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               exclude: [
                 /@babel(?:\/|\\{1,2})runtime/,
-                // EES - Exclude CKEditor project from being transpiled by Babel
+                // EES - Exclude CKEditor project from being transpiled
                 /explore-education-statistics-ckeditor/,
               ],
-              loader: require.resolve('babel-loader'),
+              loader: require.resolve('swc-loader'),
               // EES - Prevents ES modules using cjs/mjs throwing Webpack
               // errors e.g. color2k is using this.
               resolve: {
                 fullySpecified: false,
               },
               options: {
-                compact: false,
-                presets: [
-                  [
-                    require.resolve('babel-preset-react-app/dependencies'),
-                    { helpers: true },
-                  ],
-                ],
-                cacheDirectory: true,
-                // See #6846 for context on why cacheCompression is disabled
-                cacheCompression: false,
-                // Babel sourcemaps are needed for debugging into node_modules
-                // code.  Without the options below, debuggers like VSCode
-                // show incorrect code and set breakpoints on the wrong lines.
+                jsc: {
+                  parser: {
+                    syntax: 'typescript',
+                    tsx: true,
+                    dynamicImport: true,
+                  },
+                  transform: {
+                    react: {
+                      runtime: 'automatic',
+                    },
+                  },
+                },
+                env: {
+                  targets: 'defaults',
+                },
                 sourceMaps: shouldUseSourceMap,
-                inputSourceMap: shouldUseSourceMap,
               },
             },
             // "postcss" loader applies autoprefixer to our CSS.
