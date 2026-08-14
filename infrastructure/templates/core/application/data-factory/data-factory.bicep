@@ -27,6 +27,18 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   tags: tagValues
 }
 
+var keyVaultSecretsUserRoleAssignmentName = guid(resourceId('Microsoft.KeyVault/vaults',keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), dataFactoryName)
+
+module keyVaultSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
+  name: '${dataFactoryName}KeyVaultSecretsUserRoleAssignmentModule'
+  params: {
+    keyVaultName: keyVaultName
+    roleAssignmentNameOverride: keyVaultSecretsUserRoleAssignmentName
+    principalIds: [dataFactory.identity.principalId]
+    role: 'Secrets User'
+  }
+}
+
 resource managedVNet 'Microsoft.DataFactory/factories/managedVirtualNetworks@2018-06-01' = {
   parent: dataFactory
   name: 'default'

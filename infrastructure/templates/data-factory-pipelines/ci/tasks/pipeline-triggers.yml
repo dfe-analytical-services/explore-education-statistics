@@ -1,0 +1,50 @@
+parameters:
+  - name: dataFactoryName
+    type: string
+  - name: condition
+    type: string
+    default: succeeded()
+  - name: action
+    type: string
+    values:
+      - stop
+      - start
+  - name: serviceConnection
+    type: string
+
+steps:
+
+  - task: AzureCLI@2
+    displayName: 'Pipeline triggers ${{parameters.action}}'
+    condition: ${{parameters.condition}}
+    inputs:
+      azureSubscription: ${{parameters.serviceConnection}}
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        set -e
+
+        echo "Pipeline trigger ${{parameters.action}} starting..."
+
+        case "${{parameters.action}}" in
+          "stop")  triggerState="Started" ;;
+          "start") triggerState="Stopped" ;;
+        esac
+
+        triggers=$(az datafactory trigger list \
+          --factory-name ${{parameters.dataFactoryName}} \
+          --resource-group $(resourceGroupName) \
+          --query "[?properties.runtimeState=='${triggerState}'].name" \
+          -o tsv)
+
+        for trigger in $triggers; do
+
+          echo "Handling trigger $trigger..."
+
+          az datafactory trigger ${{parameters.action}} \
+            --factory-name ${{parameters.dataFactoryName}} \
+            --resource-group $(resourceGroupName) \
+            --name $trigger
+        done
+
+        echo "Pipeline trigger ${{parameters.action}} completed."
