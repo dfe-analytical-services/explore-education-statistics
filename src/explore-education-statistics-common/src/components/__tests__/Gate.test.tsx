@@ -180,7 +180,6 @@ describe('Gate', () => {
 
   test('does not unmount children if `condition` function resolves back to false', () => {
     const { rerender } = render(
-      // eslint-disable-next-line react/jsx-boolean-value
       <Gate condition={() => true}>
         <p>children</p>
       </Gate>,
@@ -238,7 +237,6 @@ describe('Gate', () => {
 
   test('unmounts children if `condition` function resolves back to false and `passOnce = false`', () => {
     const { rerender } = render(
-      // eslint-disable-next-line react/jsx-boolean-value
       <Gate condition={() => true} passOnce={false}>
         <p>children</p>
       </Gate>,
@@ -257,7 +255,6 @@ describe('Gate', () => {
 
   test('unmounts children if async `condition` resolves back to false and `passOnce = false`', async () => {
     const { rerender } = render(
-      // eslint-disable-next-line react/jsx-boolean-value
       <Gate condition={() => Promise.resolve(true)} passOnce={false}>
         <p>children</p>
       </Gate>,

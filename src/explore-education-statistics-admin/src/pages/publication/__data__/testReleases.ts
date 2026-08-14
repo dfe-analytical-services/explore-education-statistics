@@ -1,7 +1,6 @@
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 
-// eslint-disable-next-line import/prefer-default-export
 export const testReleaseSummaries: ReleaseVersionSummary[] = [
   {
     id: 'release-1-version-1',

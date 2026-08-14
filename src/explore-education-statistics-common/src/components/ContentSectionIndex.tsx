@@ -115,7 +115,6 @@ const ContentSectionIndex = ({
     };
   }, [handleScroll, visible, sticky]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const handleResize = () => {
       // Need to explicitly set heights/widths using the
