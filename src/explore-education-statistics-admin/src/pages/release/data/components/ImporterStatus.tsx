@@ -96,7 +96,6 @@ const ImporterStatus = ({
 }: ImporterStatusProps) => {
   const { data } = useQuery({
     ...releaseDataFileQueries.importStatus(releaseVersionId, dataFile.id),
-    // No point polling a file that has already finished importing.
     enabled: dataFile.status !== 'COMPLETE',
     // Poll every 5 seconds until the import reaches a status it can't move on from.
     refetchInterval: nextStatus =>

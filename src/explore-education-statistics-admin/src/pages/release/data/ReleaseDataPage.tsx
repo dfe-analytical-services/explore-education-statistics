@@ -38,8 +38,6 @@ const ReleaseDataPage = () => {
     [releaseVersionId],
   );
 
-  // Shares its query key with the data uploads section below, so this is served
-  // from the cache rather than making a request of its own.
   const { data: dataFiles = [] } = useQuery(
     releaseDataFileQueries.list(releaseVersionId),
   );

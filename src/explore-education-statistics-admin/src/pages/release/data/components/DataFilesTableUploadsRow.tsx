@@ -50,9 +50,9 @@ export default function DataFilesTableUploadRow({
       releaseVersionId,
       dataSetUpload.id,
     ),
-    // No point polling an upload that has already finished screening.
+    // Don't poll if the upload has finished screening.
     enabled: !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus),
-    // Poll every 5 seconds until screening reaches a status it can't move on from.
+    // Poll every 5 seconds until screening finishes.
     refetchInterval: progress =>
       progress && terminalScreeningStatuses.includes(progress.status)
         ? false

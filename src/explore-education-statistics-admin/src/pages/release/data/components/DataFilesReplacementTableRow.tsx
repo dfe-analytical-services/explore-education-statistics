@@ -73,9 +73,7 @@ export default function DataFilesReplacementTableRow({
           dataFile.replacedByDataFileId ?? '',
         ).queryKey,
       }),
-      // Refresh the data file list so the server recalculates
-      // `hasValidReplacementPlan`, which drives the parent section's
-      // "Confirm all valid replacements" button.
+      // Refresh the main data file list too
       queryClient.invalidateQueries({
         queryKey: releaseDataFileQueries.list(releaseVersionId).queryKey,
       }),

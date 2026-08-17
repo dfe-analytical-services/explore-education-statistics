@@ -14,9 +14,6 @@ export default function DataFilesReorderableList({
   onCancelReordering,
   onConfirmReordering,
 }: Props) {
-  // Deliberately not re-seeded from the prop: this list is unmounted whenever
-  // reordering stops, and a background refetch mid-drag would otherwise discard
-  // the ordering the user is part-way through.
   const [dataFiles, setDataFiles] = useState<DataFile[]>(initialDataFiles);
 
   const list = useMemo(
