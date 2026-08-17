@@ -1,25 +1,16 @@
-import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
-  DataSetScreenerProgress,
-  DataSetUpload,
   DataSetUploadScreeningStatus,
   ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import ProgressBar from '@common/components/ProgressBar';
-import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import Tag, { TagProps } from '@common/components/Tag';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
-export type ScreenerStatusChangeHandler = (
-  dataSetUpload: DataSetUpload,
-  progress: DataSetScreenerProgress,
-) => void;
-
 interface Props {
-  dataSetUpload: DataSetUpload;
-  releaseVersionId: string;
-  onStatusChange?: ScreenerStatusChangeHandler;
+  dataSetTitle: string;
+  percentageComplete: number;
+  status: DataSetUploadScreeningStatus;
 }
 
 export const getScreenerTestResultStatusLabel = (
@@ -89,11 +80,6 @@ export const getDataSetUploadScreeningStatusColour = (
   }
 };
 
-type StatusState = Pick<
-  DataSetScreenerProgress,
-  'status' | 'percentageComplete' | 'stage' | 'completed'
->;
-
 export const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
   'ScreenerError',
   'PendingReview',
@@ -102,44 +88,16 @@ export const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
 ];
 
 export default function ScreenerStatus({
-  dataSetUpload,
-  releaseVersionId,
-  onStatusChange,
+  dataSetTitle,
+  percentageComplete,
+  status,
 }: Props) {
-  const { data } = useQuery({
-    ...releaseDataFileQueries.screeningStatus(
-      releaseVersionId,
-      dataSetUpload.id,
-    ),
-    // No point polling an upload that has already finished screening.
-    enabled: !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus),
-    // Poll every 5 seconds until screening reaches a status it can't move on from.
-    refetchInterval: nextStatus =>
-      nextStatus && terminalScreeningStatuses.includes(nextStatus.status)
-        ? false
-        : 5000,
-    onSuccess: nextStatus => {
-      if (nextStatus.status !== dataSetUpload.screeningStatus) {
-        onStatusChange?.(dataSetUpload, nextStatus);
-      }
-    },
-  });
-
-  const currentStatus: StatusState = data ?? {
-    status: dataSetUpload.screeningStatus,
-    percentageComplete: 0,
-    stage: 'PENDING',
-    completed: false,
-  };
-
-  const hasTerminalStatus = terminalScreeningStatuses.includes(
-    currentStatus.status,
-  );
+  const hasTerminalStatus = terminalScreeningStatuses.includes(status);
 
   return (
     <>
-      <Tag colour={getDataSetUploadScreeningStatusColour(currentStatus.status)}>
-        {getDataSetUploadScreeningStatusLabel(currentStatus.status)}
+      <Tag colour={getDataSetUploadScreeningStatusColour(status)}>
+        {getDataSetUploadScreeningStatusLabel(status)}
       </Tag>
 
       {!hasTerminalStatus && (
@@ -148,9 +106,9 @@ export default function ScreenerStatus({
 
       {!hasTerminalStatus && (
         <ProgressBar
-          testId={`${dataSetUpload.dataSetTitle}-screener-progress-bar`}
+          testId={`${dataSetTitle}-screener-progress-bar`}
           className="govuk-!-margin-top-2"
-          value={currentStatus.percentageComplete}
+          value={percentageComplete}
           width={200}
         />
       )}

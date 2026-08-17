@@ -496,4 +496,50 @@ describe('DataFilesTableUploadsRow', () => {
       }),
     ).not.toBeInTheDocument();
   });
+
+  test('refreshes the uploads once screening reaches a terminal status', async () => {
+    releaseDataFileService.getDataFileScreeningStatus.mockResolvedValue({
+      percentageComplete: 100,
+      stage: 'screening',
+      status: 'PendingImport',
+      completed: true,
+    });
+
+    render(
+      <table>
+        <tbody>
+          <DataFilesTableUploadRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.screening}
+          />
+        </tbody>
+      </table>,
+    );
+
+    expect(await screen.findByText('Pending import')).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(rowBaseProps.onRefreshUploads).toHaveBeenCalled(),
+    );
+  });
+
+  test('does not poll for screening status when it is already terminal', async () => {
+    render(
+      <table>
+        <tbody>
+          <DataFilesTableUploadRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.pass}
+          />
+        </tbody>
+      </table>,
+    );
+
+    expect(await screen.findByText('Pending import')).toBeInTheDocument();
+
+    expect(
+      releaseDataFileService.getDataFileScreeningStatus,
+    ).not.toHaveBeenCalled();
+    expect(rowBaseProps.onRefreshUploads).not.toHaveBeenCalled();
+  });
 });
