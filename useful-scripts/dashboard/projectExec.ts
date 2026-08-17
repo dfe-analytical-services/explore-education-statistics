@@ -1,5 +1,5 @@
 import { $ } from 'execa';
-import { projectRoot } from '../services';
+import { projectRoot } from './services';
 
 /**
  * execa bound to the project root, for the `docker`/`docker compose` calls

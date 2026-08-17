@@ -2,7 +2,7 @@ import chalk, { ChalkInstance } from 'chalk';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { getDirname } from './utils/nodeGlobals';
+import { getDirname } from '../utils/nodeGlobals';
 
 const __dirname = getDirname(import.meta.url);
 
@@ -16,24 +16,29 @@ export const projectRootOverride = process.env.EES_PROJECT_ROOT
   ? path.resolve(process.env.EES_PROJECT_ROOT)
   : undefined;
 
-export const projectRoot = projectRootOverride ?? path.resolve(__dirname, '..');
+export const projectRoot =
+  projectRootOverride ?? path.resolve(__dirname, '../..');
 
 /**
- * Shared lock file used to serialize `dotnet build`s across every tool that
- * can start services (the `start` CLI and the dashboard), since concurrent
- * builds risk https://github.com/dotnet/sdk/issues/9487.
+ * Lock file used to serialize `dotnet build`s across everything in here that
+ * can start services (the dashboard and its `start:dashboard` CLI), since
+ * concurrent builds risk https://github.com/dotnet/sdk/issues/9487.
+ *
+ * Note that the top-level `start` script locks its own file instead, so
+ * `pnpm start` is *not* coordinated with these - running both at once can
+ * still put two `dotnet build`s against the same artifacts tree.
  *
  * Anchored to `projectRoot` rather than this file's own directory: what the
  * lock protects is the `src/artifacts` output tree, and with EES_PROJECT_ROOT
  * set that tree belongs to a *different* checkout from the one running this
  * code. Keying it to the checkout instead would give a dashboard running out
- * of one worktree and a `start` CLI run from the managed one two separate
- * lock files, so they'd build into the same artifacts tree uncoordinated.
+ * of one worktree and a `start:dashboard` run from the managed one two
+ * separate lock files, so they'd build into the same artifacts tree
+ * uncoordinated.
  *
  * `cross-process-lock` requires its target file to already exist, so it's
- * created here (once, on module load) rather than relying on some source
- * file happening to exist at this path, the way `start.ts` used to rely on
- * its own `__filename`.
+ * created here (once, on module load) rather than relying on some source file
+ * happening to exist at this path.
  */
 export const dotnetBuildLockFile = path.join(
   projectRoot,
@@ -58,7 +63,7 @@ export const allowedDockerServices = [
 export type DockerService = (typeof allowedDockerServices)[number];
 
 /**
- * Subset of `start.ts`'s CLI options that service schemas need to know about.
+ * Subset of `start.ts`'s options that service schemas need to know about.
  * Kept as a plain interface (rather than importing commander's inferred type)
  * so this module has no dependency on the CLI itself.
  */
@@ -213,7 +218,7 @@ export function serviceUsesPublicDataDb(service: ServiceName): boolean {
 /**
  * Whether a service is starting configured to use the public data database,
  * preferring an env override (e.g. the dashboard's "Start with PublicData"
- * checkbox, or the CLI's own cross-service resolution below) over the
+ * checkbox, or `start.ts`'s own cross-service resolution below) over the
  * layered appsetting, exactly as .NET's own configuration precedence would.
  */
 function resolveServiceUsesPublicDataDb(
@@ -634,7 +639,7 @@ export function resolveDockerServices(
  * true if ANY of the given services would pull `public-api-db` in on its
  * own (asking for it directly, or via its own schema/appsettings).
  *
- * Callers that start several services in one go (e.g. the CLI) should
+ * Callers that start several services in one go (e.g. `start.ts`) should
  * resolve this once up front and thread the result through as a shared env
  * override, rather than letting each service's schema work it out
  * independently - otherwise whether e.g. `publisher` gets `public-api-db`

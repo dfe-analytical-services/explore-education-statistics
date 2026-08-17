@@ -5,8 +5,8 @@ import {
   DockerService,
   serviceSchemas,
   ServiceName,
-} from '../services';
-import $$ from '../utils/projectExec';
+} from './services';
+import $$ from './projectExec';
 
 export type DockerStatus = 'running' | 'stopped' | 'unknown';
 

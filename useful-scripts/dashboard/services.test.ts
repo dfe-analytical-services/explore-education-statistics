@@ -9,11 +9,11 @@ import {
 } from './services';
 
 /**
- * These cover the dependency resolution in services.ts, which both the `start`
- * CLI and the dashboard rely on to decide what a single named service actually
- * needs running alongside it. It's the kind of logic that fails quietly - you
- * get a service that starts and then misbehaves, rather than an error - so it's
- * worth pinning down.
+ * These cover the dependency resolution in services.ts, which both the
+ * dashboard and its `start:dashboard` CLI rely on to decide what a single named
+ * service actually needs running alongside it. It's the kind of logic that
+ * fails quietly - you get a service that starts and then misbehaves, rather
+ * than an error - so it's worth pinning down.
  *
  * Deliberately not covered: readLayeredAppSetting and getServicePort. Both read
  * files out of the real checkout, including a gitignored appsettings.Local.json

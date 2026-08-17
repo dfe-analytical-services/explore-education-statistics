@@ -1,6 +1,6 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import $$ from '../utils/projectExec';
+import $$ from './projectExec';
 import { startDockerServices, stopDockerServices } from './dockerManager';
 import { ensureMssqlVolumePermissions, MSSQL_DATA_DIR } from './mssqlVolume';
 import {

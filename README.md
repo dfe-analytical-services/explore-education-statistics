@@ -538,7 +538,16 @@ pnpm dashboard
 
 This runs at `http://localhost:4300` by default (override with the `DASHBOARD_PORT` environment variable).
 
-The service dependency resolution shared by `start` and the dashboard has tests, run with:
+The dashboard has its own service definitions and dependency resolution, independent of the `start` script above.
+A command line equivalent of `start` using them is available too, which additionally starts any services a
+requested service depends on (e.g. `admin` also starts `processor`/`publisher`) and resolves `PublicDataDbExists`
+once across everything it's asked to start:
+
+```bash
+pnpm start:dashboard admin
+```
+
+The dependency resolution has tests, run with:
 
 ```bash
 pnpm test:scripts

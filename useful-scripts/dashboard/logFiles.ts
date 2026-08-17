@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { projectRoot, ServiceName } from '../services';
+import { projectRoot, ServiceName } from './services';
 
 /**
  * Where each service's full output is kept, so there's something to read when

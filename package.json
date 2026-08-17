@@ -74,11 +74,12 @@
     "lint:style": "stylelint src/**/*.{scss,css}",
     "dashboard": "tsx useful-scripts/dashboard/server.ts",
     "start": "tsx useful-scripts/start.ts",
+    "start:dashboard": "tsx useful-scripts/dashboard/start.ts",
     "test": "pnpm -r --no-bail test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
     "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
     "test:coverage": "pnpm -r --no-bail test:coverage",
-    "test:scripts": "tsx --test useful-scripts/*.test.ts",
+    "test:scripts": "tsx --test useful-scripts/dashboard/*.test.ts",
     "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc",
     "api-docs:build": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs --name ees-api-docs-builder-container ees-api-docs-builder ./docker/build-docs.sh",
     "api-docs:run": "docker rm -f ees-api-docs-builder-container && cd src/explore-education-statistics-api-docs && docker build -f docker/Dockerfile -t ees-api-docs-builder . && docker run --rm -v .:/home/ubuntu/docs -p4567:4567 -p35729:35729 --name ees-api-docs-builder-container ees-api-docs-builder ./docker/run-docs.sh"

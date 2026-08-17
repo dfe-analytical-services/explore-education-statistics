@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { Argument, Command, Option } from '@commander-js/extra-typings';
+import chalk, { ChalkInstance } from 'chalk';
 import { $, ExecaChildProcess } from 'execa';
 import fs from 'node:fs';
 import { EOL } from 'node:os';
@@ -11,31 +12,206 @@ import splitLines from 'split2';
 import kill from 'tree-kill';
 import delay from './utils/delay';
 import exitProcess from './utils/exitProcess';
-import { logColours, logInfo } from './utils/logging';
-import { getDirname } from './utils/nodeGlobals';
+import { logColours, logError, logInfo } from './utils/logging';
+import { getDirname, getFilename } from './utils/nodeGlobals';
 import onExitSignal from './utils/onExitSignal';
 import createFileLock from './utils/createFileLock';
 import { ExecaChildProcessWithoutNullStreams } from './utils/types';
-import {
-  buildRunCommand,
-  DockerService,
-  dotnetBuildLockFile,
-  projectRoot,
-  resolveDockerServices,
-  resolvePublicDataDbAvailability,
-  resolveServiceDependencies,
-  ServiceName,
-  serviceSchemas,
-  StartOptions,
-} from './services';
 
 const __dirname = getDirname(import.meta.url);
+const __filename = getFilename(import.meta.url);
 const accountRoot = path.resolve(__dirname, '../..');
+const projectRoot = path.resolve(__dirname, '..');
 
 const screenerRepositoryName = 'ees-screener-api';
 const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
 const screenerRepoUrl =
   'https://github.com/dfe-analytical-services/ees-screener-api';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const allowedDockerServices = [
+  'db',
+  'data-storage',
+  'idp',
+  'public-api-db',
+  'data-screener',
+] as const;
+
+type DockerService = (typeof allowedDockerServices)[number];
+
+type ServiceSchema = {
+  colour: ChalkInstance;
+  type: 'dotnet' | 'func' | 'docker' | 'command';
+} & (
+  | {
+      type: 'dotnet';
+      root: string;
+      dockerServices?: ServiceSchemaDockerServices;
+    }
+  | {
+      type: 'func';
+      root: string;
+      port: number;
+      dockerServices?: ServiceSchemaDockerServices;
+    }
+  | {
+      type: 'docker';
+      service: DockerService;
+    }
+  | {
+      type: 'command';
+      root: string;
+      command: string | ((options: ProgramOptions) => string);
+      checkReady?: (line: string) => boolean;
+      dockerServices?: ServiceSchemaDockerServices;
+    }
+);
+
+type ServiceSchemaDockerServices =
+  DockerService[] | ((options: ProgramOptions) => DockerService[]);
+
+// Annoyingly, need to define these separately from schemas,
+// or we run into various circular reference issues in the types.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const allowedServiceNames = [
+  'admin',
+  'analytics',
+  'content',
+  'data',
+  'frontend',
+  'frontendProd',
+  'processor',
+  'publicApiDb',
+  'publicData',
+  'publicProcessor',
+  'publisher',
+  'notifier',
+  'idp',
+  'db',
+  'dataStorage',
+  'searchFunctionApp',
+  'dataScreener',
+] as const;
+
+type ServiceName = (typeof allowedServiceNames)[number];
+
+const serviceSchemas: Record<ServiceName, ServiceSchema> = {
+  admin: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Admin',
+    colour: chalk.green,
+    type: 'dotnet',
+    dockerServices() {
+      return fs.existsSync(
+        path.join(projectRoot, this.root, 'appsettings.Idp.json'),
+      )
+        ? ['db', 'data-storage', 'public-api-db', 'data-screener']
+        : ['db', 'data-storage', 'public-api-db', 'idp', 'data-screener'];
+    },
+  },
+  analytics: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Analytics.Consumer',
+    colour: chalk.rgb(165, 158, 255),
+    port: 7076,
+    type: 'func',
+    dockerServices: ['data-storage'],
+  },
+  content: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Api',
+    colour: chalk.cyan,
+    type: 'dotnet',
+    dockerServices: ['db', 'data-storage'],
+  },
+  data: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Api',
+    colour: chalk.magenta,
+    type: 'dotnet',
+    dockerServices: ['db', 'data-storage'],
+  },
+  frontend: {
+    root: 'src/explore-education-statistics-frontend',
+    command: 'pnpm dev',
+    colour: chalk.greenBright,
+    checkReady: line => line.startsWith('Server started on '),
+    type: 'command',
+  },
+  frontendProd: {
+    root: 'src/explore-education-statistics-frontend',
+    command(options) {
+      return options.skipBuild ? 'pnpm start' : 'pnpm build && pnpm start';
+    },
+    colour: chalk.greenBright,
+    checkReady: line => line.startsWith('Server started on '),
+    type: 'command',
+  },
+  publicData: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api',
+    colour: chalk.magentaBright,
+    type: 'dotnet',
+    dockerServices: ['public-api-db'],
+  },
+  processor: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Processor',
+    colour: chalk.rgb(255, 158, 165),
+    port: 7071,
+    type: 'func',
+    dockerServices: ['db', 'data-storage'],
+  },
+  publisher: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Publisher',
+    colour: chalk.yellow,
+    port: 7072,
+    type: 'func',
+    dockerServices: ['db', 'data-storage', 'public-api-db'],
+  },
+  notifier: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Notifier',
+    colour: chalk.blue,
+    port: 7073,
+    type: 'func',
+    dockerServices: ['data-storage'],
+  },
+  publicProcessor: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor',
+    colour: chalk.blue,
+    port: 7074,
+    type: 'func',
+    dockerServices: ['db', 'public-api-db', 'data-storage'],
+  },
+  searchFunctionApp: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp',
+    colour: chalk.rgb(255, 102, 0),
+    port: 7075,
+    type: 'func',
+    dockerServices: ['data-storage'],
+  },
+  dataScreener: {
+    colour: chalk.rgb(0, 255, 221),
+    service: 'data-screener',
+    type: 'docker',
+  },
+  idp: {
+    service: 'idp',
+    colour: chalk.gray,
+    type: 'docker',
+  },
+  db: {
+    service: 'db',
+    colour: chalk.blue,
+    type: 'docker',
+  },
+  dataStorage: {
+    service: 'data-storage',
+    colour: chalk.green,
+    type: 'docker',
+  },
+  publicApiDb: {
+    service: 'public-api-db',
+    colour: chalk.blue,
+    type: 'docker',
+  },
+};
+
+type ProgramOptions = ReturnType<(typeof program)['opts']>;
 
 const program = new Command()
   .description(
@@ -44,7 +220,6 @@ const program = new Command()
 This script will also run prerequisite tasks to ensure that services will be able to startup:
 
 - Starting Docker services that are required for any services to start correctly (e.g. the database)
-- Starting any other app-process services a requested service depends on (e.g. admin also starts processor/publisher; frontend also starts content/data)
 - Run a .NET build will be executed for any .NET services (e.g. admin)
 `,
   )
@@ -68,11 +243,8 @@ Start content and data APIs:
 Start public data API:
   $ start publicData
 
-Start admin (processor/publisher are started automatically as dependencies):
-  $ start admin
-
-Start admin together with the frontend:
-  $ start admin frontend
+Start admin and its dependencies:
+  $ start admin processor publisher publicProcessor
 
 Start services without first starting any Docker services:
   $ start data content --skip-docker
@@ -103,56 +275,7 @@ program.parse();
 
 const programOpts = program.opts();
 
-const [requestedServices] = program.processedArgs;
-
-// Expand with any app-process services these depend on (e.g. `frontend`
-// needs `content`/`data` running, since it calls them directly over HTTP),
-// dependencies-first, so they're already up by the time a dependent starts.
-function expandServicesWithDependencies(
-  services: readonly ServiceName[],
-  options: StartOptions,
-): ServiceName[] {
-  const seen = new Set<ServiceName>();
-  const expanded: ServiceName[] = [];
-
-  services.forEach(service => {
-    if (seen.has(service)) {
-      return;
-    }
-
-    expanded.push(
-      ...resolveServiceDependencies(service, options, seen),
-      service,
-    );
-    seen.add(service);
-  });
-
-  return expanded;
-}
-
-// Resolve whether `public-api-db` will be available once, up front, for the
-// whole invocation - rather than letting each service's schema work it out
-// in isolation, which would make the outcome depend on whether e.g. `admin`
-// happened to be listed before or after `publisher` on the command line.
-const initialServicesToStart = expandServicesWithDependencies(
-  requestedServices,
-  programOpts,
-);
-const publicDataDbAvailable = resolvePublicDataDbAvailability(
-  initialServicesToStart,
-  programOpts,
-);
-const startOptions: StartOptions = publicDataDbAvailable
-  ? { ...programOpts, env: { PublicDataDbExists: 'true' } }
-  : programOpts;
-
-// Re-expand with the resolved options - the override above can itself pull
-// in further dependencies (e.g. admin only depends on publicProcessor/
-// publicData once PublicDataDbExists is known to be true).
-const servicesToStart = expandServicesWithDependencies(
-  requestedServices,
-  startOptions,
-);
+const [servicesToStart] = program.processedArgs;
 
 await startDockerServices();
 
@@ -181,10 +304,26 @@ async function startDockerServices() {
     return;
   }
 
-  const dockerServicesToStart = new Set<DockerService>(
-    servicesToStart.flatMap(service =>
-      resolveDockerServices(service, startOptions),
-    ),
+  const dockerServicesToStart = servicesToStart.reduce<Set<DockerService>>(
+    (acc, service) => {
+      const serviceSchema = serviceSchemas[service];
+
+      if (serviceSchema.type === 'docker') {
+        acc.add(serviceSchema.service);
+      } else if ('dockerServices' in serviceSchema) {
+        const { dockerServices } = serviceSchema;
+
+        const services =
+          typeof dockerServices === 'function'
+            ? dockerServices.call(serviceSchema, programOpts)
+            : dockerServices;
+
+        services?.forEach(dockerService => acc.add(dockerService));
+      }
+
+      return acc;
+    },
+    new Set(),
   );
 
   if (dockerServicesToStart.size > 0) {
@@ -243,43 +382,89 @@ async function startService(service: ServiceName): Promise<void> {
   let args: string[] = [];
 
   let lockUntilReady = false;
+  let beforeTask: (() => void | Promise<void>) | undefined;
   let checkReady: ((line: string) => boolean) | undefined;
 
-  let env: NodeJS.ProcessEnv = {
+  const env = {
     ...process.env,
   };
 
-  if (schema.type === 'docker') {
-    command = 'docker compose logs';
-    args = ['-f', '--no-log-prefix'];
+  switch (schema.type) {
+    case 'dotnet': {
+      command = 'dotnet run';
 
-    if (programOpts.rebuildDocker) {
-      args.push('--build', '--force-recreate');
+      env.ASPNETCORE_ENVIRONMENT ??= 'Development';
+      env.MSBUILDDISABLENODEREUSE = '1';
+
+      lockUntilReady = true;
+      checkReady = line => line.startsWith('Server listening on address:');
+
+      break;
     }
+    case 'func': {
+      command = 'dotnet run';
+      args = ['--port', `${schema.port}`, '--pause-on-error'];
 
-    args.push(schema.service);
-  } else {
-    const runCommand = buildRunCommand(service, startOptions, env);
+      env.ASPNETCORE_ENVIRONMENT ??= 'Development';
+      env.MSBUILDDISABLENODEREUSE = '1';
 
-    command = runCommand.command;
-    args = runCommand.args;
-    env = runCommand.env;
-    checkReady = runCommand.checkReady;
-    lockUntilReady = runCommand.lockUntilReady;
+      lockUntilReady = true;
+      checkReady = line => line.startsWith('Function Runtime Version:');
+
+      break;
+    }
+    case 'command': {
+      command =
+        typeof schema.command === 'function'
+          ? schema.command.call(schema, programOpts)
+          : schema.command;
+
+      checkReady = schema.checkReady;
+
+      break;
+    }
+    case 'docker': {
+      command = 'docker compose logs';
+      args = ['-f', '--no-log-prefix'];
+
+      if (programOpts.rebuildDocker) {
+        args.push('--build', '--force-recreate');
+      }
+
+      args.push(schema.service);
+
+      break;
+    }
+    default:
+      throw new Error('Unknown service definition type');
   }
 
+  const lockFile = __filename;
   const message = logColours.info(
-    'Waiting for another build to finish (started from the CLI or the dashboard)...',
+    `Waiting for another process to finish with lock on '${path.basename(
+      lockFile,
+    )}'...`,
   );
 
   const unlock = lockUntilReady
     ? await createFileLock({
-        lockFile: dotnetBuildLockFile,
+        lockFile,
         lockTimeout: 300_000,
         waitTimeout: 300_000,
         onExistingLock: () => logService(service, message),
       })
     : undefined;
+
+  try {
+    await beforeTask?.();
+  } catch (err) {
+    if (err instanceof Error) {
+      logError(err.message);
+      unlock?.();
+    }
+
+    return undefined;
+  }
 
   logService(service, logColours.info('Starting service...'));
 

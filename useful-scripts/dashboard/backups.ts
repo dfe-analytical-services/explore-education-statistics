@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
-import { projectRoot } from '../services';
-import errorMessage from '../utils/errorMessage';
-import $$ from '../utils/projectExec';
+import { projectRoot } from './services';
+import errorMessage from './errorMessage';
+import $$ from './projectExec';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import {
   getComposeServiceEnv,

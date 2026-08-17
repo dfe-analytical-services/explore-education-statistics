@@ -13,9 +13,9 @@ import {
   ServiceName,
   serviceSchemas,
   StartOptions,
-} from '../services';
+} from './services';
 import createFileLock, { UnlockCallback } from '../utils/createFileLock';
-import errorMessage from '../utils/errorMessage';
+import errorMessage from './errorMessage';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices } from './dockerManager';
 import { ServiceLogFile } from './logFiles';
@@ -290,8 +290,8 @@ function killProcessTree(
  * Tail of the queue serialising dotnet builds *within this process*.
  *
  * The file lock these builds also take only coordinates with other processes
- * (the `start` CLI): cross-process-lock hands the lock straight over when the
- * requesting pid matches the one holding it, and every service here is
+ * (a `start:dashboard` run): cross-process-lock hands the lock straight over
+ * when the requesting pid matches the one holding it, and every service here is
  * started from the dashboard's single Node process - so between two services
  * the dashboard starts, it's a no-op. Anything that starts several at once
  * (restarting everything after a backup, say) would otherwise build them
