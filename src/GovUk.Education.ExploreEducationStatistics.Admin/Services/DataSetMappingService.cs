@@ -16,13 +16,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class DataSetMappingService(
-    ContentDbContext contentDbContext,
-    IUserService userService,
-    IFilterMappingService filterMappingService,
-    IFilterGroupMappingService filterGroupMappingService,
-    IFilterItemMappingService filterItemMappingService
-) : IDataSetMappingService
+public class DataSetMappingService(ContentDbContext contentDbContext, IUserService userService) : IDataSetMappingService
 {
     public async Task<Either<ActionResult, FiltersMappingDto>> UpdateFilterMappings(
         Guid releaseVersionId,
@@ -42,11 +36,7 @@ public class DataSetMappingService(
                 // Filters
                 var updatedFilterMappings = request
                     .FilterUpdates.Select(filterUpdate =>
-                        filterMappingService.UpdateFilterMapping(
-                            mapping,
-                            filterUpdate.OriginalId,
-                            filterUpdate.NewReplacementId
-                        )
+                        UpdateFilterMapping(mapping, filterUpdate.OriginalId, filterUpdate.NewReplacementId)
                     )
                     .ToList();
 
@@ -76,7 +66,7 @@ public class DataSetMappingService(
 
                 var updatedGroupMappings = request
                     .FilterGroupUpdates.Select(groupUpdate =>
-                        filterGroupMappingService.UpdateFilterGroupMapping(
+                        UpdateFilterGroupMapping(
                             mapping,
                             originalGroupIdToGroupsMap,
                             groupUpdate.OriginalId,
@@ -109,7 +99,7 @@ public class DataSetMappingService(
 
                 var updatedItemMappings = request
                     .FilterItemUpdates.Select(itemUpdate =>
-                        filterItemMappingService.UpdateFilterItemMapping(
+                        UpdateFilterItemMapping(
                             mapping,
                             originalItemIdToItem,
                             itemUpdate.OriginalId,
@@ -131,10 +121,90 @@ public class DataSetMappingService(
                     .Select(updated => FilterItemMappingDto.FromModel(updated.FilterItemMapping!))
                     .ToList();
 
+                // The mutations above all happen on the in-memory object graph beneath FilterMappings. EF can't see
+                // through the JSON column conversion on that property, so we must mark it dirty explicitly for the
+                // changes to be persisted. ReplacementFilters/ReplacementFilterGroups/ReplacementFilterItems are
+                // never mutated here, so they don't need marking.
+                contentDbContext.Entry(mapping).Property(x => x.FilterMappings).IsModified = true;
+
                 await contentDbContext.SaveChangesAsync(cancellationToken);
 
                 return filterMappingDto;
             });
+    }
+
+    private static (FilterMapping? FilterMapping, ErrorViewModel? Error) UpdateFilterMapping(
+        DataSetMapping dataSetMapping,
+        Guid originalId,
+        Guid? newReplacementId = null
+    )
+    {
+        if (!dataSetMapping.FilterMappings.TryGetValue(originalId, out var filterMapping))
+        {
+            return (
+                null,
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(FilterMappingUpdatesRequest.FilterUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                    Code = "FilterMatchingOriginalIdNotFound",
+                    Message =
+                        $"Could not find filter mapping matching original id \"{originalId}\". DataSetMapping.Id: {dataSetMapping.Id}",
+                }
+            );
+        }
+
+        return filterMapping.UpdateMapping(dataSetMapping, newReplacementId);
+    }
+
+    private static (FilterGroupMapping? FilterGroupMapping, ErrorViewModel? Error) UpdateFilterGroupMapping(
+        DataSetMapping dataSetMapping,
+        Dictionary<Guid, (FilterMapping FilterMap, FilterGroupMapping GroupMap)> originalGroupIdToGroupMap,
+        Guid originalId,
+        Guid? newReplacementId = null
+    )
+    {
+        if (!originalGroupIdToGroupMap.TryGetValue(originalId, out var pair))
+        {
+            return (
+                null,
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(FilterMappingUpdatesRequest.FilterGroupUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                    Code = "FilterGroupMatchingOriginalIdNotFound",
+                    Message =
+                        $"Could not find filter group mapping matching original id \"{originalId}\". DataSetMapping.Id: {dataSetMapping.Id}",
+                }
+            );
+        }
+
+        return pair.GroupMap.UpdateMapping(dataSetMapping, pair.FilterMap, newReplacementId);
+    }
+
+    private static (FilterItemMapping? FilterItemMapping, ErrorViewModel? Error) UpdateFilterItemMapping(
+        DataSetMapping dataSetMapping,
+        Dictionary<Guid, (FilterGroupMapping FilterGroup, FilterItemMapping FilterItem)> originalItemIdToItemMap,
+        Guid originalId,
+        Guid? newReplacementId = null
+    )
+    {
+        if (!originalItemIdToItemMap.TryGetValue(originalId, out var pair))
+        {
+            return (
+                null,
+                new ErrorViewModel
+                {
+                    Path =
+                        $"{nameof(FilterMappingUpdatesRequest.FilterItemUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                    Code = "FilterItemMatchingOriginalIdNotFound",
+                    Message =
+                        $"Could not find filter item mapping matching original id \"{originalId}\". DataSetMapping.Id: {dataSetMapping.Id}",
+                }
+            );
+        }
+
+        return pair.FilterItem.UpdateMapping(dataSetMapping, pair.FilterGroup, newReplacementId);
     }
 
     public async Task<Either<ActionResult, List<IndicatorMappingDto>>> UpdateIndicatorMappings(

@@ -3164,7 +3164,6 @@ public class ReplacementServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3177,7 +3176,6 @@ public class ReplacementServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -3186,7 +3184,6 @@ public class ReplacementServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3197,7 +3194,6 @@ public class ReplacementServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

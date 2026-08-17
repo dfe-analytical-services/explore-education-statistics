@@ -490,34 +490,19 @@ public record ReplacementPlanFilterMappingsViewModel
                 },
                 CandidateKey = filterMap.ReplacementId,
                 Type = filterMap.Status,
-                FilterGroups = ReplacementPlanFilterGroupMappingsViewModel.FromModel(filterMap),
+                FilterGroups = ReplacementPlanFilterGroupMappingsViewModel.FromModel(mapping, filterMap),
             }
         );
-        var filterCandidates = mapping
-            .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
-            .Select(filterMap => new
+        // candidates are the complete replacement-side catalogue, whether currently claimed by a mapping or not
+        var filterCandidates = mapping.ReplacementFilters.ToDictionary(
+            replacementFilter => replacementFilter.Id,
+            replacementFilter => new ReplacementPlanFilterViewModel
             {
-                Id = filterMap.ReplacementId!.Value,
-                Label = filterMap.ReplacementLabel!,
-                Name = filterMap.ReplacementColumnName!,
-            })
-            .Concat(
-                mapping.UnmappedReplacementFilters.Select(unmappedFilter => new
-                {
-                    unmappedFilter.Id,
-                    unmappedFilter.Label,
-                    Name = unmappedFilter.ColumnName,
-                })
-            )
-            .ToDictionary(
-                x => x.Id,
-                x => new ReplacementPlanFilterViewModel
-                {
-                    Id = x.Id,
-                    Label = x.Label,
-                    Name = x.Name,
-                }
-            );
+                Id = replacementFilter.Id,
+                Label = replacementFilter.Label,
+                Name = replacementFilter.ColumnName,
+            }
+        );
 
         return new ReplacementPlanFilterMappingsViewModel { Mappings = filterMappings, Candidates = filterCandidates };
     }
@@ -550,7 +535,10 @@ public record ReplacementPlanFilterGroupMappingsViewModel
     // Key is replacement filter group id
     public Dictionary<Guid, ReplacementPlanFilterGroupViewModel> Candidates { get; init; } = new();
 
-    public static ReplacementPlanFilterGroupMappingsViewModel FromModel(FilterMapping filterMapping)
+    public static ReplacementPlanFilterGroupMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        FilterMapping filterMapping
+    )
     {
         var filterGroupMappings = filterMapping.FilterGroupMappings.Values.ToDictionary(
             groupMap => groupMap.OriginalId,
@@ -563,20 +551,20 @@ public record ReplacementPlanFilterGroupMappingsViewModel
                 },
                 CandidateKey = groupMap.ReplacementId,
                 Type = groupMap.Status,
-                FilterItems = ReplacementPlanFilterItemMappingsViewModel.FromModel(groupMap),
+                FilterItems = ReplacementPlanFilterItemMappingsViewModel.FromModel(mapping, groupMap),
             }
         );
-        var filterGroupCandidates = filterMapping
-            .FilterGroupMappings.Values.Where(groupMap => groupMap.ReplacementId != null)
-            .Select(groupMap => new { Id = groupMap.ReplacementId!.Value, Label = groupMap.ReplacementLabel! })
-            .Concat(
-                filterMapping.UnmappedReplacementFilterGroups.Select(unmappedGroup => new
+        // candidates are the replacement filter's own children, whether currently claimed by a mapping or not
+        var filterGroupCandidates = mapping
+            .ReplacementFilterGroups.Where(replacementGroup => replacementGroup.FilterId == filterMapping.ReplacementId)
+            .ToDictionary(
+                replacementGroup => replacementGroup.Id,
+                replacementGroup => new ReplacementPlanFilterGroupViewModel
                 {
-                    unmappedGroup.Id,
-                    unmappedGroup.Label,
-                })
-            )
-            .ToDictionary(x => x.Id, x => new ReplacementPlanFilterGroupViewModel { Id = x.Id, Label = x.Label });
+                    Id = replacementGroup.Id,
+                    Label = replacementGroup.Label,
+                }
+            );
 
         return new ReplacementPlanFilterGroupMappingsViewModel
         {
@@ -612,7 +600,10 @@ public record ReplacementPlanFilterItemMappingsViewModel
     // Key is replacement filter item id
     public Dictionary<Guid, ReplacementPlanFilterItemViewModel> Candidates { get; init; } = new();
 
-    public static ReplacementPlanFilterItemMappingsViewModel FromModel(FilterGroupMapping groupMapping)
+    public static ReplacementPlanFilterItemMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        FilterGroupMapping groupMapping
+    )
     {
         var itemMappings = groupMapping.FilterItemMappings.Values.ToDictionary(
             itemMap => itemMap.OriginalId,
@@ -627,17 +618,19 @@ public record ReplacementPlanFilterItemMappingsViewModel
                 Type = itemMap.Status,
             }
         );
-        var itemCandidates = groupMapping
-            .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
-            .Select(itemMap => new { Id = itemMap.ReplacementId!.Value, Label = itemMap.ReplacementLabel! })
-            .Concat(
-                groupMapping.UnmappedReplacementFilterItems.Select(unmappedItem => new
-                {
-                    unmappedItem.Id,
-                    unmappedItem.Label,
-                })
+        // candidates are the replacement group's own children, whether currently claimed by a mapping or not
+        var itemCandidates = mapping
+            .ReplacementFilterItems.Where(replacementItem =>
+                replacementItem.FilterGroupId == groupMapping.ReplacementId
             )
-            .ToDictionary(x => x.Id, x => new ReplacementPlanFilterItemViewModel { Id = x.Id, Label = x.Label });
+            .ToDictionary(
+                replacementItem => replacementItem.Id,
+                replacementItem => new ReplacementPlanFilterItemViewModel
+                {
+                    Id = replacementItem.Id,
+                    Label = replacementItem.Label,
+                }
+            );
 
         return new ReplacementPlanFilterItemMappingsViewModel { Mappings = itemMappings, Candidates = itemCandidates };
     }

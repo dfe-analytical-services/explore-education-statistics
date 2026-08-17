@@ -416,28 +416,28 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
+            .WithReplacementFilters([
+                new ReplacementFilter
                 {
                     Id = replacementFilter.Id,
                     ColumnName = replacementFilter.Name,
                     Label = replacementFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilterGroup.Id,
-                            Label = replacementFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementFilterItem.Id,
-                                    Label = replacementFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
+                },
+            ])
+            .WithReplacementFilterGroups([
+                new ReplacementFilterGroup
+                {
+                    Id = replacementFilterGroup.Id,
+                    FilterId = replacementFilter.Id,
+                    Label = replacementFilterGroup.Label,
+                },
+            ])
+            .WithReplacementFilterItems([
+                new ReplacementFilterItem
+                {
+                    Id = replacementFilterItem.Id,
+                    FilterGroupId = replacementFilterGroup.Id,
+                    Label = replacementFilterItem.Label,
                 },
             ])
             .WithIndicatorMappings(
@@ -1157,11 +1157,7 @@ public class ReplacementPlanServiceTests
                                                 originalDefaultFilterItem.Id,
                                                 new FilterItemMapping { OriginalId = originalDefaultFilterItem.Id }
                                             },
-                                        },
-                                        unmappedReplacementFilterItems:
-                                        [
-                                            new UnmappedFilterItem { Id = replacementDefaultFilterItem.Id },
-                                        ]
+                                        }
                                     )
                                 },
                             }
@@ -1169,6 +1165,32 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
+            // The complete replacement-side catalogue: the default filter/group (claimed by the mapping above)
+            // plus the replacement item, which has no original counterpart (the original item no longer exists).
+            .WithReplacementFilters([
+                new ReplacementFilter
+                {
+                    Id = replacementDefaultFilter.Id,
+                    ColumnName = replacementDefaultFilter.Name,
+                    Label = replacementDefaultFilter.Label,
+                },
+            ])
+            .WithReplacementFilterGroups([
+                new ReplacementFilterGroup
+                {
+                    Id = replacementDefaultFilterGroup.Id,
+                    FilterId = replacementDefaultFilter.Id,
+                    Label = replacementDefaultFilterGroup.Label,
+                },
+            ])
+            .WithReplacementFilterItems([
+                new ReplacementFilterItem
+                {
+                    Id = replacementDefaultFilterItem.Id,
+                    FilterGroupId = replacementDefaultFilterGroup.Id,
+                    Label = replacementDefaultFilterItem.Label,
+                },
+            ])
             .WithIndicatorMappings(
                 new Dictionary<Guid, IndicatorMapping>
                 {
@@ -1437,28 +1459,48 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
+            // The complete replacement-side catalogue: the default filter/group/item (claimed by the mapping
+            // above) plus the newly introduced filter/group/item (with no original counterpart).
+            .WithReplacementFilters([
+                new ReplacementFilter
+                {
+                    Id = replacementDefaultFilter.Id,
+                    ColumnName = replacementDefaultFilter.Name,
+                    Label = replacementDefaultFilter.Label,
+                },
+                new ReplacementFilter
                 {
                     Id = replacementNewlyIntroducedFilter.Id,
                     ColumnName = replacementNewlyIntroducedFilter.Name,
                     Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
+                },
+            ])
+            .WithReplacementFilterGroups([
+                new ReplacementFilterGroup
+                {
+                    Id = replacementDefaultFilterGroup.Id,
+                    FilterId = replacementDefaultFilter.Id,
+                    Label = replacementDefaultFilterGroup.Label,
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = replacementNewlyIntroducedFilterGroup.Id,
+                    FilterId = replacementNewlyIntroducedFilter.Id,
+                    Label = replacementNewlyIntroducedFilterGroup.Label,
+                },
+            ])
+            .WithReplacementFilterItems([
+                new ReplacementFilterItem
+                {
+                    Id = replacementDefaultFilterItem.Id,
+                    FilterGroupId = replacementDefaultFilterGroup.Id,
+                    Label = replacementDefaultFilterItem.Label,
+                },
+                new ReplacementFilterItem
+                {
+                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
+                    FilterGroupId = replacementNewlyIntroducedFilterGroup.Id,
+                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
                 },
             ]);
 
@@ -1652,28 +1694,48 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
+            // The complete replacement-side catalogue: the default filter/group/item (claimed by the mapping
+            // above) plus the newly introduced filter/group/item (with no original counterpart).
+            .WithReplacementFilters([
+                new ReplacementFilter
+                {
+                    Id = replacementDefaultFilter.Id,
+                    ColumnName = replacementDefaultFilter.Name,
+                    Label = replacementDefaultFilter.Label,
+                },
+                new ReplacementFilter
                 {
                     Id = replacementNewlyIntroducedFilter.Id,
                     ColumnName = replacementNewlyIntroducedFilter.Name,
                     Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
+                },
+            ])
+            .WithReplacementFilterGroups([
+                new ReplacementFilterGroup
+                {
+                    Id = replacementDefaultFilterGroup.Id,
+                    FilterId = replacementDefaultFilter.Id,
+                    Label = replacementDefaultFilterGroup.Label,
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = replacementNewlyIntroducedFilterGroup.Id,
+                    FilterId = replacementNewlyIntroducedFilter.Id,
+                    Label = replacementNewlyIntroducedFilterGroup.Label,
+                },
+            ])
+            .WithReplacementFilterItems([
+                new ReplacementFilterItem
+                {
+                    Id = replacementDefaultFilterItem.Id,
+                    FilterGroupId = replacementDefaultFilterGroup.Id,
+                    Label = replacementDefaultFilterItem.Label,
+                },
+                new ReplacementFilterItem
+                {
+                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
+                    FilterGroupId = replacementNewlyIntroducedFilterGroup.Id,
+                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
                 },
             ]);
 
@@ -3882,7 +3944,6 @@ public class ReplacementPlanServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3895,7 +3956,6 @@ public class ReplacementPlanServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -3904,7 +3964,6 @@ public class ReplacementPlanServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3915,7 +3974,6 @@ public class ReplacementPlanServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

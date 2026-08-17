@@ -84,14 +84,6 @@ public class ReplacementServiceHelperTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = replacementIndicatorA1CId,
-                                            Label = "Indicator A1C",
-                                        },
-                                    ],
                                 }
                             },
                         },
@@ -147,17 +139,6 @@ public class ReplacementServiceHelperTests
                                 }
                             },
                         },
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = replacementGroupB3Id,
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem { Id = replacementIndicatorB3AId },
-                                ],
-                            },
-                        ],
                     }
                 },
                 {
@@ -185,24 +166,44 @@ public class ReplacementServiceHelperTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
+            // The complete replacement-side catalogue: both entries already claimed by the mappings above
+            // (filter A/A1/A1A/A1B, filter B/B1/B1A) and entries with no original counterpart
+            // (A1C, filter B's group B3/B3A, and the entirely new filter C/C1/C1A).
+            ReplacementFilters =
             [
-                new UnmappedFilter
+                new ReplacementFilter { Id = replacementFilterAId },
+                new ReplacementFilter { Id = replacementFilterBId },
+                new ReplacementFilter { Id = replacementFilterCId, Label = "Filter C" },
+            ],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup { Id = replacementGroupA1Id, FilterId = replacementFilterAId },
+                new ReplacementFilterGroup { Id = replacementGroupB1Id, FilterId = replacementFilterBId },
+                new ReplacementFilterGroup { Id = replacementGroupB3Id, FilterId = replacementFilterBId },
+                new ReplacementFilterGroup
                 {
-                    Id = replacementFilterCId,
-                    Label = "Filter C",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementGroupC1Id,
-                            Label = "Group C1",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem { Id = replacementIndicatorC1AId, Label = "Indicator C1A" },
-                            ],
-                        },
-                    ],
+                    Id = replacementGroupC1Id,
+                    FilterId = replacementFilterCId,
+                    Label = "Group C1",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem { Id = replacementIndicatorA1AId, FilterGroupId = replacementGroupA1Id },
+                new ReplacementFilterItem { Id = replacementIndicatorA1BId, FilterGroupId = replacementGroupA1Id },
+                new ReplacementFilterItem
+                {
+                    Id = replacementIndicatorA1CId,
+                    FilterGroupId = replacementGroupA1Id,
+                    Label = "Indicator A1C",
+                },
+                new ReplacementFilterItem { Id = replacementIndicatorB1AId, FilterGroupId = replacementGroupB1Id },
+                new ReplacementFilterItem { Id = replacementIndicatorB3AId, FilterGroupId = replacementGroupB3Id },
+                new ReplacementFilterItem
+                {
+                    Id = replacementIndicatorC1AId,
+                    FilterGroupId = replacementGroupC1Id,
+                    Label = "Indicator C1A",
                 },
             ],
         };
@@ -1194,48 +1195,6 @@ public class ReplacementServiceHelperTests
             ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = indicatorsMappings,
             UnmappedReplacementIndicators = unmappedReplacementIndicators,
-        };
-    }
-
-    private static FilterMapping CreateFilterMapping(
-        Filter original,
-        Filter? replacement = null,
-        Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
-        MapStatus status = MapStatus.Unset
-    )
-    {
-        return new FilterMapping
-        {
-            OriginalId = original.Id,
-            OriginalColumnName = original.Name,
-            OriginalLabel = original.Label,
-            ReplacementId = replacement?.Id,
-            ReplacementColumnName = replacement?.Name,
-            ReplacementLabel = replacement?.Label,
-            FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
-            Status = status,
-        };
-    }
-
-    private static FilterGroupMapping CreateFilterGroupMapping(
-        FilterGroup original,
-        FilterGroup? replacement = null,
-        Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
-        MapStatus status = MapStatus.Unset
-    )
-    {
-        return new FilterGroupMapping
-        {
-            OriginalId = original.Id,
-            OriginalLabel = original.Label,
-            ReplacementId = replacement?.Id,
-            ReplacementLabel = replacement?.Label,
-            FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
-            Status = status,
         };
     }
 }

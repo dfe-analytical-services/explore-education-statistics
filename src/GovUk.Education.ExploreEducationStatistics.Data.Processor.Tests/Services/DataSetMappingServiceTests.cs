@@ -208,15 +208,7 @@ public class DataSetMappingServiceTests
                                                     Status = MapStatus.Unset,
                                                 }
                                             },
-                                        },
-                                        unmappedReplacementFilterItems:
-                                        [
-                                            new UnmappedFilterItem
-                                            {
-                                                Id = replacementFilterItem1A2.Id,
-                                                Label = replacementFilterItem1A2.Label,
-                                            },
-                                        ]
+                                        }
                                     )
                                 },
                                 {
@@ -238,23 +230,7 @@ public class DataSetMappingServiceTests
                                         }
                                     )
                                 },
-                            },
-                            unmappedReplacementFilterGroups:
-                            [
-                                new UnmappedFilterGroup
-                                {
-                                    Id = replacementFilterGroup1B.Id,
-                                    Label = replacementFilterGroup1B.Label,
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = replacementFilterItem1B1.Id,
-                                            Label = replacementFilterItem1B1.Label,
-                                        },
-                                    ],
-                                },
-                            ]
+                            }
                         )
                     },
                     {
@@ -287,31 +263,44 @@ public class DataSetMappingServiceTests
                         )
                     },
                 },
-                UnmappedReplacementFilters =
-                [
-                    new UnmappedFilter
+                // The complete replacement-side catalogue: both the entries claimed by the mappings above
+                // (filter1/1A/1A1) and the entries with no original counterpart (1A2, 1B/1B1, and the entirely
+                // unmatched filter2/2A/2A1).
+                ReplacementFilters = new List<Filter> { replacementFilter1, replacementFilter2 }
+                    .Select(filter => new ReplacementFilter
                     {
-                        Id = replacementFilter2.Id,
-                        ColumnName = replacementFilter2.Name,
-                        Label = replacementFilter2.Label,
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = replacementFilterGroup2A.Id,
-                                Label = replacementFilterGroup2A.Label,
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem
-                                    {
-                                        Id = replacementFilterItem2A1.Id,
-                                        Label = replacementFilterItem2A1.Label,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
+                        Id = filter.Id,
+                        ColumnName = filter.Name,
+                        Label = filter.Label,
+                    })
+                    .ToList(),
+                ReplacementFilterGroups = new List<(FilterGroup Group, Guid FilterId)>
+                {
+                    (replacementFilterGroup1A, replacementFilter1.Id),
+                    (replacementFilterGroup1B, replacementFilter1.Id),
+                    (replacementFilterGroup2A, replacementFilter2.Id),
+                }
+                    .Select(x => new ReplacementFilterGroup
+                    {
+                        Id = x.Group.Id,
+                        FilterId = x.FilterId,
+                        Label = x.Group.Label,
+                    })
+                    .ToList(),
+                ReplacementFilterItems = new List<(FilterItem Item, Guid FilterGroupId)>
+                {
+                    (replacementFilterItem1A1, replacementFilterGroup1A.Id),
+                    (replacementFilterItem1A2, replacementFilterGroup1A.Id),
+                    (replacementFilterItem1B1, replacementFilterGroup1B.Id),
+                    (replacementFilterItem2A1, replacementFilterGroup2A.Id),
+                }
+                    .Select(x => new ReplacementFilterItem
+                    {
+                        Id = x.Item.Id,
+                        FilterGroupId = x.FilterGroupId,
+                        Label = x.Item.Label,
+                    })
+                    .ToList(),
             };
             result.AssertDeepEqualTo(expectedMapping, ignoreProperties: [mapping => mapping.Id]);
         }
@@ -738,7 +727,6 @@ public class DataSetMappingServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -751,7 +739,6 @@ public class DataSetMappingServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -760,7 +747,6 @@ public class DataSetMappingServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -771,7 +757,6 @@ public class DataSetMappingServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

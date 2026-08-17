@@ -46,7 +46,7 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 .SingleAsync(cancellationToken);
 
             // NOTE: Basically copied from DataSetMappingService.GenerateInitialFilterMapping, although we save
-            // filterMappings unmappedReplacementFilters rather than return them
+            // filterMappings/replacement candidates rather than return them
             var originalFilters = await statisticsDbContext
                 .Filter.AsNoTracking()
                 .Include(f => f.FilterGroups)
@@ -61,7 +61,40 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 .Where(f => f.SubjectId == replacementSubjectId)
                 .ToListAsync(cancellationToken);
 
-            // Create dictionaries to speed up performance when creating filterMappings/unmappedReplacementFilters
+            // The complete replacement-side catalogue, captured once here and never mutated afterwards.
+            var replacementFilterCandidates = replacementFilters
+                .Select(filter => new ReplacementFilter
+                {
+                    Id = filter.Id,
+                    Label = filter.Label,
+                    ColumnName = filter.Name,
+                })
+                .ToList();
+
+            var replacementGroupCandidates = replacementFilters
+                .SelectMany(filter =>
+                    filter.FilterGroups.Select(group => new ReplacementFilterGroup
+                    {
+                        Id = group.Id,
+                        FilterId = filter.Id,
+                        Label = group.Label,
+                    })
+                )
+                .ToList();
+
+            var replacementItemCandidates = replacementFilters
+                .SelectMany(filter => filter.FilterGroups)
+                .SelectMany(group =>
+                    group.FilterItems.Select(item => new ReplacementFilterItem
+                    {
+                        Id = item.Id,
+                        FilterGroupId = group.Id,
+                        Label = item.Label,
+                    })
+                )
+                .ToList();
+
+            // Create dictionaries to speed up performance when matching originals to replacements
             var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name
 
             var replacementFilterIdToGroupLabelToGroupMap = replacementFilters
@@ -75,7 +108,7 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 .GroupBy(x => x.FilterGroupId)
                 .ToDictionary(x => x.Key, x => x.ToDictionary(g => g.FilterItem.Label, g => g.FilterItem)); // automap items by label
 
-            // Now we created FilterMappings
+            // Now we create FilterMappings
             var filterMappings = new Dictionary<Guid, FilterMapping>();
             foreach (var originalFilter in originalFilters)
             {
@@ -86,7 +119,7 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                         ? replacementFilterIdToGroupLabelToGroupMap.GetValueOrDefault(replacementFilter.Id)
                         : null;
 
-                var (filterGroupMappings, unmappedReplacementGroups) = GenerateInitialFilterGroupMapping(
+                var filterGroupMappings = GenerateInitialFilterGroupMapping(
                     originalFilter.FilterGroups,
                     replacementGroupLabelToGroupMap,
                     replacementGroupIdToItemLabelToItemMap
@@ -103,7 +136,6 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                     ReplacementLabel = replacementFilter?.Label,
 
                     FilterGroupMappings = filterGroupMappings,
-                    UnmappedReplacementFilterGroups = unmappedReplacementGroups,
 
                     Status = replacementFilter == null ? MapStatus.Unset : MapStatus.AutoSet,
                 };
@@ -111,41 +143,17 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 filterMappings.Add(filterMapping.OriginalId, filterMapping);
             }
 
-            // Now we create UnmappedReplacementFilters
-            var mappedReplacementFilterIds = filterMappings
-                .Values.Where(m => m.ReplacementId.HasValue)
-                .Select(m => m.ReplacementId!.Value);
-
-            var unmappedReplacementFilters = replacementFiltersMap
-                .Values.ExceptBy(mappedReplacementFilterIds, filter => filter.Id)
-                .Select(filter => new UnmappedFilter
-                {
-                    Id = filter.Id,
-                    Label = filter.Label,
-                    ColumnName = filter.Name,
-
-                    UnmappedReplacementFilterGroups = filter
-                        .FilterGroups.Select(group => new UnmappedFilterGroup
-                        {
-                            Id = group.Id,
-                            Label = group.Label,
-                            UnmappedReplacementFilterItems = group
-                                .FilterItems.Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                                .ToList(),
-                        })
-                        .ToList(),
-                })
-                .ToList();
-
             mapping.FilterMappings = filterMappings;
-            mapping.UnmappedReplacementFilters = unmappedReplacementFilters;
+            mapping.ReplacementFilters = replacementFilterCandidates;
+            mapping.ReplacementFilterGroups = replacementGroupCandidates;
+            mapping.ReplacementFilterItems = replacementItemCandidates;
         }
 
         await contentDbContext.SaveChangesAsync(cancellationToken);
         return Ok("All DataSetMapping.FilterMappings created");
     }
 
-    private static (Dictionary<Guid, FilterGroupMapping>, List<UnmappedFilterGroup>) GenerateInitialFilterGroupMapping(
+    private static Dictionary<Guid, FilterGroupMapping> GenerateInitialFilterGroupMapping(
         List<FilterGroup> originalFilterGroups,
         Dictionary<string, FilterGroup>? replacementGroupLabelToGroupMap,
         Dictionary<Guid, Dictionary<string, FilterItem>> replacementGroupIdToItemLabelToItemMap
@@ -162,7 +170,7 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 replacementFilterGroup != null
                     ? replacementGroupIdToItemLabelToItemMap.GetValueOrDefault(replacementFilterGroup.Id)
                     : null;
-            var (filterItemMappings, unmappedReplacementItems) = GenerateInitialFilterItemMapping(
+            var filterItemMappings = GenerateInitialFilterItemMapping(
                 originalFilterGroup.FilterItems,
                 replacementItemLabelToItemMap
             );
@@ -176,7 +184,6 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
                 ReplacementLabel = replacementFilterGroup?.Label,
 
                 FilterItemMappings = filterItemMappings,
-                UnmappedReplacementFilterItems = unmappedReplacementItems,
 
                 Status =
                     replacementGroupLabelToGroupMap == null
@@ -187,34 +194,10 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
             filterGroupMappings.Add(filterGroupMapping.OriginalId, filterGroupMapping);
         }
 
-        // if parent is unmapped, we don't know what the replacement groups will be, so return empty unmapped list
-        // if parent is mapped, we can figure out which replacement groups for this filter are unmapped
-        var unmappedReplacementGroups = new List<UnmappedFilterGroup>();
-        if (replacementGroupLabelToGroupMap != null)
-        {
-            // parent is mapped
-            var mappedReplacementGroupIds = filterGroupMappings
-                .Values.Where(m => m.ReplacementId.HasValue)
-                .Select(m => m.ReplacementId!.Value);
-
-            unmappedReplacementGroups = replacementGroupLabelToGroupMap
-                .Values.ExceptBy(mappedReplacementGroupIds, group => group.Id)
-                .Select(group => new UnmappedFilterGroup
-                {
-                    Id = group.Id,
-                    Label = group.Label,
-
-                    UnmappedReplacementFilterItems = group
-                        .FilterItems.Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                        .ToList(),
-                })
-                .ToList();
-        }
-
-        return (filterGroupMappings, unmappedReplacementGroups);
+        return filterGroupMappings;
     }
 
-    private static (Dictionary<Guid, FilterItemMapping>, List<UnmappedFilterItem>) GenerateInitialFilterItemMapping(
+    private static Dictionary<Guid, FilterItemMapping> GenerateInitialFilterItemMapping(
         List<FilterItem> originalFilterItems,
         Dictionary<string, FilterItem>? replacementItemLabelToItemMap
     )
@@ -243,22 +226,6 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
             filterItemMappings.Add(filterItemMapping.OriginalId, filterItemMapping);
         }
 
-        // if parent is unmapped, we don't know what the replacement items will be, so return empty unmapped list
-        // if parent is mapped, we can figure out which replacement items for this group are unmapped
-        var unmappedReplacementItems = new List<UnmappedFilterItem>();
-        if (replacementItemLabelToItemMap != null)
-        {
-            // parent is mapped
-            var mappedReplacementItemIds = filterItemMappings
-                .Values.Where(m => m.ReplacementId.HasValue)
-                .Select(m => m.ReplacementId!.Value);
-
-            unmappedReplacementItems = replacementItemLabelToItemMap
-                .Values.ExceptBy(mappedReplacementItemIds, item => item.Id)
-                .Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                .ToList();
-        }
-
-        return (filterItemMappings, unmappedReplacementItems);
+        return filterItemMappings;
     }
 }

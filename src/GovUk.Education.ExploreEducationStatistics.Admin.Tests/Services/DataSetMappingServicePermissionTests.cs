@@ -102,16 +102,6 @@ public class DataSetMappingServicePermissionTests
         IUserService? userService = null
     )
     {
-        var filterItemMappingService = new FilterItemMappingService(contentDbContext);
-        var filterGroupMappingService = new FilterGroupMappingService(contentDbContext, filterItemMappingService);
-        var filterMappingService = new FilterMappingService(contentDbContext, filterGroupMappingService);
-
-        return new DataSetMappingService(
-            contentDbContext,
-            userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-            filterMappingService,
-            filterGroupMappingService,
-            filterItemMappingService
-        );
+        return new DataSetMappingService(contentDbContext, userService ?? Mock.Of<IUserService>(MockBehavior.Strict));
     }
 }

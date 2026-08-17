@@ -25,6 +25,7 @@ public abstract class ReplacementServiceHelper
             if (filterIdsWithMapping.Contains(filterSequenceEntry.Id))
             {
                 var replacementGroupSequence = GenerateReplacementGroupSequence(
+                    mapping,
                     mapping.FilterMappings[filterSequenceEntry.Id],
                     filterSequenceEntry
                 );
@@ -38,22 +39,31 @@ public abstract class ReplacementServiceHelper
             }
         }
 
-        // 2. Add unmapped replacement filters
+        // 2. Add replacement filters that no live mapping claims (i.e. they have no original counterpart). A
+        // filter with no mapping can't have any of its children claimed either, so its whole subtree is unclaimed.
+        var claimedFilterIds = mapping
+            .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
+            .Select(filterMap => filterMap.ReplacementId!.Value)
+            .ToHashSet();
         replacementSequence.AddRange(
             mapping
-                .UnmappedReplacementFilters.OrderBy(unmappedFilter => unmappedFilter.Label, LabelComparer)
-                .Select(unmappedFilter => new FilterSequenceEntry(
-                    Id: unmappedFilter.Id,
-                    FilterGroupSequence: unmappedFilter
-                        .UnmappedReplacementFilterGroups.OrderBy(unmappedGroup => unmappedGroup.Label, LabelComparer)
-                        .Select(unmappedGroup => new FilterGroupSequenceEntry(
-                            Id: unmappedGroup.Id,
-                            FilterItemSequence: unmappedGroup
-                                .UnmappedReplacementFilterItems.OrderBy(
-                                    unmappedItem => unmappedItem.Label,
-                                    LabelComparer
+                .ReplacementFilters.Where(replacementFilter => !claimedFilterIds.Contains(replacementFilter.Id))
+                .OrderBy(replacementFilter => replacementFilter.Label, LabelComparer)
+                .Select(replacementFilter => new FilterSequenceEntry(
+                    Id: replacementFilter.Id,
+                    FilterGroupSequence: mapping
+                        .ReplacementFilterGroups.Where(replacementGroup =>
+                            replacementGroup.FilterId == replacementFilter.Id
+                        )
+                        .OrderBy(replacementGroup => replacementGroup.Label, LabelComparer)
+                        .Select(replacementGroup => new FilterGroupSequenceEntry(
+                            Id: replacementGroup.Id,
+                            FilterItemSequence: mapping
+                                .ReplacementFilterItems.Where(replacementItem =>
+                                    replacementItem.FilterGroupId == replacementGroup.Id
                                 )
-                                .Select(unmappedItem => unmappedItem.Id)
+                                .OrderBy(replacementItem => replacementItem.Label, LabelComparer)
+                                .Select(replacementItem => replacementItem.Id)
                                 .ToList()
                         ))
                         .ToList()
@@ -64,6 +74,7 @@ public abstract class ReplacementServiceHelper
     }
 
     private static List<FilterGroupSequenceEntry> GenerateReplacementGroupSequence(
+        DataSetMapping mapping,
         FilterMapping filterMapping,
         FilterSequenceEntry originalFilterSequenceEntry
     )
@@ -78,6 +89,7 @@ public abstract class ReplacementServiceHelper
             if (groupIdsWithMapping.Contains(groupSequenceEntry.Id))
             {
                 var replacementItemSequence = GenerateReplacementItemSequence(
+                    mapping,
                     filterMapping.FilterGroupMappings[groupSequenceEntry.Id],
                     groupSequenceEntry
                 );
@@ -91,14 +103,26 @@ public abstract class ReplacementServiceHelper
             }
         }
 
+        // Add replacement groups (under this filter's replacement) that no live mapping claims
+        var claimedGroupIds = filterMapping
+            .FilterGroupMappings.Values.Where(groupMap => groupMap.ReplacementId != null)
+            .Select(groupMap => groupMap.ReplacementId!.Value)
+            .ToHashSet();
         replacementGroupSequence.AddRange(
-            filterMapping
-                .UnmappedReplacementFilterGroups.OrderBy(unmappedGroup => unmappedGroup.Label)
-                .Select(unmappedGroup => new FilterGroupSequenceEntry(
-                    Id: unmappedGroup.Id,
-                    FilterItemSequence: unmappedGroup
-                        .UnmappedReplacementFilterItems.OrderBy(unmappedItem => unmappedItem.Label)
-                        .Select(unmappedItem => unmappedItem.Id)
+            mapping
+                .ReplacementFilterGroups.Where(replacementGroup =>
+                    replacementGroup.FilterId == filterMapping.ReplacementId
+                    && !claimedGroupIds.Contains(replacementGroup.Id)
+                )
+                .OrderBy(replacementGroup => replacementGroup.Label)
+                .Select(replacementGroup => new FilterGroupSequenceEntry(
+                    Id: replacementGroup.Id,
+                    FilterItemSequence: mapping
+                        .ReplacementFilterItems.Where(replacementItem =>
+                            replacementItem.FilterGroupId == replacementGroup.Id
+                        )
+                        .OrderBy(replacementItem => replacementItem.Label)
+                        .Select(replacementItem => replacementItem.Id)
                         .ToList()
                 ))
         );
@@ -107,6 +131,7 @@ public abstract class ReplacementServiceHelper
     }
 
     private static List<Guid> GenerateReplacementItemSequence(
+        DataSetMapping mapping,
         FilterGroupMapping groupMapping,
         FilterGroupSequenceEntry originalGroupSequenceEntry
     )
@@ -125,8 +150,18 @@ public abstract class ReplacementServiceHelper
             }
         }
 
+        // Add replacement items (under this group's replacement) that no live mapping claims
+        var claimedItemIds = groupMapping
+            .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
+            .Select(itemMap => itemMap.ReplacementId!.Value)
+            .ToHashSet();
         replacementItemSequence.AddRange(
-            groupMapping.UnmappedReplacementFilterItems.Select(unmappedItem => unmappedItem.Id)
+            mapping
+                .ReplacementFilterItems.Where(replacementItem =>
+                    replacementItem.FilterGroupId == groupMapping.ReplacementId
+                    && !claimedItemIds.Contains(replacementItem.Id)
+                )
+                .Select(replacementItem => replacementItem.Id)
         );
 
         return replacementItemSequence;

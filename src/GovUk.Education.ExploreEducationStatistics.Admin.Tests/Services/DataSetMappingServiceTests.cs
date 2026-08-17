@@ -1141,29 +1141,52 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
+            // ReplacementFilters/Groups/Items are the complete replacement-side catalogue - it includes both the
+            // still-unclaimed replacementFilter1Id subtree, and the previouslyMappedReplacementFilter2Id subtree
+            // that filter 2's mapping currently claims.
+            ReplacementFilters =
             [
-                new UnmappedFilter
+                new ReplacementFilter
                 {
                     Id = replacementFilter1Id,
                     Label = "Replacement filter 1",
                     ColumnName = "replacement_filter_1",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilter1Group1Id,
-                            Label = "Original filter 1 group 1",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementFilter1Group1Item1Id,
-                                    Label = "Original filter 1 group 1 item 1",
-                                },
-                            ],
-                        },
-                    ],
+                },
+                new ReplacementFilter
+                {
+                    Id = previouslyMappedReplacementFilter2Id,
+                    Label = "Replacement filter 2",
+                    ColumnName = "replacement_filter_2",
+                },
+            ],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = replacementFilter1Group1Id,
+                    FilterId = replacementFilter1Id,
+                    Label = "Original filter 1 group 1",
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = previouslyMappedReplacementFilter2Group1Id,
+                    FilterId = previouslyMappedReplacementFilter2Id,
+                    Label = "Replacement filter 2 group 1",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = replacementFilter1Group1Item1Id,
+                    FilterGroupId = replacementFilter1Group1Id,
+                    Label = "Original filter 1 group 1 item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = previouslyMappedReplacementFilter2Group1Item1Id,
+                    FilterGroupId = previouslyMappedReplacementFilter2Group1Id,
+                    Label = "Replacement filter 2 group 1 item 1",
                 },
             ],
         };
@@ -1241,17 +1264,10 @@ public class DataSetMappingServiceTests
             Assert.Null(filter2Group1Item1.ReplacementId);
             Assert.Equal(MapStatus.ParentNotMapped, filter2Group1Item1.Status);
 
-            Assert.Single(dbMapping.UnmappedReplacementFilters);
-            var newlyUnmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
-            Assert.Equal(previouslyMappedReplacementFilter2Id, newlyUnmappedFilter.Id);
-            Assert.Equal("Replacement filter 2", newlyUnmappedFilter.Label);
-            var newlyUnmappedGroup = Assert.Single(newlyUnmappedFilter.UnmappedReplacementFilterGroups);
-            Assert.Equal(previouslyMappedReplacementFilter2Group1Id, newlyUnmappedGroup.Id);
-            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(
-                previouslyMappedReplacementFilter2Group1Item1Id,
-                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
-            );
+            // previouslyMappedReplacementFilter2Id is available again simply because no live mapping claims it any
+            // more (asserted above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilters.Count);
+            Assert.Contains(dbMapping.ReplacementFilters, f => f.Id == previouslyMappedReplacementFilter2Id);
         }
     }
 
@@ -1333,29 +1349,51 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
+            // The catalogue is the complete replacement-side data: both the still-claimed oldReplacementFilterId
+            // subtree, and the new, currently-unclaimed newReplacementFilterId subtree.
+            ReplacementFilters =
             [
-                new UnmappedFilter
+                new ReplacementFilter
+                {
+                    Id = oldReplacementFilterId,
+                    Label = "Old replacement filter",
+                    ColumnName = "old_replacement_filter",
+                },
+                new ReplacementFilter
                 {
                     Id = newReplacementFilterId,
                     Label = "New replacement filter",
                     ColumnName = "new_replacement_filter",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = newReplacementFilterGroup1Id,
-                            Label = "Original filter group 1",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = newReplacementFilterGroup1Item1Id,
-                                    Label = "Original filter group 1 item 1",
-                                },
-                            ],
-                        },
-                    ],
+                },
+            ],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = oldReplacementFilterGroup1Id,
+                    FilterId = oldReplacementFilterId,
+                    Label = "Old replacement filter group 1",
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = newReplacementFilterGroup1Id,
+                    FilterId = newReplacementFilterId,
+                    Label = "Original filter group 1",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = oldReplacementFilterGroup1Item1Id,
+                    FilterGroupId = oldReplacementFilterGroup1Id,
+                    Label = "Old replacement filter group 1 item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = newReplacementFilterGroup1Item1Id,
+                    FilterGroupId = newReplacementFilterGroup1Id,
+                    Label = "Original filter group 1 item 1",
                 },
             ],
         };
@@ -1420,19 +1458,14 @@ public class DataSetMappingServiceTests
             Assert.Equal("Original filter group 1 item 1", item1.ReplacementLabel);
             Assert.Equal(MapStatus.AutoSet, item1.Status);
 
-            Assert.Single(dbMapping.UnmappedReplacementFilters);
-            var unmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
-            Assert.Equal(oldReplacementFilterId, unmappedFilter.Id);
-            Assert.Equal("Old replacement filter", unmappedFilter.Label);
-            Assert.Equal("old_replacement_filter", unmappedFilter.ColumnName);
-
-            var unmappedGroup = Assert.Single(unmappedFilter.UnmappedReplacementFilterGroups);
-            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
-
-            var unmappedItem = Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedItem.Id);
-            Assert.Equal("Old replacement filter group 1 item 1", unmappedItem.Label);
+            // oldReplacementFilterId is available again simply because no live mapping claims it any more (asserted
+            // above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilters.Count);
+            Assert.Contains(dbMapping.ReplacementFilters, f => f.Id == oldReplacementFilterId);
+            Assert.Equal(2, dbMapping.ReplacementFilterGroups.Count);
+            Assert.Contains(dbMapping.ReplacementFilterGroups, g => g.Id == oldReplacementFilterGroup1Id);
+            Assert.Equal(2, dbMapping.ReplacementFilterItems.Count);
+            Assert.Contains(dbMapping.ReplacementFilterItems, i => i.Id == oldReplacementFilterGroup1Item1Id);
         }
     }
 
@@ -1475,7 +1508,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1531,7 +1563,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1599,7 +1630,6 @@ public class DataSetMappingServiceTests
                     new FilterMapping { OriginalId = originalFilterId }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1685,7 +1715,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1780,7 +1809,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1912,26 +1940,43 @@ public class DataSetMappingServiceTests
                                 }
                             },
                         },
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = newReplacementFilterGroup1Id,
-                                Label = "New replacement filter group 1",
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem
-                                    {
-                                        Id = newReplacementFilterGroup1Item1Id,
-                                        Label = "Original filter group 1 item 1",
-                                    },
-                                ],
-                            },
-                        ],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
+            // The catalogue is scoped under the (already-claimed) replacementFilterId and includes both the
+            // still-claimed oldReplacementFilterGroup2Id subtree, and the new, currently-unclaimed
+            // newReplacementFilterGroup1Id subtree.
+            ReplacementFilters = [new ReplacementFilter { Id = replacementFilterId, Label = "Replacement filter" }],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = newReplacementFilterGroup1Id,
+                    FilterId = replacementFilterId,
+                    Label = "New replacement filter group 1",
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = oldReplacementFilterGroup2Id,
+                    FilterId = replacementFilterId,
+                    Label = "Old replacement filter group 2",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = newReplacementFilterGroup1Item1Id,
+                    FilterGroupId = newReplacementFilterGroup1Id,
+                    Label = "Original filter group 1 item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = oldReplacementFilterGroup2Item1Id,
+                    FilterGroupId = oldReplacementFilterGroup2Id,
+                    Label = "Old replacement filter group 2 item 1",
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1998,15 +2043,12 @@ public class DataSetMappingServiceTests
             Assert.Null(group2Item1.ReplacementId);
             Assert.Equal(MapStatus.ParentNotMapped, group2Item1.Status);
 
-            Assert.Single(filter.UnmappedReplacementFilterGroups);
-            var newlyUnmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
-            Assert.Equal(oldReplacementFilterGroup2Id, newlyUnmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 2", newlyUnmappedGroup.Label);
-            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(
-                oldReplacementFilterGroup2Item1Id,
-                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
-            );
+            // oldReplacementFilterGroup2Id is available again simply because no live mapping claims it any more
+            // (asserted above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilterGroups.Count);
+            Assert.Contains(dbMapping.ReplacementFilterGroups, g => g.Id == oldReplacementFilterGroup2Id);
+            Assert.Equal(2, dbMapping.ReplacementFilterItems.Count);
+            Assert.Contains(dbMapping.ReplacementFilterItems, i => i.Id == oldReplacementFilterGroup2Item1Id);
         }
     }
 
@@ -2038,6 +2080,8 @@ public class DataSetMappingServiceTests
         var newReplacementFilterGroup1Id = Guid.NewGuid();
         var newReplacementFilterGroup1Item1Id = Guid.NewGuid();
 
+        var replacementFilterId = Guid.NewGuid();
+
         var mapping = new DataSetMapping
         {
             OriginalDataFileId = originalDataFileId,
@@ -2050,7 +2094,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = originalFilterId,
                         OriginalLabel = "Original filter",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementFilterId,
                         ReplacementLabel = "Replacement filter",
                         Status = MapStatus.AutoSet,
                         FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
@@ -2081,26 +2125,43 @@ public class DataSetMappingServiceTests
                                 }
                             },
                         },
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = newReplacementFilterGroup1Id,
-                                Label = "New replacement filter group 1",
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem
-                                    {
-                                        Id = newReplacementFilterGroup1Item1Id,
-                                        Label = "Original filter group 1 item 1",
-                                    },
-                                ],
-                            },
-                        ],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
+            // The catalogue is scoped under the (already-claimed) replacementFilterId and includes both the
+            // still-claimed oldReplacementFilterGroup1Id subtree, and the new, currently-unclaimed
+            // newReplacementFilterGroup1Id subtree.
+            ReplacementFilters = [new ReplacementFilter { Id = replacementFilterId, Label = "Replacement filter" }],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = newReplacementFilterGroup1Id,
+                    FilterId = replacementFilterId,
+                    Label = "New replacement filter group 1",
+                },
+                new ReplacementFilterGroup
+                {
+                    Id = oldReplacementFilterGroup1Id,
+                    FilterId = replacementFilterId,
+                    Label = "Old replacement filter group 1",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = newReplacementFilterGroup1Item1Id,
+                    FilterGroupId = newReplacementFilterGroup1Id,
+                    Label = "Original filter group 1 item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = oldReplacementFilterGroup1Item1Id,
+                    FilterGroupId = oldReplacementFilterGroup1Id,
+                    Label = "Old replacement filter group 1 item 1",
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2151,12 +2212,12 @@ public class DataSetMappingServiceTests
             Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
             Assert.Equal(MapStatus.AutoSet, item1.Status);
 
-            Assert.Single(filter.UnmappedReplacementFilterGroups);
-            var unmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
-            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
-            Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedGroup.UnmappedReplacementFilterItems.Single().Id);
+            // oldReplacementFilterGroup1Id is available again simply because no live mapping claims it any more
+            // (asserted above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilterGroups.Count);
+            Assert.Contains(dbMapping.ReplacementFilterGroups, g => g.Id == oldReplacementFilterGroup1Id);
+            Assert.Equal(2, dbMapping.ReplacementFilterItems.Count);
+            Assert.Contains(dbMapping.ReplacementFilterItems, i => i.Id == oldReplacementFilterGroup1Item1Id);
         }
     }
 
@@ -2185,7 +2246,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2263,11 +2323,9 @@ public class DataSetMappingServiceTests
                                 new FilterGroupMapping { OriginalId = originalFilterGroupId, Status = MapStatus.Unset }
                             },
                         },
-                        UnmappedReplacementFilterGroups = [],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2383,21 +2441,40 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = newReplacementFilterItem1Id,
-                                            Label = "New replacement filter item 1",
-                                        },
-                                    ],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
+            // The catalogue is scoped under the (already-claimed) replacementFilterId/replacementFilterGroupId and
+            // includes both the still-claimed oldReplacementFilterItem2Id, and the new, currently-unclaimed
+            // newReplacementFilterItem1Id.
+            ReplacementFilters = [new ReplacementFilter { Id = replacementFilterId, Label = "Replacement filter" }],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = replacementFilterGroupId,
+                    FilterId = replacementFilterId,
+                    Label = "Replacement filter group",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = newReplacementFilterItem1Id,
+                    FilterGroupId = replacementFilterGroupId,
+                    Label = "New replacement filter item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = oldReplacementFilterItem2Id,
+                    FilterGroupId = replacementFilterGroupId,
+                    Label = "Old replacement filter item 2",
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2459,10 +2536,10 @@ public class DataSetMappingServiceTests
             Assert.Null(item2.ReplacementId);
             Assert.Equal(MapStatus.ManuallySet, item2.Status);
 
-            Assert.Single(group.UnmappedReplacementFilterItems);
-            var newlyUnmappedItem = group.UnmappedReplacementFilterItems.Single();
-            Assert.Equal(oldReplacementFilterItem2Id, newlyUnmappedItem.Id);
-            Assert.Equal("Old replacement filter item 2", newlyUnmappedItem.Label);
+            // oldReplacementFilterItem2Id is available again simply because no live mapping claims it any more
+            // (asserted above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilterItems.Count);
+            Assert.Contains(dbMapping.ReplacementFilterItems, i => i.Id == oldReplacementFilterItem2Id);
         }
     }
 
@@ -2491,6 +2568,8 @@ public class DataSetMappingServiceTests
         var oldReplacementFilterItem1Id = Guid.NewGuid();
         var newReplacementFilterItem1Id = Guid.NewGuid();
 
+        var replacementFilterGroupId = Guid.NewGuid();
+
         var mapping = new DataSetMapping
         {
             OriginalDataFileId = originalDataFileId,
@@ -2514,7 +2593,7 @@ public class DataSetMappingServiceTests
                                 {
                                     OriginalId = originalFilterGroupId,
                                     OriginalLabel = "Original filter group",
-                                    ReplacementId = Guid.NewGuid(),
+                                    ReplacementId = replacementFilterGroupId,
                                     ReplacementLabel = "Replacement filter group",
                                     Status = MapStatus.AutoSet,
                                     FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
@@ -2531,21 +2610,29 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = newReplacementFilterItem1Id,
-                                            Label = "New replacement filter item 1",
-                                        },
-                                    ],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
+            // The catalogue is scoped under the (already-claimed) replacementFilterGroupId and includes both the
+            // still-claimed oldReplacementFilterItem1Id, and the new, currently-unclaimed newReplacementFilterItem1Id.
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = newReplacementFilterItem1Id,
+                    FilterGroupId = replacementFilterGroupId,
+                    Label = "New replacement filter item 1",
+                },
+                new ReplacementFilterItem
+                {
+                    Id = oldReplacementFilterItem1Id,
+                    FilterGroupId = replacementFilterGroupId,
+                    Label = "Old replacement filter item 1",
+                },
+            ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2593,10 +2680,10 @@ public class DataSetMappingServiceTests
             Assert.Equal("New replacement filter item 1", item1.ReplacementLabel);
             Assert.Equal(MapStatus.ManuallySet, item1.Status);
 
-            Assert.Single(group.UnmappedReplacementFilterItems);
-            var unmappedItem = group.UnmappedReplacementFilterItems.Single();
-            Assert.Equal(oldReplacementFilterItem1Id, unmappedItem.Id);
-            Assert.Equal("Old replacement filter item 1", unmappedItem.Label);
+            // oldReplacementFilterItem1Id is available again simply because no live mapping claims it any more
+            // (asserted above) - the candidate catalogue itself is immutable and stays as it was.
+            Assert.Equal(2, dbMapping.ReplacementFilterItems.Count);
+            Assert.Contains(dbMapping.ReplacementFilterItems, i => i.Id == oldReplacementFilterItem1Id);
         }
     }
 
@@ -2625,7 +2712,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2717,14 +2803,12 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems = [],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2829,25 +2913,31 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
+            ReplacementFilters =
             [
-                new UnmappedFilter
+                new ReplacementFilter
                 {
                     Id = replacementFilterId,
                     Label = "Replacement filter label",
                     ColumnName = "replacement_filter",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilterGroupId,
-                            Label = "Different group label",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem { Id = replacementFilterItemId, Label = "Different item label" },
-                            ],
-                        },
-                    ],
+                },
+            ],
+            ReplacementFilterGroups =
+            [
+                new ReplacementFilterGroup
+                {
+                    Id = replacementFilterGroupId,
+                    FilterId = replacementFilterId,
+                    Label = "Different group label",
+                },
+            ],
+            ReplacementFilterItems =
+            [
+                new ReplacementFilterItem
+                {
+                    Id = replacementFilterItemId,
+                    FilterGroupId = replacementFilterGroupId,
+                    Label = "Different item label",
                 },
             ],
         };
@@ -2913,9 +3003,11 @@ public class DataSetMappingServiceTests
             Assert.Equal(replacementFilterItemId, item.ReplacementId);
             Assert.Equal(MapStatus.ManuallySet, item.Status);
 
-            Assert.Empty(dbMapping.UnmappedReplacementFilters);
-            Assert.Empty(filter.UnmappedReplacementFilterGroups);
-            Assert.Empty(group.UnmappedReplacementFilterItems);
+            // The candidate catalogue itself is immutable and unaffected by the mappings above - it still contains
+            // exactly the entries it started with.
+            Assert.Equal([replacementFilterId], dbMapping.ReplacementFilters.Select(f => f.Id));
+            Assert.Equal([replacementFilterGroupId], dbMapping.ReplacementFilterGroups.Select(g => g.Id));
+            Assert.Equal([replacementFilterItemId], dbMapping.ReplacementFilterItems.Select(i => i.Id));
         }
     }
 
@@ -2924,16 +3016,6 @@ public class DataSetMappingServiceTests
         IUserService? userService = null
     )
     {
-        var filterItemMappingService = new FilterItemMappingService(contentDbContext);
-        var filterGroupMappingService = new FilterGroupMappingService(contentDbContext, filterItemMappingService);
-        var filterMappingService = new FilterMappingService(contentDbContext, filterGroupMappingService);
-
-        return new DataSetMappingService(
-            contentDbContext,
-            userService ?? MockUtils.AlwaysTrueUserService().Object,
-            filterMappingService,
-            filterGroupMappingService,
-            filterItemMappingService
-        );
+        return new DataSetMappingService(contentDbContext, userService ?? MockUtils.AlwaysTrueUserService().Object);
     }
 }

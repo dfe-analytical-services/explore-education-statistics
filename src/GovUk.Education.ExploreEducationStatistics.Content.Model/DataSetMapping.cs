@@ -24,7 +24,14 @@ public record DataSetMapping
     public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
 
     public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
-    public List<UnmappedFilter> UnmappedReplacementFilters { get; set; } = []; // EES-7370 Change set -> init
+
+    // The complete catalogue of every filter/group/item that exists in the replacement data file. Populated once
+    // when the mapping is created and never mutated afterwards - "is this candidate available" is answered by
+    // checking whether any live FilterMapping/FilterGroupMapping/FilterItemMapping already claims it, not by
+    // moving candidates in and out of these lists.
+    public List<ReplacementFilter> ReplacementFilters { get; set; } = [];
+    public List<ReplacementFilterGroup> ReplacementFilterGroups { get; set; } = [];
+    public List<ReplacementFilterItem> ReplacementFilterItems { get; set; } = [];
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -106,13 +113,33 @@ public record DataSetMapping
                 .HasColumnType("nvarchar(max)");
 
             builder
-                .Property(x => x.UnmappedReplacementFilters)
+                .Property(x => x.ReplacementFilters)
                 .HasConversion(
-                    unmappedFilters => JsonSerializer.Serialize(unmappedFilters, JsonOptions),
-                    unmappedFiltersString =>
-                        JsonSerializer.Deserialize<List<UnmappedFilter>>(unmappedFiltersString, JsonOptions)
-                        ?? new List<UnmappedFilter>(),
-                    ValueComparer.CreateDefault<List<UnmappedFilter>>(false)
+                    replacementFilters => JsonSerializer.Serialize(replacementFilters, JsonOptions),
+                    replacementFiltersString =>
+                        JsonSerializer.Deserialize<List<ReplacementFilter>>(replacementFiltersString, JsonOptions)
+                        ?? new List<ReplacementFilter>(),
+                    ValueComparer.CreateDefault<List<ReplacementFilter>>(false)
+                );
+
+            builder
+                .Property(x => x.ReplacementFilterGroups)
+                .HasConversion(
+                    replacementGroups => JsonSerializer.Serialize(replacementGroups, JsonOptions),
+                    replacementGroupsString =>
+                        JsonSerializer.Deserialize<List<ReplacementFilterGroup>>(replacementGroupsString, JsonOptions)
+                        ?? new List<ReplacementFilterGroup>(),
+                    ValueComparer.CreateDefault<List<ReplacementFilterGroup>>(false)
+                );
+
+            builder
+                .Property(x => x.ReplacementFilterItems)
+                .HasConversion(
+                    replacementItems => JsonSerializer.Serialize(replacementItems, JsonOptions),
+                    replacementItemsString =>
+                        JsonSerializer.Deserialize<List<ReplacementFilterItem>>(replacementItemsString, JsonOptions)
+                        ?? new List<ReplacementFilterItem>(),
+                    ValueComparer.CreateDefault<List<ReplacementFilterItem>>(false)
                 );
         }
     }
@@ -175,28 +202,27 @@ public record LocationMapping
     public MapStatus Status { get; set; }
 }
 
-public record UnmappedFilter
+// The complete catalogue of replacement-side filters/groups/items, captured once when the mapping is created.
+// FilterId/FilterGroupId record the parent so candidates for a given filter/group can be found by a simple
+// filter, without needing a tree shaped to match the mapping it's being matched against.
+public record ReplacementFilter
 {
     public Guid Id { get; set; }
     public string Label { get; set; } = "";
     public string ColumnName { get; set; } = "";
-
-    // All child groups of an unmapped filter must also be unmapped
-    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
 }
 
-public record UnmappedFilterGroup
+public record ReplacementFilterGroup
 {
     public Guid Id { get; set; }
+    public Guid FilterId { get; set; }
     public string Label { get; set; } = "";
-
-    // All child items of an unmapped group must also be unmapped
-    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
 }
 
-public record UnmappedFilterItem
+public record ReplacementFilterItem
 {
     public Guid Id { get; set; }
+    public Guid FilterGroupId { get; set; }
     public string Label { get; set; } = "";
 }
 
@@ -211,7 +237,6 @@ public record FilterMapping
     public string? ReplacementColumnName { get; set; }
 
     public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
-    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }
@@ -225,7 +250,6 @@ public record FilterGroupMapping
     public string? ReplacementLabel { get; set; }
 
     public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
-    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }

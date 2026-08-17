@@ -41,11 +41,12 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             replacementFile.SubjectId!.Value
         );
 
-        var (filterMappings, unmappedReplacementFilters) = await GenerateInitialFilterMapping(
-            statisticsDbContext,
-            originalFile.SubjectId!.Value,
-            replacementFile.SubjectId!.Value
-        );
+        var (filterMappings, replacementFilters, replacementFilterGroups, replacementFilterItems) =
+            await GenerateInitialFilterMapping(
+                statisticsDbContext,
+                originalFile.SubjectId!.Value,
+                replacementFile.SubjectId!.Value
+            );
 
         var newMapping = new DataSetMapping
         {
@@ -56,7 +57,9 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             LocationMappings = locationMappings,
             UnmappedReplacementLocations = unmappedReplacementLocations,
             FilterMappings = filterMappings,
-            UnmappedReplacementFilters = unmappedReplacementFilters,
+            ReplacementFilters = replacementFilters,
+            ReplacementFilterGroups = replacementFilterGroups,
+            ReplacementFilterItems = replacementFilterItems,
         };
 
         contentDbContext.DataSetMappings.Add(newMapping);
@@ -207,7 +210,12 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         return (locationMappings, unmappedReplacementLocations);
     }
 
-    private static async Task<(Dictionary<Guid, FilterMapping>, List<UnmappedFilter>)> GenerateInitialFilterMapping(
+    private static async Task<(
+        Dictionary<Guid, FilterMapping> FilterMappings,
+        List<ReplacementFilter> ReplacementFilters,
+        List<ReplacementFilterGroup> ReplacementFilterGroups,
+        List<ReplacementFilterItem> ReplacementFilterItems
+    )> GenerateInitialFilterMapping(
         StatisticsDbContext statisticsDbContext,
         Guid originalSubjectId,
         Guid replacementSubjectId
@@ -224,7 +232,42 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
 
         var replacementFilters = filters.Where(f => f.SubjectId == replacementSubjectId).ToList();
 
-        // Create dictionaries to speed up performance when creating filterMappings/unmappedReplacementFilters
+        // The complete replacement-side catalogue, captured once here and never mutated afterwards. Availability
+        // is worked out later by checking which of these ids a live mapping already claims, not by maintaining a
+        // separate "unmapped" list in sync by hand.
+        var replacementFilterCandidates = replacementFilters
+            .Select(filter => new ReplacementFilter
+            {
+                Id = filter.Id,
+                Label = filter.Label,
+                ColumnName = filter.Name,
+            })
+            .ToList();
+
+        var replacementGroupCandidates = replacementFilters
+            .SelectMany(filter =>
+                filter.FilterGroups.Select(group => new ReplacementFilterGroup
+                {
+                    Id = group.Id,
+                    FilterId = filter.Id,
+                    Label = group.Label,
+                })
+            )
+            .ToList();
+
+        var replacementItemCandidates = replacementFilters
+            .SelectMany(filter => filter.FilterGroups)
+            .SelectMany(group =>
+                group.FilterItems.Select(item => new ReplacementFilterItem
+                {
+                    Id = item.Id,
+                    FilterGroupId = group.Id,
+                    Label = item.Label,
+                })
+            )
+            .ToList();
+
+        // Create dictionaries to speed up performance when matching originals to replacements
         var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name
 
         var replacementFilterIdToGroupLabelToGroupMap = replacementFilters
@@ -238,7 +281,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             .GroupBy(x => x.FilterGroupId)
             .ToDictionary(x => x.Key, x => x.ToDictionary(g => g.FilterItem.Label, g => g.FilterItem)); // automap items by label
 
-        // Now we created FilterMappings
+        // Now we create FilterMappings
         var filterMappings = new Dictionary<Guid, FilterMapping>();
         foreach (var originalFilter in originalFilters)
         {
@@ -249,7 +292,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
                     ? replacementFilterIdToGroupLabelToGroupMap.GetValueOrDefault(replacementFilter.Id)
                     : null;
 
-            var (filterGroupMappings, unmappedReplacementGroups) = GenerateInitialFilterGroupMapping(
+            var filterGroupMappings = GenerateInitialFilterGroupMapping(
                 originalFilter.FilterGroups,
                 replacementGroupLabelToGroupMap,
                 replacementGroupIdToItemLabelToItemMap
@@ -266,7 +309,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
                 ReplacementLabel = replacementFilter?.Label,
 
                 FilterGroupMappings = filterGroupMappings,
-                UnmappedReplacementFilterGroups = unmappedReplacementGroups,
 
                 Status = replacementFilter == null ? MapStatus.Unset : MapStatus.AutoSet,
             };
@@ -274,36 +316,10 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             filterMappings.Add(filterMapping.OriginalId, filterMapping);
         }
 
-        // Now we create UnmappedReplacementFilters
-        var mappedReplacementFilterIds = filterMappings
-            .Values.Where(m => m.ReplacementId.HasValue)
-            .Select(m => m.ReplacementId!.Value);
-
-        var unmappedReplacementFilters = replacementFiltersMap
-            .Values.ExceptBy(mappedReplacementFilterIds, filter => filter.Id)
-            .Select(filter => new UnmappedFilter
-            {
-                Id = filter.Id,
-                Label = filter.Label,
-                ColumnName = filter.Name,
-
-                UnmappedReplacementFilterGroups = filter
-                    .FilterGroups.Select(group => new UnmappedFilterGroup
-                    {
-                        Id = group.Id,
-                        Label = group.Label,
-                        UnmappedReplacementFilterItems = group
-                            .FilterItems.Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                            .ToList(),
-                    })
-                    .ToList(),
-            })
-            .ToList();
-
-        return (filterMappings, unmappedReplacementFilters);
+        return (filterMappings, replacementFilterCandidates, replacementGroupCandidates, replacementItemCandidates);
     }
 
-    private static (Dictionary<Guid, FilterGroupMapping>, List<UnmappedFilterGroup>) GenerateInitialFilterGroupMapping(
+    private static Dictionary<Guid, FilterGroupMapping> GenerateInitialFilterGroupMapping(
         List<FilterGroup> originalFilterGroups,
         Dictionary<string, FilterGroup>? replacementGroupLabelToGroupMap,
         Dictionary<Guid, Dictionary<string, FilterItem>> replacementGroupIdToItemLabelToItemMap
@@ -320,7 +336,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
                 replacementFilterGroup != null
                     ? replacementGroupIdToItemLabelToItemMap.GetValueOrDefault(replacementFilterGroup.Id)
                     : null;
-            var (filterItemMappings, unmappedReplacementItems) = GenerateInitialFilterItemMapping(
+            var filterItemMappings = GenerateInitialFilterItemMapping(
                 originalFilterGroup.FilterItems,
                 replacementItemLabelToItemMap
             );
@@ -334,7 +350,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
                 ReplacementLabel = replacementFilterGroup?.Label,
 
                 FilterItemMappings = filterItemMappings,
-                UnmappedReplacementFilterItems = unmappedReplacementItems,
 
                 Status =
                     replacementGroupLabelToGroupMap == null
@@ -345,34 +360,10 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             filterGroupMappings.Add(filterGroupMapping.OriginalId, filterGroupMapping);
         }
 
-        // if parent is unmapped, we don't know what the replacement groups will be, so return empty unmapped list
-        // if parent is mapped, we can figure out which replacement groups for this filter are unmapped
-        var unmappedReplacementGroups = new List<UnmappedFilterGroup>();
-        if (replacementGroupLabelToGroupMap != null)
-        {
-            // parent filter is mapped
-            var mappedReplacementGroupIds = filterGroupMappings
-                .Values.Where(m => m.ReplacementId.HasValue)
-                .Select(m => m.ReplacementId!.Value);
-
-            unmappedReplacementGroups = replacementGroupLabelToGroupMap
-                .Values.ExceptBy(mappedReplacementGroupIds, group => group.Id)
-                .Select(group => new UnmappedFilterGroup
-                {
-                    Id = group.Id,
-                    Label = group.Label,
-
-                    UnmappedReplacementFilterItems = group
-                        .FilterItems.Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                        .ToList(),
-                })
-                .ToList();
-        }
-
-        return (filterGroupMappings, unmappedReplacementGroups);
+        return filterGroupMappings;
     }
 
-    private static (Dictionary<Guid, FilterItemMapping>, List<UnmappedFilterItem>) GenerateInitialFilterItemMapping(
+    private static Dictionary<Guid, FilterItemMapping> GenerateInitialFilterItemMapping(
         List<FilterItem> originalFilterItems,
         Dictionary<string, FilterItem>? replacementItemLabelToItemMap
     )
@@ -401,22 +392,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             filterItemMappings.Add(filterItemMapping.OriginalId, filterItemMapping);
         }
 
-        // if parent is unmapped, we don't know what the replacement items will be, so return empty unmapped list
-        // if parent is mapped, we can figure out which replacement items for this group are unmapped
-        var unmappedReplacementItems = new List<UnmappedFilterItem>();
-        if (replacementItemLabelToItemMap != null)
-        {
-            // parent is mapped
-            var mappedReplacementItemIds = filterItemMappings
-                .Values.Where(m => m.ReplacementId.HasValue)
-                .Select(m => m.ReplacementId!.Value);
-
-            unmappedReplacementItems = replacementItemLabelToItemMap
-                .Values.ExceptBy(mappedReplacementItemIds, item => item.Id)
-                .Select(item => new UnmappedFilterItem { Id = item.Id, Label = item.Label })
-                .ToList();
-        }
-
-        return (filterItemMappings, unmappedReplacementItems);
+        return filterItemMappings;
     }
 }

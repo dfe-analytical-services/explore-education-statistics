@@ -35,10 +35,20 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, FilterMapping> filterMappings
     ) => generator.ForInstance(m => m.SetFilterMappings(filterMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementFilters(
+    public static Generator<DataSetMapping> WithReplacementFilters(
         this Generator<DataSetMapping> generator,
-        List<UnmappedFilter> unmappedFilters
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementFilters(unmappedFilters));
+        List<ReplacementFilter> replacementFilters
+    ) => generator.ForInstance(m => m.SetReplacementFilters(replacementFilters));
+
+    public static Generator<DataSetMapping> WithReplacementFilterGroups(
+        this Generator<DataSetMapping> generator,
+        List<ReplacementFilterGroup> replacementFilterGroups
+    ) => generator.ForInstance(m => m.SetReplacementFilterGroups(replacementFilterGroups));
+
+    public static Generator<DataSetMapping> WithReplacementFilterItems(
+        this Generator<DataSetMapping> generator,
+        List<ReplacementFilterItem> replacementFilterItems
+    ) => generator.ForInstance(m => m.SetReplacementFilterItems(replacementFilterItems));
 
     public static Generator<DataSetMapping> WithIndicatorMappings(
         this Generator<DataSetMapping> generator,
@@ -93,10 +103,20 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, FilterMapping> filterMappings
     ) => setters.Set(m => m.FilterMappings, filterMappings);
 
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementFilters(
+    public static InstanceSetters<DataSetMapping> SetReplacementFilters(
         this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedFilter> unmappedFilters
-    ) => setters.Set(m => m.UnmappedReplacementFilters, unmappedFilters);
+        List<ReplacementFilter> replacementFilters
+    ) => setters.Set(m => m.ReplacementFilters, replacementFilters);
+
+    public static InstanceSetters<DataSetMapping> SetReplacementFilterGroups(
+        this InstanceSetters<DataSetMapping> setters,
+        List<ReplacementFilterGroup> replacementFilterGroups
+    ) => setters.Set(m => m.ReplacementFilterGroups, replacementFilterGroups);
+
+    public static InstanceSetters<DataSetMapping> SetReplacementFilterItems(
+        this InstanceSetters<DataSetMapping> setters,
+        List<ReplacementFilterItem> replacementFilterItems
+    ) => setters.Set(m => m.ReplacementFilterItems, replacementFilterItems);
 
     public static InstanceSetters<DataSetMapping> SetIndicatorMappings(
         this InstanceSetters<DataSetMapping> setters,
