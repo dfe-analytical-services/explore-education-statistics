@@ -88,6 +88,16 @@ function usesPublicDataDb(service: ServiceName): boolean {
   );
 }
 
+/** An error carrying the status code it should be reported with. */
+class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 /**
  * Express 4 doesn't catch rejected promises from async handlers, so an
  * uncaught error here would otherwise crash the whole dashboard process
@@ -98,9 +108,57 @@ function asyncHandler(
 ) {
   return (req: express.Request, res: express.Response) => {
     handler(req, res).catch(err => {
-      res.status(500).json({ error: errorMessage(err) });
+      // Some responses stream, and are therefore already committed by the
+      // time anything can fail. Trying to set a status on one of those throws
+      // ERR_HTTP_HEADERS_SENT from inside the error path, replacing whatever
+      // actually went wrong with a less useful error about reporting it.
+      if (res.headersSent) {
+        res.end();
+        return;
+      }
+
+      res
+        .status(err instanceof HttpError ? err.status : 500)
+        .json({ error: errorMessage(err) });
     });
   };
+}
+
+/**
+ * The destructive operation currently running, if any.
+ *
+ * Backup, restore and import all stop every service, take containers down and
+ * bring them back up, and each ends by restarting whatever it stopped. Two of
+ * them overlapping means one's cleanup fighting the other's setup - a restore
+ * emptying the Azurite volume while a backup is reading it, or restarting
+ * services the other deliberately stopped.
+ */
+let runningOperation: string | undefined;
+
+/**
+ * Runs a destructive operation, refusing rather than queueing if one is
+ * already in progress. Refusing is the friendlier of the two: queueing a
+ * second restore behind a ten-minute backup, with nothing on screen to say
+ * so, is how you end up wondering why your data changed later.
+ */
+async function withExclusiveOperation<T>(
+  name: string,
+  run: () => Promise<T>,
+): Promise<T> {
+  if (runningOperation) {
+    throw new HttpError(
+      409,
+      `Can't ${name} while ${runningOperation} is in progress - wait for it to finish.`,
+    );
+  }
+
+  runningOperation = name;
+
+  try {
+    return await run();
+  } finally {
+    runningOperation = undefined;
+  }
 }
 
 const app = express();
@@ -191,22 +249,38 @@ app.get(
         };
       }
 
+      const publicDataDbExists = usesPublicDataDb(name);
+
+      // Resolved with the same PublicDataDbExists this service would actually
+      // start with, rather than with no options at all - otherwise admin's
+      // "Needs:" line omits publicProcessor/publicData/public-api-db until
+      // it's running, which is exactly when you're reading it to find out
+      // what starting it will bring up.
+      const options = {
+        env: { PublicDataDbExists: String(publicDataDbExists) },
+      };
+
       return {
         name,
         kind: 'process' as const,
         processType: schema.type,
         status: getStatus(name),
         error: getError(name),
-        publicDataDbExists: usesPublicDataDb(name),
-        dependsOnServices: resolveServiceDependencies(name, {}),
-        dependsOn: resolveDockerServices(name, {}),
+        publicDataDbExists,
+        dependsOnServices: resolveServiceDependencies(name, options),
+        dependsOn: resolveDockerServices(name, options),
         url: schema.url,
         group: schema.group,
         conflictsWith: schema.conflictsWith,
       };
     });
 
-    res.json({ services, issues, projectRootOverride });
+    res.json({
+      services,
+      issues,
+      projectRootOverride,
+      runningOperation: runningOperation ?? null,
+    });
   }),
 );
 
@@ -417,8 +491,8 @@ app.post(
   asyncHandler(async (req, res) => {
     const { label } = req.body ?? {};
 
-    const backup = await createUnifiedBackup(
-      typeof label === 'string' ? label : '',
+    const backup = await withExclusiveOperation('take a backup', () =>
+      createUnifiedBackup(typeof label === 'string' ? label : ''),
     );
     res.json({ backup });
   }),
@@ -429,7 +503,9 @@ app.post(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    await restoreUnifiedBackup(id);
+    await withExclusiveOperation('restore a backup', () =>
+      restoreUnifiedBackup(id),
+    );
     res.json({ ok: true });
   }),
 );
@@ -439,7 +515,11 @@ app.delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    await deleteUnifiedBackup(id);
+    // Exclusive too, despite only deleting files: the backup being deleted
+    // could be the one a restore is midway through reading.
+    await withExclusiveOperation('delete a backup', () =>
+      deleteUnifiedBackup(id),
+    );
     res.json({ ok: true });
   }),
 );
@@ -453,11 +533,15 @@ app.post(
       return;
     }
 
+    const { path: uploadPath } = req.file;
+
     try {
-      await importMssqlDataZip(req.file.path);
+      await withExclusiveOperation('import a test data zip', () =>
+        importMssqlDataZip(uploadPath),
+      );
       res.json({ ok: true });
     } finally {
-      await fsp.unlink(req.file.path).catch(() => {});
+      await fsp.unlink(uploadPath).catch(() => {});
     }
   }),
 );
@@ -474,7 +558,18 @@ app.use(
     _: express.NextFunction,
   ) => {
     console.error('Unhandled request error:', err);
-    res.status(500).json({ error: errorMessage(err) });
+
+    // Same reasoning as asyncHandler: a streamed response is already
+    // committed, and setting a status on one throws from inside the handler
+    // that exists to report the original problem.
+    if (res.headersSent) {
+      res.end();
+      return;
+    }
+
+    res
+      .status(err instanceof HttpError ? err.status : 500)
+      .json({ error: errorMessage(err) });
   },
 );
 
