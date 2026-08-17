@@ -156,8 +156,24 @@ export function subscribeLogs(
  * port nobody holds just leaves the port alone and lets the service that's
  * about to start fail on the bind itself, which says far more about what's
  * wrong than a failure here would.
+ *
+ * Whatever it kills is reported through `log`, because "whatever's currently
+ * holding it" is not always something stale - a service being debugged from
+ * an IDE holds the same port, and having that killed from under you with no
+ * explanation anywhere is baffling.
  */
-async function killPortHolder(port: number): Promise<void> {
+async function killPortHolder(
+  port: number,
+  log: (line: string) => void,
+): Promise<void> {
+  const reportKilled = (pids: string[]): void => {
+    if (pids.length > 0) {
+      log(
+        `[dashboard] Freed port ${port} by killing pid ${pids.join(', ')} - if you were debugging this service from an IDE, that's what just stopped`,
+      );
+    }
+  };
+
   switch (process.platform) {
     // No `fuser`, so look the holders up and kill them by pid. `netstat`
     // rather than `Get-NetTCPConnection` to avoid paying PowerShell's startup
@@ -187,6 +203,7 @@ async function killPortHolder(port: number): Promise<void> {
         Array.from(pids, pid => $({ reject: false })`taskkill /F /PID ${pid}`),
       );
 
+      reportKilled(Array.from(pids));
       break;
     }
     // macOS ships `fuser`, but without the `-k` flag, so it also has to go via
@@ -203,10 +220,17 @@ async function killPortHolder(port: number): Promise<void> {
         await $({ reject: false })`kill -9 ${pids}`;
       }
 
+      reportKilled(pids);
       break;
     }
-    default:
-      await $({ reject: false })`fuser -k ${port}/tcp`;
+    default: {
+      // `fuser` prints the pids it matched to stdout and everything else to
+      // stderr, so the one call both kills and says what it killed.
+      const { stdout } = await $({ reject: false })`fuser -k ${port}/tcp`;
+
+      reportKilled(stdout.trim().split(/\s+/).filter(Boolean));
+      break;
+    }
   }
 }
 
@@ -223,17 +247,33 @@ async function killPortHolder(port: number): Promise<void> {
  * signals anything, so it needs the event loop to turn at least once - which
  * a handler running as the process exits never gets. It stays as the fallback
  * for a pid that leads no group, where there is time to walk the tree.
+ *
+ * Windows has no process groups at all, so there is nothing to signal by
+ * negated pid and `tree-kill` (which shells out to `taskkill /T`) is the only
+ * option. Branching on the platform rather than letting the call fail and
+ * fall through keeps that deliberate: whether a negative pid comes back as
+ * ESRCH or some other errno is a libuv implementation detail, and relying on
+ * it would have made Windows work only by accident. The consequence is that
+ * the shutdown path can't stop services on Windows - it needs the event loop
+ * `taskkill` requires - which is the same as it was before services were
+ * spawned detached.
  */
 function killProcessTree(
   pid: number,
   signal: NodeJS.Signals = 'SIGTERM',
 ): void {
+  if (process.platform === 'win32') {
+    kill(pid, signal);
+    return;
+  }
+
   try {
     process.kill(-pid, signal);
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'ESRCH') {
-      kill(pid, signal);
-    }
+  } catch {
+    // Any failure here means the group signal didn't land - typically ESRCH
+    // for a pid that leads no group. Walking the tree is slower but works
+    // from anywhere that isn't the exit path.
+    kill(pid, signal);
   }
 }
 
@@ -360,7 +400,7 @@ export async function startProcess(
     const port = getServicePort(service);
 
     if (port) {
-      await killPortHolder(port);
+      await killPortHolder(port, line => appendLog(entry, line));
     }
 
     if (await cancelled()) {
@@ -420,8 +460,11 @@ export async function startProcess(
       cleanup: false,
       // Makes the spawned shell a process group leader, so everything it goes
       // on to start - `dotnet run`, the Functions host, that host's worker -
-      // shares one group that `killProcessTree` can signal in one go.
-      detached: true,
+      // shares one group that `killProcessTree` can signal in one go. Not on
+      // Windows, which has no process groups to lead: there it only detaches
+      // the child into a console window of its own, which buys nothing and
+      // litters the desktop with one per service.
+      detached: process.platform !== 'win32',
     })`${runCommand.command} ${runCommand.args}` as ExecaChildProcessWithoutNullStreams;
 
     entry.process = childProcess;
