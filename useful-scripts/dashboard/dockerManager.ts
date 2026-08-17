@@ -81,6 +81,25 @@ export async function execInService(
 }
 
 /**
+ * Everything Compose still holds for a Docker service's container, for the
+ * "download the full log" link. Unlike app processes, there's nothing to tee
+ * to disk here - the container is already keeping the whole thing.
+ */
+export async function dockerServiceLogs(
+  service: ServiceName,
+): Promise<{ stdout: string }> {
+  const schema = serviceSchemas[service];
+
+  if (schema.type !== 'docker') {
+    throw new Error(`'${service}' is not a Docker service`);
+  }
+
+  return $$({
+    reject: false,
+  })`docker compose logs --no-color --no-log-prefix ${schema.service}`;
+}
+
+/**
  * Streams a Docker service's logs to a listener: the most recent 500 lines
  * immediately, then anything new as it's written. Unlike process logs, Docker
  * logs come from the container itself, so this works whether the service is

@@ -393,11 +393,30 @@ button:disabled {
 .log-panel-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+/* Takes up the slack, so the download link and Close sit together on the
+   right rather than being spread across the header. */
+.log-panel-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.log-panel-download {
+  color: var(--muted);
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.log-panel-download:hover {
+  color: var(--blue);
+  text-decoration: underline;
 }
 
 .log-panel-content {

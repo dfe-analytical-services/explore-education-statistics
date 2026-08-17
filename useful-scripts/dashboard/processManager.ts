@@ -18,6 +18,7 @@ import createFileLock, { UnlockCallback } from '../utils/createFileLock';
 import errorMessage from '../utils/errorMessage';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices } from './dockerManager';
+import { ServiceLogFile } from './logFiles';
 
 export type ProcessStatus =
   'stopped' | 'starting' | 'running' | 'stopping' | 'error';
@@ -51,6 +52,13 @@ interface ManagedProcess {
    * longer its own and unwinds without touching state the new one now owns.
    */
   startToken?: number;
+  /**
+   * The service's on-disk log for this run. The in-memory `logs` buffer is
+   * capped at MAX_LOG_LINES, which a service can blow through during startup
+   * alone, so the thing you actually want to read when a start goes wrong is
+   * often already gone by the time you open the panel.
+   */
+  logFile?: ServiceLogFile;
 }
 
 const MAX_LOG_LINES = 500;
@@ -101,6 +109,7 @@ function appendLog(entry: ManagedProcess, line: string): void {
     entry.logs.shift();
   }
 
+  entry.logFile?.write(line);
   entry.subscribers.forEach(listener => listener(line));
 }
 
@@ -339,6 +348,13 @@ export async function startProcess(
   entry.status = 'starting';
   entry.error = undefined;
   entry.logs = [];
+
+  // Opened here rather than at spawn time so the file also captures what
+  // happened *before* the process existed - waiting on the build lock, a
+  // dependency failing, the start being cancelled - which is exactly the part
+  // that's hard to diagnose after the fact.
+  entry.logFile?.close();
+  entry.logFile = new ServiceLogFile(service);
 
   nextStartToken += 1;
   const startToken = nextStartToken;
@@ -708,6 +724,10 @@ export function stopAllProcesses(): void {
     if (entry.process?.pid) {
       killProcessTree(entry.process.pid);
     }
+
+    // Synchronous, like everything else on this path, so the tail of each log
+    // is flushed rather than lost with the process.
+    entry.logFile?.close();
   });
 }
 

@@ -64,6 +64,7 @@ mssqlImportBtn.addEventListener('click', async () => {
 const logPanel = document.getElementById('log-panel');
 const logPanelBackdrop = document.getElementById('log-panel-backdrop');
 const logPanelTitle = document.getElementById('log-panel-title');
+const logPanelDownload = document.getElementById('log-panel-download');
 const logPanelContent = document.getElementById('log-panel-content');
 document
   .getElementById('log-panel-close')
@@ -135,6 +136,8 @@ function openLogPanel(name) {
   closeLogPanel();
   currentLogService = name;
   logPanelTitle.textContent = `Logs: ${displayName(name)}`;
+  // The panel only holds the tail of the log; this is the whole of it.
+  logPanelDownload.href = `/api/services/${name}/log-file`;
   logPanelContent.textContent = '';
   logPanel.classList.remove('hidden');
   logPanelBackdrop.classList.remove('hidden');

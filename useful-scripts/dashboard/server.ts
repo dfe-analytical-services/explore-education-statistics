@@ -2,7 +2,9 @@ import express from 'express';
 import multer from 'multer';
 import os from 'node:os';
 import path from 'node:path';
+import { createReadStream } from 'node:fs';
 import fsp from 'node:fs/promises';
+import { pipeline } from 'node:stream/promises';
 import process from 'node:process';
 import {
   allowedServiceNames,
@@ -23,12 +25,14 @@ import {
   restoreUnifiedBackup,
 } from './backups';
 import {
+  dockerServiceLogs,
   getDockerStatuses,
   startDockerServices,
   stopAllDockerServices,
   stopDockerServices,
   subscribeDockerLogs,
 } from './dockerManager';
+import { logFilePaths } from './logFiles';
 import {
   ensureMssqlVolumePermissions,
   findMissingDatabaseLoginLine,
@@ -354,6 +358,51 @@ app.get('/api/services/:name/logs', (req, res) => {
 
   req.on('close', () => unsubscribe());
 });
+
+/**
+ * The whole of a service's log, as a download - the panel only holds the most
+ * recent lines, and a startup failure usually scrolls out of that.
+ *
+ * For app processes this is what the dashboard teed to disk as it ran (the
+ * rotated-out file first, so it reads chronologically). Docker services keep
+ * their own logs in the container, so those come straight from Compose.
+ */
+app.get(
+  '/api/services/:name/log-file',
+  asyncHandler(async (req, res) => {
+    const { name } = req.params;
+
+    if (!isServiceName(name)) {
+      res.status(404).json({ error: `Unknown service '${name}'` });
+      return;
+    }
+
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}.log"`);
+
+    if (serviceSchemas[name].type === 'docker') {
+      const { stdout } = await dockerServiceLogs(name);
+      res.send(stdout);
+      return;
+    }
+
+    const files = logFilePaths(name);
+
+    if (files.length === 0) {
+      res.send(
+        `No log file for '${name}' yet - it hasn't been started from the dashboard.\n`,
+      );
+      return;
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const file of files) {
+      await pipeline(createReadStream(file), res, { end: false });
+    }
+
+    res.end();
+  }),
+);
 
 app.get(
   '/api/backups',
