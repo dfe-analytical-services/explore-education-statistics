@@ -19,6 +19,7 @@
     </header>
 
     <div id="project-root-banner" class="project-root-banner hidden"></div>
+    <div id="operation-banner" class="operation-banner hidden"></div>
     <div id="issues-banner" class="issues-banner hidden"></div>
 
     <main>
@@ -51,7 +52,9 @@
           </p>
           <div class="backup-create-row">
             <input id="mssql-import-input" type="file" accept=".zip" />
-            <button id="mssql-import-btn" class="primary">Import</button>
+            <button id="mssql-import-btn" class="primary op-exclusive">
+              Import
+            </button>
           </div>
           <p class="card-meta">
             Stops the db and any running app processes, extracts the zip over

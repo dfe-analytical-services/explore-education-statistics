@@ -56,6 +56,19 @@ h1 {
   display: none;
 }
 
+.operation-banner {
+  background: rgba(77, 143, 240, 0.12);
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin: 1rem 2rem 0;
+  font-size: 0.8rem;
+}
+
+.operation-banner.hidden {
+  display: none;
+}
+
 .issues-banner {
   display: flex;
   align-items: center;

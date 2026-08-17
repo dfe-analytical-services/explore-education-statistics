@@ -1,9 +1,15 @@
+/* eslint-disable no-alert -- This is a single-user local dev tool served on
+   localhost, and confirm()/alert() are the right weight for "you are about to
+   overwrite your local database". Building a modal system to say the same
+   thing would be more code to go wrong for no benefit. */
+
 const dockerServicesEl = document.getElementById('docker-services');
 const appServicesEl = document.getElementById('app-services');
 const backupPanelEl = document.getElementById('backup-panel');
 const stopAllBtn = document.getElementById('stop-all-btn');
 const issuesBannerEl = document.getElementById('issues-banner');
 const projectRootBannerEl = document.getElementById('project-root-banner');
+const operationBannerEl = document.getElementById('operation-banner');
 
 stopAllBtn.addEventListener('click', async () => {
   if (!window.confirm('Stop all app processes AND all Docker services?')) {
@@ -12,7 +18,19 @@ stopAllBtn.addEventListener('click', async () => {
   stopAllBtn.disabled = true;
   stopAllBtn.textContent = 'Stopping...';
   try {
-    await api('/api/services/stop-all', { method: 'POST' });
+    const { forced = [] } = await api('/api/services/stop-all', {
+      method: 'POST',
+    });
+
+    // A service that ignored SIGTERM was killed outright, so it never got to
+    // shut down cleanly - worth knowing before trusting whatever it left.
+    if (forced.length) {
+      window.alert(
+        `These didn't shut down cleanly and had to be killed: ${forced
+          .map(displayName)
+          .join(', ')}.`,
+      );
+    }
   } catch (err) {
     window.alert(err.message);
   }
@@ -76,6 +94,24 @@ let currentLogService = null;
 let pendingLogLines = [];
 let logFlushHandle = null;
 
+// A `docker logs -f` follow left open runs indefinitely, so without a cap the
+// panel grows without bound. Tracked as a list of appended text nodes rather
+// than by rewriting the panel's text, so dropping the oldest is a node
+// removal rather than re-serialising everything that's left.
+const MAX_PANEL_LINES = 2000;
+let logChunks = [];
+let logLineCount = 0;
+
+function trimLogPanel() {
+  // Never drops the last chunk: it's the one just appended, and the panel
+  // showing nothing would be worse than it showing more than the cap.
+  while (logLineCount > MAX_PANEL_LINES && logChunks.length > 1) {
+    const oldest = logChunks.shift();
+    logLineCount -= oldest.lines;
+    oldest.node.remove();
+  }
+}
+
 /**
  * Appends every line buffered since the last flush in one go.
  *
@@ -102,10 +138,13 @@ function flushLogLines() {
     logPanelContent.scrollHeight - logPanelContent.scrollTop <=
     logPanelContent.clientHeight + 20;
 
-  logPanelContent.appendChild(
-    document.createTextNode(`${pendingLogLines.join('\n')}\n`),
-  );
+  const node = document.createTextNode(`${pendingLogLines.join('\n')}\n`);
+  logPanelContent.appendChild(node);
+  logChunks.push({ node, lines: pendingLogLines.length });
+  logLineCount += pendingLogLines.length;
   pendingLogLines = [];
+
+  trimLogPanel();
 
   if (pinnedToBottom) {
     logPanelContent.scrollTop = logPanelContent.scrollHeight;
@@ -122,6 +161,8 @@ function closeLogPanel() {
     logFlushHandle = null;
   }
   pendingLogLines = [];
+  logChunks = [];
+  logLineCount = 0;
   currentLogService = null;
   logPanel.classList.add('hidden');
   logPanelBackdrop.classList.add('hidden');
@@ -405,6 +446,30 @@ function renderGroupedServiceCard(groupName, members) {
 
   const isBusy = displayStatus === 'starting' || displayStatus === 'stopping';
 
+  // Only frontendProd builds on start (`pnpm build && pnpm start`), so this is
+  // the one mode where skipping it means anything - matches the CLI's
+  // --skip-build.
+  const buildsOnStart = selectedName === 'frontendProd';
+
+  if (buildsOnStart) {
+    const option = document.createElement('label');
+    option.className = 'admin-option';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = skipBuildChoice;
+    checkbox.disabled = locked || isBusy;
+    option.classList.toggle('disabled', locked || isBusy);
+    checkbox.addEventListener('change', () => {
+      skipBuildChoice = checkbox.checked;
+      renderApp();
+    });
+    option.appendChild(checkbox);
+    option.appendChild(document.createTextNode('Skip build'));
+
+    card.appendChild(option);
+  }
+
   const toggleBtn = document.createElement('button');
   toggleBtn.className = active ? 'danger' : 'primary';
   toggleBtn.textContent = active ? 'Stop' : 'Start';
@@ -415,6 +480,9 @@ function renderGroupedServiceCard(groupName, members) {
     try {
       await api(`/api/services/${target}/${active ? 'stop' : 'start'}`, {
         method: 'POST',
+        ...(!active && buildsOnStart
+          ? { body: JSON.stringify({ skipBuild: skipBuildChoice }) }
+          : {}),
       });
     } catch (err) {
       window.alert(err.message);
@@ -455,6 +523,32 @@ function groupServices(services) {
 
 let lastServices = [];
 let fixingIssueId = null;
+// The destructive operation the server says is running, if any. Backup,
+// restore, delete and import refuse to overlap (409), so the buttons reflect
+// that rather than letting a click come back as an error.
+let runningOperation = null;
+// Whether to skip `frontendProd`'s production build, mirroring the CLI's
+// --skip-build. Remembered across re-renders, like the mode selection.
+let skipBuildChoice = false;
+
+function renderOperationState() {
+  const busy = Boolean(runningOperation);
+
+  document.querySelectorAll('.op-exclusive').forEach(element => {
+    element.toggleAttribute('disabled', busy);
+
+    if (busy) {
+      element.setAttribute('title', `Busy: ${runningOperation}`);
+    } else {
+      element.removeAttribute('title');
+    }
+  });
+
+  operationBannerEl.textContent = busy
+    ? `${runningOperation[0].toUpperCase()}${runningOperation.slice(1)} in progress - other data operations are unavailable until it finishes.`
+    : '';
+  operationBannerEl.classList.toggle('hidden', !busy);
+}
 // The user's explicit "Start with PublicData" choice on the Admin card, or
 // null when they haven't touched it and it should follow the state of things
 // (see startsWithPublicData below).
@@ -569,16 +663,26 @@ function renderApp() {
   appServicesEl.replaceChildren(...processItems.map(item => item.card));
 }
 
+// Never rejects: this runs on a timer, so a transient failure (the server
+// restarting, most often) would otherwise produce an unhandled rejection
+// every few seconds, and the next tick recovers on its own anyway.
 async function refreshServices() {
-  const {
-    services,
-    issues = [],
-    projectRootOverride,
-  } = await api('/api/services');
-  lastServices = services;
-  renderApp();
-  renderIssues(issues);
-  renderProjectRootBanner(projectRootOverride);
+  try {
+    const {
+      services,
+      issues = [],
+      projectRootOverride,
+      runningOperation: operation = null,
+    } = await api('/api/services');
+    lastServices = services;
+    runningOperation = operation;
+    renderApp();
+    renderIssues(issues);
+    renderProjectRootBanner(projectRootOverride);
+    renderOperationState();
+  } catch (err) {
+    console.error('Failed to refresh services', err);
+  }
 }
 
 function formatBytes(bytes) {
@@ -635,6 +739,7 @@ function renderBackupItem(backup) {
   actions.className = 'backup-item-actions';
 
   const restoreBtn = document.createElement('button');
+  restoreBtn.className = 'op-exclusive';
   restoreBtn.textContent = 'Restore';
   restoreBtn.addEventListener('click', async () => {
     if (
@@ -656,7 +761,7 @@ function renderBackupItem(backup) {
   actions.appendChild(restoreBtn);
 
   const deleteBtn = document.createElement('button');
-  deleteBtn.className = 'danger';
+  deleteBtn.className = 'danger op-exclusive';
   deleteBtn.textContent = 'Delete';
   deleteBtn.addEventListener('click', async () => {
     if (
@@ -690,7 +795,7 @@ function renderBackupPanel(backups) {
   createRow.appendChild(labelInput);
 
   const createBtn = document.createElement('button');
-  createBtn.className = 'primary';
+  createBtn.className = 'primary op-exclusive';
   createBtn.textContent = 'Backup';
   createBtn.addEventListener('click', async () => {
     createBtn.disabled = true;
@@ -728,9 +833,18 @@ function renderBackupPanel(backups) {
   return panel;
 }
 
+// Same reasoning as refreshServices: called from click handlers and on load,
+// and a failure here shouldn't surface as an unhandled rejection.
 async function refreshBackups() {
-  const { backups } = await api('/api/backups');
-  backupPanelEl.replaceChildren(renderBackupPanel(backups));
+  try {
+    const { backups } = await api('/api/backups');
+    backupPanelEl.replaceChildren(renderBackupPanel(backups));
+    // The panel was just rebuilt, so its buttons need the current state
+    // reapplying to them.
+    renderOperationState();
+  } catch (err) {
+    console.error('Failed to refresh backups', err);
+  }
 }
 
 refreshServices();

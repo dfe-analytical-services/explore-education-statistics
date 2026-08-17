@@ -14,6 +14,7 @@ import {
   ServiceName,
   serviceSchemas,
   serviceUsesPublicDataDb,
+  StartOptions,
 } from '../services';
 import errorMessage from '../utils/errorMessage';
 import { getDirname } from '../utils/nodeGlobals';
@@ -302,6 +303,11 @@ app.post(
       return;
     }
 
+    // Mirrors the CLI's --skip-build, for the frontend tile: `frontendProd`
+    // otherwise runs a full production build every time it starts.
+    const options: StartOptions =
+      req.body?.skipBuild === true ? { skipBuild: true } : {};
+
     // The dashboard's "Start with PublicData" checkbox sends this either way
     // round, so that an explicitly unticked box beats an appsettings default
     // of `PublicDataDbExists: true` - whatever the checkbox showed is what
@@ -311,11 +317,12 @@ app.post(
       const { startPublicData } = req.body;
 
       await startProcess('admin', {
+        ...options,
         env: { PublicDataDbExists: String(startPublicData) },
       });
 
       if (startPublicData) {
-        await startProcess('publicData');
+        await startProcess('publicData', options);
       }
 
       res.json({ ok: true });
@@ -333,15 +340,18 @@ app.post(
         !usesPublicDataDb('admin')
       ) {
         await stopProcess('admin');
-        await startProcess('admin', { env: { PublicDataDbExists: 'true' } });
+        await startProcess('admin', {
+          ...options,
+          env: { PublicDataDbExists: 'true' },
+        });
       }
 
-      await startProcess('publicData');
+      await startProcess('publicData', options);
       res.json({ ok: true });
       return;
     }
 
-    await startProcess(name);
+    await startProcess(name, options);
     res.json({ ok: true });
   }),
 );
