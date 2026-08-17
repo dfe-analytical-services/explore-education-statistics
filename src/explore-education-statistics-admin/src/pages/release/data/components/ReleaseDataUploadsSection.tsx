@@ -131,30 +131,6 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, setAllDataFiles, refetchDataFiles],
   );
 
-  const handleReplacementStatusChange = useCallback(
-    async (updatedDataFile: DataFile) => {
-      try {
-        const permissions = await permissionService.getDataFilePermissions(
-          releaseVersionId,
-          updatedDataFile.id,
-        );
-        setAllDataFiles(currentDataFiles =>
-          currentDataFiles?.map(file =>
-            file.id !== updatedDataFile.id
-              ? file
-              : {
-                  ...updatedDataFile,
-                  permissions,
-                },
-          ),
-        );
-      } catch {
-        refetchDataFiles();
-      }
-    },
-    [releaseVersionId, setAllDataFiles, refetchDataFiles],
-  );
-
   const handleDataSetImport = useCallback(
     async (dataSetUploadIds: string[]) => {
       await releaseDataFileService.importDataSets(
@@ -322,7 +298,6 @@ export default function ReleaseDataUploadsSection({
                     onRefreshUploads={refetchDataSetUploads}
                     onDeleteUpload={handleDeleteUploadConfirm}
                     onDataSetImport={handleDataSetImport}
-                    onReplacementStatusChange={handleReplacementStatusChange}
                   />
                 )}
 
