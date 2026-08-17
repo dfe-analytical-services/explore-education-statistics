@@ -538,6 +538,12 @@ pnpm dashboard
 
 This runs at `http://localhost:4300` by default (override with the `DASHBOARD_PORT` environment variable).
 
+The service dependency resolution shared by `start` and the dashboard has tests, run with:
+
+```bash
+pnpm test:scripts
+```
+
 By default, the dashboard runs services from the same checkout it's started from. If you're using
 [git worktrees](https://git-scm.com/docs/git-worktree) to work on multiple branches at once, you can instead point
 it at services in a *different* checkout by setting `EES_PROJECT_ROOT`:
