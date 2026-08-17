@@ -27,6 +27,7 @@ import {
 } from './backups';
 import {
   dockerServiceLogs,
+  getDockerStartFailure,
   getDockerStatuses,
   startDockerServices,
   stopAllDockerServices,
@@ -266,11 +267,22 @@ app.get(
       const schema = serviceSchemas[name];
 
       if (schema.type === 'docker') {
+        const status = dockerStatuses[schema.service] ?? 'stopped';
+
         return {
           name,
           kind: 'docker' as const,
           dockerService: schema.service,
-          status: dockerStatuses[schema.service] ?? 'stopped',
+          status,
+          // A container that exits on startup otherwise leaves a card that
+          // just says 'Stopped' - `compose up -d` succeeded, so there's
+          // nothing else on screen to say the start was even attempted.
+          // Dropped once it's running, since it may well have been started
+          // from a terminal rather than from here.
+          error:
+            status === 'running'
+              ? undefined
+              : getDockerStartFailure(schema.service),
           url: schema.url,
         };
       }
