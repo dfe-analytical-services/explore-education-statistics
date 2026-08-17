@@ -1,7 +1,7 @@
 import { DataFile } from '@admin/services/releaseDataFileService';
 import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 interface Props {
   dataFiles: DataFile[];
@@ -14,11 +14,10 @@ export default function DataFilesReorderableList({
   onCancelReordering,
   onConfirmReordering,
 }: Props) {
+  // Deliberately not re-seeded from the prop: this list is unmounted whenever
+  // reordering stops, and a background refetch mid-drag would otherwise discard
+  // the ordering the user is part-way through.
   const [dataFiles, setDataFiles] = useState<DataFile[]>(initialDataFiles);
-
-  useEffect(() => {
-    setDataFiles(initialDataFiles);
-  }, [initialDataFiles]);
 
   const list = useMemo(
     () =>

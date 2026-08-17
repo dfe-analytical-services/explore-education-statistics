@@ -1,5 +1,6 @@
 import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
+import DataUploadsGuidance from '@admin/pages/release/data/components/DataUploadsGuidance';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import dataReplacementService from '@admin/services/dataReplacementService';
 import permissionService from '@admin/services/permissionService';
@@ -16,20 +17,18 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 interface Props {
   publicationId: string;
   releaseVersionId: string;
   canUpdateRelease: boolean;
-  onDataFilesChange?: (dataFiles: DataFile[]) => void;
 }
 
 export default function ReleaseDataUploadsSection({
   publicationId,
   releaseVersionId,
   canUpdateRelease,
-  onDataFilesChange,
 }: Props) {
   const [isReordering, toggleReordering] = useToggle(false);
 
@@ -55,16 +54,14 @@ export default function ReleaseDataUploadsSection({
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
 
-  useEffect(() => {
-    onDataFilesChange?.(allDataFiles);
-  }, [allDataFiles, onDataFilesChange]);
-
-  const uploadsWithoutReplacements = allDataSetUploads.filter(
-    upload => !upload.replacingFileId,
+  const uploadsWithoutReplacements = useMemo(
+    () => allDataSetUploads.filter(upload => !upload.replacingFileId),
+    [allDataSetUploads],
   );
 
-  const uploadsWithReplacements = allDataSetUploads.filter(
-    upload => upload.replacingFileId,
+  const uploadsWithReplacements = useMemo(
+    () => allDataSetUploads.filter(upload => upload.replacingFileId),
+    [allDataSetUploads],
   );
 
   const dataFilesExcludingReplacements = useMemo(
@@ -105,6 +102,10 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, queryClient],
   );
 
+  const refreshDataFileLists = useCallback(async () => {
+    await Promise.all([refetchDataFiles(), refetchDataSetUploads()]);
+  }, [refetchDataFiles, refetchDataSetUploads]);
+
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
       try {
@@ -142,21 +143,10 @@ export default function ReleaseDataUploadsSection({
         uploads?.filter(upload => !dataSetUploadIds.includes(upload.id)),
       );
 
-      await refetchDataSetUploads();
-      await refetchDataFiles();
+      await refreshDataFileLists();
     },
-    [
-      releaseVersionId,
-      setAllDataUploads,
-      refetchDataFiles,
-      refetchDataSetUploads,
-    ],
+    [releaseVersionId, setAllDataUploads, refreshDataFileLists],
   );
-
-  const handleDeleteUploadConfirm = useCallback(async () => {
-    await refetchDataFiles();
-    await refetchDataSetUploads();
-  }, [refetchDataFiles, refetchDataSetUploads]);
 
   const handleDeleteConfirm = useCallback(
     async (deletedFileId: string) => {
@@ -166,11 +156,6 @@ export default function ReleaseDataUploadsSection({
     },
     [setAllDataFiles],
   );
-
-  const handleSubmit = async () => {
-    await refetchDataFiles();
-    await refetchDataSetUploads();
-  };
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
@@ -199,55 +184,15 @@ export default function ReleaseDataUploadsSection({
     <>
       <h2>Add data file to release</h2>
 
-      <InsetText>
-        <h3>Before you start</h3>
-        <p>
-          Data files will be displayed in the table tool and can be used to
-          create data blocks. They will also be attached to the release for
-          users to download. Please ensure:
-        </p>
-        <ul>
-          <li>
-            your data files have passed the checks in our{' '}
-            <a
-              href="https://rsconnect/rsc/dfe-published-data-qa/"
-              rel="noopener noreferrer nofollow"
-              target="_blank"
-            >
-              screening app (opens in new tab)
-            </a>
-          </li>
-          <li>
-            your data files meets these standards - if not you won't be able to
-            upload it to your release
-          </li>
-          <li>
-            if you have any issues uploading data files, or questions about data
-            standards contact:{' '}
-            <a href="mailto:explore.statistics@education.gov.uk">
-              explore.statistics@education.gov.uk
-            </a>
-          </li>
-        </ul>
-        <h4>Data replacement</h4>
-        <p>
-          Files are expected to have a unique title, any files that are uploaded
-          with a title that matches an existing file will start a data
-          replacement instead of importing as a separate file.
-        </p>
-      </InsetText>
-      <WarningMessage>
-        The system runs some basic screening checks during data import. Analysts
-        should still ensure that all data files undergo the full screening check
-        suite prior to being uploaded, as provided by the external screener app.
-      </WarningMessage>
+      <DataUploadsGuidance />
+
       {canUpdateRelease ? (
         <DataFileUploadForm
           dataSetFileTitles={dataFilesExcludingReplacements.map(
             file => file.title,
           )}
           releaseVersionId={releaseVersionId}
-          onSubmit={handleSubmit}
+          onSubmit={refreshDataFileLists}
         />
       ) : (
         <WarningMessage>
@@ -296,7 +241,7 @@ export default function ReleaseDataUploadsSection({
                     testId="Data file replacements table"
                     onConfirmReplacement={refetchDataFiles}
                     onRefreshUploads={refetchDataSetUploads}
-                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDeleteUpload={refreshDataFileLists}
                     onDataSetImport={handleDataSetImport}
                   />
                 )}
@@ -312,10 +257,10 @@ export default function ReleaseDataUploadsSection({
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"
                     onDeleteFile={handleDeleteConfirm}
-                    onDeleteUpload={handleDeleteUploadConfirm}
+                    onDeleteUpload={refreshDataFileLists}
                     onDataSetImport={handleDataSetImport}
-                    onEditFile={handleSubmit}
-                    onReplaceFile={handleSubmit}
+                    onEditFile={refreshDataFileLists}
+                    onReplaceFile={refreshDataFileLists}
                     onRefreshUploads={refetchDataSetUploads}
                     onStatusChange={handleStatusChange}
                   />
