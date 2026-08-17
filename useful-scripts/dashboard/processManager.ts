@@ -1,5 +1,6 @@
 import { $ } from 'execa';
 import path from 'node:path';
+import process from 'node:process';
 import splitLines from 'split2';
 import kill from 'tree-kill';
 import {
@@ -110,9 +111,90 @@ export function subscribeLogs(
  * Frees up a port from whatever's currently holding it - typically a stale
  * process left over from a dashboard restart that didn't get a chance to
  * shut its children down gracefully (e.g. after a `kill -9` on the server).
+ *
+ * Best-effort on every platform: nothing here rejects, so a missing tool or a
+ * port nobody holds just leaves the port alone and lets the service that's
+ * about to start fail on the bind itself, which says far more about what's
+ * wrong than a failure here would.
  */
 async function killPortHolder(port: number): Promise<void> {
-  await $({ reject: false })`fuser -k ${port}/tcp`;
+  switch (process.platform) {
+    // No `fuser`, so look the holders up and kill them by pid. `netstat`
+    // rather than `Get-NetTCPConnection` to avoid paying PowerShell's startup
+    // cost on every single service start.
+    case 'win32': {
+      const { stdout } = await $({ reject: false })`netstat -ano -p tcp`;
+
+      const pids = new Set(
+        stdout
+          .split(/\r?\n/)
+          .map(line => line.trim().split(/\s+/))
+          // Columns are [proto, local address, foreign address, state, pid].
+          // Matched on the local address alone: the state column is localised
+          // on non-English Windows, and the foreign address would match
+          // whatever is *connected* to the port rather than holding it.
+          .filter(
+            ([proto, local, , , pid]) =>
+              proto === 'TCP' &&
+              local?.endsWith(`:${port}`) &&
+              pid &&
+              pid !== '0',
+          )
+          .map(columns => columns[4]),
+      );
+
+      await Promise.all(
+        Array.from(pids, pid => $({ reject: false })`taskkill /F /PID ${pid}`),
+      );
+
+      break;
+    }
+    // macOS ships `fuser`, but without the `-k` flag, so it also has to go via
+    // pids. Restricted to listeners because `lsof` would otherwise report
+    // every client connected to the port too.
+    case 'darwin': {
+      const { stdout } = await $({
+        reject: false,
+      })`lsof -ti ${`tcp:${port}`} -sTCP:LISTEN`;
+
+      const pids = stdout.split('\n').filter(Boolean);
+
+      if (pids.length) {
+        await $({ reject: false })`kill -9 ${pids}`;
+      }
+
+      break;
+    }
+    default:
+      await $({ reject: false })`fuser -k ${port}/tcp`;
+  }
+}
+
+/**
+ * Signals a service's whole process tree, synchronously.
+ *
+ * Services are spawned detached, so the shell execa starts leads a process
+ * group that everything below it inherits - `dotnet run`, the Functions host
+ * it launches, and that host's own worker. Signalling the negated pid reaches
+ * the entire group in one syscall.
+ *
+ * Being a syscall rather than a walk is what makes it usable from the exit
+ * path. `tree-kill` enumerates descendants by shelling out to `ps` before it
+ * signals anything, so it needs the event loop to turn at least once - which
+ * a handler running as the process exits never gets. It stays as the fallback
+ * for a pid that leads no group, where there is time to walk the tree.
+ */
+function killProcessTree(
+  pid: number,
+  signal: NodeJS.Signals = 'SIGTERM',
+): void {
+  try {
+    process.kill(-pid, signal);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ESRCH') {
+      kill(pid, signal);
+    }
+  }
 }
 
 /**
@@ -240,6 +322,10 @@ export async function startProcess(
       env: runCommand.env,
       shell: true,
       cleanup: false,
+      // Makes the spawned shell a process group leader, so everything it goes
+      // on to start - `dotnet run`, the Functions host, that host's worker -
+      // shares one group that `killProcessTree` can signal in one go.
+      detached: true,
     })`${runCommand.command} ${runCommand.args}` as ExecaChildProcessWithoutNullStreams;
 
     entry.process = childProcess;
@@ -355,21 +441,27 @@ export async function stopProcess(service: ServiceName): Promise<void> {
 
   const { exited } = entry;
 
-  await new Promise<void>(resolve => {
-    kill(pid, 'SIGTERM', () => resolve());
-  });
+  killProcessTree(pid, 'SIGTERM');
 
-  // tree-kill's callback fires once the signal's been sent, not once the
-  // process has actually exited - wait for the real exit too, otherwise
-  // callers that restart the service immediately after race against this
-  // process's own delayed 'exit' handler stomping on the new one's state.
+  // Signalling only says the process was told to go; wait for it to actually
+  // exit, otherwise callers that restart the service immediately after race
+  // against this process's own delayed 'exit' handler stomping on the new
+  // one's state.
   await exited;
 }
 
+/**
+ * Stops every service without waiting for any of them, for the shutdown path.
+ *
+ * Nothing here may be asynchronous. This runs from `signal-exit`, by which
+ * point the process is already on its way out and the event loop won't turn
+ * again - so any work deferred to a later tick is simply dropped, and the
+ * services it was meant to stop outlive the dashboard as orphans.
+ */
 export function stopAllProcesses(): void {
   registry.forEach(entry => {
     if (entry.process?.pid) {
-      kill(entry.process.pid);
+      killProcessTree(entry.process.pid);
     }
   });
 }
