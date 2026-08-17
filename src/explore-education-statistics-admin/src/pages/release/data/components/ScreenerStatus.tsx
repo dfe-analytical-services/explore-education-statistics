@@ -1,13 +1,13 @@
-import releaseDataFileService, {
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
+import {
   DataSetScreenerProgress,
   DataSetUpload,
   DataSetUploadScreeningStatus,
   ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import ProgressBar from '@common/components/ProgressBar';
-import useInterval from '@common/hooks/useInterval';
-import useMounted from '@common/hooks/useMounted';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React from 'react';
 import Tag, { TagProps } from '@common/components/Tag';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
@@ -106,39 +106,31 @@ export default function ScreenerStatus({
   releaseVersionId,
   onStatusChange,
 }: Props) {
-  const [currentStatus, setCurrentStatus] = useState<StatusState>({
+  const { data } = useQuery({
+    ...releaseDataFileQueries.screeningStatus(
+      releaseVersionId,
+      dataSetUpload.id,
+    ),
+    // No point polling an upload that has already finished screening.
+    enabled: !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus),
+    // Poll every 5 seconds until screening reaches a status it can't move on from.
+    refetchInterval: nextStatus =>
+      nextStatus && terminalScreeningStatuses.includes(nextStatus.status)
+        ? false
+        : 5000,
+    onSuccess: nextStatus => {
+      if (nextStatus.status !== dataSetUpload.screeningStatus) {
+        onStatusChange?.(dataSetUpload, nextStatus);
+      }
+    },
+  });
+
+  const currentStatus: StatusState = data ?? {
     status: dataSetUpload.screeningStatus,
     percentageComplete: 0,
     stage: 'PENDING',
     completed: false,
-  });
-
-  const fetchStatus = useCallback(async () => {
-    const nextStatus = await releaseDataFileService.getDataFileScreeningStatus(
-      releaseVersionId,
-      dataSetUpload.id,
-    );
-
-    setCurrentStatus(nextStatus);
-
-    if (onStatusChange && nextStatus.status !== dataSetUpload.screeningStatus) {
-      onStatusChange(dataSetUpload, nextStatus);
-    }
-  }, [releaseVersionId, dataSetUpload, onStatusChange]);
-
-  const [cancelInterval] = useInterval(fetchStatus, 5000);
-
-  useMounted(() => {
-    if (!terminalScreeningStatuses.includes(dataSetUpload.screeningStatus)) {
-      fetchStatus();
-    }
-  });
-
-  useEffect(() => {
-    if (terminalScreeningStatuses.includes(currentStatus.status)) {
-      cancelInterval();
-    }
-  }, [cancelInterval, currentStatus]);
+  };
 
   const hasTerminalStatus = terminalScreeningStatuses.includes(
     currentStatus.status,

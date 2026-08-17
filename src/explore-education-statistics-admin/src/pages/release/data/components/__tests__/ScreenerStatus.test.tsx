@@ -2,7 +2,8 @@ import ScreenerStatus from '@admin/pages/release/data/components/ScreenerStatus'
 import _releaseDataFileService, {
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import { render, screen, waitFor } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 
 jest.mock('@admin/services/releaseDataFileService');
 

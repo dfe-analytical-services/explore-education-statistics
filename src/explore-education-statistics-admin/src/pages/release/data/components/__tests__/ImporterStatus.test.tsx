@@ -2,8 +2,8 @@ import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus'
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import flushPromises from '@common-test/flushPromises';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -186,10 +186,8 @@ describe('ImporterStatus', () => {
       />,
     );
 
-    expect(await screen.findByText('Queued')).toBeInTheDocument();
+    expect(screen.getByText('Queued')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
-
-    await flushPromises();
 
     expect(await screen.findByText('Failed')).toBeInTheDocument();
 
@@ -226,10 +224,8 @@ describe('ImporterStatus', () => {
       />,
     );
 
-    expect(await screen.findByText('Queued')).toBeInTheDocument();
+    expect(screen.getByText('Queued')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
-
-    await flushPromises();
 
     expect(await screen.findByText('Failed')).toBeInTheDocument();
     expect(
