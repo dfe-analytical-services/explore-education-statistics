@@ -293,9 +293,13 @@ app.post(
 app.post(
   '/api/services/stop-all',
   asyncHandler(async (_req, res) => {
-    await stopAllStartedProcesses();
+    const { forced } = await stopAllStartedProcesses();
     await stopAllDockerServices();
-    res.json({ ok: true });
+
+    // Reported back rather than swallowed: a service that had to be killed
+    // didn't get to shut down cleanly, which is worth knowing before you take
+    // a backup of what it left behind.
+    res.json({ ok: true, forced });
   }),
 );
 

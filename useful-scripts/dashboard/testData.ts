@@ -52,7 +52,7 @@ async function resolveExtractedDataDir(stagingDir: string): Promise<string> {
 export default async function importMssqlDataZip(
   zipFilePath: string,
 ): Promise<void> {
-  const stoppedServices = await stopAllStartedProcesses();
+  const { restartable: stoppedServices } = await stopAllStartedProcesses();
   await stopDockerServices(['db']);
 
   // The data directory is the one place it's fine to create: an import is the

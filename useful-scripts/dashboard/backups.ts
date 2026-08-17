@@ -335,7 +335,7 @@ export async function createUnifiedBackup(
   // databases/storage mid-backup. Each store's own create function already
   // brings up (or, for Azurite, stops/starts) whichever Docker service it
   // needs, so there's no need to do that here too.
-  const stoppedServices = await stopAllStartedProcesses();
+  const { restartable: stoppedServices } = await stopAllStartedProcesses();
 
   const id = buildId(label);
   const { label: parsedLabel, timestamp } = parseId(id);
@@ -494,7 +494,7 @@ export async function restoreUnifiedBackup(id: string): Promise<void> {
   // app connections. MSSQL/Postgres restores handle their own exclusivity
   // (SINGLE_USER / pg_restore against a live server); only Azurite needs
   // its container stopped, which its own restore function already does.
-  const stoppedServices = await stopAllStartedProcesses();
+  const { restartable: stoppedServices } = await stopAllStartedProcesses();
 
   const presentStores = BACKUP_STORES.filter(store => backup.stores[store]);
 

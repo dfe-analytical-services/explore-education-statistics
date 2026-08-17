@@ -15,6 +15,7 @@ import {
   StartOptions,
 } from '../services';
 import createFileLock, { UnlockCallback } from '../utils/createFileLock';
+import errorMessage from '../utils/errorMessage';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices } from './dockerManager';
 
@@ -37,11 +38,36 @@ interface ManagedProcess {
    * value from a previous run says nothing about the next one.
    */
   publicDataDbExists?: boolean;
+  /**
+   * Identifies the in-flight `startProcess` call that currently owns this
+   * entry, or undefined once nothing is starting it.
+   *
+   * A start spends most of its life in awaits - Docker, dependencies, the
+   * dotnet build lock - before it has a process to signal, so a stop arriving
+   * during that window has nothing to kill and used to be a no-op that the
+   * start then blithely undid by spawning anyway. Clearing the token cancels
+   * it instead. It's a token rather than a boolean flag so that a *new* start
+   * also supersedes the old one: the outgoing call sees a token that is no
+   * longer its own and unwinds without touching state the new one now owns.
+   */
+  startToken?: number;
 }
 
 const MAX_LOG_LINES = 500;
 
+/**
+ * How long a service gets to honour SIGTERM before it's killed outright.
+ *
+ * Generous, because a Functions host draining in-flight work legitimately
+ * takes a while and killing it early is worse than waiting. Bounded at all
+ * because every destructive operation stops services first, so an unbounded
+ * wait means one stubborn process hangs a backup or an import indefinitely.
+ */
+const STOP_GRACE_MS = 60_000;
+
 const registry = new Map<ServiceName, ManagedProcess>();
+
+let nextStartToken = 0;
 
 function getOrCreate(service: ServiceName): ManagedProcess {
   let entry = registry.get(service);
@@ -260,13 +286,41 @@ export async function startProcess(
   entry.error = undefined;
   entry.logs = [];
 
+  nextStartToken += 1;
+  const startToken = nextStartToken;
+  entry.startToken = startToken;
+
   // Hoisted so a failure part-way through can hand the dotnet build
   // mutex back rather than holding it for the life of the dashboard. Clears
   // itself when called, so the release sites below can't double-release.
   let releaseBuildMutex: UnlockCallback | undefined;
 
+  /**
+   * Whether this start has been cancelled or superseded, unwinding it if so.
+   * Called after every await that happens before the process is spawned - the
+   * whole point is to notice a stop that arrived while there was nothing yet
+   * to signal, and to notice it before a process exists to leak.
+   *
+   * Deliberately touches no entry state beyond the build mutex: whoever
+   * invalidated the token owns the entry now.
+   */
+  const cancelled = async (): Promise<boolean> => {
+    if (entry.startToken === startToken) {
+      return false;
+    }
+
+    await releaseBuildMutex?.();
+    appendLog(entry, '[dashboard] Start cancelled');
+
+    return true;
+  };
+
   try {
     await startDockerServices(resolveDockerServices(service, options));
+
+    if (await cancelled()) {
+      return;
+    }
 
     await Promise.all(
       resolveServiceDependencies(service, options).map(dependency =>
@@ -274,10 +328,18 @@ export async function startProcess(
       ),
     );
 
+    if (await cancelled()) {
+      return;
+    }
+
     const port = getServicePort(service);
 
     if (port) {
       await killPortHolder(port);
+    }
+
+    if (await cancelled()) {
+      return;
     }
 
     const runCommand = buildRunCommand(service, options);
@@ -317,6 +379,13 @@ export async function startProcess(
       }
     }
 
+    // The most important of these checks: waiting for the build lock is the
+    // longest a start ever sits without a process, so it's where a stop is
+    // most likely to land.
+    if (await cancelled()) {
+      return;
+    }
+
     const childProcess = $({
       cwd: path.join(projectRoot, schema.root),
       env: runCommand.env,
@@ -341,9 +410,13 @@ export async function startProcess(
     });
 
     let isReady = false;
+    let hasExited = false;
 
     const markReady = async () => {
-      if (isReady) {
+      // stdout that was buffered when the process died still arrives after
+      // the exit handler has run, so a ready line in it would otherwise
+      // resurrect a service that has already stopped.
+      if (isReady || hasExited) {
         return;
       }
 
@@ -372,6 +445,8 @@ export async function startProcess(
     });
 
     childProcess.on('exit', async (code, signal) => {
+      hasExited = true;
+
       if (!isReady) {
         await releaseBuildMutex?.();
       }
@@ -379,6 +454,7 @@ export async function startProcess(
       const wasStopping = entry.status === 'stopping';
 
       entry.process = undefined;
+      entry.startToken = undefined;
       entry.status = wasStopping || code === 0 || signal ? 'stopped' : 'error';
 
       if (entry.status === 'error') {
@@ -394,21 +470,39 @@ export async function startProcess(
       resolveSettled();
     });
   } catch (err) {
+    entry.error = errorMessage(err);
+
+    if (entry.process) {
+      // The process spawned before whatever went wrong here, so it is still
+      // out there holding its port and its database connections. Keep
+      // tracking it - with the error attached for the UI to show - rather
+      // than marking it 'error': that status means "nothing is running", so
+      // the pid would be forgotten, no Stop button would be offered, and
+      // (being detached) it would go on to outlive the dashboard entirely.
+      // Its own exit handler still owns the mutex and the settled/exited
+      // promises, so nothing is unwound here.
+      entry.status = 'running';
+      appendLog(
+        entry,
+        `[dashboard] Start failed after the process had spawned - it is still running: ${entry.error}`,
+      );
+
+      throw err;
+    }
+
     // Everything above runs with the service already marked 'starting', and
     // the guard at the top of this function treats 'starting' as "already on
     // its way up" - so without resetting it here a failure would leave the
     // service wedged, with every later Start silently doing nothing until the
     // dashboard was restarted.
-    if (!entry.process) {
-      // Never got as far as spawning, so nothing else will hand the dotnet
-      // build mutex back or settle these for us.
-      await releaseBuildMutex?.();
-      entry.settled = Promise.resolve();
-      entry.exited = Promise.resolve();
-    }
-
+    //
+    // Never got as far as spawning, so nothing else will hand the dotnet
+    // build mutex back or settle these for us.
+    await releaseBuildMutex?.();
+    entry.settled = Promise.resolve();
+    entry.exited = Promise.resolve();
+    entry.startToken = undefined;
     entry.status = 'error';
-    entry.error = err instanceof Error ? err.message : String(err);
     appendLog(entry, `[dashboard] Failed to start: ${entry.error}`);
 
     throw err;
@@ -426,15 +520,62 @@ export async function waitUntilSettled(service: ServiceName): Promise<void> {
   await registry.get(service)?.settled;
 }
 
-export async function stopProcess(service: ServiceName): Promise<void> {
-  const entry = registry.get(service);
-  const pid = entry?.process?.pid;
+/**
+ * Resolves true if `promise` settles within `ms`, false if it times out.
+ *
+ * The timer is cleared on the happy path so a service that stops promptly
+ * doesn't leave a minute-long handle behind holding the event loop open.
+ */
+function settledWithin(
+  promise: Promise<unknown> | undefined,
+  ms: number,
+): Promise<boolean> {
+  return new Promise(resolve => {
+    const timer = setTimeout(() => resolve(false), ms);
 
-  if (!entry || !pid) {
-    if (entry) {
-      entry.status = 'stopped';
+    Promise.resolve(promise).then(() => {
+      clearTimeout(timer);
+      resolve(true);
+    });
+  });
+}
+
+/**
+ * Stops a service and waits for it to actually be gone.
+ *
+ * Returns whether it had to be forced. A service that ignores SIGTERM is
+ * killed outright after {@link STOP_GRACE_MS} rather than waited on forever,
+ * because backup, restore and import all stop services before they touch any
+ * data - so an unbounded wait here hangs the whole operation, with the UI
+ * left sitting on "Backing up..." and no indication why.
+ */
+export async function stopProcess(service: ServiceName): Promise<boolean> {
+  const entry = registry.get(service);
+
+  if (!entry) {
+    return false;
+  }
+
+  const pid = entry.process?.pid;
+
+  if (!pid) {
+    // Nothing has spawned. If a start is in flight it's parked in one of its
+    // awaits - Docker, dependencies, the build lock - and would go on to
+    // spawn the very process this stop is meant to prevent. Dropping the
+    // token is what makes it notice and unwind instead.
+    if (entry.startToken !== undefined) {
+      appendLog(
+        entry,
+        '[dashboard] Stop requested while starting - cancelling',
+      );
     }
-    return;
+
+    entry.startToken = undefined;
+    entry.status = 'stopped';
+    entry.settled = Promise.resolve();
+    entry.exited = Promise.resolve();
+
+    return false;
   }
 
   entry.status = 'stopping';
@@ -447,7 +588,19 @@ export async function stopProcess(service: ServiceName): Promise<void> {
   // exit, otherwise callers that restart the service immediately after race
   // against this process's own delayed 'exit' handler stomping on the new
   // one's state.
+  if (await settledWithin(exited, STOP_GRACE_MS)) {
+    return false;
+  }
+
+  appendLog(
+    entry,
+    `[dashboard] Still running ${STOP_GRACE_MS / 1000}s after SIGTERM - sending SIGKILL`,
+  );
+
+  killProcessTree(pid, 'SIGKILL');
   await exited;
+
+  return true;
 }
 
 /**
@@ -466,20 +619,49 @@ export function stopAllProcesses(): void {
   });
 }
 
+export interface StopAllResult {
+  /**
+   * The services that were genuinely up beforehand, for callers that put
+   * things back afterwards (a backup restore, a test-data import).
+   */
+  restartable: ServiceName[];
+  /** The services that ignored SIGTERM and had to be killed. */
+  forced: ServiceName[];
+}
+
 /**
- * Gracefully stops every app-process service that isn't already stopped,
- * for the dashboard's "Stop all" button. Leaves Docker services running,
- * same as stopping them individually would. Returns the services that were
- * running/starting beforehand, so callers that need to restore state
- * afterwards (e.g. a backup restore or test-data import) know what to
- * restart.
+ * Gracefully stops every app-process service, for the dashboard's "Stop all"
+ * button and for the operations that have to quiesce things before touching
+ * data. Leaves Docker services running, same as stopping them individually
+ * would.
+ *
+ * What gets stopped and what gets restarted are deliberately different sets.
+ * Anything holding a process is stopped, whatever its status - a start that
+ * failed after spawning leaves one running under an 'error' status, still on
+ * its port and still connected to the databases a backup is about to read.
+ * Only what was actually running or starting is worth restoring though;
+ * resurrecting a service that had already crashed isn't restoring state, it's
+ * inventing it.
  */
-export async function stopAllStartedProcesses(): Promise<ServiceName[]> {
-  const startedServices = Array.from(registry.entries())
-    .filter(([, entry]) => entry.status !== 'stopped')
+export async function stopAllStartedProcesses(): Promise<StopAllResult> {
+  const entries = Array.from(registry.entries());
+
+  const restartable = entries
+    .filter(
+      ([, entry]) => entry.status === 'running' || entry.status === 'starting',
+    )
     .map(([service]) => service);
 
-  await Promise.all(startedServices.map(service => stopProcess(service)));
+  const toStop = entries
+    .filter(([, entry]) => entry.process?.pid || entry.status !== 'stopped')
+    .map(([service]) => service);
 
-  return startedServices;
+  const wasForced = await Promise.all(
+    toStop.map(service => stopProcess(service)),
+  );
+
+  return {
+    restartable,
+    forced: toStop.filter((_, index) => wasForced[index]),
+  };
 }
