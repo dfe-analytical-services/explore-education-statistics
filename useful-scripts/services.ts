@@ -583,6 +583,12 @@ export function resolveServiceDependencies(
   options: StartOptions = {},
   seen: Set<ServiceName> = new Set(),
 ): ServiceName[] {
+  // Seeding `seen` with the service itself is what keeps the "not including
+  // the service itself" part of the contract true if a cycle is ever
+  // introduced: without it, A -> B -> A resolves A as its own dependency,
+  // which reads as a schema bug rather than the cycle it actually is.
+  seen.add(service);
+
   const dependencies = resolveOwnServiceDependencies(service, options);
   const result: ServiceName[] = [];
 

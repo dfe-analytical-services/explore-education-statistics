@@ -4,10 +4,16 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { projectRoot } from '../services';
+import errorMessage from '../utils/errorMessage';
+import $$ from '../utils/projectExec';
 
-const $$ = $({ cwd: projectRoot });
-
-const MSSQL_DATA_DIR = path.join(projectRoot, 'data/ees-mssql');
+/**
+ * The `db` container's bind-mounted data directory. Exported because the
+ * test-data import writes into the same directory, and two independently
+ * declared copies of this path silently drifting apart would point the health
+ * check and the import at different places.
+ */
+export const MSSQL_DATA_DIR = path.join(projectRoot, 'data/ees-mssql');
 
 /**
  * The `db` (MSSQL) container runs as a dedicated non-root user that has
@@ -82,10 +88,6 @@ export type MssqlVolumeHealth =
 let cachedHealth: MssqlVolumeHealth | undefined;
 let cachedAt = 0;
 const HEALTH_TTL_MS = 5_000;
-
-function errorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
 
 function modeString(mode: number): string {
   // eslint-disable-next-line no-bitwise

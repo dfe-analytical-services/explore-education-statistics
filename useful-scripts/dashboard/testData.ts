@@ -1,18 +1,15 @@
-import { $ } from 'execa';
 import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { projectRoot } from '../services';
+import $$ from '../utils/projectExec';
 import { startDockerServices, stopDockerServices } from './dockerManager';
-import { ensureMssqlVolumePermissions } from './mssqlVolume';
+import { ensureMssqlVolumePermissions, MSSQL_DATA_DIR } from './mssqlVolume';
 import {
   getRestartOptions,
   startProcess,
   stopAllStartedProcesses,
   waitUntilSettled,
 } from './processManager';
-
-const MSSQL_DATA_DIR = path.join(projectRoot, 'data/ees-mssql');
 
 // Our own on-disk backups (see backups.ts) live alongside the MSSQL data
 // files in this same bind-mounted directory, so a full data-directory swap
@@ -24,7 +21,7 @@ async function extractToStagingDir(zipFilePath: string): Promise<string> {
     path.join(os.tmpdir(), 'ees-mssql-import-'),
   );
 
-  await $({ cwd: projectRoot })`unzip -o ${zipFilePath} -d ${stagingDir}`;
+  await $$`unzip -o ${zipFilePath} -d ${stagingDir}`;
 
   return stagingDir;
 }

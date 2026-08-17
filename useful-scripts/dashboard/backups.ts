@@ -1,9 +1,10 @@
-import { $ } from 'execa';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { projectRoot } from '../services';
+import errorMessage from '../utils/errorMessage';
+import $$ from '../utils/projectExec';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices, stopDockerServices } from './dockerManager';
 import {
@@ -36,10 +37,6 @@ export interface UnifiedBackupInfo {
   label: string;
   timestamp: string;
   stores: Partial<Record<BackupStore, { sizeBytes: number }>>;
-}
-
-function errorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
 }
 
 /**
@@ -90,8 +87,6 @@ const POSTGRES_BACKUP_DIR = path.join(projectRoot, 'data/backups/postgres');
 
 const AZURITE_VOLUME = 'explore-education-statistics_data-storage-data';
 const AZURITE_BACKUP_DIR = path.join(projectRoot, 'data/backups/azurite');
-
-const $$ = $({ cwd: projectRoot });
 
 function slugifyLabel(label: string): string {
   const slug = label

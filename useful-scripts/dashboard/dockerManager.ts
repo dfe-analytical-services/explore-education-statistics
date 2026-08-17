@@ -1,12 +1,12 @@
-import { $, ExecaChildProcess } from 'execa';
+import { ExecaChildProcess } from 'execa';
 import splitLines from 'split2';
 import {
   allowedDockerServices,
   DockerService,
-  projectRoot,
   serviceSchemas,
   ServiceName,
 } from '../services';
+import $$ from '../utils/projectExec';
 
 export type DockerStatus = 'running' | 'stopped' | 'unknown';
 
@@ -14,8 +14,6 @@ interface ComposePsEntry {
   Service: string;
   State: string;
 }
-
-const $$ = $({ cwd: projectRoot });
 
 /**
  * Get the current status of every Docker Compose service, including ones

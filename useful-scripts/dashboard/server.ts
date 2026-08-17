@@ -13,6 +13,7 @@ import {
   serviceSchemas,
   serviceUsesPublicDataDb,
 } from '../services';
+import errorMessage from '../utils/errorMessage';
 import { getDirname } from '../utils/nodeGlobals';
 import onExitSignal from '../utils/onExitSignal';
 import {
@@ -61,10 +62,6 @@ process.on('uncaughtException', err => {
 
 function isServiceName(value: string): value is ServiceName {
   return (allowedServiceNames as readonly string[]).includes(value);
-}
-
-function errorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
 }
 
 /**
