@@ -11,7 +11,7 @@ import splitLines from 'split2';
 import kill from 'tree-kill';
 import delay from './utils/delay';
 import exitProcess from './utils/exitProcess';
-import { logColours, logError, logInfo } from './utils/logging';
+import { logColours, logInfo } from './utils/logging';
 import { getDirname } from './utils/nodeGlobals';
 import onExitSignal from './utils/onExitSignal';
 import createFileLock from './utils/createFileLock';
@@ -21,6 +21,7 @@ import {
   DockerService,
   dotnetBuildLockFile,
   projectRoot,
+  resolveDockerServices,
   resolvePublicDataDbAvailability,
   resolveServiceDependencies,
   ServiceName,
@@ -180,26 +181,10 @@ async function startDockerServices() {
     return;
   }
 
-  const dockerServicesToStart = servicesToStart.reduce<Set<DockerService>>(
-    (acc, service) => {
-      const serviceSchema = serviceSchemas[service];
-
-      if (serviceSchema.type === 'docker') {
-        acc.add(serviceSchema.service);
-      } else if ('dockerServices' in serviceSchema) {
-        const { dockerServices } = serviceSchema;
-
-        const services =
-          typeof dockerServices === 'function'
-            ? dockerServices.call(serviceSchema, startOptions)
-            : dockerServices;
-
-        services?.forEach(dockerService => acc.add(dockerService));
-      }
-
-      return acc;
-    },
-    new Set(),
+  const dockerServicesToStart = new Set<DockerService>(
+    servicesToStart.flatMap(service =>
+      resolveDockerServices(service, startOptions),
+    ),
   );
 
   if (dockerServicesToStart.size > 0) {
@@ -258,7 +243,6 @@ async function startService(service: ServiceName): Promise<void> {
   let args: string[] = [];
 
   let lockUntilReady = false;
-  let beforeTask: (() => void | Promise<void>) | undefined;
   let checkReady: ((line: string) => boolean) | undefined;
 
   let env: NodeJS.ProcessEnv = {
@@ -296,17 +280,6 @@ async function startService(service: ServiceName): Promise<void> {
         onExistingLock: () => logService(service, message),
       })
     : undefined;
-
-  try {
-    await beforeTask?.();
-  } catch (err) {
-    if (err instanceof Error) {
-      logError(err.message);
-      unlock?.();
-    }
-
-    return undefined;
-  }
 
   logService(service, logColours.info('Starting service...'));
 
