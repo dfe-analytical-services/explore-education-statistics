@@ -6,7 +6,12 @@ import { projectRoot } from '../services';
 import errorMessage from '../utils/errorMessage';
 import $$ from '../utils/projectExec';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
-import { startDockerServices, stopDockerServices } from './dockerManager';
+import {
+  getComposeServiceEnv,
+  getExistingVolumeName,
+  startDockerServices,
+  stopDockerServices,
+} from './dockerManager';
 import {
   getRestartOptions,
   startProcess,
@@ -77,15 +82,13 @@ async function forEachStoreOrThrow<T>(
 }
 
 const MSSQL_DATABASES = ['content', 'statistics'] as const;
-const MSSQL_SA_PASSWORD = 'Your_Password123';
 const MSSQL_HOST_BACKUP_DIR = path.join(projectRoot, 'data/ees-mssql/backups');
 const MSSQL_CONTAINER_BACKUP_DIR = '/var/opt/mssql/data/backups';
 
-const POSTGRES_DB = 'public_data';
-const POSTGRES_PASSWORD = 'password';
 const POSTGRES_BACKUP_DIR = path.join(projectRoot, 'data/backups/postgres');
 
-const AZURITE_VOLUME = 'explore-education-statistics_data-storage-data';
+/** The volume as declared in docker-compose.yml, not its real prefixed name. */
+const AZURITE_DECLARED_VOLUME = 'data-storage-data';
 const AZURITE_BACKUP_DIR = path.join(projectRoot, 'data/backups/azurite');
 
 function slugifyLabel(label: string): string {
@@ -132,10 +135,12 @@ async function sumFileSizes(files: string[]): Promise<number> {
 async function execSqlcmd(query: string): Promise<void> {
   await startDockerServices(['db']);
 
+  const password = await getComposeServiceEnv('db', 'SA_PASSWORD');
+
   // -b: exit with a non-zero code on SQL errors, so failures (e.g. permission
   // errors writing the backup file) surface as thrown errors instead of
   // being silently swallowed by sqlcmd's default success exit code.
-  await $$`docker compose exec -T db /opt/mssql-tools18/bin/sqlcmd -C -b -S localhost -U sa -P ${MSSQL_SA_PASSWORD} -Q ${query}`;
+  await $$`docker compose exec -T db /opt/mssql-tools18/bin/sqlcmd -C -b -S localhost -U sa -P ${password} -Q ${query}`;
 }
 
 async function listSingleFileBackups(
@@ -268,10 +273,15 @@ async function createPostgresBackup(id: string): Promise<BackupInfo> {
 
   const { label, timestamp } = parseId(id);
   const filePath = path.join(POSTGRES_BACKUP_DIR, `${id}.dump`);
+  const password = await getComposeServiceEnv(
+    'public-api-db',
+    'POSTGRES_PASSWORD',
+  );
+  const database = await getComposeServiceEnv('public-api-db', 'POSTGRES_DB');
 
   const child = $$({
-    env: { PGPASSWORD: POSTGRES_PASSWORD },
-  })`docker compose exec -T public-api-db pg_dump -U postgres -Fc ${POSTGRES_DB}` as ExecaChildProcessWithoutNullStreams;
+    env: { PGPASSWORD: password },
+  })`docker compose exec -T public-api-db pg_dump -U postgres -Fc ${database}` as ExecaChildProcessWithoutNullStreams;
 
   await Promise.all([
     pipeline(child.stdout, fs.createWriteStream(filePath)),
@@ -294,10 +304,14 @@ async function createAzuriteBackup(id: string): Promise<BackupInfo> {
   const fileName = `${id}.tar.gz`;
   const filePath = path.join(AZURITE_BACKUP_DIR, fileName);
 
+  // Resolved before anything is stopped, so a missing volume fails without
+  // having taken Azurite down first.
+  const volume = await getExistingVolumeName(AZURITE_DECLARED_VOLUME);
+
   await stopDockerServices(['data-storage']);
 
   try {
-    await $$`docker run --rm -v ${AZURITE_VOLUME}:/source:ro -v ${AZURITE_BACKUP_DIR}:/backup alpine tar czf /backup/${fileName} -C /source .`;
+    await $$`docker run --rm -v ${volume}:/source:ro -v ${AZURITE_BACKUP_DIR}:/backup alpine tar czf /backup/${fileName} -C /source .`;
   } finally {
     await startDockerServices(['data-storage']);
   }
@@ -404,16 +418,37 @@ async function restorePostgresBackup(id: string): Promise<void> {
 
   await startDockerServices(['public-api-db']);
 
+  const password = await getComposeServiceEnv(
+    'public-api-db',
+    'POSTGRES_PASSWORD',
+  );
+  const database = await getComposeServiceEnv('public-api-db', 'POSTGRES_DB');
+
+  // `reject: false` because --clean --if-exists makes pg_restore exit
+  // non-zero over errors that are entirely expected - dropping objects that
+  // aren't there yet on a first restore. The exit code alone therefore can't
+  // tell a real failure from routine noise, so the stderr is sifted below
+  // rather than the whole thing being taken as success.
   const child = $$({
-    env: { PGPASSWORD: POSTGRES_PASSWORD },
+    env: { PGPASSWORD: password },
     stdin: 'pipe',
     reject: false,
-  })`docker compose exec -T public-api-db pg_restore -U postgres -d ${POSTGRES_DB} --clean --if-exists --no-owner` as ExecaChildProcessWithoutNullStreams;
+  })`docker compose exec -T public-api-db pg_restore -U postgres -d ${database} --clean --if-exists --no-owner` as ExecaChildProcessWithoutNullStreams;
 
-  await Promise.all([
+  const [, result] = await Promise.all([
     pipeline(fs.createReadStream(backup.files[0]), child.stdin),
     child,
   ]);
+
+  if (result.exitCode !== 0) {
+    const realErrors = collectRealRestoreErrors(result.stderr ?? '');
+
+    if (realErrors.length > 0) {
+      throw new Error(
+        `pg_restore failed (exit ${result.exitCode}): ${realErrors.join('; ')}`,
+      );
+    }
+  }
 }
 
 async function restoreAzuriteBackup(id: string): Promise<void> {
@@ -429,14 +464,50 @@ async function restoreAzuriteBackup(id: string): Promise<void> {
   }
 
   const fileName = path.basename(backup.files[0]);
+  const volume = await getExistingVolumeName(AZURITE_DECLARED_VOLUME);
+
+  // Read the whole archive before anything is destroyed. The restore empties
+  // the volume and then extracts into it, so a truncated or corrupt tarball
+  // discovered at extraction time would leave neither the old data nor the
+  // new. `stdout: 'ignore'` because this is about whether it reads, not what
+  // is in it, and the listing can be enormous.
+  await $$({
+    stdout: 'ignore',
+  })`docker run --rm -v ${AZURITE_BACKUP_DIR}:/backup:ro alpine tar tzf /backup/${fileName}`;
 
   await stopDockerServices(['data-storage']);
 
   try {
-    await $$`docker run --rm -v ${AZURITE_VOLUME}:/target -v ${AZURITE_BACKUP_DIR}:/backup alpine sh -c ${`find /target -mindepth 1 -delete && tar xzf /backup/${fileName} -C /target`}`;
+    await $$`docker run --rm -v ${volume}:/target -v ${AZURITE_BACKUP_DIR}:/backup alpine sh -c ${`find /target -mindepth 1 -delete && tar xzf /backup/${fileName} -C /target`}`;
   } finally {
     await startDockerServices(['data-storage']);
   }
+}
+
+/**
+ * pg_restore output that means "this went as expected", despite the non-zero
+ * exit code that accompanies it.
+ *
+ * Restoring into a database that doesn't have the objects yet makes
+ * `--clean --if-exists` log an ignorable error per object it tried to drop,
+ * and pg_restore still exits non-zero having ignored them. Deliberately kept
+ * narrow: anything not listed here is treated as a real failure, so the cost
+ * of being wrong is a loud restore rather than a silently broken one.
+ */
+const BENIGN_RESTORE_PATTERNS = [
+  /does not exist, skipping/i,
+  /^pg_restore: warning:/i,
+  /errors ignored on restore/i,
+] as const;
+
+function collectRealRestoreErrors(stderr: string): string[] {
+  return stderr
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .filter(
+      line => !BENIGN_RESTORE_PATTERNS.some(pattern => pattern.test(line)),
+    );
 }
 
 async function restoreBackupForStore(

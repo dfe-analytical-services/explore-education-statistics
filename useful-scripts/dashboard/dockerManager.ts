@@ -15,6 +15,88 @@ interface ComposePsEntry {
   State: string;
 }
 
+interface ComposeConfig {
+  name: string;
+  services?: Record<string, { environment?: Record<string, string> }>;
+  volumes?: Record<string, { name?: string }>;
+}
+
+let composeConfigPromise: Promise<ComposeConfig> | undefined;
+
+/**
+ * The fully resolved Compose configuration - project name, per-service
+ * environment, and the real (project-prefixed) names of declared volumes.
+ *
+ * Worth asking Compose rather than reconstructing any of it: the project name
+ * comes from a `name:` key, COMPOSE_PROJECT_NAME or the directory basename
+ * depending on the setup, and everything derived from it inherits that
+ * ambiguity. Cached for the life of the process, so a change to
+ * docker-compose.yml needs the dashboard restarting to be picked up - it's a
+ * file that changes about once a year.
+ */
+export function getComposeConfig(): Promise<ComposeConfig> {
+  composeConfigPromise ??= (async () => {
+    const { stdout } = await $$`docker compose config --format json`;
+    return JSON.parse(stdout) as ComposeConfig;
+  })();
+
+  return composeConfigPromise;
+}
+
+/**
+ * An environment value docker-compose.yml sets for a service - database
+ * credentials, mostly, so that they're configured in exactly one place rather
+ * than copied into the tooling that has to authenticate with them.
+ */
+export async function getComposeServiceEnv(
+  service: DockerService,
+  key: string,
+): Promise<string> {
+  const config = await getComposeConfig();
+  const value = config.services?.[service]?.environment?.[key];
+
+  if (value === undefined) {
+    throw new Error(
+      `docker-compose.yml doesn't set '${key}' for the '${service}' service`,
+    );
+  }
+
+  return value;
+}
+
+/**
+ * The real name of a declared Compose volume, checked to actually exist.
+ *
+ * The check matters because `docker run -v` *creates* a named volume that
+ * isn't there rather than failing - so a wrong name doesn't produce an error,
+ * it produces an empty volume, and an operation reading from one appears to
+ * succeed while backing up nothing at all.
+ */
+export async function getExistingVolumeName(
+  declaredName: string,
+): Promise<string> {
+  const config = await getComposeConfig();
+  const volume = config.volumes?.[declaredName]?.name;
+
+  if (!volume) {
+    throw new Error(
+      `docker-compose.yml doesn't declare a '${declaredName}' volume`,
+    );
+  }
+
+  const { exitCode } = await $$({
+    reject: false,
+  })`docker volume inspect ${volume}`;
+
+  if (exitCode !== 0) {
+    throw new Error(
+      `Docker volume '${volume}' doesn't exist - start the service that owns it at least once before backing it up or restoring over it`,
+    );
+  }
+
+  return volume;
+}
+
 /**
  * Get the current status of every Docker Compose service, including ones
  * that have never been started (and so won't appear in `compose ps` output).

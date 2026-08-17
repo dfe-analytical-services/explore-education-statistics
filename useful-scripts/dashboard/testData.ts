@@ -1,5 +1,4 @@
 import fsp from 'node:fs/promises';
-import os from 'node:os';
 import path from 'node:path';
 import $$ from '../utils/projectExec';
 import { startDockerServices, stopDockerServices } from './dockerManager';
@@ -16,9 +15,32 @@ import {
 // needs to leave this one entry alone.
 const MSSQL_BACKUPS_DIR_NAME = 'backups';
 
+/**
+ * Fails early, and legibly, if `unzip` isn't installed - otherwise the first
+ * sign of it is a bare `spawn unzip ENOENT` after the databases have already
+ * been stopped.
+ */
+async function assertUnzipAvailable(): Promise<void> {
+  const { exitCode } = await $$({ reject: false })`unzip -v`;
+
+  if (exitCode !== 0) {
+    throw new Error(
+      "`unzip` isn't available on this machine - install it (e.g. `sudo apt install unzip`) and try the import again",
+    );
+  }
+}
+
+/**
+ * Extracts alongside the MSSQL data directory rather than in the system temp
+ * directory, so that moving the payload into place afterwards is a rename on
+ * one filesystem instead of a multi-gigabyte copy across two. That matters
+ * for more than speed: the copy happens *after* the old data directory has
+ * been emptied, so running out of space part-way through used to leave
+ * neither the old data nor the new.
+ */
 async function extractToStagingDir(zipFilePath: string): Promise<string> {
   const stagingDir = await fsp.mkdtemp(
-    path.join(os.tmpdir(), 'ees-mssql-import-'),
+    path.join(path.dirname(MSSQL_DATA_DIR), 'ees-mssql-import-'),
   );
 
   await $$`unzip -o ${zipFilePath} -d ${stagingDir}`;
@@ -52,6 +74,10 @@ async function resolveExtractedDataDir(stagingDir: string): Promise<string> {
 export default async function importMssqlDataZip(
   zipFilePath: string,
 ): Promise<void> {
+  // Before anything is stopped: there's no point taking the databases down to
+  // discover the tool that does the work is missing.
+  await assertUnzipAvailable();
+
   const { restartable: stoppedServices } = await stopAllStartedProcesses();
   await stopDockerServices(['db']);
 
@@ -80,13 +106,16 @@ export default async function importMssqlDataZip(
         ),
     );
 
+    // Renamed rather than copied: staging sits on the same filesystem as the
+    // data directory, so this is a metadata operation rather than a
+    // multi-gigabyte copy - and it can't run out of space half way through,
+    // which at this point would be after the old data has already gone.
     const newEntries = await fsp.readdir(extractedDataDir);
     await Promise.all(
       newEntries.map(entry =>
-        fsp.cp(
+        fsp.rename(
           path.join(extractedDataDir, entry),
           path.join(MSSQL_DATA_DIR, entry),
-          { recursive: true },
         ),
       ),
     );

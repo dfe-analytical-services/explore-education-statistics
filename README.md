@@ -547,9 +547,13 @@ EES_PROJECT_ROOT=/path/to/other/checkout pnpm dashboard
 ```
 
 This is useful, for example, if you're iterating on the dashboard itself on one branch, but want it to manage
-services from a feature branch checked out elsewhere. Note that Docker Compose's project name defaults to the
-checkout's directory name, so pointing at a different checkout means Docker will manage a separate container
-stack - stop any containers already running under the current checkout first to avoid port clashes.
+services from a feature branch checked out elsewhere.
+
+Note that `docker-compose.yml` pins the Compose project name (`name: explore-education-statistics`), so every
+checkout shares one container stack regardless of its directory name. Pointing `EES_PROJECT_ROOT` at a different
+checkout therefore manages the *same* containers, not a second set - but the bind-mounted paths
+(`./data/ees-mssql` and friends) resolve relative to whichever checkout Compose is invoked from, so switching
+between them will recreate those containers against the other checkout's data.
 
 ### Running Azure Search locally
 
