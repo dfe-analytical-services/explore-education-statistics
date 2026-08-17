@@ -51,6 +51,7 @@ import {
   subscribeLogs,
 } from './processManager';
 import importMssqlDataZip from './testData';
+import findWebAppFailure, { webAppServices } from './webAppHealth';
 
 const __dirname = getDirname(import.meta.url);
 const PORT = Number(process.env.DASHBOARD_PORT ?? 4300);
@@ -178,7 +179,12 @@ const uploadZip = multer({
 interface ServiceIssue {
   id: string;
   message: string;
-  fixLabel: string;
+  /**
+   * Label for the button that fixes the issue, where the dashboard can fix it.
+   * Omitted for issues it can only report - the client renders no button at
+   * all rather than a dead one.
+   */
+  fixLabel?: string;
   fixEndpoint?: string;
   /**
    * Optional client-side behaviour for the fix button, for cases where the
@@ -236,6 +242,25 @@ app.get(
         serviceName: 'db',
       });
     }
+
+    // These fail with the service still 'running' and its card still green -
+    // admin only starts its dev server when the first request arrives, and the
+    // frontend's dev server compiles fine and then 500s - so without this the
+    // dashboard has nothing to say about a browser showing an exception page.
+    webAppServices.forEach(service => {
+      const failure = findWebAppFailure(service, getLogs(service));
+
+      if (failure) {
+        issues.push({
+          id: `web-app-${service}`,
+          message: failure.message,
+          // No fix button: the fix is `pnpm clean`, which deletes the
+          // node_modules this dashboard is itself running out of whenever
+          // EES_PROJECT_ROOT isn't pointing somewhere else.
+          serviceName: service,
+        });
+      }
+    });
 
     const services = allowedServiceNames.map(name => {
       const schema = serviceSchemas[name];
