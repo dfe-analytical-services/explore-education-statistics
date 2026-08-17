@@ -65,6 +65,20 @@ const MAX_LOG_LINES = 500;
  */
 const STOP_GRACE_MS = 60_000;
 
+/**
+ * How long a service may hold the dotnet build mutex before it's taken back.
+ *
+ * The mutex is held until the service is *ready*, not until it has finished
+ * building, because there's no reliable marker for the end of the build in
+ * `dotnet run` output. That's fine when a service either starts or dies, and
+ * useless when one builds successfully and then hangs - admin unable to reach
+ * the database being the usual way - because nothing else can build for as
+ * long as it sits there. Long enough for a cold build plus startup, short
+ * enough that one wedged service doesn't take the rest of the dashboard with
+ * it.
+ */
+const BUILD_MUTEX_MAX_HOLD_MS = 600_000;
+
 const registry = new Map<ServiceName, ManagedProcess>();
 
 let nextStartToken = 0;
@@ -294,6 +308,17 @@ export async function startProcess(
   // mutex back rather than holding it for the life of the dashboard. Clears
   // itself when called, so the release sites below can't double-release.
   let releaseBuildMutex: UnlockCallback | undefined;
+  let buildMutexTimer: NodeJS.Timeout | undefined;
+
+  /** Hands the build mutex back, cancelling the deadline that would have. */
+  const releaseBuildMutexNow = async (): Promise<void> => {
+    if (buildMutexTimer) {
+      clearTimeout(buildMutexTimer);
+      buildMutexTimer = undefined;
+    }
+
+    await releaseBuildMutex?.();
+  };
 
   /**
    * Whether this start has been cancelled or superseded, unwinding it if so.
@@ -309,7 +334,7 @@ export async function startProcess(
       return false;
     }
 
-    await releaseBuildMutex?.();
+    await releaseBuildMutexNow();
     appendLog(entry, '[dashboard] Start cancelled');
 
     return true;
@@ -356,7 +381,9 @@ export async function startProcess(
         // Generous timeouts because this is held until the service is ready,
         // not just built, and a queue of cold dotnet builds takes a while.
         // `lockTimeout` expiring would hand the lock to another process
-        // mid-build, which is the very thing it's here to prevent.
+        // mid-build, which is the very thing it's here to prevent - it stays
+        // well clear of BUILD_MUTEX_MAX_HOLD_MS so that the deadline below,
+        // which releases the lock properly, always gets there first.
         const unlockFile = await createFileLock({
           lockFile: dotnetBuildLockFile,
           lockTimeout: 1_800_000,
@@ -409,6 +436,28 @@ export async function startProcess(
       resolveSettled = resolve;
     });
 
+    // Nothing releases the mutex between here and the service becoming ready
+    // or exiting, so a service that does neither would hold it indefinitely.
+    // Unref'd because this is a backstop, not a reason to keep the process
+    // alive.
+    if (releaseBuildMutex) {
+      buildMutexTimer = setTimeout(() => {
+        appendLog(
+          entry,
+          `[dashboard] Still not ready ${BUILD_MUTEX_MAX_HOLD_MS / 60_000} minutes after starting - releasing the build lock so other services aren't blocked behind it`,
+        );
+
+        releaseBuildMutexNow().catch(err =>
+          appendLog(
+            entry,
+            `[dashboard] Failed to release the build lock: ${errorMessage(err)}`,
+          ),
+        );
+      }, BUILD_MUTEX_MAX_HOLD_MS);
+
+      buildMutexTimer.unref();
+    }
+
     let isReady = false;
     let hasExited = false;
 
@@ -422,7 +471,7 @@ export async function startProcess(
 
       isReady = true;
       entry.status = 'running';
-      await releaseBuildMutex?.();
+      await releaseBuildMutexNow();
       resolveSettled();
     };
 
@@ -448,7 +497,7 @@ export async function startProcess(
       hasExited = true;
 
       if (!isReady) {
-        await releaseBuildMutex?.();
+        await releaseBuildMutexNow();
       }
 
       const wasStopping = entry.status === 'stopping';
@@ -498,7 +547,7 @@ export async function startProcess(
     //
     // Never got as far as spawning, so nothing else will hand the dotnet
     // build mutex back or settle these for us.
-    await releaseBuildMutex?.();
+    await releaseBuildMutexNow();
     entry.settled = Promise.resolve();
     entry.exited = Promise.resolve();
     entry.startToken = undefined;
