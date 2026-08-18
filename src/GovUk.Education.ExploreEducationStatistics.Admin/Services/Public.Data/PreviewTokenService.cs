@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -21,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 public class PreviewTokenService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext,
-    IUserService userService
+    IUserService userService,
+    IUserRepository userRepository
 ) : IPreviewTokenService
 {
     public async Task<Either<ActionResult, PreviewTokenViewModel>> CreatePreviewToken(
@@ -32,8 +34,15 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await userService
-            .CheckIsBauUser()
+            .CheckCanManagePublicApiDataSetPreviewTokens(user)
             .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
@@ -88,8 +97,15 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await userService
-            .CheckIsBauUser()
+            .CheckCanManagePublicApiDataSetPreviewTokens(user)
             .OnSuccess(async () =>
                 await publicDataDbContext.PreviewTokens.SingleOrNotFoundAsync(
                     pt => pt.Id == previewTokenId,

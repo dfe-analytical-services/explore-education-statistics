@@ -74,27 +74,27 @@ export default function ReleaseApiDataSetsSection() {
 
       <LoadingSpinner loading={hasDataSetsLoading}>
         {/* TODO: Update when non-BAU users can create API data sets  */}
-        {user?.permissions.isBauUser && (
-          <>
-            {canUpdateRelease ? (
-              <ApiDataSetCreateModal
-                publicationId={releaseVersion.publicationId}
-                releaseVersionId={releaseVersion.id}
-                onSubmit={async ({ releaseFileId }) => {
-                  await apiDataSetService.createDataSet({
-                    releaseFileId,
-                  });
-                  refetch();
-                }}
-              />
-            ) : (
-              <WarningMessage>
-                This release has been approved and API data sets can no longer
-                be created for it.
-              </WarningMessage>
-            )}
-          </>
-        )}
+        {/* {user?.permissions.isBauUser && ( */}
+        <>
+          {canUpdateRelease ? (
+            <ApiDataSetCreateModal
+              publicationId={releaseVersion.publicationId}
+              releaseVersionId={releaseVersion.id}
+              onSubmit={async ({ releaseFileId }) => {
+                await apiDataSetService.createDataSet({
+                  releaseFileId,
+                });
+                refetch();
+              }}
+            />
+          ) : (
+            <WarningMessage>
+              This release has been approved and API data sets can no longer be
+              created for it.
+            </WarningMessage>
+          )}
+        </>
+        {/* )} */}
 
         {dataSets.length > 0 ? (
           <>
