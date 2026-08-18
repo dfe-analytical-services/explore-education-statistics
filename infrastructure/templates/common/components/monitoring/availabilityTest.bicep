@@ -65,12 +65,7 @@ param tagValues object
 
 var severityLevel = severityMapping[alertSeverity]
 
-// Deep link straight to the Availability blade for this Application Insights resource, so
-// recipients can see failing locations, response codes and exceptions without having to
-// navigate there manually from Teams/Slack.
-var appInsightsAvailabilityBladeUrl = 'https://portal.azure.com/#resource${appInsightsId}/availability'
-
-var alertFullDescription = 'Fires when ${testDescription} fails from ${minFailedLocationsToAlert} or more of ${length(testLocations)} test locations. URL tested: ${url}. Investigate failing locations, response codes and exceptions in the Availability blade: ${appInsightsAvailabilityBladeUrl}. This endpoint depends on FUAPI, PostgreSQL and Azure AI Search - if the Public API app itself is healthy, check those next. For more info, review [public API alert guidance on diagnosing availability test failures](https://dfe-gov-uk.visualstudio.com.mcas.ms/s101-Explore-Education-Statistics/_wiki/wikis/s101-Explore-Education-Statistics.wiki/18320/Public-API-availability-alert-investigation).'
+var alertFullDescription = 'Fires when ${testDescription} fails from ${minFailedLocationsToAlert} or more of ${length(testLocations)} test locations. URL tested: ${url}.  This endpoint depends on FUAPI, PostgreSQL and Azure AI Search - if the Public API app itself is healthy, check those next. For more info, review guidance on diagnosing availability test failures https://dfe-gov-uk.visualstudio.com.mcas.ms/s101-Explore-Education-Statistics/_wiki/wikis/s101-Explore-Education-Statistics.wiki/18320/Public-API-availability-alert-investigation'
 
 resource availabilityTest 'Microsoft.Insights/webtests@2022-06-15' = {
   name: name
