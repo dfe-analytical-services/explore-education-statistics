@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -20,7 +21,8 @@ internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
     IDataSetVersionMappingService dataSetVersionMappingService,
-    IUserService userService
+    IUserService userService,
+    IUserRepository userRepository
 ) : IDataSetService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
@@ -129,8 +131,16 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await GetReleaseVersion(releaseFileId, cancellationToken)
+            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets(user))
             .OnSuccess(async _ =>
                 await processorClient.CreateDataSet(releaseFileId: releaseFileId, cancellationToken: cancellationToken)
             )
@@ -371,6 +381,29 @@ internal class DataSetService(
             .Include(ds => ds.Versions)
             .Include(ds => ds.LatestDraftVersion)
             .Include(ds => ds.LatestLiveVersion);
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> GetReleaseVersion(
+        Guid releaseFileId,
+        CancellationToken cancellationToken
+    ) =>
+        await contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Where(r => r.Id == releaseFileId)
+            .Select(rf => rf.ReleaseVersion)
+            .SingleOrNotFoundAsync(cancellationToken);
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIsNotApproved(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        {
+            return new ForbidResult();
+        }
+
+        return Unit.Instance;
     }
 
     private record DataSetReleaseVersions
