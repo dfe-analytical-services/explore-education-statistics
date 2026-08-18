@@ -186,13 +186,13 @@ public class DataSetMappingServiceTests
 
             Assert.Multiple(
                 () => Assert.Equal("replacement_indicator_4", originalIndicator1Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator1Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator1Mapping.Status),
                 () => Assert.Equal("replacement_indicator_5", originalIndicator2Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator2Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator2Mapping.Status),
                 () => Assert.Null(originalIndicator3Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.ManuallySet), originalIndicator3Mapping.Status),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator3Mapping.Status),
                 () => Assert.Equal("replacement_indicator_3", originalIndicator4Mapping.ReplacementColumnName),
-                () => Assert.Equal(nameof(MapStatus.AutoSet), originalIndicator4Mapping.Status)
+                () => Assert.Equal(MapStatus.AutoSet, originalIndicator4Mapping.Status)
             );
         }
 
@@ -562,8 +562,7 @@ public class DataSetMappingServiceTests
 
             validationProblem.AssertHasError(
                 expectedPath: "Updates.NewReplacementId",
-                expectedCode: "UnmappedIndicatorMatchingReplacementIdNotFound",
-                expectedMessage: $"No available unmapped indicator matching replacement id \"{replacementIndicatorAlreadyMappedId}\""
+                expectedCode: "UnmappedIndicatorMatchingReplacementIdNotFound"
             );
         }
     }
@@ -666,8 +665,8 @@ public class DataSetMappingServiceTests
                     ReplacementDataFileId = replacementDataFileId,
                     Updates =
                     [
-                        new() { OriginalLocationId = loc1Id, NewReplacementLocationId = replacementLocId },
-                        new() { OriginalLocationId = loc2Id, NewReplacementLocationId = null },
+                        new() { OriginalId = loc1Id, NewReplacementId = replacementLocId },
+                        new() { OriginalId = loc2Id, NewReplacementId = null },
                     ],
                 },
                 CancellationToken.None
@@ -678,15 +677,15 @@ public class DataSetMappingServiceTests
 
             var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
             Assert.Equal(replacementLocId, map1.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), map1.Status);
+            Assert.Equal(MapStatus.ManuallySet, map1.Status);
 
             var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
             Assert.Null(map2.ReplacementId);
-            Assert.Equal(nameof(MapStatus.ManuallySet), map2.Status);
+            Assert.Equal(MapStatus.ManuallySet, map2.Status);
 
             var map3 = locationMappingList.Single(m => m.OriginalId == loc3Id);
             Assert.Equal(loc3ReplacementId, map3.ReplacementId);
-            Assert.Equal(nameof(MapStatus.Unset), map3.Status);
+            Assert.Equal(MapStatus.Unset, map3.Status);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -880,14 +879,14 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = badId }],
+                    Updates = [new() { OriginalId = badId }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.OriginalLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.OriginalId)}",
                 "LocationMatchingOriginalIdNameNotFound"
             );
         }
@@ -944,14 +943,14 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = Guid.NewGuid() }],
+                    Updates = [new() { OriginalId = locId, NewReplacementId = Guid.NewGuid() }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                 "UnmappedLocationMatchingReplacementLocationIdNotFound"
             );
         }
@@ -1013,16 +1012,1910 @@ public class DataSetMappingServiceTests
                 {
                     OriginalDataFileId = originalDataFileId,
                     ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalLocationId = locId, NewReplacementLocationId = replacementLocId }],
+                    Updates = [new() { OriginalId = locId, NewReplacementId = replacementLocId }],
                 },
                 CancellationToken.None
             );
 
             var validationProblem = result.AssertBadRequestWithValidationProblem();
             validationProblem.AssertHasError(
-                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(LocationMappingUpdateRequest.NewReplacementLocationId)}",
+                $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
                 "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation"
             );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var originalFilter1Id = Guid.NewGuid();
+        var originalFilter1Group1Id = Guid.NewGuid();
+        var originalFilter1Group1Item1Id = Guid.NewGuid();
+
+        var originalFilter2Id = Guid.NewGuid();
+        var originalFilter2Group1Id = Guid.NewGuid();
+        var originalFilter2Group1Item1Id = Guid.NewGuid();
+
+        var replacementFilter1Id = Guid.NewGuid();
+        var replacementFilter1Group1Id = Guid.NewGuid();
+        var replacementFilter1Group1Item1Id = Guid.NewGuid();
+
+        var previouslyMappedReplacementFilter2Id = Guid.NewGuid();
+        var previouslyMappedReplacementFilter2Group1Id = Guid.NewGuid();
+        var previouslyMappedReplacementFilter2Group1Item1Id = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilter1Id,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilter1Id,
+                        OriginalLabel = "Original filter 1",
+                        OriginalColumnName = "original_filter_1",
+                        Status = MapStatus.Unset,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilter1Group1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilter1Group1Id,
+                                    OriginalLabel = "Original filter 1 group 1",
+                                    Status = MapStatus.ParentNotMapped,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilter1Group1Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilter1Group1Item1Id,
+                                                OriginalLabel = "Original filter 1 group 1 item 1",
+                                                Status = MapStatus.ParentNotMapped,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+                {
+                    originalFilter2Id,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilter2Id,
+                        OriginalLabel = "Original filter 2",
+                        OriginalColumnName = "original_filter_2",
+                        ReplacementId = previouslyMappedReplacementFilter2Id,
+                        ReplacementLabel = "Replacement filter 2",
+                        ReplacementColumnName = "replacement_filter_2",
+                        Status = MapStatus.AutoSet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilter2Group1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilter2Group1Id,
+                                    OriginalLabel = "Original filter 2 group 1",
+                                    ReplacementId = previouslyMappedReplacementFilter2Group1Id,
+                                    ReplacementLabel = "Replacement filter 2 group 1",
+                                    Status = MapStatus.AutoSet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilter2Group1Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilter2Group1Item1Id,
+                                                OriginalLabel = "Original filter 2 group 1 item 1",
+                                                ReplacementId = previouslyMappedReplacementFilter2Group1Item1Id,
+                                                ReplacementLabel = "Replacement filter 2 group 1 item 1",
+                                                Status = MapStatus.AutoSet,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters =
+            [
+                new UnmappedFilter
+                {
+                    Id = replacementFilter1Id,
+                    Label = "Replacement filter 1",
+                    ColumnName = "replacement_filter_1",
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = replacementFilter1Group1Id,
+                            Label = "Original filter 1 group 1",
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem
+                                {
+                                    Id = replacementFilter1Group1Item1Id,
+                                    Label = "Original filter 1 group 1 item 1",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates =
+                    [
+                        new() { OriginalId = originalFilter1Id, NewReplacementId = replacementFilter1Id },
+                        new() { OriginalId = originalFilter2Id, NewReplacementId = null },
+                    ],
+                    FilterGroupUpdates = [],
+                    FilterItemUpdates = [],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            Assert.Equal(2, dto.Filters.Count);
+            Assert.Empty(dto.FilterGroups);
+            Assert.Empty(dto.FilterItems);
+
+            var filter1Dto = dto.Filters.Single(f => f.OriginalId == originalFilter1Id);
+            Assert.Equal(replacementFilter1Id, filter1Dto.ReplacementId);
+            Assert.Equal("Replacement filter 1", filter1Dto.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, filter1Dto.Status);
+
+            var filter2Dto = dto.Filters.Single(f => f.OriginalId == originalFilter2Id);
+            Assert.Null(filter2Dto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, filter2Dto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+
+            var filter1 = dbMapping.FilterMappings[originalFilter1Id];
+            Assert.Equal(replacementFilter1Id, filter1.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, filter1.Status);
+
+            var filter1Group1 = filter1.FilterGroupMappings[originalFilter1Group1Id];
+            Assert.Equal(replacementFilter1Group1Id, filter1Group1.ReplacementId);
+            Assert.Equal(MapStatus.AutoSet, filter1Group1.Status);
+
+            var filter1Group1Item1 = filter1Group1.FilterItemMappings[originalFilter1Group1Item1Id];
+            Assert.Equal(replacementFilter1Group1Item1Id, filter1Group1Item1.ReplacementId);
+            Assert.Equal(MapStatus.AutoSet, filter1Group1Item1.Status);
+
+            var filter2 = dbMapping.FilterMappings[originalFilter2Id];
+            Assert.Null(filter2.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, filter2.Status);
+
+            var filter2Group1 = filter2.FilterGroupMappings[originalFilter2Group1Id];
+            Assert.Null(filter2Group1.ReplacementId);
+            Assert.Equal(MapStatus.ParentNotMapped, filter2Group1.Status);
+
+            var filter2Group1Item1 = filter2Group1.FilterItemMappings[originalFilter2Group1Item1Id];
+            Assert.Null(filter2Group1Item1.ReplacementId);
+            Assert.Equal(MapStatus.ParentNotMapped, filter2Group1Item1.Status);
+
+            Assert.Single(dbMapping.UnmappedReplacementFilters);
+            var newlyUnmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
+            Assert.Equal(previouslyMappedReplacementFilter2Id, newlyUnmappedFilter.Id);
+            Assert.Equal("Replacement filter 2", newlyUnmappedFilter.Label);
+            var newlyUnmappedGroup = Assert.Single(newlyUnmappedFilter.UnmappedReplacementFilterGroups);
+            Assert.Equal(previouslyMappedReplacementFilter2Group1Id, newlyUnmappedGroup.Id);
+            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
+            Assert.Equal(
+                previouslyMappedReplacementFilter2Group1Item1Id,
+                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_ChangeExistingReplacementFilter_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroup1Id = Guid.NewGuid();
+        var originalFilterGroup1Item1Id = Guid.NewGuid();
+
+        var oldReplacementFilterId = Guid.NewGuid();
+        var oldReplacementFilterGroup1Id = Guid.NewGuid();
+        var oldReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var newReplacementFilterId = Guid.NewGuid();
+        var newReplacementFilterGroup1Id = Guid.NewGuid();
+        var newReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter",
+                        OriginalColumnName = "original_filter",
+                        ReplacementId = oldReplacementFilterId,
+                        ReplacementLabel = "Old replacement filter",
+                        ReplacementColumnName = "old_replacement_filter",
+                        Status = MapStatus.ManuallySet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroup1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroup1Id,
+                                    OriginalLabel = "Original filter group 1",
+                                    ReplacementId = oldReplacementFilterGroup1Id,
+                                    ReplacementLabel = "Old replacement filter group 1",
+                                    Status = MapStatus.AutoSet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterGroup1Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterGroup1Item1Id,
+                                                OriginalLabel = "Original filter group 1 item 1",
+                                                ReplacementId = oldReplacementFilterGroup1Item1Id,
+                                                ReplacementLabel = "Old replacement filter group 1 item 1",
+                                                Status = MapStatus.AutoSet,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters =
+            [
+                new UnmappedFilter
+                {
+                    Id = newReplacementFilterId,
+                    Label = "New replacement filter",
+                    ColumnName = "new_replacement_filter",
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = newReplacementFilterGroup1Id,
+                            Label = "Original filter group 1",
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem
+                                {
+                                    Id = newReplacementFilterGroup1Item1Id,
+                                    Label = "Original filter group 1 item 1",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates =
+                    [
+                        new() { OriginalId = originalFilterId, NewReplacementId = newReplacementFilterId },
+                    ],
+                    FilterGroupUpdates = [],
+                    FilterItemUpdates = [],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            Assert.Single(dto.Filters);
+
+            var filterDto = dto.Filters.Single();
+            Assert.Equal(originalFilterId, filterDto.OriginalId);
+            Assert.Equal(newReplacementFilterId, filterDto.ReplacementId);
+            Assert.Equal("New replacement filter", filterDto.ReplacementLabel);
+            Assert.Equal("new_replacement_filter", filterDto.ReplacementColumnName);
+            Assert.Equal(MapStatus.ManuallySet, filterDto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+
+            var filter = dbMapping.FilterMappings[originalFilterId];
+            Assert.Equal(newReplacementFilterId, filter.ReplacementId);
+            Assert.Equal("New replacement filter", filter.ReplacementLabel);
+            Assert.Equal("new_replacement_filter", filter.ReplacementColumnName);
+            Assert.Equal(MapStatus.ManuallySet, filter.Status);
+
+            var group1 = filter.FilterGroupMappings[originalFilterGroup1Id];
+            Assert.Equal(newReplacementFilterGroup1Id, group1.ReplacementId);
+            Assert.Equal("Original filter group 1", group1.ReplacementLabel);
+            Assert.Equal(MapStatus.AutoSet, group1.Status);
+
+            var item1 = group1.FilterItemMappings[originalFilterGroup1Item1Id];
+            Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
+            Assert.Equal("Original filter group 1 item 1", item1.ReplacementLabel);
+            Assert.Equal(MapStatus.AutoSet, item1.Status);
+
+            Assert.Single(dbMapping.UnmappedReplacementFilters);
+            var unmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
+            Assert.Equal(oldReplacementFilterId, unmappedFilter.Id);
+            Assert.Equal("Old replacement filter", unmappedFilter.Label);
+            Assert.Equal("old_replacement_filter", unmappedFilter.ColumnName);
+
+            var unmappedGroup = Assert.Single(unmappedFilter.UnmappedReplacementFilterGroups);
+            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
+            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
+
+            var unmappedItem = Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
+            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedItem.Id);
+            Assert.Equal("Old replacement filter group 1 item 1", unmappedItem.Label);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_NoReleaseVersion_NotFound()
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+        var service = SetupDataSetMappingService(contentDbContext);
+        var result = await service.UpdateFilterMappings(
+            Guid.NewGuid(),
+            new FilterMappingUpdatesRequest(),
+            CancellationToken.None
+        );
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_NoDataSetMapping_NotFound()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>(),
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = Guid.NewGuid(),
+                    FilterUpdates = [],
+                },
+                CancellationToken.None
+            );
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_OriginalFilterNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var filterDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>(),
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates = [new() { OriginalId = filterDoesNotExistId, NewReplacementId = null }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                expectedCode: "FilterMatchingOriginalIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_UnmappedReplacementFilterNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var replacementFilterDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping { OriginalId = originalFilterId }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates =
+                    [
+                        new() { OriginalId = originalFilterId, NewReplacementId = replacementFilterDoesNotExistId },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterUpdates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
+                expectedCode: "UnmappedFilterMatchingReplacementIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_FilterGroupParentNotMapped_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalGroupId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        Status = MapStatus.Unset,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupId,
+                                    Status = MapStatus.ParentNotMapped,
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterGroupUpdates = [new() { OriginalId = originalGroupId, NewReplacementId = Guid.NewGuid() }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterGroupUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                expectedCode: "FilterGroupParentNotMapped"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_FilterItemParentNotMapped_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalGroupId = Guid.NewGuid();
+        var originalItemId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        Status = MapStatus.Unset,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupId,
+                                    Status = MapStatus.ParentNotMapped,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalItemId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalItemId,
+                                                Status = MapStatus.ParentNotMapped,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterItemUpdates = [new() { OriginalId = originalItemId, NewReplacementId = Guid.NewGuid() }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterItemUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                expectedCode: "FilterItemParentNotMapped"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_FilterGroup_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroup1Id = Guid.NewGuid();
+        var originalFilterGroup1Item1Id = Guid.NewGuid();
+
+        var originalFilterGroup2Id = Guid.NewGuid();
+        var originalFilterGroup2Item1Id = Guid.NewGuid();
+
+        var replacementFilterId = Guid.NewGuid();
+        var newReplacementFilterGroup1Id = Guid.NewGuid();
+        var newReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var oldReplacementFilterGroup2Id = Guid.NewGuid();
+        var oldReplacementFilterGroup2Item1Id = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter",
+                        ReplacementId = replacementFilterId,
+                        ReplacementLabel = "Replacement filter",
+                        Status = MapStatus.AutoSet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroup1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroup1Id,
+                                    OriginalLabel = "Original filter group 1",
+                                    Status = MapStatus.Unset,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterGroup1Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterGroup1Item1Id,
+                                                OriginalLabel = "Original filter group 1 item 1",
+                                                Status = MapStatus.ParentNotMapped,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                            {
+                                originalFilterGroup2Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroup2Id,
+                                    OriginalLabel = "Original filter group 2",
+                                    ReplacementId = oldReplacementFilterGroup2Id,
+                                    ReplacementLabel = "Old replacement filter group 2",
+                                    Status = MapStatus.AutoSet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterGroup2Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterGroup2Item1Id,
+                                                OriginalLabel = "Original filter group 2 item 1",
+                                                ReplacementId = oldReplacementFilterGroup2Item1Id,
+                                                ReplacementLabel = "Old replacement filter group 2 item 1",
+                                                Status = MapStatus.AutoSet,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                        UnmappedReplacementFilterGroups =
+                        [
+                            new UnmappedFilterGroup
+                            {
+                                Id = newReplacementFilterGroup1Id,
+                                Label = "New replacement filter group 1",
+                                UnmappedReplacementFilterItems =
+                                [
+                                    new UnmappedFilterItem
+                                    {
+                                        Id = newReplacementFilterGroup1Item1Id,
+                                        Label = "Original filter group 1 item 1",
+                                    },
+                                ],
+                            },
+                        ],
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates = [],
+                    FilterGroupUpdates =
+                    [
+                        new() { OriginalId = originalFilterGroup1Id, NewReplacementId = newReplacementFilterGroup1Id },
+                        new() { OriginalId = originalFilterGroup2Id, NewReplacementId = null },
+                    ],
+                    FilterItemUpdates = [],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            Assert.Empty(dto.Filters);
+            Assert.Equal(2, dto.FilterGroups.Count);
+            Assert.Empty(dto.FilterItems);
+
+            var group1Dto = dto.FilterGroups.Single(g => g.OriginalId == originalFilterGroup1Id);
+            Assert.Equal(newReplacementFilterGroup1Id, group1Dto.ReplacementId);
+            Assert.Equal("New replacement filter group 1", group1Dto.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, group1Dto.Status);
+
+            var group2Dto = dto.FilterGroups.Single(g => g.OriginalId == originalFilterGroup2Id);
+            Assert.Null(group2Dto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, group2Dto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+            var filter = dbMapping.FilterMappings[originalFilterId];
+
+            var group1 = filter.FilterGroupMappings[originalFilterGroup1Id];
+            Assert.Equal(newReplacementFilterGroup1Id, group1.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, group1.Status);
+            var item1 = group1.FilterItemMappings[originalFilterGroup1Item1Id];
+            Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
+            Assert.Equal(MapStatus.AutoSet, item1.Status);
+
+            var group2 = filter.FilterGroupMappings[originalFilterGroup2Id];
+            Assert.Null(group2.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, group2.Status);
+            var group2Item1 = group2.FilterItemMappings[originalFilterGroup2Item1Id];
+            Assert.Null(group2Item1.ReplacementId);
+            Assert.Equal(MapStatus.ParentNotMapped, group2Item1.Status);
+
+            Assert.Single(filter.UnmappedReplacementFilterGroups);
+            var newlyUnmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
+            Assert.Equal(oldReplacementFilterGroup2Id, newlyUnmappedGroup.Id);
+            Assert.Equal("Old replacement filter group 2", newlyUnmappedGroup.Label);
+            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
+            Assert.Equal(
+                oldReplacementFilterGroup2Item1Id,
+                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_ChangeExistingReplacementFilterGroup_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroup1Id = Guid.NewGuid();
+        var originalFilterGroup1Item1Id = Guid.NewGuid();
+
+        var oldReplacementFilterGroup1Id = Guid.NewGuid();
+        var oldReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var newReplacementFilterGroup1Id = Guid.NewGuid();
+        var newReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter",
+                        ReplacementId = Guid.NewGuid(),
+                        ReplacementLabel = "Replacement filter",
+                        Status = MapStatus.AutoSet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroup1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroup1Id,
+                                    OriginalLabel = "Original filter group 1",
+                                    ReplacementId = oldReplacementFilterGroup1Id,
+                                    ReplacementLabel = "Old replacement filter group 1",
+                                    Status = MapStatus.ManuallySet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterGroup1Item1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterGroup1Item1Id,
+                                                OriginalLabel = "Original filter group 1 item 1",
+                                                ReplacementId = oldReplacementFilterGroup1Item1Id,
+                                                ReplacementLabel = "Old replacement filter group 1 item 1",
+                                                Status = MapStatus.AutoSet,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                        UnmappedReplacementFilterGroups =
+                        [
+                            new UnmappedFilterGroup
+                            {
+                                Id = newReplacementFilterGroup1Id,
+                                Label = "New replacement filter group 1",
+                                UnmappedReplacementFilterItems =
+                                [
+                                    new UnmappedFilterItem
+                                    {
+                                        Id = newReplacementFilterGroup1Item1Id,
+                                        Label = "Original filter group 1 item 1",
+                                    },
+                                ],
+                            },
+                        ],
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterGroupUpdates =
+                    [
+                        new() { OriginalId = originalFilterGroup1Id, NewReplacementId = newReplacementFilterGroup1Id },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            var groupDto = Assert.Single(dto.FilterGroups);
+            Assert.Equal(newReplacementFilterGroup1Id, groupDto.ReplacementId);
+            Assert.Equal("New replacement filter group 1", groupDto.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, groupDto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+            var filter = dbMapping.FilterMappings[originalFilterId];
+
+            var group1 = filter.FilterGroupMappings[originalFilterGroup1Id];
+            Assert.Equal(newReplacementFilterGroup1Id, group1.ReplacementId);
+            Assert.Equal("New replacement filter group 1", group1.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, group1.Status);
+
+            var item1 = group1.FilterItemMappings[originalFilterGroup1Item1Id];
+            Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
+            Assert.Equal(MapStatus.AutoSet, item1.Status);
+
+            Assert.Single(filter.UnmappedReplacementFilterGroups);
+            var unmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
+            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
+            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
+            Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
+            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedGroup.UnmappedReplacementFilterItems.Single().Id);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_OriginalFilterGroupNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var groupDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>(),
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterGroupUpdates = [new() { OriginalId = groupDoesNotExistId, NewReplacementId = null }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterGroupUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                expectedCode: "FilterGroupMatchingOriginalIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_UnmappedReplacementFilterGroupNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroupId = Guid.NewGuid();
+        var replacementGroupDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        Status = MapStatus.AutoSet,
+                        ReplacementId = Guid.NewGuid(),
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroupId,
+                                new FilterGroupMapping { OriginalId = originalFilterGroupId, Status = MapStatus.Unset }
+                            },
+                        },
+                        UnmappedReplacementFilterGroups = [],
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterGroupUpdates =
+                    [
+                        new() { OriginalId = originalFilterGroupId, NewReplacementId = replacementGroupDoesNotExistId },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterGroupUpdates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
+                expectedCode: "UnmappedFilterGroupMatchingReplacementIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_FilterItem_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroupId = Guid.NewGuid();
+        var originalFilterItem1Id = Guid.NewGuid();
+        var originalFilterItem2Id = Guid.NewGuid();
+
+        var replacementFilterId = Guid.NewGuid();
+        var replacementFilterGroupId = Guid.NewGuid();
+        var newReplacementFilterItem1Id = Guid.NewGuid();
+        var oldReplacementFilterItem2Id = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter",
+                        ReplacementId = replacementFilterId,
+                        ReplacementLabel = "Replacement filter",
+                        Status = MapStatus.AutoSet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroupId,
+                                    OriginalLabel = "Original filter group",
+                                    ReplacementId = replacementFilterGroupId,
+                                    ReplacementLabel = "Replacement filter group",
+                                    Status = MapStatus.AutoSet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterItem1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterItem1Id,
+                                                OriginalLabel = "Original filter item 1",
+                                                Status = MapStatus.Unset,
+                                            }
+                                        },
+                                        {
+                                            originalFilterItem2Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterItem2Id,
+                                                OriginalLabel = "Original filter item 2",
+                                                ReplacementId = oldReplacementFilterItem2Id,
+                                                ReplacementLabel = "Old replacement filter item 2",
+                                                Status = MapStatus.AutoSet,
+                                            }
+                                        },
+                                    },
+                                    UnmappedReplacementFilterItems =
+                                    [
+                                        new UnmappedFilterItem
+                                        {
+                                            Id = newReplacementFilterItem1Id,
+                                            Label = "New replacement filter item 1",
+                                        },
+                                    ],
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates = [],
+                    FilterGroupUpdates = [],
+                    FilterItemUpdates =
+                    [
+                        new() { OriginalId = originalFilterItem1Id, NewReplacementId = newReplacementFilterItem1Id },
+                        new() { OriginalId = originalFilterItem2Id, NewReplacementId = null },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            Assert.Empty(dto.Filters);
+            Assert.Empty(dto.FilterGroups);
+            Assert.Equal(2, dto.FilterItems.Count);
+
+            var item1Dto = dto.FilterItems.Single(i => i.OriginalId == originalFilterItem1Id);
+            Assert.Equal(newReplacementFilterItem1Id, item1Dto.ReplacementId);
+            Assert.Equal("New replacement filter item 1", item1Dto.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, item1Dto.Status);
+
+            var item2Dto = dto.FilterItems.Single(i => i.OriginalId == originalFilterItem2Id);
+            Assert.Null(item2Dto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, item2Dto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+            var filter = dbMapping.FilterMappings[originalFilterId];
+            var group = filter.FilterGroupMappings[originalFilterGroupId];
+
+            var item1 = group.FilterItemMappings[originalFilterItem1Id];
+            Assert.Equal(newReplacementFilterItem1Id, item1.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, item1.Status);
+
+            var item2 = group.FilterItemMappings[originalFilterItem2Id];
+            Assert.Null(item2.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, item2.Status);
+
+            Assert.Single(group.UnmappedReplacementFilterItems);
+            var newlyUnmappedItem = group.UnmappedReplacementFilterItems.Single();
+            Assert.Equal(oldReplacementFilterItem2Id, newlyUnmappedItem.Id);
+            Assert.Equal("Old replacement filter item 2", newlyUnmappedItem.Label);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_ChangeExistingReplacementFilterItem_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroupId = Guid.NewGuid();
+        var originalFilterItem1Id = Guid.NewGuid();
+
+        var oldReplacementFilterItem1Id = Guid.NewGuid();
+        var newReplacementFilterItem1Id = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter",
+                        ReplacementId = Guid.NewGuid(),
+                        ReplacementLabel = "Replacement filter",
+                        Status = MapStatus.AutoSet,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroupId,
+                                    OriginalLabel = "Original filter group",
+                                    ReplacementId = Guid.NewGuid(),
+                                    ReplacementLabel = "Replacement filter group",
+                                    Status = MapStatus.AutoSet,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterItem1Id,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterItem1Id,
+                                                OriginalLabel = "Original filter item 1",
+                                                ReplacementId = oldReplacementFilterItem1Id,
+                                                ReplacementLabel = "Old replacement filter item 1",
+                                                Status = MapStatus.ManuallySet,
+                                            }
+                                        },
+                                    },
+                                    UnmappedReplacementFilterItems =
+                                    [
+                                        new UnmappedFilterItem
+                                        {
+                                            Id = newReplacementFilterItem1Id,
+                                            Label = "New replacement filter item 1",
+                                        },
+                                    ],
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterItemUpdates =
+                    [
+                        new() { OriginalId = originalFilterItem1Id, NewReplacementId = newReplacementFilterItem1Id },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            var itemDto = Assert.Single(dto.FilterItems);
+            Assert.Equal(newReplacementFilterItem1Id, itemDto.ReplacementId);
+            Assert.Equal("New replacement filter item 1", itemDto.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, itemDto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+            var filter = dbMapping.FilterMappings[originalFilterId];
+            var group = filter.FilterGroupMappings[originalFilterGroupId];
+
+            var item1 = group.FilterItemMappings[originalFilterItem1Id];
+            Assert.Equal(newReplacementFilterItem1Id, item1.ReplacementId);
+            Assert.Equal("New replacement filter item 1", item1.ReplacementLabel);
+            Assert.Equal(MapStatus.ManuallySet, item1.Status);
+
+            Assert.Single(group.UnmappedReplacementFilterItems);
+            var unmappedItem = group.UnmappedReplacementFilterItems.Single();
+            Assert.Equal(oldReplacementFilterItem1Id, unmappedItem.Id);
+            Assert.Equal("Old replacement filter item 1", unmappedItem.Label);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_OriginalFilterItemNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var itemDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>(),
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterItemUpdates = [new() { OriginalId = itemDoesNotExistId, NewReplacementId = null }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterItemUpdates)}.{nameof(MappingUpdateRequest.OriginalId)}",
+                expectedCode: "FilterItemMatchingOriginalIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_UnmappedReplacementFilterItemNotFound_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroupId = Guid.NewGuid();
+        var originalFilterItemId = Guid.NewGuid();
+        var replacementItemDoesNotExistId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        Status = MapStatus.AutoSet,
+                        ReplacementId = Guid.NewGuid(),
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroupId,
+                                    Status = MapStatus.AutoSet,
+                                    ReplacementId = Guid.NewGuid(),
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterItemId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterItemId,
+                                                Status = MapStatus.Unset,
+                                            }
+                                        },
+                                    },
+                                    UnmappedReplacementFilterItems = [],
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterItemUpdates =
+                    [
+                        new() { OriginalId = originalFilterItemId, NewReplacementId = replacementItemDoesNotExistId },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasError(
+                expectedPath: $"{nameof(FilterMappingUpdatesRequest.FilterItemUpdates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
+                expectedCode: "UnmappedFilterItemMatchingReplacementIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFilterMappings_MapFilterThenGroupThenItemInSingleRequest_Success()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = replacementDataFileId },
+        };
+
+        var originalFilterId = Guid.NewGuid();
+        var originalFilterGroupId = Guid.NewGuid();
+        var originalFilterItemId = Guid.NewGuid();
+
+        var replacementFilterId = Guid.NewGuid();
+        var replacementFilterGroupId = Guid.NewGuid();
+        var replacementFilterItemId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            FilterMappings = new Dictionary<Guid, FilterMapping>
+            {
+                {
+                    originalFilterId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterId,
+                        OriginalLabel = "Original filter label",
+                        Status = MapStatus.Unset,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalFilterGroupId,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalFilterGroupId,
+                                    OriginalLabel = "Original filter group label",
+                                    Status = MapStatus.ParentNotMapped,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalFilterItemId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalFilterItemId,
+                                                OriginalLabel = "Original filter item label",
+                                                Status = MapStatus.ParentNotMapped,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+            },
+            UnmappedReplacementFilters =
+            [
+                new UnmappedFilter
+                {
+                    Id = replacementFilterId,
+                    Label = "Replacement filter label",
+                    ColumnName = "replacement_filter",
+                    UnmappedReplacementFilterGroups =
+                    [
+                        new UnmappedFilterGroup
+                        {
+                            Id = replacementFilterGroupId,
+                            Label = "Different group label",
+                            UnmappedReplacementFilterItems =
+                            [
+                                new UnmappedFilterItem { Id = replacementFilterItemId, Label = "Different item label" },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext);
+
+            var result = await service.UpdateFilterMappings(
+                releaseVersion.Id,
+                new FilterMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    FilterUpdates = [new() { OriginalId = originalFilterId, NewReplacementId = replacementFilterId }],
+                    FilterGroupUpdates =
+                    [
+                        new() { OriginalId = originalFilterGroupId, NewReplacementId = replacementFilterGroupId },
+                    ],
+                    FilterItemUpdates =
+                    [
+                        new() { OriginalId = originalFilterItemId, NewReplacementId = replacementFilterItemId },
+                    ],
+                },
+                CancellationToken.None
+            );
+
+            var dto = result.AssertRight();
+            var filterDto = Assert.Single(dto.Filters);
+            Assert.Equal(replacementFilterId, filterDto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, filterDto.Status);
+
+            var groupDto = Assert.Single(dto.FilterGroups);
+            Assert.Equal(replacementFilterGroupId, groupDto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, groupDto.Status);
+
+            var itemDto = Assert.Single(dto.FilterItems);
+            Assert.Equal(replacementFilterItemId, itemDto.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, itemDto.Status);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var dbMapping = contentDbContext.DataSetMappings.Single();
+            var filter = dbMapping.FilterMappings[originalFilterId];
+            Assert.Equal(replacementFilterId, filter.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, filter.Status);
+
+            var group = filter.FilterGroupMappings[originalFilterGroupId];
+            Assert.Equal(replacementFilterGroupId, group.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, group.Status);
+
+            var item = group.FilterItemMappings[originalFilterItemId];
+            Assert.Equal(replacementFilterItemId, item.ReplacementId);
+            Assert.Equal(MapStatus.ManuallySet, item.Status);
+
+            Assert.Empty(dbMapping.UnmappedReplacementFilters);
+            Assert.Empty(filter.UnmappedReplacementFilterGroups);
+            Assert.Empty(group.UnmappedReplacementFilterItems);
         }
     }
 
