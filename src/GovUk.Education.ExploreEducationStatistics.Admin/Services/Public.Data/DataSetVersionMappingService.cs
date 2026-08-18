@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -25,7 +26,8 @@ public class DataSetVersionMappingService(
     IUserService userService,
     PublicDataDbContext publicDataDbContext,
     ContentDbContext contentDbContext,
-    IMappingTypesRepository mappingTypesRepository
+    IMappingTypesRepository mappingTypesRepository,
+    IUserRepository userRepository
 ) : IDataSetVersionMappingService
 {
     private static readonly MappingType[] IncompleteMappingTypes = [MappingType.AutoNone];
@@ -169,9 +171,16 @@ public class DataSetVersionMappingService(
         CancellationToken cancellationToken
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
-                .CheckIsBauUser()
+                .CheckCanManagePublicApiDataSets(user)
                 .OnSuccess(() =>
                     CheckMappingExists(nextDataSetVersionId, cancellationToken).OnSuccess(CheckInMappingStatus)
                 )

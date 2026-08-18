@@ -72,4 +72,10 @@ public enum SecurityPolicies
     CanApproveSpecificMethodology,
     CanMakeAmendmentOfSpecificMethodology,
     CanDeleteSpecificMethodology,
+
+    /**
+     * Public API management
+     */
+    CanManagePublicApiDataSets,
+    CanManagePublicApiDataSetPreviewTokens,
 }
