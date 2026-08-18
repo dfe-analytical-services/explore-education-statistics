@@ -114,6 +114,18 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     type: 'Patch',
   };
 
+  const testMinorDraftVersion: ApiDataSetDraftVersion = {
+    ...testDraftVersion,
+    version: '1.1',
+    type: 'Minor',
+  };
+
+  const testInitialDraftVersion: ApiDataSetDraftVersion = {
+    ...testDraftVersion,
+    version: '1.0',
+    type: 'Major',
+  };
+
   const defaultTestConfig = {
     appInsightsKey: '',
     publicAppUrl: 'http://localhost',
@@ -1324,7 +1336,8 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
   test.each([
     ['patch', testPatchDraftVersion],
-    ['non-patch', testDraftVersion],
+    ['minor', testMinorDraftVersion],
+    ['major', testDraftVersion],
   ])('unfinalises a finalised %s version', async (_, draftVersion) => {
     apiDataSetService.getDataSet
       .mockResolvedValueOnce({
@@ -1383,6 +1396,28 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           'Status',
         ),
       ).toHaveTextContent('Action required');
+      const draftVersionSummary = within(
+        screen.getByTestId('draft-version-summary'),
+      );
+      expect(
+        draftVersionSummary.getByTestId('Geographic levels'),
+      ).toHaveTextContent('National, Local authority');
+      expect(draftVersionSummary.getByTestId('Time periods')).toHaveTextContent(
+        '2018 to 2024',
+      );
+      expect(draftVersionSummary.getByTestId('Indicators')).toHaveTextContent(
+        'Test draft indicator',
+      );
+      expect(draftVersionSummary.getByTestId('Filters')).toHaveTextContent(
+        'Test draft filter',
+      );
+      if (draftVersion.type !== 'Patch') {
+        expect(
+          draftVersionSummary.getByRole('button', {
+            name: 'Remove draft version',
+          }),
+        ).toBeInTheDocument();
+      }
       expect(
         screen.queryByRole('button', {
           name: 'Unfinalise this data set version',
@@ -1403,6 +1438,25 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         screen.getByRole('link', { name: 'Map indicators' }),
       ).toBeInTheDocument();
     });
+  });
+
+  test('does not show the unfinalise action for the initial version', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      status: 'Draft',
+      draftVersion: testInitialDraftVersion,
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unfinalise this data set version',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('does not show the unfinalise action for an approved release', async () => {
