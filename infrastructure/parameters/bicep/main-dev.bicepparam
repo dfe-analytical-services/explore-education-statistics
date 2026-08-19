@@ -1,0 +1,1 @@
+using '../../templates/main.bicep'
