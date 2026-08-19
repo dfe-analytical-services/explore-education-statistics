@@ -42,7 +42,7 @@ module applicationInsightsModule '../../../common/components/monitoring/appInsig
 // genuine, publication-list-independent, read-only endpoint that depends on both PostgreSQL and
 // Azure AI Search. This detects when the public route, the Public API app, PostgreSQL or
 // Azure AI Search prevent the request from completing successfully.
-module availabilityTestModule '../../../common/components/monitoring/availabilityTest.bicep' = {
+module availabilityTestModule '../../../common/components/monitoring/availability-test.bicep' = {
   name: 'publicApiAvailabilityTestDeploy'
   params: {
     name: '${resourceNames.publicApi.appInsights}-publications'

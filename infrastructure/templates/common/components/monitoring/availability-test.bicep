@@ -93,6 +93,12 @@ resource availabilityTest 'Microsoft.Insights/webtests@2022-06-15' = {
       HttpVerb: 'GET'
       ParseDependentRequests: false
       FollowRedirects: true
+      Headers: [
+        {
+          key: 'ees-request-source'
+          value: 'Azure uptime monitoring'
+        }
+      ]
     }
     ValidationRules: {
       ExpectedHttpStatusCode: 200
