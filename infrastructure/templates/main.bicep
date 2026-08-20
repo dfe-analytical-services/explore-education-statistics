@@ -1,39 +1,23 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { AppServicePlanSku } from 'common/components/app-service-plan/types.bicep'
-import { MemoryCacheConfig } from 'types.bicep'
+import { MemoryCacheConfig, Tags } from 'types.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
 param environmentIdentifier string = ''
 
 @description('Tag Value - Enter the Department name tag value e.g. Data Directorate')
-param departmentName string = ''
-
-@description('Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Pre-Production / Production')
-param environmentName string = ''
-
-@description('Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production')
-param subscriptionName string = ''
-
-@description('Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES')
-param solutionName string = ''
-
-@description('Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown.')
-param costCentre string = ''
-
-@description('Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura')
-param serviceOwnerName string = ''
-
-@description('Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value.')
-param dateProvisioned string = ''
-
-@description('Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul')
-param createdBy string = ''
-
-@description('Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A')
-param deploymentRepo string = ''
-
-@description('Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A')
-param deploymentScript string = ''
+param tagValues Tags = {
+  Department: ''
+  Solution: ''
+  Environment: ''
+  Subscription: ''
+  CostCentre: ''
+  ServiceOwner: ''
+  DateProvisioned: ''
+  CreatedBy: ''
+  DeploymentRepo: ''
+  DeploymentScript: ''
+}
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -95,19 +79,6 @@ param memoryCacheConfig MemoryCacheConfig = {
 @secure()
 @description('''Admin database user's password.''')
 param sqlAdminUserPassword string = ''
-
-var tagValues = {
-  Department: departmentName
-  Solution: solutionName
-  Environment: environmentName
-  Subscription: subscriptionName
-  CostCentre: costCentre
-  ServiceOwner: serviceOwnerName
-  DateProvisioned: dateProvisioned
-  CreatedBy: createdBy
-  DeploymentRepo: deploymentRepo
-  DeploymentScript: deploymentScript
-}
 
 var legacyResourcePrefix = environmentIdentifier
 var newResourcePrefix = '${environmentIdentifier}-ees'
