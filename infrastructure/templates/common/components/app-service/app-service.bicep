@@ -33,6 +33,13 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling in this environment.')
 param autoscaleEnabled bool
 
+@description('Whether to create or update Azure Monitor alerts during this deploy.')
+param alerts {
+  appServiceHealth: bool
+  httpErrors: bool
+  alertsGroupName: string
+}?
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -127,4 +134,13 @@ module autoscaleSettingsModule 'autoscale-settings.bicep' = {
     appServicePlanId: appServicePlanId
     autoscaleEnabled: autoscaleEnabled
   }
+}
+
+module alertsModule 'alerts.bicep' = if (alerts != null) {
+  name: '${appServiceName}AlertsModuleDeploy'
+  params: {
+    appServiceName: appServiceName
+    alerts: alerts!
+    tagValues: tagValues
+  }  
 }

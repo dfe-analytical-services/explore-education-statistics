@@ -44,7 +44,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
 }
 
 module stagingSlotVNetLink 'slot-virtual-network-link.bicep' = if (vnetLink != null) {
-  name: '${appServiceName}VnetLinkModuleDeploy'
+  name: '${appServiceName}${slotName}VnetLinkModuleDeploy'
   params: {
     appServiceName: appServiceName
     slotName: slotName
