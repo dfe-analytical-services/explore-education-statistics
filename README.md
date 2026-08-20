@@ -136,12 +136,6 @@ corepack install
 pnpm i
 ```
 
-The first install after a PNPM major version bump will ask to remove and recreate `node_modules`,
-as the virtual store layout changes between majors. This is expected; answer yes.
-
-On Windows this can fail with an `EPERM ... unlink` error if an editor language server is holding a
-native `.node` file open. Close your editor, or stop its ESLint and TypeScript servers, then retry.
-
 ### Set up GitHub Packages source
 
 In additional to the common .NET dependencies sourced from [nuget.org](nuget.org), some dependencies 
@@ -535,7 +529,8 @@ ees content data
 
 ### Running Azure Search locally
 
-We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications. To get this running locally, you will need to add the correct variables to a `.env.local` in the frontend project directory.
+We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications.
+To get this running locally, you will need to add the correct variables to a `.env.local` in the frontend project directory.
 
 ```
 AZURE_SEARCH_QUERY_KEY=
@@ -579,9 +574,6 @@ From PNPM 11 onwards only auth and registry settings are read from `.npmrc`. Eve
 lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml), in camelCase, alongside the workspace package
 list. See the [PNPM settings reference](https://pnpm.io/settings).
 
-This includes `overrides`, which used to sit in the `pnpm` field of the root `package.json`. PNPM 11
-ignores that field entirely, so anything left there is silently dropped rather than reported.
-
 PNPM also does not run dependency build scripts unless they are explicitly allowed, via `allowBuilds`
 in `pnpm-workspace.yaml`. If a dependency that needs to compile or download a binary is added, run:
 
@@ -594,9 +586,9 @@ defaults to on.
 
 #### Recently published packages
 
-PNPM refuses to install packages published within the last 24 hours (`minimumReleaseAge`), as a guard
-against a compromised release being pulled in before anyone notices. This applies to the committed
-lockfile, and the check runs on `pnpm run` and `pnpm exec` too, not just `pnpm i`.
+PNPM refuses to install packages published within the last 12 hours (`minimumReleaseAge` setting in
+`pnpm-workspace.yaml`), as a guard against a compromised release being pulled in before anyone notices.
+This applies to the committed lockfile, and the check runs on `pnpm run` and `pnpm exec` too, not just `pnpm i`.
 
 So a lockfile committed on the same day a dependency publishes will fail until it ages out. If that
 blocks something urgent, exclude the specific package rather than turning the policy off:
@@ -613,12 +605,12 @@ minimumReleaseAgeExclude:
 - `explore-education-statistics-frontend`
   - Contains the public frontend application.
   - This is a server side rendered Next application.
-    
+
 - `explore-education-statistics-common`
   - Contains common code between the other sub-projects for re-use.
 
 - `explore-education-statistics-ckeditor`
- - Contains the customised CKEditor build for the admin application.
+  - Contains the customised CKEditor build for the admin application.
 
 #### Adding dependencies
 
@@ -637,9 +629,8 @@ When adding new NPM dependencies, be aware that we need to be careful about wher
 - `explore-education-statistics-commmon` dependencies are in `dependencies` as these must all be 
   included in the final build (admin or public).
   
-- `explore-education-statistics-admin` dependencies are in `dependencies` simply for consistency
-  and simplicity. We need all dependencies to create the build, so it doesn't make sense to split 
-  out separate `devDependencies`.
+- `explore-education-statistics-admin` dependencies are in either `dependencies` or 
+  `devDependencies`.
 
 To install new dependencies, you will need to use PNPM to do this, with the following steps:
 
@@ -671,8 +662,8 @@ These scripts can generally be run from most `package.json` files across the pro
 - `pnpm lint` - Lint projects using Stylelint and ESLint.
   - `pnpm lint:js` - Run ESLint only.
   - `pnpm lint:style` - Run Stylelint only.
-- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
 
+- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
   - `pnpm fix:js` - Fix only ESLint lints.
   - `pnpm fix:style` - Fix only Stylelint lints.
 

@@ -17,3 +17,5 @@ allowBuilds:
   bufferutil: true
   puppeteer: true
   utf-8-validate: true
+
+minimumReleaseAge: 720
