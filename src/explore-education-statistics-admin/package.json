@@ -83,7 +83,7 @@
     "intersection-observer": "^0.12.2",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "jest-junit": "^16.0.0",
+    "jest-junit": "^17.0.0",
     "jest-mock-extended": "^4.0.1",
     "jest-resolve": "^30.4.1",
     "jest-serializer-html": "^7.1.0",

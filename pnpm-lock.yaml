@@ -375,8 +375,8 @@ importers:
         specifier: ^30.4.1
         version: 30.4.1
       jest-junit:
-        specifier: ^16.0.0
-        version: 16.0.0
+        specifier: ^17.0.0
+        version: 17.0.0
       jest-mock-extended:
         specifier: ^4.0.1
         version: 4.0.1(@jest/globals@30.4.1)(jest@30.4.2)(typescript@6.0.3)
@@ -697,8 +697,8 @@ importers:
         specifier: ^3.3.4
         version: 3.3.4(@jest/globals@30.4.1)
       jest-junit:
-        specifier: ^16.0.0
-        version: 16.0.0
+        specifier: ^17.0.0
+        version: 17.0.0
       jest-matcher-utils:
         specifier: ^30.4.1
         version: 30.4.1
@@ -899,8 +899,8 @@ importers:
         specifier: ^30.4.2
         version: 30.4.2(@types/node@22.19.7)
       jest-junit:
-        specifier: ^12.0.0
-        version: 12.3.0
+        specifier: ^17.0.0
+        version: 17.0.0
       jest-mock-extended:
         specifier: ^4.0.1
         version: 4.0.1(@jest/globals@30.4.1)(jest@30.4.2)(typescript@6.0.3)
@@ -9697,11 +9697,6 @@ packages:
     hasBin: true
     dev: true
 
-  /ansi-regex@4.1.1:
-    resolution: {integrity: sha512-ILlv4k/3f6vfQ4OoP2AGvirOktlQ98ZEL1k9FaQjxa3L1abBgbuTDAdPOpvbGncC0BTVQrl+OM8xZGK6tWXt7g==}
-    engines: {node: '>=6'}
-    dev: true
-
   /ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -14981,23 +14976,13 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /jest-junit@12.3.0:
-    resolution: {integrity: sha512-+NmE5ogsEjFppEl90GChrk7xgz8xzvF0f+ZT5AnhW6suJC93gvQtmQjfyjDnE0Z2nXJqEkxF0WXlvjG/J+wn/g==}
-    engines: {node: '>=10.12.0'}
-    dependencies:
-      mkdirp: 1.0.4
-      strip-ansi: 5.2.0
-      uuid: 8.3.2
-      xml: 1.0.1
-    dev: true
-
-  /jest-junit@16.0.0:
-    resolution: {integrity: sha512-A94mmw6NfJab4Fg/BlvVOUXzXgF0XIH6EmTgJ5NDPp4xoKq0Kr7sErb+4Xs9nZvu58pJojz5RFGpqnZYJTrRfQ==}
-    engines: {node: '>=10.12.0'}
+  /jest-junit@17.0.0:
+    resolution: {integrity: sha512-RYWCkq4j59gUXj5DsgbIE7xFBZzu1gtibPhyjSjMmGaOTLnqlXhg7x9zuGCwgbCuMAyoyvk0Mi8wSrRR5uOeLA==}
+    engines: {node: '>=20.0.0'}
     dependencies:
       mkdirp: 1.0.4
       strip-ansi: 6.0.1
-      uuid: 8.3.2
+      uuid: 14.0.2
       xml: 1.0.1
     dev: true
 
@@ -20241,13 +20226,6 @@ packages:
       is-regexp: 1.0.0
     dev: true
 
-  /strip-ansi@5.2.0:
-    resolution: {integrity: sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==}
-    engines: {node: '>=6'}
-    dependencies:
-      ansi-regex: 4.1.1
-    dev: true
-
   /strip-ansi@6.0.1:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
@@ -21431,6 +21409,11 @@ packages:
     dependencies:
       base64-arraybuffer: 1.0.2
     dev: false
+
+  /uuid@14.0.2:
+    resolution: {integrity: sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==}
+    hasBin: true
+    dev: true
 
   /uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
