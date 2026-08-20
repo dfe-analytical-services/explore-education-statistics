@@ -25,6 +25,17 @@ type ResourceNames = {
     keyVault: string
     secrets: {
       screenerStorageAccountConnectionString: string
+      adminSignalrConnectionString: string
+      adminGovUkNotifyApiKey: string
+      openIdConnectClientId: string
+      openIdConnectAuthority: string
+      openIdConnectValidAudience: string
+      openIdConnectValidIssuers: string
+      openIdConnectFullyQualifiedScopeName: string
+      coreStorageAccountConnectionString: string
+      publicStorageAccountConnectionString: string
+      publisherStorageAccountConnectionString: string
+      publicApiContainerAppPrivateUrl: string
     }
   }
   alertsGroup: string
@@ -73,7 +84,18 @@ func getResourceNames(
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     secrets: {
+      adminGovUkNotifyApiKey: 'ees_admin_govuknotify_api_key'
+      adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'
+      openIdConnectClientId: 'ees_openidconnect_clientid'
+      openIdConnectAuthority: 'ees_openidconnect_authority'
+      openIdConnectValidAudience: 'ees_openidconnect_valid_audience'
+      openIdConnectValidIssuers: 'ees_openidconnect_valid_issuers'
+      openIdConnectFullyQualifiedScopeName: 'ees_openidconnect_fully_qualified_scope_name'
+      publicApiContainerAppPrivateUrl: 'ees_publicapi_public_api_containerapp_private_url'
       screenerStorageAccountConnectionString: '${legacyResourcePrefix}-ees-sapisafn-connection-string'
+      coreStorageAccountConnectionString: 'ees_storage_core'
+      publicStorageAccountConnectionString: 'ees_storage_public'
+      publisherStorageAccountConnectionString: 'ees_storage_publisher'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'

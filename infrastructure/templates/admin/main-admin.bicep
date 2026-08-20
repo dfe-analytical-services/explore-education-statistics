@@ -1,6 +1,7 @@
 import { ResourceNames } from '../resource-names.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { MemoryCacheConfig } from '../types.bicep'
+import { keyVaultRef } from '../functions.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -77,6 +78,14 @@ param screenerAppRegistrationClientId string
 
 var adminSubnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', resourceNames.vnet.vnet, resourceNames.vnet.subnets.admin)
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.keyVault.keyVault
+}
+
+var vaultUri = keyVault.properties.vaultUri
+
+var signalrConnectionStringSecretUri = keyVaultRef(vaultUri, resourceNames.keyVault.secrets.adminSignalrConnectionString)
+
 module adminAppServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'adminAppServicePlanModule'
   params: {
@@ -138,7 +147,7 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       App__EnableSwagger: enableSwagger
       App__EnableThemeDeletion: enableThemeDeletion
       App__EnableEinPublishedPageDeletion: enableEinPublishedPageDeletion
-      Azure__SignalR__ConnectionString: '@Microsoft.KeyVault(SecretUri=${reference('ees_signalr_admin_connectionstring', '2018-02-14').secretUriWithVersion})'
+      Azure__SignalR__ConnectionString: signalrConnectionStringSecretUri
       EventGrid__EventTopics__0__Key: 'PublicationChangedEvent'
       EventGrid__EventTopics__0__TopicEndpoint: reference(
         resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.publicationChanged),
@@ -156,23 +165,23 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       ).endpoint
       IdentityServer__IssuerUri: 'urn=${adminHostname}'
       IdentityServer__Key__Name: 'CN=${adminHostname}'
-      Notify__ApiKey: '@Microsoft.KeyVault(SecretUri=${reference('ees_admin_govuknotify_api_key', '2018-02-14').secretUriWithVersion})'
-      OpenIdConnectIdentityFramework__ClientId: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_clientid', '2018-02-14').secretUriWithVersion})'
-      OpenIdConnectIdentityFramework__Authority: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_authority', '2018-02-14').secretUriWithVersion})'
-      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_valid_audience','2018-02-14').secretUriWithVersion})'
-      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_valid_issuers','2018-02-14').secretUriWithVersion})'
-      OpenIdConnectSpaClient__ClientId: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_clientid', '2018-02-14').secretUriWithVersion})'
-      OpenIdConnectSpaClient__Authority: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_authority', '2018-02-14').secretUriWithVersion})'
-      'OpenIdConnectSpaClient__KnownAuthorities:0': '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_authority', '2018-02-14').secretUriWithVersion})'
-      OpenIdConnectSpaClient__AdminApiScope: '@Microsoft.KeyVault(SecretUri=${reference('ees_openidconnect_fully_qualified_scope_name', '2018-02-14').secretUriWithVersion})'
+      Notify__ApiKey: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.adminGovUkNotifyApiKey)
+      OpenIdConnectIdentityFramework__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectClientId)
+      OpenIdConnectIdentityFramework__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
+      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectValidAudience)
+      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectValidIssuers)
+      OpenIdConnectSpaClient__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectClientId)
+      OpenIdConnectSpaClient__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
+      'OpenIdConnectSpaClient__KnownAuthorities:0': keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
+      OpenIdConnectSpaClient__AdminApiScope: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectFullyQualifiedScopeName)
       MemoryCache__Enabled: true
       MemoryCache__MaxCacheSizeMb: memoryCacheConfig.maxCacheSizeMb
       MemoryCache__ExpirationScanFrequencySeconds: memoryCacheConfig.expirationScanFrequencySeconds
       MemoryCache__Overrides__DurationInSeconds: memoryCacheConfig.?overridesDurationInSeconds
       MemoryCache__Overrides__ExpirySchedule: memoryCacheConfig.?overridesExpirySchedule
-      CoreStorage: '@Microsoft.KeyVault(SecretUri=${reference('ees_storage_core', '2018-02-14').secretUriWithVersion})'
-      PublicStorage: '@Microsoft.KeyVault(SecretUri=${reference('ees_storage_public').secretUriWithVersion})'
-      PublisherStorage: '@Microsoft.KeyVault(SecretUri=${reference('ees_storage_publisher', '2018-02-14').secretUriWithVersion})'
+      CoreStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
+      PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
+      PublisherStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
       PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: preReleaseMinutesBeforeStart
       ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule: prepareScheduledReleaseVersionsFunctionCronSchedule
       ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule: publishScheduledReleaseVersionsFunctionCronSchedule
@@ -180,14 +189,14 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       PublicApp__Url: publicAppUrl
       PublicDataDbExists: true
       PublicDataApi__PublicUrl: 'https://${publicApiUrl}'
-      PublicDataApi__PrivateUrl: '@Microsoft.KeyVault(SecretUri=${reference('ees_publicapi_public_api_containerapp_private_url','2018-02-14').secretUriWithVersion})'
+      PublicDataApi__PrivateUrl: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl)
       PublicDataApi__DocsUrl: 'https://${publicApiDocsUrl}'
       PublicDataApi__AppRegistrationClientId: apiAppRegistrationClientId
       PublicDataProcessor__Url: 'https://${resourceNames.publicApi.processor.functionApp}.azurewebsites.net'
       PublicDataProcessor__AppRegistrationClientId: publicDataProcessorAppRegistrationClientId
       DataScreener__Url: 'https://${resourceNames.screener.functionApp}.azurewebsites.net/api'
       DataScreener__AppRegistrationClientId: screenerAppRegistrationClientId
-      DataScreener__ScreenerStorage: '@Microsoft.KeyVault(SecretUri=${reference(resourceNames.keyVault.secrets.screenerStorageAccountConnectionString, '2018-02-14').secretUriWithVersion})'
+      DataScreener__ScreenerStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.screenerStorageAccountConnectionString)
       DataScreener__ScreenerProgressUpdateIntervalSeconds: 5
       DataScreener__ScreenerProgressUpdateFailureIntervalMinutes: 1440
     }
