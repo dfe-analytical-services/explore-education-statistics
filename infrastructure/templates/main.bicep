@@ -3,34 +3,34 @@ import { AppServicePlanSku } from 'common/components/app-service-plan/types.bice
 import { MemoryCacheConfig } from 'types.bicep'
 
 @description('Tag Value - Enter the Department name tag value e.g. Data Directorate')
-param departmentName string
+param departmentName string = ''
 
 @description('Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Pre-Production / Production')
-param environmentName string
+param environmentName string = ''
 
 @description('Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production')
-param subscriptionName string
+param subscriptionName string = ''
 
 @description('Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES')
-param solutionName string
+param solutionName string = ''
 
 @description('Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown.')
-param costCentre string
+param costCentre string = ''
 
 @description('Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura')
-param serviceOwnerName string
+param serviceOwnerName string = ''
 
 @description('Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value.')
-param dateProvisioned string
+param dateProvisioned string = ''
 
 @description('Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. RULER, Paul')
-param createdBy string
+param createdBy string = ''
 
 @description('Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A')
-param deploymentRepo string
+param deploymentRepo string = ''
 
 @description('Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A')
-param deploymentScript string
+param deploymentScript string = ''
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -57,13 +57,13 @@ param enableThemeDeletion bool = false
 param enableEinPublishedPageDeletion bool = false
 
 @description('Client ID of the public API Container App app registration in Entra ID.')
-param apiAppRegistrationClientId string
+param apiAppRegistrationClientId string = ''
 
 @description('Client ID of the public API processor app registration in Entra ID.')
-param publicDataProcessorAppRegistrationClientId string
+param publicDataProcessorAppRegistrationClientId string = ''
 
 @description('Client ID of the Screener API Function App app registration in Entra ID.')
-param screenerAppRegistrationClientId string
+param screenerAppRegistrationClientId string = ''
 
 @description('Public URL of the public API.')
 param publicApiUrl string
@@ -91,7 +91,7 @@ param memoryCacheConfig MemoryCacheConfig = {
 
 @secure()
 @description('''Admin database user's password.''')
-param sqlAdminUserPassword string
+param sqlAdminUserPassword string = ''
 
 var tagValues = {
   Department: departmentName
