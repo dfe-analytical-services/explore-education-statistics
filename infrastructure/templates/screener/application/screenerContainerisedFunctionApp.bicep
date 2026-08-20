@@ -1,5 +1,5 @@
 import { FirewallRule, IpRange } from '../../common/types.bicep'
-import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { ResourceNames } from '../types.bicep'
 
 @description('Specifies common resource naming variables.')
@@ -17,7 +17,7 @@ param applicationInsightsConnectionString string = ''
 @description('Specifies whether or not the Screener Function App already exists.')
 param functionAppExists bool
 
-param sku AppServicePlanSku
+param sku FunctionAppServicePlanSku
 
 @description('The IP address ranges that can access the Screener storage accounts.')
 param storageFirewallRules IpRange[]
