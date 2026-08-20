@@ -755,10 +755,7 @@
     "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
     "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-content')]",
     "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
-    "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
-    "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
-    "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
@@ -1275,7 +1272,6 @@
     ],
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
-      "[concat('Microsoft.Web/sites/', variables('adminAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",

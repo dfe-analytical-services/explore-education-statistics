@@ -6,6 +6,9 @@ param appServiceName string
 @description('Name of the App Insights instance that this App Service is connected to.')
 param appInsightsName string
 
+@description('Name of Key Vault to allow secret access to from this App Service.')
+param keyVaultName string?
+
 @description('Minimum TLS version supported.')
 param minTlsVersion string
 
@@ -62,6 +65,18 @@ resource appService 'Microsoft.Web/sites@2019-08-01' = {
   }
 }
 
+var appServiceSecretsUserRoleAssignmentName = guid(resourceId('Microsoft.KeyVault/vaults', appServiceName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), appServiceName)
+
+module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
+  name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
+  params: {
+    keyVaultName: keyVaultName!
+    roleAssignmentNameOverride: appServiceSecretsUserRoleAssignmentName
+    principalIds: [appService.identity.principalId]
+    role: 'Secrets User'
+  }
+}
+
 resource virtualNetworkLink 'Microsoft.Web/sites/config@2018-11-01' = if (subnetRef != null) {
   parent: appService
   name: 'virtualNetwork'
@@ -75,7 +90,6 @@ resource virtualNetworkLink 'Microsoft.Web/sites/config@2018-11-01' = if (subnet
 resource appSettings 'Microsoft.Web/sites/config@2019-08-01' = {
   parent: appService
   name: 'appsettings'
-  location: resourceGroup().location
   properties: union(applicationAppSettings, {
     APPINSIGHTS_INSTRUMENTATIONKEY: reference(
       resourceId('Microsoft.Insights/components', appInsightsName),

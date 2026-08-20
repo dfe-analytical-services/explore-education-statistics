@@ -86,6 +86,8 @@ var vaultUri = keyVault.properties.vaultUri
 
 var signalrConnectionStringSecretUri = keyVaultRef(vaultUri, resourceNames.keyVault.secrets.adminSignalrConnectionString)
 
+var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
+
 module adminAppServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'adminAppServicePlanModule'
   params: {
@@ -125,12 +127,12 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       {
         name: 'StatisticsDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}').fullyQualifiedDomainName},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=adminapp@${reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}').fullyQualifiedDomainName};Password=${sqlAdminUserPassword};'
+        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=adminapp@${coreSqlServerFqdn};Password=${sqlAdminUserPassword};'
       }
       {
         name: 'ContentDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}').fullyQualifiedDomainName},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=adminapp@${reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}').fullyQualifiedDomainName};Password=${sqlAdminUserPassword};'
+        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=adminapp@${coreSqlServerFqdn};Password=${sqlAdminUserPassword};'
       }
       {
         name: 'PublicDataDb'
