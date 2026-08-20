@@ -93,6 +93,7 @@ module adminAppServicePlanModule '../common/components/app-service-plan/app-serv
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: adminSku
+    operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
       cpuPercentage: true
