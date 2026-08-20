@@ -2,8 +2,8 @@ import { getResourceNames } from 'resource-names.bicep'
 import { AppServicePlanSku } from 'common/components/app-service-plan/types.bicep'
 import { MemoryCacheConfig } from 'types.bicep'
 
-@description('Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources')
-param subscription string = ''
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
+param environmentIdentifier string = ''
 
 @description('Tag Value - Enter the Department name tag value e.g. Data Directorate')
 param departmentName string = ''
@@ -109,8 +109,8 @@ var tagValues = {
   DeploymentScript: deploymentScript
 }
 
-var legacyResourcePrefix = subscription
-var newResourcePrefix = '${subscription}-ees'
+var legacyResourcePrefix = environmentIdentifier
+var newResourcePrefix = '${environmentIdentifier}-ees'
 var publicApiResourcePrefix = '${newResourcePrefix}-papi'
 var screenerResourcePrefix = '${newResourcePrefix}-sapi'
 
