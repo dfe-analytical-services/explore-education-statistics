@@ -24,14 +24,16 @@ type ResourceNames = {
   keyVault: {
     keyVault: string
     secrets: {
-      screenerStorageAccountConnectionString: string
-      adminSignalrConnectionString: string
-      adminGovUkNotifyApiKey: string
-      openIdConnectClientId: string
-      openIdConnectAuthority: string
-      openIdConnectValidAudience: string
-      openIdConnectValidIssuers: string
-      openIdConnectFullyQualifiedScopeName: string
+      admin: {
+        adminSignalrConnectionString: string
+        adminGovUkNotifyApiKey: string
+        openIdConnectClientId: string
+        openIdConnectAuthority: string
+        openIdConnectValidAudience: string
+        openIdConnectValidIssuers: string
+        openIdConnectFullyQualifiedScopeName: string
+        screenerStorageAccountConnectionString: string
+      }
       coreStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
@@ -84,15 +86,17 @@ func getResourceNames(
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     secrets: {
-      adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'
-      adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'
-      openIdConnectClientId: 'ees-openidconnect-clientid'
-      openIdConnectAuthority: 'ees-openidconnect-authority'
-      openIdConnectValidAudience: 'ees-openidconnect-valid-audience'
-      openIdConnectValidIssuers: 'ees-openidconnect-valid-issuers'
-      openIdConnectFullyQualifiedScopeName: 'ees-openidconnect-fully-qualified-scope-name'
+      admin: {
+        adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'
+        adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'
+        openIdConnectClientId: 'ees-openidconnect-clientid'
+        openIdConnectAuthority: 'ees-openidconnect-authority'
+        openIdConnectValidAudience: 'ees-openidconnect-valid-audience'
+        openIdConnectValidIssuers: 'ees-openidconnect-valid-issuers'
+        openIdConnectFullyQualifiedScopeName: 'ees-openidconnect-fully-qualified-scope-name'
+        screenerStorageAccountConnectionString: '${legacyResourcePrefix}eessapisafn-connection-string'
+      }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
-      screenerStorageAccountConnectionString: '${legacyResourcePrefix}-ees-sapisafn-connection-string'
       coreStorageAccountConnectionString: 'ees-storage-core'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: 'ees-storage-publisher'

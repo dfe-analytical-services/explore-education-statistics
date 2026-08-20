@@ -82,7 +82,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 var vaultUri = keyVault.properties.vaultUri
 
-var signalrConnectionStringSecretUri = keyVaultRef(vaultUri, resourceNames.keyVault.secrets.adminSignalrConnectionString)
+var signalrConnectionStringSecretUri = keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.adminSignalrConnectionString)
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -169,15 +169,15 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       ).endpoint
       IdentityServer__IssuerUri: 'urn=${adminHostname}'
       IdentityServer__Key__Name: 'CN=${adminHostname}'
-      Notify__ApiKey: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.adminGovUkNotifyApiKey)
-      OpenIdConnectIdentityFramework__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectClientId)
-      OpenIdConnectIdentityFramework__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
-      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectValidAudience)
-      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectValidIssuers)
-      OpenIdConnectSpaClient__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectClientId)
-      OpenIdConnectSpaClient__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
-      'OpenIdConnectSpaClient__KnownAuthorities:0': keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectAuthority)
-      OpenIdConnectSpaClient__AdminApiScope: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.openIdConnectFullyQualifiedScopeName)
+      Notify__ApiKey: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.adminGovUkNotifyApiKey)
+      OpenIdConnectIdentityFramework__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectClientId)
+      OpenIdConnectIdentityFramework__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
+      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectValidAudience)
+      OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectValidIssuers)
+      OpenIdConnectSpaClient__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectClientId)
+      OpenIdConnectSpaClient__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
+      'OpenIdConnectSpaClient__KnownAuthorities:0': keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
+      OpenIdConnectSpaClient__AdminApiScope: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectFullyQualifiedScopeName)
       MemoryCache__Enabled: true
       MemoryCache__MaxCacheSizeMb: memoryCacheConfig.maxCacheSizeMb
       MemoryCache__ExpirationScanFrequencySeconds: memoryCacheConfig.expirationScanFrequencySeconds
@@ -200,7 +200,7 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       PublicDataProcessor__AppRegistrationClientId: publicDataProcessorAppRegistrationClientId
       DataScreener__Url: 'https://${resourceNames.screener.functionApp}.azurewebsites.net/api'
       DataScreener__AppRegistrationClientId: screenerAppRegistrationClientId
-      DataScreener__ScreenerStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.screenerStorageAccountConnectionString)
+      DataScreener__ScreenerStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString)
       DataScreener__ScreenerProgressUpdateIntervalSeconds: 5
       DataScreener__ScreenerProgressUpdateFailureIntervalMinutes: 1440
     }
