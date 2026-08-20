@@ -136,6 +136,12 @@ corepack install
 pnpm i
 ```
 
+The first install after a PNPM major version bump will ask to remove and recreate `node_modules`,
+as the virtual store layout changes between majors. This is expected; answer yes.
+
+On Windows this can fail with an `EPERM ... unlink` error if an editor language server is holding a
+native `.node` file open. Close your editor, or stop its ESLint and TypeScript servers, then retry.
+
 ### Set up GitHub Packages source
 
 In additional to the common .NET dependencies sourced from [nuget.org](nuget.org), some dependencies 
@@ -566,6 +572,39 @@ No secrets/keys etc. should be added to these environment variables.
 The project currently uses [PNPM](https://pnpm.io) and [PNPM workspaces](https://pnpm.io/workspaces) to handle dependencies as we have
 adopted a monorepo project structure and have dependencies between sub-projects. These dependencies
 are established using symlinks that PNPM creates.
+
+#### Where PNPM settings live
+
+From PNPM 11 onwards only auth and registry settings are read from `.npmrc`. Every other setting
+lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml), in camelCase, alongside the workspace package
+list. See the [PNPM settings reference](https://pnpm.io/settings).
+
+This includes `overrides`, which used to sit in the `pnpm` field of the root `package.json`. PNPM 11
+ignores that field entirely, so anything left there is silently dropped rather than reported.
+
+PNPM also does not run dependency build scripts unless they are explicitly allowed, via `allowBuilds`
+in `pnpm-workspace.yaml`. If a dependency that needs to compile or download a binary is added, run:
+
+```bash
+pnpm approve-builds
+```
+
+Packages left out of `allowBuilds` will fail the install rather than warn, because `strictDepBuilds`
+defaults to on.
+
+#### Recently published packages
+
+PNPM refuses to install packages published within the last 24 hours (`minimumReleaseAge`), as a guard
+against a compromised release being pulled in before anyone notices. This applies to the committed
+lockfile, and the check runs on `pnpm run` and `pnpm exec` too, not just `pnpm i`.
+
+So a lockfile committed on the same day a dependency publishes will fail until it ages out. If that
+blocks something urgent, exclude the specific package rather than turning the policy off:
+
+```yaml
+minimumReleaseAgeExclude:
+  - some-package
+```
 
 - `explore-education-statistics-admin`
   - Contains the admin frontend application.

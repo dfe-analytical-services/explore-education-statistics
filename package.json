@@ -2,32 +2,10 @@
   "name": "explore-education-statistics",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@11.22.0",
   "engines": {
     "node": "22.23.1",
-    "pnpm": ">=10.34.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@swc/core",
-      "esbuild",
-      "sharp",
-      "unrs-resolver"
-    ],
-    "ignoredBuiltDependencies": [
-      "core-js-pure",
-      "es5-ext",
-      "iframe-resizer"
-    ],
-    "overrides": {
-      "@tanstack/query-core": "4.41.1",
-      "@tanstack/react-query": "4.42.0",
-      "cookie@<0.7.0": ">=0.7.0",
-      "picomatch@4.0.0-4.0.3": "4.0.4",
-      "picomatch@3.0.0-3.0.1": "3.0.2",
-      "picomatch@<2.3.2": "2.3.2"
-    }
+    "pnpm": ">=11.22.0"
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^11.0.0",
