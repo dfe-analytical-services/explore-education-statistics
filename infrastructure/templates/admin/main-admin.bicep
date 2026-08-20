@@ -76,8 +76,6 @@ param publicDataProcessorAppRegistrationClientId string
 @description('The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID.')
 param screenerAppRegistrationClientId string
 
-var adminSubnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', resourceNames.vnet.vnet, resourceNames.vnet.subnets.admin)
-
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
 }
@@ -141,7 +139,10 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
         connectionString: '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault};SecretName=ees-admin-connectionstring-publicdatadb)'
       }
     ]
-    subnetRef: adminSubnetRef
+    vnetLink: {
+      vnetName: resourceNames.vnet.vnet
+      subnetName: resourceNames.vnet.subnets.admin
+    }
     appInsightsName: adminAppInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices

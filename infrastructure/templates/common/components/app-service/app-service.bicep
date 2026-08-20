@@ -15,8 +15,11 @@ param minTlsVersion string
 @description('The owning App Service Plan id.')
 param appServicePlanId string
 
-@description('Subnet used to connect the App Service to a VNet.')
-param subnetRef string
+@description('Subnet used to connect the App Service to a VNet, if required.')
+param vnetLink {
+  vnetName: string
+  subnetName: string
+}?
 
 @description('Database connection strings.')
 param connectionStrings ConnectionString[]?
@@ -35,7 +38,7 @@ param tagValues object
 
 var deploySlotName = 'deploy'
 
-resource appService 'Microsoft.Web/sites@2019-08-01' = {
+resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
   location: resourceGroup().location
   identity: {
@@ -65,29 +68,7 @@ resource appService 'Microsoft.Web/sites@2019-08-01' = {
   }
 }
 
-var appServiceSecretsUserRoleAssignmentName = guid(resourceId('Microsoft.KeyVault/vaults', appServiceName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), appServiceName)
-
-module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
-  name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
-  params: {
-    keyVaultName: keyVaultName!
-    roleAssignmentNameOverride: appServiceSecretsUserRoleAssignmentName
-    principalIds: [appService.identity.principalId]
-    role: 'Secrets User'
-  }
-}
-
-resource virtualNetworkLink 'Microsoft.Web/sites/config@2018-11-01' = if (subnetRef != null) {
-  parent: appService
-  name: 'virtualNetwork'
-  location: resourceGroup().location
-  properties: {
-    subnetResourceId: subnetRef
-    swiftSupported: true
-  }
-}
-
-resource appSettings 'Microsoft.Web/sites/config@2019-08-01' = {
+resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
   name: 'appsettings'
   properties: union(applicationAppSettings, {
@@ -106,104 +87,44 @@ resource appSettings 'Microsoft.Web/sites/config@2019-08-01' = {
   })
 }
 
-resource stagingSlot 'Microsoft.Web/sites/slots@2018-11-01' = {
-  parent: appService
-  name: deploySlotName
-  kind: 'app'
-  location: resourceGroup().location
-  tags: tagValues
-  properties: {
-    serverFarmId: appServicePlanId
-    httpsOnly: true
-    siteConfig: {
-      http20Enabled: true
-      minTlsVersion: minTlsVersion
-      ftpsState: 'FtpsOnly'
-      netFrameworkVersion: 'v10.0'
-      alwaysOn: false
-      webSocketsEnabled: false
-      remoteDebuggingEnabled: false
-      httpLoggingEnabled: true
-      detailedErrorLoggingEnabled: true
-      requestTracingEnabled: true
-      use32BitWorkerProcess: false
-    }
+var appServiceSecretsUserRoleAssignmentName = guid(resourceId('Microsoft.KeyVault/vaults', appServiceName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), appServiceName)
+
+module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
+  name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
+  params: {
+    keyVaultName: keyVaultName!
+    roleAssignmentNameOverride: appServiceSecretsUserRoleAssignmentName
+    principalIds: [appService.identity.principalId]
+    role: 'Secrets User'
   }
 }
 
-resource deploySlotVirttualNetworkLink 'Microsoft.Web/sites/slots/config@2018-11-01' = if (subnetRef != null) {
-  parent: stagingSlot
-  name: 'virtualNetwork'
-  location: resourceGroup().location
-  properties: {
-    subnetResourceId: subnetRef
-    swiftSupported: true
+module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
+  name: '${appServiceName}VnetLinkModuleDeploy'
+  params: {
+    appServiceName: appService.name
+    vNetName: vnetLink!.vnetName
+    subnetName: vnetLink!.subnetName
   }
 }
 
-resource autoscaleSettings 'Microsoft.Insights/autoscaleSettings@2014-04-01' = {
-  name: '${appServiceName}-autoscale'
-  location: resourceGroup().location
-  tags: {}
-  properties: {
-    name: '${appServiceName}-autoscale'
-    enabled: autoscaleEnabled
-    targetResourceUri: appServicePlanId
-    profiles: [
-      {
-        name: 'Auto created scale condition'
-        capacity: {
-          minimum: 2
-          maximum: 10
-          default: 2
-        }
-        rules: [
-          {
-            scaleAction: {
-              direction: 'Increase'
-              type: 'ChangeCount'
-              value: 1
-              cooldown: 'PT5M'
-            }
-            metricTrigger: {
-              metricName: 'CpuPercentage'
-              metricNamespace: 'microsoft.web/serverfarms'
-              metricResourceUri: appServicePlanId
-              operator: 'GreaterThan'
-              statistic: 'Average'
-              threshold: 70
-              timeAggregation: 'Average'
-              timeGrain: 'PT1M'
-              timeWindow: 'PT10M'
-              dimensions: []
-              dividePerInstance: false
-            }
-          }
-          {
-            scaleAction: {
-              direction: 'Decrease'
-              type: 'ChangeCount'
-              value: 1
-              cooldown: 'PT5M'
-            }
-            metricTrigger: {
-              metricName: 'CpuPercentage'
-              metricNamespace: 'microsoft.web/serverfarms'
-              metricResourceUri: appServicePlanId
-              operator: 'LessThan'
-              statistic: 'Average'
-              threshold: 30
-              timeAggregation: 'Average'
-              timeGrain: 'PT1M'
-              timeWindow: 'PT10M'
-              dimensions: []
-              dividePerInstance: false
-            }
-          }
-        ]
-      }
-    ]
-    notifications: []
-    targetResourceLocation: ''
+module stagingSlotModule 'swap-slot.bicep' = {
+  name: '${appServiceName}${deploySlotName}ModuleDeploy'
+  params: {
+    appServiceName: appService.name
+    slotName: deploySlotName
+    appServicePlanId: appServicePlanId
+    minTlsVersion: minTlsVersion
+    vnetLink: vnetLink
+    tagValues: tagValues
+  }
+}
+
+module autoscaleSettingsModule 'autoscale-settings.bicep' = {
+  name: '${appServiceName}AutoscaleSettingsModuleDeploy'
+  params: {
+    appServiceName: appService.name
+    appServicePlanId: appServicePlanId
+    autoscaleEnabled: autoscaleEnabled
   }
 }
