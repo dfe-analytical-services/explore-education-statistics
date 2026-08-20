@@ -40,11 +40,6 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => generator.ForInstance(m => m.SetIndicatorMappings(indicatorMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementIndicators(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementIndicators(unmappedIndicators));
-
     public static Generator<DataSetMapping> WithLocationMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, LocationMapping> locationMappings
@@ -92,11 +87,6 @@ public static class DataSetMappingGeneratorExtensions
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => setters.Set(m => m.IndicatorMappings, indicatorMappings);
-
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementIndicators(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => setters.Set(m => m.UnmappedReplacementIndicators, unmappedIndicators);
 
     public static InstanceSetters<DataSetMapping> SetLocationMappings(
         this InstanceSetters<DataSetMapping> setters,
