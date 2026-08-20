@@ -20,7 +20,6 @@ public record DataSetMapping
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; init; } = null!;
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
-    public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
 
     public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
 
@@ -73,16 +72,6 @@ public record DataSetMapping
                 .HasColumnType("nvarchar(max)");
 
             builder
-                .Property(x => x.UnmappedReplacementLocations)
-                .HasConversion(
-                    unmappedLocations => JsonSerializer.Serialize(unmappedLocations, JsonOptions),
-                    unmappedLocationsString =>
-                        JsonSerializer.Deserialize<List<UnmappedLocation>>(unmappedLocationsString, JsonOptions)
-                        ?? new List<UnmappedLocation>(),
-                    ValueComparer.CreateDefault<List<UnmappedLocation>>(false)
-                );
-
-            builder
                 .Property(x => x.FilterMappings)
                 .HasConversion(
                     filterMappings => JsonSerializer.Serialize(filterMappings, JsonOptions),
@@ -119,14 +108,6 @@ public record IndicatorMapping
     public string? ReplacementGroupLabel { get; set; }
 
     public MapStatus Status { get; set; }
-}
-
-public record UnmappedLocation
-{
-    public Guid Id { get; set; }
-    public GeographicLevel GeographicLevel { get; set; }
-    public string Code { get; set; } = "";
-    public string Name { get; set; } = "";
 }
 
 public record LocationMapping

@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -45,11 +45,6 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, LocationMapping> locationMappings
     ) => generator.ForInstance(m => m.SetLocationMappings(locationMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementLocations(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedLocation> unmappedLocations
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementLocations(unmappedLocations));
-
     public static InstanceSetters<DataSetMapping> SetDefaults(this InstanceSetters<DataSetMapping> setters) =>
         setters
             .SetDefault(m => m.OriginalDataFileId)
@@ -92,9 +87,4 @@ public static class DataSetMappingGeneratorExtensions
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, LocationMapping> locationMappings
     ) => setters.Set(m => m.LocationMappings, locationMappings);
-
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementLocations(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedLocation> unmappedLocations
-    ) => setters.Set(m => m.UnmappedReplacementLocations, unmappedLocations);
 }
