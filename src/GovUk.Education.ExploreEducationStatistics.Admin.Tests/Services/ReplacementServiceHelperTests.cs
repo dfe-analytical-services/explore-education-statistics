@@ -532,7 +532,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -744,7 +745,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -908,7 +910,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -1014,7 +1017,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         Assert.NotNull(updatedSequence);
@@ -1148,14 +1152,14 @@ public class ReplacementServiceHelperTests
                     }
                 },
             },
-            UnmappedReplacementIndicators = [],
         };
 
         var updatedSequence = ReplacementServiceHelper.ReplaceIndicatorSequence(
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         Assert.NotNull(updatedSequence);
@@ -1181,7 +1185,6 @@ public class ReplacementServiceHelperTests
     )
     {
         Dictionary<Guid, IndicatorMapping> indicatorsMappings = new();
-        List<UnmappedIndicator> unmappedReplacementIndicators = [];
         if (originalIndicatorGroups != null && replacementIndicatorGroups != null)
         {
             // emulates automapping that occurs from indicator groups when a mapping is initially generated
@@ -1211,21 +1214,6 @@ public class ReplacementServiceHelperTests
                         };
                     }
                 );
-            unmappedReplacementIndicators = replacementIndicatorGroups
-                .SelectMany(group => group.Indicators, (group, indicator) => new { group, indicator })
-                .ExceptBy(
-                    indicatorsMappings.Values.Select(mapping => mapping.ReplacementId),
-                    unmappedPair => unmappedPair.indicator.Id
-                )
-                .Select(pair => new UnmappedIndicator
-                {
-                    Id = pair.indicator.Id,
-                    Label = pair.indicator.Label,
-                    ColumnName = pair.indicator.Name,
-                    GroupId = pair.group.Id,
-                    GroupLabel = pair.group.Label,
-                })
-                .ToList();
         }
 
         return new DataSetMapping
@@ -1233,7 +1221,6 @@ public class ReplacementServiceHelperTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = indicatorsMappings,
-            UnmappedReplacementIndicators = unmappedReplacementIndicators,
         };
     }
 }
