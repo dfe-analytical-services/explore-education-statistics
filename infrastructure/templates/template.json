@@ -80,21 +80,6 @@
         "P3V2 PremiumV2"
       ]
     },
-    "skuAdmin": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
-    },
     "skuImporter": {
       "type": "string",
       "defaultValue": "S1 Standard",
@@ -483,13 +468,6 @@
         "description": "Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App"
       }
     },
-    "preReleaseMinutesBeforeStart": {
-      "type": "int",
-      "defaultValue": 870,
-      "metadata": {
-        "description": "Prerelease start time as number of minutes before a release is scheduled to be published"
-      }
-    },
     "blobDeleteRetentionEnabled": {
       "defaultValue": true,
       "type": "bool",
@@ -512,19 +490,7 @@
       "type": "string",
       "defaultValue": "storage"
     },
-    "detailedErrors": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "enableSwagger": {
-      "type": "bool",
-      "defaultValue": false
-    },
-    "enableThemeDeletion": {
-      "type": "bool",
-      "defaultValue": false
-    },
-    "enableEinPublishedPageDeletion": {
       "type": "bool",
       "defaultValue": false
     },
@@ -729,31 +695,6 @@
       "defaultValue": true,
       "metadata": {
         "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
-      }
-    },
-    "publicDataProcessorAppRegistrationClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID"
-      }
-    },
-    "screenerAppRegistrationClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID"
-      }
-    },
-    "enhancedScreenerJourney": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether or not Admin supports the background screening process"
-      }
-    },
-    "apiAppRegistrationClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID"
       }
     },
     "analyticsEnabled": {

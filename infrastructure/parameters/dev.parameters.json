@@ -11,9 +11,6 @@
     "skuContent": {
       "value": "P1V2 PremiumV2"
     },
-    "skuAdmin": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },
@@ -34,9 +31,6 @@
     },
     "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 30 * * * *"
-    },
-    "preReleaseMinutesBeforeStart": {
-      "value": 1440
     },
     "useSubnets": {
       "value": true
@@ -65,9 +59,6 @@
     "defaultPublicSiteCacheMaxAgeSeconds": {
       "value": "10"
     },
-    "detailedErrors": {
-      "value": true
-    },
     "storageAccountPrefix": {
       "value": "sa"
     },
@@ -75,12 +66,6 @@
       "value": "G-GRPHH2FN0L"
     },
     "enableSwagger": {
-      "value": true
-    },
-    "enableThemeDeletion": {
-      "value": true
-    },
-    "enableEinPublishedPageDeletion": {
       "value": true
     },
     "memoryCacheOverridesDurationInSeconds": {

@@ -36,7 +36,10 @@ param deploymentScript string
 param domain string
 
 @description('Admin App Service SKU')
-param adminSku AppServicePlanSku
+param adminSku AppServicePlanSku = {
+  tier: 'Premium'
+  name: 'P1V2'
+} 
 
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool = false
@@ -80,11 +83,11 @@ param publishScheduledReleaseVersionsFunctionCronSchedule string = '0 30 9 * * *
 @description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
 param tableBuilderMaxTableCellsAllowed int = 25000
 
+@description('Global configuration for memory caches.')
 param memoryCacheConfig MemoryCacheConfig = {
   expirationScanFrequencySeconds: 60
   maxCacheSizeMb: 50
 }
-
 
 @secure()
 @description('''Admin database user's password.''')
