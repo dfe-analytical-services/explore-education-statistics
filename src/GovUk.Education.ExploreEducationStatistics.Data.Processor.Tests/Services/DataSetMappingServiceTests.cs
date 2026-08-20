@@ -413,25 +413,6 @@ public class DataSetMappingServiceTests
                         CreateIndicatorMapping(originalIndicatorA4, originalIndicatorGroupA, mapStatus: MapStatus.Unset)
                     },
                 },
-                UnmappedReplacementIndicators =
-                [
-                    new UnmappedIndicator
-                    {
-                        Id = replacementIndicatorA3.Id,
-                        Label = replacementIndicatorA3.Label,
-                        ColumnName = replacementIndicatorA3.Name,
-                        GroupId = replacementIndicatorGroupA.Id,
-                        GroupLabel = replacementIndicatorGroupA.Label,
-                    },
-                    new UnmappedIndicator
-                    {
-                        Id = replacementIndicatorA4.Id,
-                        Label = replacementIndicatorA4.Label,
-                        ColumnName = replacementIndicatorA4.Name,
-                        GroupId = replacementIndicatorGroupB.Id,
-                        GroupLabel = replacementIndicatorGroupB.Label,
-                    },
-                ],
             };
 
             result.AssertDeepEqualTo(expectedMapping, ignoreProperties: [mapping => mapping.Id]);
