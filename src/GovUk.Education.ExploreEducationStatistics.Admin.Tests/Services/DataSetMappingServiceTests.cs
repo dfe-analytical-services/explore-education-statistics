@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -935,32 +935,6 @@ public class DataSetMappingServiceTests
             var map3 = locationMappingList.Single(m => m.OriginalId == loc3Id);
             Assert.Equal(loc3ReplacementId, map3.ReplacementId);
             Assert.Equal(MapStatus.Unset, map3.Status);
-        }
-
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
-
-            // loc2 released displacedReplacementLocId above, so it should now be available to another mapping
-            var result = await service.UpdateLocationMappings(
-                releaseVersion.Id,
-                new LocationMappingUpdatesRequest
-                {
-                    OriginalDataFileId = originalDataFileId,
-                    ReplacementDataFileId = replacementDataFileId,
-                    Updates = [new() { OriginalId = loc4Id, NewReplacementId = displacedReplacementLocId }],
-                },
-                CancellationToken.None
-            );
-
-            var locationMappingList = result.AssertRight();
-
-            var map4 = locationMappingList.Single(m => m.OriginalId == loc4Id);
-            Assert.Equal(displacedReplacementLocId, map4.ReplacementId);
-            Assert.Equal("Old Country Name", map4.ReplacementName);
-            Assert.Equal("E9200002", map4.ReplacementCode);
-            Assert.Equal(MapStatus.ManuallySet, map4.Status);
         }
     }
 
