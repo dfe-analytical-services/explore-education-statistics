@@ -306,9 +306,13 @@ public record ReplacementPlanMappingViewModel
 
     public ReplacementPlanFilterMappingsViewModel Filters { get; init; } = null!;
 
-    public static ReplacementPlanMappingViewModel FromModel(DataSetMapping mapping, List<Filter> replacementFilters)
+    public static ReplacementPlanMappingViewModel FromModel(
+        DataSetMapping mapping,
+        List<Filter> replacementFilters,
+        List<Indicator> replacementIndicators
+    )
     {
-        var indicatorMappings = ReplacementPlanIndicatorMappingsViewModel.FromModel(mapping);
+        var indicatorMappings = ReplacementPlanIndicatorMappingsViewModel.FromModel(mapping, replacementIndicators);
         var locationMappings = ReplacementPlanLocationMappingsViewModel.FromModel(mapping);
         var filterMappings = ReplacementPlanFilterMappingsViewModel.FromModel(mapping, replacementFilters);
 
@@ -329,7 +333,10 @@ public record ReplacementPlanIndicatorMappingsViewModel
     // Key is replacement indicator id
     public Dictionary<Guid, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = null!;
 
-    public static ReplacementPlanIndicatorMappingsViewModel FromModel(DataSetMapping mapping)
+    public static ReplacementPlanIndicatorMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        List<Indicator> replacementIndicators
+    )
     {
         var indicatorMappings = mapping.IndicatorMappings.Values.ToDictionary(
             indicatorMap => indicatorMap.OriginalId,
@@ -345,31 +352,17 @@ public record ReplacementPlanIndicatorMappingsViewModel
                 CandidateKey = indicatorMap.ReplacementId,
             }
         );
-        var indicatorCandidates = mapping // candidates are all possible replacement indicators
-            .IndicatorMappings.Values.Where(indicatorMap => indicatorMap.ReplacementId != null)
-            .Select(indicatorMap => new
+
+        var indicatorCandidates = replacementIndicators.ToDictionary(
+            replacementIndicator => replacementIndicator.Id,
+            replacementIndicator => new ReplacementPlanIndicatorViewModel
             {
-                Id = indicatorMap.ReplacementId!.Value,
-                ColumnName = indicatorMap.ReplacementColumnName!,
-                Label = indicatorMap.ReplacementLabel!,
-            })
-            .Concat(
-                mapping.UnmappedReplacementIndicators.Select(unmappedIndicator => new
-                {
-                    unmappedIndicator.Id,
-                    unmappedIndicator.ColumnName,
-                    unmappedIndicator.Label,
-                })
-            )
-            .ToDictionary(
-                x => x.Id,
-                x => new ReplacementPlanIndicatorViewModel
-                {
-                    Id = x.Id,
-                    Name = x.ColumnName,
-                    Label = x.Label,
-                }
-            );
+                Id = replacementIndicator.Id,
+                Name = replacementIndicator.Name,
+                Label = replacementIndicator.Label,
+            }
+        );
+
         return new ReplacementPlanIndicatorMappingsViewModel
         {
             Mappings = indicatorMappings,
