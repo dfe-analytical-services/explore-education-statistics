@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -26,6 +26,7 @@ public class ReplacementPlanService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
+    ILocationRepository locationRepository,
     IDataSetVersionService dataSetVersionService,
     ITimePeriodService timePeriodService,
     IUserService userService,
@@ -158,10 +159,15 @@ public class ReplacementPlanService(
                     .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
                     .ToListAsync(cancellationToken);
 
+                var replacementLocations = (
+                    await locationRepository.GetDistinctForSubject(replacementSubjectId)
+                ).ToList();
+
                 var mappingPlan = ReplacementPlanMappingViewModel.FromModel(
                     mapping,
                     replacementFilters,
-                    replacementIndicators
+                    replacementIndicators,
+                    replacementLocations
                 );
 
                 return new DataReplacementPlanViewModel
