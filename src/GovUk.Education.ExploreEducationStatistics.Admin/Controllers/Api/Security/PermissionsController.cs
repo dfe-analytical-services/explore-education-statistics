@@ -49,6 +49,7 @@ public class PermissionsController(
             CanAccessAnalystPages: await userService.CheckCanAccessAnalystPages(user).IsRight(),
             CanAccessAllImports: await userService.CheckCanViewAllImports().IsRight(),
             CanManageAllTaxonomy: await userService.CheckCanManageAllTaxonomy().IsRight(),
+            CanManagePublicApiDataSets: await userService.CheckCanManagePublicApiDataSets(user).IsRight(),
             IsBauUser: isBauUser,
             IsApprover: isApprover
         );

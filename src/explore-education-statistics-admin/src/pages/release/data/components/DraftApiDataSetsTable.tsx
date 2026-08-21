@@ -1,5 +1,6 @@
 import isPatchVersion from '@common/utils/isPatchVersion';
 import Link from '@admin/components/Link';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
 import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
@@ -40,6 +41,10 @@ export default function DraftApiDataSetsTable({
   publicationId,
   releaseVersionId,
 }: Props) {
+  const { user } = useAuthContext();
+  const canManagePublicApiDataSets =
+    user?.permissions.canManagePublicApiDataSets;
+
   if (!dataSets.length) {
     return <InsetText>No draft API data sets for this publication.</InsetText>;
   }
@@ -138,12 +143,15 @@ export default function DraftApiDataSetsTable({
                           },
                         )}
                       >
-                        {draftVersion.version === '1.0' || !canUpdateRelease
+                        {draftVersion.version === '1.0' ||
+                        !canUpdateRelease ||
+                        !canManagePublicApiDataSets
                           ? 'View details'
                           : 'View details / edit draft'}
                         <VisuallyHidden>for {dataSet.title}</VisuallyHidden>
                       </Link>
-                      {draftVersion.status !== 'Processing' &&
+                      {canManagePublicApiDataSets &&
+                        draftVersion.status !== 'Processing' &&
                         draftVersion.status !== 'Finalising' &&
                         canUpdateRelease &&
                         !isPatch && (
