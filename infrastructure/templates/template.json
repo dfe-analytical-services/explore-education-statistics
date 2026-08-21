@@ -50,21 +50,6 @@
         "P3V2 PremiumV2"
       ]
     },
-    "skuData": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
-    },
     "skuContent": {
       "type": "string",
       "defaultValue": "S1 Standard",
@@ -173,18 +158,6 @@
         "description": "The password of the content api user of the public SQL Server"
       }
     },
-    "sqlPublicDataApiUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the data api for the public SQL Server"
-      }
-    },
-    "sqlPublicDataApiPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the data api user of the public SQL Server"
-      }
-    },
     "sqlContentApiUser": {
       "type": "string",
       "metadata": {
@@ -195,18 +168,6 @@
       "type": "securestring",
       "metadata": {
         "description": "The password of the content api user for the private SQL Server"
-      }
-    },
-    "sqlDataApiUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the data api for the private SQL Server"
-      }
-    },
-    "sqlDataApiPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the data api user for the private SQL Server"
       }
     },
     "sqlPublisherUser": {
@@ -243,18 +204,6 @@
       "type": "securestring",
       "metadata": {
         "description": "The password of the notifier user for the private SQL Server"
-      }
-    },
-    "sqlAdminUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the admin app for the private SQL Server"
-      }
-    },
-    "sqlAdminUserPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the admin app for the private SQL Server"
       }
     },
     "sqlFirewallRules": {
@@ -749,9 +698,6 @@
     "statisticsDbName": "statistics",
     "statisticsReplicaDbName": "statistics",
     "appInsightsWorkspaceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
-    "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
-    "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
-    "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
     "contentAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-content')]",
     "contentPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-content')]",
     "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
@@ -1222,30 +1168,16 @@
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
     "ees-publisher-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
-    "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
-    "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
-    "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
-    "ees-openidconnect-valid-audience": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-audience')]",
-    "ees-openidconnect-fully-qualified-scope-name": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-fully-qualified-scope-name')]",
-    "ees-openidconnect-valid-issuers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-issuers')]",
-    "ees-publicapi-public-api-containerapp-private-url": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publicapi-public-api-containerapp-private-url')]",
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
-    "ees-signalr-admin-connectionstring": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-signalr-admin-connectionstring')]",
-    "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
     "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
-    "ees-sql-password-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-admin')]",
-    "ees-sql-password-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-data')]",
     "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
     "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
     "ees-sql-password-notifier": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-notifier')]",
-    "ees-sql-user-admin": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-admin')]",
-    "ees-sql-user-data": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-data')]",
     "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
     "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
@@ -1275,8 +1207,7 @@
       "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('importerAppName'))]",
-      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]",
-      "[concat('Microsoft.Web/sites/', variables('dataAppName'))]"
+      "[concat('Microsoft.Web/sites/', variables('contentAppName'))]"
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
@@ -3576,74 +3507,6 @@
         "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
         "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "name": "[concat(variables('dataAppName'), '-autoscale')]",
-      "apiVersion": "2014-04-01",
-      "type": "Microsoft.Insights/autoscaleSettings",
-      "location": "[resourceGroup().location]",
-      "tags": {},
-      "properties": {
-        "name": "[concat(variables('dataAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscaleAppServices')]",
-        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
-        "profiles": [
-          {
-            "name": "Auto created scale condition",
-            "capacity": {
-              "minimum": 2,
-              "maximum": 10,
-              "default": 2
-            },
-            "rules": [
-              {
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
-                  "operator": "GreaterThan",
-                  "statistic": "Average",
-                  "threshold": 70,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              },
-              {
-                "scaleAction": {
-                  "direction": "Decrease",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('dataPlanName'))]",
-                  "operator": "LessThan",
-                  "statistic": "Average",
-                  "threshold": 30,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              }
-            ]
-          }
-        ],
-        "notifications": [],
-        "targetResourceLocation": ""
       }
     },
     {
