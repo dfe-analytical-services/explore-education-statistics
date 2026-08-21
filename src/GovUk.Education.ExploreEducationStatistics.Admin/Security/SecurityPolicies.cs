@@ -77,5 +77,6 @@ public enum SecurityPolicies
      * Public API management
      */
     CanManagePublicApiDataSets,
+    CanViewPublicApiDataSets,
     CanManagePublicApiDataSetPreviewTokens,
 }

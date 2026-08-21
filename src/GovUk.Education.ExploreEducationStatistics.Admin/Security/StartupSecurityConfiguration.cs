@@ -282,6 +282,11 @@ public static class StartupSecurityConfiguration
             );
 
             options.AddPolicy(
+                nameof(SecurityPolicies.CanViewPublicApiDataSets),
+                policy => policy.Requirements.Add(new ViewPublicApiDataSetsRequirement())
+            );
+
+            options.AddPolicy(
                 nameof(SecurityPolicies.CanManagePublicApiDataSetPreviewTokens),
                 policy => policy.Requirements.Add(new ManagePublicApiDataSetPreviewTokensRequirement())
             );
@@ -355,6 +360,7 @@ public static class StartupSecurityConfiguration
          * Public API management
          */
         services.AddTransient<IAuthorizationHandler, ManagePublicApiDataSetsAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewPublicApiDataSetsAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ManagePublicApiDataSetPreviewTokensAuthorizationHandler>();
     }
 }

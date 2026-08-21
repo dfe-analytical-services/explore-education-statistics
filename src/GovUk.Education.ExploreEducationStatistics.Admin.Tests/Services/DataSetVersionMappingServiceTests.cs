@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories.Public.Data.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -365,7 +366,8 @@ public class DataSetVersionMappingServiceTests
         ContentDbContext contentDbContext,
         IPostgreSqlRepository? mockPostgreSqlRepository = null,
         IUserService? mockUserService = null,
-        IMappingTypesRepository? mockMappingTypesRepository = null
+        IMappingTypesRepository? mockMappingTypesRepository = null,
+        IUserRepository? mockUserRepository = null
     )
     {
         return new DataSetVersionMappingService(
@@ -373,7 +375,8 @@ public class DataSetVersionMappingServiceTests
             mockUserService ?? Mock.Of<IUserService>(behavior: MockBehavior.Strict),
             publicDataDbContext,
             contentDbContext,
-            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict)
+            mockMappingTypesRepository ?? Mock.Of<IMappingTypesRepository>(behavior: MockBehavior.Strict),
+            mockUserRepository ?? Mock.Of<IUserRepository>(behavior: MockBehavior.Strict)
         );
     }
 }
