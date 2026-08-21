@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { check } from 'k6';
 import loggingUtils from '../../utils/loggingUtils';
 import getStandardOptions from '../../configuration/options';

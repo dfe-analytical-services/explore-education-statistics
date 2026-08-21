@@ -1,0 +1,6 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+ind_one,Indicator,Indicator one,,,,,
+filter_one_updated,Filter,Filter one updated,,,,,
+filter_two_updated,Filter,Filter two updated,,,,,filter_group_one
+filter_three,Filter,Filter three,,,,,
+filter_four,Filter,Filter four,,,,,filter_group_four

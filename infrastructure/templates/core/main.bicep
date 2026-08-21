@@ -28,6 +28,12 @@ param publicApiApplicationGatewayFqdn string = ''
 @description('Certificate type for Azure Front Door.')
 param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
+@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
+param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+
+@description('Specify if manual deletion of backups is allowed in Recovery Services Vault.')
+param recoveryServicesVaultImmutable bool = false
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -43,8 +49,14 @@ param deployAzureFrontDoor bool = false
 @description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
 
-@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
-param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+@description('Whether or not to deploy Data Factory.')
+param deployDataFactory bool = false
+
+@description('Whether or not to deploy Recovery Services Vault and its policies.')
+param deployRecoveryServicesVault bool = false
+
+@description('Whether or not to deploy the Container Registry.')
+param deployContainerRegistry bool = false
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
@@ -67,7 +79,7 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-var resourcePrefix = '${subscription}-ees'
+var commonResourcePrefix = '${subscription}-ees'
 var publicApiResourcePrefix = '${subscription}-ees-papi'
 
 var resourceNames = {
@@ -77,7 +89,6 @@ var resourceNames = {
     publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     publicSiteApp: '${subscription}-as-ees-public-site'
     publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
-    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
   }
 }
 
@@ -109,7 +120,7 @@ module keyVaultModule 'application/keyVault/keyVault.bicep' = {
 module logAnalyticsWorkspaceModule 'application/log-analytics-workspace/log-analytics-workspace.bicep' = {
   name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
   params: {
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     location: location
     tagValues: tagValues
   }
@@ -129,8 +140,10 @@ module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    deployRecoveryServicesVault: deployRecoveryServicesVault
+    recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
     tagValues: tagValues
   }
 }
@@ -139,10 +152,10 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     resourceNames: {
       adminApp: resourceNames.existingResources.adminApp
-      alertsGroup: resourceNames.existingResources.alertsGroup
+      alertsGroup: alertsModule.outputs.actionGroupName
       publisherFunction: resourceNames.existingResources.publisherFunction
       vNet: vNetModule.outputs.vNetName
       subnets: {
@@ -159,7 +172,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
   params: {
     subscription: subscription
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
@@ -174,7 +187,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
   params: {
     location: location
     subscription: subscription
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
     publicApiAppName: resourceNames.existingResources.publicApiApp
     publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
@@ -185,6 +198,24 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
     publicSiteFqdn: replace(publicSiteUrl, 'https://', '')
     publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
     deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (deployDataFactory) {
+  name: 'dataFactoryModuleDeploy'
+  params: {
+    subscription: subscription
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
+  name: 'containerRegistryModuleDeploy'
+  params: {
     tagValues: tagValues
   }
 }

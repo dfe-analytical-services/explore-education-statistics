@@ -11,11 +11,11 @@ param slackAlertsChannel string
 
 @secure()
 @description('Token to securely post to the Slack channel.')
-param slackAppToken string // keyVault.getSecret('ees-alerts-slackapptoken')
+param slackAppToken string
 
 @secure()
 @description('The Power Automate Webhook URL used to post messages to Teams.')
-param teamsPowerAutomateWebhookUrl string // keyVault.getSecret('ees-alerts-teamswebhookurl')
+param teamsPowerAutomateWebhookUrl string
 
 var alertsLogicAppName = '${subscription}-${abbreviations.logicWorkflows}-ees-slackwebhook'
 

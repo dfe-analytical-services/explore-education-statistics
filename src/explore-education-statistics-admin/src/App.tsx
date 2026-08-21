@@ -6,7 +6,7 @@ import {
   useConfig,
 } from '@admin/contexts/ConfigContext';
 import { ConfiguredMsalProvider } from '@admin/contexts/ConfiguredMsalProvider';
-import routes, { publicRoutes } from '@admin/routes/routes';
+import routes, { publicRoutes } from '@admin/routes/appRoutes';
 import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,

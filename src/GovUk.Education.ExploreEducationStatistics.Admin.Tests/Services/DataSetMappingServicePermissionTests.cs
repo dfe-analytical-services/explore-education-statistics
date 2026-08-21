@@ -14,6 +14,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class DataSetMappingServicePermissionTests
 {
     [Fact]
+    public async Task UpdateFilterMappings()
+    {
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
+            .AssertForbidden(userService =>
+            {
+                var service = SetupDataSetMappingService(
+                    contentDbContext: contentDbContext,
+                    userService: userService.Object
+                );
+                return service.UpdateFilterMappings(
+                    releaseVersion.Id,
+                    new FilterMappingUpdatesRequest(),
+                    CancellationToken.None
+                );
+            });
+    }
+
+    [Fact]
     public async Task UpdateIndicatorMapping()
     {
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };

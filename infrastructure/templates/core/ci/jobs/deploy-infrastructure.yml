@@ -33,6 +33,9 @@ jobs:
                 deployPrivateDnsZones: false
                 deployAzureFrontDoor: false
                 deployApplicationGateway: false
+                deployDataFactory: false
+                deployContainerRegistry: false
+                deployRecoveryServicesVault: false
                 deployAlerts: false
 
             - template: ../tasks/deploy-bicep.yml
@@ -45,4 +48,7 @@ jobs:
                 deployPrivateDnsZones: $(deployPrivateDnsZones)
                 deployAzureFrontDoor: $(deployAzureFrontDoor)
                 deployApplicationGateway: $(deployApplicationGateway)
+                deployDataFactory: $(deployDataFactory)
+                deployContainerRegistry: $(deployContainerRegistry)
+                deployRecoveryServicesVault: $(deployRecoveryServicesVault)
                 deployAlerts: $(deployAlerts)

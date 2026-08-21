@@ -39,7 +39,28 @@ parameters:
     values:
       - Yes
       - No
+    default: No
+  - name: deployDataFactory
+    displayName: Does Data Factory need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
     default: No  
+  - name: deployContainerRegistry
+    displayName: Does the Container Registry need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No  
+  - name: deployRecoveryServicesVault
+    displayName: Does Recovery Services Vault or its policies need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: deployAlerts
     displayName: Do the Azure Monitor alerts need creating or updating?
     type: string
@@ -79,6 +100,12 @@ variables:
     value: ${{ iif(eq(parameters.deployAzureFrontDoor, 'Yes'), true, false) }}
   - name: deployApplicationGateway
     value: ${{ iif(eq(parameters.deployApplicationGateway, 'Yes'), true, false) }}
+  - name: deployDataFactory
+    value: ${{ iif(eq(parameters.deployDataFactory, 'Yes'), true, false) }}
+  - name: deployContainerRegistry
+    value: ${{ iif(eq(parameters.deployContainerRegistry, 'Yes'), true, false) }}
+  - name: deployRecoveryServicesVault
+    value: ${{ iif(eq(parameters.deployRecoveryServicesVault, 'Yes'), true, false) }}
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
 

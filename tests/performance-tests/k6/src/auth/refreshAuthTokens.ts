@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable camelcase */
 import http from 'k6/http';
 import { AuthDetails } from './getAuthTokens';
 import getEnvironmentAndUsersFromFile from '../utils/environmentAndUsers';

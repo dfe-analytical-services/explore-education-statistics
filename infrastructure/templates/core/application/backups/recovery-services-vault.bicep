@@ -1,7 +1,7 @@
-import { ResourceNames } from '../../types.bicep'
+import { abbreviations } from '../../../common/abbreviations.bicep'
 
-@description('Common resource naming variables.')
-param resourceNames ResourceNames
+@description('Naming prefix for resources.')
+param resourcePrefix string
 
 @description('The location to create resources in.')
 param location string
@@ -12,10 +12,12 @@ param immutable bool
 @description('Tags for the resources')
 param tagValues object
 
-module recoveryVaultModule '../../components/recoveryVault.bicep' = {
+var recoveryServicesVaultName = '${resourcePrefix}-${abbreviations.recoveryServicesVaults}'
+
+module recoveryVaultModule '../../../common/components/recovery-services-vault/recovery-services-vault.bicep' = {
   name: 'recoveryVaultDeploy'
   params: {
-    vaultName: resourceNames.sharedResources.recoveryVault
+    vaultName: recoveryServicesVaultName
     location: location
     redundancy: 'GeoRedundant'
     immutable: immutable
@@ -30,11 +32,11 @@ module recoveryVaultModule '../../components/recoveryVault.bicep' = {
   }
 }
 
-module fileShareBackupPolicyModule '../../components/recoveryVaultFileShareBackupPolicy.bicep' = {
+module fileShareBackupPolicyModule '../../../common/components/recovery-services-vault/file-share-backup-policy.bicep' = {
   name: 'fileShareBackupPolicyDeploy'
   params: {
-    policyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
-    vaultName: resourceNames.sharedResources.recoveryVault
+    policyName: 'DailyPolicy'
+    vaultName: recoveryServicesVaultName
     location: location
     dailyBackupTimeUtc: '00:00'
     daysToRetainDailyBackups: 30
@@ -53,3 +55,5 @@ module fileShareBackupPolicyModule '../../components/recoveryVaultFileShareBacku
     recoveryVaultModule
   ]
 }
+
+output recoveryServicesVaultName string = recoveryServicesVaultName

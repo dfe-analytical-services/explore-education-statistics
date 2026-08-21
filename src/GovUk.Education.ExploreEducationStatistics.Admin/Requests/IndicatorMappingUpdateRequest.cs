@@ -1,6 +1,5 @@
 #nullable enable
 using FluentValidation;
-using LinqToDB.Internal.Common;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
@@ -9,7 +8,7 @@ public class IndicatorMappingUpdatesRequest
     public Guid OriginalDataFileId { get; init; }
     public Guid ReplacementDataFileId { get; init; }
 
-    public List<IndicatorMappingUpdateRequest> Updates { get; init; } = [];
+    public List<MappingUpdateRequest> Updates { get; init; } = [];
 
     public class Validator : AbstractValidator<IndicatorMappingUpdatesRequest>
     {
@@ -19,52 +18,13 @@ public class IndicatorMappingUpdatesRequest
 
             RuleFor(x => x.ReplacementDataFileId).NotEmpty();
 
-            RuleForEach(x => x.Updates).SetValidator(new IndicatorMappingUpdateRequest.Validator());
+            RuleForEach(x => x.Updates).SetValidator(new MappingUpdateRequest.Validator());
 
             RuleFor(x => x.Updates)
-                .Must(HaveUniqueOriginalNames)
+                .Must(MappingUpdateRequest.HaveUniqueOriginalIds)
                 .WithMessage("Each OriginalId must be unique.")
-                .Must(HaveUniqueReplacementNames)
+                .Must(MappingUpdateRequest.HaveUniqueReplacementIds)
                 .WithMessage("Each NewReplacementId must be unique (if provided).");
-        }
-
-        private bool HaveUniqueOriginalNames(List<IndicatorMappingUpdateRequest> updates)
-        {
-            if (updates.IsNullOrEmpty())
-            {
-                return true;
-            }
-
-            return updates.Select(u => u.OriginalId).Distinct().Count() == updates.Count;
-        }
-
-        private bool HaveUniqueReplacementNames(List<IndicatorMappingUpdateRequest> updates)
-        {
-            if (updates.IsNullOrEmpty())
-            {
-                return true;
-            }
-
-            var nonNullReplacements = updates
-                .Where(u => u.NewReplacementId != null)
-                .Select(u => u.NewReplacementId)
-                .ToList();
-
-            return nonNullReplacements.Distinct().Count() == nonNullReplacements.Count;
-        }
-    }
-}
-
-public record IndicatorMappingUpdateRequest
-{
-    public Guid OriginalId { get; init; }
-    public Guid? NewReplacementId { get; init; }
-
-    public class Validator : AbstractValidator<IndicatorMappingUpdateRequest>
-    {
-        public Validator()
-        {
-            RuleFor(x => x.OriginalId).NotEmpty().WithMessage("OriginalId cannot be an empty.");
         }
     }
 }

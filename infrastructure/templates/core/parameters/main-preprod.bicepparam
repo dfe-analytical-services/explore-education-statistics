@@ -9,3 +9,5 @@ param publicApiApplicationGatewayFqdn = 'pre-production.statistics.api.education
 param publicApiPublicUrl = 'https://pp-api.education.gov.uk/statistics-preprod'
 
 param slackAlertsChannel = 'C0681S50SP5'
+
+param recoveryServicesVaultImmutable = true

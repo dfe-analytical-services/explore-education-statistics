@@ -675,10 +675,6 @@
         "description": "Slack channel to post Azure alerts to"
       }
     },
-    "dataFactoryConcurrency": {
-      "type": "int",
-      "defaultValue": 1
-    },
     "containerRegistryName": {
       "type": "string",
       "defaultValue": "eesacr",
@@ -1285,7 +1281,6 @@
     ],
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
     "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
-    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
@@ -2157,60 +2152,6 @@
         "applicationId": "[variables('adminAppName')]",
         "Request_Source": "AzureTfsExtensionAzureProject",
         "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-      }
-    },
-    {
-      "condition": "[equals(parameters('environmentName'), 'Development')]",
-      "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2022-02-01-preview",
-      "name": "[parameters('containerRegistryName')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Standard",
-        "tier": "Standard"
-      },
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Container Registry",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "adminUserEnabled": false,
-        "policies": {
-          "quarantinePolicy": {
-            "status": "disabled"
-          },
-          "trustPolicy": {
-            "type": "Notary",
-            "status": "disabled"
-          },
-          "exportPolicy": {
-            "status": "enabled"
-          },
-          "azureADAuthenticationAsArmPolicy": {
-            "status": "enabled"
-          },
-          "softDeletePolicy": {
-            "retentionDays": 7,
-            "status": "enabled"
-          }
-        },
-        "encryption": {
-          "status": "disabled"
-        },
-        "dataEndpointEnabled": false,
-        "publicNetworkAccess": "Enabled",
-        "networkRuleBypassOptions": "AzureServices",
-        "zoneRedundancy": "Disabled",
-        "anonymousPullEnabled": false
       }
     },
     {
@@ -4160,50 +4101,6 @@
       }
     },
     {
-      "name": "datafactory",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "properties": {
-        "mode": "incremental",
-        "templateLink": {
-          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "environment": {
-            "value": "[parameters('environment')]"
-          },
-          "coreSqlServerName": {
-            "value": "[variables('coreSqlServerName')]"
-          },
-          "dataFactoryName": {
-            "value": "[variables('dataFactoryName')]"
-          },
-          "dataFactoryConcurrency": {
-            "value": "[parameters('dataFactoryConcurrency')]"
-          },
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "branch": {
-            "value": "[parameters('branch')]"
-          },
-          "actionGroupAlerts": {
-            "value": "[variables('actionGroupAlerts')]"
-          },
-          "slackAlertsChannel": {
-            "value": "[parameters('slackAlertsChannel')]"
-          }
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
-      ]
-    },
-    {
       "copy": {
         "name": "keyVaultCertificateUsersCopy",
         "count": "[length(variables('keyVaultCertificateUserPrincipalRefs'))]"
@@ -4229,17 +4126,6 @@
       "properties": {
         "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
         "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-        "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('dataFactoryName')))]",
-      "properties": {
-        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
-        "principalId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
         "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "principalType": "ServicePrincipal"
       }
