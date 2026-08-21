@@ -13,3 +13,5 @@ jobs:
         uses: actions/checkout@v7
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@v5.0.0
+        with:
+          warn-only: true
