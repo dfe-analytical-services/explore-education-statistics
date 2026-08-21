@@ -1,4 +1,4 @@
-import { AppServicePlanSku } from 'common/components/app-service-plan/types.bicep'
+import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @export()
 type AdminConfig = {

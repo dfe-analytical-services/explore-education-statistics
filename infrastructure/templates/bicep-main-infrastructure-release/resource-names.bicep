@@ -1,4 +1,4 @@
-import { abbreviations } from 'common/abbreviations.bicep'
+import { abbreviations } from '../common/abbreviations.bicep'
 
 @export()
 type ResourceNames = {

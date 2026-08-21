@@ -64,7 +64,7 @@ var minTlsVersion = '1.2'
 
 var logAnalyticsWorkspaceId = resourceId('Microsoft.OperationalInsights/workspaces', resourceNames.logAnalyticsWorkspace)
 
-module adminModule 'admin/main-admin.bicep' = {
+module adminModule '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames

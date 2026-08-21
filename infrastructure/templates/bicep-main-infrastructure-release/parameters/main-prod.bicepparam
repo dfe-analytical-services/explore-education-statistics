@@ -1,4 +1,4 @@
-using '../../templates/main.bicep'
+using '../main.bicep'
 
 param environmentConfigParam = {
   environmentIdentifier: 's101p01'
