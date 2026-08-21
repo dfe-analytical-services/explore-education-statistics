@@ -28,7 +28,7 @@ type AdminConfig = {
   }?
 }
 
-var defaultAdminConfig = {
+var defaultConfig = {
   appServiceSku: {
     tier: 'Premium'
     name: 'P1V2'
@@ -39,10 +39,8 @@ var defaultAdminConfig = {
 }
 
 @export()
-func mergeAdminConfig(overridden AdminConfig) AdminConfig => {
-  appServiceSku: overridden.?appServiceSku ?? defaultAdminConfig.appServiceSku
-  enableThemeDeletion: overridden.?enableThemeDeletion ?? defaultAdminConfig.enableThemeDeletion
-  enableEinPublishedPageDeletion: overridden.?enableEinPublishedPageDeletion ?? defaultAdminConfig.enableEinPublishedPageDeletion
-  preReleaseMinutesBeforeStart: overridden.?preReleaseMinutesBeforeStart ?? defaultAdminConfig.preReleaseMinutesBeforeStart
-  pipelineVariables: overridden.?pipelineVariables
-}
+func mergeAdminConfig(overridden AdminConfig) AdminConfig =>
+  mergeConfigInternal(json(string(defaultConfig)), json(string(overridden)))
+
+func mergeConfigInternal(default object, overridden object) object => 
+  union(default, overridden)

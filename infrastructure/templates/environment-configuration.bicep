@@ -37,7 +37,7 @@ type EnvironmentConfig = {
   enableSwagger: bool?
 }
 
-var defaultEnvironmentConfig = {
+var defaultConfig = {
   enableSwagger: false
   detailedErrors: false
   autoscaleAppServices: true
@@ -51,21 +51,12 @@ var defaultEnvironmentConfig = {
 }
 
 @export()
-func mergeEnvironmentConfig(overridden EnvironmentConfig) EnvironmentConfig => {
-  enableSwagger: overridden.?enableSwagger ?? defaultEnvironmentConfig.?enableSwagger
-  detailedErrors: overridden.?detailedErrors ?? defaultEnvironmentConfig.?detailedErrors
-  autoscaleAppServices: overridden.?autoscaleAppServices ?? defaultEnvironmentConfig.?autoscaleAppServices
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: overridden.?memoryCacheConfig.?expirationScanFrequencySeconds ?? defaultEnvironmentConfig.memoryCacheConfig.expirationScanFrequencySeconds
-    maxCacheSizeMb: overridden.?memoryCacheConfig.?maxCacheSizeMb ?? defaultEnvironmentConfig.memoryCacheConfig.maxCacheSizeMb
-    overridesDurationInSeconds: overridden.?memoryCacheConfig.?overridesDurationInSeconds
-    overridesExpirySchedule: overridden.?memoryCacheConfig.?overridesExpirySchedule
-  }
-  tableBuilderMaxTableCellsAllowed: overridden.?tableBuilderMaxTableCellsAllowed ?? defaultEnvironmentConfig.tableBuilderMaxTableCellsAllowed
-  prepareScheduledReleaseVersionsFunctionCronSchedule: overridden.?prepareScheduledReleaseVersionsFunctionCronSchedule ?? defaultEnvironmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule
-  publishScheduledReleaseVersionsFunctionCronSchedule: overridden.?publishScheduledReleaseVersionsFunctionCronSchedule ?? defaultEnvironmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule
-  domain: overridden.?domain
-  environmentIdentifier: overridden.?environmentIdentifier
-  publicApiUrl: overridden.?publicApiUrl
-  publicApiDocsUrl: overridden.?publicApiDocsUrl
-}
+func mergeEnvironmentConfig(overridden EnvironmentConfig) EnvironmentConfig =>
+  mergeConfigInternal(json(string(defaultConfig)), json(string(overridden)))
+
+func mergeConfigInternal(default object, overridden object) object => 
+  union(
+    default,
+    overridden,
+    union(default.memoryCacheConfig, overridden.memoryCacheConfig)
+  )
