@@ -17,6 +17,8 @@ public class DataBlockSummaryViewModel
 
     public string Source { get; set; } = "";
 
+    public string? DataSetName { get; set; }
+
     public bool InContent { get; set; }
 
     public int ChartsCount { get; set; }

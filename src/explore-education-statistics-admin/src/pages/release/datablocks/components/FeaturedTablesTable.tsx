@@ -107,6 +107,7 @@ export default function FeaturedTablesTable({
               <th scope="col" className="govuk-!-width-one-quarter">
                 Data block name
               </th>
+              <th scope="col">Data set name</th>
               <th scope="col">Has chart</th>
               <th scope="col">In content</th>
               <th scope="col">Featured table name</th>
@@ -167,6 +168,7 @@ function FeaturedTablesRow({
   return (
     <tr>
       <td>{dataBlock.name}</td>
+      <td>{dataBlock.dataSetName ?? 'Not available'}</td>
       <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
       <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
       <td>{featuredTable.name}</td>

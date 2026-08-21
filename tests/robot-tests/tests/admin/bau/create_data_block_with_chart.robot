@@ -203,14 +203,16 @@ Validate data block is in list
 
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
-    user checks table column heading contains    1    2    Has chart    testid:dataBlocks
-    user checks table column heading contains    1    3    In content    testid:dataBlocks
-    user checks table column heading contains    1    4    Created date    testid:dataBlocks
-    user checks table column heading contains    1    5    Actions    testid:dataBlocks
+    user checks table column heading contains    1    2    Data set name    testid:dataBlocks
+    user checks table column heading contains    1    3    Has chart    testid:dataBlocks
+    user checks table column heading contains    1    4    In content    testid:dataBlocks
+    user checks table column heading contains    1    5    Created date    testid:dataBlocks
+    user checks table column heading contains    1    6    Actions    testid:dataBlocks
 
     user checks table body has x rows    1    testid:dataBlocks
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
-    user checks table cell contains    1    3    No    testid:dataBlocks
+    user checks table cell contains    1    2    UI test subject    testid:dataBlocks
+    user checks table cell contains    1    4    No    testid:dataBlocks
 
 Start creating a featured table
     user clicks link    Create data block
@@ -268,16 +270,18 @@ Validate data block is in list again
 
     user waits until table is visible
     user checks table column heading contains    1    1    Data block name    testid:featuredTables
-    user checks table column heading contains    1    2    Has chart    testid:featuredTables
-    user checks table column heading contains    1    3    In content    testid:featuredTables
-    user checks table column heading contains    1    4    Featured table name    testid:featuredTables
-    user checks table column heading contains    1    5    Created date    testid:featuredTables
-    user checks table column heading contains    1    6    Actions    testid:featuredTables
+    user checks table column heading contains    1    2    Data set name    testid:featuredTables
+    user checks table column heading contains    1    3    Has chart    testid:featuredTables
+    user checks table column heading contains    1    4    In content    testid:featuredTables
+    user checks table column heading contains    1    5    Featured table name    testid:featuredTables
+    user checks table column heading contains    1    6    Created date    testid:featuredTables
+    user checks table column heading contains    1    7    Actions    testid:featuredTables
 
     user checks table body has x rows    1    testid:featuredTables
     user checks table cell contains    1    1    UI test featured table    testid:featuredTables
-    user checks table cell contains    1    3    No    testid:featuredTables
-    user checks table cell contains    1    4    UI test featured table name    testid:featuredTables
+    user checks table cell contains    1    2    UI test subject    testid:featuredTables
+    user checks table cell contains    1    4    No    testid:featuredTables
+    user checks table cell contains    1    5    UI test featured table name    testid:featuredTables
 
 Embed data block into release content
     user clicks link    Content
@@ -421,11 +425,11 @@ Validate marked as 'In content' on data block list
 
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
-    user checks table column heading contains    1    3    In content    testid:dataBlocks
+    user checks table column heading contains    1    4    In content    testid:dataBlocks
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
-    user checks table cell contains    1    3    Yes    testid:dataBlocks
+    user checks table cell contains    1    4    Yes    testid:dataBlocks
 
 Navigate to Chart tab
     user clicks edit data block link    ${DATABLOCK_NAME}
@@ -553,11 +557,11 @@ Save chart and validate marked as 'Has chart' in data blocks list
 
     user waits until table is visible
     user checks table column heading contains    1    1    Name    testid:dataBlocks
-    user checks table column heading contains    1    2    Has chart    testid:dataBlocks
+    user checks table column heading contains    1    3    Has chart    testid:dataBlocks
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
-    user checks table cell contains    1    2    Yes    testid:dataBlocks
+    user checks table cell contains    1    3    Yes    testid:dataBlocks
 
 Validate line chart embeds correctly
     user clicks link    Content

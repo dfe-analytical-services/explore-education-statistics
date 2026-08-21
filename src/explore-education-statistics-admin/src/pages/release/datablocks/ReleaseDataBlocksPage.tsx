@@ -169,6 +169,7 @@ const ReleaseDataBlocksPage = ({
                   <th scope="col" className="govuk-!-width-one-quarter">
                     Name
                   </th>
+                  <th scope="col">Data set name</th>
                   <th scope="col">Has chart</th>
                   <th scope="col">In content</th>
                   <th scope="col">Created date</th>
@@ -181,6 +182,7 @@ const ReleaseDataBlocksPage = ({
                 {filteredDataBlocks.map(dataBlock => (
                   <tr key={dataBlock.id}>
                     <td>{dataBlock.name}</td>
+                    <td>{dataBlock.dataSetName ?? 'Not available'}</td>
                     <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
                     <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
                     <td>

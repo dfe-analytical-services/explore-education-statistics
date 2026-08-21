@@ -186,6 +186,8 @@ public class DataBlockService : IDataBlockService
                     .FeaturedTables.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                     .ToListAsync();
 
+                var dataSetNamesBySubjectId = await GetDataSetNamesBySubjectId(releaseVersion.Id);
+
                 return dataBlocks
                     .Select(block =>
                     {
@@ -202,6 +204,9 @@ public class DataBlockService : IDataBlockService
                             HighlightName = featuredTable?.Name,
                             HighlightDescription = featuredTable?.Description,
                             Source = block.Source,
+                            DataSetName = block.Query is null
+                                ? null
+                                : dataSetNamesBySubjectId.GetValueOrDefault(block.Query.SubjectId),
                             ChartsCount = block.Charts.Count,
                             InContent = inContent,
                         };
@@ -491,6 +496,22 @@ public class DataBlockService : IDataBlockService
             && await _context
                 .KeyStatisticsDataBlock.Where(ks => ks.ReleaseVersionId == releaseVersionId)
                 .AllAsync(ks => ks.DataBlockId != dataBlockVersion.Id);
+    }
+
+    private async Task<Dictionary<Guid, string?>> GetDataSetNamesBySubjectId(Guid releaseVersionId)
+    {
+        var dataReleaseFiles = await _context
+            .ReleaseFiles.Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data && rf.File.SubjectId != null
+            )
+            .Select(rf => new { SubjectId = rf.File.SubjectId!.Value, rf.Name })
+            .ToListAsync();
+
+        // Group defensively - a release version should only have one data file per subject, but we
+        // don't want to throw here if that ever isn't the case.
+        return dataReleaseFiles
+            .GroupBy(rf => rf.SubjectId)
+            .ToDictionary(group => group.Key, group => group.First().Name);
     }
 
     public async Task<List<DataBlock>> ListDataBlocks(Guid releaseVersionId)

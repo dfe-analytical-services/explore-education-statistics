@@ -507,6 +507,55 @@ public class DataBlockServiceTests
     }
 
     [Fact]
+    public async Task List_SetsDataSetNameFromDataBlockSubject()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var subjectId = Guid.NewGuid();
+
+        ReleaseFile dataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName("Test data set name")
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId));
+
+        var dataBlockWithDataSet = new DataBlock
+        {
+            Name = "Test name 1",
+            Query = new FullTableQuery { SubjectId = subjectId },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var dataBlockWithoutDataSet = new DataBlock
+        {
+            Name = "Test name 2",
+            Query = new FullTableQuery { SubjectId = Guid.NewGuid() },
+            ReleaseVersion = releaseVersion,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.AddRangeAsync(dataBlockWithDataSet, dataBlockWithoutDataSet);
+            await context.ReleaseFiles.AddAsync(dataReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildDataBlockService(context);
+            var result = await service.List(releaseVersion.Id);
+
+            var listResult = result.AssertRight();
+
+            Assert.Equal(2, listResult.Count);
+            Assert.Equal("Test data set name", listResult[0].DataSetName);
+            Assert.Null(listResult[1].DataSetName);
+        }
+    }
+
+    [Fact]
     public async Task List_KeyStatisticInContent()
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
