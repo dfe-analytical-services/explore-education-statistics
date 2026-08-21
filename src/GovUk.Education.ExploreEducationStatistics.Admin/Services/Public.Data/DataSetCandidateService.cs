@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -12,16 +13,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
-internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserService userService)
-    : IDataSetCandidateService
+internal class DataSetCandidateService(
+    ContentDbContext contentDbContext,
+    IUserService userService,
+    IUserRepository userRepository
+) : IDataSetCandidateService
 {
     public async Task<Either<ActionResult, IReadOnlyList<DataSetCandidateViewModel>>> ListCandidates(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewReleaseVersion)
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await userService
+            .CheckCanManagePublicApiDataSets(user)
+            .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId, cancellationToken))
             .OnSuccess(async () => await DoListCandidates(releaseVersionId, cancellationToken));
     }
 

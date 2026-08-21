@@ -5,15 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ManagePublicApiDataSetPreviewTokensRequirement : IAuthorizationRequirement;
+public class ViewPublicApiDataSetsRequirement : IAuthorizationRequirement;
 
-public class ManagePublicApiDataSetPreviewTokensAuthorizationHandler(
-    IAuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<ManagePublicApiDataSetPreviewTokensRequirement, (User, Guid)>
+public class ViewPublicApiDataSetsAuthorizationHandler(IAuthorizationHandlerService authorizationHandlerService)
+    : AuthorizationHandler<ViewPublicApiDataSetsRequirement, (User, Guid)>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ManagePublicApiDataSetPreviewTokensRequirement requirement,
+        ViewPublicApiDataSetsRequirement requirement,
         (User, Guid) userAndPublicationId
     )
     {
