@@ -1,7 +1,7 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, mergeEnvironmentConfig } from 'environment-configuration.bicep'
-import { AdminConfig, mergeAdminConfig } from 'admin-configuration.bicep'
+import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'admin-configuration.bicep'
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
 param tags Tags = {
@@ -32,8 +32,11 @@ var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 //
 param adminConfigParam AdminConfig = {}
 
-// Merge default configuration with overridden configuration from params files and pipeline variables.
+// Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
+
+// These values are all supplied specifically by pipeline variables.
+param adminPipelineVariables AdminPipelineVariables = {}
 
 @secure()
 @description('''Admin database user's password.''')
@@ -74,9 +77,9 @@ module adminModule 'admin/main-admin.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
     enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: adminConfig.pipelineVariables!.apiAppRegistrationClientId!
-    publicDataProcessorAppRegistrationClientId: adminConfig.pipelineVariables!.publicDataProcessorAppRegistrationClientId!
-    screenerAppRegistrationClientId: adminConfig.pipelineVariables!.screenerAppRegistrationClientId!
+    apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
+    publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
+    screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
     publicApiUrl: environmentConfig.publicApiUrl!
     publicApiDocsUrl: environmentConfig.publicApiDocsUrl!
     prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!

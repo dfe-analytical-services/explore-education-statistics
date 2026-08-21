@@ -14,8 +14,10 @@ type AdminConfig = {
 
   @description('Pre-release start time as number of minutes before a release is scheduled to be published.')
   preReleaseMinutesBeforeStart: int?
+}
 
-  pipelineVariables: {
+@export()
+type AdminPipelineVariables = {
 
     @description('Client ID of the public API Container App app registration in Entra ID.')
     apiAppRegistrationClientId: string?
@@ -25,7 +27,6 @@ type AdminConfig = {
 
     @description('Client ID of the Screener API Function App app registration in Entra ID.')
     screenerAppRegistrationClientId: string?
-  }?
 }
 
 var defaultConfig = {
