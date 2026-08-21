@@ -41,7 +41,4 @@ var defaultConfig = {
 
 @export()
 func mergeAdminConfig(overridden AdminConfig) AdminConfig =>
-  mergeConfigInternal(json(string(defaultConfig)), json(string(overridden)))
-
-func mergeConfigInternal(default object, overridden object) object => 
-  union(default, overridden)
+  union(defaultConfig, overridden)

@@ -52,11 +52,8 @@ var defaultConfig = {
 
 @export()
 func mergeEnvironmentConfig(overridden EnvironmentConfig) EnvironmentConfig =>
-  mergeConfigInternal(json(string(defaultConfig)), json(string(overridden)))
-
-func mergeConfigInternal(default object, overridden object) object => 
   union(
-    default,
+    defaultConfig,
     overridden,
-    union(default.memoryCacheConfig, overridden.memoryCacheConfig)
+    union(defaultConfig.memoryCacheConfig, overridden.?memoryCacheConfig ?? {})
   )
