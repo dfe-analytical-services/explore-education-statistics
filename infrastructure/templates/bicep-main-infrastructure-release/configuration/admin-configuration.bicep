@@ -1,9 +1,9 @@
-import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 
 @export()
 type AdminConfig = {
 
-  @description('Admin App Service SKU')
+  @description('App Service SKU')
   appServiceSku: AppServicePlanSku?
 
   @description('Whether or not to enable theme deletion in this environment (for test teardown).')
@@ -19,14 +19,14 @@ type AdminConfig = {
 @export()
 type AdminPipelineVariables = {
 
-    @description('Client ID of the public API Container App app registration in Entra ID.')
-    apiAppRegistrationClientId: string?
+  @description('Client ID of the public API Container App app registration in Entra ID.')
+  apiAppRegistrationClientId: string?
 
-    @description('Client ID of the public API processor app registration in Entra ID.')
-    publicDataProcessorAppRegistrationClientId: string?
+  @description('Client ID of the public API processor app registration in Entra ID.')
+  publicDataProcessorAppRegistrationClientId: string?
 
-    @description('Client ID of the Screener API Function App app registration in Entra ID.')
-    screenerAppRegistrationClientId: string?
+  @description('Client ID of the Screener API Function App app registration in Entra ID.')
+  screenerAppRegistrationClientId: string?
 }
 
 var defaultConfig = {

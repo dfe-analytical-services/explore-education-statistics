@@ -1,4 +1,4 @@
-import { MemoryCacheConfig } from 'types.bicep'
+import { MemoryCacheConfig } from '../types.bicep'
 
 @export()
 type EnvironmentConfig = {

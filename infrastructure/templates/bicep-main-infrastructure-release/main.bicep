@@ -1,7 +1,8 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
-import { EnvironmentConfig, mergeEnvironmentConfig } from 'environment-configuration.bicep'
-import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'admin-configuration.bicep'
+import { EnvironmentConfig, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
+import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 
 //
 // Tagging config.
@@ -49,9 +50,22 @@ var adminConfig = mergeAdminConfig(adminConfigParam)
 param adminPipelineVariables AdminPipelineVariables = {}
 
 @secure()
-@description('''Admin database user's password.''')
-param sqlAdminUserPassword string = ''
+@description('''Admin database user's password for Azure SQL databases.''')
+param adminAzureSqlPassword string = ''
 
+
+
+//
+// Data API-specific config.
+//
+param dataApiConfigParam DataApiConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
+
+@secure()
+@description('''Data API database user's password for Azure SQL databases.''')
+param dataApiAzureSqlPassword string = ''
 
 
 //
@@ -109,7 +123,7 @@ module adminModule '../admin/main.bicep' = {
     minTlsVersion: minTlsVersion
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: sqlAdminUserPassword
+    databaseUserPassword: adminAzureSqlPassword
     tagValues: tags
   }
 }
@@ -118,7 +132,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
     resourceNames: resourceNames
-    appServiceSku: adminConfig.appServiceSku!
+    appServiceSku: dataApiConfig.appServiceSku!
     publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
@@ -132,7 +146,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: sqlAdminUserPassword
+    databaseUserPassword: dataApiAzureSqlPassword
     tagValues: tags
   }
 }
