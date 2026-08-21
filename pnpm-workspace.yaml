@@ -43,10 +43,18 @@ allowBuilds:
   iframe-resizer: false
 
 overrides:
+  '@opentelemetry/core@2': '>=2.10.0 <3'
   '@tanstack/query-core': 4.41.1
   '@tanstack/react-query': 4.42.0
+  'brace-expansion@5': '>=5.0.9 <6'
   'cookie@<0.7.0': '>=0.7.0'
-  'picomatch@<4.0.3': 4.0.4
   'picomatch@<2.3.2': 2.3.2
+  'picomatch@<4.0.3': 4.0.4
+  'postcss@8': '>=8.5.26 <9'
+  'serialize-javascript@6.0.2': '7.1.0'
+  'svgo@4': '>=4.0.2 <5'
+  'uuid@8': '14.0.2'
+  'ws@7': '>=7.5.13 <8'
+  'yaml@1': '>=1.10.3 <2'
 
 minimumReleaseAge: 720
