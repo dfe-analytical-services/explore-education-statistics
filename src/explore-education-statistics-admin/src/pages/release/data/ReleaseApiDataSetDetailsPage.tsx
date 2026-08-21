@@ -39,6 +39,7 @@ import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDr
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -47,6 +48,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const history = useHistory();
   const { publicAppUrl } = useConfig();
   const { releaseVersion } = useReleaseVersionContext();
+  const { user } = useAuthContext();
 
   const [finalisingStatus, setFinalisingStatus] =
     useState<DataSetFinalisingStatus>(undefined);
@@ -198,32 +200,36 @@ export default function ReleaseApiDataSetDetailsPage() {
                     View preview token log
                   </Link>
                 </li>
-                {unfinaliseAction && <li>{unfinaliseAction}</li>}
               </>
             )}
-            {canUpdateRelease &&
-              !isPatch &&
-              dataSet?.draftVersion?.status !== 'Finalising' && (
-                <li>
-                  <DeleteDraftVersionButton
-                    dataSet={dataSet}
-                    dataSetVersion={dataSet.draftVersion}
-                    onDeleted={() =>
-                      history.push(
-                        generatePath<ReleaseRouteParams>(
-                          releaseApiDataSetsRoute.path,
-                          {
-                            publicationId: releaseVersion.publicationId,
-                            releaseVersionId: releaseVersion.id,
-                          },
-                        ),
-                      )
-                    }
-                  >
-                    Remove draft version
-                  </DeleteDraftVersionButton>
-                </li>
-              )}
+            {user?.permissions.canManagePublicApiDataSets && (
+              <>
+                {unfinaliseAction && <li>{unfinaliseAction}</li>}
+                {canUpdateRelease &&
+                  !isPatch &&
+                  dataSet?.draftVersion?.status !== 'Finalising' && (
+                    <li>
+                      <DeleteDraftVersionButton
+                        dataSet={dataSet}
+                        dataSetVersion={dataSet.draftVersion}
+                        onDeleted={() =>
+                          history.push(
+                            generatePath<ReleaseRouteParams>(
+                              releaseApiDataSetsRoute.path,
+                              {
+                                publicationId: releaseVersion.publicationId,
+                                releaseVersionId: releaseVersion.id,
+                              },
+                            ),
+                          )
+                        }
+                      >
+                        Remove draft version
+                      </DeleteDraftVersionButton>
+                    </li>
+                  )}
+              </>
+            )}
           </ul>
         )
       }
@@ -375,7 +381,8 @@ export default function ReleaseApiDataSetDetailsPage() {
 
             {majorVersionRejected
               ? majorVersionErrorSummary
-              : mappingComplete &&
+              : user?.permissions.canManagePublicApiDataSets &&
+                mappingComplete &&
                 dataSet.draftVersion && (
                   <ApiDataSetFinaliseBanner
                     dataSetId={dataSetId}
