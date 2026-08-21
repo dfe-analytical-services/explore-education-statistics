@@ -1,5 +1,7 @@
 import { getResourceNames } from 'resource-names.bicep'
-import { Tags, EnvironmentConfig, AdminConfig } from 'types.bicep'
+import { Tags } from 'types.bicep'
+import { EnvironmentConfig, mergeEnvironmentConfig } from 'environment-configuration.bicep'
+import { AdminConfig, mergeAdminConfig } from 'admin-configuration.bicep'
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
 param tags Tags = {
@@ -20,23 +22,8 @@ param tags Tags = {
 //
 param environmentConfigParam EnvironmentConfig = {}
 
-var defaultEnvironmentConfig = {
-  enableSwagger: false
-  detailedErrors: false
-  autoscaleAppServices: true
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-  }
-  tableBuilderMaxTableCellsAllowed: 1000000
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
-}
-
-func mergeEnvironmentConfig(default EnvironmentConfig, overridden EnvironmentConfig) EnvironmentConfig =>
-  union(default, overridden)
-
-var environmentConfig = mergeEnvironmentConfig(defaultEnvironmentConfig, environmentConfigParam)
+// Merge default configuration with overridden configuration.
+var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 
 
 
@@ -45,20 +32,8 @@ var environmentConfig = mergeEnvironmentConfig(defaultEnvironmentConfig, environ
 //
 param adminConfigParam AdminConfig = {}
 
-var defaultAdminConfig = {
-  appServiceSku: {
-    tier: 'Premium'
-    name: 'P1V2'
-  }
-  enableThemeDeletion: false
-  enableEinPublishedPageDeletion: false
-  preReleaseMinutesBeforeStart: 870
-}
-
-func mergeAdminConfig(default AdminConfig, overridden AdminConfig) AdminConfig =>
-  union(default, overridden)
-
-var adminConfig = mergeAdminConfig(defaultAdminConfig, adminConfigParam)
+// Merge default configuration with overridden configuration from params files and pipeline variables.
+var adminConfig = mergeAdminConfig(adminConfigParam)
 
 @secure()
 @description('''Admin database user's password.''')
