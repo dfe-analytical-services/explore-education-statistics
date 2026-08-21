@@ -66,6 +66,10 @@ var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.datab
 
 var analyticsFileShareMountPath string = '\\mounts\\analytics'
 
+resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
+  name: resourceNames.analytics.storage.storageAccountName
+}
+
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'dataApiAppServicePlanModule'
   params: {
@@ -122,6 +126,15 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
+    azureFileShares: [
+      {
+        storageName: analyticsStorageAccount.name
+        storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
+        storageAccountName: analyticsStorageAccount.name
+        fileShareName: resourceNames.analytics.storage.fileShareName
+        mountPath: analyticsFileShareMountPath
+      }
+    ]
     applicationAppSettings: {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger
@@ -134,15 +147,5 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
     }
     tagValues: tagValues
-  }
-}
-
-module analyticsFileShareMountModule '../common/components/app-service/file-share-mount.bicep' = if (analyticsEnabled) {
-  name: 'dataApiAnalyticsFileShareMountModuleDeploy'
-  params: {
-    appServiceName: appServiceModule.outputs.appServiceName
-    storageAccountName: resourceNames.analytics.storage.storageAccountName
-    fileShareName: resourceNames.analytics.storage.fileShareName
-    fileShareMountPath: analyticsFileShareMountPath
   }
 }

@@ -1,3 +1,5 @@
+import { AzureFileShareMount } from '../storage/types.bicep'
+
 @description('Name of the App Service that owns the swap slot.')
 param appServiceName string
 
@@ -15,6 +17,9 @@ param vnetLink {
   vnetName: string
   subnetName: string
 }?
+
+@description('File Shares to mount on this App Service slot.')
+param azureFileShares AzureFileShareMount[]?
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -50,5 +55,14 @@ module stagingSlotVNetLink 'slot-virtual-network-link.bicep' = if (vnetLink != n
     slotName: slotName
     vNetName: vnetLink!.vnetName
     subnetName: vnetLink!.subnetName
+  }
+}
+
+module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site-slot.bicep' = {
+  name: '${appServiceName}${slotName}AzureStorageAccountsConfigModuleDeploy'
+  params: {
+    siteName: appServiceName
+    slotName: slotName
+    azureFileShares: azureFileShares
   }
 }

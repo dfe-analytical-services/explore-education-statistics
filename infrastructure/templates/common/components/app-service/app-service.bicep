@@ -1,4 +1,5 @@
 import { ConnectionString } from 'types.bicep'
+import { AzureFileShareMount } from '../storage/types.bicep'
 
 @description('Name of the App Service.')
 param appServiceName string
@@ -35,6 +36,9 @@ param autoscaleEnabled bool
 
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
+
+@description('File Shares to mount on this App Service and its slots.')
+param azureFileShares AzureFileShareMount[]?
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
@@ -139,6 +143,14 @@ module autoscaleSettingsModule 'autoscale-settings.bicep' = {
     appServiceName: appService.name
     appServicePlanId: appServicePlanId
     autoscaleEnabled: autoscaleEnabled
+  }
+}
+
+module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
+  name: '${appServiceName}AzureStorageAccountsConfigModuleDeploy'
+  params: {
+    siteName: appServiceName
+    azureFileShares: azureFileShares
   }
 }
 

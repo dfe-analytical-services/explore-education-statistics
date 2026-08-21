@@ -314,23 +314,12 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   tags: tagValues
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if (length(azureFileShares) > 0) {
-  name: 'azurestorageaccounts'
-  parent: functionApp
-  properties: reduce(
-    azureFileShares,
-    {},
-    (cur, next) =>
-      union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      })
-  )
+module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
+  name: '${functionApp.name}AzureStorageAccountsConfigModuleDeploy'
+  params: {
+    siteName: functionApp.name
+    azureFileShares: azureFileShares
+  }
 }
 
 module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
