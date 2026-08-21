@@ -3,6 +3,10 @@ import { Tags } from 'types.bicep'
 import { EnvironmentConfig, mergeEnvironmentConfig } from 'environment-configuration.bicep'
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'admin-configuration.bicep'
 
+//
+// Tagging config.
+//
+
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
 param tags Tags = {
   Department: ''
@@ -17,6 +21,8 @@ param tags Tags = {
   DeploymentScript: ''
 }
 
+
+
 //
 // Environment-wide config.
 //
@@ -24,6 +30,10 @@ param environmentConfigParam EnvironmentConfig = {}
 
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+
+@secure()
+@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+param publicAppBasicAuthPassword string = ''
 
 
 
@@ -64,11 +74,21 @@ var minTlsVersion = '1.2'
 
 var logAnalyticsWorkspaceId = resourceId('Microsoft.OperationalInsights/workspaces', resourceNames.logAnalyticsWorkspace)
 
+var afdEndpointResourceId = resourceId('Microsoft.Cdn/profiles/afdEndpoints', resourceNames.frontDoor.frontDoorName, resourceNames.frontDoor.defaultEndpoint.endpointName)
+
+var basePublicAllowedOrigins = [
+  'https://${environmentConfig.?domain}'
+  'https://${resourceNames.publicSite.appService.appServiceName}.azurewebsites.net'
+  'https://${reference(afdEndpointResourceId, '2025-06-01').hostName}'
+]
+
+var publicSiteAllowedOrigins = union(basePublicAllowedOrigins, [environmentConfig.?additionalPublicAllowedOrigins])
+
 module adminModule '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
-    adminSku: adminConfig.appServiceSku!
+    appServiceSku: adminConfig.appServiceSku!
     adminHostname: 'admin.${environmentConfig.domain!}'
     publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
@@ -89,7 +109,30 @@ module adminModule '../admin/main.bicep' = {
     minTlsVersion: minTlsVersion
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    sqlAdminUserPassword: sqlAdminUserPassword
+    databaseUserPassword: sqlAdminUserPassword
+    tagValues: tags
+  }
+}
+
+module dataApiModuleDeploy '../data-api/main.bicep' = {
+  name: 'dataApiModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: adminConfig.appServiceSku!
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    autoscaleAppServices: environmentConfig.autoscaleAppServices!
+    allowedOrigins: publicSiteAllowedOrigins
+    analyticsEnabled: environmentConfig.analyticsEnabled!
+    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: environmentConfig.basicAuthUsername!
+    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    deployAlerts: true
+    detailedErrors: environmentConfig.detailedErrors!
+    enableSwagger: environmentConfig.enableSwagger!
+    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: sqlAdminUserPassword
     tagValues: tags
   }
 }

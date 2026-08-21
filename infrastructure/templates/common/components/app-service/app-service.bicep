@@ -33,6 +33,9 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling in this environment.')
 param autoscaleEnabled bool
 
+@description('The origins supported for CORS calls to this App Service.')
+param allowedOrigins string[]?
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
   appServiceHealth: bool
@@ -71,6 +74,9 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
       connectionStrings: connectionStrings
+      cors: {
+        allowedOrigins: allowedOrigins
+      }
     }
   }
 }
@@ -144,3 +150,5 @@ module alertsModule 'alerts.bicep' = if (alerts != null) {
     tagValues: tagValues
   }  
 }
+
+output appServiceName string = appService.name
