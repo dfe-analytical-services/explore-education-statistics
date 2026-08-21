@@ -1,6 +1,6 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
-import { EnvironmentConfig, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
+import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 
@@ -32,9 +32,8 @@ param environmentConfigParam EnvironmentConfig = {}
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 
-@secure()
-@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-param publicAppBasicAuthPassword string = ''
+// These values are all supplied specifically by pipeline variables.
+param environmentPipelineVariables EnvironmentPipelineVariables = {}
 
 
 
@@ -49,10 +48,6 @@ var adminConfig = mergeAdminConfig(adminConfigParam)
 // These values are all supplied specifically by pipeline variables.
 param adminPipelineVariables AdminPipelineVariables = {}
 
-@secure()
-@description('''Admin database user's password for Azure SQL databases.''')
-param adminAzureSqlPassword string = ''
-
 
 
 //
@@ -63,9 +58,24 @@ param dataApiConfigParam DataApiConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 
+
+
+//
+// Secret pipeline variables (required to be top-level params).
+//
+
 @secure()
 @description('''Data API database user's password for Azure SQL databases.''')
 param dataApiAzureSqlPassword string = ''
+
+@secure()
+@description('''Admin database user's password for Azure SQL databases.''')
+param adminAzureSqlPassword string = ''
+
+@secure()
+@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+param publicAppBasicAuthPassword string = ''
+
 
 
 //
@@ -138,7 +148,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentConfig.basicAuthUsername!
+    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
     publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!

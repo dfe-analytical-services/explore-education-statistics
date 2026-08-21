@@ -16,6 +16,10 @@ param environmentConfigParam = {
     overridesDurationInSeconds: 10
   }
   tableBuilderMaxTableCellsAllowed: 25000
+  additionalPublicAllowedOrigins: [
+    'http://localhost:3000'
+  ]
+  basicAuthEnabled: true
 }
 
 param adminConfigParam = {
@@ -23,4 +27,3 @@ param adminConfigParam = {
   enableThemeDeletion: true
   enableEinPublishedPageDeletion: true
 }
-
