@@ -12,16 +12,36 @@ import {
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import featuredTableService, {
   FeaturedTable,
 } from '@admin/services/featuredTableService';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import SortedTableHeader, {
+  TableSort,
+} from '@common/components/SortedTableHeader';
 import WarningMessage from '@common/components/WarningMessage';
-import React, { useCallback, useMemo } from 'react';
+import orderBy from 'lodash/orderBy';
+import React, { useCallback, useMemo, useState } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+
+type DataBlockSortColumn =
+  'name' | 'dataSetName' | 'hasChart' | 'inContent' | 'created';
+
+const dataBlockSortValues: Record<
+  DataBlockSortColumn,
+  (dataBlock: ReleaseDataBlockSummary) => string | boolean
+> = {
+  name: dataBlock => dataBlock.name.toLowerCase(),
+  dataSetName: dataBlock => dataBlock.dataSetName?.toLowerCase() ?? '',
+  hasChart: dataBlock => dataBlock.chartsCount > 0,
+  inContent: dataBlock => dataBlock.inContent,
+  created: dataBlock => dataBlock.created ?? '',
+};
 
 const ReleaseDataBlocksPage = ({
   match,
@@ -29,6 +49,11 @@ const ReleaseDataBlocksPage = ({
   const { publicationId, releaseVersionId } = match.params;
 
   const queryClient = useQueryClient();
+
+  const [sort, setSort] = useState<TableSort<DataBlockSortColumn>>({
+    column: 'name',
+    direction: 'ascending',
+  });
 
   const listFeaturedTablesQuery = useMemo(
     () => featuredTableQueries.list(releaseVersionId),
@@ -96,13 +121,36 @@ const ReleaseDataBlocksPage = ({
     },
   );
 
+  const filteredDataBlocks = useMemo(() => {
+    const unfeaturedDataBlocks = dataBlocks.filter(dataBlock => {
+      return !featuredTables.find(table => table.dataBlockId === dataBlock.id);
+    });
+
+    return orderBy(
+      unfeaturedDataBlocks,
+      // Sort by name as well, so that rows with equal values keep a stable order
+      [dataBlockSortValues[sort.column], dataBlockSortValues.name],
+      [sort.direction === 'ascending' ? 'asc' : 'desc', 'asc'],
+    );
+  }, [dataBlocks, featuredTables, sort]);
+
+  const handleSortChange = useCallback((column: DataBlockSortColumn) => {
+    setSort(currentSort =>
+      currentSort.column === column
+        ? {
+            column,
+            direction:
+              currentSort.direction === 'ascending'
+                ? 'descending'
+                : 'ascending',
+          }
+        : { column, direction: 'ascending' },
+    );
+  }, []);
+
   if (isLoadingDataBlocks || isLoadingFeaturedTables || isLoadingPermissions) {
     return <LoadingSpinner />;
   }
-
-  const filteredDataBlocks = dataBlocks.filter(dataBlock => {
-    return !featuredTables.find(table => table.dataBlockId === dataBlock.id);
-  });
 
   return (
     <>
@@ -159,71 +207,94 @@ const ReleaseDataBlocksPage = ({
       )}
 
       {filteredDataBlocks.length > 0 && (
-        <>
-          <h3>Data blocks</h3>
-
-          <div className="table-container">
-            <table data-testid="dataBlocks">
-              <thead>
-                <tr>
-                  <th scope="col" className="govuk-!-width-one-quarter">
-                    Name
-                  </th>
-                  <th scope="col">Data set name</th>
-                  <th scope="col">Has chart</th>
-                  <th scope="col">In content</th>
-                  <th scope="col">Created date</th>
-                  <th scope="col" className="govuk-table__header--actions">
-                    Actions
-                  </th>
+        <div className="table-container">
+          <table data-testid="dataBlocks">
+            <caption className="govuk-table__caption--m">
+              Data blocks
+              <VisuallyHidden> (column headers are sortable)</VisuallyHidden>
+            </caption>
+            <thead>
+              <tr>
+                <SortedTableHeader
+                  column="name"
+                  label="Data block"
+                  sort={sort}
+                  onClick={handleSortChange}
+                />
+                <SortedTableHeader
+                  column="dataSetName"
+                  label="Data file"
+                  sort={sort}
+                  onClick={handleSortChange}
+                />
+                <SortedTableHeader
+                  column="hasChart"
+                  label="Has chart"
+                  sort={sort}
+                  onClick={handleSortChange}
+                />
+                <SortedTableHeader
+                  column="inContent"
+                  label="In content"
+                  sort={sort}
+                  onClick={handleSortChange}
+                />
+                <SortedTableHeader
+                  column="created"
+                  label="Created date"
+                  sort={sort}
+                  onClick={handleSortChange}
+                />
+                <th scope="col" className="govuk-table__header--actions">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDataBlocks.map(dataBlock => (
+                <tr key={dataBlock.id}>
+                  <td>{dataBlock.name}</td>
+                  <td>{dataBlock.dataSetName ?? 'Not available'}</td>
+                  <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
+                  <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
+                  <td>
+                    {dataBlock.created ? (
+                      <FormattedDate format="d MMMM yyyy HH:mm">
+                        {dataBlock.created}
+                      </FormattedDate>
+                    ) : (
+                      'Not available'
+                    )}
+                  </td>
+                  <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
+                    <Link
+                      className="govuk-!-margin-bottom-0"
+                      unvisited
+                      data-testid={`Edit data block ${dataBlock.name}`}
+                      to={generatePath<ReleaseDataBlockRouteParams>(
+                        releaseDataBlockEditRoute.path,
+                        {
+                          publicationId,
+                          releaseVersionId,
+                          dataBlockId: dataBlock.id,
+                        },
+                      )}
+                    >
+                      {canUpdateRelease ? 'Edit block' : 'View block'}
+                    </Link>
+                    {canUpdateRelease && (
+                      <DataBlockDeletePlanModal
+                        releaseVersionId={releaseVersionId}
+                        dataBlockId={dataBlock.id}
+                        onConfirm={() => handleDeleteConfirm(dataBlock.id)}
+                      />
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredDataBlocks.map(dataBlock => (
-                  <tr key={dataBlock.id}>
-                    <td>{dataBlock.name}</td>
-                    <td>{dataBlock.dataSetName ?? 'Not available'}</td>
-                    <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
-                    <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
-                    <td>
-                      {dataBlock.created ? (
-                        <FormattedDate format="d MMMM yyyy HH:mm">
-                          {dataBlock.created}
-                        </FormattedDate>
-                      ) : (
-                        'Not available'
-                      )}
-                    </td>
-                    <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
-                      <Link
-                        className="govuk-!-margin-bottom-0"
-                        unvisited
-                        data-testid={`Edit data block ${dataBlock.name}`}
-                        to={generatePath<ReleaseDataBlockRouteParams>(
-                          releaseDataBlockEditRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            dataBlockId: dataBlock.id,
-                          },
-                        )}
-                      >
-                        {canUpdateRelease ? 'Edit block' : 'View block'}
-                      </Link>
-                      {canUpdateRelease && (
-                        <DataBlockDeletePlanModal
-                          releaseVersionId={releaseVersionId}
-                          dataBlockId={dataBlock.id}
-                          onConfirm={() => handleDeleteConfirm(dataBlock.id)}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {canUpdateRelease && (

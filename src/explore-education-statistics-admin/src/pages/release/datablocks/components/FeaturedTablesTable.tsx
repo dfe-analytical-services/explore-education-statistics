@@ -107,7 +107,7 @@ export default function FeaturedTablesTable({
               <th scope="col" className="govuk-!-width-one-quarter">
                 Data block name
               </th>
-              <th scope="col">Data set name</th>
+              <th scope="col">Data file</th>
               <th scope="col">Has chart</th>
               <th scope="col">In content</th>
               <th scope="col">Featured table name</th>
