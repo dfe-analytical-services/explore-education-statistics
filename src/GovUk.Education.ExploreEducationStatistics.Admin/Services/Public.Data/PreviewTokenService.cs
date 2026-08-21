@@ -41,9 +41,10 @@ public class PreviewTokenService(
             return new ForbidResult();
         }
 
-        return await userService
-            .CheckCanManagePublicApiDataSetPreviewTokens(user)
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        return await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(user, dataSetVersion.DataSet.PublicationId)
+            )
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
@@ -71,12 +72,19 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await publicDataDbContext
-                    .PreviewTokens.AsNoTracking()
-                    .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken)
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await CheckPreviewTokenExists(previewTokenId, cancellationToken)
+            .OnSuccessDo(previewToken =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(
+                    user,
+                    previewToken.DataSetVersion.DataSet.PublicationId
+                )
             )
             .OnSuccess(MapPreviewToken);
     }
@@ -86,9 +94,17 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(user, dataSetVersion.DataSet.PublicationId)
+            )
             .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
     }
 
@@ -104,12 +120,11 @@ public class PreviewTokenService(
             return new ForbidResult();
         }
 
-        return await userService
-            .CheckCanManagePublicApiDataSetPreviewTokens(user)
-            .OnSuccess(async () =>
-                await publicDataDbContext.PreviewTokens.SingleOrNotFoundAsync(
-                    pt => pt.Id == previewTokenId,
-                    cancellationToken: cancellationToken
+        return await CheckPreviewTokenExists(previewTokenId, cancellationToken)
+            .OnSuccessDo(previewToken =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(
+                    user,
+                    previewToken.DataSetVersion.DataSet.PublicationId
                 )
             )
             .OnSuccessDo(ValidatePreviewToken)
@@ -128,6 +143,7 @@ public class PreviewTokenService(
     {
         return await publicDataDbContext
             .DataSetVersions.AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .SingleOrNotFoundAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
     }
 
@@ -160,6 +176,17 @@ public class PreviewTokenService(
             )
             : Unit.Instance;
     }
+
+    private async Task<Either<ActionResult, PreviewToken>> CheckPreviewTokenExists(
+        Guid previewTokenId,
+        CancellationToken cancellationToken
+    ) =>
+        await publicDataDbContext
+            .PreviewTokens.AsNoTracking()
+            .Include(pt => pt.DataSetVersion)
+                .ThenInclude(dsv => dsv.DataSet)
+            .Where(pt => pt.Id == previewTokenId)
+            .SingleOrNotFoundAsync(cancellationToken);
 
     private async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> DoList(
         Guid dataSetVersionId,

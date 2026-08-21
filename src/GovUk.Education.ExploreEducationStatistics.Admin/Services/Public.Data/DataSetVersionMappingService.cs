@@ -34,14 +34,25 @@ public class DataSetVersionMappingService(
 
     private static readonly MappingType[] NoMappingTypes = [MappingType.ManualNone, MappingType.AutoNone];
 
-    public Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
+    public async Task<Either<ActionResult, LocationMappingPlan>> GetLocationMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await CheckMappingExists(nextDataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersionMapping =>
+                userService.CheckCanViewPublicApiDataSets(
+                    user,
+                    dataSetVersionMapping.TargetDataSetVersion.DataSet.PublicationId
+                )
+            )
             .OnSuccess(mapping => mapping.LocationMappingPlan);
     }
 
@@ -61,25 +72,47 @@ public class DataSetVersionMappingService(
         );
     }
 
-    public Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
+    public async Task<Either<ActionResult, FilterMappingPlan>> GetFilterMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await CheckMappingExists(nextDataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersionMapping =>
+                userService.CheckCanViewPublicApiDataSets(
+                    user,
+                    dataSetVersionMapping.TargetDataSetVersion.DataSet.PublicationId
+                )
+            )
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
-    public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
+    public async Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
         Guid nextDataSetVersionId,
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await CheckMappingExists(nextDataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersionMapping =>
+                userService.CheckCanViewPublicApiDataSets(
+                    user,
+                    dataSetVersionMapping.TargetDataSetVersion.DataSet.PublicationId
+                )
+            )
             .OnSuccess(mapping => mapping.IndicatorMappingPlan);
     }
 
@@ -813,6 +846,7 @@ public class DataSetVersionMappingService(
         return await publicDataDbContext
             .DataSetVersionMappings.AsNoTracking()
             .Include(mapping => mapping.TargetDataSetVersion)
+                .ThenInclude(targetVersion => targetVersion.DataSet)
             .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken

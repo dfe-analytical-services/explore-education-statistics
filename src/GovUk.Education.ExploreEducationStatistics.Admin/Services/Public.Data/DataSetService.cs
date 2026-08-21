@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -32,8 +33,15 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSetsQueryable = publicDataDbContext
@@ -68,8 +76,15 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSets = await publicDataDbContext
@@ -103,11 +118,18 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
         return await QueryDataSet(dataSetId)
             .SingleOrNotFoundAsync(cancellationToken)
             .OnSuccessDo(dataSet =>
                 CheckPublicationExists(dataSet.PublicationId, cancellationToken)
-                    .OnSuccess(userService.CheckCanViewPublication)
+                    .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
             )
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }

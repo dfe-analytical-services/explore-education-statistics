@@ -411,11 +411,21 @@ public static class UserServiceExtensions
         return userService.CheckPolicy(user, SecurityPolicies.CanManagePublicApiDataSets);
     }
 
-    public static Task<Either<ActionResult, User>> CheckCanManagePublicApiDataSetPreviewTokens(
+    public static Task<Either<ActionResult, (User, Guid)>> CheckCanViewPublicApiDataSets(
         this IUserService userService,
-        User user
+        User user,
+        Guid publicationId
     )
     {
-        return userService.CheckPolicy(user, SecurityPolicies.CanManagePublicApiDataSetPreviewTokens);
+        return userService.CheckPolicy((user, publicationId), SecurityPolicies.CanViewPublicApiDataSets);
+    }
+
+    public static Task<Either<ActionResult, (User, Guid)>> CheckCanManagePublicApiDataSetPreviewTokens(
+        this IUserService userService,
+        User user,
+        Guid publicationId
+    )
+    {
+        return userService.CheckPolicy((user, publicationId), SecurityPolicies.CanManagePublicApiDataSetPreviewTokens);
     }
 }

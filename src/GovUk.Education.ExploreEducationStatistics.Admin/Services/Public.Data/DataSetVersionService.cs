@@ -38,13 +38,17 @@ public class DataSetVersionService(
         Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>
     > ListLiveVersions(Guid dataSetId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(() =>
-                publicDataDbContext
-                    .DataSets.AsNoTracking()
-                    .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken)
-            )
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await publicDataDbContext
+            .DataSets.AsNoTracking()
+            .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken)
+            .OnSuccessDo(dataSet => userService.CheckCanViewPublicApiDataSets(user, dataSet.PublicationId))
             .OnSuccess(async dataSet =>
             {
                 var dataSetVersionsQueryable = publicDataDbContext
@@ -80,10 +84,16 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanViewPublicApiDataSets(user, dataSetVersion.DataSet.PublicationId)
             )
             .OnSuccess(mapper.Map<DataSetVersionInfoViewModel>);
     }
@@ -249,13 +259,16 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(() =>
-                publicDataDbContext
-                    .DataSetVersions.AsNoTracking()
-                    .Where(dsv => dsv.Id == dataSetVersionId)
-                    .SingleOrNotFoundAsync(cancellationToken: cancellationToken)
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanViewPublicApiDataSets(user, dataSetVersion.DataSet.PublicationId)
             )
             .OnSuccess(dsv =>
                 publicDataApiClient.GetDataSetVersionChanges(
@@ -272,11 +285,15 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
-            )
+        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
+
+        if (user is null)
+        {
+            return new ForbidResult();
+        }
+
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(dataSetVersion => userService.CheckCanManagePublicApiDataSets(user))
             .OnSuccessDo(dataSetVersion => CheckCanUpdateVersion(dataSetVersion, updateRequest))
             .OnSuccess(async dataSetVersion =>
                 await UpdateVersion(
@@ -373,6 +390,7 @@ public class DataSetVersionService(
     {
         return await publicDataDbContext
             .DataSetVersions.AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .Where(dsv => dsv.Id == dataSetVersionId)
             .SingleOrNotFoundAsync(cancellationToken);
     }
