@@ -278,8 +278,8 @@ const dataReplacementService = {
     originalDataFileId: string,
     replacementDataFileId: string,
     updates: {
-      originalLocationId: string;
-      newReplacementLocationId?: string;
+      originalId: string;
+      newReplacementId?: string;
     }[],
   ): Promise<DataReplacementPlan['mapping']['locations']['mappings']> {
     const locationMappings: PlanMappingLocationUpdateResponse =
