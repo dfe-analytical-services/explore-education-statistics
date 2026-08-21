@@ -1,3 +1,5 @@
+import { AppServicePlanSku } from 'common/components/app-service-plan/types.bicep'
+
 @export()
 type MemoryCacheConfig = {
 
@@ -47,3 +49,69 @@ type Tags = {
   @description('Tag Value - the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A')
   DeploymentScript: string
 }
+
+@export()
+type EnvironmentConfig = {
+
+  @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
+  environmentIdentifier: string?
+
+  @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
+  domain: string?
+
+  @description('Public URL of the public API.')
+  publicApiUrl: string?
+
+  @description('Public URL of the public API documentation site.')
+  publicApiDocsUrl: string?
+
+  @description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App.')
+  prepareScheduledReleaseVersionsFunctionCronSchedule: string?
+
+  @description('Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App')
+  publishScheduledReleaseVersionsFunctionCronSchedule: string?
+
+  @description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
+  tableBuilderMaxTableCellsAllowed: int?
+
+  @description('Global configuration for memory caches.')
+  memoryCacheConfig: MemoryCacheConfig?
+
+  @description('Whether or not to enable autoscaling of App Services in this environment.')
+  autoscaleAppServices: bool?
+
+  @description('Whether or not to enable detailed error messages in this environment.')
+  detailedErrors: bool?
+
+  @description('Whether or not to enable Swagger API pages in this environment.')
+  enableSwagger: bool?
+}
+
+@export()
+type AdminConfig = {
+
+  @description('Admin App Service SKU')
+  appServiceSku: AppServicePlanSku?
+
+  @description('Whether or not to enable theme deletion in this environment (for test teardown).')
+  enableThemeDeletion: bool?
+
+  @description('Whether or not to enable published Education In Numbers pages deletion in this environment.')
+  enableEinPublishedPageDeletion: bool?
+
+  @description('Pre-release start time as number of minutes before a release is scheduled to be published.')
+  preReleaseMinutesBeforeStart: int?
+
+  pipelineVariables: {
+
+    @description('Client ID of the public API Container App app registration in Entra ID.')
+    apiAppRegistrationClientId: string?
+
+    @description('Client ID of the public API processor app registration in Entra ID.')
+    publicDataProcessorAppRegistrationClientId: string?
+
+    @description('Client ID of the Screener API Function App app registration in Entra ID.')
+    screenerAppRegistrationClientId: string?
+  }?
+}
+

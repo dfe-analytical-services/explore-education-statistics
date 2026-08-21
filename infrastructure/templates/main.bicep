@@ -1,12 +1,8 @@
 import { getResourceNames } from 'resource-names.bicep'
-import { AppServicePlanSku } from 'common/components/app-service-plan/types.bicep'
-import { MemoryCacheConfig, Tags } from 'types.bicep'
+import { Tags, EnvironmentConfig, AdminConfig } from 'types.bicep'
 
-@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
-param environmentIdentifier string = ''
-
-@description('Tag Value - Enter the Department name tag value e.g. Data Directorate')
-param tagValues Tags = {
+@description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
+param tags Tags = {
   Department: ''
   Solution: ''
   Environment: ''
@@ -19,69 +15,63 @@ param tagValues Tags = {
   DeploymentScript: ''
 }
 
-@description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
-param domain string
+//
+// Environment-wide config.
+//
+param environmentConfigParam EnvironmentConfig = {}
 
-@description('Admin App Service SKU')
-param adminSku AppServicePlanSku = {
-  tier: 'Premium'
-  name: 'P1V2'
-} 
-
-@description('Whether or not to enable autoscaling of App Services in this environment.')
-param autoscaleAppServices bool = false
-
-@description('Whether or not to enable detailed error messages in this environment.')
-param detailedErrors bool = false
-
-@description('Whether or not to enable Swagger API pages in this environment.')
-param enableSwagger bool = false
-
-@description('Whether or not to enable theme deletion in this environment (for test teardown).')
-param enableThemeDeletion bool = false
-
-@description('Whether or not to enable published Education In Numbers pages deletion in this environment.')
-param enableEinPublishedPageDeletion bool = false
-
-@description('Client ID of the public API Container App app registration in Entra ID.')
-param apiAppRegistrationClientId string = ''
-
-@description('Client ID of the public API processor app registration in Entra ID.')
-param publicDataProcessorAppRegistrationClientId string = ''
-
-@description('Client ID of the Screener API Function App app registration in Entra ID.')
-param screenerAppRegistrationClientId string = ''
-
-@description('Public URL of the public API.')
-param publicApiUrl string
-
-@description('Public URL of the public API documentation site.')
-param publicApiDocsUrl string
-
-@description('Pre-release start time as number of minutes before a release is scheduled to be published.')
-param preReleaseMinutesBeforeStart int = 870
-
-@description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App.')
-param prepareScheduledReleaseVersionsFunctionCronSchedule string = '0 5 0 * * *'
-
-@description('Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App')
-param publishScheduledReleaseVersionsFunctionCronSchedule string = '0 30 9 * * *'
-
-@description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
-param tableBuilderMaxTableCellsAllowed int = 25000
-
-@description('Global configuration for memory caches.')
-param memoryCacheConfig MemoryCacheConfig = {
-  expirationScanFrequencySeconds: 60
-  maxCacheSizeMb: 50
+var defaultEnvironmentConfig = {
+  enableSwagger: false
+  detailedErrors: false
+  autoscaleAppServices: true
+  memoryCacheConfig: {
+    expirationScanFrequencySeconds: 60
+    maxCacheSizeMb: 50
+  }
+  tableBuilderMaxTableCellsAllowed: 1000000
+  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
+  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
 }
+
+func mergeEnvironmentConfig(default EnvironmentConfig, overridden EnvironmentConfig) EnvironmentConfig =>
+  union(default, overridden)
+
+var environmentConfig = mergeEnvironmentConfig(defaultEnvironmentConfig, environmentConfigParam)
+
+
+
+//
+// Admin-specific config.
+//
+param adminConfigParam AdminConfig = {}
+
+var defaultAdminConfig = {
+  appServiceSku: {
+    tier: 'Premium'
+    name: 'P1V2'
+  }
+  enableThemeDeletion: false
+  enableEinPublishedPageDeletion: false
+  preReleaseMinutesBeforeStart: 870
+}
+
+func mergeAdminConfig(default AdminConfig, overridden AdminConfig) AdminConfig =>
+  union(default, overridden)
+
+var adminConfig = mergeAdminConfig(defaultAdminConfig, adminConfigParam)
 
 @secure()
 @description('''Admin database user's password.''')
 param sqlAdminUserPassword string = ''
 
-var legacyResourcePrefix = environmentIdentifier
-var newResourcePrefix = '${environmentIdentifier}-ees'
+
+
+//
+// Resource provisioning.
+//
+
+var legacyResourcePrefix = environmentConfig.environmentIdentifier!
+var newResourcePrefix = '${environmentConfig.environmentIdentifier!}-ees'
 var publicApiResourcePrefix = '${newResourcePrefix}-papi'
 var screenerResourcePrefix = '${newResourcePrefix}-sapi'
 
@@ -100,28 +90,28 @@ module adminModule 'admin/main-admin.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
-    adminSku: adminSku
-    adminHostname: 'admin.${domain}'
-    publicAppUrl: 'https://${domain}'
-    autoscaleAppServices: autoscaleAppServices
+    adminSku: adminConfig.appServiceSku!
+    adminHostname: 'admin.${environmentConfig.domain!}'
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
-    detailedErrors: detailedErrors
-    enableSwagger: enableSwagger
-    enableThemeDeletion: enableThemeDeletion
-    enableEinPublishedPageDeletion: enableEinPublishedPageDeletion
-    apiAppRegistrationClientId: apiAppRegistrationClientId
-    publicDataProcessorAppRegistrationClientId: publicDataProcessorAppRegistrationClientId
-    screenerAppRegistrationClientId: screenerAppRegistrationClientId
-    publicApiUrl: publicApiUrl
-    publicApiDocsUrl: publicApiDocsUrl
-    prepareScheduledReleaseVersionsFunctionCronSchedule: prepareScheduledReleaseVersionsFunctionCronSchedule
-    publishScheduledReleaseVersionsFunctionCronSchedule: publishScheduledReleaseVersionsFunctionCronSchedule
-    preReleaseMinutesBeforeStart: preReleaseMinutesBeforeStart
-    tableBuilderMaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
+    detailedErrors: environmentConfig.detailedErrors!
+    enableSwagger: environmentConfig.enableSwagger!
+    enableThemeDeletion: adminConfig.enableThemeDeletion!
+    enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
+    apiAppRegistrationClientId: adminConfig.pipelineVariables!.apiAppRegistrationClientId!
+    publicDataProcessorAppRegistrationClientId: adminConfig.pipelineVariables!.publicDataProcessorAppRegistrationClientId!
+    screenerAppRegistrationClientId: adminConfig.pipelineVariables!.screenerAppRegistrationClientId!
+    publicApiUrl: environmentConfig.publicApiUrl!
+    publicApiDocsUrl: environmentConfig.publicApiDocsUrl!
+    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
+    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
+    preReleaseMinutesBeforeStart: adminConfig.preReleaseMinutesBeforeStart!
+    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
-    memoryCacheConfig: memoryCacheConfig
+    memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     sqlAdminUserPassword: sqlAdminUserPassword
-    tagValues: tagValues
+    tagValues: tags
   }
 }

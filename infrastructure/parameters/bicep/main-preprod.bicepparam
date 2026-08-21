@@ -1,12 +1,12 @@
 using '../../templates/main.bicep'
 
-param domain = 'pre-production.explore-education-statistics.service.gov.uk'
+param environmentConfigParam = {
+  environmentIdentifier: 's101p02'
+  domain: 'pre-production.explore-education-statistics.service.gov.uk'
+  publicApiUrl: 'pp-api.education.gov.uk/statistics-preprod'
+  publicApiDocsUrl: 'pp-api.education.gov.uk/statistics-preprod/docs'
+}
 
-param autoscaleAppServices = true
-
-param enableThemeDeletion = true
-
-param publicApiUrl = 'pp-api.education.gov.uk/statistics-preprod'
-param publicApiDocsUrl = 'pp-api.education.gov.uk/statistics-preprod/docs'
-
-param tableBuilderMaxTableCellsAllowed = 1000000
+param adminConfigParam = {
+  enableThemeDeletion: true
+}
