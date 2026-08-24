@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -22,8 +20,7 @@ internal class DataSetService(
     PublicDataDbContext publicDataDbContext,
     IProcessorClient processorClient,
     IDataSetVersionMappingService dataSetVersionMappingService,
-    IUserService userService,
-    IUserRepository userRepository
+    IUserService userService
 ) : IDataSetService
 {
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetSummaryViewModel>>> ListDataSets(
@@ -33,15 +30,8 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
-
-        if (user is null)
-        {
-            return new ForbidResult();
-        }
-
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSetsQueryable = publicDataDbContext
@@ -76,15 +66,8 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
-
-        if (user is null)
-        {
-            return new ForbidResult();
-        }
-
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSets = await publicDataDbContext
@@ -118,18 +101,11 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
-
-        if (user is null)
-        {
-            return new ForbidResult();
-        }
-
         return await QueryDataSet(dataSetId)
             .SingleOrNotFoundAsync(cancellationToken)
             .OnSuccessDo(dataSet =>
                 CheckPublicationExists(dataSet.PublicationId, cancellationToken)
-                    .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(user, publication.Id))
+                    .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             )
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }
@@ -153,16 +129,9 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        var user = await userRepository.FindActiveUserById(userService.GetUserId(), cancellationToken);
-
-        if (user is null)
-        {
-            return new ForbidResult();
-        }
-
         return await GetReleaseVersion(releaseFileId, cancellationToken)
             .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
-            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets(user))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccess(async _ =>
                 await processorClient.CreateDataSet(releaseFileId: releaseFileId, cancellationToken: cancellationToken)
             )

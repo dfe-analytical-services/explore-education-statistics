@@ -1,30 +1,25 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
 public class ManagePublicApiDataSetsRequirement : IAuthorizationRequirement;
 
-public class ManagePublicApiDataSetsAuthorizationHandler
-    : AuthorizationHandler<ManagePublicApiDataSetsRequirement, User>
+public class ManagePublicApiDataSetsAuthorizationHandler : AuthorizationHandler<ManagePublicApiDataSetsRequirement>
 {
-    protected override async Task HandleRequirementAsync(
+    // TODO Publication-specific roles will also be able to satisfy this requirement in future -
+    // this handler will then need to take a resource (e.g. a publication id) to check against.
+    protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        ManagePublicApiDataSetsRequirement requirement,
-        User user
+        ManagePublicApiDataSetsRequirement requirement
     )
     {
-        if (!user.Active)
-        {
-            return;
-        }
-
-        if (user.IsBau())
+        if (context.User.IsInRole(RoleNames.BauUser))
         {
             context.Succeed(requirement);
-            return;
         }
+
+        return Task.CompletedTask;
     }
 }
