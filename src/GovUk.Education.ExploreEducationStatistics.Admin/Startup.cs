@@ -547,8 +547,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetService<PublicDataDbContext>()!,
                 provider.GetRequiredService<IProcessorClient>(),
                 provider.GetRequiredService<IDataSetVersionMappingService>(),
-                provider.GetRequiredService<IUserService>(),
-                provider.GetRequiredService<IUserRepository>()
+                provider.GetRequiredService<IUserService>()
             ));
 
             services.AddTransient<IDataSetVersionService, NoOpDataSetVersionService>();

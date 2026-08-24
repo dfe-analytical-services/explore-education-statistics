@@ -1,7 +1,7 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using Microsoft.AspNetCore.Authorization;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -9,29 +9,25 @@ public class ManagePublicApiDataSetPreviewTokensRequirement : IAuthorizationRequ
 
 public class ManagePublicApiDataSetPreviewTokensAuthorizationHandler(
     IAuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<ManagePublicApiDataSetPreviewTokensRequirement, (User, Guid)>
+) : AuthorizationHandler<ManagePublicApiDataSetPreviewTokensRequirement, Guid>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ManagePublicApiDataSetPreviewTokensRequirement requirement,
-        (User, Guid) userAndPublicationId
+        Guid publicationId
     )
     {
-        var (user, publicationId) = userAndPublicationId;
-
-        if (!user.Active)
-        {
-            return;
-        }
-
-        if (user.IsBau())
+        if (context.User.IsInRole(RoleNames.BauUser))
         {
             context.Succeed(requirement);
             return;
         }
 
         if (
-            await authorizationHandlerService.UserHasAnyRoleOnPublication(userId: user.Id, publicationId: publicationId)
+            await authorizationHandlerService.UserHasAnyRoleOnPublication(
+                userId: context.User.GetUserId(),
+                publicationId: publicationId
+            )
         )
         {
             context.Succeed(requirement);

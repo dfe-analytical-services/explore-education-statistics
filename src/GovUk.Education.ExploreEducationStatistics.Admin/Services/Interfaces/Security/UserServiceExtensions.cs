@@ -403,29 +403,24 @@ public static class UserServiceExtensions
         return new DataFilePermissions { CanCancelImport = (await userService.CheckCanCancelFileImport(file)).IsRight };
     }
 
-    public static Task<Either<ActionResult, User>> CheckCanManagePublicApiDataSets(
-        this IUserService userService,
-        User user
-    )
+    public static Task<Either<ActionResult, Unit>> CheckCanManagePublicApiDataSets(this IUserService userService)
     {
-        return userService.CheckPolicy(user, SecurityPolicies.CanManagePublicApiDataSets);
+        return userService.CheckPolicy(SecurityPolicies.CanManagePublicApiDataSets);
     }
 
-    public static Task<Either<ActionResult, (User, Guid)>> CheckCanViewPublicApiDataSets(
+    public static Task<Either<ActionResult, Guid>> CheckCanViewPublicApiDataSets(
         this IUserService userService,
-        User user,
         Guid publicationId
     )
     {
-        return userService.CheckPolicy((user, publicationId), SecurityPolicies.CanViewPublicApiDataSets);
+        return userService.CheckPolicy(publicationId, SecurityPolicies.CanViewPublicApiDataSets);
     }
 
-    public static Task<Either<ActionResult, (User, Guid)>> CheckCanManagePublicApiDataSetPreviewTokens(
+    public static Task<Either<ActionResult, Guid>> CheckCanManagePublicApiDataSetPreviewTokens(
         this IUserService userService,
-        User user,
         Guid publicationId
     )
     {
-        return userService.CheckPolicy((user, publicationId), SecurityPolicies.CanManagePublicApiDataSetPreviewTokens);
+        return userService.CheckPolicy(publicationId, SecurityPolicies.CanManagePublicApiDataSetPreviewTokens);
     }
 }
