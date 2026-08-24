@@ -82,7 +82,7 @@ def compare_images(
 
         # compute the Structural Similarity Index (SSIM) between the two
         # images, ensuring that the difference image is returned
-        (score, diff_image) = compare_ssim(image1, image2, full=True)
+        score, diff_image = compare_ssim(image1, image2, full=True)
         diff_image = (diff_image * 255).astype("uint8")
 
         if score < (1 - diff_threshold):
@@ -101,7 +101,7 @@ def compare_images(
                 # compute the bounding box of the contour and then draw the
                 # bounding box on both input images to represent where the two
                 # images differ
-                (x, y, w, h) = cv2.boundingRect(contour)
+                x, y, w, h = cv2.boundingRect(contour)
                 cv2.rectangle(image1_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
 

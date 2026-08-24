@@ -241,21 +241,25 @@ class SnapshotService:
 
         if failed:
             # At least one snapshot did not match so send a failure message to slack
-            self._send_slack_notification(
-                blocks=[
-                    {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": ":warning: Snapshots do not match"},
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "See <https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt|pull request> for more details",
+            (
+                self._send_slack_notification(
+                    blocks=[
+                        {
+                            "type": "header",
+                            "text": {"type": "plain_text", "text": ":warning: Snapshots do not match"},
                         },
-                    },
-                ]
-            ) if self.slack_webhook_url else print("Snapshot script complete. Snapshots do not match")
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "See <https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt|pull request> for more details",
+                            },
+                        },
+                    ]
+                )
+                if self.slack_webhook_url
+                else print("Snapshot script complete. Snapshots do not match")
+            )
 
         else:
             print("Snapshot script complete. No differences found.")
