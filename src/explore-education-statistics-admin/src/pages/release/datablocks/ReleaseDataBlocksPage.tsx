@@ -121,7 +121,7 @@ const ReleaseDataBlocksPage = ({
     },
   );
 
-  const filteredDataBlocks = useMemo(() => {
+  const sortedDataBlocks = useMemo(() => {
     const unfeaturedDataBlocks = dataBlocks.filter(dataBlock => {
       return !featuredTables.find(table => table.dataBlockId === dataBlock.id);
     });
@@ -206,7 +206,7 @@ const ReleaseDataBlocksPage = ({
         />
       )}
 
-      {filteredDataBlocks.length > 0 && (
+      {sortedDataBlocks.length > 0 && (
         <div className="table-container">
           <table data-testid="dataBlocks">
             <caption className="govuk-table__caption--m">
@@ -216,12 +216,14 @@ const ReleaseDataBlocksPage = ({
             <thead>
               <tr>
                 <SortedTableHeader
+                  className="govuk-!-width-one-quarter"
                   column="name"
                   label="Data block"
                   sort={sort}
                   onClick={handleSortChange}
                 />
                 <SortedTableHeader
+                  className="govuk-!-width-one-quarter"
                   column="dataSetName"
                   label="Data file"
                   sort={sort}
@@ -251,7 +253,7 @@ const ReleaseDataBlocksPage = ({
               </tr>
             </thead>
             <tbody>
-              {filteredDataBlocks.map(dataBlock => (
+              {sortedDataBlocks.map(dataBlock => (
                 <tr key={dataBlock.id}>
                   <td>{dataBlock.name}</td>
                   <td>{dataBlock.dataSetName ?? 'Not available'}</td>
