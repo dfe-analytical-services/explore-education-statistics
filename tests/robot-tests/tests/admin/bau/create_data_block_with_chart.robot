@@ -202,8 +202,8 @@ Validate data block is in list
     user waits until page finishes loading
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name    testid:dataBlocks
-    user checks table column heading contains    1    2    Data set name    testid:dataBlocks
+    user checks table column heading contains    1    1    Data block    testid:dataBlocks
+    user checks table column heading contains    1    2    Data file    testid:dataBlocks
     user checks table column heading contains    1    3    Has chart    testid:dataBlocks
     user checks table column heading contains    1    4    In content    testid:dataBlocks
     user checks table column heading contains    1    5    Created date    testid:dataBlocks
@@ -270,7 +270,7 @@ Validate data block is in list again
 
     user waits until table is visible
     user checks table column heading contains    1    1    Data block name    testid:featuredTables
-    user checks table column heading contains    1    2    Data set name    testid:featuredTables
+    user checks table column heading contains    1    2    Data file    testid:featuredTables
     user checks table column heading contains    1    3    Has chart    testid:featuredTables
     user checks table column heading contains    1    4    In content    testid:featuredTables
     user checks table column heading contains    1    5    Featured table name    testid:featuredTables
@@ -424,7 +424,7 @@ Validate marked as 'In content' on data block list
     user waits until h2 is visible    Data blocks
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name    testid:dataBlocks
+    user checks table column heading contains    1    1    Data block    testid:dataBlocks
     user checks table column heading contains    1    4    In content    testid:dataBlocks
 
     user checks table body has x rows    1
@@ -556,7 +556,7 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user waits until page finishes loading
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name    testid:dataBlocks
+    user checks table column heading contains    1    1    Data block    testid:dataBlocks
     user checks table column heading contains    1    3    Has chart    testid:dataBlocks
 
     user checks table body has x rows    1
@@ -969,6 +969,44 @@ Create data block with categorical and numerical data
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
+
+Validate sorting the data blocks list
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+    user waits until page finishes loading
+
+    user waits until table is visible
+    user checks table body has x rows    2    testid:dataBlocks
+
+    # Sorted by data block name ascending by default
+    user checks table cell contains    1    1    ${DATABLOCK_2_NAME}    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_NAME}    testid:dataBlocks
+
+    user clicks button    Data block    testid:dataBlocks
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_2_NAME}    testid:dataBlocks
+
+    # "UI test subject" sorts before "UI test subject - categorical and numerical"
+    user clicks button    Data file    testid:dataBlocks
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_2_NAME}    testid:dataBlocks
+
+    user clicks button    Data file    testid:dataBlocks
+    user checks table cell contains    1    1    ${DATABLOCK_2_NAME}    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_NAME}    testid:dataBlocks
+
+    # Only ${DATABLOCK_NAME} has a chart, and is the only one in content
+    user clicks button    Has chart    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_NAME}    testid:dataBlocks
+
+    user clicks button    In content    testid:dataBlocks
+    user checks table cell contains    2    1    ${DATABLOCK_NAME}    testid:dataBlocks
+
+    # ${DATABLOCK_NAME} was created first
+    user clicks button    Created date    testid:dataBlocks
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+
+    user clicks edit data block link    ${DATABLOCK_2_NAME}
 
 Configure geographic chart with categorical and numerical data sets
     user clicks link    Chart

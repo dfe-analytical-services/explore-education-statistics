@@ -69,7 +69,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: '2021-02-01T15:00:00.0000000',
       heading: 'Block 4 heading',
       source: 'Block 4 source',
-      dataSetName: 'Data set 4',
+      dataSetName: 'A data set 4',
       inContent: false,
       chartsCount: 0,
     },
@@ -209,7 +209,7 @@ describe('ReleaseDataBlocksPage', () => {
     const dataBlocksRow2Cells = within(dataBlocksRows[2]).getAllByRole('cell');
     expect(dataBlocksRow2Cells).toHaveLength(6);
     expect(dataBlocksRow2Cells[0]).toHaveTextContent('Block 4');
-    expect(dataBlocksRow2Cells[1]).toHaveTextContent('Data set 4');
+    expect(dataBlocksRow2Cells[1]).toHaveTextContent('A data set 4');
     expect(dataBlocksRow2Cells[2]).toHaveTextContent('No');
     expect(dataBlocksRow2Cells[3]).toHaveTextContent('No');
     expect(dataBlocksRow2Cells[4]).toHaveTextContent('1 February 2021 15:00');
@@ -324,7 +324,7 @@ describe('ReleaseDataBlocksPage', () => {
     const dataBlocksRow2Cells = within(dataBlocksRows[2]).getAllByRole('cell');
     expect(dataBlocksRow2Cells).toHaveLength(6);
     expect(dataBlocksRow2Cells[0]).toHaveTextContent('Block 4');
-    expect(dataBlocksRow2Cells[1]).toHaveTextContent('Data set 4');
+    expect(dataBlocksRow2Cells[1]).toHaveTextContent('A data set 4');
     expect(dataBlocksRow2Cells[2]).toHaveTextContent('No');
     expect(dataBlocksRow2Cells[3]).toHaveTextContent('No');
     expect(dataBlocksRow2Cells[4]).toHaveTextContent('1 February 2021 15:00');
@@ -522,6 +522,130 @@ describe('ReleaseDataBlocksPage', () => {
           name: 'Delete block',
         }),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('sorting data blocks', () => {
+    const getDataBlockNames = () =>
+      within(screen.getByTestId('dataBlocks'))
+        .getAllByRole('row')
+        .slice(1)
+        .map(row => within(row).getAllByRole('cell')[0].textContent);
+
+    beforeEach(() => {
+      dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+      featuredTableService.listFeaturedTables.mockResolvedValue([]);
+    });
+
+    test('sorts by name in ascending order by default', async () => {
+      renderPage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      expect(getDataBlockNames()).toEqual([
+        'Block 1',
+        'Block 2',
+        'Block 3',
+        'Block 4',
+      ]);
+
+      const nameHeader = screen.getByRole('columnheader', {
+        name: /Data block/,
+      });
+      expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
+      expect(
+        screen.getByRole('columnheader', { name: /Data file/ }),
+      ).toHaveAttribute('aria-sort', 'none');
+    });
+
+    test('clicking the data block control toggles to descending order', async () => {
+      const { user } = renderPage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /Data block/ }));
+
+      expect(getDataBlockNames()).toEqual([
+        'Block 4',
+        'Block 3',
+        'Block 2',
+        'Block 1',
+      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /Data block/ }),
+      ).toHaveAttribute('aria-sort', 'descending');
+      expect(
+        screen.getByRole('columnheader', { name: /Data file/ }),
+      ).toHaveAttribute('aria-sort', 'none');
+    });
+
+    test('clicking the data file control sorts by data set name', async () => {
+      const { user } = renderPage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /Data file/ }));
+
+      // Block 3 has no data set name, so is sorted first
+      expect(getDataBlockNames()).toEqual([
+        'Block 3',
+        'Block 4',
+        'Block 1',
+        'Block 2',
+      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /Data file/ }),
+      ).toHaveAttribute('aria-sort', 'ascending');
+
+      await user.click(screen.getByRole('button', { name: /Data file/ }));
+
+      expect(getDataBlockNames()).toEqual([
+        'Block 2',
+        'Block 1',
+        'Block 4',
+        'Block 3',
+      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /Data file/ }),
+      ).toHaveAttribute('aria-sort', 'descending');
+    });
+
+    test('clicking the in content control sorts by in content', async () => {
+      const { user } = renderPage();
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /In content/ }));
+
+      expect(getDataBlockNames()).toEqual([
+        'Block 2',
+        'Block 3',
+        'Block 4',
+        'Block 1',
+      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /In content/ }),
+      ).toHaveAttribute('aria-sort', 'ascending');
+
+      await user.click(screen.getByRole('button', { name: /In content/ }));
+
+      expect(getDataBlockNames()).toEqual([
+        'Block 1',
+        'Block 2',
+        'Block 3',
+        'Block 4',
+      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /In content/ }),
+      ).toHaveAttribute('aria-sort', 'descending');
     });
   });
 

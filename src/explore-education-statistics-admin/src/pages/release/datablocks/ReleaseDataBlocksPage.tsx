@@ -3,8 +3,8 @@ import Link from '@admin/components/Link';
 import DataBlockDeletePlanModal from '@admin/pages/release/datablocks/components/DataBlockDeletePlanModal';
 import FeaturedTablesTable from '@admin/pages/release/datablocks/components/FeaturedTablesTable';
 import dataBlockQueries from '@admin/queries/dataBlockQueries';
-import permissionQueries from '@admin/queries/permissionQueries';
 import featuredTableQueries from '@admin/queries/featuredTableQueries';
+import permissionQueries from '@admin/queries/permissionQueries';
 import {
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
@@ -22,12 +22,12 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SortedTableHeader, {
   TableSort,
 } from '@common/components/SortedTableHeader';
-import WarningMessage from '@common/components/WarningMessage';
-import orderBy from 'lodash/orderBy';
-import React, { useCallback, useMemo, useState } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import orderBy from 'lodash/orderBy';
+import { useCallback, useMemo, useState } from 'react';
+import { generatePath, RouteComponentProps } from 'react-router';
 
 type DataBlockSortColumn =
   'name' | 'dataSetName' | 'hasChart' | 'inContent' | 'created';
