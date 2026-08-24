@@ -35,7 +35,7 @@
     <PackageVersion Include="Microsoft.Azure.SignalR" Version="1.33.0" />
     <PackageVersion Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.5" />
     <PackageVersion Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="3.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.Azure" Version="1.14.0" />
+    <PackageVersion Include="Microsoft.Extensions.Azure" Version="1.14.1" />
   </ItemGroup>
 
   <ItemGroup Label="Data / Database">
