@@ -23,11 +23,41 @@ jobs:
       fetchDepth: 5
       fetchTags: false
 
-    - task: UsePythonVersion@0
-      displayName: Use Python 3.14
+    - bash: |
+        set -euo pipefail
+
+        PYTHON_VERSION=$(cat "$BUILD_SOURCESDIRECTORY/.python-version")
+        UV_VERSION=0.12.5
+        UV_SHA256=68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2
+        echo "Target Python version: $PYTHON_VERSION (via uv $UV_VERSION)"
+
+        # UsePythonVersion@0 cannot download Python on self-hosted agents, so
+        # install it with uv instead. uv is pinned and checksum-verified rather
+        # than piped from an installer script, because this job has Key Vault
+        # secrets in its environment.
+        UV_DIR="$AGENT_TOOLSDIRECTORY/uv/$UV_VERSION"
+        UV="$UV_DIR/uv"
+        if [ ! -x "$UV" ]; then
+          TARBALL=uv-x86_64-unknown-linux-gnu.tar.gz
+          mkdir -p "$UV_DIR"
+          curl -fsSL "https://github.com/astral-sh/uv/releases/download/$UV_VERSION/$TARBALL" -o "$UV_DIR/$TARBALL"
+          echo "$UV_SHA256  $UV_DIR/$TARBALL" | sha256sum -c -
+          tar -xzf "$UV_DIR/$TARBALL" -C "$UV_DIR" --strip-components=1
+          rm -f "$UV_DIR/$TARBALL"
+        fi
+        export PATH="$UV_DIR:$PATH"
+        uv --version
+
+        # --no-bin keeps uv from putting python shims in the agent user's bin dir.
+        uv python install --no-bin "$PYTHON_VERSION"
+
+        # run_tests_pipeline.py runs "pip install pipenv" against the interpreter
+        # on PATH. uv's builds are marked externally managed (PEP 668), so that
+        # fails outside a virtual environment. --seed provides pip.
+        uv venv --seed --python "$PYTHON_VERSION" "$AGENT_TEMPDIRECTORY/venv"
+        echo "##vso[task.prependpath]$AGENT_TEMPDIRECTORY/venv/bin"
+      displayName: Install Python
       timeoutInMinutes: 5
-      inputs:
-        versionSpec: '3.14'
 
     - task: AzureKeyVault@2
       displayName: Azure Key Vault - s101d01-kv-ees-01
@@ -41,6 +71,7 @@ jobs:
       displayName: Run tests
       condition: succeededOrFailed()
       inputs:
+        pythonInterpreter: $(Agent.TempDirectory)/venv/bin/python
         scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
         arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "${{ parameters.testFolder }}" --processes 4 --rerun-attempts 3
         # The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
