@@ -60,7 +60,7 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "format:check": "prettier --list-different \"**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "format:robot": "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml tests/robot-tests",
-    "format:robot:check": "pnpm format:robot -- --check --diff",
+    "format:robot:check": "python3 -m pipenv run robotidy --check --diff --config tests/robot-tests/robotidy.toml tests/robot-tests",
     "format:python": "python3 -m pipenv run black tests && python3 -m pipenv run isort tests",
     "format:python:check": "python3 -m pipenv run black tests --diff && python3 -m pipenv run isort tests --diff",
     "linkchecker": "python3 -m pipenv run linkchecker --config .linkcheckerrc https://explore-education-statistics.service.gov.uk/",
