@@ -11,7 +11,7 @@ internal static class FilterItemMappingExtensions
     public static (FilterItemMapping? FilterItemMapping, ErrorViewModel? Error) UpdateFilterItemMapping(
         this DataSetMapping dataSetMapping,
         Dictionary<Guid, (FilterGroupMapping FilterGroup, FilterItemMapping FilterItem)> originalItemIdToItemMap,
-        List<Filter> replacementFilters,
+        IReadOnlyList<Filter> replacementFilters,
         Guid originalId,
         Guid? newReplacementId = null
     )
@@ -96,7 +96,7 @@ internal static class FilterItemMappingExtensions
     private static bool IsFilterItemCandidateAvailable(
         this DataSetMapping dataSetMapping,
         FilterItemMapping itemMapping,
-        List<FilterItem> replacementFilterItems,
+        IReadOnlyList<FilterItem> replacementFilterItems,
         Guid candidateId
     )
     {

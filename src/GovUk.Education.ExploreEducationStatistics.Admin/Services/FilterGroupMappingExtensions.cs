@@ -12,7 +12,7 @@ internal static class FilterGroupMappingExtensions
     public static (FilterGroupMapping? FilterGroupMapping, ErrorViewModel? Error) UpdateFilterGroupMapping(
         this DataSetMapping dataSetMapping,
         Dictionary<Guid, (FilterMapping FilterMap, FilterGroupMapping GroupMap)> originalGroupIdToGroupMap,
-        List<Filter> replacementFilters,
+        IReadOnlyList<Filter> replacementFilters,
         Guid originalId,
         Guid? newReplacementId = null
     )
@@ -96,7 +96,7 @@ internal static class FilterGroupMappingExtensions
     private static bool IsFilterGroupCandidateAvailable(
         this DataSetMapping dataSetMapping,
         FilterGroupMapping groupMapping,
-        List<FilterGroup> replacementFilterGroups,
+        IReadOnlyList<FilterGroup> replacementFilterGroups,
         Guid candidateId
     )
     {
@@ -111,7 +111,7 @@ internal static class FilterGroupMappingExtensions
 
     internal static void AutoMapChildItems(
         this FilterGroupMapping groupMapping,
-        List<FilterItem> replacementFilterItems
+        IReadOnlyList<FilterItem> replacementFilterItems
     )
     {
         if (groupMapping.ReplacementId == null)

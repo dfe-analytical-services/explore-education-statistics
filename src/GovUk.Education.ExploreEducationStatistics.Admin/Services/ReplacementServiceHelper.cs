@@ -18,10 +18,12 @@ public abstract class ReplacementServiceHelper
     {
         // Add mapped replacement filters
         var replacementSequence = new List<FilterSequenceEntry>();
-        var filterIdsWithMapping = mapping
+        var filterMappingsWithReplacement = mapping
             .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
-            .Select(filterMap => filterMap.OriginalId)
-            .ToHashSet();
+            .Select(filterMap => new { filterMap.OriginalId, ReplacementId = filterMap.ReplacementId!.Value })
+            .ToList();
+
+        var filterIdsWithMapping = filterMappingsWithReplacement.Select(filterMap => filterMap.OriginalId).ToHashSet();
         foreach (var filterSequenceEntry in originalSequence)
         {
             if (filterIdsWithMapping.Contains(filterSequenceEntry.Id))
@@ -48,10 +50,7 @@ public abstract class ReplacementServiceHelper
         }
 
         // Add remaining replacement filters - those that are unmapped
-        var claimedFilterIds = mapping
-            .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
-            .Select(filterMap => filterMap.ReplacementId!.Value)
-            .ToHashSet();
+        var claimedFilterIds = filterMappingsWithReplacement.Select(filterMap => filterMap.ReplacementId).ToHashSet();
         replacementSequence.AddRange(
             replacementFilters
                 .Where(replacementFilter => !claimedFilterIds.Contains(replacementFilter.Id))
@@ -82,10 +81,12 @@ public abstract class ReplacementServiceHelper
     {
         // Add mapped replacement groups
         var replacementGroupSequence = new List<FilterGroupSequenceEntry>();
-        var groupIdsWithMapping = filterMapping
+        var groupMappingsWithReplacement = filterMapping
             .FilterGroupMappings.Values.Where(groupMap => groupMap.ReplacementId != null)
-            .Select(groupMap => groupMap.OriginalId)
-            .ToHashSet();
+            .Select(groupMap => new { groupMap.OriginalId, ReplacementId = groupMap.ReplacementId!.Value })
+            .ToList();
+
+        var groupIdsWithMapping = groupMappingsWithReplacement.Select(groupMap => groupMap.OriginalId).ToHashSet();
         foreach (var groupSequenceEntry in originalFilterSequenceEntry.FilterGroupSequence)
         {
             if (groupIdsWithMapping.Contains(groupSequenceEntry.Id))
@@ -112,10 +113,7 @@ public abstract class ReplacementServiceHelper
         }
 
         // Add remaining replacement groups - those that are unmapped
-        var claimedGroupIds = filterMapping
-            .FilterGroupMappings.Values.Where(groupMap => groupMap.ReplacementId != null)
-            .Select(groupMap => groupMap.ReplacementId!.Value)
-            .ToHashSet();
+        var claimedGroupIds = groupMappingsWithReplacement.Select(groupMap => groupMap.ReplacementId).ToHashSet();
         replacementGroupSequence.AddRange(
             replacementFilterGroups
                 .Where(replacementGroup => !claimedGroupIds.Contains(replacementGroup.Id))
@@ -140,10 +138,12 @@ public abstract class ReplacementServiceHelper
     {
         // Add mapped replacement items
         var replacementItemSequence = new List<Guid>();
-        var itemIdsWithMapping = groupMapping
+        var itemMappingsWithReplacement = groupMapping
             .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
-            .Select(itemMap => itemMap.OriginalId)
-            .ToHashSet();
+            .Select(itemMap => new { itemMap.OriginalId, ReplacementId = itemMap.ReplacementId!.Value })
+            .ToList();
+
+        var itemIdsWithMapping = itemMappingsWithReplacement.Select(itemMap => itemMap.OriginalId).ToHashSet();
 
         foreach (var sequenceItemId in originalGroupSequenceEntry.FilterItemSequence)
         {
@@ -154,10 +154,7 @@ public abstract class ReplacementServiceHelper
         }
 
         // Add remaining replacement items - those that are currently unmapped
-        var claimedItemIds = groupMapping
-            .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
-            .Select(itemMap => itemMap.ReplacementId!.Value)
-            .ToHashSet();
+        var claimedItemIds = itemMappingsWithReplacement.Select(itemMap => itemMap.ReplacementId).ToHashSet();
         replacementItemSequence.AddRange(
             replacementFilterItems
                 .Where(replacementItem => !claimedItemIds.Contains(replacementItem.Id))

@@ -191,7 +191,7 @@ public record FilterMapping
 
     public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
 
-    // TODO Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
+    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
     public List<UnmappedFilterGroup>? UnmappedReplacementFilterGroups { get; set; } = [];
 
     public MapStatus Status { get; set; }
@@ -207,7 +207,7 @@ public record FilterGroupMapping
 
     public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
 
-    // TODO Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
+    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
     public List<UnmappedFilterItem>? UnmappedReplacementFilterItems { get; set; } = [];
 
     public MapStatus Status { get; set; }

@@ -11,7 +11,7 @@ internal static class FilterMappingExtensions
 {
     public static (FilterMapping? FilterMapping, ErrorViewModel? Error) UpdateFilterMapping(
         this DataSetMapping dataSetMapping,
-        List<Filter> replacementFilters,
+        IReadOnlyList<Filter> replacementFilters,
         Guid originalId,
         Guid? newReplacementId = null
     )
@@ -71,7 +71,7 @@ internal static class FilterMappingExtensions
     private static bool IsFilterCandidateAvailable(
         DataSetMapping dataSetMapping,
         FilterMapping filterMapping,
-        List<Filter> replacementFilters,
+        IReadOnlyList<Filter> replacementFilters,
         Guid candidateId
     )
     {

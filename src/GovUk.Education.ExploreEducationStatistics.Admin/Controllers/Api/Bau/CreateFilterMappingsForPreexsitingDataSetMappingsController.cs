@@ -20,6 +20,7 @@ public class CreateFilterMappingsForPreexistingDataSetMappingsController(
     StatisticsDbContext statisticsDbContext
 ) : ControllerBase
 {
+    // TODO EES-7370 Remove
     [HttpPut("create-filter-mappings")]
     public async Task<ActionResult> CreateFilterMappings(CancellationToken cancellationToken = default)
     {
