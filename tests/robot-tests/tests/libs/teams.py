@@ -233,9 +233,9 @@ class TeamsService:
     def __init__(self, webhook_url: Optional[str] = None):
         self.webhook_url = webhook_url or os.getenv("TEAMS_UI_TESTS_WEBHOOK_URL")
 
-    def send_pipeline_report(self, card: dict) -> bool:
+    def _post_card(self, card: dict, description: str) -> bool:
         if not self.webhook_url:
-            logger.warning("TEAMS_UI_TESTS_WEBHOOK_URL is not set; skipping Teams notification")
+            logger.warning(f"Teams webhook URL is not set; skipping {description}")
             return False
 
         try:
@@ -250,8 +250,14 @@ class TeamsService:
                     logger.warning(f"Teams webhook returned HTTP {response.status}")
                     return False
         except (HTTPError, URLError, TimeoutError, ValueError) as ex:
-            logger.warning(f"Unable to send UI test report to Teams: {ex}")
+            logger.warning(f"Unable to send {description} to Teams: {ex}")
             return False
 
-        logger.info("Sent UI test pipeline report to Teams")
+        logger.info(f"Sent {description} to Teams")
         return True
+
+    def send_pipeline_report(self, card: dict) -> bool:
+        return self._post_card(card, "UI test pipeline report")
+
+    def send_snapshot_notification(self, card: dict) -> bool:
+        return self._post_card(card, "snapshot notification")
