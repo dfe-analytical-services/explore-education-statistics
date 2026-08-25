@@ -1,6 +1,7 @@
 import InsetText from '@common/components/InsetText';
 import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
 import { EinContentBlock } from '@common/services/types/einBlocks';
+import Link from '@frontend/components/Link';
 import React from 'react';
 
 interface Props {
@@ -14,7 +15,7 @@ const EducationInNumbersSectionBlocks = ({ blocks }: Props) => {
         <EinContentBlockRenderer
           key={block.id}
           block={block}
-          publicAppUrl={process.env.PUBLIC_URL}
+          renderLink={linkProps => <Link {...linkProps} />}
         />
       ))}
     </>

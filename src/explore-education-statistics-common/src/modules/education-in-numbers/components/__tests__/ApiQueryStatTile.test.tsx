@@ -1,13 +1,24 @@
 import render from '@common-test/render';
 import { screen } from '@testing-library/react';
 import React from 'react';
-import ApiQueryStatTile from '../ApiQueryStatTile';
+import ApiQueryStatTile, { ApiQueryStatTileProps } from '../ApiQueryStatTile';
+
+const renderLink: ApiQueryStatTileProps['renderLink'] = ({
+  children,
+  className,
+  testId,
+  to,
+}) => (
+  <a className={className} data-testid={testId} href={to}>
+    {children}
+  </a>
+);
 
 describe('ApiQueryStatTile', () => {
   test('Renders link text using publication and release labels, and slugs in the url', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',
@@ -29,7 +40,7 @@ describe('ApiQueryStatTile', () => {
     expect(link).toHaveTextContent('Publication title');
     expect(link).toHaveAttribute(
       'href',
-      'https://example.com/find-statistics/publication-slug/release-slug',
+      '/find-statistics/publication-slug/release-slug',
     );
 
     expect(
@@ -40,7 +51,7 @@ describe('ApiQueryStatTile', () => {
   test('Formats the statistic using the indicator unit and decimal places', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',
@@ -63,7 +74,7 @@ describe('ApiQueryStatTile', () => {
   test('Does not render a link when labels are not available, even if slugs are', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',
@@ -85,7 +96,7 @@ describe('ApiQueryStatTile', () => {
   test('Does not render a link when publication or release is not set', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',
@@ -105,7 +116,7 @@ describe('ApiQueryStatTile', () => {
   test('Renders a `Not the latest data` tag when the tile is not on the latest data set version', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',
@@ -126,7 +137,7 @@ describe('ApiQueryStatTile', () => {
   test('Does not render a `Not the latest data` tag when the tile is on the latest data set version', () => {
     render(
       <ApiQueryStatTile
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         tile={{
           id: 'tile-1',
           type: 'ApiQueryStatTile',

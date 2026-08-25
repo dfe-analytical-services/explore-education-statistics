@@ -1,4 +1,5 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
+import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import EducationInNumbersEditableBlock from '@admin/pages/education-in-numbers/content/components/EducationInNumbersEditableBlock';
@@ -211,7 +212,18 @@ const EducationInNumbersAccordionSection = ({
         isReordering={isReordering}
         onBlocksChange={setBlocks}
         renderBlock={block => (
-          <EinContentBlockRenderer block={block} publicAppUrl={publicAppUrl} />
+          <EinContentBlockRenderer
+            block={block}
+            renderLink={({ children, className, testId, to }) => (
+              <Link
+                className={className}
+                data-testid={testId}
+                to={`${publicAppUrl}${to}`}
+              >
+                {children}
+              </Link>
+            )}
+          />
         )}
         renderEditableBlock={(block, contentBlockNumber) => {
           const { editLabel, groupButtonsLabel, removeLabel } =

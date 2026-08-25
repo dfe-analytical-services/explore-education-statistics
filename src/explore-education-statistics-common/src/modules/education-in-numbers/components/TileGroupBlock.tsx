@@ -2,14 +2,16 @@ import FreeTextStatTile from '@common/modules/education-in-numbers/components/Fr
 import TileWrapper from '@common/modules/education-in-numbers/components/TileWrapper';
 import { EinTileGroupBlock } from '@common/services/types/einBlocks';
 import React from 'react';
-import ApiQueryStatTile from '@common/modules/education-in-numbers/components/ApiQueryStatTile';
+import ApiQueryStatTile, {
+  ApiQueryStatTileProps,
+} from '@common/modules/education-in-numbers/components/ApiQueryStatTile';
 
 export interface TileGroupBlockProps {
   block: EinTileGroupBlock;
-  publicAppUrl: string;
+  renderLink: ApiQueryStatTileProps['renderLink'];
 }
 
-const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
+const TileGroupBlock = ({ block, renderLink }: TileGroupBlockProps) => {
   const { title, tiles } = block;
 
   return (
@@ -29,7 +31,7 @@ const TileGroupBlock = ({ block, publicAppUrl }: TileGroupBlockProps) => {
                 <ApiQueryStatTile
                   key={tile.id}
                   tile={tile}
-                  publicAppUrl={publicAppUrl}
+                  renderLink={renderLink}
                 />
               );
             default:

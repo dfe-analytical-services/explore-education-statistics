@@ -2,19 +2,26 @@ import Tag from '@common/components/Tag';
 import styles from '@common/modules/education-in-numbers/components/ApiQueryStatTile.module.scss';
 import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { EinApiQueryStatTile } from '@common/services/types/einBlocks';
+
+interface LinkRenderProps {
+  children: ReactNode;
+  className: string;
+  testId: string;
+  to: string;
+}
 
 export interface ApiQueryStatTileProps {
   tile: EinApiQueryStatTile;
-  publicAppUrl: string;
+  renderLink: (props: LinkRenderProps) => ReactNode;
   testId?: string;
 }
 
 const ApiQueryStatTile = ({
   testId = 'api-query-stat-tile',
   tile,
-  publicAppUrl,
+  renderLink,
 }: ApiQueryStatTileProps) => {
   const {
     title,
@@ -61,13 +68,12 @@ const ApiQueryStatTile = ({
           >
             {releaseLabel}
           </span>
-          <a
-            href={`${publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
-            data-testid={`${testId}-link`}
-            className={classNames('govuk-link', styles.publication)}
-          >
-            {publicationLabel}
-          </a>
+          {renderLink({
+            children: publicationLabel,
+            className: styles.publication,
+            testId: `${testId}-link`,
+            to: `/find-statistics/${publicationSlug}/${releaseSlug}`,
+          })}
         </div>
       )}
     </div>

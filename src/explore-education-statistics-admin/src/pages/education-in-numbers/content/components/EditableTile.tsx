@@ -1,3 +1,4 @@
+import Link from '@admin/components/Link';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import EditableApiQueryStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableApiQueryStatTileForm';
 import EditableFreeTextStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
@@ -77,7 +78,18 @@ export default function EditableTile({
         />
       ) : (
         <>
-          <ApiQueryStatTile tile={tile} publicAppUrl={publicAppUrl} />
+          <ApiQueryStatTile
+            tile={tile}
+            renderLink={({ children, className, testId, to }) => (
+              <Link
+                className={className}
+                data-testid={testId}
+                to={`${publicAppUrl}${to}`}
+              >
+                {children}
+              </Link>
+            )}
+          />
           {!tile.isLatestVersion && (
             <WarningMessage
               className="govuk-!-margin-top-2 govuk-!-margin-bottom-0"

@@ -1,13 +1,25 @@
 import render from '@common-test/render';
 import { screen } from '@testing-library/react';
 import React from 'react';
+import { ApiQueryStatTileProps } from '../ApiQueryStatTile';
 import TileGroupBlock from '../TileGroupBlock';
+
+const renderLink: ApiQueryStatTileProps['renderLink'] = ({
+  children,
+  className,
+  testId,
+  to,
+}) => (
+  <a className={className} data-testid={testId} href={to}>
+    {children}
+  </a>
+);
 
 describe('TileGroupBlock', () => {
   test('Renders correctly', () => {
     render(
       <TileGroupBlock
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         block={{
           type: 'TileGroupBlock',
           id: 'tile-group-block-1',
@@ -49,7 +61,7 @@ describe('TileGroupBlock', () => {
   test('Renders correctly with no title and one tile', () => {
     render(
       <TileGroupBlock
-        publicAppUrl="https://example.com"
+        renderLink={renderLink}
         block={{
           type: 'TileGroupBlock',
           id: 'tile-group-block-1',
