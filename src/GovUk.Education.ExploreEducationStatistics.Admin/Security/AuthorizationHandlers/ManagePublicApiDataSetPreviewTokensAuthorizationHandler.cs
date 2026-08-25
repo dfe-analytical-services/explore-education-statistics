@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
@@ -24,9 +25,10 @@ public class ManagePublicApiDataSetPreviewTokensAuthorizationHandler(
         }
 
         if (
-            await authorizationHandlerService.UserHasAnyRoleOnPublication(
+            await authorizationHandlerService.UserHasAnyPublicationRoleOnPublication(
                 userId: context.User.GetUserId(),
-                publicationId: publicationId
+                publicationId: publicationId,
+                rolesToInclude: [PublicationRole.Drafter, PublicationRole.Approver]
             )
         )
         {

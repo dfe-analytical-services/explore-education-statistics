@@ -89,7 +89,9 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckPreviewTokenExists(previewTokenId, cancellationToken)
+        // Deliberately requests a tracked entity since the mutation below needs EF to pick up
+        // and persist the change to Expires.
+        return await CheckPreviewTokenExists(previewTokenId, cancellationToken, trackChanges: true)
             .OnSuccessDo(previewToken =>
                 userService.CheckCanManagePublicApiDataSetPreviewTokens(
                     previewToken.DataSetVersion.DataSet.PublicationId
@@ -147,14 +149,23 @@ public class PreviewTokenService(
 
     private async Task<Either<ActionResult, PreviewToken>> CheckPreviewTokenExists(
         Guid previewTokenId,
-        CancellationToken cancellationToken
-    ) =>
-        await publicDataDbContext
-            .PreviewTokens.AsNoTracking()
+        CancellationToken cancellationToken,
+        bool trackChanges = false
+    )
+    {
+        IQueryable<PreviewToken> query = publicDataDbContext.PreviewTokens;
+
+        if (!trackChanges)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
             .Include(pt => pt.DataSetVersion)
                 .ThenInclude(dsv => dsv.DataSet)
             .Where(pt => pt.Id == previewTokenId)
             .SingleOrNotFoundAsync(cancellationToken);
+    }
 
     private async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> DoList(
         Guid dataSetVersionId,
