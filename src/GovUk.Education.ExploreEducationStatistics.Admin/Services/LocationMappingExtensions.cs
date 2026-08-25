@@ -13,7 +13,7 @@ internal static class LocationMappingExtensions
 {
     public static Either<ActionResult, LocationMapping> UpdateLocationMapping(
         this DataSetMapping dataSetMapping,
-        List<Location> replacementLocations,
+        IReadOnlyList<Location> replacementLocations,
         Guid originalId,
         Guid? newReplacementId = null
     )
@@ -87,7 +87,7 @@ internal static class LocationMappingExtensions
     private static bool IsLocationCandidateAvailable(
         DataSetMapping dataSetMapping,
         LocationMapping locationMapping,
-        List<Location> replacementLocations,
+        IReadOnlyList<Location> replacementLocations,
         Guid candidateId
     )
     {
