@@ -30,7 +30,7 @@ describe('createDataSetListRequest', () => {
         page: 1,
         search: '',
         orderBy: 'published desc',
-        filter: 'latestData eq true',
+        filter: 'isSuperseded eq false and latestData eq true',
       });
     });
   });
@@ -100,7 +100,7 @@ describe('createDataSetListRequest', () => {
       const result = createDataSetListRequest(testQuery);
 
       expect(result.filter).toBe(
-        "search.in(releaseType, 'AccreditedOfficialStatistics|OfficialStatistics', '|') and latestData eq true",
+        "isSuperseded eq false and search.in(releaseType, 'AccreditedOfficialStatistics|OfficialStatistics', '|') and latestData eq true",
       );
     });
 
@@ -112,7 +112,9 @@ describe('createDataSetListRequest', () => {
 
       const result = createDataSetListRequest(testInvalidQuery);
 
-      expect(result.filter).toBe('latestData eq true');
+      expect(result.filter).toBe(
+        'isSuperseded eq false and latestData eq true',
+      );
     });
 
     test('when latestDataOnly is undefined', () => {
@@ -122,7 +124,9 @@ describe('createDataSetListRequest', () => {
 
       const result = createDataSetListRequest(testQuery);
 
-      expect(result.filter).toBe('latestData eq true');
+      expect(result.filter).toBe(
+        'isSuperseded eq false and latestData eq true',
+      );
     });
 
     test('excludes latestdata filter when latestDataOnly is false', () => {
@@ -132,7 +136,7 @@ describe('createDataSetListRequest', () => {
 
       const result = createDataSetListRequest(testQuery);
 
-      expect(result.filter).toBeUndefined();
+      expect(result.filter).toBe('isSuperseded eq false');
     });
 
     test('includes api filter when dataSetType is api', () => {
@@ -143,7 +147,7 @@ describe('createDataSetListRequest', () => {
       const result = createDataSetListRequest(testQuery);
 
       expect(result.filter).toBe(
-        "latestData eq true and api/id ne null and api/id ne ''",
+        "isSuperseded eq false and latestData eq true and api/id ne null and api/id ne ''",
       );
     });
 
@@ -154,7 +158,9 @@ describe('createDataSetListRequest', () => {
 
       const result = createDataSetListRequest(testQuery);
 
-      expect(result.filter).toBe('latestData eq true');
+      expect(result.filter).toBe(
+        'isSuperseded eq false and latestData eq true',
+      );
     });
 
     test('excludes api filter when dataSetType is undefined', () => {
@@ -164,7 +170,9 @@ describe('createDataSetListRequest', () => {
 
       const result = createDataSetListRequest(testQuery);
 
-      expect(result.filter).toBe('latestData eq true');
+      expect(result.filter).toBe(
+        'isSuperseded eq false and latestData eq true',
+      );
     });
 
     test('combines themeId, publicationId, releaseType and geographicLevel filters', () => {
@@ -221,7 +229,7 @@ describe('createDataSetSuggestRequest', () => {
       page: 1,
       search: 'test search',
       orderBy: 'published desc',
-      filter: 'latestData eq true',
+      filter: 'isSuperseded eq false and latestData eq true',
     });
   });
 });
