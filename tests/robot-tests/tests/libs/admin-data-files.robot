@@ -86,11 +86,12 @@ user confirms upload to complete import
     END
 
     IF    ${WAIT_FOR_SCREENING_TO_COMPLETE}
+        user waits until subject screening has finished    ${SUBJECT_NAME}
         ${row}=    user gets table row    ${SUBJECT_NAME}    ${DATA_FILES_TABLE_SELECTOR}
-        ${statusText}=    get status for subject    ${SUBJECT_NAME}
         ${button}=    user gets button element    View details    ${row}
         user clicks element    ${button}
         user waits until modal is visible    Data set details
+        ${statusText}=    get status for subject    ${SUBJECT_NAME}
 
         IF    '${statusText}' == 'Pending review'
             user waits until h3 is visible    Screener test warnings
@@ -205,7 +206,7 @@ user waits until page does not contain data uploads table
 user acknowledges any warnings in screener modal
     user clicks element    id:screener-results-filtered-tab
     user waits until h3 is visible    Screener test warnings
-    user clicks all checkboxes in parent    screener-results-filtered
+    user clicks all checkboxes in parent    screener-results-filtered    %{WAIT_SMALL}
 
 user deletes subject file
     [Arguments]    ${SUBJECT_NAME}
@@ -260,14 +261,10 @@ user enters text into data guidance data file content editor
     user enters text into element    ${editor}    ${text}
 
 get status for subject
-    [Arguments]    ${SUBJECT_NAME}
+    [Arguments]    ${SUBJECT_NAME}    ${wait}=${timeout}
+    user waits until page contains element    xpath=//*[@data-testid='${SUBJECT_NAME}-status']    ${wait}
     ${statusText}=    Get Text    xpath=//*[@data-testid='${SUBJECT_NAME}-status']
-    [Return]    ${statusText}
-
-user waits until subject has status
-    [Arguments]    ${SUBJECT_NAME}    ${STATUS}
-    user waits until page contains element
-    ...    xpath=//*[@data-testid='${SUBJECT_NAME}-status' and contains(., '${STATUS}')]
+    RETURN    ${statusText}
 
 upload subject
     [Arguments]
@@ -289,8 +286,11 @@ user waits for screening to complete
     [Arguments]
     ...    ${SUBJECT_NAME}
 
-    user waits until subject has status    ${SUBJECT_NAME}    Screening
-    user waits until page contains element    testid:${SUBJECT_NAME}-screener-progress-bar
-    user waits until page does not contain element    testid:${SUBJECT_NAME}-screener-progress-bar
-    ...    wait=%{WAIT_DATA_FILE_SCREEN}
+    user waits until subject screening has finished    ${SUBJECT_NAME}
     user waits until page finishes loading
+
+user waits until subject screening has finished
+    [Arguments]    ${SUBJECT_NAME}    ${wait}=%{WAIT_DATA_FILE_SCREEN}
+    user waits until page contains element
+    ...    xpath=//*[@data-testid='${SUBJECT_NAME}-status'][contains(., 'Pending review') or contains(., 'Pending import') or contains(., 'Failed screening') or contains(., 'Screener error')]
+    ...    ${wait}

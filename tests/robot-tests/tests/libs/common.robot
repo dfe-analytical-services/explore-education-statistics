@@ -22,7 +22,6 @@ ${PUBLIC_API_FILES_DIR}             ${EXECDIR}${/}tests${/}files${/}public-api-d
 ${UNZIPPED_FILES_DIR}               ${EXECDIR}${/}tests${/}files${/}.unzipped-seed-data-files${/}
 ${DOWNLOADS_DIR}                    ${EXECDIR}${/}test-results${/}downloads${/}
 ${timeout}                          %{TIMEOUT}
-${implicit_wait}                    %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}    0
 ${log_network_traffic}              0
 ${MODAL_SELECTOR}                   css:div[role='dialog']
@@ -251,10 +250,7 @@ user waits until page finishes loading
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
     ...    ${spinner_timeout}
 
-    sleep    0.5
-
-    # Wait to ensure network activity attribute is updated in DOM
-    user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
+    user waits until page contains element    css:body[data-network-activity="idle"]    ${network_timeout}
 
 user waits until parent contains element
     [Arguments]
@@ -545,7 +541,7 @@ user waits until element is not visible
 
 user checks element is not visible
     [Arguments]    ${element}    ${wait}=${timeout}
-    element should not be visible    ${element}    ${wait}
+    wait until element is not visible    ${element}    timeout=${wait}
 
 user checks element is visually hidden
     [Arguments]    ${selector}    ${parent}=css:body
@@ -580,7 +576,7 @@ user checks element is disabled
 
 user checks element should contain
     [Arguments]    ${element}    ${text}    ${wait}=${timeout}
-    element should contain    ${element}    ${text}
+    wait until element contains    ${element}    ${text}    timeout=${wait}
 
 user checks element should not contain
     [Arguments]    ${element}    ${text}
@@ -781,26 +777,35 @@ user checks element attribute value should be
 
 user checks element value should be
     [Arguments]    ${locator}    ${value}    ${wait}=${timeout}
-    element attribute value should be    ${locator}    value    ${value}    ${wait}
+    user waits until page contains element    ${locator}    ${wait}
+    user retries keyword until it succeeds    ${wait}    1s
+    ...    element attribute value should be    ${locator}    value    ${value}
 
 user checks textarea contains
     [Arguments]    ${selector}    ${text}
     textarea should contain    ${selector}    ${text}
 
 user checks summary list contains
-    [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}
+    [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=%{WAIT_MEDIUM}
     user waits until parent contains element    ${parent}
     ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    ...    %{WAIT_MEDIUM}
+    ...    ${wait}
     ${element}=    get child element    ${parent}
     ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
     user waits until element is visible    ${element}    %{WAIT_LONG}
 
+user checks summary list contains london date
+    [Arguments]    ${term}    ${parent}=css:body    ${wait}=%{WAIT_MEDIUM}
+    ${date_matcher}=    get london date xpath matcher
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[${date_matcher}]
+    ...    ${wait}
+
 user checks summary list does not contain
-    [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=${timeout}
+    [Arguments]    ${term}    ${description}    ${parent}=css:body    ${wait}=%{WAIT_MEDIUM}
     user waits until parent contains element    ${parent}
     ...    xpath:.//dt[contains(text(), "${term}")]
-    ...    %{WAIT_MEDIUM}
+    ...    ${wait}
     user waits until parent does not contain element    ${parent}
     ...    xpath:.//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
 
@@ -813,7 +818,7 @@ user checks select contains at least x options
     [Arguments]    ${locator}    ${num}
     ${options}=    get list items    ${locator}
     ${length}=    get length    ${options}
-    should be true    ${options} > ${num}
+    should be true    ${length} > ${num}
 
 user checks select contains option
     [Arguments]    ${locator}    ${label}
@@ -1026,7 +1031,8 @@ user clicks checkbox
     user clicks element    xpath://label[${text_matcher} or strong[${text_matcher}]]/../input[@type="checkbox"]
 
 user clicks all checkboxes in parent
-    [Arguments]    ${testid}
+    [Arguments]    ${testid}    ${wait}=${timeout}
+    user waits until page contains element    css:[data-testid="${testid}"] input[type=checkbox]    ${wait}
     @{checkboxes}=    Get WebElements    css:[data-testid="${testid}"] input[type=checkbox]
     FOR    ${checkbox}    IN    @{checkboxes}
         user scrolls to element    ${checkbox}
@@ -1111,10 +1117,10 @@ user checks list contains exact items in order
     END
 
 user checks items matching locator contain exact items in order
-    [Arguments]    @{expected_items}    ${locator}
-    ${actual}=    Get WebElements    ${locator}
+    [Arguments]    @{expected_items}    ${locator}    ${wait}=${timeout}
     ${num_items}=    Get Length    ${expected_items}
-    length should be    ${actual}    ${num_items}
+    user waits until page contains element    ${locator}    ${wait}    limit=${num_items}
+    ${actual}=    Get WebElements    ${locator}
     FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
         user checks element should contain    ${actual}[${index}]    ${content}
     END
@@ -1134,6 +1140,13 @@ user checks breadcrumb count should be
 user checks nth breadcrumb contains
     [Arguments]    ${num}    ${text}
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(${num})    ${text}
+
+user checks release note date is today
+    [Arguments]    ${position}=1    ${wait}=${timeout}
+    ${date_matcher}=    get london date xpath matcher
+    user waits until parent contains element    css:#release-notes li:nth-of-type(${position})
+    ...    xpath:.//time[${date_matcher}]
+    ...    ${wait}
 
 user waits until page contains other release
     [Arguments]    ${other_release_title}    ${wait}=${timeout}
@@ -1162,17 +1175,15 @@ user navigates to
 
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
-    IF    '${variable_value}'=='${EMPTY}'
-        Variable "${variable_name}" is empty.
-    END
+    Should Not Be Empty    ${variable_value}    msg=Variable "${variable_name}" is empty.
 
 user waits until table tool wizard step is available
     [Arguments]    ${step_number}    ${table_tool_step_title}    ${wait}=%{WAIT_MEDIUM}
     user waits until page contains element    xpath://*[@data-testid="wizardStep-${step_number}"]    ${wait}
     user waits until page does not contain element    xpath://*[@data-testid="wizardStep-${step_number}" and @hidden]
     ...    ${wait}
-    # this visible check passes when it should fail?!
-    user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
+    user waits until element is visible
+    ...    xpath://*[@data-testid="wizardStep-${step_number}"]//*[self::h2 or self::h3][contains(., "${table_tool_step_title}")]
     ...    %{WAIT_SMALL}
     user waits until page finishes loading
 
@@ -1233,35 +1244,42 @@ user takes html snapshot of element
     ${filepath}=    take html snapshot of element    ${element}    ${filename}
     [Return]    ${filepath}
 
+user retries keyword until it succeeds
+    [Arguments]    ${retries}    ${interval}    ${keyword}    @{args}
+    ${previous_run_on_failure}=    Register Keyword To Run On Failure    NOTHING
+    TRY
+        Wait Until Keyword Succeeds    ${retries}    ${interval}    ${keyword}    @{args}
+    FINALLY
+        Register Keyword To Run On Failure    ${previous_run_on_failure}
+    END
+
+user waits until file is downloaded
+    [Arguments]    ${filename}    ${retries}=30    ${interval}=1s
+    Wait Until Keyword Succeeds    ${retries}    ${interval}
+    ...    File Should Exist    ${DOWNLOADS_DIR}${filename}
+    ${file_size}=    Get File Size    ${DOWNLOADS_DIR}${filename}
+    Should Be True    ${file_size} > 0
+
 user waits for caches to expire
     sleep    %{WAIT_CACHE_EXPIRY}
 
 user wait for option to be available and select it
     [Arguments]    ${dropdown_locator}    ${option_text}    ${timeout}=%{TIMEOUT}
-    wait until keyword succeeds    ${timeout}    1s    check option exist in dropdown    ${dropdown_locator}
+    user waits until page contains element    ${dropdown_locator}    ${timeout}
+    wait until keyword succeeds    ${timeout}    1s    check option exists in dropdown    ${dropdown_locator}
     ...    ${option_text}
     select from list by label    ${dropdown_locator}    ${option_text}
 
-check option exist in dropdown
+check option exists in dropdown
     [Arguments]    ${dropdown_locator}    ${option_text}
-    ${options}=    get webelements    ${dropdown_locator} > option
-    ${all_texts}=    Create List
-
-    FOR    ${option}    IN    @{options}
-        ${text}=    get text    ${option}
-        Append To List    ${all_texts}    ${text}
-    END
-
-    ${matched}=    Run Keyword And Return Status    Should Contain    ${all_texts}    ${option_text}
-    IF    "${matched}" == "${False}"
-        # Adding logging to help catch intermittent test failures
-        Log to console    \n\tOption '${option_text}' not found in the ${dropdown_locator} dropdown.
-        Log to console    \n\tAvailable options were: ${all_texts}
-    END
-    [Return]    ${matched}
+    ${all_texts}=    get list items    ${dropdown_locator}
+    Should Contain    ${all_texts}    ${option_text}
+    ...    msg=Option '${option_text}' not found in the ${dropdown_locator} dropdown. Available options were: ${all_texts}
+    ...    values=${False}
 
 Get Texts From Elements
-    [Arguments]    ${locator}
+    [Arguments]    ${locator}    ${wait}=${timeout}
+    user waits until page contains element    ${locator}    ${wait}
     ${elements}=    Get WebElements    ${locator}
     ${texts}=    Create List
     FOR    ${element}    IN    @{elements}

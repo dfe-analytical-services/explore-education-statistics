@@ -105,8 +105,7 @@ Publish amendment
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
-    ${date}=    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Verify default organisation is showing on public page again

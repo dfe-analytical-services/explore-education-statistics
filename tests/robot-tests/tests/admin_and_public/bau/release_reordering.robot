@@ -355,8 +355,7 @@ Add release note to amendment of second release
     user clicks link    Content
     user adds a release note    Test release note one
 
-    ${date}=    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Approve second release amendment

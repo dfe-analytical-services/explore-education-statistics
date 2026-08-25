@@ -150,7 +150,7 @@ Validate data sets list
 
 Validate zip contains correct files
     [Documentation]    EES-4147
-    sleep    8    # wait for file to download
+    user waits until file is downloaded    data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
@@ -214,7 +214,6 @@ Remove release filter
     ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user wait for option to be available and select it    css:select[id="filters-form-publication"]
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    sleep    1    # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it    css:select[id="filters-form-release"]
     ...    ${PUPIL_ABSENCE_RELEASE_NAME}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}

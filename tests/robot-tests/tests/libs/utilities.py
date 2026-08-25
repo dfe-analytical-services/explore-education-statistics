@@ -16,6 +16,8 @@ from tests.libs.selenium_elements import element_finder, sl
 
 logger = get_logger(__name__)
 
+RETRYABLE_LOOKUP_EXCEPTIONS = (NoSuchElementException, StaleElementReferenceException)
+
 # Should only initialise some parts once e.g. registration
 # of custom locators onto the framework's ElementFinder
 if not utilities_init.initialised:
@@ -76,19 +78,6 @@ def get_url_with_basic_auth(url: str):
 def raise_assertion_error(err_msg):
     sl().failure_occurred()
     raise AssertionError(err_msg)
-
-
-def retry_or_fail_with_delay(func, retries=5, delay=1.0, *args, **kwargs):
-    last_exception = None
-    for attempt in range(retries):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            last_exception = e
-            logger.info(f"Attempt {attempt + 1}/{retries} failed with error: {e}. Retrying in {delay} seconds...")
-            time.sleep(delay)
-    # Raise the last exception if all retries failed
-    raise last_exception
 
 
 def wait_until_parent_contains_element(
@@ -170,7 +159,7 @@ def get_child_element(parent_locator: object, child_locator: str, retries: int =
             )
         return children[0]
 
-    return do_with_retries(get_element, "get_child_element", NoSuchElementException, retries, delay)
+    return do_with_retries(get_element, "get_child_element", RETRYABLE_LOOKUP_EXCEPTIONS, retries, delay)
 
 
 def get_child_elements(parent_locator: object, child_locator: str):
@@ -178,6 +167,8 @@ def get_child_elements(parent_locator: object, child_locator: str):
         child_locator = _normalise_child_locator(child_locator)
         parent_el = _get_webelement_from_locator(parent_locator)
         return element_finder().find_elements(child_locator, parent=parent_el)
+    except StaleElementReferenceException:
+        raise
     except Exception as err:
         logger.warning(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
@@ -210,7 +201,7 @@ def set_cookie_from_json(cookie_json):
 
 
 def user_should_be_at_top_of_page():
-    (x, y) = sl().get_window_position()
+    x, y = sl().get_window_position()
     if y != 0:
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
@@ -270,14 +261,6 @@ def user_is_on_admin_dashboard(admin_url: str) -> bool:
     return left_part == admin_url or left_part == f"{admin_url}/dashboard"
 
 
-def user_is_on_admin_dashboard_with_theme_selected(admin_url: str, theme: str) -> bool:
-    if not user_is_on_admin_dashboard(admin_url):
-        return False
-    selected_theme = sl().get_selected_list_label("id:publicationsReleases-theme-themeId")
-    if selected_theme != theme:
-        return False
-
-
 def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
     if user_is_on_admin_dashboard(admin_url):
         return
@@ -335,7 +318,7 @@ def get_child_element_with_retry(parent_locator: object, child_locator: str, max
         return get_child_element(parent_locator, child_locator)
 
     return do_with_retries(
-        get_element, "get_child_element_with_retry", NoSuchElementException, max_retries, retry_delay
+        get_element, "get_child_element_with_retry", RETRYABLE_LOOKUP_EXCEPTIONS, max_retries, retry_delay
     )
 
 
@@ -349,7 +332,8 @@ def do_with_retries(action, action_description: str, allowed_exception_types, re
         except allowed_exception_types as ex:
             last_exception = ex
             retry_count += 1
-            time.sleep(retry_delay)
+            if retry_count < retries:
+                time.sleep(retry_delay)
 
     raise_assertion_error(
         f"Failed to perform action {action_description} after {retries} retries."

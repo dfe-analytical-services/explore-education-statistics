@@ -136,5 +136,4 @@ user checks invalid data set file details in modal
     user checks summary list contains    Size    976 B    testid:Data file details
     user checks summary list contains    Status    Failed screening    testid:Data file details
     user checks summary list contains    Uploaded by    ees-test.bau1@education.gov.uk    testid:Data file details
-    ${date}=    get london date
-    user checks summary list contains    Date uploaded    ${date}    testid:Data file details
+    user checks summary list contains london date    Date uploaded    testid:Data file details

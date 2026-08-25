@@ -67,8 +67,7 @@ Check the file details in the modal
     user checks summary list contains    Status    Pending review    testid:Data file details
 
     user checks summary list contains    Uploaded by    ees-test.bau1@education.gov.uk    testid:Data file details
-    ${date}=    get london date
-    user checks summary list contains    Date uploaded    ${date}    testid:Data file details
+    user checks summary list contains london date    Date uploaded    testid:Data file details
 
 Continue the import
     user clicks button    Continue import with warnings

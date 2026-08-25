@@ -211,8 +211,7 @@ Add a Footnote as a publication approver
 Check publication approver can create a release note
     user clicks link    Content
     user adds a release note    Test release note one
-    ${date}    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Check publication approver can publish a release

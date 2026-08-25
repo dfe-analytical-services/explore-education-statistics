@@ -29,7 +29,8 @@ Validate zip contains correct files
     [Documentation]    EES-4147
     user clicks button containing text    Download data set (ZIP)
 
-    sleep    8    # wait for file to download
+    user waits until file is downloaded
+    ...    seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     ${list}=    create list    data/absence_in_prus.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    seed-publication-pupil-absence-in-schools-in-england_2016-17.zip
     ...    ${list}

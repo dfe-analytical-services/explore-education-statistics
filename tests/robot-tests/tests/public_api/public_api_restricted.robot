@@ -86,10 +86,10 @@ Create multiple API data sets and refresh the page
 
     user waits until h3 is visible    Draft API data sets
 
-    wait until keyword succeeds    20x    %{WAIT_SMALL}s
-    ...    user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
-    wait until keyword succeeds    20x    %{WAIT_SMALL}s
-    ...    user checks table cell contains    2    3    Ready    testid:draft-api-data-sets
+    user waits until table cell contains    1    3    Ready    testid:draft-api-data-sets
+    ...    %{WAIT_DATA_FILE_IMPORT}
+    user waits until table cell contains    2    3    Ready    testid:draft-api-data-sets
+    ...    %{WAIT_DATA_FILE_IMPORT}
 
 Verify the contents inside the 'Draft API data sets' table
     user waits until h3 is visible    Draft API data sets

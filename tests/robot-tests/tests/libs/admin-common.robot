@@ -9,7 +9,6 @@ Library     String
 *** Variables ***
 ${BAU1_BROWSER}         bau1
 ${ANALYST1_BROWSER}     analyst1
-${MODAL_SELECTOR}       css:[role="dialog"]
 
 
 *** Keywords ***
@@ -788,19 +787,23 @@ user waits until modal is visible
     ...    ${modal_text}=${EMPTY}
     ...    ${wait}=${timeout}
 
-    user waits until parent contains element    ${MODAL_SELECTOR}    //h2[span[normalize-space(.)='${modal_title}']]
-    ...    timeout=${wait}
+    ${modal_selector}=    user gets modal selector    ${modal_title}
+    user waits until page contains element    ${modal_selector}    ${wait}
+    ${modal_element}=    get webelement    ${modal_selector}
     IF    "${modal_text}" != "${EMPTY}"
-        user waits until parent contains element    ${MODAL_SELECTOR}    xpath://*[.="${modal_text}"]
+        user waits until parent contains element    ${modal_element}    xpath://*[.="${modal_text}"]
         ...    timeout=${wait}
     END
-    ${modal_element}=    get webelement    ${MODAL_SELECTOR}
-    [Return]    ${modal_element}
+    RETURN    ${modal_element}
 
 user waits until modal is not visible
     [Arguments]    ${modal_title}    ${wait}=${timeout}
-    user waits until page does not contain element    ${MODAL_SELECTOR}    ${wait}
-    user waits until h2 is not visible    ${modal_title}
+    ${modal_selector}=    user gets modal selector    ${modal_title}
+    user waits until page does not contain element    ${modal_selector}    ${wait}
+
+user gets modal selector
+    [Arguments]    ${modal_title}
+    RETURN    xpath://div[@role="dialog"][.//h2[span[normalize-space(.)="${modal_title}"]]]
 
 user checks modal warning text contains
     [Arguments]

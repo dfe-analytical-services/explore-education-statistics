@@ -59,6 +59,6 @@ paginated response should contain results
     END
 
 user waits until draft API data set status contains
-    [Arguments]    ${expected_status}    ${retries}=10x    ${interval}=%{WAIT_SMALL}s
-    wait until keyword succeeds    ${retries}    ${interval}
-    ...    user checks summary list contains    Status    ${expected_status}    testid:draft-version-summary
+    [Arguments]    ${expected_status}    ${wait}=%{WAIT_DATA_FILE_IMPORT}
+    user checks summary list contains    Status    ${expected_status}    testid:draft-version-summary
+    ...    wait=${wait}

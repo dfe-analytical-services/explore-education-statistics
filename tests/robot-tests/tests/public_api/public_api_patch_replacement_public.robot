@@ -184,7 +184,6 @@ Validate the version status of indicators task is now complete
 
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version
-    user waits for caches to expire
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
 
@@ -209,8 +208,7 @@ Add release note for amendment
     User clicks button    Add note    id:release-notes
     user enters text into element    id:create-release-note-form-reason    Test release note
     user clicks button    Save note
-    ${date}=    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note
 
 Approve amendment release
@@ -305,7 +303,6 @@ Validate the version status of indicators task is now complete after mapping the
 
 Confirm finalization of this API data set version for second patch replacement
     user clicks button    Finalise this data set version
-    user waits for caches to expire
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
 
@@ -330,8 +327,7 @@ Add release note for amendment for second patch replacement
     User clicks button    Add note    id:release-notes
     user enters text into element    id:create-release-note-form-reason    Test release note
     user clicks button    Save note
-    ${date}=    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note
 
 Approve amendment release for second patch replacement

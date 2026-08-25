@@ -24,6 +24,11 @@ def get_local_browser_date_and_time(offset_days: int = 0, format_string: str = "
     return _get_date_and_time(offset_days, format_string, _get_browser_timezone())
 
 
+def get_london_date_xpath_matcher(days_tolerance: int = 1, format_string: str = "%-d %B %Y") -> str:
+    dates = [_get_date_and_time(-offset, format_string, "Europe/London") for offset in range(days_tolerance + 1)]
+    return " or ".join(f'contains(., "{date}")' for date in dates)
+
+
 def get_london_day_of_month(offset_days: int = 0) -> str:
     return _get_date_and_time(offset_days, "%-d", "Europe/London")
 

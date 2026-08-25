@@ -141,7 +141,6 @@ Validate that location, filter and indicator mappings are complete
 
 Confirm finalization of this API data set version
     user clicks button    Finalise this data set version
-    user waits for caches to expire
     user waits until h2 is visible    Mappings finalised
     user waits until page contains    Draft API data set version is ready to be published
 

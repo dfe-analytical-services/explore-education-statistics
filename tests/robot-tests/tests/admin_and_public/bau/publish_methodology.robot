@@ -202,8 +202,7 @@ Verify that the methodology displays a link to the publication
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the methodology content is correct
-    ${date}=    get london date
-    user checks summary list contains    Published    ${date}
+    user checks summary list contains london date    Published
 
     user checks accordion is in position    Methodology content section 1    1    id:content
     user checks accordion is in position    Methodology content section 2    2    id:content
@@ -364,9 +363,8 @@ Verify that the amended methodology displays a link to the publication
     ...    css:[aria-labelledby="related-information"]
 
 Verify that the amended methodology content is correct
-    ${date}=    get london date
-    user checks summary list contains    Published    ${date}
-    user checks summary list contains    Last updated    ${date}
+    user checks summary list contains london date    Published
+    user checks summary list contains london date    Last updated
 
     user checks accordion is in position    Methodology content section 2    1    id:content
     user checks accordion is in position    Methodology content section 1 updated    2    id:content

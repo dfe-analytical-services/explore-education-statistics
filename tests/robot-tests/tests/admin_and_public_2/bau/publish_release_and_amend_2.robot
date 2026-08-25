@@ -287,8 +287,7 @@ Add release note to release amendment
     user clicks button    Add note
     user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
-    ${date}    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Go to "Sign off" page
@@ -421,8 +420,7 @@ Update Seven filters footnote
 Add release note for new release amendment
     user clicks link    Content
     user adds a release note    Test release note two
-    ${date}    get london date
-    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user checks release note date is today
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
 Go to "Sign off" to approve amended release for immediate publication

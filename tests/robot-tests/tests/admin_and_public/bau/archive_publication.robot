@@ -142,8 +142,6 @@ Generate permalink for archive-publication
     user waits until table tool wizard step is available    5    Choose your filters
     user checks previous table tool step contains    4    Time period    2005 to 2016
     user clicks element    id:filtersForm-submit
-    Sleep    5
-
     user waits until page finishes loading
 
     user waits until results table appears    %{WAIT_LONG}
@@ -175,7 +173,6 @@ Check that archive-publication subject appears correctly on Data catalogue page
     user wait for option to be available and select it
     ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_ARCHIVE}
-    sleep    1    # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it
     ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_ARCHIVE}
@@ -278,7 +275,6 @@ Check data catalogue page contains archive and superseding publication subjects
     user wait for option to be available and select it
     ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_SUPERSEDE}
-    sleep    1    # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it
     ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_SUPERSEDE}
@@ -293,7 +289,6 @@ Check data catalogue page contains archive and superseding publication subjects
     user wait for option to be available and select it
     ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_ARCHIVE}
-    sleep    1    # wait a moment to wait for release filter options to get updated
     user wait for option to be available and select it
     ...    css:select[id="filters-form-release"]
     ...    ${RELEASE_NAME_ARCHIVE}
