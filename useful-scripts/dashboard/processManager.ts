@@ -16,12 +16,23 @@ import {
 } from './services';
 import createFileLock, { UnlockCallback } from '../utils/createFileLock';
 import errorMessage from './errorMessage';
+import {
+  findFunctionHostFailureLine,
+  functionHostServices,
+} from './functionHostHealth';
 import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
 import { startDockerServices } from './dockerManager';
 import { ServiceLogFile } from './logFiles';
 
+/**
+ * 'unhealthy' is for a service whose process is alive and doing nothing
+ * useful - a Functions host that started and then failed to load its
+ * functions being the case that prompted it. It's deliberately distinct from
+ * 'error', which means nothing is running: the process is still there,
+ * holding its port, and still needs stopping.
+ */
 export type ProcessStatus =
-  'stopped' | 'starting' | 'running' | 'stopping' | 'error';
+  'stopped' | 'starting' | 'running' | 'stopping' | 'error' | 'unhealthy';
 
 interface ManagedProcess {
   status: ProcessStatus;
@@ -330,13 +341,24 @@ export async function startProcess(
 
   const entry = getOrCreate(service);
 
-  if (entry.status === 'running' || entry.status === 'starting') {
+  // 'unhealthy' counts as already started: the process is still out there on
+  // its port, so starting again would spawn a second one alongside it rather
+  // than replacing it. Getting a broken service back needs an explicit stop.
+  if (
+    entry.status === 'running' ||
+    entry.status === 'starting' ||
+    entry.status === 'unhealthy'
+  ) {
     return;
   }
 
   const runningConflict = (schema.conflictsWith ?? []).find(conflict => {
     const conflictStatus = getStatus(conflict);
-    return conflictStatus === 'running' || conflictStatus === 'starting';
+    return (
+      conflictStatus === 'running' ||
+      conflictStatus === 'starting' ||
+      conflictStatus === 'unhealthy'
+    );
   });
 
   if (runningConflict) {
@@ -523,8 +545,11 @@ export async function startProcess(
     const markReady = async () => {
       // stdout that was buffered when the process died still arrives after
       // the exit handler has run, so a ready line in it would otherwise
-      // resurrect a service that has already stopped.
-      if (isReady || hasExited) {
+      // resurrect a service that has already stopped. A service already known
+      // to be broken is left alone for the same reason: a Functions host
+      // reprinting its banner as it retries a failing startup is not news
+      // that it's working.
+      if (isReady || hasExited || entry.status === 'unhealthy') {
         return;
       }
 
@@ -532,6 +557,47 @@ export async function startProcess(
       entry.status = 'running';
       await releaseBuildMutexNow();
       resolveSettled();
+    };
+
+    /**
+     * Marks a service that is up but not doing its job, without pretending
+     * the process has gone away.
+     *
+     * Settles the start and hands the build mutex back, exactly as becoming
+     * ready would: this is as far as this service is ever going to get, and
+     * leaving either outstanding would hold every queued build behind a
+     * service that is never going to finish starting.
+     */
+    const markUnhealthy = async (cause: string) => {
+      if (
+        hasExited ||
+        entry.status === 'stopping' ||
+        entry.status === 'unhealthy'
+      ) {
+        return;
+      }
+
+      entry.status = 'unhealthy';
+      entry.error = cause;
+      appendLog(entry, `[dashboard] Started, but not working: ${cause}`);
+      await releaseBuildMutexNow();
+      resolveSettled();
+    };
+
+    // Only Functions hosts have a "running but idle" failure mode the
+    // dashboard can spot from the outside - see functionHostHealth.
+    const isFunctionHost = functionHostServices.includes(service);
+
+    const checkFunctionHostFailure = (line: string): void => {
+      if (!isFunctionHost) {
+        return;
+      }
+
+      const failure = findFunctionHostFailureLine(line);
+
+      if (failure) {
+        markUnhealthy(failure);
+      }
     };
 
     // lockUntilReady only governs the dotnet-build mutex - readiness itself
@@ -546,10 +612,13 @@ export async function startProcess(
       if (!isReady && runCommand.checkReady?.(line)) {
         markReady();
       }
+
+      checkFunctionHostFailure(line);
     });
 
     childProcess.stderr.pipe(splitLines()).on('data', (line: string) => {
       appendLog(entry, line);
+      checkFunctionHostFailure(line);
     });
 
     childProcess.on('exit', async (code, signal) => {
@@ -561,11 +630,24 @@ export async function startProcess(
 
       const wasStopping = entry.status === 'stopping';
 
+      // A service already known to be broken didn't stop, it died - so the
+      // exit code doesn't get to call it a clean shutdown. It has to be asked
+      // separately because Core Tools exits 0 after a startup it couldn't
+      // recover from (`--pause-on-error` returning straight away when nothing
+      // is attached to read the keypress), which on the code alone is
+      // indistinguishable from a service that was told to stop.
+      const wasUnhealthy = entry.status === 'unhealthy';
+
       entry.process = undefined;
       entry.startToken = undefined;
-      entry.status = wasStopping || code === 0 || signal ? 'stopped' : 'error';
+      entry.status =
+        wasStopping || (!wasUnhealthy && (code === 0 || signal))
+          ? 'stopped'
+          : 'error';
 
-      if (entry.status === 'error') {
+      // Whatever we already know about why it was broken beats "exited with
+      // code 0", which says nothing at all.
+      if (entry.status === 'error' && !wasUnhealthy) {
         entry.error = `Process exited with code ${code}`;
       }
 
@@ -587,9 +669,11 @@ export async function startProcess(
       // than marking it 'error': that status means "nothing is running", so
       // the pid would be forgotten, no Stop button would be offered, and
       // (being detached) it would go on to outlive the dashboard entirely.
-      // Its own exit handler still owns the mutex and the settled/exited
-      // promises, so nothing is unwound here.
-      entry.status = 'running';
+      // 'unhealthy' says both halves of that: there is a process to stop, and
+      // whatever it's doing, the start didn't finish. Its own exit handler
+      // still owns the mutex and the settled/exited promises, so nothing is
+      // unwound here.
+      entry.status = 'unhealthy';
       appendLog(
         entry,
         `[dashboard] Start failed after the process had spawned - it is still running: ${entry.error}`,
@@ -749,18 +833,23 @@ export interface StopAllResult {
  *
  * What gets stopped and what gets restarted are deliberately different sets.
  * Anything holding a process is stopped, whatever its status - a start that
- * failed after spawning leaves one running under an 'error' status, still on
- * its port and still connected to the databases a backup is about to read.
- * Only what was actually running or starting is worth restoring though;
- * resurrecting a service that had already crashed isn't restoring state, it's
- * inventing it.
+ * failed after spawning leaves one running under an 'unhealthy' status, still
+ * on its port and still connected to the databases a backup is about to read.
+ * Only what was actually started is worth restoring though; resurrecting a
+ * service that had already crashed isn't restoring state, it's inventing it.
+ * 'unhealthy' is restored, because a service the user deliberately started
+ * and hasn't stopped should still be there afterwards - broken, as they left
+ * it, rather than quietly gone.
  */
 export async function stopAllStartedProcesses(): Promise<StopAllResult> {
   const entries = Array.from(registry.entries());
 
   const restartable = entries
     .filter(
-      ([, entry]) => entry.status === 'running' || entry.status === 'starting',
+      ([, entry]) =>
+        entry.status === 'running' ||
+        entry.status === 'starting' ||
+        entry.status === 'unhealthy',
     )
     .map(([service]) => service);
 

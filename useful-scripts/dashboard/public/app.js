@@ -248,7 +248,11 @@ function appendOpenLink(card, service) {
 }
 
 function isStarted(service) {
-  return service?.status === 'running' || service?.status === 'starting';
+  return (
+    service?.status === 'running' ||
+    service?.status === 'starting' ||
+    service?.status === 'unhealthy'
+  );
 }
 
 /**
@@ -300,7 +304,11 @@ function renderServiceCard(service) {
   const actions = document.createElement('div');
   actions.className = 'card-actions';
 
-  const isRunning = service.status === 'running';
+  // 'unhealthy' means the process is up but not working - so it's still the
+  // Stop button that's wanted, not another Start that would spawn a second one
+  // alongside it.
+  const isRunning =
+    service.status === 'running' || service.status === 'unhealthy';
   const isBusy = service.status === 'starting' || service.status === 'stopping';
 
   if (service.name === 'admin') {
@@ -390,7 +398,8 @@ function renderGroupedServiceCard(groupName, members) {
     m =>
       m.status === 'running' ||
       m.status === 'starting' ||
-      m.status === 'stopping',
+      m.status === 'stopping' ||
+      m.status === 'unhealthy',
   );
   const locked = Boolean(active);
   const selectedName =

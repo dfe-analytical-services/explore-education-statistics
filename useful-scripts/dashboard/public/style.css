@@ -186,7 +186,8 @@ h2 {
   background: var(--amber);
 }
 
-.status-error {
+.status-error,
+.status-unhealthy {
   background: var(--red);
 }
 

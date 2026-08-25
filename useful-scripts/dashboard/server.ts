@@ -53,6 +53,9 @@ import {
 } from './processManager';
 import importMssqlDataZip from './testData';
 import findWebAppFailure, { webAppServices } from './webAppHealth';
+import findFunctionHostFailure, {
+  functionHostServices,
+} from './functionHostHealth';
 
 const __dirname = getDirname(import.meta.url);
 const PORT = Number(process.env.DASHBOARD_PORT ?? 4300);
@@ -83,7 +86,8 @@ function isServiceName(value: string): value is ServiceName {
  */
 function usesPublicDataDb(service: ServiceName): boolean {
   const status = getStatus(service);
-  const isStarted = status === 'running' || status === 'starting';
+  const isStarted =
+    status === 'running' || status === 'starting' || status === 'unhealthy';
 
   return (
     (isStarted ? getPublicDataDbOverride(service) : undefined) ??
@@ -263,6 +267,26 @@ app.get(
       }
     });
 
+    // A Functions host that faults on startup keeps its port and goes on
+    // retrying, so nothing about it looks stopped. The card is marked
+    // 'Unhealthy' by then, which says something is wrong but not what - and
+    // what's wrong is usually a Core Tools too old for these services, which
+    // no amount of restarting will change.
+    functionHostServices.forEach(service => {
+      const failure = findFunctionHostFailure(service, getLogs(service));
+
+      if (failure) {
+        issues.push({
+          id: `function-host-${service}`,
+          message: failure.message,
+          // No fix button: installing Core Tools is outside anything this
+          // dashboard manages, and how you'd upgrade it depends on how you
+          // installed it - so the message has to be the whole of the help.
+          serviceName: service,
+        });
+      }
+    });
+
     const services = allowedServiceNames.map(name => {
       const schema = serviceSchemas[name];
 
@@ -373,7 +397,9 @@ app.post(
       const adminStatus = getStatus('admin');
 
       if (
-        (adminStatus === 'running' || adminStatus === 'starting') &&
+        (adminStatus === 'running' ||
+          adminStatus === 'starting' ||
+          adminStatus === 'unhealthy') &&
         !usesPublicDataDb('admin')
       ) {
         await stopProcess('admin');

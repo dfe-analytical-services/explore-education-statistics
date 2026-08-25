@@ -984,7 +984,12 @@ See our custom config inside `.linkcheckerrc` and linkchecker docs for more info
 ### The Function Apps aren't running
 
 If any of the Function Apps (Processor, Publisher or Public Processor) won't spin up successfully, and you're hitting a `Value cannot be null. (Parameter: 'provider')` error,
+or a `Could not load file or assembly 'Microsoft.Extensions.*, Version=10.0.0.0'` under `Error configuring services in an external startup class`,
 try upgrading your [Azure Functions Core Tools version](https://github.com/Azure/azure-functions-core-tools).
+
+You need **4.13.0 or later**. Earlier versions bundle a Functions host built against .NET 9, which can't load the
+net10.0 WebJobs extensions these apps build against - so the host starts, faults while configuring itself, and then
+sits there holding its port without running a single function. Check what you have with `func --version`.
 
 ## License
 
