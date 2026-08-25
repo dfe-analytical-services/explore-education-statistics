@@ -19,15 +19,14 @@
 
   .notLatestTag {
     align-self: flex-start;
-    // Cancels the tag's own 8px left padding so its first letter lines up with
-    // the title and statistic instead of sitting indented from them.
-    margin-left: -8px;
+    margin-top: 2px;
     margin-bottom: govuk-spacing(3);
   }
 
   .meta {
     display: flex;
     flex-direction: column;
+    margin-top: auto;
   }
 
   .release {

@@ -231,12 +231,12 @@ function getTileReorderLabel(tile: EinTile): string {
     case 'FreeTextStatTile':
       return (
         [tile.title, tile.statistic, tile.trend].filter(Boolean).join(' ') ||
-        'Unset free text stat tile'
+        'Empty free text stat tile'
       );
     case 'ApiQueryStatTile':
       return (
         [tile.title, tile.statistic].filter(Boolean).join(' ') ||
-        'Unset API query stat tile'
+        'Empty API query stat tile'
       );
     default:
       return 'Unknown tile';

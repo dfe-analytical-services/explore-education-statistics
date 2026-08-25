@@ -26,13 +26,15 @@ const FreeTextStatTile = ({
       </p>
 
       {linkText && linkUrl && (
-        <a
-          href={linkUrl}
-          data-testid={`${testId}-link`}
-          className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
-        >
-          {linkText}
-        </a>
+        <div className={styles.linkContainer}>
+          <a
+            href={linkUrl}
+            data-testid={`${testId}-link`}
+            className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
+          >
+            {linkText}
+          </a>
+        </div>
       )}
     </div>
   );
