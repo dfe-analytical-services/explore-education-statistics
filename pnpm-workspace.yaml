@@ -3,6 +3,7 @@ packages:
   - 'src/explore-education-statistics-ckeditor'
   - 'src/explore-education-statistics-common'
   - 'src/explore-education-statistics-frontend'
+  - 'useful-scripts/dashboard'
 
 # From pnpm 11 onwards only auth and registry settings are read from .npmrc.
 # Every other setting has to live here. See https://pnpm.io/settings.

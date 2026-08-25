@@ -2,7 +2,7 @@ import chalk, { ChalkInstance } from 'chalk';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { getDirname } from '../utils/nodeGlobals';
+import { getDirname } from './utils/nodeGlobals';
 
 const __dirname = getDirname(import.meta.url);
 

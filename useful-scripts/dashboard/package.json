@@ -1,0 +1,27 @@
+{
+  "name": "ees-dashboard",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@commander-js/extra-typings": "^11.0.0",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^18.17.5",
+    "@types/signal-exit": "^3.0.4",
+    "@types/split2": "^4.2.3",
+    "chalk": "^6.0.0",
+    "cross-process-lock": "^2.2.0",
+    "execa": "^8.0.1",
+    "express": "^4.22.2",
+    "multer": "^2.2.0",
+    "signal-exit": "^4.1.0",
+    "split2": "^4.2.0",
+    "tree-kill": "^1.2.2",
+    "tsx": "^4.22.4"
+  },
+  "scripts": {
+    "dashboard": "tsx server.ts",
+    "start:dashboard": "tsx start.ts",
+    "test:scripts": "tsx --test *.test.ts"
+  }
+}

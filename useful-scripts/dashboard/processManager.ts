@@ -14,13 +14,13 @@ import {
   serviceSchemas,
   StartOptions,
 } from './services';
-import createFileLock, { UnlockCallback } from '../utils/createFileLock';
+import createFileLock, { UnlockCallback } from './utils/createFileLock';
 import errorMessage from './errorMessage';
 import {
   findFunctionHostFailureLine,
   functionHostServices,
 } from './functionHostHealth';
-import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
+import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 import { startDockerServices } from './dockerManager';
 import { ServiceLogFile } from './logFiles';
 

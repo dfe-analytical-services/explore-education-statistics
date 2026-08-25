@@ -17,8 +17,8 @@ import {
   StartOptions,
 } from './services';
 import errorMessage from './errorMessage';
-import { getDirname } from '../utils/nodeGlobals';
-import onExitSignal from '../utils/onExitSignal';
+import { getDirname } from './utils/nodeGlobals';
+import onExitSignal from './utils/onExitSignal';
 import {
   createUnifiedBackup,
   deleteUnifiedBackup,

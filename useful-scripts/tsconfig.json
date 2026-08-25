@@ -10,7 +10,7 @@
     "strictNullChecks": true
   },
   "exclude": ["node_modules"],
-  "include": ["*.ts", "utils/*.ts", "dashboard/*.ts"],
+  "include": ["*.ts", "utils/*.ts"],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"

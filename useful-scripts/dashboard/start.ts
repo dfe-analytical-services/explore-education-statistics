@@ -9,13 +9,13 @@ import process from 'node:process';
 import { spawnSync } from 'node:child_process';
 import splitLines from 'split2';
 import kill from 'tree-kill';
-import delay from '../utils/delay';
-import exitProcess from '../utils/exitProcess';
-import { logColours, logInfo } from '../utils/logging';
-import { getDirname } from '../utils/nodeGlobals';
-import onExitSignal from '../utils/onExitSignal';
-import createFileLock from '../utils/createFileLock';
-import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
+import delay from './utils/delay';
+import exitProcess from './utils/exitProcess';
+import { logColours, logInfo } from './utils/logging';
+import { getDirname } from './utils/nodeGlobals';
+import onExitSignal from './utils/onExitSignal';
+import createFileLock from './utils/createFileLock';
+import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 import {
   buildRunCommand,
   DockerService,
@@ -39,7 +39,7 @@ const screenerRepoUrl =
 
 const program = new Command()
   .description(
-    `Start one or more project services in parallel (run with 'pnpm start:dashboard').
+    `Start one or more project services in parallel (run with 'pnpm --filter ees-dashboard start:dashboard').
 
 The dashboard's counterpart to the top-level 'start' script, sharing the service definitions and dependency resolution the dashboard itself starts services with.
 
@@ -56,34 +56,34 @@ This script will also run prerequisite tasks to ensure that services will be abl
 Examples:
 
 Start frontend:
-  $ pnpm start:dashboard frontend
+  $ pnpm --filter ees-dashboard start:dashboard frontend
 
 Start frontend in production mode:
-  $ pnpm start:dashboard frontendProd
+  $ pnpm --filter ees-dashboard start:dashboard frontendProd
 
 Start frontend in production mode without build step:
-  $ pnpm start:dashboard frontendProd --skip-build
+  $ pnpm --filter ees-dashboard start:dashboard frontendProd --skip-build
 
 Start content and data APIs:
-  $ pnpm start:dashboard data content
+  $ pnpm --filter ees-dashboard start:dashboard data content
   
 Start public data API:
-  $ pnpm start:dashboard publicData
+  $ pnpm --filter ees-dashboard start:dashboard publicData
 
 Start admin (processor/publisher are started automatically as dependencies):
-  $ pnpm start:dashboard admin
+  $ pnpm --filter ees-dashboard start:dashboard admin
 
 Start admin together with the frontend:
-  $ pnpm start:dashboard admin frontend
+  $ pnpm --filter ees-dashboard start:dashboard admin frontend
 
 Start services without first starting any Docker services:
-  $ pnpm start:dashboard data content --skip-docker
+  $ pnpm --filter ees-dashboard start:dashboard data content --skip-docker
 
 Start Docker services directly:
-  $ pnpm start:dashboard db dataStorage
+  $ pnpm --filter ees-dashboard start:dashboard db dataStorage
 
 Restart Docker services:
-  $ pnpm start:dashboard db dataStorage --restart-docker  
+  $ pnpm --filter ees-dashboard start:dashboard db dataStorage --restart-docker  
 `,
   )
   .addArgument(

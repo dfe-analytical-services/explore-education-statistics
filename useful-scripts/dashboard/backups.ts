@@ -5,7 +5,7 @@ import { pipeline } from 'node:stream/promises';
 import { projectRoot } from './services';
 import errorMessage from './errorMessage';
 import $$ from './projectExec';
-import { ExecaChildProcessWithoutNullStreams } from '../utils/types';
+import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 import {
   getComposeServiceEnv,
   getExistingVolumeName,
