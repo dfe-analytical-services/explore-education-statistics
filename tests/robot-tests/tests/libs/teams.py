@@ -20,6 +20,8 @@ UNAVAILABLE = "results unavailable"
 
 SUCCESSFUL_JOB_STATUSES = {"succeeded", "succeededwithissues"}
 
+FLAKY_TAG = "Flaky"
+
 
 @dataclass(frozen=True)
 class SuiteDefinition:
@@ -39,6 +41,7 @@ class SuiteResult:
     run_attempts: int = 0
     final_failures: int = 0
     classification: str = UNAVAILABLE
+    flaky_tests: tuple[str, ...] = ()
 
     @property
     def total(self) -> int:
@@ -53,6 +56,18 @@ def _read_totals(report_path: Path) -> tuple[int, int, int]:
         raise ValueError(f"Unable to find total statistics in {report_path}")
 
     return int(total.attrib["pass"]), int(total.attrib["fail"]), int(total.attrib["skip"])
+
+
+def _read_flaky_test_names(report_path: Path) -> tuple[str, ...]:
+    report = ElementTree.parse(report_path)
+
+    return tuple(
+        sorted(
+            test.attrib["name"]
+            for test in report.iter("test")
+            if any((tag.text or "").strip() == FLAKY_TAG for tag in test.iter("tag"))
+        )
+    )
 
 
 def _get_run_number(run_directory: Path) -> Optional[int]:
@@ -77,6 +92,7 @@ def collect_suite_result(artifacts_directory: Path, suite: SuiteDefinition) -> S
 
         _, final_run_directory = max(run_directories, key=lambda run: run[0])
         _, final_failures, _ = _read_totals(final_run_directory / "output.xml")
+        flaky_tests = _read_flaky_test_names(merged_report_path)
     except (ElementTree.ParseError, OSError, KeyError, TypeError, ValueError) as ex:
         logger.warning(f'Unable to read results for "{suite.name}": {ex}')
         return SuiteResult(
@@ -91,7 +107,7 @@ def collect_suite_result(artifacts_directory: Path, suite: SuiteDefinition) -> S
         classification = FAILED
     elif not dependency_succeeded:
         classification = UNAVAILABLE
-    elif len(run_directories) > 1:
+    elif flaky_tests or len(run_directories) > 1:
         classification = FLAKY
     else:
         classification = PASSED
@@ -105,6 +121,7 @@ def collect_suite_result(artifacts_directory: Path, suite: SuiteDefinition) -> S
         skipped=skipped,
         run_attempts=len(run_directories),
         final_failures=final_failures,
+        flaky_tests=flaky_tests,
         classification=classification,
     )
 
@@ -138,6 +155,8 @@ def _format_attention_result(result: SuiteResult) -> str:
         detail = f"job status: {result.dependency_status or 'unknown'}"
     elif result.classification == FLAKY:
         detail = f"passed after {result.run_attempts} attempts"
+        if result.flaky_tests:
+            detail += f"; flaky tests: {', '.join(result.flaky_tests)}"
     elif result.final_failures == 0:
         detail = f"job status: {result.dependency_status or 'unknown'}"
     else:
@@ -164,6 +183,10 @@ def build_pipeline_report_card(
         {
             "title": "Flaky suites",
             "value": str(sum(result.classification == FLAKY for result in results)),
+        },
+        {
+            "title": "Flaky test cases",
+            "value": str(sum(len(result.flaky_tests) for result in results)),
         },
         {
             "title": "Unavailable results",

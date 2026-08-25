@@ -9,6 +9,7 @@ Resource            ../../libs/tables-common.robot
 Suite Setup         user signs in as bau1
 Suite Teardown      do suite teardown
 Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
 Force Tags          Admin    Local    Dev    AltersData
 

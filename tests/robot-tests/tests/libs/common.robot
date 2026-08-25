@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=record test failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=0    run_on_failure=capture failure diagnostics
 Library     OperatingSystem
 Library     Collections
 Library     String

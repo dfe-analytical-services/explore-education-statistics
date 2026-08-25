@@ -1,6 +1,8 @@
 from robot.api import SuiteVisitor
 from tests.libs.logger import get_logger
 
+FLAKY_TAG = "Flaky"
+
 
 class CheckForAtLeastOnePassingRunPrerebotModifier(SuiteVisitor):
     logger = get_logger(__name__)
@@ -15,4 +17,5 @@ class CheckForAtLeastOnePassingRunPrerebotModifier(SuiteVisitor):
                     f'CheckForAtLeastOnePassingRunPrerebotModifier - marking test "{test}" as PASS because it passed in at least one of the test runs.'
                 )
                 test.status = "PASS"
+                test.tags.add(FLAKY_TAG)
                 test.message = f'Marking test "{test}" as PASS because it passed in at least one of the test runs.  Previous message is {test.message}'

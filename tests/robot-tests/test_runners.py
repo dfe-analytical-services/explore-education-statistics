@@ -21,7 +21,7 @@ def create_robot_arguments(arguments: argparse.Namespace, test_run_folder: str) 
 
     robot_args += _create_include_and_exclude_args(arguments)
 
-    robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
+    robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}"]
 
     if arguments.fail_fast:
         robot_args += ["--exitonfailure"]

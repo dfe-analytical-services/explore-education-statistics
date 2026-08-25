@@ -189,7 +189,6 @@ def load_environment_variables(arguments: argparse.Namespace):
 def validate_environment_variables():
     required_env_vars = [
         "TIMEOUT",
-        "IMPLICIT_WAIT",
         "PUBLIC_URL",
         "ADMIN_URL",
         "PUBLIC_AUTH_USER",

@@ -8,6 +8,7 @@ Force Tags          GeneralPublic    Local    Failing
 Suite Setup         do suite setup
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Test Cases ***

@@ -6,6 +6,7 @@ Force Tags          Prod    Preprod
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Test Cases ***

@@ -19,10 +19,11 @@ from tests.libs.teams import (
 )
 
 
-def _write_report(path: Path, passed: int, failed: int, skipped: int):
+def _write_report(path: Path, passed: int, failed: int, skipped: int, flaky_tests: list[str] = None):
     path.parent.mkdir(parents=True, exist_ok=True)
+    tests = "".join(f'<test name="{test_name}"><tag>Flaky</tag></test>' for test_name in flaky_tests or [])
     path.write_text(
-        "<robot><statistics><total>"
+        f"<robot><suite>{tests}</suite><statistics><total>"
         f'<stat pass="{passed}" fail="{failed}" skip="{skipped}" />'
         "</total></statistics></robot>",
         encoding="utf-8",
@@ -49,9 +50,10 @@ class CollectSuiteResultTests(unittest.TestCase):
         merged: tuple[int, int, int],
         final: tuple[int, int, int],
         run_attempts: int = 1,
+        flaky_tests: list[str] = None,
     ):
         artifact_directory = self.artifacts_directory / "test-results-public-api"
-        _write_report(artifact_directory / "output.xml", *merged)
+        _write_report(artifact_directory / "output.xml", *merged, flaky_tests=flaky_tests)
 
         for run_attempt in range(1, run_attempts + 1):
             run_totals = final if run_attempt == run_attempts else merged
@@ -81,6 +83,22 @@ class CollectSuiteResultTests(unittest.TestCase):
 
         self.assertEqual(FLAKY, result.classification)
         self.assertEqual(2, result.run_attempts)
+
+    def test_reports_tests_that_were_rescued_by_a_rerun_as_flaky(self):
+        self.write_suite_reports(merged=(8, 0, 1), final=(8, 0, 1), flaky_tests=["Upload datafile", "Approve release"])
+
+        result = collect_suite_result(self.artifacts_directory, self.create_suite())
+
+        self.assertEqual(FLAKY, result.classification)
+        self.assertEqual(("Approve release", "Upload datafile"), result.flaky_tests)
+
+    def test_reports_no_flaky_tests_when_none_are_tagged(self):
+        self.write_suite_reports(merged=(8, 0, 1), final=(8, 0, 1))
+
+        result = collect_suite_result(self.artifacts_directory, self.create_suite())
+
+        self.assertEqual(PASSED, result.classification)
+        self.assertEqual((), result.flaky_tests)
 
     def test_classifies_failed_job_even_when_report_has_no_final_failures(self):
         self.write_suite_reports(merged=(8, 0, 1), final=(8, 0, 1))
@@ -120,7 +138,7 @@ class BuildPipelineReportCardTests(unittest.TestCase):
         results = [
             SuiteResult("Public", "public-artifact", "Succeeded", 10, 0, 1, 1, 0, PASSED),
             SuiteResult("Admin & public", "admin & artifact", "Failed", 8, 2, 3, 3, 2, FAILED),
-            SuiteResult("Public API", "api-artifact", "Succeeded", 7, 0, 0, 2, 0, FLAKY),
+            SuiteResult("Public API", "api-artifact", "Succeeded", 7, 0, 0, 2, 0, FLAKY, ("Choose locations",)),
             SuiteResult("Seed data", "seed-artifact", "Canceled"),
         ]
         artifacts_url = "https://dev.azure.com/example/project/_build/results?buildId=123&view=artifacts"
@@ -131,6 +149,8 @@ class BuildPipelineReportCardTests(unittest.TestCase):
         facts = content["body"][1]["facts"]
         details = content["body"][3]["text"]
         self.assertEqual("31", next(fact["value"] for fact in facts if fact["title"] == "Total test cases"))
+        self.assertEqual("1", next(fact["value"] for fact in facts if fact["title"] == "Flaky test cases"))
+        self.assertIn("flaky tests: Choose locations", details)
         self.assertNotIn("**Public**", details)
         self.assertIn("**Admin & public**", details)
         self.assertIn("`admin & artifact`", details)

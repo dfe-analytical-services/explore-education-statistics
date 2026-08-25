@@ -1,11 +1,12 @@
 *** Settings ***
-Library         RequestsLibrary
-Resource        ../../libs/public-api-common.robot
+Library             RequestsLibrary
+Resource            ../../libs/public-api-common.robot
 
-Force Tags      GeneralPublic    PublicApi    Local    Dev    Test    Preprod
+Force Tags          GeneralPublic    PublicApi    Local    Dev    Test    Preprod
 
-Suite Setup     create session    papi    %{PUBLIC_API_URL}
-Test Setup      fail test fast if required
+Suite Setup         create session    papi    %{PUBLIC_API_URL}
+Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
 
 *** Variables ***

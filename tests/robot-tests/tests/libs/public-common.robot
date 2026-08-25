@@ -64,8 +64,7 @@ user opens data set details for subject
     ${toggle_xpath}=    Set Variable
     ...    ${dataset_xpath}//button[@aria-expanded="false"]
 
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
+    user clicks element if exists    xpath=${toggle_xpath}
 
 user checks main links for page 'Explore and download data' are present
     [Arguments]    @{expected_card_link_texts}
@@ -110,8 +109,7 @@ User checks page 'Explore and download data' data set available properties
     ${toggle_xpath}=    Set Variable
     ...    ${dataset_xpath}//button[@aria-expanded="false"]
 
-    Run Keyword And Ignore Error
-    ...    Click Element    xpath=${toggle_xpath}
+    user clicks element if exists    xpath=${toggle_xpath}
 
     # Assert "Number of rows" dt exists
     Page Should Contain Element

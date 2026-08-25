@@ -11,6 +11,23 @@ logger = get_logger(__name__)
 
 PATH = f"{os.getcwd()}{os.sep}test-results"
 
+FLAKY_TAG = "Flaky"
+
+
+def get_flaky_test_names(report_path: str) -> list[str]:
+    try:
+        with open(report_path, "rb") as report:
+            soup = BeautifulSoup(report.read(), features="xml")
+    except OSError as e:
+        logger.warning(f"Unable to read {report_path} to determine flaky tests: {e}")
+        return []
+
+    return sorted(
+        test["name"]
+        for test in soup.find_all("test")
+        if any(tag.get_text(strip=True) == FLAKY_TAG for tag in test.find_all("tag", recursive=True))
+    )
+
 
 class SlackService:
     def __init__(self):
@@ -49,19 +66,7 @@ class SlackService:
 
         total_tests_count = passed_tests + failed_tests_in_merged_report + skipped_tests
 
-        # Whilst genuine bugs that fail a step every time will always show as FAILED in the merged test report AND
-        # the final run report, this is not always true of flaky / intermittent test failures, which can be identified
-        # in part by an unequal number of failures in the merged test report versus that of the final run attempt. It can
-        # also be identified by the fact that the tests finally all passed but the number of attempts was greater than 1.
-        flaky_test_message = (
-            "Definitely"
-            if failed_tests_in_final_run == 0 and number_of_test_runs > 1
-            else "Definitely not"
-            if failed_tests_in_final_run == 0 and number_of_test_runs == 1
-            else "Likely"
-            if failed_tests_in_merged_report != failed_tests_in_final_run
-            else "Unlikely"
-        )
+        flaky_tests = get_flaky_test_names(f"{PATH}{os.sep}output.xml")
 
         blocks = [
             {
@@ -81,10 +86,30 @@ class SlackService:
                     {"type": "mrkdwn", "text": f"*Passed test cases*\n{passed_tests}"},
                     {"type": "mrkdwn", "text": f"*Failed test cases*\n{failed_tests_in_final_run}"},
                     {"type": "mrkdwn", "text": f"*Skipped test cases*\n{skipped_tests}"},
-                    {"type": "mrkdwn", "text": f"*Flaky tests?*\n{flaky_test_message}"},
+                    {"type": "mrkdwn", "text": f"*Flaky test cases*\n{len(flaky_tests)}"},
                 ],
             },
         ]
+
+        if flaky_tests:
+            flaky_test_list_items = [
+                {"type": "rich_text_section", "elements": [{"type": "text", "text": test}]} for test in flaky_tests
+            ]
+
+            blocks += [
+                {"type": "divider"},
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"*Flaky tests* ({len(flaky_tests)}) — failed at least once but passed on a rerun",
+                    },
+                },
+                {
+                    "type": "rich_text",
+                    "elements": [{"type": "rich_text_list", "style": "bullet", "elements": flaky_test_list_items}],
+                },
+            ]
 
         if suites_failed:
             failed_test_suites_list_items = []

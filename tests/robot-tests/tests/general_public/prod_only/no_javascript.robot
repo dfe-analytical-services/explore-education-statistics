@@ -1,10 +1,11 @@
 *** Settings ***
-Resource        ../../libs/public-common.robot
-Library         ../../libs/no_javascript.py
+Resource            ../../libs/public-common.robot
+Library             ../../libs/no_javascript.py
 
-Test Setup      fail test fast if required
+Test Setup          fail test fast if required
+Test Teardown       Run Keyword If Test Failed    record test failure
 
-Force Tags      GeneralPublic    Prod
+Force Tags          GeneralPublic    Prod
 
 
 *** Test Cases ***

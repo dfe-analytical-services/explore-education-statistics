@@ -21,13 +21,17 @@ failing_suites_filename = ".failing_suites"
 logger = get_logger(__name__)
 
 
+# SeleniumLibrary runs this for every failing SeleniumLibrary keyword, including ones the caller
+# tolerates or is retrying, so it must not record state or have any other side effect.
+def capture_failure_diagnostics():
+    visual.capture_screenshot()
+    _capture_html()
+
+
 def record_test_failure():
     if not current_test_suite_failing_fast():
         record_failing_test_suite()
-        visual.capture_screenshot()
         visual.capture_large_screenshot()
-        _capture_html()
-        _raise_assertion_error("Recorded test failure")
 
     if BuiltIn().get_variable_value("${prompt_to_continue_on_failure}") == "1":
         _prompt_to_continue()
