@@ -188,6 +188,44 @@ These snapshot files are used by the test suite `tests/general_public/check_snap
 
 ## Guidelines for people writing UI tests
 
+These rules exist because breaking them produces tests that fail intermittently and then pass on a
+rerun, which is the hardest kind of failure to diagnose.
+
+**Never assert without a wait.** The frontend renders asynchronously, so `Page Should Contain`,
+`Element Should Contain` and a bare `Get WebElements` all race the render. Use the `user waits until ...`
+keywords in `tests/libs/common.robot`, which take a timeout, rather than the raw SeleniumLibrary
+`... Should ...` keywords. If you need to iterate over `Get WebElements`, wait for the expected count
+first — an empty list silently passes.
+
+**Wait for terminal states, not transient ones.** Waiting for an in-flight indicator (a "Screening"
+status, a progress bar, a spinner) fails whenever the work finishes between two polls. Wait for the
+state you actually want to act on.
+
+**Don't use `Sleep`.** Wait for the condition instead. A fixed sleep is simultaneously too short (it
+will eventually flake) and too long (it costs wall-clock on every green run). The exceptions are
+places where we are genuinely waiting out a cache TTL (`user waits for caches to expire`) or working
+around a known bug — in which case add a comment naming the ticket.
+
+**Tolerated failures must suppress the run-on-failure hook.** SeleniumLibrary runs the registered
+run-on-failure keyword whenever one of its keywords fails, regardless of whether the caller wrapped
+it in `Run Keyword And Ignore Error` or is retrying it via `Wait Until Keyword Succeeds`. If you
+genuinely need to tolerate a failing SeleniumLibrary keyword, prefer a keyword that does not fail
+(`user clicks element if exists`), or wrap the block in
+`Register Keyword To Run On Failure    NOTHING` and restore the previous value afterwards.
+
+**Prefer explicit waits over `Wait Until Keyword Succeeds`.** Most of our keywords already wait
+internally, so wrapping one in `Wait Until Keyword Succeeds` compounds the two timeouts into
+something much longer than intended. Pass a longer `wait` to the keyword instead.
+
+**Don't compare against a date computed at assertion time.** A date the server stamped is "today" as
+of the action, not as of the assertion, so a run crossing midnight fails. Use
+`user checks release note date is today` / `user checks summary list contains london date`, or build a
+matcher with `get london date xpath matcher`, which tolerate the day boundary.
+
+**Scope selectors to a container.** An unscoped `//h2` matches every heading on the page, so the
+assertion passes without checking anything. Anchor selectors to the `data-testid` of the thing you
+mean.
+
 ## Parallelism / Pabot
 
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. This might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.

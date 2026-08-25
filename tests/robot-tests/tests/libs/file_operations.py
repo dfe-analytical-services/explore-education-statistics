@@ -4,8 +4,9 @@ import zipfile
 import requests
 from tests.libs.selenium_elements import sl
 
-requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
 session = requests.Session()
+session.mount("http://", requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3))
+session.mount("https://", requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3))
 
 
 def download_file(link_locator, file_name):
@@ -13,6 +14,10 @@ def download_file(link_locator, file_name):
         os.makedirs("test-results/downloads")
     link_url = sl().get_element_attribute(link_locator, "href")
     r = session.get(link_url, allow_redirects=True, stream=True)
+    if not r.ok:
+        raise AssertionError(
+            f'Download of "{file_name}" from {link_url} failed with HTTP {r.status_code}: {r.text[:500]}'
+        )
     with open(f"test-results/downloads/{file_name}", "wb") as f:
         f.write(r.content)
 

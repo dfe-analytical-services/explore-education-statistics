@@ -121,6 +121,7 @@ def run():
 
     max_run_attempts = args.rerun_attempts + 1
     test_run_index = 0
+    failing_suites = []
 
     logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
 
@@ -188,9 +189,9 @@ def run():
 
             try:
                 failing_suites = reports.get_failing_test_suite_sources(f"{test_run_results_folder}{os.sep}output.xml")
-            except Exception as ex:
+            except Exception:
                 logger.error(f"Unable to determine failing suites from {test_run_results_folder}{os.sep}output.xml")
-                logger.error(ex)
+                raise
 
             # If all tests passed, return early.
             if len(failing_suites) == 0:

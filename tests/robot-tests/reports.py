@@ -143,7 +143,7 @@ def _get_failing_leaf_suite_ids_from_report(report: BeautifulSoup) -> []:
     leaf_suite_ids = []
     for suite_id in suite_ids:
         other_suite_ids_containing_suite_id = [
-            other_suite_id for other_suite_id in suite_ids if other_suite_id != suite_id and suite_id in other_suite_id
+            other_suite_id for other_suite_id in suite_ids if other_suite_id.startswith(f"{suite_id}-")
         ]
         if len(other_suite_ids_containing_suite_id) == 0:
             leaf_suite_ids += [suite_id]
