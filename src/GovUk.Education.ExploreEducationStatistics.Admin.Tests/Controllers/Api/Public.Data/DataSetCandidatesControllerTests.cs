@@ -1,12 +1,12 @@
 #nullable enable
 using System.Security.Claims;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -81,11 +81,8 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
             );
         }
 
-        [Theory]
-        [InlineData(SecurityClaimTypes.UpdateAllReleases)]
-        [InlineData(SecurityClaimTypes.CreateAnyRelease)]
-        [InlineData(null)]
-        public async Task NoPermissionsToViewReleaseVersion_Returns403(SecurityClaimTypes? claimType)
+        [Fact]
+        public async Task NotBauUser_Returns403()
         {
             ReleaseVersion releaseVersion = DataFixture
                 .DefaultReleaseVersion()
@@ -93,11 +90,42 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
 
             await fixture.GetContentDbContext().AddTestData(context => context.ReleaseVersions.Add(releaseVersion));
 
-            var authenticatedUser = claimType.HasValue
-                ? DataFixture.AuthenticatedUser().WithClaim(claimType.Value.ToString())
-                : DataFixture.AuthenticatedUser();
+            var response = await GetDataSetCandidates(releaseVersion.Id, user: DataFixture.AuthenticatedUser());
 
-            var response = await GetDataSetCandidates(releaseVersion.Id, user: authenticatedUser);
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the release version's
+            // publication does not (yet) satisfy this policy. This test should start failing once
+            // publication-role support is added to ManagePublicApiDataSetsAuthorizationHandler, at which
+            // point it should be updated to reflect the new expected behaviour.
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 0, draftVersion: true)
+                .WithPublication(DataFixture.DefaultPublication());
+            var releaseVersion = release.Versions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(release.Publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseVersions.Add(releaseVersion);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var response = await GetDataSetCandidates(releaseVersion.Id, user: identityUser);
 
             response.AssertForbidden();
         }
@@ -295,9 +323,7 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient(
-                user: user ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllReleases))
-            );
+            var client = fixture.CreateClient(user: user ?? DataFixture.BauUser());
 
             var query = new Dictionary<string, string?> { { "releaseVersionId", releaseVersionId.ToString() } };
 
