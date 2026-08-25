@@ -1,0 +1,10 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.masthead {
+  background-color: govuk-colour('blue');
+  color: govuk-functional-colour('inverse-text');
+
+  *:is(:link, :visited, h1, h2, label, p) {
+    color: govuk-functional-colour('inverse-text');
+  }
+}
