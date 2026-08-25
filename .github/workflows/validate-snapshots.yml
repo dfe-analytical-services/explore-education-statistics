@@ -9,7 +9,7 @@ on:
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SNAPSHOTS_WEBHOOK_URL }}
-  PYTHON_VERSION: 3.10.10
+  PYTHON_VERSION: 3.14.6
 
 jobs:
   test:

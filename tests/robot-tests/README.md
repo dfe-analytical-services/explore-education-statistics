@@ -40,7 +40,7 @@ See the [installation guide](https://github.com/pyenv/pyenv#installation) for de
 
 ## What do I need to install?
 
-Firstly, install Python 3.10. You can use pyenv to do this which is the recommended way of installing and managing python. See [pyenv installation instructions](#pyenv-installation)
+Firstly, install Python 3.14. You can use pyenv to do this which is the recommended way of installing and managing python. See [pyenv installation instructions](#pyenv-installation)
 
 > **Installing Python via Homebrew?**
 > If using silicon Apple machine, ensure your homebrew is installed correctly in `/opt/homebrew/ and after installing python via homebrew ensure that it's the arm64 version installed
@@ -52,7 +52,7 @@ Firstly, install Python 3.10. You can use pyenv to do this which is the recommen
 
 Then ensure python and pip are included in your PATH environment variable
 
-- `python --version` should return a version >= 3.10. If it doesn't you can try using the commands `python3` or `python3.10`, if you have multiple versions of python installed on your machine.
+- `python --version` should return a version >= 3.14. If it doesn't you can try using the commands `python3` or `python3.14`, if you have multiple versions of python installed on your machine.
 - To verify `pip` is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
 - For Windows, I needed to add `C:\Program Files\Python38` and `C:\Program Files\Python38\Scripts` to the `PATH` system variable. Check your Program Files directory to find out where Python is installed on your computer. A search engine will tell you how to add them to the `PATH`.
 
