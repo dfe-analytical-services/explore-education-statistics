@@ -49,7 +49,7 @@ param alertsGroupName string
 param alertSeverity Severity = 'Critical'
 
 @description('The frequency with which the alert rule evaluates the availability test results against the threshold.')
-param alertEvaluationFrequency EvaluationFrequency = 'PT5M'
+param alertEvaluationFrequency EvaluationFrequency = 'PT1M'
 
 @description('The timespan used to evaluate failed test location count against the threshold.')
 param alertWindowSize WindowSize = 'PT5M'
@@ -65,7 +65,7 @@ param tagValues object
 
 var severityLevel = severityMapping[alertSeverity]
 
-var alertFullDescription = 'Fires when ${testDescription} fails from ${minFailedLocationsToAlert} or more of ${length(testLocations)} test locations. URL tested: ${url}.  This endpoint depends on FUAPI, PostgreSQL and Azure AI Search - if the Public API app itself is healthy, check those next. For more info, review guidance on diagnosing availability test failures https://dfe-gov-uk.visualstudio.com.mcas.ms/s101-Explore-Education-Statistics/_wiki/wikis/s101-Explore-Education-Statistics.wiki/18320/Public-API-availability-alert-investigation'
+var alertFullDescription = 'Fires when ${testDescription} fails from ${minFailedLocationsToAlert} or more of ${length(testLocations)} test locations. URL tested: ${url}.  This endpoint depends on FUAPI, PostgreSQL and Azure AI Search - if the Public API app itself is healthy, check those next. For more info, review guidance on [diagnosing availability test failures](https://dfe-gov-uk.visualstudio.com.mcas.ms/s101-Explore-Education-Statistics/_wiki/wikis/s101-Explore-Education-Statistics.wiki/18320/Public-API-availability-alert-investigation).'
 
 resource availabilityTest 'Microsoft.Insights/webtests@2022-06-15' = {
   name: name
