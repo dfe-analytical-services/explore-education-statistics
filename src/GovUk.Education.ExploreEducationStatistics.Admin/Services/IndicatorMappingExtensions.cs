@@ -13,7 +13,7 @@ internal static class IndicatorMappingExtensions
 {
     public static Either<ActionResult, IndicatorMapping> UpdateIndicatorMapping(
         this DataSetMapping dataSetMapping,
-        List<Indicator> replacementIndicators,
+        IReadOnlyList<Indicator> replacementIndicators,
         Guid originalId,
         Guid? newReplacementId = null
     )
@@ -77,7 +77,7 @@ internal static class IndicatorMappingExtensions
     private static bool IsIndicatorCandidateAvailable(
         DataSetMapping dataSetMapping,
         IndicatorMapping indicatorMapping,
-        List<Indicator> replacementIndicators,
+        IReadOnlyList<Indicator> replacementIndicators,
         Guid candidateId
     )
     {
