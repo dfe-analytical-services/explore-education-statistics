@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -159,19 +159,18 @@ public class ReleaseService : IReleaseService
 
         var releaseDataBlockList = (
             await _contentDbContext
-                .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
-                .OfType<DataBlock>()
+                .DataBlockVersions.Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
                 .Select(db => new { db.Id, db.Query })
                 .ToListAsync()
-        ) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
-            .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
+        ) // we need to materialise the list access `dataBlockVersion.Query.SubjectId` as `Query` is json
+            .Where(dataBlockVersion => publishedSubjectIds.Contains(dataBlockVersion.Query.SubjectId))
             .ToList();
 
-        var releaseDataBlockIdList = releaseDataBlockList.Select(db => db.Id).ToList();
+        var releaseDataBlockVersionIdList = releaseDataBlockList.Select(db => db.Id).ToList();
 
         var featuredTables = await _contentDbContext
-            .FeaturedTables.Include(ft => ft.DataBlock)
-            .Where(ft => releaseDataBlockIdList.Contains(ft.DataBlockId))
+            .FeaturedTables.Include(ft => ft.DataBlockVersion)
+            .Where(ft => releaseDataBlockVersionIdList.Contains(ft.DataBlockVersionId))
             .OrderBy(ft => ft.Order)
             .ThenBy(ft => ft.Name)
             .ToListAsync();
@@ -181,9 +180,9 @@ public class ReleaseService : IReleaseService
                 ft.Id,
                 ft.Name,
                 ft.Description,
-                ft.DataBlock.Query.SubjectId,
+                ft.DataBlockVersion.Query.SubjectId,
+                ft.DataBlockVersionId,
                 ft.DataBlockId,
-                ft.DataBlockParentId,
                 ft.Order
             ))
             .ToList();

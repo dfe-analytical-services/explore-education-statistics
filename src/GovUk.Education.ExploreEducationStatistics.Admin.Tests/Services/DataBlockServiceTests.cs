@@ -41,8 +41,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -62,7 +62,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -81,7 +81,16 @@ public class DataBlockServiceTests
         {
             Name = "Featured table name",
             Description = "Featured table description",
-            DataBlock = dataBlockVersion.ContentBlock,
+            DataBlockVersion = dataBlockVersion,
+        };
+
+        var dataBlockVersionLink = new DataBlockVersionLink
+        {
+            Id = dataBlockVersion.Id,
+            DataBlockVersionId = dataBlockVersion.Id,
+            DataBlockVersion = dataBlockVersion,
+            ReleaseVersion = releaseVersion,
+            Order = 5,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -90,6 +99,7 @@ public class DataBlockServiceTests
             context.ReleaseVersions.Add(releaseVersion);
             context.ReleaseFiles.Add(releaseFile);
             context.DataBlockVersions.Add(dataBlockVersion);
+            context.DataBlockVersionLinks.Add(dataBlockVersionLink);
             context.FeaturedTables.Add(featuredTable);
             await context.SaveChangesAsync();
         }
@@ -104,7 +114,7 @@ public class DataBlockServiceTests
             Assert.Equal(dataBlockVersion.Heading, retrievedResult.Heading);
             Assert.Equal(dataBlockVersion.Name, retrievedResult.Name);
             Assert.Equal(dataBlockVersion.Source, retrievedResult.Source);
-            Assert.Equal(dataBlockVersion.Order, retrievedResult.Order);
+            Assert.Equal(dataBlockVersionLink.Order, retrievedResult.Order);
 
             Assert.Equal(featuredTable.Name, retrievedResult.HighlightName);
             Assert.Equal(featuredTable.Description, retrievedResult.HighlightDescription);
@@ -125,8 +135,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -136,7 +146,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -156,6 +166,7 @@ public class DataBlockServiceTests
             context.ReleaseVersions.Add(releaseVersion);
             context.ReleaseFiles.Add(releaseFile);
             context.DataBlockVersions.Add(dataBlockVersion);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -180,8 +191,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -193,7 +204,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -211,6 +222,7 @@ public class DataBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -235,8 +247,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -256,7 +268,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -275,6 +287,7 @@ public class DataBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -300,8 +313,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -324,13 +337,14 @@ public class DataBlockServiceTests
             },
         };
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -361,20 +375,20 @@ public class DataBlockServiceTests
     [Fact]
     public async Task Get_WrongRelease()
     {
-        var dataBlock = new DataBlock { Name = "Test name" };
+        var dataBlockVersion = new DataBlockVersion { Name = "Test name" };
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddAsync(dataBlock);
+            await context.AddAsync(dataBlockVersion);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildDataBlockService(context);
-            var result = await service.Get(dataBlock.Id);
+            var result = await service.Get(dataBlockVersion.Id);
 
             result.AssertNotFound();
         }
@@ -400,96 +414,96 @@ public class DataBlockServiceTests
             .WithName("Test data set title 2")
             .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId2));
 
-        var dataBlock1 = new DataBlock
+        var dataBlockVersion1 = new DataBlockVersion
         {
+            Id = Guid.NewGuid(),
             Heading = "Test heading 1",
             Name = "Test name 1",
             Source = "Test source 1",
-            Order = 5,
             Created = new DateTime(2000, 1, 1),
-            ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
                 SubjectId = subjectId1,
-                Filters = new List<Guid> { Guid.NewGuid() },
-                Indicators = new List<Guid> { Guid.NewGuid() },
+                Filters = [Guid.NewGuid()],
+                Indicators = [Guid.NewGuid()],
             },
             Table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
-                    },
+                    Rows = [new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)],
+                    Columns = [new(Guid.NewGuid().ToString(), TableHeaderType.Filter)],
                 },
             },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     Title = "Test chart 1",
                     Height = 400,
                     Width = 500,
                 },
-            },
+            ],
             ReleaseVersion = releaseVersion,
         };
         var featuredTable1 = new FeaturedTable
         {
             Name = "Test highlight name 1",
             Description = "Test highlight description 1",
-            DataBlock = dataBlock1,
+            DataBlockVersion = dataBlockVersion1,
             ReleaseVersion = releaseVersion,
         };
 
-        var dataBlock2 = new DataBlock
+        var dataBlockVersion2 = new DataBlockVersion
         {
+            Id = Guid.NewGuid(),
             Heading = "Test heading 2",
             Name = "Test name 2",
             Source = "Test source 2",
-            Order = 7,
             Created = new DateTime(2001, 2, 2),
             Query = new FullTableQuery
             {
                 SubjectId = subjectId2,
-                Filters = new List<Guid> { Guid.NewGuid() },
-                Indicators = new List<Guid> { Guid.NewGuid() },
+                Filters = [Guid.NewGuid()],
+                Indicators = [Guid.NewGuid()],
             },
             Table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
-                    },
+                    Rows = [new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)],
+                    Columns = [new(Guid.NewGuid().ToString(), TableHeaderType.Filter)],
                 },
             },
-            Charts = new List<IChart>(),
+            Charts = [],
             ReleaseVersion = releaseVersion,
         };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Test highlight name 2",
             Description = "Test highlight description 2",
-            DataBlock = dataBlock2,
+            DataBlockVersion = dataBlockVersion2,
             ReleaseVersion = releaseVersion,
+        };
+
+        // dataBlock1 is "in content" via a DataBlockVersionLink placed in a content section. dataBlock2 is not, and
+        // so has no link at all - a DataBlockVersionLink only exists for as long as its version is placed.
+        var dataBlockVersionLink1 = new DataBlockVersionLink
+        {
+            Id = dataBlockVersion1.Id,
+            DataBlockVersionId = dataBlockVersion1.Id,
+            DataBlockVersion = dataBlockVersion1,
+            ReleaseVersion = releaseVersion,
+            Order = 5,
+            ContentSectionId = Guid.NewGuid(),
         };
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddRangeAsync(dataBlock1, dataBlock2);
+            await context.AddRangeAsync(dataBlockVersion1, dataBlockVersion2);
+            await context.DataBlockVersionLinks.AddAsync(dataBlockVersionLink1);
             await context.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
             await context.ReleaseFiles.AddRangeAsync(dataReleaseFile1, dataReleaseFile2);
             await context.SaveChangesAsync();
@@ -504,22 +518,22 @@ public class DataBlockServiceTests
 
             Assert.Equal(2, listResult.Count);
 
-            Assert.Equal(dataBlock1.Heading, listResult[0].Heading);
-            Assert.Equal(dataBlock1.Name, listResult[0].Name);
-            Assert.Equal(dataBlock1.Created, listResult[0].Created);
+            Assert.Equal(dataBlockVersion1.Heading, listResult[0].Heading);
+            Assert.Equal(dataBlockVersion1.Name, listResult[0].Name);
+            Assert.Equal(dataBlockVersion1.Created, listResult[0].Created);
             Assert.Equal(featuredTable1.Name, listResult[0].HighlightName);
             Assert.Equal(featuredTable1.Description, listResult[0].HighlightDescription);
-            Assert.Equal(dataBlock1.Source, listResult[0].Source);
+            Assert.Equal(dataBlockVersion1.Source, listResult[0].Source);
             Assert.Equal("Test data set title 1", listResult[0].DataSetTitle);
             Assert.Equal(1, listResult[0].ChartsCount);
             Assert.True(listResult[0].InContent);
 
-            Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
-            Assert.Equal(dataBlock2.Name, listResult[1].Name);
-            Assert.Equal(dataBlock2.Created, listResult[1].Created);
+            Assert.Equal(dataBlockVersion2.Heading, listResult[1].Heading);
+            Assert.Equal(dataBlockVersion2.Name, listResult[1].Name);
+            Assert.Equal(dataBlockVersion2.Created, listResult[1].Created);
             Assert.Equal(featuredTable2.Name, listResult[1].HighlightName);
             Assert.Equal(featuredTable2.Description, listResult[1].HighlightDescription);
-            Assert.Equal(dataBlock2.Source, listResult[1].Source);
+            Assert.Equal(dataBlockVersion2.Source, listResult[1].Source);
             Assert.Equal("Test data set title 2", listResult[1].DataSetTitle);
             Assert.Equal(0, listResult[1].ChartsCount);
             Assert.False(listResult[1].InContent);
@@ -539,20 +553,19 @@ public class DataBlockServiceTests
             .WithName("Test data set name")
             .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId));
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
-            ContentSectionId = null,
             Query = new FullTableQuery { SubjectId = subjectId },
             ReleaseVersion = releaseVersion,
         };
 
-        var keyStatistic = new KeyStatisticDataBlock { ReleaseVersion = releaseVersion, DataBlock = dataBlock };
+        var keyStatistic = new KeyStatisticDataBlock { ReleaseVersion = releaseVersion, DataBlockVersion = dataBlockVersion };
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddRangeAsync(dataBlock);
+            await context.AddRangeAsync(dataBlockVersion);
             await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
             await context.ReleaseFiles.AddAsync(dataReleaseFile);
             await context.SaveChangesAsync();
@@ -567,7 +580,7 @@ public class DataBlockServiceTests
 
             var responseDataBlock = Assert.Single(listResult);
 
-            Assert.Equal(dataBlock.Id, responseDataBlock.Id);
+            Assert.Equal(dataBlockVersion.Id, responseDataBlock.Id);
             Assert.True(responseDataBlock.InContent);
         }
     }
@@ -585,64 +598,68 @@ public class DataBlockServiceTests
             .WithName("Test data set title")
             .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId));
 
-        var relatedDataBlock = new DataBlock
+        var relatedDataBlockVersion = new DataBlockVersion
         {
+            Id = Guid.NewGuid(),
             Heading = "Test heading 1",
             Name = "Test name 1",
             Source = "Test source 1",
-            Order = 5,
             Created = new DateTime(2000, 1, 1),
-            ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
                 SubjectId = subjectId,
-                Filters = new List<Guid> { Guid.NewGuid() },
-                Indicators = new List<Guid> { Guid.NewGuid() },
+                Filters = [Guid.NewGuid()],
+                Indicators = [Guid.NewGuid()],
             },
             Table = new TableBuilderConfiguration
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator),
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter),
-                    },
+                    Rows = [new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)],
+                    Columns = [new(Guid.NewGuid().ToString(), TableHeaderType.Filter)],
                 },
             },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     Title = "Test chart 1",
                     Height = 400,
                     Width = 500,
                 },
-            },
+            ],
             ReleaseVersion = releaseVersion,
         };
         var featuredTable1 = new FeaturedTable
         {
             Name = "Test highlight name 1",
             Description = "Test highlight description 1",
-            DataBlock = relatedDataBlock,
+            DataBlockVersion = relatedDataBlockVersion,
             ReleaseVersion = releaseVersion,
         };
-        var unrelatedDataBlock = new DataBlock
+        var unrelatedDataBlockVersion = new DataBlockVersion
         {
             Name = "Test name 2",
             // This Data Block is attached to a different Release
             ReleaseVersion = new ReleaseVersion(),
         };
 
+        var relatedDataBlockVersionLink = new DataBlockVersionLink
+        {
+            Id = relatedDataBlockVersion.Id,
+            DataBlockVersionId = relatedDataBlockVersion.Id,
+            DataBlockVersion = relatedDataBlockVersion,
+            ReleaseVersion = releaseVersion,
+            Order = 5,
+            ContentSectionId = Guid.NewGuid(),
+        };
+
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddRangeAsync(relatedDataBlock, unrelatedDataBlock);
+            await context.AddRangeAsync(relatedDataBlockVersion, unrelatedDataBlockVersion);
+            await context.DataBlockVersionLinks.AddAsync(relatedDataBlockVersionLink);
             await context.FeaturedTables.AddAsync(featuredTable1);
             await context.ReleaseFiles.AddAsync(dataReleaseFile);
             await context.SaveChangesAsync();
@@ -655,12 +672,12 @@ public class DataBlockServiceTests
 
             var viewModel = Assert.Single(result.AssertRight());
 
-            Assert.Equal(relatedDataBlock.Heading, viewModel.Heading);
-            Assert.Equal(relatedDataBlock.Name, viewModel.Name);
-            Assert.Equal(relatedDataBlock.Created, viewModel.Created);
+            Assert.Equal(relatedDataBlockVersion.Heading, viewModel.Heading);
+            Assert.Equal(relatedDataBlockVersion.Name, viewModel.Name);
+            Assert.Equal(relatedDataBlockVersion.Created, viewModel.Created);
             Assert.Equal(featuredTable1.Name, viewModel.HighlightName);
             Assert.Equal(featuredTable1.Description, viewModel.HighlightDescription);
-            Assert.Equal(relatedDataBlock.Source, viewModel.Source);
+            Assert.Equal(relatedDataBlockVersion.Source, viewModel.Source);
             Assert.Equal("Test data set title", viewModel.DataSetTitle);
             Assert.Equal(1, viewModel.ChartsCount);
             Assert.True(viewModel.InContent);
@@ -674,8 +691,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -695,11 +712,19 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
+
+        var dataBlockVersionLink = new DataBlockVersionLink
+        {
+            Id = dataBlockVersion.Id,
+            DataBlockVersionId = dataBlockVersion.Id,
+            DataBlockVersion = dataBlockVersion,
+            ReleaseVersion = releaseVersion,
+        };
 
         releaseVersion.Content = _fixture
             .DefaultContentSection()
-            .WithContentBlocks(ListOf<ContentBlock>(dataBlockVersion.ContentBlock))
+            .WithContentBlocks(ListOf<ContentBlock>(dataBlockVersionLink))
             .GenerateList(1);
 
         var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
@@ -728,7 +753,7 @@ public class DataBlockServiceTests
 
             Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
             Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
-            Assert.Equal(dataBlockVersion.ContentSection!.Heading, dependentBlocks[0].ContentSectionHeading);
+            Assert.Equal(releaseVersion.Content[0].Heading, dependentBlocks[0].ContentSectionHeading);
             Assert.False(dependentBlocks[0].IsKeyStatistic);
             Assert.Null(dependentBlocks[0].FeaturedTable);
 
@@ -744,16 +769,16 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
-        var keyStatistic = new KeyStatisticDataBlock { DataBlock = dataBlockVersion.ContentBlock };
+        var keyStatistic = new KeyStatisticDataBlock { DataBlockVersion = dataBlockVersion };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -778,7 +803,7 @@ public class DataBlockServiceTests
 
             Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
             Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
-            Assert.Null(dataBlockVersion.ContentSection);
+            Assert.Null(dependentBlocks[0].ContentSectionHeading);
             Assert.True(dependentBlocks[0].IsKeyStatistic);
         }
     }
@@ -788,20 +813,20 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var featuredTable = new FeaturedTable
         {
             Name = "Featured table name",
             Description = "Featured table description",
-            DataBlock = dataBlockVersion.ContentBlock,
+            DataBlockVersion = dataBlockVersion,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -827,7 +852,6 @@ public class DataBlockServiceTests
 
             Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
             Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
-            Assert.Null(dataBlockVersion.ContentSection);
             Assert.NotNull(dependentBlocks[0].FeaturedTable);
             Assert.Equal(featuredTable.Name, dependentBlocks[0].FeaturedTable!.Name);
             Assert.Equal(featuredTable.Description, dependentBlocks[0].FeaturedTable!.Description);
@@ -861,11 +885,11 @@ public class DataBlockServiceTests
     {
         var fileId = Guid.NewGuid();
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test name",
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new InfographicChart
                 {
                     Title = "Test chart",
@@ -873,8 +897,7 @@ public class DataBlockServiceTests
                     Height = 400,
                     Width = 500,
                 },
-            },
-            ContentSection = new ContentSection { Heading = "Test heading" },
+            ],
             ReleaseVersion = new ReleaseVersion(),
         };
         var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
@@ -883,7 +906,7 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddAsync(dataBlock);
+            await context.AddAsync(dataBlockVersion);
             await context.AddAsync(file);
             await context.SaveChangesAsync();
         }
@@ -891,7 +914,7 @@ public class DataBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildDataBlockService(context);
-            var result = await service.GetDeletePlan(Guid.NewGuid(), dataBlock.Id);
+            var result = await service.GetDeletePlan(Guid.NewGuid(), dataBlockVersion.Id);
 
             result.AssertNotFound();
         }
@@ -904,8 +927,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestDraftVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -925,14 +948,11 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestDraftVersion!;
+        var dataBlockVersion = dataBlock.LatestDraftVersion!;
 
-        releaseVersion.KeyStatistics = new List<KeyStatistic>
-        {
-            new KeyStatisticDataBlock { DataBlockId = dataBlockVersion.Id },
-        };
+        releaseVersion.KeyStatistics = [new KeyStatisticDataBlock { DataBlockVersionId = dataBlockVersion.Id }];
 
-        releaseVersion.FeaturedTables = ListOf(new FeaturedTable { DataBlockId = dataBlockVersion.Id });
+        releaseVersion.FeaturedTables = ListOf(new FeaturedTable { DataBlockVersionId = dataBlockVersion.Id });
 
         var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
 
@@ -940,16 +960,17 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddAsync(dataBlockParent);
+            await context.AddAsync(dataBlock);
             await context.AddAsync(file);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlock.LatestDraftVersion!, releaseVersion));
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            Assert.NotEmpty(context.DataBlocks.ToList());
+            Assert.NotEmpty(context.DataBlockVersionLinks.ToList());
             Assert.NotEmpty(context.DataBlockVersions.ToList());
-            Assert.NotEmpty(context.DataBlockParents.ToList());
+            Assert.NotEmpty(context.DataBlocks.ToList());
             Assert.NotEmpty(context.FeaturedTables.ToList());
             Assert.NotEmpty(context.KeyStatistics.ToList());
         }
@@ -964,15 +985,15 @@ public class DataBlockServiceTests
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-            var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
             cacheKeyService
                 .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
-                .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
@@ -990,9 +1011,9 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            Assert.Empty(context.DataBlocks.ToList());
+            Assert.Empty(context.DataBlockVersionLinks.ToList());
             Assert.Empty(context.DataBlockVersions.ToList());
-            Assert.Empty(context.DataBlockParents.ToList());
+            Assert.Empty(context.DataBlocks.ToList());
             Assert.Empty(context.FeaturedTables.ToList());
             Assert.Empty(context.KeyStatistics.ToList());
         }
@@ -1005,8 +1026,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestDraftVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -1024,23 +1045,23 @@ public class DataBlockServiceTests
                     .WithReleaseVersion(releaseVersion)
                     .Generate()
             )
-            // In this test, the DataBlockParent also has an already-published DataBlockVersion which cannot be
+            // In this test, the DataBlock also has an already-published DataBlockVersion which cannot be
             // deleted, and thus the parent will also not be deleted.
             .WithLatestPublishedVersion(_fixture.DefaultDataBlockVersion().Generate())
             .Generate();
 
-        var draftDataBlockVersion = dataBlockParent.LatestDraftVersion!;
-        var publishedDataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var draftDataBlockVersion = dataBlock.LatestDraftVersion!;
+        var publishedDataBlockVersion = dataBlock.LatestPublishedVersion!;
 
-        releaseVersion.KeyStatistics = new List<KeyStatistic>
-        {
-            new KeyStatisticDataBlock { DataBlockId = draftDataBlockVersion.Id },
-            new KeyStatisticDataBlock { DataBlockId = publishedDataBlockVersion.Id },
-        };
+        releaseVersion.KeyStatistics =
+        [
+            new KeyStatisticDataBlock { DataBlockVersionId = draftDataBlockVersion.Id },
+            new KeyStatisticDataBlock { DataBlockVersionId = publishedDataBlockVersion.Id },
+        ];
 
         releaseVersion.FeaturedTables = ListOf(
-            new FeaturedTable { DataBlockId = draftDataBlockVersion.Id },
-            new FeaturedTable { DataBlockId = publishedDataBlockVersion.Id }
+            new FeaturedTable { DataBlockVersionId = draftDataBlockVersion.Id },
+            new FeaturedTable { DataBlockVersionId = publishedDataBlockVersion.Id }
         );
 
         var file = new File { Id = fileId, Filename = "test-infographic.jpg" };
@@ -1049,16 +1070,18 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddAsync(dataBlockParent);
+            await context.AddAsync(dataBlock);
             await context.AddAsync(file);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(draftDataBlockVersion, releaseVersion));
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(publishedDataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            Assert.NotEmpty(context.DataBlocks.ToList());
+            Assert.NotEmpty(context.DataBlockVersionLinks.ToList());
             Assert.NotEmpty(context.DataBlockVersions.ToList());
-            Assert.NotEmpty(context.DataBlockParents.ToList());
+            Assert.NotEmpty(context.DataBlocks.ToList());
             Assert.NotEmpty(context.FeaturedTables.ToList());
             Assert.NotEmpty(context.KeyStatistics.ToList());
         }
@@ -1073,15 +1096,15 @@ public class DataBlockServiceTests
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-            var dataBlockCacheKey = new DataBlockTableResultCacheKey(draftDataBlockVersion);
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(draftDataBlockVersion);
 
             cacheKeyService
                 .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, draftDataBlockVersion.Id))
-                .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
@@ -1099,30 +1122,30 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var remainingDataBlock = Assert.Single(context.DataBlocks.ToList());
-            Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlock.Id);
+            var remainingDataBlockVersionLink = Assert.Single(context.DataBlockVersionLinks.ToList());
+            Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlockVersionLink.Id);
 
             var remainingDataBlockVersion = Assert.Single(context.DataBlockVersions.ToList());
             Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlockVersion.Id);
 
-            var remainingDataBlockParent = Assert.Single(context.DataBlockParents.ToList());
+            var remainingDataBlock = Assert.Single(context.DataBlocks.ToList());
 
             // The already-published DataBlockVersion will remain unchanged until at such a point in time where this
             // Release Amendment is published, at which point it will be updated to null to indicate that this
             // Data Block is no longer publicly visible.
-            Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlockParent.LatestPublishedVersionId);
+            Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlock.LatestPublishedVersionId);
 
             // The latest draft DataBlockVersion will be set to null, as there is no longer a draft version as part
             // of this Release Amendment.
-            Assert.Null(remainingDataBlockParent.LatestDraftVersionId);
+            Assert.Null(remainingDataBlock.LatestDraftVersionId);
 
             var remainingFeaturedTable = Assert.Single(context.FeaturedTables.ToList());
-            Assert.Equal(publishedDataBlockVersion.Id, remainingFeaturedTable.DataBlockId);
+            Assert.Equal(publishedDataBlockVersion.Id, remainingFeaturedTable.DataBlockVersionId);
 
             var remainingKeyStatistic = Assert.IsType<KeyStatisticDataBlock>(
                 Assert.Single(context.KeyStatistics.ToList())
             );
-            Assert.Equal(publishedDataBlockVersion.Id, remainingKeyStatistic.DataBlockId);
+            Assert.Equal(publishedDataBlockVersion.Id, remainingKeyStatistic.DataBlockVersionId);
         }
     }
 
@@ -1151,20 +1174,20 @@ public class DataBlockServiceTests
     [Fact]
     public async Task Delete_ReleaseNotFound()
     {
-        var dataBlock = new DataBlock();
+        var dataBlockVersion = new DataBlockVersion();
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.AddAsync(dataBlock);
+            await context.AddAsync(dataBlockVersion);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildDataBlockService(context);
-            var result = await service.Delete(Guid.NewGuid(), dataBlock.Id);
+            var result = await service.Delete(Guid.NewGuid(), dataBlockVersion.Id);
 
             result.AssertNotFound();
         }
@@ -1213,19 +1236,19 @@ public class DataBlockServiceTests
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new List<TableHeader> { new(Guid.NewGuid().ToString(), TableHeaderType.Indicator) },
-                    Columns = new List<TableHeader> { new(Guid.NewGuid().ToString(), TableHeaderType.Filter) },
+                    Rows = [new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)],
+                    Columns = [new(Guid.NewGuid().ToString(), TableHeaderType.Filter)],
                 },
             },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     Title = "Test chart",
                     Height = 600,
                     Width = 700,
                 },
-            },
+            ],
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1249,56 +1272,49 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockParents = context.DataBlockParents.ToList();
-            var dataBlockVersions = context.DataBlockVersions.ToList();
             var dataBlocks = context.DataBlocks.ToList();
+            var dataBlockVersions = context.DataBlockVersions.ToList();
 
-            // Validate that we have a new "DataBlockParent" to keep track of the various DataBlockVersions.
+            // Validate that we have a new "DataBlock" to keep track of the various DataBlockVersions.
             // Assert as well that it does not currently have a LatestPublishedVersion as this is a new
             // DataBlock but instead has a LatestDraftVersion.
-            var dataBlockParent = Assert.Single(dataBlockParents);
-            Assert.Null(dataBlockParent.LatestPublishedVersionId);
-            Assert.NotEqual(Guid.Empty, dataBlockParent.LatestDraftVersionId);
+            var dataBlock = Assert.Single(dataBlocks);
+            Assert.Null(dataBlock.LatestPublishedVersionId);
+            Assert.NotEqual(Guid.Empty, dataBlock.LatestDraftVersionId);
 
             // Validate that we have a single "version 0" DataBlockVersion for this new DataBlock. Assert that it
-            // is attached to its parent correctly, that is recognised as the LatestDraftVersion, and that it is
-            // attached to the underlying ContentBlock successfully.
+            // is attached to its parent correctly and that it is recognised as the LatestDraftVersion.
             var dataBlockVersion = Assert.Single(dataBlockVersions);
-            var dataBlock = Assert.Single(dataBlocks);
             Assert.Equal(0, dataBlockVersion.Version);
-            Assert.Equal(dataBlock.Id, dataBlockVersion.ContentBlockId);
-            Assert.Equal(dataBlockParent.Id, dataBlockVersion.DataBlockParentId);
-            Assert.Equal(dataBlockParent.LatestDraftVersionId, dataBlockVersion.Id);
+            Assert.Equal(dataBlock.Id, dataBlockVersion.DataBlockId);
+            Assert.Equal(dataBlock.LatestDraftVersionId, dataBlockVersion.Id);
+
+            // A newly created DataBlock is not yet placed in a content section, so it has no DataBlockVersionLink.
+            Assert.Empty(context.DataBlockVersionLinks.ToList());
 
             // Assert that the new DataBlock is connected correctly to its owning Release.
             Assert.Equal(releaseVersion.Id, dataBlockVersion.ReleaseVersionId);
-            Assert.Equal(releaseVersion.Id, dataBlock.ReleaseVersionId);
 
             // Assert that the DataBlockVersion has a Created date, but no Updated or Published dates at this time.
             dataBlockVersion.Created.AssertUtcNow();
             Assert.Null(dataBlockVersion.Updated);
             Assert.Null(dataBlockVersion.Published);
 
-            dataBlock.Created.AssertUtcNow();
-            Assert.Null(dataBlock.Updated);
+            Assert.Equal(createRequest.Heading, dataBlockVersion.Heading);
+            Assert.Equal(createRequest.Name, dataBlockVersion.Name);
+            Assert.Equal(createRequest.Source, dataBlockVersion.Source);
 
-            Assert.Equal(createRequest.Heading, dataBlock.Heading);
-            Assert.Equal(createRequest.Name, dataBlock.Name);
-            Assert.Equal(createRequest.Source, dataBlock.Source);
-
-            createRequest.Query.AsFullTableQuery().AssertDeepEqualTo(dataBlock.Query);
-            createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
-            createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
+            createRequest.Query.AsFullTableQuery().AssertDeepEqualTo(dataBlockVersion.Query);
+            createRequest.Table.AssertDeepEqualTo(dataBlockVersion.Table);
+            createRequest.Charts.AssertDeepEqualTo(dataBlockVersion.Charts);
 
             var savedRelease = await context.ReleaseVersions.FirstOrDefaultAsync(rv => rv.Id == releaseVersion.Id);
 
-            var savedDataBlocks = context
-                .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersion.Id)
-                .ToList();
-
             Assert.NotNull(savedRelease);
-            Assert.Single(savedDataBlocks);
-            Assert.Equal(dataBlock, savedDataBlocks[0]);
+
+            // No ContentBlock is created either, as the only ContentBlock a data block owns is its
+            // DataBlockVersionLink.
+            Assert.Empty(context.ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersion.Id).ToList());
         }
     }
 
@@ -1335,15 +1351,15 @@ public class DataBlockServiceTests
             Heading = "Test heading",
             Name = "Test name",
             Query = new FullTableQueryRequest { SubjectId = subjectId },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     // No title
                     Height = 600,
                     Width = 700,
                 },
-            },
+            ],
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1362,7 +1378,7 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlocks = context.DataBlocks.ToList();
+            var dataBlocks = context.DataBlockVersions.ToList();
 
             Assert.Single(dataBlocks);
 
@@ -1393,7 +1409,7 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlocks = context.DataBlocks.ToList();
+            var dataBlocks = context.DataBlockVersionLinks.ToList();
 
             Assert.Empty(dataBlocks);
         }
@@ -1406,8 +1422,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -1427,7 +1443,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -1442,11 +1458,21 @@ public class DataBlockServiceTests
             },
         };
 
+        var dataBlockVersionLink = new DataBlockVersionLink
+        {
+            Id = dataBlockVersion.Id,
+            DataBlockVersionId = dataBlockVersion.Id,
+            DataBlockVersion = dataBlockVersion,
+            ReleaseVersion = releaseVersion,
+            Order = 5,
+        };
+
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            await context.DataBlockVersionLinks.AddAsync(dataBlockVersionLink);
             await context.SaveChangesAsync();
         }
 
@@ -1456,30 +1482,30 @@ public class DataBlockServiceTests
             Name = "New name",
             Source = "New source",
             Query = new FullTableQueryRequest { SubjectId = subjectId },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     Title = "New chart",
                     Height = 600,
                     Width = 700,
                 },
-            },
+            ],
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-            var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
             cacheKeyService
                 .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
-                .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
@@ -1497,7 +1523,7 @@ public class DataBlockServiceTests
             Assert.Equal(updateRequest.Heading, updateResult.Heading);
             Assert.Equal(updateRequest.Name, updateResult.Name);
             Assert.Equal(updateRequest.Source, updateResult.Source);
-            Assert.Equal(dataBlockVersion.Order, updateResult.Order);
+            Assert.Equal(dataBlockVersionLink.Order, updateResult.Order);
             Assert.Equal(subjectId, updateResult.DataSetId);
             Assert.Equal("test file", updateResult.DataSetName);
 
@@ -1508,7 +1534,7 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlockVersion.Id);
+            var updatedDataBlock = await context.DataBlockVersions.FindAsync(dataBlockVersion.Id);
 
             Assert.NotNull(updatedDataBlock);
             Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
@@ -1528,8 +1554,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -1549,7 +1575,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -1567,6 +1593,7 @@ public class DataBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -1575,30 +1602,30 @@ public class DataBlockServiceTests
             Heading = "New heading",
             Name = "New name",
             Query = new FullTableQueryRequest { SubjectId = subjectId },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     // No title
                     Height = 600,
                     Width = 700,
                 },
-            },
+            ],
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-            var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
             cacheKeyService
                 .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
-                .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
@@ -1622,7 +1649,7 @@ public class DataBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlockVersion.Id);
+            var updatedDataBlock = await context.DataBlockVersions.FindAsync(dataBlockVersion.Id);
 
             Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
             updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
@@ -1656,8 +1683,8 @@ public class DataBlockServiceTests
 
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -1678,7 +1705,7 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var releaseFile = new ReleaseFile
         {
@@ -1699,6 +1726,7 @@ public class DataBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.AddRangeAsync(dataBlockVersion, file, releaseFile);
+            context.DataBlockVersionLinks.Add(BuildDataBlockVersionLink(dataBlockVersion, releaseVersion));
             await context.SaveChangesAsync();
         }
 
@@ -1707,15 +1735,15 @@ public class DataBlockServiceTests
             Heading = "Test heading",
             Name = "Test name",
             Query = new FullTableQueryRequest { SubjectId = subjectId },
-            Charts = new List<IChart>
-            {
+            Charts =
+            [
                 new LineChart
                 {
                     Title = "New chart",
                     Height = 600,
                     Width = 700,
                 },
-            },
+            ],
         };
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1726,15 +1754,15 @@ public class DataBlockServiceTests
 
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-            var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
             cacheKeyService
                 .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
-                .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
 
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
 
-            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockCacheKey)).Returns(Task.CompletedTask);
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
 
             var service = BuildDataBlockService(
                 context,
@@ -1758,31 +1786,36 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParents = _fixture
-            .DefaultDataBlockParent()
+        var dataBlocks = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(() =>
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
             )
             .GenerateList(4);
 
-        var unattachedDataBlockVersion1 = dataBlockParents[0].LatestPublishedVersion!;
-        var unattachedDataBlockVersion2 = dataBlockParents[1].LatestPublishedVersion!;
-        var attachedDataBlockVersion1 = dataBlockParents[2].LatestPublishedVersion!;
-        var attachedDataBlockVersion2 = dataBlockParents[3].LatestPublishedVersion!;
+        var unattachedDataBlockVersion1 = dataBlocks[0].LatestPublishedVersion!;
+        var unattachedDataBlockVersion2 = dataBlocks[1].LatestPublishedVersion!;
+        var attachedDataBlockVersion1 = dataBlocks[2].LatestPublishedVersion!;
+        var attachedDataBlockVersion2 = dataBlocks[3].LatestPublishedVersion!;
 
         var keyStat = new KeyStatisticDataBlock
         {
             ReleaseVersion = releaseVersion,
             // This Data Block is "attached" because it's used with a Key Stat.
-            DataBlock = attachedDataBlockVersion1.ContentBlock,
+            DataBlockVersion = attachedDataBlockVersion1,
         };
+
+        // Only a DataBlockVersion that is placed in a content section has a DataBlockVersionLink, so just the
+        // content-attached one gets a link here. The key-stat one is excluded via its key stat instead, and the two
+        // unattached ones have no link at all.
+        var contentLink = BuildDataBlockVersionLink(attachedDataBlockVersion2, releaseVersion);
 
         releaseVersion.Content = _fixture
             .DefaultContentSection()
             .WithContentBlocks(
                 ListOf<ContentBlock>(
                     // This Data Block is "attached" because it's used within Release Content.
-                    attachedDataBlockVersion2.ContentBlock,
+                    contentLink,
                     new HtmlBlock()
                 )
             )
@@ -1791,16 +1824,11 @@ public class DataBlockServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            // Add an unrelated Data Block.
+            // Add an unrelated Data Block link for a different Release.
             await contentDbContext.ContentBlocks.AddRangeAsync(
-                new DataBlock
-                {
-                    Name = "Unattached for different Release",
-                    ContentSection = null,
-                    ReleaseVersion = new ReleaseVersion(),
-                }
+                new DataBlockVersionLink { ContentSection = new(), ReleaseVersion = new ReleaseVersion() }
             );
-            await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParents);
+            await contentDbContext.DataBlocks.AddRangeAsync(dataBlocks);
             await contentDbContext.KeyStatisticsDataBlock.AddRangeAsync(keyStat);
             await contentDbContext.SaveChangesAsync();
         }
@@ -1831,6 +1859,18 @@ public class DataBlockServiceTests
 
         result.AssertNotFound();
     }
+
+    private static DataBlockVersionLink BuildDataBlockVersionLink(
+        DataBlockVersion dataBlockVersion,
+        ReleaseVersion releaseVersion
+    ) =>
+        new()
+        {
+            Id = dataBlockVersion.Id,
+            DataBlockVersionId = dataBlockVersion.Id,
+            DataBlockVersion = dataBlockVersion,
+            ReleaseVersion = releaseVersion,
+        };
 
     private static DataBlockService BuildDataBlockService(
         ContentDbContext contentDbContext,

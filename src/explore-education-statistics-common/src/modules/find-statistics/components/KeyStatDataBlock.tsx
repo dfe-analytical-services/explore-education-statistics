@@ -7,7 +7,7 @@ import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 export interface KeyStatDataBlockProps {
   children?: ReactNode;
   releaseVersionId: string;
-  dataBlockParentId: string;
+  dataBlockId: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
@@ -17,7 +17,7 @@ export interface KeyStatDataBlockProps {
 export default function KeyStatDataBlock({
   children,
   releaseVersionId,
-  dataBlockParentId,
+  dataBlockId,
   trend,
   guidanceTitle = 'Help',
   guidanceText,
@@ -27,9 +27,7 @@ export default function KeyStatDataBlock({
     data: dataBlock,
     isLoading,
     error,
-  } = useQuery(
-    tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockParentId),
-  );
+  } = useQuery(tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId));
 
   const title = dataBlock?.title;
   const statistic = dataBlock?.value;

@@ -6,7 +6,7 @@ import {
 } from '@common/services/publicationService';
 
 export interface KeyStatisticDataBlockCreateRequest {
-  dataBlockId: string;
+  dataBlockVersionId: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;

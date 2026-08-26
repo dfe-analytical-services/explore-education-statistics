@@ -18,7 +18,7 @@ public class CacheKeyService : ICacheKeyService
         _contentPersistenceHelper = contentPersistenceHelper;
     }
 
-    public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
+    public async Task<Either<ActionResult, DataBlockVersionTableResultCacheKey>> CreateCacheKeyForDataBlock(
         Guid releaseVersionId,
         Guid dataBlockVersionId
     )
@@ -29,6 +29,6 @@ public class CacheKeyService : ICacheKeyService
                     dataBlockVersion.Id == dataBlockVersionId && dataBlockVersion.ReleaseVersionId == releaseVersionId
                 )
             )
-            .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
+            .OnSuccess(dataBlockVersion => new DataBlockVersionTableResultCacheKey(dataBlockVersion));
     }
 }

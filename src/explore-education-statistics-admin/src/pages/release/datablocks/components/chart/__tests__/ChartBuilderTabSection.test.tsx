@@ -86,7 +86,7 @@ describe('ChartBuilderTabSection', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'data-block-1',
-    dataBlockParentId: 'data-block-parent-1',
+    dataBlockId: 'data-block-1',
     dataSetId: 'data-set-1',
     dataSetName: 'Test data set',
     name: 'Test block',
@@ -205,7 +205,7 @@ describe('ChartBuilderTabSection', () => {
 
     expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
       'release-1',
-      'data-block-parent-1',
+      'data-block-1',
       1,
     );
 

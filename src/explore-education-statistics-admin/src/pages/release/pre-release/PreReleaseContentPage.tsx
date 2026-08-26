@@ -28,10 +28,10 @@ const PreReleaseContentPage = ({
 
   const handleFeaturedTableLinks = (url: string, text: string) => {
     // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
-    // so split twice to get the dataBlockParentId.
-    const dataBlockParentId = url.split('fast-track/')[1].split('?')[0];
+    // so split twice to get the dataBlockId.
+    const dataBlockId = url.split('fast-track/')[1].split('?')[0];
     const featuredTable = featuredTables.find(
-      table => table.dataBlockParentId === dataBlockParentId,
+      table => table.dataBlockId === dataBlockId,
     );
 
     return (
@@ -41,7 +41,7 @@ const PreReleaseContentPage = ({
           {
             publicationId,
             releaseVersionId,
-            dataBlockId: featuredTable?.dataBlockId,
+            dataBlockVersionId: featuredTable?.dataBlockVersionId,
           },
         )}
       >

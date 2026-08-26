@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
@@ -44,7 +44,7 @@ public abstract class ManageContentPageServiceTests
 
             releaseVersion.RelatedInformation.Add(new Link { Description = "Related 1", Url = "https://related-1" });
 
-            var unattachedDataBlockParent = new DataBlockParent
+            var unattachedDataBlock = new DataBlock
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
@@ -53,7 +53,7 @@ public abstract class ManageContentPageServiceTests
                 },
             };
 
-            var keyStatDataBlockParent = new DataBlockParent
+            var keyStatDataBlock = new DataBlock
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
@@ -64,13 +64,12 @@ public abstract class ManageContentPageServiceTests
 
             var inContentDataBlockVersionId = Guid.NewGuid();
 
-            var inContentDataBlockParent = new DataBlockParent
+            var inContentDataBlock = new DataBlock
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
                     ReleaseVersionId = releaseVersion.Id,
                     Id = inContentDataBlockVersionId,
-                    ContentBlock = new DataBlock { Id = inContentDataBlockVersionId, Order = 1 },
                 },
             };
 
@@ -80,13 +79,13 @@ public abstract class ManageContentPageServiceTests
                 new KeyStatisticDataBlock
                 {
                     Order = 0,
-                    DataBlockId = keyStatDataBlockParent.LatestPublishedVersion!.Id,
+                    DataBlockVersionId = keyStatDataBlock.LatestPublishedVersion!.Id,
                 },
             ];
 
-            List<DataBlockViewModel> unattachedDataBlocks =
+            List<DataBlockVersionViewModel> unattachedDataBlocks =
             [
-                new() { Id = unattachedDataBlockParent.LatestPublishedVersion!.Id },
+                new() { Id = unattachedDataBlock.LatestPublishedVersion!.Id },
             ];
 
             var files = _dataFixture
@@ -117,7 +116,13 @@ public abstract class ManageContentPageServiceTests
                 Content =
                 [
                     new HtmlBlock { Order = 0, Body = "Test block 1" },
-                    inContentDataBlockParent.LatestPublishedVersion!.ContentBlock,
+                    new DataBlockVersionLink
+                    {
+                        Id = inContentDataBlockVersionId,
+                        DataBlockVersionId = inContentDataBlockVersionId,
+                        DataBlockVersion = inContentDataBlock.LatestPublishedVersion!,
+                        Order = 1,
+                    },
                 ],
             };
             releaseVersion.GenericContent = [genericContentSection];
@@ -126,11 +131,7 @@ public abstract class ManageContentPageServiceTests
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Publications.Add(publication);
-                contentDbContext.DataBlockParents.AddRange(
-                    unattachedDataBlockParent,
-                    keyStatDataBlockParent,
-                    inContentDataBlockParent
-                );
+                contentDbContext.DataBlocks.AddRange(unattachedDataBlock, keyStatDataBlock, inContentDataBlock);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -183,10 +184,10 @@ public abstract class ManageContentPageServiceTests
                 var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(
                     contentRelease.KeyStatistics[0]
                 );
-                Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
+                Assert.Equal(originalKeyStatDataBlock.DataBlockVersionId, keyStatDataBlockViewModel.DataBlockVersionId);
                 Assert.Equal(
-                    keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
-                    keyStatDataBlockViewModel.DataBlockParentId
+                    keyStatDataBlock.LatestPublishedVersion!.DataBlockId,
+                    keyStatDataBlockViewModel.DataBlockId
                 );
 
                 Assert.Equal(releaseVersion.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
@@ -260,12 +261,9 @@ public abstract class ManageContentPageServiceTests
                 var htmlBlockViewModel = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
                 Assert.Equal("Test block 1", htmlBlockViewModel.Body);
 
-                var dataBlockViewModel = Assert.IsType<DataBlockViewModel>(contentSections[0].Content[1]);
+                var dataBlockViewModel = Assert.IsType<DataBlockVersionViewModel>(contentSections[0].Content[1]);
                 Assert.Equal(inContentDataBlockVersionId, dataBlockViewModel.Id);
-                Assert.Equal(
-                    inContentDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
-                    dataBlockViewModel.DataBlockParentId
-                );
+                Assert.Equal(inContentDataBlock.LatestPublishedVersion!.DataBlockId, dataBlockViewModel.DataBlockId);
 
                 var contentPublication = contentRelease.Publication;
 
@@ -386,7 +384,7 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(mock => mock.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
 
             methodologyVersionRepository
                 .Setup(mock => mock.GetLatestVersionByPublication(publication.Id))
@@ -501,11 +499,11 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(mock => mock.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
 
             methodologyVersionRepository
                 .Setup(mock => mock.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync([]);
 
             releaseFileService
                 .Setup(mock => mock.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
@@ -609,10 +607,8 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
-            methodologyVersionRepository
-                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
             releaseFileService
                 .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
@@ -671,10 +667,8 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
-            methodologyVersionRepository
-                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
             releaseFileService
                 .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
@@ -751,10 +745,8 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
-            methodologyVersionRepository
-                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
             releaseFileService
                 .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
@@ -831,10 +823,8 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
-            methodologyVersionRepository
-                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
             releaseFileService
                 .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
@@ -891,10 +881,8 @@ public abstract class ManageContentPageServiceTests
 
             dataBlockService
                 .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
-            methodologyVersionRepository
-                .Setup(s => s.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(new List<MethodologyVersion>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
             releaseFileService
                 .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
