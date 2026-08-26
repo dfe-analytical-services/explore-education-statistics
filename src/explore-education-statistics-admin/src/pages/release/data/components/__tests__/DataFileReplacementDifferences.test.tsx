@@ -4,6 +4,7 @@ import dataReplacementService, {
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
+import cloneDeep from 'lodash/cloneDeep';
 import DataFileReplacementDifferencesTable from '../DataFileReplacementDifferencesTable';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
@@ -741,6 +742,13 @@ describe('DataFileReplacementDifferences', () => {
 
     await waitFor(() => {
       expect(
+        within(filtersTable!).getByText('Item one candidate'),
+      ).toBeVisible();
+      expect(within(filtersTable!).queryByText('not present')).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(
         dataReplacementService.updatePlanFilterMappings,
       ).toHaveBeenCalledWith(
         'releaseVersionId',
@@ -755,6 +763,42 @@ describe('DataFileReplacementDifferences', () => {
           },
         ],
       );
+    });
+  });
+
+  test('refreshes the internal mappings when the plan is reloaded', async () => {
+    const { rerender } = sharedRender();
+    const reloadedFilters = cloneDeep(filterMappings);
+    const reloadedItem =
+      reloadedFilters.mappings['filter-one'].filterGroups.mappings['group-one']
+        .filterItems.mappings['item-one'];
+
+    reloadedItem.type = 'ManuallySet';
+    reloadedItem.candidateKey = 'item-one-candidate';
+
+    rerender(
+      <DataFileReplacementDifferences
+        replacementFileId="replacementFileId"
+        reloadPlan={jest.fn()}
+        fileId="fileId"
+        releaseVersionId="releaseVersionId"
+        plan={{
+          ...testReplacementPlan,
+          mapping: {
+            ...testReplacementPlan.mapping,
+            filters: reloadedFilters,
+          },
+        }}
+      />,
+    );
+
+    const filtersTable = screen.getByText('Filters').closest('table');
+    expect(filtersTable).not.toBeNull();
+
+    await waitFor(() => {
+      expect(
+        within(filtersTable!).getByText('Item one candidate'),
+      ).toBeVisible();
     });
   });
 });

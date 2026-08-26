@@ -7,7 +7,7 @@ import dataReplacementService, {
   PlanMappings,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 import DataFileReplacementFilterDifferencesTable from '@admin/pages/release/data/components/DataFileReplacementFilterDifferencesTable';
 import DataFileReplacementDifferencesTable from './DataFileReplacementDifferencesTable';
@@ -30,6 +30,10 @@ export default function DataFileReplacementDifferences({
   const [planMappings, updatePlanMappings] = useImmer<PlanMappings>(
     plan.mapping,
   );
+
+  useEffect(() => {
+    updatePlanMappings(plan.mapping);
+  }, [plan.mapping, updatePlanMappings]);
 
   // instead of passing the datablocks down to the tables, it seems better to handle this here
   const indicatorReplacementGroups = useMemo(() => {
@@ -219,7 +223,7 @@ export default function DataFileReplacementDifferences({
       />
 
       <DataFileReplacementFilterDifferencesTable
-        filters={plan.mapping.filters}
+        filters={planMappings.filters}
         handleMappingUpdate={handleFiltersMappingUpdate}
       />
     </>
