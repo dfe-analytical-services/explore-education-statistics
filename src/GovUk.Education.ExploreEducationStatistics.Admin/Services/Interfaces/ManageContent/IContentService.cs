@@ -58,7 +58,7 @@ public interface IContentService
         ContentBlockUpdateRequest request
     );
 
-    Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(
+    Task<Either<ActionResult, DataBlockVersionViewModel?>> AttachDataBlock(
         Guid releaseVersionId,
         Guid contentSectionId,
         DataBlockAttachRequest request

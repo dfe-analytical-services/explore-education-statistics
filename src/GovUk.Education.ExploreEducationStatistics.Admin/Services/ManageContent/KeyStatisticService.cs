@@ -34,7 +34,7 @@ public class KeyStatisticService(
             .OnSuccess(_ =>
                 persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
                     query.Where(dataBlockVersion =>
-                        dataBlockVersion.Id == request.DataBlockId
+                        dataBlockVersion.Id == request.DataBlockVersionId
                         && dataBlockVersion.ReleaseVersionId == releaseVersionId
                     )
                 )
@@ -53,8 +53,8 @@ public class KeyStatisticService(
 
                 var keyStatisticDataBlock = new KeyStatisticDataBlock
                 {
-                    DataBlockId = request.DataBlockId,
-                    DataBlockParentId = dataBlockVersion.DataBlockParentId,
+                    DataBlockVersionId = request.DataBlockVersionId,
+                    DataBlockId = dataBlockVersion.DataBlockId,
                     ReleaseVersionId = releaseVersionId,
                     Trend = request.Trend,
                     GuidanceTitle = request.GuidanceTitle,

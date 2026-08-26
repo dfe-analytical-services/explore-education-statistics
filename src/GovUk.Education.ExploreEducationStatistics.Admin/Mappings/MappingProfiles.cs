@@ -12,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
-using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
+using DataBlockVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockVersionViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
@@ -23,9 +23,9 @@ using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewMode
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 
-/**
- * AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
- */
+/// <summary>
+/// AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
+/// </summary>
 public class MappingProfiles : CommonMappingProfile
 {
     public MappingProfiles()
@@ -46,9 +46,9 @@ public class MappingProfiles : CommonMappingProfile
             .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
 
         CreateContentBlockMap();
-        CreateMap<DataBlockCreateRequest, DataBlock>()
+        CreateMap<DataBlockCreateRequest, DataBlockVersion>()
             .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default, default)));
-        CreateMap<DataBlockUpdateRequest, DataBlock>()
+        CreateMap<DataBlockUpdateRequest, DataBlockVersion>()
             .ForMember(dest => dest.Query, m => m.MapFrom(c => c.Query.AsFullTableQuery(default, default)));
 
         CreateMap<FeaturedTable, FeaturedTableViewModel>();
@@ -154,13 +154,22 @@ public class MappingProfiles : CommonMappingProfile
                 m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created))
             );
 
-        // EES-4640 - we include an AfterMap configuration here to ensure that any time we create a
-        // DataBlockViewModel from a plain DataBlock, we also include the DataBlockParentId on the
-        // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
-        // removed from the ContentBlock model, this can go too.
-        CreateMap<DataBlock, DataBlockViewModel>().AfterMap<DataBlockViewModelPostMappingAction>();
+        // A DataBlockVersionLink (a ContentBlock) carries the positional/locking state (Order, Comments, Locked, ...)
+        // mapped by the base ContentBlock -> IContentBlockViewModel map above, while the data block's content
+        // (Heading, Name, Query, ...) and DataBlockId are read through its DataBlockVersion navigation.
+        CreateMap<DataBlockVersionLink, DataBlockVersionViewModel>()
+            .ForMember(dest => dest.DataBlockId, m => m.MapFrom(link => link.DataBlockVersion.DataBlockId))
+            .ForMember(dest => dest.Heading, m => m.MapFrom(link => link.DataBlockVersion.Heading))
+            .ForMember(dest => dest.Name, m => m.MapFrom(link => link.DataBlockVersion.Name))
+            .ForMember(dest => dest.Source, m => m.MapFrom(link => link.DataBlockVersion.Source))
+            .ForMember(dest => dest.Query, m => m.MapFrom(link => link.DataBlockVersion.Query))
+            .ForMember(dest => dest.Charts, m => m.MapFrom(link => link.DataBlockVersion.Charts))
+            .ForMember(dest => dest.Table, m => m.MapFrom(link => link.DataBlockVersion.Table));
 
-        CreateMap<DataBlockVersion, DataBlockViewModel>();
+        // An unattached data block has no DataBlockVersionLink, so it is mapped straight from its DataBlockVersion
+        // and simply has no positional or locking state. The view model's Id remains the DataBlockVersion's Id
+        // either way, as a link shares its Id with the DataBlockVersion it points at.
+        CreateMap<DataBlockVersion, DataBlockVersionViewModel>();
 
         CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
             .ForMember(dest => dest.Title, m => m.MapFrom(embedBlockLink => embedBlockLink.EmbedBlock.Title))

@@ -66,10 +66,10 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
           id: 'test-section-1-block-1-id',
         },
         {
-          type: 'DataBlock',
+          type: 'DataBlockVersionLink',
           dataBlockVersion: {
             dataBlockVersionId: 'test-section-1-block-2-data-block-version-id',
-            dataBlockParentId: 'test-section-1-block-2-data-block-parent-id',
+            dataBlockId: 'test-section-1-block-2-data-block-id',
             charts: [
               {
                 type: 'infographic',
@@ -192,7 +192,7 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
     {
       type: 'KeyStatisticDataBlock',
       dataBlockVersionId: 'test-key-statistic-2-data-block-version-id',
-      dataBlockParentId: 'test-key-statistic-2-data-block-parent-id',
+      dataBlockId: 'test-key-statistic-2-data-block-id',
       id: 'test-key-statistic-2-id',
     },
     {
@@ -209,12 +209,11 @@ export const testReleaseHomeContent: ReleaseVersionHomeContent = {
     id: 'test-key-statistics-secondary-section-id',
     content: [
       {
-        type: 'DataBlock',
+        type: 'DataBlockVersionLink',
         dataBlockVersion: {
           dataBlockVersionId:
             'test-key-statistics-secondary-data-block-version-id',
-          dataBlockParentId:
-            'test-key-statistics-secondary-data-block-parent-id',
+          dataBlockId: 'test-key-statistics-secondary-data-block-id',
           charts: [
             {
               type: 'infographic',
@@ -357,15 +356,15 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
   featuredTables: [
     {
       featuredTableId: 'featured-table-1-id',
+      dataBlockVersionId: 'featured-table-1-data-block-id',
       dataBlockId: 'featured-table-1-data-block-id',
-      dataBlockParentId: 'featured-table-1-data-block-parent-id',
       title: 'Featured table 1',
       summary: 'Featured table 1 description',
     },
     {
       featuredTableId: 'featured-table-2-id',
+      dataBlockVersionId: 'featured-table-2-data-block-id',
       dataBlockId: 'featured-table-2-data-block-id',
-      dataBlockParentId: 'featured-table-2-data-block-parent-id',
       title: 'Featured table 2',
       summary: 'Featured table 2 description',
     },

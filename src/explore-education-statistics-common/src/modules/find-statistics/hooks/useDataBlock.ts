@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 
 interface Options {
-  dataBlock: Pick<DataBlock, 'id' | 'charts' | 'query' | 'dataBlockParentId'>;
+  dataBlock: Pick<DataBlock, 'id' | 'charts' | 'query' | 'dataBlockId'>;
   dataBlockStaleTime?: number;
   getInfographic?: GetInfographic;
   releaseVersionId: string;
@@ -39,7 +39,7 @@ export default function useDataBlock({
   } = useQuery({
     ...tableBuilderQueries.getDataBlockTable(
       releaseVersionId,
-      dataBlock.dataBlockParentId,
+      dataBlock.dataBlockId,
     ),
     staleTime: dataBlockStaleTime,
   });
@@ -51,7 +51,7 @@ export default function useDataBlock({
   } = useQuery({
     ...tableBuilderQueries.getDataBlockGeoJson(
       releaseVersionId,
-      dataBlock.dataBlockParentId,
+      dataBlock.dataBlockId,
       selectedBoundaryLevel ?? -1,
     ),
     enabled: isMapChart,
@@ -64,7 +64,7 @@ export default function useDataBlock({
       await queryClient.prefetchQuery({
         ...tableBuilderQueries.getDataBlockGeoJson(
           releaseVersionId,
-          dataBlock.dataBlockParentId,
+          dataBlock.dataBlockId,
           boundaryLevel,
         ),
         staleTime: Infinity,

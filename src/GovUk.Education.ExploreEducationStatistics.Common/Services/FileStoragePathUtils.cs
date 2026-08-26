@@ -20,14 +20,14 @@ public static class FileStoragePathUtils
         return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
     }
 
-    public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
+    public static string PublicContentDataBlockPath(string publicationSlug, string releaseSlug)
     {
         return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{DataBlocksDirectory}";
     }
 
-    public static string PrivateContentDataBlockPath(Guid releaseVersionId, Guid dataBlockId)
+    public static string PrivateContentDataBlockPath(Guid releaseVersionId, Guid dataBlockVersionId)
     {
-        return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}.json";
+        return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockVersionId}.json";
     }
 
     public static string PrivateContentDataBlockLocationsPath(
@@ -44,9 +44,9 @@ public static class FileStoragePathUtils
         return $"{ReleasesDirectory}/{releaseVersionId}/{SubjectMetaDirectory}/{subjectId}.json";
     }
 
-    public static string PublicContentDataBlockPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
+    public static string PublicContentDataBlockVersionPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
     {
-        return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}.json";
+        return $"{PublicContentDataBlockPath(publicationSlug, releaseSlug)}/{dataBlockId}.json";
     }
 
     public static string PublicContentDataBlockLocationsPath(
@@ -56,7 +56,7 @@ public static class FileStoragePathUtils
         long boundaryLevelId
     )
     {
-        return $"{PublicContentDataBlockParentPath(publicationSlug, releaseSlug)}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
+        return $"{PublicContentDataBlockPath(publicationSlug, releaseSlug)}/{dataBlockId}-boundary-levels/{dataBlockId}-{boundaryLevelId}.json";
     }
 
     public static string PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)

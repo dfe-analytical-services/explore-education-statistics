@@ -43,25 +43,25 @@ const ReleaseContentPageLoaded = () => {
         totalUnresolvedComments,
         totalUnsavedBlocks,
       }) => {
-        const handleFeaturedTableItemClick = (dataBlockId: string) => {
+        const handleFeaturedTableItemClick = (dataBlockVersionId: string) => {
           setEditingMode('table-preview');
-          setPreviewFeaturedTableId(dataBlockId);
+          setPreviewFeaturedTableId(dataBlockVersionId);
         };
 
         const transformFeaturedTableLinks = (url: string, text: string) => {
           return (
             <ButtonText
               onClick={() => {
-                // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
-                // so split twice to get the dataBlockParentId.
-                const dataBlockParentId = url
-                  .split('fast-track/')[1]
-                  .split('?')[0];
+                // the url format is `/data-tables/fast-track/<data-block-id>?featuredTables`
+                // so split twice to get the dataBlockId.
+                const dataBlockId = url.split('fast-track/')[1].split('?')[0];
                 const featuredTable = featuredTables?.find(
-                  table => table.dataBlockParentId === dataBlockParentId,
+                  table => table.dataBlockId === dataBlockId,
                 );
                 if (featuredTable) {
-                  handleFeaturedTableItemClick(featuredTable.dataBlockId);
+                  handleFeaturedTableItemClick(
+                    featuredTable.dataBlockVersionId,
+                  );
                 }
               }}
             >

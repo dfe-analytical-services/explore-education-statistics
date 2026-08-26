@@ -88,7 +88,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                           {
                             publicationId,
                             releaseVersionId,
-                            dataBlockId: dataBlock.id,
+                            dataBlockVersionId: dataBlock.id,
                           },
                         )}
                       >

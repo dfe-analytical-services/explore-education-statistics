@@ -29,11 +29,11 @@ public class FileStoragePathUtilsTests
 
         [Theory]
         [MemberData(nameof(PublicationReleaseAndIdData))]
-        public void PublicContentDataBlockPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
+        public void PublicContentDataBlockVersionPath(string publicationSlug, string releaseSlug, Guid dataBlockId)
         {
             Assert.Equal(
                 $"publications/publication-slug/releases/release-slug/data-blocks/{dataBlockId}.json",
-                FileStoragePathUtils.PublicContentDataBlockPath(
+                FileStoragePathUtils.PublicContentDataBlockVersionPath(
                     publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug,
                     dataBlockId
@@ -63,11 +63,11 @@ public class FileStoragePathUtilsTests
 
         [Theory]
         [MemberData(nameof(PublicationAndReleaseData))]
-        public void PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
+        public void PublicContentDataBlockPath(string publicationSlug, string releaseSlug)
         {
             Assert.Equal(
                 $"publications/publication-slug/releases/release-slug/data-blocks",
-                FileStoragePathUtils.PublicContentDataBlockParentPath(
+                FileStoragePathUtils.PublicContentDataBlockPath(
                     publicationSlug: publicationSlug,
                     releaseSlug: releaseSlug
                 )
@@ -141,7 +141,7 @@ public class FileStoragePathUtilsTests
                 $"releases/{releaseVersionId}/data-blocks/{dataBlockId}.json",
                 FileStoragePathUtils.PrivateContentDataBlockPath(
                     releaseVersionId: releaseVersionId,
-                    dataBlockId: dataBlockId
+                    dataBlockVersionId: dataBlockId
                 )
             );
         }

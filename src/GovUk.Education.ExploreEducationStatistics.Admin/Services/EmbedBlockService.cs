@@ -122,7 +122,7 @@ public class EmbedBlockService : IEmbedBlockService
             .OnSuccessDo(contentBlock =>
                 ValidateContentSectionAttachedToReleaseVersion(
                     releaseVersionId: releaseVersionId,
-                    contentSectionId: contentBlock.ContentSectionId!.Value
+                    contentSectionId: contentBlock.ContentSectionId
                 )
             )
             .OnSuccessDo(_ => ValidateEmbedUrl(request.Url))

@@ -118,7 +118,7 @@ public class ReplacementServiceTests
             },
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -155,7 +155,7 @@ public class ReplacementServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -363,7 +363,7 @@ public class ReplacementServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -447,8 +447,6 @@ public class ReplacementServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
@@ -986,7 +984,7 @@ public class ReplacementServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -1077,8 +1075,6 @@ public class ReplacementServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
@@ -1256,14 +1252,18 @@ public class ReplacementServiceTests
             .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync(Unit.Instance);
 
-        var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+        var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
         cacheKeyService
-            .Setup(service => service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
-            .ReturnsAsync(cacheKey);
+            .Setup(service =>
+                service.CreateCacheKeyForDataBlock(dataBlockVersion.ReleaseVersionId, dataBlockVersion.Id)
+            )
+            .ReturnsAsync(dataBlockVersionCacheKey);
 
         var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-        privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey)).Returns(Task.CompletedTask);
+        privateBlobCacheService
+            .Setup(service => service.DeleteItemAsync(dataBlockVersionCacheKey))
+            .Returns(Task.CompletedTask);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1306,8 +1306,10 @@ public class ReplacementServiceTests
             Assert.NotNull(replacementFileUpdated);
             Assert.Null(replacementFileUpdated.ReplacingId);
 
-            var replacedDataBlock = await contentDbContext.DataBlocks.FirstAsync(db => db.Id == dataBlock.Id);
-            Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
+            var replacedDataBlock = await contentDbContext.DataBlockVersions.FirstAsync(db =>
+                db.Id == dataBlockVersion.Id
+            );
+            Assert.Equal(dataBlockVersion.Name, replacedDataBlock.Name);
             Assert.Equal(replacementReleaseSubject.SubjectId, replacedDataBlock.Query.SubjectId);
 
             Assert.Single(replacedDataBlock.Query.Indicators);
@@ -1656,7 +1658,7 @@ public class ReplacementServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -1713,8 +1715,6 @@ public class ReplacementServiceTests
             Charts = [],
             ReleaseVersion = releaseVersion,
         };
-
-        var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
@@ -1868,15 +1868,19 @@ public class ReplacementServiceTests
             .Setup(service => service.RemoveDataFiles(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync(Unit.Instance);
 
-        var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+        var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
         cacheKeyService
-            .Setup(service => service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
-            .ReturnsAsync(cacheKey);
+            .Setup(service =>
+                service.CreateCacheKeyForDataBlock(dataBlockVersion.ReleaseVersionId, dataBlockVersion.Id)
+            )
+            .ReturnsAsync(dataBlockVersionCacheKey);
 
         var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-        privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey)).Returns(Task.CompletedTask);
+        privateBlobCacheService
+            .Setup(service => service.DeleteItemAsync(dataBlockVersionCacheKey))
+            .Returns(Task.CompletedTask);
 
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
@@ -1922,8 +1926,10 @@ public class ReplacementServiceTests
             Assert.NotNull(replacementFileUpdated);
             Assert.Null(replacementFileUpdated.ReplacingId);
 
-            var replacedDataBlock = await contentDbContext.DataBlocks.FirstAsync(db => db.Id == dataBlock.Id);
-            Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
+            var replacedDataBlock = await contentDbContext.DataBlockVersions.FirstAsync(db =>
+                db.Id == dataBlockVersion.Id
+            );
+            Assert.Equal(dataBlockVersion.Name, replacedDataBlock.Name);
             Assert.Equal(replacementReleaseSubject.SubjectId, replacedDataBlock.Query.SubjectId);
 
             Assert.Single(replacedDataBlock.Query.Indicators);
@@ -2124,7 +2130,7 @@ public class ReplacementServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -2164,8 +2170,6 @@ public class ReplacementServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
@@ -2274,7 +2278,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
@@ -2296,15 +2300,19 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+        var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
         cacheKeyService
-            .Setup(service => service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
-            .ReturnsAsync(cacheKey);
+            .Setup(service =>
+                service.CreateCacheKeyForDataBlock(dataBlockVersion.ReleaseVersionId, dataBlockVersion.Id)
+            )
+            .ReturnsAsync(dataBlockVersionCacheKey);
 
         var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-        privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey)).Returns(Task.CompletedTask);
+        privateBlobCacheService
+            .Setup(service => service.DeleteItemAsync(dataBlockVersionCacheKey))
+            .Returns(Task.CompletedTask);
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
@@ -2345,7 +2353,9 @@ public class ReplacementServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var replacedDataBlock = await contentDbContext.DataBlocks.FirstAsync(db => db.Id == dataBlock.Id);
+            var replacedDataBlock = await contentDbContext.DataBlockVersions.FirstAsync(db =>
+                db.Id == dataBlockVersion.Id
+            );
 
             var mapChart = Assert.IsType<MapChart>(replacedDataBlock.Charts[0]);
 
@@ -2468,7 +2478,7 @@ public class ReplacementServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlock = new DataBlock
+        var dataBlockVersion = new DataBlockVersion
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -2504,8 +2514,6 @@ public class ReplacementServiceTests
             },
             ReleaseVersion = releaseVersion,
         };
-
-        var dataBlockVersion = new DataBlockVersion { Id = dataBlock.Id, ContentBlock = dataBlock };
 
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
@@ -2578,7 +2586,7 @@ public class ReplacementServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.Files.AddRange(originalFile, replacementFile);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlocks.AddRange(dataBlock);
+            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
             contentDbContext.DataImports.Add(replacementDataImport);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
@@ -2594,15 +2602,19 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+        var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
 
         var cacheKeyService = new Mock<ICacheKeyService>(Strict);
         cacheKeyService
-            .Setup(service => service.CreateCacheKeyForDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
-            .ReturnsAsync(cacheKey);
+            .Setup(service =>
+                service.CreateCacheKeyForDataBlock(dataBlockVersion.ReleaseVersionId, dataBlockVersion.Id)
+            )
+            .ReturnsAsync(dataBlockVersionCacheKey);
 
         var privateBlobCacheService = new Mock<IPrivateBlobCacheService>(Strict);
-        privateBlobCacheService.Setup(service => service.DeleteItemAsync(cacheKey)).Returns(Task.CompletedTask);
+        privateBlobCacheService
+            .Setup(service => service.DeleteItemAsync(dataBlockVersionCacheKey))
+            .Returns(Task.CompletedTask);
 
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
         releaseVersionService
@@ -2643,7 +2655,9 @@ public class ReplacementServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var replacedDataBlock = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+            var replacedDataBlock = await contentDbContext.DataBlockVersions.SingleAsync(db =>
+                db.Id == dataBlockVersion.Id
+            );
 
             var mapChart = Assert.IsType<MapChart>(replacedDataBlock.Charts[0]);
 

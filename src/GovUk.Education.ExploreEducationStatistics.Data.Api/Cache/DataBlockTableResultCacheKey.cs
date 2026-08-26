@@ -10,24 +10,24 @@ public record DataBlockTableResultCacheKey : IBlobCacheKey
 {
     private string PublicationSlug { get; }
     private string ReleaseSlug { get; }
-    private Guid DataBlockParentId { get; }
+    private Guid DataBlockId { get; }
 
     // ReSharper disable once UnusedMember.Global
     public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion)
         : this(
             publicationSlug: dataBlockVersion.ReleaseVersion.Release.Publication.Slug,
             releaseSlug: dataBlockVersion.ReleaseVersion.Release.Slug,
-            dataBlockParentId: dataBlockVersion.DataBlockParentId
+            dataBlockId: dataBlockVersion.DataBlockId
         ) { }
 
-    public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockParentId)
+    public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockId)
     {
         PublicationSlug = publicationSlug;
         ReleaseSlug = releaseSlug;
-        DataBlockParentId = dataBlockParentId;
+        DataBlockId = dataBlockId;
     }
 
     public IBlobContainer Container => BlobContainers.PublicContent;
 
-    public string Key => PublicContentDataBlockPath(PublicationSlug, ReleaseSlug, DataBlockParentId);
+    public string Key => PublicContentDataBlockVersionPath(PublicationSlug, ReleaseSlug, DataBlockId);
 }

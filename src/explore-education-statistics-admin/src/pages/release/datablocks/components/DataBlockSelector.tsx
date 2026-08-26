@@ -20,14 +20,14 @@ interface Props {
   canUpdate?: boolean;
   publicationId: string;
   releaseVersionId: string;
-  dataBlockId: string;
+  dataBlockVersionId: string;
 }
 
 const DataBlockSelector = ({
   canUpdate = true,
   publicationId,
   releaseVersionId,
-  dataBlockId,
+  dataBlockVersionId,
 }: Props) => {
   const history = useHistory();
 
@@ -68,7 +68,7 @@ const DataBlockSelector = ({
         name="selectedDataBlock"
         disabled={isLoading}
         order={FormSelect.unordered}
-        value={dataBlockId}
+        value={dataBlockVersionId}
         options={dataBlockOptions}
         onChange={e => {
           history.push(
@@ -77,7 +77,7 @@ const DataBlockSelector = ({
               {
                 publicationId,
                 releaseVersionId,
-                dataBlockId: e.target.value,
+                dataBlockVersionId: e.target.value,
               },
             ),
           );
