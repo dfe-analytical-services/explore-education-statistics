@@ -12,9 +12,8 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary, KeysWithType } from '@common/types';
 import prefixNoun from '@common/utils/string/prefixNoun';
 import Yup from '@common/validation/yup';
-import React, { useState } from 'react';
+import React from 'react';
 import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
-import ErrorMessage from '@common/components/ErrorMessage';
 
 interface FormValues {
   selectedCandidate: string;
