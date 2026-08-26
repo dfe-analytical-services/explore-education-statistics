@@ -29,6 +29,7 @@ describe('ReleaseApiDataSetsSection', () => {
     name: 'BAU user',
     permissions: {
       isBauUser: true,
+      canManagePublicApiDataSets: true,
     } as GlobalPermissions,
   };
 
@@ -37,6 +38,7 @@ describe('ReleaseApiDataSetsSection', () => {
     name: 'Analyst user',
     permissions: {
       isBauUser: false,
+      canManagePublicApiDataSets: false,
     } as GlobalPermissions,
   };
 
@@ -203,7 +205,7 @@ describe('ReleaseApiDataSetsSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('does not render create button when user is not BAU', async () => {
+  test('does not render create button when user cannot manage public API data sets, and shows contact message instead', async () => {
     apiDataSetCandidateService.listCandidates.mockResolvedValue([]);
     apiDataSetService.listDataSets.mockResolvedValue([]);
 
@@ -216,6 +218,15 @@ describe('ReleaseApiDataSetsSection', () => {
     ).toBeInTheDocument();
 
     expect(screen.queryByText('Create API data set')).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(/To create, replace or remove API data sets/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: 'explore.statistics@education.gov.uk',
+      }),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
   });
 
   test('clicking the create button opens modal form to create API data set', async () => {
