@@ -12,10 +12,16 @@
     "resourceGroup": {
       "type": "string"
     },
-    "slackAlertsChannel": {
-      "type": "string"
+    "slackAlertsChannels": {
+      "type": "Array"
+    },
+    "hiveSlackAlertsChannels": {
+      "type": "Array"
     },
     "slackAppToken": {
+      "type": "securestring"
+    },
+    "hiveSlackAppToken": {
       "type": "securestring"
     },
     "teamsPowerAutomateWebhookUrl": {
@@ -177,60 +183,67 @@
         "alertLinkTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('fragments')?['alertTargetResourceUrl']})"
       }
     },
-    "Post message to Slack": {
+    "Post messages to Slack": {
       "runAfter": {
         "fields": [
           "Succeeded"
         ]
       },
-      "type": "Http",
-      "inputs": {
-        "method": "POST",
-        "uri": "https://slack.com/api/chat.postMessage",
-        "body": {
-          "channel": "@parameters('slackAlertsChannel')",
-          "text": "@outputs('fields')?['titleSlack']",
-          "attachments": [
-            {
-              "color": "@outputs('fields')?['colourSlack']",
-              "fields": [
+      "type": "Foreach",
+      "description": "Post the alert to every configured Slack channel. Channels listed in hiveSlackAlertsChannels belong to the Hive workspace and are posted with the Hive app token; all others use the DfE app token.",
+      "foreach": "@union(parameters('slackAlertsChannels'), parameters('hiveSlackAlertsChannels'))",
+      "actions": {
+        "Post message to Slack": {
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://slack.com/api/chat.postMessage",
+            "body": {
+              "channel": "@items('Post messages to Slack')",
+              "text": "@outputs('fields')?['titleSlack']",
+              "attachments": [
                 {
-                  "title": "Alert",
-                  "value": "@outputs('variables')?['alertName']",
-                  "short": true
-                },
-                {
-                  "title": "Severity",
-                  "value": "@outputs('fields')?['severity']",
-                  "short": true
-                },
-                {
-                  "title": "@{outputs('variables')?['monitorCondition']} at",
-                  "value": "@outputs('fields')?['alertTime']",
-                  "short": false
-                },
-                {
-                  "title": "Window start",
-                  "value": "@outputs('fields')?['windowStart']",
-                  "short": true
-                },
-                {
-                  "title": "Window end",
-                  "value": "@outputs('fields')?['windowEnd']",
-                  "short": true
-                },
-                {
-                  "title": "Logic App workflow version",
-                  "value": "1.0",
-                  "short": true
+                  "color": "@outputs('fields')?['colourSlack']",
+                  "fields": [
+                    {
+                      "title": "Alert",
+                      "value": "@outputs('variables')?['alertName']",
+                      "short": true
+                    },
+                    {
+                      "title": "Severity",
+                      "value": "@outputs('fields')?['severity']",
+                      "short": true
+                    },
+                    {
+                      "title": "@{outputs('variables')?['monitorCondition']} at",
+                      "value": "@outputs('fields')?['alertTime']",
+                      "short": false
+                    },
+                    {
+                      "title": "Window start",
+                      "value": "@outputs('fields')?['windowStart']",
+                      "short": true
+                    },
+                    {
+                      "title": "Window end",
+                      "value": "@outputs('fields')?['windowEnd']",
+                      "short": true
+                    },
+                    {
+                      "title": "Logic App workflow version",
+                      "value": "1.0",
+                      "short": true
+                    }
+                  ]
                 }
               ]
+            },
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "@{concat('Bearer ', if(contains(parameters('hiveSlackAlertsChannels'), items('Post messages to Slack')), parameters('hiveSlackAppToken'), parameters('slackAppToken')))}"
             }
-          ]
-        },
-        "headers": {
-          "Content-Type": "application/json",
-          "Authorization": "@{concat('Bearer ', parameters('slackAppToken'))}"
+          }
         }
       }
     },

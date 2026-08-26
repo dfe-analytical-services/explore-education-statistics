@@ -8,4 +8,4 @@ param publicSiteInternalServiceFqdn = 's101d01-ees-fde-eve8c8hmd6gxgqcr.a03.azur
 param publicApiApplicationGatewayFqdn = 'dev.statistics.api.education.gov.uk'
 param publicApiPublicUrl = 'https://pp-api.education.gov.uk/statistics-dev'
 
-param slackAlertsChannel = 'C067Z1K68UD'
+param slackAlertsChannels = ['C067Z1K68UD']

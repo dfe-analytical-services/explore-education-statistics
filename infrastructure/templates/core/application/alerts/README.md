@@ -17,6 +17,20 @@ The [Logic App](alerts-logic-app.bicep) receives JSON payloads from metric alert
 information using a series of `Compose` actions, and then 2 HTTP actions, one for Teams and one for
 Slack, take those variables and construct POSTs in the correct format for their target platforms.
 
+The Slack action runs inside a `Foreach` over every channel in `slackAlertsChannels` and
+`hiveSlackAlertsChannels`. The two parameters exist because the channels live in different Slack
+workspaces, and each workspace needs its own app token - channels listed in `hiveSlackAlertsChannels`
+are posted with the token from the `ees-alerts-hiveslackapptoken` Key Vault secret, and all others
+with the token from `ees-alerts-slackapptoken`. Both Slack apps need the `chat:write` scope and must
+be invited to their channels, otherwise `chat.postMessage` returns HTTP 200 with `"ok": false` and
+the alert is dropped without the Logic App run failing.
+
+`hiveSlackAlertsChannels` is only populated in production; the other environments inherit the empty
+default in [main.bicep](../../main.bicep) and never post to Hive. The
+`ees-alerts-hiveslackapptoken` secret still has to exist in every environment's Key Vault, because
+Bicep resolves it at deployment time regardless of whether any channel uses it - a placeholder value
+is fine outside production.
+
 The [Logic App definition](alerts-logic-app-definition.json) defines the workflow.
 
 ## Action Group
