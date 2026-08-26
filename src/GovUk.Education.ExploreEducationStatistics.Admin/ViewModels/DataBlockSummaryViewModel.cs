@@ -1,25 +1,25 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-public class DataBlockSummaryViewModel
+public record DataBlockSummaryViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Heading { get; set; } = "";
+    public required string Heading { get; init; }
 
-    public string Name { get; set; } = "";
+    public required string Name { get; init; }
 
-    public DateTime? Created { get; set; }
+    public DateTime? Created { get; init; }
 
-    public string? HighlightName { get; set; }
+    public string? HighlightName { get; init; }
 
-    public string? HighlightDescription { get; set; }
+    public string? HighlightDescription { get; init; }
 
-    public string Source { get; set; } = "";
+    public string? Source { get; init; }
 
-    public string? DataSetName { get; set; }
+    public required string DataSetName { get; init; }
 
-    public bool InContent { get; set; }
+    public required bool InContent { get; init; }
 
-    public int ChartsCount { get; set; }
+    public required int ChartsCount { get; init; }
 }
