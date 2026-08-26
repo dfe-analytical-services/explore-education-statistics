@@ -5,6 +5,7 @@ import dataReplacementService, {
   FilterMappingPlan,
   FilterMappingSource,
   PlanMappings,
+  ReplacementMapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import React, { useCallback, useEffect, useMemo } from 'react';
@@ -19,6 +20,43 @@ interface Props {
   plan: DataReplacementPlan;
   reloadPlan: () => void;
 }
+
+type FilterMappings =
+  | FilterMappingPlan
+  | FilterMappingFilterGroups
+  | FilterMappingFilterItems<FilterMappingSource>;
+
+const findFilterMapping = (
+  filters: FilterMappings,
+  sourceKey: string,
+): ReplacementMapping<FilterMappingSource> | undefined => {
+  const mapping = filters.mappings[sourceKey];
+
+  if (mapping) {
+    return mapping;
+  }
+
+  for (let i = 0; i < Object.values(filters.mappings).length; i += 1) {
+    const child = Object.values(filters.mappings)[i];
+    if ('filterGroups' in child) {
+      const result = findFilterMapping(
+        child.filterGroups as FilterMappingFilterGroups,
+        sourceKey,
+      );
+      if (result) return result;
+    }
+
+    if ('filterItems' in child) {
+      const result = findFilterMapping(
+        child.filterItems as FilterMappingFilterItems<FilterMappingSource>,
+        sourceKey,
+      );
+      if (result) return result;
+    }
+  }
+
+  return undefined;
+};
 
 export default function DataFileReplacementDifferences({
   releaseVersionId,
@@ -56,26 +94,48 @@ export default function DataFileReplacementDifferences({
 
   const handleIndicatorsMappingUpdate = useCallback(
     async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
+      const currentMapping = planMappings.indicators.mappings[sourceKey];
+
+      if (!currentMapping) {
+        throw new Error(`Could not find indicator mapping: ${sourceKey}`);
+      }
+
+      const previousMapping = {
+        candidateKey: currentMapping.candidateKey,
+        type: currentMapping.type,
+      };
+
       updatePlanMappings(draft => {
         draft.indicators.mappings[sourceKey].candidateKey = candidateKey;
         draft.indicators.mappings[sourceKey].type = 'ManuallySet';
         return draft;
       });
-      await dataReplacementService.updatePlanIndicatorMappings(
-        releaseVersionId,
-        fileId,
-        replacementFileId,
-        [
-          {
-            originalId: sourceKey,
-            newReplacementId: candidateKey,
-          },
-        ],
-      );
 
-      reloadPlan();
+      try {
+        await dataReplacementService.updatePlanIndicatorMappings(
+          releaseVersionId,
+          fileId,
+          replacementFileId,
+          [
+            {
+              originalId: sourceKey,
+              newReplacementId: candidateKey,
+            },
+          ],
+        );
+
+        reloadPlan();
+      } catch (error) {
+        updatePlanMappings(draft => {
+          draft.indicators.mappings[sourceKey].candidateKey =
+            previousMapping.candidateKey;
+          draft.indicators.mappings[sourceKey].type = previousMapping.type;
+          return draft;
+        });
+      }
     },
     [
+      planMappings.indicators.mappings,
       updatePlanMappings,
       releaseVersionId,
       fileId,
@@ -86,26 +146,48 @@ export default function DataFileReplacementDifferences({
 
   const handleLocationsMappingUpdate = useCallback(
     async ({ sourceKey, candidateKey }: UpdateMappingPayload) => {
+      const currentMapping = planMappings.locations.mappings[sourceKey];
+
+      if (!currentMapping) {
+        throw new Error(`Could not find location mapping: ${sourceKey}`);
+      }
+
+      const previousMapping = {
+        candidateKey: currentMapping.candidateKey,
+        type: currentMapping.type,
+      };
+
       updatePlanMappings(draft => {
         draft.locations.mappings[sourceKey].candidateKey = candidateKey;
         draft.locations.mappings[sourceKey].type = 'ManuallySet';
         return draft;
       });
-      await dataReplacementService.updatePlanLocationMappings(
-        releaseVersionId,
-        fileId,
-        replacementFileId,
-        [
-          {
-            originalId: sourceKey,
-            newReplacementId: candidateKey,
-          },
-        ],
-      );
 
-      reloadPlan();
+      try {
+        await dataReplacementService.updatePlanLocationMappings(
+          releaseVersionId,
+          fileId,
+          replacementFileId,
+          [
+            {
+              originalId: sourceKey,
+              newReplacementId: candidateKey,
+            },
+          ],
+        );
+
+        reloadPlan();
+      } catch (error) {
+        updatePlanMappings(draft => {
+          draft.locations.mappings[sourceKey].candidateKey =
+            previousMapping.candidateKey;
+          draft.locations.mappings[sourceKey].type = previousMapping.type;
+          return draft;
+        });
+      }
     },
     [
+      planMappings.locations.mappings,
       updatePlanMappings,
       releaseVersionId,
       fileId,
@@ -118,64 +200,56 @@ export default function DataFileReplacementDifferences({
     async (updatePayload: UpdateMappingPayload, type: string) => {
       const { sourceKey, candidateKey } = updatePayload;
 
+      const currentMapping = findFilterMapping(planMappings.filters, sourceKey);
+
+      if (!currentMapping) {
+        throw new Error(`Could not find filter mapping: ${sourceKey}`);
+      }
+
+      const previousMapping = {
+        candidateKey: currentMapping.candidateKey,
+        type: currentMapping.type,
+      };
+
       updatePlanMappings(draft => {
-        const updateMapping = (
-          mappingsPlan:
-            | FilterMappingPlan
-            | FilterMappingFilterGroups
-            | FilterMappingFilterItems<FilterMappingSource>,
-        ): boolean => {
-          const mapping = mappingsPlan.mappings[sourceKey];
+        const mapping = findFilterMapping(draft.filters, sourceKey);
 
-          if (mapping) {
-            mapping.candidateKey = candidateKey;
-            mapping.type = 'ManuallySet';
-            return true;
-          }
-
-          return Object.values(mappingsPlan.mappings).some(childMapping => {
-            if ('filterGroups' in childMapping) {
-              return updateMapping(
-                childMapping.filterGroups as FilterMappingFilterGroups,
-              );
-            }
-
-            if ('filterItems' in childMapping) {
-              return updateMapping(
-                childMapping.filterItems as FilterMappingFilterItems<FilterMappingSource>,
-              );
-            }
-
-            return false;
-          });
-        };
-
-        updateMapping(draft.filters);
-
-        return draft;
+        if (mapping) {
+          mapping.candidateKey = candidateKey;
+          mapping.type = 'ManuallySet';
+        }
       });
 
-      const updateData = {
-        originalId: updatePayload.sourceKey,
-        newReplacementId: updatePayload.candidateKey,
+      const update = {
+        originalId: sourceKey,
+        newReplacementId: candidateKey,
       };
-      const filterUpdates = type === 'filter' ? [updateData] : [];
-      const filterGroupUpdates = type === 'group' ? [updateData] : [];
-      const filterItemUpdates = type === 'item' ? [updateData] : [];
 
-      await dataReplacementService.updatePlanFilterMappings(
-        releaseVersionId,
-        fileId,
-        replacementFileId,
-        filterUpdates,
-        filterGroupUpdates,
-        filterItemUpdates,
-      );
+      try {
+        await dataReplacementService.updatePlanFilterMappings(
+          releaseVersionId,
+          fileId,
+          replacementFileId,
+          type === 'filter' ? [update] : [],
+          type === 'group' ? [update] : [],
+          type === 'item' ? [update] : [],
+        );
 
-      reloadPlan();
+        reloadPlan();
+      } catch (error) {
+        updatePlanMappings(draft => {
+          const mapping = findFilterMapping(draft.filters, sourceKey);
+
+          if (mapping) {
+            mapping.candidateKey = previousMapping.candidateKey;
+            mapping.type = previousMapping.type;
+          }
+        });
+      }
     },
     [
       fileId,
+      planMappings.filters,
       releaseVersionId,
       reloadPlan,
       replacementFileId,

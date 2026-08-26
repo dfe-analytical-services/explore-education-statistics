@@ -294,8 +294,8 @@ export default function DataFileReplacementFilterDifferencesTable({
                       allCandidateOptions={td.allCandidates}
                       unmappedCandidateOptions={td.unmappedCandidates}
                       mapping={mapping}
-                      onSubmit={payload => {
-                        handleMappingUpdate(payload, payloadType);
+                      onSubmit={async payload => {
+                        await handleMappingUpdate(payload, payloadType);
                       }}
                       rowLabel="label"
                       mappedDataLabels={{ label: 'Label' }}
