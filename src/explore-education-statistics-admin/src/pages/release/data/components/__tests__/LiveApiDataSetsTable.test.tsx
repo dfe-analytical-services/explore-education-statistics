@@ -1,3 +1,4 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import LiveApiDataSetsTable, {
   LiveApiDataSetSummary,
 } from '@admin/pages/release/data/components/LiveApiDataSetsTable';
@@ -5,6 +6,7 @@ import _apiDataSetCandidateService, {
   ApiDataSetCandidate,
 } from '@admin/services/apiDataSetCandidateService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import { GlobalPermissions } from '@admin/services/authService';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import { createMemoryHistory, History } from 'history';
@@ -18,6 +20,24 @@ const apiDataSetCandidateService = jest.mocked(_apiDataSetCandidateService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('LiveApiDataSetsTable', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testDataSets: LiveApiDataSetSummary[] = [
     {
       id: 'data-set-2',
@@ -206,6 +226,23 @@ describe('LiveApiDataSetsTable', () => {
     ).toHaveLength(0);
   });
 
+  test("does not render 'Create new version' buttons when user cannot manage public API data sets", () => {
+    render(
+      <LiveApiDataSetsTable
+        canUpdateRelease
+        dataSets={testDataSets}
+        publicationId="publication-1"
+        releaseVersionId="release-version-1"
+        releaseId="release-1"
+      />,
+      { user: testAnalystUser },
+    );
+
+    expect(
+      screen.queryAllByRole('button', { name: /Create new version/ }),
+    ).toHaveLength(0);
+  });
+
   test('renders message when no data sets', () => {
     render(
       <LiveApiDataSetsTable
@@ -322,11 +359,17 @@ describe('LiveApiDataSetsTable', () => {
   function render(
     ui: ReactNode,
     options?: {
-      history: History;
+      history?: History;
+      user?: User;
     },
   ) {
-    const { history = createMemoryHistory() } = options ?? {};
+    const { history = createMemoryHistory(), user = testBauUser } =
+      options ?? {};
 
-    return baseRender(<Router history={history}>{ui}</Router>);
+    return baseRender(
+      <AuthContextTestProvider user={user}>
+        <Router history={history}>{ui}</Router>
+      </AuthContextTestProvider>,
+    );
   }
 });

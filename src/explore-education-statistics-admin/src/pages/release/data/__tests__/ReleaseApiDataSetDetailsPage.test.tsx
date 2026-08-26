@@ -1,3 +1,4 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease as testBaseRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
@@ -12,6 +13,7 @@ import _apiDataSetService, {
   ApiDataSetLiveVersion,
 } from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import { GlobalPermissions } from '@admin/services/authService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
@@ -25,6 +27,24 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetDetailsPage', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testLiveRelease: ReleaseVersion = {
     ...testBaseRelease,
     id: 'release-1-id',
@@ -259,6 +279,25 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     expect(
       screen.queryByTestId('live-version-summary'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render the `Remove draft version` button for a user without permission to manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+    });
+
+    renderPage({ user: testAnalystUser });
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    const summary = within(screen.getByTestId('draft-version-summary'));
+
+    expect(
+      summary.queryByRole('button', { name: 'Remove draft version' }),
     ).not.toBeInTheDocument();
   });
 
@@ -747,6 +786,41 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       expect(
         screen.getByRole('heading', { name: 'Draft version tasks' }),
       ).toBeInTheDocument();
+    });
+
+    test('does not show the finalise banner when mapping is complete for a user without permission to manage public API data sets', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+            indicatorsComplete: true,
+            isMajorVersionUpdate: null,
+            filtersHaveMajorChange: false,
+            locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      renderPage({ user: testAnalystUser });
+
+      expect(
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId('notificationBanner'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          'Draft API data set version is ready to be finalised',
+        ),
+      ).not.toBeInTheDocument();
     });
 
     test('successfully finalised', async () => {
@@ -1484,12 +1558,52 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('shows the unfinalise action for a user with permission to manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Unfinalise this data set version',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not show the unfinalise action for a user without permission to manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: testDraftVersion,
+    });
+
+    renderPage({ user: testAnalystUser });
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unfinalise this data set version',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;
+    user?: User;
   }) {
-    const { releaseVersion = testDraftRelease, dataSetId = 'data-set-id' } =
-      options ?? {};
+    const {
+      releaseVersion = testDraftRelease,
+      dataSetId = 'data-set-id',
+      user = testBauUser,
+    } = options ?? {};
 
     return render(
       <TestConfigContextProvider
@@ -1497,25 +1611,27 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           ...defaultTestConfig,
         }}
       >
-        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetRouteParams>(
-                releaseApiDataSetDetailsRoute.path,
-                {
-                  publicationId: releaseVersion.publicationId,
-                  releaseVersionId: releaseVersion.id,
-                  dataSetId,
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetDetailsPage}
-              path={releaseApiDataSetDetailsRoute.path}
-            />
-          </MemoryRouter>
-        </ReleaseVersionContextProvider>
+        <AuthContextTestProvider user={user}>
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
+            <MemoryRouter
+              initialEntries={[
+                generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetDetailsRoute.path,
+                  {
+                    publicationId: releaseVersion.publicationId,
+                    releaseVersionId: releaseVersion.id,
+                    dataSetId,
+                  },
+                ),
+              ]}
+            >
+              <Route
+                component={ReleaseApiDataSetDetailsPage}
+                path={releaseApiDataSetDetailsRoute.path}
+              />
+            </MemoryRouter>
+          </ReleaseVersionContextProvider>
+        </AuthContextTestProvider>
       </TestConfigContextProvider>,
     );
   }
