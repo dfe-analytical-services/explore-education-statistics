@@ -358,6 +358,13 @@ public class ContentDbContext : DbContext
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<List<ReleaseSeriesItem>>(v)
             );
+
+        modelBuilder
+            .Entity<Publication>()
+            .HasOne(p => p.SupersededBy)
+            .WithMany()
+            .HasForeignKey(p => p.SupersededById)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 
     private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)
