@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
@@ -115,21 +116,18 @@ public class DataSetUploadRepositoryTests
         var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-        {
-            contentDbContext.DataSetUploads.AddRange(upload1, upload2, upload3);
-            await contentDbContext.SaveChangesAsync();
-        }
+        await SeedUploads(contextId, upload1, upload2, upload3);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var privateBlobStorageService = BuildPrivateBlobStorageServiceMock();
+            var dataSetScreenerClient = new DataSetScreenerClientMockBuilder();
 
-            privateBlobStorageService
-                .Setup(mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
-            var service = BuildService(contentDbContext, privateBlobStorageService.Object);
+            var service = BuildService(
+                contentDbContext,
+                privateBlobStorageService.Object,
+                dataSetScreenerClient.Build()
+            );
 
             // Act
             var result = await service.Delete(releaseVersionId, upload2.Id, CancellationToken.None);
@@ -140,9 +138,52 @@ public class DataSetUploadRepositoryTests
                 Times.Exactly(2)
             );
 
+            // The upload was not undergoing screening, so the Screener API should not be asked to
+            // delete any progress or completion report files.
+            dataSetScreenerClient.Assert.DeleteScreenerProgressAndCompletionFilesWasNotCalled();
+
             result.AssertRight();
             Assert.Equal(2, contentDbContext.DataSetUploads.Count());
             Assert.Null(await contentDbContext.DataSetUploads.FindAsync(upload2.Id));
+        }
+    }
+
+    [Fact]
+    public async Task Delete_UploadUndergoingScreening_ScreenerProgressAndCompletionFilesDeleted()
+    {
+        // Arrange
+        var releaseVersionId = Guid.NewGuid();
+
+        var builder = new DataSetUploadMockBuilder();
+        var screeningUpload = builder.WithReleaseVersionId(releaseVersionId).BuildInitialEntity();
+        var screenedUpload = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+
+        var contextId = Guid.NewGuid().ToString();
+        await SeedUploads(contextId, screeningUpload, screenedUpload);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        {
+            var privateBlobStorageService = BuildPrivateBlobStorageServiceMock();
+            var dataSetScreenerClient = new DataSetScreenerClientMockBuilder();
+
+            var service = BuildService(
+                contentDbContext,
+                privateBlobStorageService.Object,
+                dataSetScreenerClient.Build()
+            );
+
+            // Act
+            var result = await service.Delete(releaseVersionId, screeningUpload.Id, CancellationToken.None);
+
+            // Assert
+
+            // Only the deleted upload should have its progress and completion report files deleted,
+            // leaving the unrelated upload in this release version untouched.
+            dataSetScreenerClient.Assert.DeleteScreenerProgressAndCompletionFilesWasCalled(screeningUpload.Id);
+
+            result.AssertRight();
+            Assert.Null(await contentDbContext.DataSetUploads.FindAsync(screeningUpload.Id));
+            Assert.NotNull(await contentDbContext.DataSetUploads.FindAsync(screenedUpload.Id));
         }
     }
 
@@ -158,21 +199,18 @@ public class DataSetUploadRepositoryTests
         var upload3 = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
 
         var contextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-        {
-            contentDbContext.DataSetUploads.AddRange(upload1, upload2, upload3);
-            await contentDbContext.SaveChangesAsync();
-        }
+        await SeedUploads(contextId, upload1, upload2, upload3);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+            var privateBlobStorageService = BuildPrivateBlobStorageServiceMock();
+            var dataSetScreenerClient = new DataSetScreenerClientMockBuilder();
 
-            privateBlobStorageService
-                .Setup(mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
-            var service = BuildService(contentDbContext, privateBlobStorageService.Object);
+            var service = BuildService(
+                contentDbContext,
+                privateBlobStorageService.Object,
+                dataSetScreenerClient.Build()
+            );
 
             // Act
             var result = await service.DeleteAll(releaseVersionId, CancellationToken.None);
@@ -181,6 +219,52 @@ public class DataSetUploadRepositoryTests
             privateBlobStorageService.Verify(
                 mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()),
                 Times.Exactly(6)
+            );
+
+            // None of the uploads were undergoing screening, so the Screener API should not be asked
+            // to delete any progress or completion report files.
+            dataSetScreenerClient.Assert.DeleteScreenerProgressAndCompletionFilesWasNotCalled();
+
+            result.AssertRight();
+            Assert.Empty(contentDbContext.DataSetUploads);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAll_UploadsUndergoingScreening_ScreenerProgressAndCompletionFilesDeleted()
+    {
+        // Arrange
+        var releaseVersionId = Guid.NewGuid();
+
+        var builder = new DataSetUploadMockBuilder();
+        var screeningUpload1 = builder.WithReleaseVersionId(releaseVersionId).BuildInitialEntity();
+        var screeningUpload2 = builder.WithReleaseVersionId(releaseVersionId).BuildInitialEntity();
+        var screenedUpload = builder.WithReleaseVersionId(releaseVersionId).BuildScreenedEntity();
+
+        var contextId = Guid.NewGuid().ToString();
+        await SeedUploads(contextId, screeningUpload1, screeningUpload2, screenedUpload);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        {
+            var privateBlobStorageService = BuildPrivateBlobStorageServiceMock();
+            var dataSetScreenerClient = new DataSetScreenerClientMockBuilder();
+
+            var service = BuildService(
+                contentDbContext,
+                privateBlobStorageService.Object,
+                dataSetScreenerClient.Build()
+            );
+
+            // Act
+            var result = await service.DeleteAll(releaseVersionId, CancellationToken.None);
+
+            // Assert
+
+            // Only the uploads that were still undergoing screening should have their progress and
+            // completion report files deleted.
+            dataSetScreenerClient.Assert.DeleteScreenerProgressAndCompletionFilesWasCalled(
+                screeningUpload1.Id,
+                screeningUpload2.Id
             );
 
             result.AssertRight();
@@ -220,14 +304,35 @@ public class DataSetUploadRepositoryTests
         );
     }
 
+    private static async Task SeedUploads(string contextId, params DataSetUpload[] uploads)
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext(contextId);
+
+        contentDbContext.DataSetUploads.AddRange(uploads);
+        await contentDbContext.SaveChangesAsync();
+    }
+
+    private static Mock<IPrivateBlobStorageService> BuildPrivateBlobStorageServiceMock()
+    {
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseTempFiles, It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        return privateBlobStorageService;
+    }
+
     private static DataSetUploadRepository BuildService(
         ContentDbContext context,
-        IPrivateBlobStorageService? privateBlobStorageService = null
+        IPrivateBlobStorageService? privateBlobStorageService = null,
+        IDataSetScreenerClient? dataSetScreenerClient = null
     )
     {
         return new DataSetUploadRepository(
             context,
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
+            dataSetScreenerClient ?? Mock.Of<IDataSetScreenerClient>(),
             mapper: MapperUtils.AdminMapper()
         );
     }
