@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1079 data sets",
+  "num_datasets": "1082 data sets",
   "themes": [
     {
       "publications": [
@@ -75,6 +75,7 @@
         "Planned LA and school expenditure",
         "School finances during the Covid-19 pandemic",
         "School funding statistics",
+        "Student loan forecasts - earnings",
         "Student loan forecasts for England"
       ],
       "theme_heading": "Finance and funding"
