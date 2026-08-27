@@ -68,13 +68,13 @@ const Page = ({
       >
         {customBannerContent}
 
-        <Breadcrumbs
-          breadcrumbs={
-            isHomepage
-              ? undefined
-              : breadcrumbs.concat([{ name: breadcrumbLabel || title }])
-          }
-        />
+        {!isHomepage && (
+          <Breadcrumbs
+            breadcrumbs={breadcrumbs.concat([
+              { name: breadcrumbLabel || title },
+            ])}
+          />
+        )}
 
         <main
           className="govuk-main-wrapper app-main-class"
