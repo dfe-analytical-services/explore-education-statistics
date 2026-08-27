@@ -342,11 +342,7 @@ public class ContentDbContext : DbContext
             .Property(n => n.Updated)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-        modelBuilder
-            .Entity<Publication>()
-            .HasOne(p => p.Contact)
-            .WithMany() // Ideally this would be WithOne, but we would need to fix existing data to do this
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Publication>().HasOne(p => p.Contact).WithOne().OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder
             .Entity<Publication>()
