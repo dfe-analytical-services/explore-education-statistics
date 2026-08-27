@@ -10,13 +10,16 @@ internal static class FilterItemMappingExtensions
 {
     public static (FilterItemMapping? FilterItemMapping, ErrorViewModel? Error) UpdateFilterItemMapping(
         this DataSetMapping dataSetMapping,
-        Dictionary<Guid, (FilterGroupMapping FilterGroup, FilterItemMapping FilterItem)> originalItemIdToItemMap,
         IReadOnlyList<Filter> replacementFilters,
         Guid originalId,
         Guid? newReplacementId = null
     )
     {
-        if (!originalItemIdToItemMap.TryGetValue(originalId, out var pair))
+        var groupMapping = dataSetMapping
+            .FilterMappings.Values.SelectMany(filterMap => filterMap.FilterGroupMappings.Values)
+            .SingleOrDefault(groupMap => groupMap.FilterItemMappings.ContainsKey(originalId));
+
+        if (groupMapping == null)
         {
             return (
                 null,
@@ -31,7 +34,7 @@ internal static class FilterItemMappingExtensions
             );
         }
 
-        var (groupMapping, itemMapping) = pair;
+        var itemMapping = groupMapping.FilterItemMappings[originalId];
 
         if (itemMapping.Status == MapStatus.ParentNotMapped)
         {

@@ -11,13 +11,16 @@ internal static class FilterGroupMappingExtensions
 {
     public static (FilterGroupMapping? FilterGroupMapping, ErrorViewModel? Error) UpdateFilterGroupMapping(
         this DataSetMapping dataSetMapping,
-        Dictionary<Guid, (FilterMapping FilterMap, FilterGroupMapping GroupMap)> originalGroupIdToGroupMap,
         IReadOnlyList<Filter> replacementFilters,
         Guid originalId,
         Guid? newReplacementId = null
     )
     {
-        if (!originalGroupIdToGroupMap.TryGetValue(originalId, out var pair))
+        var filterMapping = dataSetMapping.FilterMappings.Values.SingleOrDefault(filterMap =>
+            filterMap.FilterGroupMappings.ContainsKey(originalId)
+        );
+
+        if (filterMapping == null)
         {
             return (
                 null,
@@ -32,7 +35,7 @@ internal static class FilterGroupMappingExtensions
             );
         }
 
-        var (filterMapping, groupMapping) = pair;
+        var groupMapping = filterMapping.FilterGroupMappings[originalId];
 
         if (groupMapping.Status == MapStatus.ParentNotMapped)
         {

@@ -81,17 +81,9 @@ public class DataSetMappingService(
                 };
 
                 // FilterGroups
-                var originalGroupIdToGroupsMap = mapping
-                    .FilterMappings.Values.SelectMany(
-                        fm => fm.FilterGroupMappings.Values,
-                        (fm, gm) => (FilterMap: fm, GroupMap: gm)
-                    )
-                    .ToDictionary(x => x.GroupMap.OriginalId);
-
                 var updatedGroupMappings = request
                     .FilterGroupUpdates.Select(groupUpdate =>
                         mapping.UpdateFilterGroupMapping(
-                            originalGroupIdToGroupsMap,
                             replacementFilters,
                             groupUpdate.OriginalId,
                             groupUpdate.NewReplacementId
@@ -113,18 +105,9 @@ public class DataSetMappingService(
                     .ToList();
 
                 // FilterItems
-                var originalItemIdToItem = mapping
-                    .FilterMappings.Values.SelectMany(fm => fm.FilterGroupMappings.Values)
-                    .SelectMany(
-                        fg => fg.FilterItemMappings.Values,
-                        (group, item) => (FilterGroup: group, FilterItem: item)
-                    )
-                    .ToDictionary(x => x.FilterItem.OriginalId);
-
                 var updatedItemMappings = request
                     .FilterItemUpdates.Select(itemUpdate =>
                         mapping.UpdateFilterItemMapping(
-                            originalItemIdToItem,
                             replacementFilters,
                             itemUpdate.OriginalId,
                             itemUpdate.NewReplacementId
