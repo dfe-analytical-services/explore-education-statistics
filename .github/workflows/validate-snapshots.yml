@@ -114,7 +114,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Teams Notification
-        if: ${{ env.TEAMS_WEBHOOK_URL != '' }}
+        if: ${{ always() && env.TEAMS_WEBHOOK_URL != '' }}
         env:
           WORKFLOW_RESULT: ${{ needs.test.result }}
           WORKFLOW_NAME: ${{ github.workflow }}
