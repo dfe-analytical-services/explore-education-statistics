@@ -25,5 +25,10 @@ public interface IDataImportService
         int? lastProcessedRowIndex = null
     );
 
-    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
+    Task WriteDataSetFileMeta(
+        Guid fileId,
+        Guid subjectId,
+        int numDataFileRows,
+        HashSet<GeographicLevel> csvGeographicLevels
+    );
 }

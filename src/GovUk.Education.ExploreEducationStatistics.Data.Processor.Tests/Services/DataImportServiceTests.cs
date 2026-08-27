@@ -267,7 +267,18 @@ public class DataImportServiceTests
 
         var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
 
-        await service.WriteDataSetFileMeta(file.Id, subject.Id, totalRows);
+        await service.WriteDataSetFileMeta(
+            file.Id,
+            subject.Id,
+            totalRows,
+            csvGeographicLevels:
+            [
+                GeographicLevel.Country,
+                GeographicLevel.LocalAuthority,
+                GeographicLevel.Region,
+                GeographicLevel.School,
+            ]
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -275,11 +286,15 @@ public class DataImportServiceTests
                 .Files.Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.SubjectId == subject.Id);
 
-            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel).ToList();
-            Assert.Equal(3, geogLvls.Count);
-            Assert.Contains(GeographicLevel.Country, geogLvls);
-            Assert.Contains(GeographicLevel.LocalAuthority, geogLvls);
-            Assert.Contains(GeographicLevel.Region, geogLvls);
+            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels.ToDictionary(
+                gl => gl.GeographicLevel,
+                gl => gl.CsvOnly
+            );
+            Assert.Equal(4, geogLvls.Count);
+            Assert.False(geogLvls[GeographicLevel.Country]);
+            Assert.False(geogLvls[GeographicLevel.LocalAuthority]);
+            Assert.False(geogLvls[GeographicLevel.Region]);
+            Assert.True(geogLvls[GeographicLevel.School]);
 
             Assert.NotNull(updatedFile.DataSetFileMeta);
             var meta = updatedFile.DataSetFileMeta;

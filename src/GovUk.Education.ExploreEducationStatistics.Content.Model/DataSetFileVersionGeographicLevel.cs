@@ -10,4 +10,6 @@ public class DataSetFileVersionGeographicLevel
     public File DataSetFileVersion { get; set; } = null!;
 
     public GeographicLevel GeographicLevel { get; set; }
+
+    public bool? CsvOnly { get; set; }
 }

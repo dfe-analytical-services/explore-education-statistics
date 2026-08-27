@@ -128,18 +128,19 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows)
+    public async Task WriteDataSetFileMeta(
+        Guid fileId,
+        Guid subjectId,
+        int numDataFileRows,
+        HashSet<GeographicLevel> csvGeographicLevels
+    )
     {
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
         var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
 
-        var geographicLevels = observations
-            .Select(o => o.Location.GeographicLevel)
-            .Distinct()
-            .OrderBy(gl => gl)
-            .ToList();
+        var importedGeographicLevels = observations.Select(o => o.Location.GeographicLevel).Distinct().ToList();
 
         var timePeriods = observations
             .Select(o => new { o.Year, o.TimeIdentifier })
@@ -191,8 +192,14 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         file.DataSetFileMeta = dataSetFileMeta;
 
-        var dataSetFileVersionGeographicLevels = geographicLevels
-            .Select(gl => new DataSetFileVersionGeographicLevel { DataSetFileVersionId = fileId, GeographicLevel = gl })
+        var dataSetFileVersionGeographicLevels = csvGeographicLevels
+            .OrderBy(gl => gl)
+            .Select(gl => new DataSetFileVersionGeographicLevel
+            {
+                DataSetFileVersionId = fileId,
+                GeographicLevel = gl,
+                CsvOnly = !importedGeographicLevels.Contains(gl),
+            })
             .ToList();
         contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 

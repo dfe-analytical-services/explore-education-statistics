@@ -123,7 +123,12 @@ public class FileImportService(
         try
         {
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+            await dataImportService.WriteDataSetFileMeta(
+                import.FileId,
+                import.SubjectId,
+                import.TotalRows!.Value,
+                import.GeographicLevels ?? throw new ArgumentException("Import must have GeographicLevels")
+            );
         }
         catch (Exception e)
         {
