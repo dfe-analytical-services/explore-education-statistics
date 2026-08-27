@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -11,21 +12,31 @@ public abstract class ReplacementServiceHelper
 
     public static List<FilterSequenceEntry> ReplaceFilterSequence(
         List<FilterSequenceEntry> originalSequence,
-        DataSetMapping mapping
+        DataSetMapping mapping,
+        List<Filter> replacementFilters
     )
     {
-        // 1. Add mapped replacement filters
+        // Add mapped replacement filters
         var replacementSequence = new List<FilterSequenceEntry>();
-        var filterIdsWithMapping = mapping
+        var filterMappingsWithReplacement = mapping
             .FilterMappings.Values.Where(filterMap => filterMap.ReplacementId != null)
-            .Select(filterMap => filterMap.OriginalId)
-            .ToHashSet();
+            .Select(filterMap => new { filterMap.OriginalId, ReplacementId = filterMap.ReplacementId!.Value })
+            .ToList();
+
+        var filterIdsWithMapping = filterMappingsWithReplacement.Select(filterMap => filterMap.OriginalId).ToHashSet();
         foreach (var filterSequenceEntry in originalSequence)
         {
             if (filterIdsWithMapping.Contains(filterSequenceEntry.Id))
             {
+                var filterMapping = mapping.FilterMappings[filterSequenceEntry.Id];
+                var replacementFilterGroups = replacementFilters
+                    .Where(f => f.Id == filterMapping.ReplacementId)
+                    .Select(f => f.FilterGroups)
+                    .Single();
+
                 var replacementGroupSequence = GenerateReplacementGroupSequence(
-                    mapping.FilterMappings[filterSequenceEntry.Id],
+                    filterMapping,
+                    replacementFilterGroups,
                     filterSequenceEntry
                 );
 
@@ -38,22 +49,21 @@ public abstract class ReplacementServiceHelper
             }
         }
 
-        // 2. Add unmapped replacement filters
+        // Add remaining replacement filters - those that are unmapped
+        var claimedFilterIds = filterMappingsWithReplacement.Select(filterMap => filterMap.ReplacementId).ToHashSet();
         replacementSequence.AddRange(
-            mapping
-                .UnmappedReplacementFilters.OrderBy(unmappedFilter => unmappedFilter.Label, LabelComparer)
-                .Select(unmappedFilter => new FilterSequenceEntry(
-                    Id: unmappedFilter.Id,
-                    FilterGroupSequence: unmappedFilter
-                        .UnmappedReplacementFilterGroups.OrderBy(unmappedGroup => unmappedGroup.Label, LabelComparer)
-                        .Select(unmappedGroup => new FilterGroupSequenceEntry(
-                            Id: unmappedGroup.Id,
-                            FilterItemSequence: unmappedGroup
-                                .UnmappedReplacementFilterItems.OrderBy(
-                                    unmappedItem => unmappedItem.Label,
-                                    LabelComparer
-                                )
-                                .Select(unmappedItem => unmappedItem.Id)
+            replacementFilters
+                .Where(replacementFilter => !claimedFilterIds.Contains(replacementFilter.Id))
+                .OrderBy(replacementFilter => replacementFilter.Label, LabelComparer)
+                .Select(replacementFilter => new FilterSequenceEntry(
+                    Id: replacementFilter.Id,
+                    FilterGroupSequence: replacementFilter
+                        .FilterGroups.OrderBy(replacementGroup => replacementGroup.Label, LabelComparer)
+                        .Select(replacementGroup => new FilterGroupSequenceEntry(
+                            Id: replacementGroup.Id,
+                            FilterItemSequence: replacementGroup
+                                .FilterItems.OrderBy(replacementItem => replacementItem.Label, LabelComparer)
+                                .Select(replacementItem => replacementItem.Id)
                                 .ToList()
                         ))
                         .ToList()
@@ -65,20 +75,31 @@ public abstract class ReplacementServiceHelper
 
     private static List<FilterGroupSequenceEntry> GenerateReplacementGroupSequence(
         FilterMapping filterMapping,
+        List<FilterGroup> replacementFilterGroups,
         FilterSequenceEntry originalFilterSequenceEntry
     )
     {
+        // Add mapped replacement groups
         var replacementGroupSequence = new List<FilterGroupSequenceEntry>();
-        var groupIdsWithMapping = filterMapping
+        var groupMappingsWithReplacement = filterMapping
             .FilterGroupMappings.Values.Where(groupMap => groupMap.ReplacementId != null)
-            .Select(groupMap => groupMap.OriginalId)
-            .ToHashSet();
+            .Select(groupMap => new { groupMap.OriginalId, ReplacementId = groupMap.ReplacementId!.Value })
+            .ToList();
+
+        var groupIdsWithMapping = groupMappingsWithReplacement.Select(groupMap => groupMap.OriginalId).ToHashSet();
         foreach (var groupSequenceEntry in originalFilterSequenceEntry.FilterGroupSequence)
         {
             if (groupIdsWithMapping.Contains(groupSequenceEntry.Id))
             {
+                var filterGroupMapping = filterMapping.FilterGroupMappings[groupSequenceEntry.Id];
+                var replacementItems = replacementFilterGroups
+                    .Where(g => g.Id == filterGroupMapping.ReplacementId)
+                    .Select(g => g.FilterItems)
+                    .Single();
+
                 var replacementItemSequence = GenerateReplacementItemSequence(
-                    filterMapping.FilterGroupMappings[groupSequenceEntry.Id],
+                    filterGroupMapping,
+                    replacementItems,
                     groupSequenceEntry
                 );
 
@@ -91,14 +112,17 @@ public abstract class ReplacementServiceHelper
             }
         }
 
+        // Add remaining replacement groups - those that are unmapped
+        var claimedGroupIds = groupMappingsWithReplacement.Select(groupMap => groupMap.ReplacementId).ToHashSet();
         replacementGroupSequence.AddRange(
-            filterMapping
-                .UnmappedReplacementFilterGroups.OrderBy(unmappedGroup => unmappedGroup.Label)
-                .Select(unmappedGroup => new FilterGroupSequenceEntry(
-                    Id: unmappedGroup.Id,
-                    FilterItemSequence: unmappedGroup
-                        .UnmappedReplacementFilterItems.OrderBy(unmappedItem => unmappedItem.Label)
-                        .Select(unmappedItem => unmappedItem.Id)
+            replacementFilterGroups
+                .Where(replacementGroup => !claimedGroupIds.Contains(replacementGroup.Id))
+                .OrderBy(replacementGroup => replacementGroup.Label)
+                .Select(replacementGroup => new FilterGroupSequenceEntry(
+                    Id: replacementGroup.Id,
+                    FilterItemSequence: replacementGroup
+                        .FilterItems.OrderBy(replacementItem => replacementItem.Label)
+                        .Select(replacementItem => replacementItem.Id)
                         .ToList()
                 ))
         );
@@ -108,14 +132,18 @@ public abstract class ReplacementServiceHelper
 
     private static List<Guid> GenerateReplacementItemSequence(
         FilterGroupMapping groupMapping,
+        List<FilterItem> replacementFilterItems,
         FilterGroupSequenceEntry originalGroupSequenceEntry
     )
     {
+        // Add mapped replacement items
         var replacementItemSequence = new List<Guid>();
-        var itemIdsWithMapping = groupMapping
+        var itemMappingsWithReplacement = groupMapping
             .FilterItemMappings.Values.Where(itemMap => itemMap.ReplacementId != null)
-            .Select(itemMap => itemMap.OriginalId)
-            .ToHashSet();
+            .Select(itemMap => new { itemMap.OriginalId, ReplacementId = itemMap.ReplacementId!.Value })
+            .ToList();
+
+        var itemIdsWithMapping = itemMappingsWithReplacement.Select(itemMap => itemMap.OriginalId).ToHashSet();
 
         foreach (var sequenceItemId in originalGroupSequenceEntry.FilterItemSequence)
         {
@@ -125,8 +153,12 @@ public abstract class ReplacementServiceHelper
             }
         }
 
+        // Add remaining replacement items - those that are currently unmapped
+        var claimedItemIds = itemMappingsWithReplacement.Select(itemMap => itemMap.ReplacementId).ToHashSet();
         replacementItemSequence.AddRange(
-            groupMapping.UnmappedReplacementFilterItems.Select(unmappedItem => unmappedItem.Id)
+            replacementFilterItems
+                .Where(replacementItem => !claimedItemIds.Contains(replacementItem.Id))
+                .Select(replacementItem => replacementItem.Id)
         );
 
         return replacementItemSequence;

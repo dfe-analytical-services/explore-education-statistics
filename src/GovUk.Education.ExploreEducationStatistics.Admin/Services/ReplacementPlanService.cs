@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -23,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReplacementPlanService(
     ContentDbContext contentDbContext,
+    StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
     IDataSetVersionService dataSetVersionService,
     ITimePeriodService timePeriodService,
@@ -143,7 +145,14 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
-                var mappingPlan = ReplacementPlanMappingViewModel.FromModel(mapping);
+                var replacementFilters = await statisticsDbContext
+                    .Filter.AsNoTracking()
+                    .Include(f => f.FilterGroups)
+                        .ThenInclude(g => g.FilterItems)
+                    .Where(f => f.SubjectId == replacementSubjectId)
+                    .ToListAsync(cancellationToken);
+
+                var mappingPlan = ReplacementPlanMappingViewModel.FromModel(mapping, replacementFilters);
 
                 return new DataReplacementPlanViewModel
                 {

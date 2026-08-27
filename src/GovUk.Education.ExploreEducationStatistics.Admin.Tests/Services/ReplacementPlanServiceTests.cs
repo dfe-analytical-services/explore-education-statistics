@@ -416,30 +416,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementFilter.Id,
-                    ColumnName = replacementFilter.Name,
-                    Label = replacementFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilterGroup.Id,
-                            Label = replacementFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementFilterItem.Id,
-                                    Label = replacementFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ])
             .WithIndicatorMappings(
                 new Dictionary<Guid, IndicatorMapping>
                 {
@@ -1157,11 +1133,7 @@ public class ReplacementPlanServiceTests
                                                 originalDefaultFilterItem.Id,
                                                 new FilterItemMapping { OriginalId = originalDefaultFilterItem.Id }
                                             },
-                                        },
-                                        unmappedReplacementFilterItems:
-                                        [
-                                            new UnmappedFilterItem { Id = replacementDefaultFilterItem.Id },
-                                        ]
+                                        }
                                     )
                                 },
                             }
@@ -1436,31 +1408,7 @@ public class ReplacementPlanServiceTests
                         )
                     },
                 }
-            )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementNewlyIntroducedFilter.Id,
-                    ColumnName = replacementNewlyIntroducedFilter.Name,
-                    Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1651,31 +1599,7 @@ public class ReplacementPlanServiceTests
                         )
                     },
                 }
-            )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementNewlyIntroducedFilter.Id,
-                    ColumnName = replacementNewlyIntroducedFilter.Name,
-                    Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -3869,6 +3793,7 @@ public class ReplacementPlanServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
+            statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
@@ -3882,7 +3807,6 @@ public class ReplacementPlanServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3895,7 +3819,6 @@ public class ReplacementPlanServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -3904,7 +3827,6 @@ public class ReplacementPlanServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3915,7 +3837,6 @@ public class ReplacementPlanServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

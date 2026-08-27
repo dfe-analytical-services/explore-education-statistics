@@ -35,11 +35,6 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, FilterMapping> filterMappings
     ) => generator.ForInstance(m => m.SetFilterMappings(filterMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementFilters(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedFilter> unmappedFilters
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementFilters(unmappedFilters));
-
     public static Generator<DataSetMapping> WithIndicatorMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
@@ -92,11 +87,6 @@ public static class DataSetMappingGeneratorExtensions
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, FilterMapping> filterMappings
     ) => setters.Set(m => m.FilterMappings, filterMappings);
-
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementFilters(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedFilter> unmappedFilters
-    ) => setters.Set(m => m.UnmappedReplacementFilters, unmappedFilters);
 
     public static InstanceSetters<DataSetMapping> SetIndicatorMappings(
         this InstanceSetters<DataSetMapping> setters,
