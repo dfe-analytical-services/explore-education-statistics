@@ -45,6 +45,7 @@ import {
   getLogs,
   getPublicDataDbOverride,
   getStatus,
+  hasIndexedFunctions,
   startProcess,
   stopAllProcesses,
   stopAllStartedProcesses,
@@ -273,7 +274,11 @@ app.get(
     // what's wrong is usually a Core Tools too old for these services, which
     // no amount of restarting will change.
     functionHostServices.forEach(service => {
-      const failure = findFunctionHostFailure(service, getLogs(service));
+      const failure = findFunctionHostFailure(
+        service,
+        getLogs(service),
+        hasIndexedFunctions(service),
+      );
 
       if (failure) {
         issues.push({

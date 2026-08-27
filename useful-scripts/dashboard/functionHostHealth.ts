@@ -130,6 +130,64 @@ export function findFunctionHostFailureLine(line: string): string | undefined {
 }
 
 /**
+ * The name of the function a line of a Functions host's output says it has
+ * indexed, or undefined if the line says nothing of the sort.
+ *
+ * `func` prints one tab-indented `Name: trigger` per function, under a
+ * `Functions:` header, once it has loaded the app's extensions and indexed
+ * what it found. That makes this the only line in the output that says the
+ * host got all the way up. The banner `checkReady` watches for - `Function
+ * Runtime Version:`, see services.ts - is printed before any of that happens,
+ * so on its own it can't tell a host that works from one that is about to
+ * fault on the app's assemblies.
+ */
+export function findIndexedFunction(line: string): string | undefined {
+  return line.match(
+    /^\t([A-Za-z0-9_]+): (?:\[[A-Z,]+] https?:\/\/|\w+Trigger\b)/,
+  )?.[1];
+}
+
+/** What {@link readFunctionHostLine} made of a line. */
+export type FunctionHostLineVerdict =
+  | { kind: 'indexed'; name: string }
+  | { kind: 'failed'; cause: string }
+  | { kind: 'unremarkable' };
+
+/**
+ * What one line of a Functions host's output says about whether the host is
+ * doing its job, given whether it has already listed functions it indexed.
+ *
+ * The ordering is the whole point of this, and why it isn't left inline in the
+ * caller: an indexed function has to win over a failure signature. The host
+ * reprints those signatures verbatim every time it re-launches a language
+ * worker, which it does routinely, mid-run, on a host whose functions are up
+ * and serving queues - and reading them as a failed startup is what flipped a
+ * working processor to 'Unhealthy' an hour and a half into a clean run.
+ */
+export function readFunctionHostLine(
+  line: string,
+  hasIndexedFunctions: boolean,
+): FunctionHostLineVerdict {
+  const name = findIndexedFunction(line);
+
+  if (name) {
+    return { kind: 'indexed', name };
+  }
+
+  // The trade is that a worker which dies for good after a successful startup
+  // now goes unreported. Telling that apart from a recycle needs more than the
+  // line that announces either, so it wants the host's own status endpoint
+  // rather than a guess made from its output.
+  if (hasIndexedFunctions) {
+    return { kind: 'unremarkable' };
+  }
+
+  const cause = findFunctionHostFailureLine(line);
+
+  return cause ? { kind: 'failed', cause } : { kind: 'unremarkable' };
+}
+
+/**
  * The Core Tools version a Functions host reported on startup, if its banner
  * is still in the given lines.
  *
@@ -157,13 +215,18 @@ function isCoreToolsTooOld(version: string): boolean {
 /**
  * What to tell the user to do about it.
  *
- * Three cases, because how confident the advice can be depends on what's
+ * Four cases, because how confident the advice can be depends on what's
  * actually known. A Core Tools we can see is too old earns a flat
  * instruction; a version-mismatch signature on a Core Tools that looks new
  * enough earns a hedged one; and a startup that threw for some other reason
  * earns none at all - naming the version it's running is what makes the
  * difference checkable, and "upgrade Core Tools" is worse than silence for
  * someone whose problem is a bad connection string.
+ *
+ * That last case splits on whether the version is knowable. When the banner
+ * is still in the log there is no reason to raise Core Tools as a suspect at
+ * all: the log already answers the question, so repeating the requirement
+ * only sends someone off to check a version this has just read.
  */
 function describeRemedy(
   version: string | undefined,
@@ -188,6 +251,14 @@ function describeRemedy(
     );
   }
 
+  if (version) {
+    return (
+      `Download the full log to see what its startup threw. Azure Functions ` +
+      `Core Tools ${version} is new enough for these net10.0 services, so ` +
+      `the failure is the app's own.`
+    );
+  }
+
   return (
     `Download the full log to see what its startup threw. If Azure Functions ` +
     `Core Tools is older than ${MIN_CORE_TOOLS_VERSION} that's the usual ` +
@@ -207,12 +278,21 @@ function describeRemedy(
  * marked running by the time it does. It then stays up, holding its port and
  * retrying the same failing startup, until someone stops it - which is why
  * this reads as "started fine, does nothing" from the outside.
+ *
+ * `hasIndexedFunctions` is what stops it saying so about a host that is
+ * plainly working, because the host reuses its startup-failure lines every
+ * time it re-launches a language worker - hours into a run that indexed
+ * everything and has been serving queues since. Callers that have watched
+ * every line should pass what they saw: the default reads the lines given,
+ * and the buffer they come from is capped, so by the time a recycle shows up
+ * in it the function list has usually scrolled away.
  */
 export default function findFunctionHostFailure(
   service: ServiceName,
   lines: readonly string[],
+  hasIndexedFunctions = lines.some(line => findIndexedFunction(line)),
 ): { cause: string; message: string } | undefined {
-  if (!functionHostServices.includes(service)) {
+  if (!functionHostServices.includes(service) || hasIndexedFunctions) {
     return undefined;
   }
 

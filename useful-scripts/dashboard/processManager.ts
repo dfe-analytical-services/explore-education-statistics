@@ -17,8 +17,8 @@ import {
 import createFileLock, { UnlockCallback } from './utils/createFileLock';
 import errorMessage from './errorMessage';
 import {
-  findFunctionHostFailureLine,
   functionHostServices,
+  readFunctionHostLine,
 } from './functionHostHealth';
 import { ExecaChildProcessWithoutNullStreams } from './utils/types';
 import { startDockerServices } from './dockerManager';
@@ -70,6 +70,15 @@ interface ManagedProcess {
    * often already gone by the time you open the panel.
    */
   logFile?: ServiceLogFile;
+  /**
+   * Whether this run's Functions host has listed the functions it indexed.
+   *
+   * Kept here rather than looked for in `logs` because that buffer is capped:
+   * the list is printed during startup, and the output that makes this worth
+   * asking about - a host recycling its language worker hours later - has long
+   * since pushed it out.
+   */
+  hasIndexedFunctions?: boolean;
 }
 
 const MAX_LOG_LINES = 500;
@@ -130,6 +139,10 @@ export function getStatus(service: ServiceName): ProcessStatus {
 
 export function getError(service: ServiceName): string | undefined {
   return registry.get(service)?.error;
+}
+
+export function hasIndexedFunctions(service: ServiceName): boolean {
+  return registry.get(service)?.hasIndexedFunctions ?? false;
 }
 
 export function getPublicDataDbOverride(
@@ -370,6 +383,7 @@ export async function startProcess(
   entry.status = 'starting';
   entry.error = undefined;
   entry.logs = [];
+  entry.hasIndexedFunctions = false;
 
   // Opened here rather than at spawn time so the file also captures what
   // happened *before* the process existed - waiting on the build lock, a
@@ -584,19 +598,48 @@ export async function startProcess(
       resolveSettled();
     };
 
+    /**
+     * Takes a service that had been marked unhealthy back to running.
+     *
+     * Unlike markReady there is nothing to settle or hand back here -
+     * markUnhealthy did both on the way in - so this only has the status to
+     * put right. `isReady` goes with it, to keep "running" and "ready" from
+     * disagreeing about a service that is now both.
+     */
+    const markRecovered = (): void => {
+      if (hasExited || entry.status !== 'unhealthy') {
+        return;
+      }
+
+      isReady = true;
+      entry.status = 'running';
+      entry.error = undefined;
+      appendLog(entry, '[dashboard] Working after all: its functions are up');
+    };
+
     // Only Functions hosts have a "running but idle" failure mode the
     // dashboard can spot from the outside - see functionHostHealth.
     const isFunctionHost = functionHostServices.includes(service);
 
-    const checkFunctionHostFailure = (line: string): void => {
+    const checkFunctionHostLine = (line: string): void => {
       if (!isFunctionHost) {
         return;
       }
 
-      const failure = findFunctionHostFailureLine(line);
+      const verdict = readFunctionHostLine(
+        line,
+        entry.hasIndexedFunctions ?? false,
+      );
 
-      if (failure) {
-        markUnhealthy(failure);
+      // An indexed function answers the question for the rest of the run, and
+      // overrides a verdict already reached: a host can fail its first startup
+      // attempt and index everything on the next, and this is the only line
+      // that would say so.
+      if (verdict.kind === 'indexed') {
+        entry.hasIndexedFunctions = true;
+        markRecovered();
+      } else if (verdict.kind === 'failed') {
+        markUnhealthy(verdict.cause);
       }
     };
 
@@ -613,12 +656,12 @@ export async function startProcess(
         markReady();
       }
 
-      checkFunctionHostFailure(line);
+      checkFunctionHostLine(line);
     });
 
     childProcess.stderr.pipe(splitLines()).on('data', (line: string) => {
       appendLog(entry, line);
-      checkFunctionHostFailure(line);
+      checkFunctionHostLine(line);
     });
 
     childProcess.on('exit', async (code, signal) => {
