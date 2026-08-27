@@ -5,10 +5,15 @@
   padding: govuk-spacing(4);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 
-  * {
+  > * {
     padding-top: 0 !important;
     margin-bottom: govuk-spacing(1);
   }
+}
+
+.linkContainer {
+  margin-top: auto;
+  margin-bottom: 0;
 }

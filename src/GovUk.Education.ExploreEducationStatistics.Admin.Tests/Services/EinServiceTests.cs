@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -567,6 +568,40 @@ public class EducationInNumbersServiceTests
                         },
                     ],
                 },
+                new EinContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    Order = 2,
+                    Heading = "Section 3",
+                    Content =
+                    [
+                        new EinTileGroupBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 0,
+                            Title = "Tile group 3.1",
+                            Tiles =
+                            [
+                                new EinApiQueryStatTile
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 0,
+                                    Title = "Tile 3.1.1",
+                                    DataSetId = Guid.NewGuid(),
+                                    Version = "1.0.1",
+                                    DataSetVersionId = Guid.NewGuid(),
+                                    LatestDataSetVersionId = Guid.NewGuid(),
+                                    Query = "Tile 3.1.1 query",
+                                    Statistic = "Tile 3.1.1 statistic",
+                                    IndicatorUnit = IndicatorUnit.Percent,
+                                    DecimalPlaces = 1,
+                                    QueryResult = "Tile 3.1.1 query result",
+                                    ReleaseId = Guid.NewGuid(),
+                                },
+                            ],
+                        },
+                    ],
+                },
             ],
         };
 
@@ -592,6 +627,7 @@ public class EducationInNumbersServiceTests
             var amendment = await contentDbContext
                 .EinPageVersions.Include(p => p.Content)
                     .ThenInclude(s => s.Content)
+                        .ThenInclude(block => (block as EinTileGroupBlock)!.Tiles)
                 .SingleAsync(p => p.Id == amendmentId);
 
             Assert.NotEqual(originalPageVersion.Id, amendment.Id);
@@ -633,6 +669,35 @@ public class EducationInNumbersServiceTests
             Assert.Equal(amendmentSection2.Id, amendmentSection2Block1.EinContentSectionId);
             Assert.Equal(originalSection2Block1.Order, amendmentSection2Block1.Order);
             Assert.Equal(originalSection2Block1.Body, amendmentSection2Block1.Body);
+
+            var originalSection3 = originalPageVersion.Content[2];
+            var amendmentSection3 = amendment.Content[2];
+            Assert.Equal(originalSection3.Content.Count, amendmentSection3.Content.Count);
+
+            var originalGroupBlock = (EinTileGroupBlock)originalSection3.Content[0];
+            var amendmentGroupBlock = Assert.IsType<EinTileGroupBlock>(amendmentSection3.Content[0]);
+            Assert.NotEqual(originalGroupBlock.Id, amendmentGroupBlock.Id);
+            Assert.Equal(amendmentSection3.Id, amendmentGroupBlock.EinContentSectionId);
+            Assert.Equal(originalGroupBlock.Order, amendmentGroupBlock.Order);
+            Assert.Equal(originalGroupBlock.Title, amendmentGroupBlock.Title);
+            Assert.Equal(originalGroupBlock.Tiles.Count, amendmentGroupBlock.Tiles.Count);
+
+            var originalTile = (EinApiQueryStatTile)originalGroupBlock.Tiles[0];
+            var amendmentTile = Assert.IsType<EinApiQueryStatTile>(amendmentGroupBlock.Tiles[0]);
+            Assert.NotEqual(originalTile.Id, amendmentTile.Id);
+            Assert.Equal(amendmentGroupBlock.Id, amendmentTile.EinParentBlockId);
+            Assert.Equal(originalTile.Order, amendmentTile.Order);
+            Assert.Equal(originalTile.Title, amendmentTile.Title);
+            Assert.Equal(originalTile.DataSetId, amendmentTile.DataSetId);
+            Assert.Equal(originalTile.Version, amendmentTile.Version);
+            Assert.Equal(originalTile.DataSetVersionId, amendmentTile.DataSetVersionId);
+            Assert.Equal(originalTile.LatestDataSetVersionId, amendmentTile.LatestDataSetVersionId);
+            Assert.Equal(originalTile.Query, amendmentTile.Query);
+            Assert.Equal(originalTile.Statistic, amendmentTile.Statistic);
+            Assert.Equal(originalTile.IndicatorUnit, amendmentTile.IndicatorUnit);
+            Assert.Equal(originalTile.DecimalPlaces, amendmentTile.DecimalPlaces);
+            Assert.Equal(originalTile.QueryResult, amendmentTile.QueryResult);
+            Assert.Equal(originalTile.ReleaseId, amendmentTile.ReleaseId);
         }
     }
 
