@@ -204,8 +204,12 @@ public class ContentDbContext : DbContext
             .Entity<DataImport>()
             .Property(import => import.GeographicLevels)
             .HasConversion(
-                v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<HashSet<GeographicLevel>>(v)
+                v => JsonConvert.SerializeObject(v, new EnumToEnumValueJsonConverter<GeographicLevel>()),
+                v =>
+                    JsonConvert.DeserializeObject<HashSet<GeographicLevel>>(
+                        v,
+                        new EnumToEnumValueJsonConverter<GeographicLevel>()
+                    )
             );
     }
 
