@@ -60,7 +60,7 @@ public class DataImport
     /// </summary>
     public int? LastProcessedRowIndex { get; set; }
 
-    public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
+    public HashSet<GeographicLevel>? GeographicLevels { get; set; }
 
     public List<DataImportError> Errors { get; set; } = new();
 
