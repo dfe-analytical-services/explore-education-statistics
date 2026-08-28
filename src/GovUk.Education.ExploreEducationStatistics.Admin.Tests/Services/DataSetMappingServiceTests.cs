@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -765,8 +766,9 @@ public class DataSetMappingServiceTests
         var loc1Id = Guid.NewGuid();
         var loc2Id = Guid.NewGuid();
         var loc3Id = Guid.NewGuid();
+        var loc4Id = Guid.NewGuid();
         var replacementLocId = Guid.NewGuid();
-        var newlyUnmappedLocId = Guid.NewGuid();
+        var displacedReplacementLocId = Guid.NewGuid();
         var loc3ReplacementId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
@@ -792,7 +794,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = loc2Id,
                         OriginalGeographicLevel = GeographicLevel.Country,
-                        ReplacementId = newlyUnmappedLocId,
+                        ReplacementId = displacedReplacementLocId,
                         ReplacementName = "Old Country Name",
                         ReplacementCode = "E9200002",
                         ReplacementGeographicLevel = GeographicLevel.Country,
@@ -809,17 +811,35 @@ public class DataSetMappingServiceTests
                         Status = MapStatus.Unset,
                     }
                 },
-            },
-            UnmappedReplacementLocations =
-            [
-                new UnmappedLocation
                 {
-                    Id = replacementLocId,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
-                    Name = "New LA",
-                    Code = "301",
+                    loc4Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc4Id,
+                        OriginalGeographicLevel = GeographicLevel.Country,
+                        Status = MapStatus.Unset,
+                    }
                 },
-            ],
+            },
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
+        };
+        var displacedReplacementLocation = new Location
+        {
+            Id = displacedReplacementLocId,
+            GeographicLevel = GeographicLevel.Country,
+            Country = new Country("E9200002", "Old Country Name"),
+        };
+        var loc3ReplacementLocation = new Location
+        {
+            Id = loc3ReplacementId,
+            GeographicLevel = GeographicLevel.Region,
+            Region = new Region("E12000003", "Yorkshire and The Humber"),
         };
 
         var originalReleaseFile = new ReleaseFile
@@ -839,6 +859,8 @@ public class DataSetMappingServiceTests
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -847,9 +869,40 @@ public class DataSetMappingServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            statisticsDbContext.Location.AddRange(
+                replacementLocation,
+                displacedReplacementLocation,
+                loc3ReplacementLocation
+            );
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = displacedReplacementLocation,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = loc3ReplacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateLocationMappings(
                 releaseVersion.Id,
@@ -867,10 +920,12 @@ public class DataSetMappingServiceTests
             );
 
             var locationMappingList = result.AssertRight();
-            Assert.Equal(3, locationMappingList.Count);
+            Assert.Equal(4, locationMappingList.Count);
 
             var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
             Assert.Equal(replacementLocId, map1.ReplacementId);
+            Assert.Equal("New LA", map1.ReplacementName);
+            Assert.Equal("301", map1.ReplacementCode);
             Assert.Equal(MapStatus.ManuallySet, map1.Status);
 
             var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
@@ -881,17 +936,122 @@ public class DataSetMappingServiceTests
             Assert.Equal(loc3ReplacementId, map3.ReplacementId);
             Assert.Equal(MapStatus.Unset, map3.Status);
         }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_ReplacementLocationClaimedByAnotherMapping_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
+
+        var loc1Id = Guid.NewGuid();
+        var loc2Id = Guid.NewGuid();
+
+        var replacementLocId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    loc1Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc1Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        ReplacementId = replacementLocId,
+                        ReplacementGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    loc2Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc2Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var dbMapping = contentDbContext.DataSetMappings.Single();
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
 
-            Assert.Single(dbMapping.UnmappedReplacementLocations);
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.Location.Add(replacementLocation);
+            statisticsDbContext.Observation.Add(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
 
-            // Check that the old replacement from loc2 was moved back to unmapped
-            Assert.Contains(dbMapping.UnmappedReplacementLocations, l => l.Id == newlyUnmappedLocId);
-            // Check that the new replacement was removed from unmapped
-            Assert.DoesNotContain(dbMapping.UnmappedReplacementLocations, l => l.Id == replacementLocId);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
+
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    Updates = [new() { OriginalId = loc2Id, NewReplacementId = replacementLocId }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasError(
+                expectedPath: "Updates.NewReplacementId",
+                expectedCode: "UnmappedLocationMatchingReplacementLocationIdNotFound"
+            );
         }
     }
 
@@ -1130,7 +1290,6 @@ public class DataSetMappingServiceTests
                     new LocationMapping { OriginalId = locId }
                 },
             },
-            UnmappedReplacementLocations = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1202,13 +1361,18 @@ public class DataSetMappingServiceTests
                     new LocationMapping { OriginalId = locId, OriginalGeographicLevel = GeographicLevel.Region }
                 },
             },
-            UnmappedReplacementLocations =
-            [
-                new UnmappedLocation { Id = replacementLocId, GeographicLevel = GeographicLevel.LocalAuthority },
-            ],
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -1217,9 +1381,24 @@ public class DataSetMappingServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            statisticsDbContext.Location.Add(replacementLocation);
+            statisticsDbContext.Observation.Add(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
             var result = await service.UpdateLocationMappings(
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
@@ -3368,9 +3547,12 @@ public class DataSetMappingServiceTests
         IUserService? userService = null
     )
     {
+        statisticsDbContext ??= StatisticsDbUtils.InMemoryStatisticsDbContext();
+
         return new DataSetMappingService(
             contentDbContext,
-            statisticsDbContext ?? StatisticsDbUtils.InMemoryStatisticsDbContext(),
+            statisticsDbContext,
+            new LocationRepository(statisticsDbContext),
             userService ?? MockUtils.AlwaysTrueUserService().Object
         );
     }

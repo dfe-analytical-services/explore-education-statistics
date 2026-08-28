@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -20,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class DataSetMappingService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
+    ILocationRepository locationRepository,
     IUserService userService
 ) : IDataSetMappingService
 {
@@ -211,13 +213,22 @@ public class DataSetMappingService(
             )
             .OnSuccess(async validated =>
             {
-                var mapping = validated.Mapping;
+                var (mapping, replacementReleaseFile) = validated;
+
+                var replacementLocations = (
+                    await locationRepository.GetDistinctForSubject(replacementReleaseFile.File.SubjectId!.Value)
+                ).ToList();
 
                 var updatedMappings = request
                     .Updates.Select(update =>
-                        UpdateLocationMapping(mapping, update.OriginalId, update.NewReplacementId)
+                        mapping.UpdateLocationMapping(replacementLocations, update.OriginalId, update.NewReplacementId)
                     )
                     .ToList(); // cannot be async!
+
+                // The mutations above happen on the in-memory object graph beneath LocationMappings. EF can't see
+                // through the JSON column conversion on that property, so we must mark it dirty explicitly for the
+                // changes to be persisted.
+                contentDbContext.Entry(mapping).Property(x => x.LocationMappings).IsModified = true;
 
                 // we still save changes from the Updates that succeeded, even if some failed
                 await contentDbContext.SaveChangesAsync(cancellationToken);
@@ -226,100 +237,6 @@ public class DataSetMappingService(
                     .OnSuccessAll()
                     .OnSuccess(_ => mapping.LocationMappings.Values.Select(LocationMappingDto.FromModel).ToList());
             });
-    }
-
-    private Either<ActionResult, LocationMapping> UpdateLocationMapping(
-        DataSetMapping dataSetMapping,
-        Guid originalLocationId,
-        Guid? newReplacementLocationId = null
-    )
-    {
-        if (!dataSetMapping.LocationMappings.TryGetValue(originalLocationId, out var locationMapping))
-        {
-            return ValidationResult(
-                new ErrorViewModel
-                {
-                    Path = $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.OriginalId)}",
-                    Code = "LocationMatchingOriginalIdNameNotFound",
-                    Message = $"Could not find location mapping matching original location id \"{originalLocationId}\"",
-                }
-            );
-        }
-
-        if (
-            locationMapping.ReplacementId == newReplacementLocationId
-            && locationMapping.Status == MapStatus.ManuallySet
-        )
-        {
-            return locationMapping; // it is already mapped, so can skip
-        }
-
-        var availableUnmappedLocation = dataSetMapping.UnmappedReplacementLocations.SingleOrDefault(unmappedLocation =>
-            unmappedLocation.Id == newReplacementLocationId
-        );
-
-        if (newReplacementLocationId != null && availableUnmappedLocation == null)
-        {
-            return ValidationResult(
-                new ErrorViewModel
-                {
-                    Path =
-                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
-                    Code = "UnmappedLocationMatchingReplacementLocationIdNotFound",
-                    Message = $"No available unmapped location matching replacement id \"{newReplacementLocationId}\"",
-                }
-            );
-        }
-
-        if (
-            newReplacementLocationId != null
-            && availableUnmappedLocation != null
-            && availableUnmappedLocation.GeographicLevel != locationMapping.OriginalGeographicLevel
-        )
-        {
-            return ValidationResult(
-                new ErrorViewModel
-                {
-                    Path =
-                        $"{nameof(LocationMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
-                    Code = "UnmappedLocationHasDifferentGeographicLevelAsOriginalLocation",
-                    Message =
-                        $"The replacement location has a different geographic level than the original location. Replacement id: \"{newReplacementLocationId}\"",
-                }
-            );
-        }
-
-        if (availableUnmappedLocation != null)
-        {
-            // remove availableUnmappedLocation from UnmappedReplacementLocations as it's about to become mapped
-            dataSetMapping.UnmappedReplacementLocations.Remove(availableUnmappedLocation);
-            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementLocations).IsModified = true;
-        }
-
-        if (locationMapping.ReplacementId != null && locationMapping.ReplacementId != newReplacementLocationId)
-        {
-            // We need to move the preexisting mapped location into UnmappedReplacementLocations, as it will be overwritten
-            var newlyUnmappedLocation = new UnmappedLocation
-            {
-                Id = locationMapping.ReplacementId.Value,
-                GeographicLevel = locationMapping.ReplacementGeographicLevel!.Value,
-                Code = locationMapping.ReplacementCode!,
-                Name = locationMapping.ReplacementName!,
-            };
-            dataSetMapping.UnmappedReplacementLocations.Add(newlyUnmappedLocation);
-            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementLocations).IsModified = true;
-        }
-
-        // locationMapping.Original* properties should never change
-        locationMapping.ReplacementId = availableUnmappedLocation?.Id;
-        locationMapping.ReplacementGeographicLevel = availableUnmappedLocation?.GeographicLevel;
-        locationMapping.ReplacementCode = availableUnmappedLocation?.Code;
-        locationMapping.ReplacementName = availableUnmappedLocation?.Name;
-        locationMapping.Status = MapStatus.ManuallySet;
-
-        contentDbContext.Entry(dataSetMapping).Property(x => x.LocationMappings).IsModified = true;
-
-        return locationMapping;
     }
 
     private async Task<Either<ActionResult, (DataSetMapping Mapping, ReleaseFile ReplacementFile)>> ValidateMapping(

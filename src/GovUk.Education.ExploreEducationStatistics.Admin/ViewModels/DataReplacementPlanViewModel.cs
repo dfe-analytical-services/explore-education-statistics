@@ -309,11 +309,12 @@ public record ReplacementPlanMappingViewModel
     public static ReplacementPlanMappingViewModel FromModel(
         DataSetMapping mapping,
         List<Filter> replacementFilters,
-        List<Indicator> replacementIndicators
+        List<Indicator> replacementIndicators,
+        List<Location> replacementLocations
     )
     {
         var indicatorMappings = ReplacementPlanIndicatorMappingsViewModel.FromModel(mapping, replacementIndicators);
-        var locationMappings = ReplacementPlanLocationMappingsViewModel.FromModel(mapping);
+        var locationMappings = ReplacementPlanLocationMappingsViewModel.FromModel(mapping, replacementLocations);
         var filterMappings = ReplacementPlanFilterMappingsViewModel.FromModel(mapping, replacementFilters);
 
         return new ReplacementPlanMappingViewModel
@@ -395,7 +396,10 @@ public record ReplacementPlanLocationMappingsViewModel
     // Key is replacement location id
     public Dictionary<Guid, ReplacementPlanLocationViewModel> Candidates { get; init; } = new();
 
-    public static ReplacementPlanLocationMappingsViewModel FromModel(DataSetMapping mapping)
+    public static ReplacementPlanLocationMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        List<Location> replacementLocations
+    )
     {
         var locationMappings = mapping.LocationMappings.Values.ToDictionary(
             locationMap => locationMap.OriginalId,
@@ -411,31 +415,15 @@ public record ReplacementPlanLocationMappingsViewModel
                 CandidateKey = locationMap.ReplacementId,
             }
         );
-        var locationCandidates = mapping // candidates are all possible replacement locations
-            .LocationMappings.Values.Where(locationMap => locationMap.ReplacementId != null)
-            .Select(locationMap => new
+        var locationCandidates = replacementLocations.ToDictionary(
+            replacementLocation => replacementLocation.Id,
+            replacementLocation => new ReplacementPlanLocationViewModel
             {
-                Id = locationMap.ReplacementId!.Value,
-                Code = locationMap.ReplacementCode!,
-                Name = locationMap.ReplacementName!,
-            })
-            .Concat(
-                mapping.UnmappedReplacementLocations.Select(unmappedLocation => new
-                {
-                    unmappedLocation.Id,
-                    unmappedLocation.Code,
-                    unmappedLocation.Name,
-                })
-            )
-            .ToDictionary(
-                x => x.Id,
-                x => new ReplacementPlanLocationViewModel
-                {
-                    Id = x.Id,
-                    Code = x.Code,
-                    Name = x.Name,
-                }
-            );
+                Id = replacementLocation.Id,
+                Code = replacementLocation.ToLocationAttribute().GetCodeOrFallback(),
+                Name = replacementLocation.ToLocationAttribute().Name ?? "",
+            }
+        );
 
         return new ReplacementPlanLocationMappingsViewModel
         {

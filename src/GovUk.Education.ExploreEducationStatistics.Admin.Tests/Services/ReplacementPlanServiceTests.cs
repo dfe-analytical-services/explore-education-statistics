@@ -427,8 +427,7 @@ public class ReplacementPlanServiceTests
                 {
                     { originalLocation.Id, CreateLocationMapping(originalLocation) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -2703,8 +2702,7 @@ public class ReplacementPlanServiceTests
                 {
                     { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2987,8 +2985,7 @@ public class ReplacementPlanServiceTests
                 {
                     { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3284,16 +3281,7 @@ public class ReplacementPlanServiceTests
                     },
                     { originalLocationBirmingham.Id, CreateLocationMapping(originalLocationBirmingham) },
                 }
-            )
-            .WithUnmappedReplacementLocations([
-                new UnmappedLocation
-                {
-                    Id = replacementLocationNott.Id,
-                    GeographicLevel = replacementLocationNott.GeographicLevel,
-                    Name = replacementLocationNott.ToLocationAttribute().Name!,
-                    Code = replacementLocationNott.ToLocationAttribute().GetCodeOrFallback(),
-                },
-            ]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3312,6 +3300,38 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(
+                locationEng,
+                replacementLocationDerby,
+                locationLeicester,
+                replacementLocationNott
+            );
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = locationEng,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationDerby,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = locationLeicester,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationNott,
+                }
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -3624,16 +3644,7 @@ public class ReplacementPlanServiceTests
                 {
                     { originalLocationDerby.Id, CreateLocationMapping(originalLocationDerby) },
                 }
-            )
-            .WithUnmappedReplacementLocations([
-                new UnmappedLocation
-                {
-                    Id = replacementLocationDerby.Id,
-                    GeographicLevel = replacementLocationDerby.GeographicLevel,
-                    Name = replacementLocationDerby.ToLocationAttribute().Name!,
-                    Code = replacementLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
-                },
-            ]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3652,6 +3663,15 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(replacementLocationDerby);
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationDerby,
+                }
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -3763,6 +3783,7 @@ public class ReplacementPlanServiceTests
             contentDbContext,
             statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
+            new LocationRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,

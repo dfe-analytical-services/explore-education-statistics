@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -114,6 +115,7 @@ public class DataSetMappingServicePermissionTests
         return new DataSetMappingService(
             contentDbContext,
             statisticsDbContext,
+            new LocationRepository(statisticsDbContext),
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict)
         );
     }

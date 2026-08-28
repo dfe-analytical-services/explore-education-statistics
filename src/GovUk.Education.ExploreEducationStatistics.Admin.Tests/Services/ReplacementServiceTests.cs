@@ -3204,6 +3204,7 @@ public class ReplacementServiceTests
             contentDbContext,
             statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
+            new LocationRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,

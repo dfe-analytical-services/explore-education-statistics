@@ -35,7 +35,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             replacementFile.SubjectId!.Value
         );
 
-        var (locationMappings, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
+        var locationMappings = await GenerateInitialLocationMapping(
             statisticsDbContext,
             originalFile.SubjectId!.Value,
             replacementFile.SubjectId!.Value
@@ -53,7 +53,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = indicatorMappings,
             LocationMappings = locationMappings,
-            UnmappedReplacementLocations = unmappedReplacementLocations,
             FilterMappings = filterMappings,
         };
 
@@ -116,7 +115,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         return indicatorMappings;
     }
 
-    private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(
+    private async Task<Dictionary<Guid, LocationMapping>> GenerateInitialLocationMapping(
         StatisticsDbContext statisticsDbContext,
         Guid originalSubjectId,
         Guid replacementSubjectId
@@ -171,22 +170,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             }
         );
 
-        var mappedReplacementLocationIds = locationMappings
-            .Values.Where(map => map.ReplacementId.HasValue)
-            .Select(map => map.ReplacementId!.Value);
-
-        var unmappedReplacementLocations = replacementIdToLocationMap
-            .Values.ExceptBy(mappedReplacementLocationIds, location => location.Id)
-            .Select(location => new UnmappedLocation
-            {
-                Id = location.Id,
-                Code = location.ToLocationAttribute().GetCodeOrFallback(),
-                Name = location.ToLocationAttribute().Name ?? "",
-                GeographicLevel = location.GeographicLevel,
-            })
-            .ToList();
-
-        return (locationMappings, unmappedReplacementLocations);
+        return locationMappings;
     }
 
     private static async Task<Dictionary<Guid, FilterMapping>> GenerateInitialFilterMapping(

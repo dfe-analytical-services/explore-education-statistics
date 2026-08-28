@@ -617,8 +617,6 @@ public class DataSetMappingServiceTests
                 },
                 dbDataSetMapping.LocationMappings
             );
-
-            Assert.Empty(dbDataSetMapping.UnmappedReplacementLocations);
         }
     }
 
