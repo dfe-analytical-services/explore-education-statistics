@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -160,13 +159,28 @@ public class DataSetMappingService(
             )
             .OnSuccess(async validated =>
             {
-                var mapping = validated.Mapping;
+                var (mapping, replacementReleaseFile) = validated;
+
+                var replacementIndicators = await statisticsDbContext
+                    .Indicator.AsNoTracking()
+                    .Include(i => i.IndicatorGroup)
+                    .Where(i => i.IndicatorGroup.SubjectId == replacementReleaseFile.File.SubjectId!.Value)
+                    .ToListAsync(cancellationToken);
 
                 var updatedMappings = request
                     .Updates.Select(update =>
-                        UpdateIndicatorMapping(mapping, update.OriginalId, update.NewReplacementId)
+                        mapping.UpdateIndicatorMapping(
+                            replacementIndicators,
+                            update.OriginalId,
+                            update.NewReplacementId
+                        )
                     )
                     .ToList(); // cannot be async!
+
+                // The mutations above happen on the in-memory object graph beneath IndicatorMappings. EF can't see
+                // through the JSON column conversion on that property, so we must mark it dirty explicitly for the
+                // changes to be persisted.
+                contentDbContext.Entry(mapping).Property(x => x.IndicatorMappings).IsModified = true;
 
                 // we still save changes from the Updates that succeeded, even if some failed
                 await contentDbContext.SaveChangesAsync(cancellationToken);
@@ -175,83 +189,6 @@ public class DataSetMappingService(
                     .OnSuccessAll()
                     .OnSuccess(_ => mapping.IndicatorMappings.Values.Select(IndicatorMappingDto.FromModel).ToList());
             });
-    }
-
-    private Either<ActionResult, IndicatorMapping> UpdateIndicatorMapping(
-        DataSetMapping dataSetMapping,
-        Guid originalId,
-        Guid? newReplacementId = null
-    )
-    {
-        if (!dataSetMapping.IndicatorMappings.TryGetValue(originalId, out var indicatorMapping))
-        {
-            return ValidationResult(
-                new ErrorViewModel
-                {
-                    Path =
-                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.OriginalId)}",
-                    Code = "IndicatorMatchingOriginalIdNotFound",
-                    Message = $"Could not find indicator mapping matching original id \"{originalId}\"",
-                }
-            );
-        }
-
-        if (indicatorMapping.ReplacementId == newReplacementId && indicatorMapping.Status == MapStatus.ManuallySet)
-        {
-            return indicatorMapping; // it is already mapped, so can skip
-        }
-
-        var availableUnmappedIndicator = dataSetMapping.UnmappedReplacementIndicators.SingleOrDefault(
-            unmappedIndicator => unmappedIndicator.Id == newReplacementId
-        );
-
-        if (newReplacementId != null && availableUnmappedIndicator == null)
-        {
-            return ValidationResult(
-                new ErrorViewModel
-                {
-                    Path =
-                        $"{nameof(IndicatorMappingUpdatesRequest.Updates)}.{nameof(MappingUpdateRequest.NewReplacementId)}",
-                    Code = "UnmappedIndicatorMatchingReplacementIdNotFound",
-                    Message =
-                        $"No available unmapped indicator matching replacement id \"{newReplacementId}\". DataSetMapping.Id: {dataSetMapping.Id}",
-                }
-            );
-        }
-
-        if (availableUnmappedIndicator != null)
-        {
-            // remove availableUnmappedIndicator from UnmappedReplacementIndicators as it's about to become mapped
-            dataSetMapping.UnmappedReplacementIndicators.Remove(availableUnmappedIndicator);
-            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementIndicators).IsModified = true;
-        }
-
-        if (indicatorMapping.ReplacementId != null && indicatorMapping.ReplacementId != newReplacementId)
-        {
-            // We need to move the preexisting mapped indicator into UnmappedReplacementIndicators, as it will be overwritten
-            var newlyUnmappedIndicator = new UnmappedIndicator
-            {
-                Id = indicatorMapping.ReplacementId.Value,
-                ColumnName = indicatorMapping.ReplacementColumnName!,
-                Label = indicatorMapping.ReplacementLabel!,
-                GroupId = indicatorMapping.ReplacementGroupId!.Value,
-                GroupLabel = indicatorMapping.ReplacementGroupLabel!,
-            };
-            dataSetMapping.UnmappedReplacementIndicators.Add(newlyUnmappedIndicator);
-            contentDbContext.Entry(dataSetMapping).Property(x => x.UnmappedReplacementIndicators).IsModified = true;
-        }
-
-        // mapping.Original* properties should never change
-        indicatorMapping.ReplacementId = availableUnmappedIndicator?.Id;
-        indicatorMapping.ReplacementColumnName = availableUnmappedIndicator?.ColumnName;
-        indicatorMapping.ReplacementLabel = availableUnmappedIndicator?.Label;
-        indicatorMapping.ReplacementGroupId = availableUnmappedIndicator?.GroupId;
-        indicatorMapping.ReplacementGroupLabel = availableUnmappedIndicator?.GroupLabel;
-        indicatorMapping.Status = MapStatus.ManuallySet;
-
-        contentDbContext.Entry(dataSetMapping).Property(x => x.IndicatorMappings).IsModified = true;
-
-        return indicatorMapping;
     }
 
     public async Task<Either<ActionResult, List<LocationMappingDto>>> UpdateLocationMappings(

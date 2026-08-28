@@ -152,7 +152,17 @@ public class ReplacementPlanService(
                     .Where(f => f.SubjectId == replacementSubjectId)
                     .ToListAsync(cancellationToken);
 
-                var mappingPlan = ReplacementPlanMappingViewModel.FromModel(mapping, replacementFilters);
+                var replacementIndicators = await statisticsDbContext
+                    .Indicator.AsNoTracking()
+                    .Include(i => i.IndicatorGroup)
+                    .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
+                    .ToListAsync(cancellationToken);
+
+                var mappingPlan = ReplacementPlanMappingViewModel.FromModel(
+                    mapping,
+                    replacementFilters,
+                    replacementIndicators
+                );
 
                 return new DataReplacementPlanViewModel
                 {

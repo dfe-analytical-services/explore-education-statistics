@@ -18,7 +18,6 @@ public record DataSetMapping
     public File ReplacementDataFile { get; init; } = null!;
 
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; init; } = null!;
-    public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
     public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
@@ -63,16 +62,6 @@ public record DataSetMapping
                 .HasColumnType("nvarchar(max)");
 
             builder
-                .Property(x => x.UnmappedReplacementIndicators)
-                .HasConversion(
-                    unmappedIndicators => JsonSerializer.Serialize(unmappedIndicators, JsonOptions),
-                    unmappedIndicatorsString =>
-                        JsonSerializer.Deserialize<List<UnmappedIndicator>>(unmappedIndicatorsString, JsonOptions)
-                        ?? new List<UnmappedIndicator>(),
-                    ValueComparer.CreateDefault<List<UnmappedIndicator>>(false)
-                );
-
-            builder
                 .Property(x => x.LocationMappings)
                 .HasConversion(
                     locationMappings => JsonSerializer.Serialize(locationMappings, JsonOptions),
@@ -113,15 +102,6 @@ public enum MapStatus
     ManuallySet, // user manually mapped this (whether to another Id or nothing)
     AutoSet, // automatically mapped when the initial mapping was created
     ParentNotMapped,
-}
-
-public record UnmappedIndicator
-{
-    public Guid Id { get; set; }
-    public string Label { get; set; } = "";
-    public string ColumnName { get; set; } = "";
-    public Guid GroupId { get; set; }
-    public string GroupLabel { get; set; } = "";
 }
 
 public record IndicatorMapping

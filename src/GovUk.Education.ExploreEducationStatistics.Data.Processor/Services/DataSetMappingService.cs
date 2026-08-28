@@ -29,7 +29,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
 
         var originalFile = replacementFile.Replacing!;
 
-        var (indicatorMappings, unmappedReplacementIndicators) = await GenerateInitialIndicatorMapping(
+        var indicatorMappings = await GenerateInitialIndicatorMapping(
             statisticsDbContext,
             originalFile.SubjectId!.Value,
             replacementFile.SubjectId!.Value
@@ -52,7 +52,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             OriginalDataFileId = originalFile.Id,
             ReplacementDataFileId = replacementFile.Id,
             IndicatorMappings = indicatorMappings,
-            UnmappedReplacementIndicators = unmappedReplacementIndicators,
             LocationMappings = locationMappings,
             UnmappedReplacementLocations = unmappedReplacementLocations,
             FilterMappings = filterMappings,
@@ -62,7 +61,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         await contentDbContext.SaveChangesAsync();
     }
 
-    private async Task<(Dictionary<Guid, IndicatorMapping>, List<UnmappedIndicator>)> GenerateInitialIndicatorMapping(
+    private async Task<Dictionary<Guid, IndicatorMapping>> GenerateInitialIndicatorMapping(
         StatisticsDbContext statisticsDbContext,
         Guid originalSubjectId,
         Guid replacementSubjectId
@@ -114,23 +113,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             }
         );
 
-        var mappedReplacementIndicatorIds = indicatorMappings
-            .Values.Where(m => m.ReplacementId.HasValue)
-            .Select(m => m.ReplacementId!.Value);
-
-        var unmappedReplacementIndicators = replacementIndicatorNameToIndicatorMap
-            .Values.ExceptBy(mappedReplacementIndicatorIds, indicator => indicator.Id)
-            .Select(i => new UnmappedIndicator
-            {
-                Id = i.Id,
-                Label = i.Label,
-                ColumnName = i.Name,
-                GroupId = i.IndicatorGroupId,
-                GroupLabel = i.IndicatorGroup.Label,
-            })
-            .ToList();
-
-        return (indicatorMappings, unmappedReplacementIndicators);
+        return indicatorMappings;
     }
 
     private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(

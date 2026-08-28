@@ -422,16 +422,6 @@ public class ReplacementPlanServiceTests
                     { originalIndicator.Id, CreateIndicatorMapping(originalIndicator, originalIndicatorGroup) },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementIndicator.Id,
-                    ColumnName = replacementIndicator.Name,
-                    Label = replacementIndicator.Label,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
@@ -2708,16 +2698,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementNewIndicator.Id,
-                    Label = replacementNewIndicator.Label,
-                    ColumnName = replacementNewIndicator.Name,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
@@ -3002,16 +2982,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementIndicatorAUpdated.Id,
-                    Label = replacementIndicatorAUpdated.Label,
-                    ColumnName = replacementIndicatorAUpdated.Name,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
@@ -3300,7 +3270,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
@@ -3650,7 +3619,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
