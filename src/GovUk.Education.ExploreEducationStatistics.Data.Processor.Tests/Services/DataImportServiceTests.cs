@@ -286,15 +286,15 @@ public class DataImportServiceTests
                 .Files.Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.SubjectId == subject.Id);
 
-            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels.ToDictionary(
+            var geogLvlToCsvOnlyMap = updatedFile.DataSetFileVersionGeographicLevels.ToDictionary(
                 gl => gl.GeographicLevel,
                 gl => gl.CsvOnly
             );
-            Assert.Equal(4, geogLvls.Count);
-            Assert.False(geogLvls[GeographicLevel.Country]);
-            Assert.False(geogLvls[GeographicLevel.LocalAuthority]);
-            Assert.False(geogLvls[GeographicLevel.Region]);
-            Assert.True(geogLvls[GeographicLevel.School]);
+            Assert.Equal(4, geogLvlToCsvOnlyMap.Count);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.Country]);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.LocalAuthority]);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.Region]);
+            Assert.True(geogLvlToCsvOnlyMap[GeographicLevel.School]);
 
             Assert.NotNull(updatedFile.DataSetFileMeta);
             var meta = updatedFile.DataSetFileMeta;

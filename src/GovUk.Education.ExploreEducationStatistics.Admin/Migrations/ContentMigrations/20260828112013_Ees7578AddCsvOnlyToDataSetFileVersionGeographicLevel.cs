@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     /// <inheritdoc />
     public partial class Ees7578AddCsvOnlyToDataSetFileVersionGeographicLevel : Migration
     {
+        private const string MigrationId = "20260828112013";
+
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,6 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "DataSetFileVersionGeographicLevels",
                 type: "bit",
                 nullable: true
+            );
+
+            migrationBuilder.SqlFromFile(
+                MigrationConstants.ContentMigrationsPath,
+                $"{MigrationId}_{nameof(Ees7578AddCsvOnlyToDataSetFileVersionGeographicLevel)}.sql"
             );
         }
 
