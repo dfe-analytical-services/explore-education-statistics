@@ -50,7 +50,7 @@ const TableToolShare = ({ tableHeaders, query, isCropped }: Props) => {
         },
       });
 
-      setPermalinkUrl(`${process.env.PUBLIC_URL}data-tables/permalink/${id}`);
+      setPermalinkUrl(`${process.env.PUBLIC_URL}/data-tables/permalink/${id}`);
 
       setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);
     } catch (err) {
