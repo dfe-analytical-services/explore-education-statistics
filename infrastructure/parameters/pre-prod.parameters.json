@@ -47,6 +47,9 @@
     "contentApiUrl": {
       "value": "cont.pre-production.explore-education-statistics.service.gov.uk"
     },
+    "azureFrontDoorCachePurgeEnabled": {
+      "value": false
+    },
     "dataApiUrl": {
       "value": "data.pre-production.explore-education-statistics.service.gov.uk"
     },

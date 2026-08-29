@@ -8,6 +8,20 @@
     "contentApiUrl": {
       "type": "string"
     },
+    "restrictContentApiOriginToFrontDoor": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Restrict the Content API App Service origin to requests from this environment's Azure Front Door profile. Enable only after the Content API custom domain has been cut over to Front Door."
+      }
+    },
+    "azureFrontDoorCachePurgeEnabled": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Allow the Publisher Function to purge superseded all-files ZIPs from Azure Front Door. Enable per environment after the AFD role assignment has been deployed."
+      }
+    },
     "dataApiUrl": {
       "type": "string"
     },
@@ -1662,6 +1676,8 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "use32BitWorkerProcess": false,
+          "ipSecurityRestrictions": "[if(parameters('restrictContentApiOriginToFrontDoor'), array(createObject('ipAddress', 'AzureFrontDoor.Backend', 'action', 'Allow', 'priority', 100, 'name', 'Allow Azure Front Door', 'description', 'Only allow requests routed through this environment Azure Front Door profile.', 'tag', 'ServiceTag', 'headers', createObject('x-azure-fdid', array(reference(resourceId('Microsoft.Cdn/profiles', variables('frontDoorName')), '2025-04-15').frontDoorId)))), createArray())]",
+          "ipSecurityRestrictionsDefaultAction": "[if(parameters('restrictContentApiOriginToFrontDoor'), 'Deny', 'Allow')]",
           "cors": {
             "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
           },
@@ -3968,6 +3984,9 @@
         "App__BauEmail": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-bau-email'), '2018-02-14').secretUriWithVersion, ')')]",
         "App__AdminAppUrl": "[variables('adminAppUrl')]",
         "App__PublicAppUrl": "[variables('publicAppUrl')]",
+        "AzureFrontDoor__CachePurgeEnabled": "[parameters('azureFrontDoorCachePurgeEnabled')]",
+        "AzureFrontDoor__EndpointResourceId": "[variables('resourceIds').afdEndpoint]",
+        "AzureFrontDoor__ContentApiHostName": "[parameters('contentApiUrl')]",
         "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
         "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",

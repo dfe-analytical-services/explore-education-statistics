@@ -42,6 +42,9 @@ param logAnalyticsWorkspaceId string
 @description('Whether to deploy a Web Application Firewall with this Front Door instance.')
 param deployWaf bool
 
+@description('Whether to associate this Front Door custom domain with the Web Application Firewall security policy.')
+param deployWafSecurityPolicy bool = true
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
   latency: bool
@@ -166,12 +169,12 @@ module wafPolicyModule 'wafPolicy.bicep' = if (deployWaf) {
   }
 }
 
-module wafSecurityPolicyModule 'wafSecurityPolicy.bicep' = if (deployWaf) {
+module wafSecurityPolicyModule 'wafSecurityPolicy.bicep' = if (deployWaf && deployWafSecurityPolicy) {
   name: '${frontDoorProfileName}WafSecurityPolicyModule'
   params: {
     securityPolicyName: '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
     wafPolicyName: wafPolicyName
-    customDomainName: customDomainName
+    customDomainNames: [customDomainName]
     frontDoorProfileName: frontDoorProfileName
   }
   dependsOn: [

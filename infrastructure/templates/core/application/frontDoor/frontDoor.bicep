@@ -1,4 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
+import { FrontDoorCertificateType } from '../../../common/components/front-door/types.bicep'
 
 @description('Environment: Subscription name. Used as a prefix for created resources.')
 @allowed([
@@ -18,8 +19,11 @@ param resourcePrefix string
 @description('URL of the public site.')
 param publicSiteUrl string
 
+@description('URL of the Content API.')
+param contentApiUrl string
+
 @description('Choose whether to use a manually-generated Key Vault certificate or a certificate provisioned by Azure Front Door.')
-param certificateType 'Provisioned' | 'BringYourOwn' = 'BringYourOwn'
+param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
 @description('Name of the Key Vault instance in which to store certificates.')
 param keyVaultName string
@@ -39,8 +43,13 @@ param tagValues object
 var frontDoorProfileName = '${resourcePrefix}-${abbreviations.frontDoorProfiles}'
 
 var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
+var contentApiHostName = replace(contentApiUrl, 'https://', '')
 
 var certificateName = '${subscription}-as-ees-public-site-certificate'
+var publicSiteCustomDomainName = '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+var contentApiCustomDomainName = '${subscription}-ees-content-${abbreviations.frontDoorDomains}'
+var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
+var wafSecurityPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
 
 var nextJsRuleSetName = 'nextjsruleset'
 
@@ -52,12 +61,13 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     keyVaultName: keyVaultName
     siteHostName: publicSiteHostName
     originHostName: '${subscription}-as-ees-public-site.azurewebsites.net'
-    customDomainName: '${resourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+    customDomainName: publicSiteCustomDomainName
     certificateType: certificateType
     certificateName: certificateType == 'BringYourOwn' ? certificateName : null
     ruleSetNames: [nextJsRuleSetName]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployWaf: true
+    deployWafSecurityPolicy: false
     alerts: deployAlerts ? {
       latency: true
       originHealth: true
@@ -71,6 +81,38 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     } : null
     tagValues: tagValues
   }
+}
+
+module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
+  name: '${frontDoorProfileName}ContentApiModuleDeploy'
+  params: {
+    subscription: subscription
+    frontDoorProfileName: frontDoorProfileName
+    frontDoorEndpointName: '${resourcePrefix}-${abbreviations.frontDoorEndpoints}'
+    keyVaultName: keyVaultName
+    contentApiHostName: contentApiHostName
+    contentApiOriginHostName: '${subscription}-as-ees-content.azurewebsites.net'
+  }
+  dependsOn: [
+    frontDoorModule
+  ]
+}
+
+module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
+  name: '${frontDoorProfileName}WafSecurityPolicyModule'
+  params: {
+    securityPolicyName: wafSecurityPolicyName
+    wafPolicyName: wafPolicyName
+    customDomainNames: [
+      publicSiteCustomDomainName
+      contentApiCustomDomainName
+    ]
+    frontDoorProfileName: frontDoorProfileName
+  }
+  dependsOn: [
+    frontDoorModule
+    contentApiFrontDoorModule
+  ]
 }
 
 resource nextJsRuleSet 'Microsoft.Cdn/profiles/rulesets@2025-04-15' existing = {
