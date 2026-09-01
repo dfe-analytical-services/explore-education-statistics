@@ -117,7 +117,7 @@ var afdEndpointResourceId = resourceId('Microsoft.Cdn/profiles/afdEndpoints', re
 
 var basePublicAllowedOrigins = [
   'https://${environmentConfig.?domain}'
-  'https://${resourceNames.publicSite.appService.appServiceName}.azurewebsites.net'
+  'https://${resourceNames.publicSite.appService}.azurewebsites.net'
   'https://${reference(afdEndpointResourceId, '2025-06-01').hostName}'
 ]
 
