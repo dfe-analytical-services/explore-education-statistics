@@ -11,9 +11,6 @@
     "skuContent": {
       "value": "P1V2 PremiumV2"
     },
-    "skuAdmin": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },

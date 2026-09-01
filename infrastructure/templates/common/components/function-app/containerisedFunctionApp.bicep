@@ -7,7 +7,7 @@ import { AzureFileShareMount } from '../storage/types.bicep'
 
 import { EntraIdAuthentication } from '../../../public-api/types.bicep'
 
-import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
@@ -69,7 +69,7 @@ param appServicePlanName string
 param applicationInsightsConnectionString string
 
 @description('Specifies the SKU for the Function App hosting plan')
-param sku AppServicePlanSku
+param sku FunctionAppServicePlanSku
 
 @description('The minimum number of instances for the function app.')
 param minimumInstanceCount int = 1
@@ -170,12 +170,11 @@ var fileServiceAlerts = alerts != null
     }
   : null
 
-module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../app-service-plan/function-app-service-plan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName
     location: location
-    kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
     maximumElasticWorkerCount: maximumInstanceCount

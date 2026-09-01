@@ -11,9 +11,6 @@
     "skuContent": {
       "value": "P1V2 PremiumV2"
     },
-    "skuAdmin": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },
@@ -58,9 +55,6 @@
     },
     "publicAppGATrackingId": {
       "value": "G-8FSLWXTV2W"
-    },
-    "enableThemeDeletion": {
-      "value": true
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000

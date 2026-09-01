@@ -5,21 +5,13 @@ import { AppServicePlanSku } from 'types.bicep'
 param planName string
 
 @description('Specifies the location for all resources.')
-param location string
+param location string = resourceGroup().location
 
 @description('The SKU for the plan')
 param sku AppServicePlanSku
 
-@description('The kind of plan to deploy. Impacted by application type and desired OS. See https://github.com/Azure/app-service-linux-docs/blob/master/Things_You_Should_Know/kind_property.md#app-service-resource-kind-reference.')
-param kind 
-  | 'app'
-  | 'functionapp'
-
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
-
-@description('The maximum number of instances that this plan can support. This pool of workers is shared between any services that use this plan.')
-param maximumElasticWorkerCount int = 1
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
@@ -31,16 +23,15 @@ param alerts {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
-  name: planName
-  location: location
-  kind: kind
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   sku: sku
+  name: planName
+  kind: 'app'
+  location: location
+  tags: tagValues
   properties: {
     reserved: operatingSystem == 'Linux'
-    maximumElasticWorkerCount: maximumElasticWorkerCount
   }
-  tags: tagValues
 }
 
 module cpuPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {

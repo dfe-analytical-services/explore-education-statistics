@@ -11,9 +11,6 @@
     "skuContent": {
       "value": "S1 Standard"
     },
-    "skuAdmin": {
-      "value": "S1 Standard"
-    },
     "skuImporter": {
       "value": "P1V2 PremiumV2"
     },
@@ -50,17 +47,11 @@
     "publicApiDocsUrl": {
       "value": "pp-api.education.gov.uk/statistics-test/docs"
     },
-    "detailedErrors": {
-      "value": true
-    },
     "publicAppGATrackingId": {
       "value": "G-ZQ5V7CBWMJ"
     },
     "branch": {
       "value": "test"
-    },
-    "enableThemeDeletion": {
-      "value": true
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
