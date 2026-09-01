@@ -59,9 +59,6 @@
     "publicAppGATrackingId": {
       "value": "G-GRPHH2FN0L"
     },
-    "enableSwagger": {
-      "value": true
-    },
     "memoryCacheOverridesDurationInSeconds": {
       "value": 10
     },

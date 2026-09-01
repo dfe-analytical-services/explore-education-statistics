@@ -93,6 +93,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appServiceName: resourceNames.contentApi.appService
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
+    keyVaultName: resourceNames.keyVault.keyVault
+    legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
         name: 'StatisticsDb'

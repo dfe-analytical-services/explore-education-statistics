@@ -400,10 +400,6 @@
       "type": "string",
       "defaultValue": "storage"
     },
-    "enableSwagger": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "memoryCacheEnabled": {
       "type": "bool",
       "defaultValue": true,
@@ -533,10 +529,6 @@
     "capacityStatisticsDb": {
       "type": "int"
     },
-    "deploySlotName": {
-      "type": "string",
-      "defaultValue": "deploy"
-    },
     "maxContentDbSizeBytes": {
       "type": "int",
       "defaultValue": 1073741824
@@ -605,20 +597,6 @@
       "defaultValue": true,
       "metadata": {
         "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
-      }
-    },
-    "analyticsEnabled": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether analytics is enabled"
-      }
-    },
-    "analyticsFileShareMountPath": {
-      "type": "string",
-      "defaultValue": "\\mounts\\analytics",
-      "metadata": {
-        "description": "Where analytics request files are saved before being processed"
       }
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
@@ -1169,8 +1147,6 @@
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
-    "analyticsFileShareName": "[concat(parameters('subscription'), '-ees-share-anlyt')]",
-    "analyticsStorageAccountName": "[concat(parameters('subscription'), 'eessaanlyt')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",

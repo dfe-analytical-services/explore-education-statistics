@@ -10,6 +10,9 @@ param appInsightsName string
 @description('Name of Key Vault to allow secret access to from this App Service.')
 param keyVaultName string?
 
+@description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
+param legacyKeyVaultRoleAssignmentName bool = false
+
 @description('Minimum TLS version supported.')
 param minTlsVersion string
 
@@ -104,13 +107,13 @@ resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   })
 }
 
-var appServiceSecretsUserRoleAssignmentName = guid(resourceId('Microsoft.KeyVault/vaults', appServiceName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), appServiceName)
-
 module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
   name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
   params: {
     keyVaultName: keyVaultName!
-    roleAssignmentNameOverride: appServiceSecretsUserRoleAssignmentName
+    roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), 'Microsoft.Web/sites/${appServiceName}')
+      : null
     principalIds: [appService.identity.principalId]
     role: 'Secrets User'
   }
