@@ -1,8 +1,11 @@
 @use '~govuk-frontend/dist/govuk/base' as *;
 
-$input-size: 53px;
-
 .masthead {
+  --search-bar-button-background: #{govuk-colour('blue', $variant: 'tint-80')};
+  --search-bar-button-text: #{govuk-colour('blue')};
+  --search-bar-input-background: #{govuk-colour('white')};
+  --search-bar-input-size: 53px;
+
   background-color: govuk-colour('blue');
   color: govuk-functional-colour('inverse-text');
 
@@ -11,21 +14,7 @@ $input-size: 53px;
   }
 
   :global(.autocomplete__input) {
-    background-color: govuk-colour('white');
     border: 0;
-    width: calc(100% - #{$input-size});
-    height: $input-size;
-  }
-
-  :global(.autocomplete__submit-button) {
-    background-color: govuk-colour('blue', $variant: 'tint-80');
-    color: govuk-colour('blue');
-    width: $input-size;
-    height: $input-size;
-  }
-
-  :global(.autocomplete__menu) {
-    margin-right: -$input-size;
   }
 }
 
