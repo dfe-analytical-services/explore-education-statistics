@@ -1,3 +1,4 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
@@ -10,6 +11,7 @@ import _apiDataSetService, {
 } from '@admin/services/apiDataSetService';
 import testFiltersMapping from '@admin/pages/release/data/__data__/testFiltersMapping';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import { GlobalPermissions } from '@admin/services/authService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
@@ -25,6 +27,24 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testDataSet: ApiDataSet = {
     id: 'data-set-id',
     title: 'Data set title',
@@ -90,6 +110,43 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
         /These mappings cannot be edited because this data set version has been finalised/,
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^Map indicator/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^No mapping/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows the mapping action buttons for a user with permission to manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('columnheader', { name: 'Actions' }).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('button', { name: /^Map indicator/ }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  test('does not show the mapping action buttons for a user who cannot manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+
+    renderPage({ user: testAnalystUser });
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
     expect(
       screen.queryByRole('columnheader', { name: 'Actions' }),
     ).not.toBeInTheDocument();
@@ -1002,32 +1059,38 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;
+    user?: User;
   }) {
-    const { releaseVersion = testRelease, dataSetId = 'data-set-id' } =
-      options ?? {};
+    const {
+      releaseVersion = testRelease,
+      dataSetId = 'data-set-id',
+      user = testBauUser,
+    } = options ?? {};
 
     return render(
-      <TestConfigContextProvider>
-        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetRouteParams>(
-                releaseApiDataSetIndicatorsMappingRoute.path,
-                {
-                  publicationId: releaseVersion.publicationId,
-                  releaseVersionId: releaseVersion.id,
-                  dataSetId,
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetIndicatorsMappingPage}
-              path={releaseApiDataSetIndicatorsMappingRoute.path}
-            />
-          </MemoryRouter>
-        </ReleaseVersionContextProvider>
-      </TestConfigContextProvider>,
+      <AuthContextTestProvider user={user}>
+        <TestConfigContextProvider>
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
+            <MemoryRouter
+              initialEntries={[
+                generatePath<ReleaseDataSetRouteParams>(
+                  releaseApiDataSetIndicatorsMappingRoute.path,
+                  {
+                    publicationId: releaseVersion.publicationId,
+                    releaseVersionId: releaseVersion.id,
+                    dataSetId,
+                  },
+                ),
+              ]}
+            >
+              <Route
+                component={ReleaseApiDataSetIndicatorsMappingPage}
+                path={releaseApiDataSetIndicatorsMappingRoute.path}
+              />
+            </MemoryRouter>
+          </ReleaseVersionContextProvider>
+        </TestConfigContextProvider>
+      </AuthContextTestProvider>,
     );
   }
 });
