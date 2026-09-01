@@ -35,17 +35,26 @@
       - "-e ees_bootstrap_bare_database=true"
   when: not ees_mssql_data.stat.exists
 
-# The container writes its data files as this uid, and exits during startup if
-# it cannot. Done with chown rather than the file module because the path is
+# The container writes its data files as this uid and exits during startup if it
+# cannot, so it needs both the ownership and the permissions. Ownership alone is
+# not enough: the modes come out of whatever is in the zip, and SQL Server has to
+# be able to write these files rather than just read them.
+#
+# Done with chown and chmod rather than the file module because the path is
 # usually a symlink, which the file module would replace with a directory. The
-# trailing slash makes chown descend into the link target.
-- name: Give the SQL Server container ownership of its data directory
+# trailing slash makes both commands descend into the link target.
+- name: Give the SQL Server container access to its data directory
   ansible.builtin.command:
-    cmd: "chown -R {{ ees_mssql_container_uid }} {{ ees_project_dir }}/data/ees-mssql/"
+    cmd: "{{ item }} {{ ees_project_dir }}/data/ees-mssql/"
+  loop:
+    - "chown -R {{ ees_mssql_container_uid }}"
+    - "chmod -R {{ ees_mssql_data_mode }}"
   become: true
   when:
     - ees_mssql_data.stat.exists
-    - ees_mssql_data.stat.uid != ees_mssql_container_uid
+    - >-
+      ees_mssql_data.stat.uid != ees_mssql_container_uid
+      or ees_mssql_data.stat.mode != ees_mssql_data_dir_mode
   changed_when: true
 
 - name: Bootstrap a bare SQL Server database

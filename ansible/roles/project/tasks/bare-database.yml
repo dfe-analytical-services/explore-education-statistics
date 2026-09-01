@@ -9,7 +9,7 @@
     path: "{{ ees_project_dir }}/data/ees-mssql"
     state: directory
     owner: "{{ ees_mssql_container_uid }}"
-    mode: "0755"
+    mode: "{{ ees_mssql_data_dir_mode }}"
   become: true
   when: not ees_mssql_data.stat.exists
 

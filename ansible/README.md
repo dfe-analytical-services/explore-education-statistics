@@ -53,6 +53,7 @@ cd ansible && ansible-playbook setup.yml \
 | `ees_mssql_zip` | highest numbered archive in `data` | The `ees-mssql-data-<n>.zip` to unpack. |
 | `ees_mssql_extract_dir` | `<checkout>/data` | Where to extract it. Point this off an encrypted filesystem if your home directory is encrypted; the playbook then symlinks it into place. |
 | `ees_mssql_replace_existing` | `false` | Throw away an existing `data/ees-mssql` and unpack the archive again. |
+| `ees_mssql_data_mode` | `a=rwX` | Permissions applied to the database directory and its contents. |
 | `ees_bootstrap_bare_database` | `false` | Create empty databases with the logins the service needs, instead of using a pre-built development database. |
 | `ees_install_chrome` | `true` | Install Google Chrome for the Robot Framework UI tests. |
 | `ees_pull_docker_images` | `true` | Pull the container images up front rather than on first use. |
@@ -163,9 +164,16 @@ Drive behind team access, so the playbook cannot fetch it for you. Everything
 after the download it can do.
 
 Drop the `ees-mssql-data-<n>.zip` into the `data` directory and run the
-playbook. It picks the highest numbered archive it finds there, unpacks it,
-puts the `ees-mssql` directory where `docker-compose.yml` expects it, and gives
-uid `10001` - the uid the SQL Server container runs as - ownership of it.
+playbook. It picks the highest numbered archive it finds there, unpacks it, and
+puts the `ees-mssql` directory where `docker-compose.yml` expects it.
+
+It then makes the result usable by the container, which runs as uid `10001`:
+ownership goes to that uid, and the permissions are set to `a=rwX` - everything
+readable and writable, with the execute bit on directories only. Ownership on
+its own is not enough. The modes come out of whatever is in the zip, SQL Server
+has to write these files rather than just read them, and the main README asks
+for all OS users to have access to this directory. Tighten
+`ees_mssql_data_mode` if you would rather it were not world writable.
 
 If several archives are present it compares them numerically, so
 `ees-mssql-data-10.zip` beats `ees-mssql-data-9.zip`. Point it at a specific one
@@ -191,7 +199,7 @@ The zip is left where you put it. It is ignored by git, but it is also several
 gigabytes, so delete it once you are happy the database works.
 
 If `data/ees-mssql` is already in place from a previous manual setup, the
-playbook leaves it alone and just fixes the ownership.
+playbook leaves the data alone and just fixes the ownership and permissions.
 
 ### Starting from empty databases instead
 

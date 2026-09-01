@@ -139,6 +139,22 @@ ees_sql_sa_password: "Your_Password123"
 # by this uid or the server will not start.
 ees_mssql_container_uid: 10001
 
+# Permissions applied to the database directory and everything under it.
+#
+# Ownership on its own is not enough. The modes come out of whatever is in the
+# zip, SQL Server has to write to these files and not just read them, and the
+# main README asks for all OS users to have access to this directory. "a=rwX"
+# gives everyone read and write, with the capital X setting execute on
+# directories only - the data files do not need to be executable.
+#
+# Tighten this if you would rather not have the directory world writable; it
+# only has to be usable by uid ees_mssql_container_uid.
+ees_mssql_data_mode: "a=rwX"
+
+# What ees_mssql_data_mode leaves a directory at. Used only to work out whether
+# the permissions still need applying, so keep it in step with the mode above.
+ees_mssql_data_dir_mode: "0777"
+
 # ---------------------------------------------------------------------------
 # GitHub Packages NuGet source (optional)
 # ---------------------------------------------------------------------------
