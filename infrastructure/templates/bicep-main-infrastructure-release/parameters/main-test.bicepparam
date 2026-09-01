@@ -10,6 +10,7 @@ param environmentConfigParam = {
   enableSwagger: true
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
+  basicAuthEnabled: true
 }
 
 param adminConfigParam = {

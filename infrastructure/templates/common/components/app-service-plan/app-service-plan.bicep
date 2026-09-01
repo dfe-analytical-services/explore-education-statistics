@@ -28,7 +28,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: planName
   kind: 'app'
   location: location
-  tags: tagValues
+  tags: union(
+    tagValues,
+    {
+      ServiceType: 'App Service plan'
+    }
+  ) 
   properties: {
     reserved: operatingSystem == 'Linux'
   }

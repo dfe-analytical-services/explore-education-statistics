@@ -1,4 +1,4 @@
-import { MemoryCacheConfig } from 'types.bicep'
+import { MemoryCacheConfig } from '../types.bicep'
 
 @export()
 type EnvironmentConfig = {
@@ -35,12 +35,30 @@ type EnvironmentConfig = {
 
   @description('Whether or not to enable Swagger API pages in this environment.')
   enableSwagger: bool?
+
+  @description('Additional CORS allowed origins for the public.')
+  additionalPublicAllowedOrigins: string[]?
+
+  @description('Whether analytics is enabled.')
+  analyticsEnabled: bool?
+
+  @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+  basicAuthEnabled: bool?
+}
+
+@export()
+type EnvironmentPipelineVariables = {
+
+  @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+  publicAppBasicAuthUsername: string?
 }
 
 var defaultConfig = {
   enableSwagger: false
   detailedErrors: false
   autoscaleAppServices: true
+  analyticsEnabled: true
+  basicAuthEnabled: false
   memoryCacheConfig: {
     expirationScanFrequencySeconds: 60
     maxCacheSizeMb: 50

@@ -7,9 +7,31 @@ type ResourceNames = {
     appServicePlan: string
     appInsights: string
   }
+  analytics: {
+    storage: {
+      storageAccountName: string
+      fileShareName: string
+    }
+  }
+  dataApi: {
+    appService: string
+    appServicePlan: string
+    appInsights: string
+  }
+  frontDoor: {
+    frontDoorName: string
+    defaultEndpoint: {
+      endpointName: string
+    }
+  }
   publicApi: {
     processor: {
       functionApp: string
+    }
+  }
+  publicSite: {
+    appService: {
+      appServiceName: string
     }
   }
   screener: {
@@ -19,6 +41,7 @@ type ResourceNames = {
     vnet: string
     subnets: {
       admin: string
+      dataApi: string
     }
   }
   keyVault: {
@@ -69,9 +92,31 @@ func getResourceNames(
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-admin'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-admin'
   }
+  analytics: {
+    storage: {
+      storageAccountName: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+      fileShareName: '${newResourcePrefix}-share-anlyt'
+    }
+  }
+  dataApi: {
+    appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-data'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
+  }
+  frontDoor: {
+    frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
+    defaultEndpoint: {
+      endpointName: '${newResourcePrefix}-${abbreviations.frontDoorEndpoints}'
+    }
+  }
   publicApi: {
     processor: {
       functionApp: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
+    }
+  }
+  publicSite: {
+    appService: {
+      appServiceName: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site'
     }
   }
   screener: {
@@ -81,6 +126,7 @@ func getResourceNames(
     vnet: '${legacyResourcePrefix}-vnet-ees'
     subnets: {
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
+      dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
     }
   }
   keyVault: {

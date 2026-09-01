@@ -360,23 +360,12 @@ module functionAppKeyVaultRoleAssignments '../../common/components/key-vault/key
   }
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
-  name: 'azurestorageaccounts'
-  parent: functionApp
-  properties: reduce(
-    azureFileShares,
-    {},
-    (cur, next) =>
-      union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      })
-  )
+module azureStorageAccountsConfigModule '../../common/components/storage/file-share-mounts-for-site.bicep' = {
+  name: '${functionApp.name}AzureStorageAccountsConfigModuleDeploy'
+  params: {
+    siteName: functionApp.name
+    azureFileShares: azureFileShares
+  }
 }
 
 // We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure

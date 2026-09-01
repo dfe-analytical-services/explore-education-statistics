@@ -10,23 +10,17 @@ param resourceNames ResourceNames
 param minTlsVersion string
 
 @secure()
-@description('''Admin database user's password.''')
-param sqlAdminUserPassword string
+@description('''The database user's password.''')
+param databaseUserPassword string
 
-@description('Admin App Service Plan SKU.')
-param adminSku AppServicePlanSku
+@description('App Service Plan SKU.')
+param appServiceSku AppServicePlanSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
 @description('Whether to display detailed error messages in this environment or not.')
 param detailedErrors bool
-
-@description('Whether or not to deploy Azure Metric alerts.')
-param deployAlerts bool
-
-@description('Specifies a set of tags with which to tag the resource in Azure.')
-param tagValues object
 
 @description('Public URI of the Admin site.')
 param adminHostname string
@@ -76,6 +70,12 @@ param publicDataProcessorAppRegistrationClientId string
 @description('The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID.')
 param screenerAppRegistrationClientId string
 
+@description('Whether or not to deploy Azure Metric alerts.')
+param deployAlerts bool
+
+@description('Specifies a set of tags with which to tag the resource in Azure.')
+param tagValues object
+
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
 }
@@ -86,11 +86,11 @@ var signalrConnectionStringSecretUri = keyVaultRef(vaultUri, resourceNames.keyVa
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
-module adminAppServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
+module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'adminAppServicePlanModule'
   params: {
     planName: resourceNames.admin.appServicePlan
-    sku: adminSku
+    sku: appServiceSku
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -101,7 +101,7 @@ module adminAppServicePlanModule '../common/components/app-service-plan/app-serv
   }
 }
 
-module adminAppInsightsModule '../common/components/monitoring/appInsights.bicep' = {
+module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
   name: 'adminAppInsightsModuleDeploy'
   params: {
     appInsightsName: resourceNames.admin.appInsights
@@ -116,22 +116,22 @@ module adminAppInsightsModule '../common/components/monitoring/appInsights.bicep
   }
 }
 
-module adminAppServiceModule '../common/components/app-service/app-service.bicep' = {
+module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.admin.appService
     minTlsVersion: minTlsVersion
-    appServicePlanId: adminAppServicePlanModule.outputs.planId
+    appServicePlanId: appServicePlanModule.outputs.planId
     connectionStrings: [
       {
         name: 'StatisticsDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=adminapp@${coreSqlServerFqdn};Password=${sqlAdminUserPassword};'
+        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=adminapp@${coreSqlServerFqdn};Password=${databaseUserPassword};'
       }
       {
         name: 'ContentDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=adminapp@${coreSqlServerFqdn};Password=${sqlAdminUserPassword};'
+        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=adminapp@${coreSqlServerFqdn};Password=${databaseUserPassword};'
       }
       {
         name: 'PublicDataDb'
@@ -143,7 +143,7 @@ module adminAppServiceModule '../common/components/app-service/app-service.bicep
       vnetName: resourceNames.vnet.vnet
       subnetName: resourceNames.vnet.subnets.admin
     }
-    appInsightsName: adminAppInsightsModule.outputs.applicationInsightsName
+    appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     applicationAppSettings: {
