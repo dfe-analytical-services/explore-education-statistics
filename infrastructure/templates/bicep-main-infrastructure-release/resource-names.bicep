@@ -13,6 +13,11 @@ type ResourceNames = {
       fileShareName: string
     }
   }
+  contentApi: {
+    appService: string
+    appServicePlan: string
+    appInsights: string
+  }
   dataApi: {
     appService: string
     appServicePlan: string
@@ -41,6 +46,7 @@ type ResourceNames = {
     vnet: string
     subnets: {
       admin: string
+      contentApi: string
       dataApi: string
     }
   }
@@ -98,6 +104,11 @@ func getResourceNames(
       fileShareName: '${newResourcePrefix}-share-anlyt'
     }
   }
+  contentApi: {
+    appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-content'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-content'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-content'
+  }
   dataApi: {
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-data'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
@@ -126,6 +137,7 @@ func getResourceNames(
     vnet: '${legacyResourcePrefix}-vnet-ees'
     subnets: {
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
+      contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
     }
   }

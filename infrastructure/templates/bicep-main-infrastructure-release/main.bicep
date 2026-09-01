@@ -2,6 +2,7 @@ import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 
 //
@@ -51,6 +52,16 @@ param adminPipelineVariables AdminPipelineVariables = {}
 
 
 //
+// Content API-specific config.
+//
+param contentApiConfigParam ContentApiConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var contentApiConfig = mergeContentApiConfig(contentApiConfigParam)
+
+
+
+//
 // Data API-specific config.
 //
 param dataApiConfigParam DataApiConfig = {}
@@ -65,12 +76,16 @@ var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 //
 
 @secure()
-@description('''Data API database user's password for Azure SQL databases.''')
-param dataApiAzureSqlPassword string = ''
-
-@secure()
 @description('''Admin database user's password for Azure SQL databases.''')
 param adminAzureSqlPassword string = ''
+
+@secure()
+@description('''Content API database user's password for Azure SQL databases.''')
+param contentApiAzureSqlPassword string = ''
+
+@secure()
+@description('''Data API database user's password for Azure SQL databases.''')
+param dataApiAzureSqlPassword string = ''
 
 @secure()
 @description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
@@ -134,6 +149,25 @@ module adminModule '../admin/main.bicep' = {
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: adminAzureSqlPassword
+    tagValues: tags
+  }
+}
+
+module contentApiModuleDeploy '../content-api/main.bicep' = {
+  name: 'contentApiModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: contentApiConfig.appServiceSku!
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    autoscaleAppServices: environmentConfig.autoscaleAppServices!
+    allowedOrigins: publicSiteAllowedOrigins
+    analyticsEnabled: environmentConfig.analyticsEnabled!
+    deployAlerts: true
+    detailedErrors: environmentConfig.detailedErrors!
+    enableSwagger: environmentConfig.enableSwagger!
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: contentApiAzureSqlPassword
     tagValues: tags
   }
 }

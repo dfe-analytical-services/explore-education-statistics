@@ -117,7 +117,7 @@ module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key
 }
 
 module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
-  name: '${appServiceName}VnetLinkModuleDeploy'
+  name: '${appServiceName}VnetLinkDeploy'
   params: {
     appServiceName: appService.name
     vNetName: vnetLink!.vnetName
@@ -126,7 +126,7 @@ module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
 }
 
 module stagingSlotModule 'swap-slot.bicep' = {
-  name: '${appServiceName}${deploySlotName}ModuleDeploy'
+  name: '${appServiceName}${deploySlotName}Deploy'
   params: {
     appServiceName: appService.name
     slotName: deploySlotName
@@ -138,7 +138,7 @@ module stagingSlotModule 'swap-slot.bicep' = {
 }
 
 module autoscaleSettingsModule 'autoscale-settings.bicep' = {
-  name: '${appServiceName}AutoscaleSettingsModuleDeploy'
+  name: '${appServiceName}AutoscaleSettingsDeploy'
   params: {
     appServiceName: appService.name
     appServicePlanId: appServicePlanId
@@ -147,7 +147,7 @@ module autoscaleSettingsModule 'autoscale-settings.bicep' = {
 }
 
 module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
-  name: '${appServiceName}AzureStorageAccountsConfigModuleDeploy'
+  name: '${appServiceName}StorageAccountsConfigDeploy'
   params: {
     siteName: appServiceName
     azureFileShares: azureFileShares
@@ -155,7 +155,7 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.b
 }
 
 module alertsModule 'alerts.bicep' = if (alerts != null) {
-  name: '${appServiceName}AlertsModuleDeploy'
+  name: '${appServiceName}AlertsDeploy'
   params: {
     appServiceName: appServiceName
     alerts: alerts!
