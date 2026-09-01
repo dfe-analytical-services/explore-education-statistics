@@ -82,7 +82,7 @@
     groups: docker
     append: true
   become: true
-  when: ees_docker_group_exists.rc == 0
+  when: ees_docker_group_exists.rc | default(1) == 0
   register: ees_docker_group
 
 - name: Note that the docker group needs a new login session
@@ -113,7 +113,6 @@
   become: true
   failed_when: false
   changed_when: false
-  when: ees_pull_docker_images | bool
 
 - name: Note that the container images cannot be pulled yet
   ansible.builtin.debug:

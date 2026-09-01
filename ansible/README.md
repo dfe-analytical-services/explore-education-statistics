@@ -118,6 +118,24 @@ it, run `wsl --shutdown` from Windows, reopen the distribution, and run the
 playbook again** to finish anything that needed systemd. The playbook says so at
 the end of the run when this applies.
 
+### Browsing from Windows
+
+Windows forwards `localhost` into the distribution, so `https://localhost:5021`
+and friends work from a browser on the Windows side. Two things do not follow it
+across, and the playbook cannot fix either from inside WSL:
+
+- **`ees.local`** resolves through Windows' own DNS, not the distribution's
+  `/etc/hosts`. If you use Keycloak as the identity provider, or otherwise want
+  the `ees.local` URLs, add `127.0.0.1 ees.local` to
+  `C:\Windows\System32\drivers\etc\hosts` as an administrator.
+- **The ASP.NET Core development certificate** is trusted in the distribution's
+  certificate store, which a browser running on Windows does not read, so it will
+  still warn. Export it and trust it on the Windows side, or browse from a
+  browser inside WSL.
+
+Neither affects the Robot Framework suite, which runs entirely inside the
+distribution against the Chrome the playbook installs there.
+
 ### Docker
 
 Either backend works:

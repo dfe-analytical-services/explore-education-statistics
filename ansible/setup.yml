@@ -129,7 +129,7 @@
           - "You have been added to the 'docker' group. That only takes effect in a new"
           - "login session - log out and back in, or run 'newgrp docker' in your shell,"
           - "before using docker without sudo."
-      when: ees_docker_group_exists.rc == 0
+      when: ees_docker_group_exists.rc | default(1) == 0
 
     - name: List what is left to do by hand
       ansible.builtin.debug:

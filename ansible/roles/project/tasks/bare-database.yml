@@ -4,6 +4,16 @@
 # The empty "content" and "statistics" databases themselves are created by the
 # container's own setup-db.sql the first time it starts.
 
+# Everything below talks to the daemon, and the errors it gives when there is
+# none are not obvious. Under WSL this is what an outstanding "wsl --shutdown"
+# looks like.
+- name: Fail if the Docker daemon is not running
+  ansible.builtin.assert:
+    that: ees_docker_info.rc | default(1) == 0
+    fail_msg: >-
+      The Docker daemon is not reachable, so the bare database cannot be
+      bootstrapped. Start Docker and run this playbook again.
+
 - name: Create the SQL Server data directory
   ansible.builtin.file:
     path: "{{ ees_project_dir }}/data/ees-mssql"
