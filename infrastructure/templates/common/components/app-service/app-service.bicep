@@ -7,6 +7,12 @@ param appServiceName string
 @description('Name of the App Insights instance that this App Service is connected to.')
 param appInsightsName string
 
+@description('The operating system to use to host App Services.')
+param operatingSystem 'Windows' | 'Linux' = 'Linux'
+
+@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
+param kind 'app' | 'app,linux,container' = 'app'
+
 @description('Name of Key Vault to allow secret access to from this App Service.')
 param keyVaultName string?
 
@@ -43,6 +49,9 @@ param allowedOrigins string[]?
 @description('File Shares to mount on this App Service and its slots.')
 param azureFileShares AzureFileShareMount[]?
 
+@description('Specific port to serve site traffic from.')
+param websitePort int?
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
   appServiceHealth: bool
@@ -57,6 +66,7 @@ var deploySlotName = 'deploy'
 
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
+  kind: kind
   location: resourceGroup().location
   identity: {
     type: 'SystemAssigned'
@@ -68,6 +78,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
     serverFarmId: appServicePlanId
     httpsOnly: true
     clientAffinityEnabled: true
+    reserved: operatingSystem == 'Linux'
     siteConfig: {
       http20Enabled: true
       minTlsVersion: minTlsVersion
@@ -101,9 +112,10 @@ resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
       '2020-02-02'
     ).InstrumentationKey
     WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
-    WEBSITE_RUN_FROM_PACKAGE: '1'
-    WEBSITE_LOAD_CERTIFICATES: '*'
+    WEBSITE_RUN_FROM_PACKAGE: kind != 'app,linux,container' ? '1' : null
+    WEBSITE_LOAD_CERTIFICATES: operatingSystem == 'Windows' ? '*' : null
     ASPNETCORE_DETAILEDERRORS: detailedErrors
+    WEBSITES_PORT: websitePort
   })
 }
 

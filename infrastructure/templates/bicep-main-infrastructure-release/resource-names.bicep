@@ -30,18 +30,27 @@ type ResourceNames = {
       endpointName: string
     }
   }
+  nlSearch: {
+    functionApp: string
+  }
+  notifier: {
+    functionApp: string
+  }
   publicApi: {
     processor: {
       functionApp: string
     }
   }
   publicSite: {
-    appService: {
-      appServiceName: string
-    }
+    appService: string
+    appServicePlan: string
+    appInsights: string
   }
   screener: {
     functionApp: string
+  }
+  search: {
+    service: string
   }
   vnet: {
     vnet: string
@@ -49,6 +58,7 @@ type ResourceNames = {
       admin: string
       contentApi: string
       dataApi: string
+      publicSite: string
     }
   }
   keyVault: {
@@ -116,6 +126,12 @@ func getResourceNames(
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
   }
+  nlSearch: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
+  }
+  notifier: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
+  }
   frontDoor: {
     frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
     defaultEndpoint: {
@@ -128,12 +144,15 @@ func getResourceNames(
     }
   }
   publicSite: {
-    appService: {
-      appServiceName: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site'
-    }
+    appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-public-site'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-public-site'
   }
   screener: {
     functionApp: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+  }
+  search: {
+    service: '${newResourcePrefix}-srch'
   }
   vnet: {
     vnet: '${legacyResourcePrefix}-vnet-ees'
@@ -141,6 +160,7 @@ func getResourceNames(
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
+      publicSite: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-public-site'
     }
   }
   keyVault: {
