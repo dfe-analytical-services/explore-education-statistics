@@ -54,7 +54,7 @@
   register: ees_pyenv_on_path
   failed_when: false
   changed_when: false
-  when: not ees_pyenv_preinstalled
+  when: not ees_pyenv_preinstalled | bool
 
 - name: Use the pyenv found on the PATH
   ansible.builtin.set_fact:
@@ -62,7 +62,7 @@
     ees_pyenv_root: "{{ ees_pyenv_on_path.stdout_lines[1] | trim }}"
     ees_pyenv_preinstalled: true
   when:
-    - not ees_pyenv_preinstalled
+    - not ees_pyenv_preinstalled | bool
     - ees_pyenv_on_path.rc | default(1) == 0
     - ees_pyenv_on_path.stdout_lines | default([]) | length >= 2
 

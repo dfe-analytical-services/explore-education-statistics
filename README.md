@@ -238,6 +238,13 @@ In Linux:
    permissions.
 
 
+> [!TIP]
+> On Ubuntu, the [Ansible setup playbook](ansible/README.md) does all of the above for
+> you. Drop the `ees-mssql-data-<number>.zip` into the `data` directory and run
+> `./ansible/bootstrap.sh` - it extracts the archive, puts it in place and sets the
+> ownership. If your home directory is encrypted, add
+> `-e ees_mssql_extract_dir=/somewhere/unencrypted` and it will symlink it in for you.
+
 All the data in the `data/ees-mssql` directory will be mounted and loaded automatically when the SQL Server Docker container starts.
 
 #### Option 2 - Use a bare database

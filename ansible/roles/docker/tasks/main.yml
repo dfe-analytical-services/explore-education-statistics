@@ -5,7 +5,7 @@
 # top of that is a good way to end up with two competing installations. The
 # service and group tasks below still run either way.
 - name: Install Docker Engine
-  when: not ees_docker_preinstalled
+  when: not ees_docker_preinstalled | bool
   block:
     - name: Add the Docker apt signing key
       ansible.builtin.get_url:

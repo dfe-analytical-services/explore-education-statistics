@@ -50,6 +50,9 @@ cd ansible && ansible-playbook setup.yml \
 | --- | --- | --- |
 | `ees_project_dir` | the checkout containing this directory | Where the EES source lives. |
 | `ees_github_username` / `ees_github_pat` | empty | Adds the GitHub Packages NuGet source. See below. |
+| `ees_mssql_zip` | highest numbered archive in `data` | The `ees-mssql-data-<n>.zip` to unpack. |
+| `ees_mssql_extract_dir` | `<checkout>/data` | Where to extract it. Point this off an encrypted filesystem if your home directory is encrypted; the playbook then symlinks it into place. |
+| `ees_mssql_replace_existing` | `false` | Throw away an existing `data/ees-mssql` and unpack the archive again. |
 | `ees_bootstrap_bare_database` | `false` | Create empty databases with the logins the service needs, instead of using a pre-built development database. |
 | `ees_install_chrome` | `true` | Install Google Chrome for the Robot Framework UI tests. |
 | `ees_pull_docker_images` | `true` | Pull the container images up front rather than on first use. |
@@ -153,24 +156,48 @@ block, so it is straightforward to see and to undo.
 
 ## What it deliberately does not do
 
-### The database
+### Downloading the database
 
 The recommended setup uses a pre-built development database that lives in Google
-Drive behind team access, so the playbook cannot fetch it. Once you have it:
+Drive behind team access, so the playbook cannot fetch it for you. Everything
+after the download it can do.
+
+Drop the `ees-mssql-data-<n>.zip` into the `data` directory and run the
+playbook. It picks the highest numbered archive it finds there, unpacks it,
+puts the `ees-mssql` directory where `docker-compose.yml` expects it, and gives
+uid `10001` - the uid the SQL Server container runs as - ownership of it.
+
+If several archives are present it compares them numerically, so
+`ees-mssql-data-10.zip` beats `ees-mssql-data-9.zip`. Point it at a specific one
+with `-e ees_mssql_zip=/path/to/ees-mssql-data-8.zip`.
+
+**SQL Server cannot run its data files from an encrypted filesystem.** If your
+home directory is encrypted, name somewhere that is not, and the playbook will
+extract there and symlink it into the `data` directory instead:
 
 ```bash
-ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql
-sudo chown -R 10001 /path/to/unencrypted/ees-mssql
+cd ansible && ansible-playbook setup.yml -e ees_mssql_extract_dir=/mnt/data
 ```
 
-The directory has to sit on an unencrypted filesystem, and be owned by uid
-`10001` because that is what the SQL Server container runs as. If
-`data/ees-mssql` already exists when the playbook runs, it fixes the ownership
-for you.
+An archive is ignored when `data/ees-mssql` already exists, so re-running the
+playbook can never destroy a database you have been working against. To
+deliberately throw the old one away and unpack again:
 
-Alternatively, `-e ees_bootstrap_bare_database=true` starts the SQL Server
-container against empty databases and creates the per-component logins and
-contained users described by ["Option 2 - Use a bare
+```bash
+cd ansible && ansible-playbook setup.yml -e ees_mssql_replace_existing=true
+```
+
+The zip is left where you put it. It is ignored by git, but it is also several
+gigabytes, so delete it once you are happy the database works.
+
+If `data/ees-mssql` is already in place from a previous manual setup, the
+playbook leaves it alone and just fixes the ownership.
+
+### Starting from empty databases instead
+
+`-e ees_bootstrap_bare_database=true` starts the SQL Server container against
+empty databases and creates the per-component logins and contained users
+described by ["Option 2 - Use a bare
 database"](../README.md#option-2---use-a-bare-database). The SQL it runs is
 guarded so it is safe to re-run. Override `ees_sql_login_password` if you do not
 want the README's example password.

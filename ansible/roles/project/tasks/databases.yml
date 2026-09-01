@@ -7,6 +7,15 @@
     follow: true
   register: ees_mssql_data
 
+- name: Unpack a pre-built development database
+  ansible.builtin.import_tasks: seed-database.yml
+
+- name: Re-check the SQL Server data directory
+  ansible.builtin.stat:
+    path: "{{ ees_project_dir }}/data/ees-mssql"
+    follow: true
+  register: ees_mssql_data
+
 - name: Explain how to obtain the pre-built development database
   ansible.builtin.debug:
     msg:
@@ -15,13 +24,14 @@
       - "development database - ask a team member for access to the Google Drive"
       - "folder and download the latest ees-mssql-data-<n>.zip."
       - ""
-      - "On Linux the extracted ees-mssql directory must live on an unencrypted"
-      - "filesystem and be owned by the container's uid, then be symlinked into"
-      - "the repo:"
-      - "  ln -s /path/to/unencrypted/ees-mssql {{ ees_project_dir }}/data/ees-mssql"
-      - "  sudo chown -R {{ ees_mssql_container_uid }} /path/to/unencrypted/ees-mssql"
+      - "Drop that zip into {{ ees_project_dir }}/data and re-run this playbook."
+      - "It will unpack it and give the container ownership of the result. If your"
+      - "home directory is on an encrypted filesystem, tell it somewhere that is"
+      - "not, and it will symlink that into place instead:"
       - ""
-      - "To start from empty databases instead, re-run this playbook with"
+      - "  ansible-playbook setup.yml -e ees_mssql_extract_dir=/mnt/data"
+      - ""
+      - "To start from empty databases instead, re-run with"
       - "-e ees_bootstrap_bare_database=true"
   when: not ees_mssql_data.stat.exists
 

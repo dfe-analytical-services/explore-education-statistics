@@ -6,7 +6,7 @@
 # All skipped when discovery already found an SDK that satisfies global.json.
 
 - name: Install the .NET SDK
-  when: not ees_dotnet_preinstalled
+  when: not ees_dotnet_preinstalled | bool
   block:
     - name: Download the dotnet-install script
       ansible.builtin.get_url:

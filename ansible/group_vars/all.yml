@@ -100,6 +100,33 @@ ees_pull_docker_images: true
 # development database, which already contains them.
 ees_bootstrap_bare_database: false
 
+# ---------------------------------------------------------------------------
+# Pre-built development database
+# ---------------------------------------------------------------------------
+# The recommended setup uses a pre-built development database, distributed as an
+# ees-mssql-data-<n>.zip through Google Drive. Drop the zip into the data
+# directory and the playbook extracts it, puts it where docker-compose.yml
+# expects it, and gives the container ownership of it.
+
+# The archive to unpack. Left empty, the playbook uses the highest numbered
+# ees-mssql-data-<n>.zip it finds in the data directory.
+ees_mssql_zip: ""
+
+# The directory the extracted ees-mssql folder ends up inside. The default is
+# the data directory, which is exactly where docker-compose.yml mounts it from.
+#
+# SQL Server cannot run its data files from an encrypted filesystem. If your home
+# directory is encrypted, point this somewhere that is not - the playbook will
+# extract there and symlink it into the data directory:
+#
+#   -e ees_mssql_extract_dir=/mnt/data
+ees_mssql_extract_dir: "{{ ees_project_dir }}/data"
+
+# Replace a database directory that is already in place. Off by default so that
+# re-running the playbook can never destroy a database you have been working
+# against - the archive is simply ignored when one already exists.
+ees_mssql_replace_existing: false
+
 # Password used for the per-component SQL Server logins created by the bare
 # database bootstrap. Override this on the command line if you want something
 # other than the README's example password.

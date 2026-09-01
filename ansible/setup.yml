@@ -84,7 +84,7 @@
     - role: node
     - role: python
     - role: chrome
-      when: ees_install_chrome | bool and not ees_chrome_preinstalled
+      when: ees_install_chrome | bool and not ees_chrome_preinstalled | bool
     - role: profile
     - role: project
 
@@ -103,10 +103,9 @@
           - "cannot fetch for you:"
           - ""
           - "  1. Database. The recommended setup is the pre-built development database."
-          - "     Ask a team member for access, download the latest ees-mssql-data-<n>.zip,"
-          - "     and extract ees-mssql into an UNENCRYPTED location. Then:"
-          - "       ln -s /path/to/unencrypted/ees-mssql {{ ees_project_dir }}/data/ees-mssql"
-          - "       sudo chown -R {{ ees_mssql_container_uid }} /path/to/unencrypted/ees-mssql"
+          - "     Ask a team member for access and download the latest"
+          - "     ees-mssql-data-<n>.zip. Drop it into {{ ees_project_dir }}/data"
+          - "     and re-run this playbook - it will unpack it and set it up."
           - "     Alternatively re-run this playbook with -e ees_bootstrap_bare_database=true"
           - "     to create empty databases with the logins the service expects."
           - ""

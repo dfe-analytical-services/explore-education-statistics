@@ -16,6 +16,8 @@ artifacts
 bin
 obj
 /data/ees-mssql
+# Pre-built development database archives, dropped here to be unpacked.
+/data/ees-mssql-data-*.zip
 # Rendered by the ansible setup playbook and deleted again straight away, but it
 # holds a password so make sure a stray one can never be committed.
 /data/sql-scripts/ansible-bare-database-bootstrap.sql

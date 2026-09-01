@@ -10,7 +10,7 @@
     dest: "{{ ees_pyenv_root }}"
     version: "{{ ees_pyenv_version }}"
     depth: 1
-  when: not ees_pyenv_preinstalled
+  when: not ees_pyenv_preinstalled | bool
 
 - name: Check whether the Python version pinned by .python-version is already built
   ansible.builtin.stat:
@@ -71,7 +71,7 @@
   environment:
     PYENV_ROOT: "{{ ees_pyenv_root }}"
   when:
-    - not ees_pyenv_preinstalled
+    - not ees_pyenv_preinstalled | bool
     - ees_pyenv_global.stdout | trim != ees_python_version
   changed_when: true
 

@@ -1,0 +1,112 @@
+---
+# Unpacks the pre-built development database from an ees-mssql-data-<n>.zip. The
+# archive contains an ees-mssql directory, which has to end up at
+# data/ees-mssql - that is the path docker-compose.yml mounts into the SQL
+# Server container.
+
+- name: Look for a development database archive in the data directory
+  ansible.builtin.find:
+    paths: "{{ ees_project_dir }}/data"
+    patterns: "ees-mssql-data-*.zip"
+    file_type: file
+  register: ees_mssql_archives
+  when: not ees_mssql_zip
+
+# The archives are numbered rather than dated, and the numbers are not zero
+# padded, so they have to be compared as integers - a plain sort puts
+# ees-mssql-data-9 after ees-mssql-data-10.
+- name: Select the highest numbered development database archive
+  ansible.builtin.set_fact:
+    ees_mssql_zip: "{{ ees_project_dir }}/data/ees-mssql-data-{{ ees_mssql_archive_numbers | max }}.zip"
+  vars:
+    ees_mssql_archive_numbers: >-
+      {{ ees_mssql_archives.files | default([]) | map(attribute='path') | map('basename')
+         | select('match', '^ees-mssql-data-[0-9]+\.zip$')
+         | map('regex_replace', '^ees-mssql-data-([0-9]+)\.zip$', '\1')
+         | map('int') | list }}
+  when:
+    - not ees_mssql_zip
+    - ees_mssql_archive_numbers | length > 0
+
+- name: Check the nominated development database archive exists
+  ansible.builtin.stat:
+    path: "{{ ees_mssql_zip }}"
+  register: ees_mssql_zip_file
+  when: ees_mssql_zip | length > 0
+
+- name: Fail if the nominated development database archive is missing
+  ansible.builtin.assert:
+    that: ees_mssql_zip_file.stat.exists
+    fail_msg: "No such development database archive: {{ ees_mssql_zip }}"
+  when: ees_mssql_zip | length > 0
+
+- name: Note that an existing database directory is being left alone
+  ansible.builtin.debug:
+    msg: >-
+      {{ ees_project_dir }}/data/ees-mssql is already in place, so
+      {{ ees_mssql_zip | basename }} has been ignored. Re-run with
+      -e ees_mssql_replace_existing=true to throw the existing database away and
+      unpack the archive over the top of it.
+  when:
+    - ees_mssql_zip | length > 0
+    - ees_mssql_data.stat.exists
+    - not ees_mssql_replace_existing | bool
+
+- name: Unpack the development database archive
+  when:
+    - ees_mssql_zip | length > 0
+    - not ees_mssql_data.stat.exists or ees_mssql_replace_existing | bool
+  block:
+    # Both of these have to go. Removing only the link would leave the real
+    # directory behind, and the unarchive step below would then skip.
+    - name: Remove the database directory being replaced
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ ees_project_dir }}/data/ees-mssql"
+        - "{{ ees_mssql_extract_dir | regex_replace('/+$', '') }}/ees-mssql"
+      become: true
+      when: ees_mssql_replace_existing | bool
+
+    # Root, because this can be somewhere like /mnt that the user cannot create
+    # in, but owned by the user, because the extraction below does not escalate
+    # and has to be able to write here. Only the extracted data itself is handed
+    # to the container's uid, and that happens afterwards.
+    - name: Create the directory to extract into
+      ansible.builtin.file:
+        path: "{{ ees_mssql_extract_dir }}"
+        state: directory
+        owner: "{{ ansible_facts.user_id }}"
+        mode: "0755"
+      become: true
+
+    # Multi-gigabyte archives are normal here, so this is not quick.
+    - name: Extract the development database archive
+      ansible.builtin.unarchive:
+        src: "{{ ees_mssql_zip }}"
+        dest: "{{ ees_mssql_extract_dir }}"
+        remote_src: true
+        creates: "{{ ees_mssql_extract_dir | regex_replace('/+$', '') }}/ees-mssql"
+
+    - name: Check the archive contained an ees-mssql directory
+      ansible.builtin.stat:
+        path: "{{ ees_mssql_extract_dir | regex_replace('/+$', '') }}/ees-mssql"
+      register: ees_mssql_extracted
+
+    - name: Fail if the archive did not contain an ees-mssql directory
+      ansible.builtin.assert:
+        that: ees_mssql_extracted.stat.exists
+        fail_msg: >-
+          {{ ees_mssql_zip }} did not produce an ees-mssql directory in
+          {{ ees_mssql_extract_dir }}. The archive is expected to contain a single
+          top level ees-mssql folder.
+
+    # Only when the data was deliberately extracted somewhere else, which is what
+    # you have to do when the checkout is on an encrypted filesystem.
+    - name: Link the extracted database into the data directory
+      ansible.builtin.file:
+        src: "{{ ees_mssql_extract_dir | regex_replace('/+$', '') }}/ees-mssql"
+        dest: "{{ ees_project_dir }}/data/ees-mssql"
+        state: link
+      when: (ees_mssql_extract_dir | regex_replace('/+$', '')) != (ees_project_dir ~ '/data')

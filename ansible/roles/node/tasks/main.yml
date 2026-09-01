@@ -11,7 +11,7 @@
     dest: "{{ ees_nvm_dir }}"
     version: "{{ ees_nvm_version }}"
     depth: 1
-  when: not ees_nvm_preinstalled
+  when: not ees_nvm_preinstalled | bool
 
 - name: Check whether the Node version pinned by .nvmrc is already installed
   ansible.builtin.stat:
@@ -42,7 +42,7 @@
       . "$NVM_DIR/nvm.sh"
       nvm alias default "{{ ees_node_version }}"
     executable: /bin/bash
-  when: not ees_nvm_preinstalled
+  when: not ees_nvm_preinstalled | bool
   changed_when: true
 
 - name: Note that the existing nvm default has been left alone
@@ -52,7 +52,7 @@
       been left as it is. Run "nvm use" in {{ ees_project_dir }} to pick up the
       version in .nvmrc, or "nvm alias default {{ ees_node_version }}" to make it
       your default.
-  when: ees_nvm_preinstalled
+  when: ees_nvm_preinstalled | bool
 
 - name: Read the pnpm version pinned by package.json
   ansible.builtin.slurp:
