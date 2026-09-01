@@ -19,6 +19,10 @@ param adminConfigParam = {
     tier: 'Standard'
     name: 'S1'
   }
+  signalRSku: {
+    name: 'Free_F1'
+    capacity: 1
+  }
 }
 
 param contentApiConfigParam = {
