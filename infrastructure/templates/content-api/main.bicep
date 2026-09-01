@@ -27,24 +27,11 @@ param enableSwagger bool
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
 
-@description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
-param tableBuilderMaxTableCellsAllowed int
-
 @description('Public URL of the public site.')
 param publicAppUrl string
 
-@description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuth bool
-
-@description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthUsername string
-
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
-
-@secure()
-@description('Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthPassword string
 
 @description('Whether analytics is enabled')
 param analyticsEnabled bool
@@ -71,9 +58,9 @@ resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' 
 }
 
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
-  name: 'dataApiAppServicePlanModule'
+  name: 'contentApiAppServicePlanModule'
   params: {
-    planName: resourceNames.dataApi.appServicePlan
+    planName: resourceNames.contentApi.appServicePlan
     sku: appServiceSku
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
@@ -86,9 +73,9 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
 }
 
 module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
-  name: 'dataApiAppInsightsModuleDeploy'
+  name: 'contentApiAppInsightsModuleDeploy'
   params: {
-    appInsightsName: resourceNames.dataApi.appInsights
+    appInsightsName: resourceNames.contentApi.appInsights
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -101,9 +88,9 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 }
 
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
-  name: 'dataApiAppServiceModuleDeploy'
+  name: 'contentApiAppServiceModuleDeploy'
   params: {
-    appServiceName: resourceNames.dataApi.appService
+    appServiceName: resourceNames.contentApi.appService
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
     keyVaultName: resourceNames.keyVault.keyVault
@@ -112,17 +99,17 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       {
         name: 'StatisticsDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${publicSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=data@${publicSqlServerFqdn};Password=${databaseUserPassword};'
+        connectionString: 'Data Source=tcp:${publicSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=content@${publicSqlServerFqdn};Password=${databaseUserPassword};'
       }
       {
         name: 'ContentDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=data@${coreSqlServerFqdn};Password=${databaseUserPassword};'
+        connectionString: 'Data Source=tcp:${coreSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.contentDb};User Id=content@${coreSqlServerFqdn};Password=${databaseUserPassword};'
       }
     ]
     vnetLink: {
       vnetName: resourceNames.vnet.vnet
-      subnetName: resourceNames.vnet.subnets.dataApi
+      subnetName: resourceNames.vnet.subnets.contentApi
     }
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
@@ -141,12 +128,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger
       PublicApp__Url: publicAppUrl
-      PublicApp__BasicAuth: publicAppBasicAuth
-      PublicApp__BasicAuthUsername: publicAppBasicAuthUsername
-      PublicApp__BasicAuthPassword: publicAppBasicAuthPassword
       Analytics__Enabled: analyticsEnabled
       Analytics__BasePath: analyticsFileShareMountPath
-      TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
     }
     tagValues: tagValues
   }

@@ -49,7 +49,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
 }
 
 module stagingSlotVNetLink 'slot-virtual-network-link.bicep' = if (vnetLink != null) {
-  name: '${appServiceName}${slotName}VnetLinkModuleDeploy'
+  name: '${appServiceName}${slotName}VnetLinkDeploy'
   params: {
     appServiceName: appServiceName
     slotName: slotName
@@ -59,7 +59,7 @@ module stagingSlotVNetLink 'slot-virtual-network-link.bicep' = if (vnetLink != n
 }
 
 module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site-slot.bicep' = {
-  name: '${appServiceName}${slotName}AzureStorageAccountsConfigModuleDeploy'
+  name: '${appServiceName}${slotName}StorageAccountsConfigDeploy'
   params: {
     siteName: appServiceName
     slotName: slotName

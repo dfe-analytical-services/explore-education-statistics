@@ -5,9 +5,6 @@
     "skuPublic": {
       "value": "B1 Basic"
     },
-    "skuContent": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },
@@ -61,9 +58,6 @@
     },
     "publicAppGATrackingId": {
       "value": "G-GRPHH2FN0L"
-    },
-    "enableSwagger": {
-      "value": true
     },
     "memoryCacheOverridesDurationInSeconds": {
       "value": 10

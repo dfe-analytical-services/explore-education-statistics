@@ -20,3 +20,17 @@ param adminConfigParam = {
     name: 'S1'
   }
 }
+
+param contentApiConfigParam = {
+  appServiceSku: {
+    tier: 'Standard'
+    name: 'S1'
+  }
+}
+
+param dataApiConfigParam = {
+  appServiceSku: {
+    tier: 'Standard'
+    name: 'S1'
+  }
+}
