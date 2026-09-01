@@ -1,0 +1,125 @@
+---
+# Installed by cloning the repo, which is the documented manual install and
+# avoids the curl-pipe-bash installer editing ~/.bashrc behind our back - the
+# profile role owns the shell configuration instead.
+#
+# Skipped entirely when discovery found an existing nvm. That one is left on
+# whatever version it is on rather than being checked out at ees_nvm_version.
+- name: Install nvm
+  ansible.builtin.git:
+    repo: https://github.com/nvm-sh/nvm.git
+    dest: "{{ ees_nvm_dir }}"
+    version: "{{ ees_nvm_version }}"
+    depth: 1
+  when: not ees_nvm_preinstalled
+
+- name: Check whether the Node version pinned by .nvmrc is already installed
+  ansible.builtin.stat:
+    path: "{{ ees_node_bin }}/node"
+  register: ees_node_binary
+
+- name: Install the Node version pinned by .nvmrc
+  ansible.builtin.shell:
+    cmd: |
+      # No -u: sourcing nvm.sh trips over its own unset variables.
+      set -eo pipefail
+      export NVM_DIR="{{ ees_nvm_dir }}"
+      . "$NVM_DIR/nvm.sh"
+      nvm install "{{ ees_node_version }}"
+    executable: /bin/bash
+  when: not ees_node_binary.stat.exists
+  changed_when: true
+
+# Only done when the playbook installed nvm itself. Somebody who already had nvm
+# has a default they picked for their other projects, and silently repointing it
+# is not this playbook's business - the checkout's .nvmrc says what the project
+# needs.
+- name: Make the pinned Node version the nvm default
+  ansible.builtin.shell:
+    cmd: |
+      set -eo pipefail
+      export NVM_DIR="{{ ees_nvm_dir }}"
+      . "$NVM_DIR/nvm.sh"
+      nvm alias default "{{ ees_node_version }}"
+    executable: /bin/bash
+  when: not ees_nvm_preinstalled
+  changed_when: true
+
+- name: Note that the existing nvm default has been left alone
+  ansible.builtin.debug:
+    msg: >-
+      Node {{ ees_node_version }} is installed, but your existing nvm default has
+      been left as it is. Run "nvm use" in {{ ees_project_dir }} to pick up the
+      version in .nvmrc, or "nvm alias default {{ ees_node_version }}" to make it
+      your default.
+  when: ees_nvm_preinstalled
+
+- name: Read the pnpm version pinned by package.json
+  ansible.builtin.slurp:
+    src: "{{ ees_project_dir }}/package.json"
+  register: ees_package_json
+
+- name: Set the pinned pnpm version as a fact
+  ansible.builtin.set_fact:
+    ees_pnpm_version: >-
+      {{ (ees_package_json.content | b64decode | from_json).packageManager
+         | regex_replace('^pnpm@([^+]+).*$', '\\1') }}
+
+# corepack's pnpm shim resolves the packageManager field of whatever directory
+# it runs in, so this has to be asked from inside the checkout.
+- name: Check whether the pinned pnpm is already available
+  ansible.builtin.command:
+    cmd: "{{ ees_node_bin }}/pnpm --version"
+    chdir: "{{ ees_project_dir }}"
+  environment:
+    PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+    COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  register: ees_pnpm_check
+  failed_when: false
+  changed_when: false
+
+- name: Set up corepack and pnpm
+  when: ees_pnpm_check.rc != 0 or ees_pnpm_check.stdout | trim != ees_pnpm_version
+  block:
+    # The version of corepack bundled with Node can fail pnpm's integrity key
+    # check, as called out in the project README. Upgrading it first avoids that.
+    - name: Upgrade corepack to the latest release
+      ansible.builtin.command:
+        cmd: "{{ ees_node_bin }}/npm install -g corepack@latest"
+      environment:
+        PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+      changed_when: true
+
+    - name: Enable the corepack package manager shims
+      ansible.builtin.command:
+        cmd: "{{ ees_node_bin }}/corepack enable"
+      environment:
+        PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+      changed_when: true
+
+    # Installs the exact pnpm version named by the packageManager field in
+    # package.json, so everyone on the team runs the same one.
+    - name: Install the pnpm version pinned by package.json
+      ansible.builtin.command:
+        cmd: "{{ ees_node_bin }}/corepack install"
+        chdir: "{{ ees_project_dir }}"
+      environment:
+        PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+      changed_when: true
+
+- name: Check whether the Azure Functions Core Tools are already installed
+  ansible.builtin.command:
+    cmd: func --version
+  environment:
+    PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+  register: ees_func_check
+  failed_when: false
+  changed_when: false
+
+- name: Install the Azure Functions Core Tools
+  ansible.builtin.command:
+    cmd: "{{ ees_node_bin }}/npm install -g azure-functions-core-tools@{{ ees_func_tools_version }}"
+  environment:
+    PATH: "{{ ees_node_bin }}:{{ ansible_facts.env.PATH }}"
+  when: ees_func_check.rc != 0 or ees_func_check.stdout | trim is not match('^' ~ ees_func_tools_version ~ '\\.')
+  changed_when: true

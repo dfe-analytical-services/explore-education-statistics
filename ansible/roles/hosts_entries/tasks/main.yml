@@ -1,0 +1,13 @@
+---
+# The applications reach the SQL Server and Azurite containers by hostname, and
+# Keycloak issues tokens for the ees.local domain, so all three have to resolve
+# to the loopback address.
+- name: Point the local service hostnames at 127.0.0.1
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED - explore-education-statistics"
+    block: |
+      {% for host in ees_hosts_entries %}
+      127.0.0.1    {{ host }}
+      {% endfor %}
+  become: true

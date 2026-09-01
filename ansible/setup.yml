@@ -1,0 +1,117 @@
+---
+- name: Set up the Explore Education Statistics project on Ubuntu
+  hosts: local
+  gather_facts: true
+  become: false
+
+  pre_tasks:
+    - name: Refuse to run as root
+      ansible.builtin.assert:
+        that: ansible_facts.user_id != "root"
+        fail_msg: >-
+          Run this playbook as the user who will develop on this machine, not as root.
+          It installs the language toolchains into that user's home directory and adds
+          them to the docker group. Individual tasks escalate with sudo as needed.
+
+    - name: Check the distribution is Ubuntu
+      ansible.builtin.assert:
+        that: ansible_facts.distribution == "Ubuntu"
+        fail_msg: >-
+          This playbook targets Ubuntu. Detected {{ ansible_facts.distribution }}
+          {{ ansible_facts.distribution_version }}.
+
+    - name: Warn about untested Ubuntu releases
+      ansible.builtin.debug:
+        msg: >-
+          Ubuntu {{ ansible_facts.distribution_version }} is outside the 22.04-24.04 range this
+          playbook has been written against. Package names and third party apt repos may
+          differ. Continuing anyway.
+      when: ansible_facts.distribution_version is not in ["22.04", "24.04"]
+
+    - name: Check the project directory looks like an EES checkout
+      ansible.builtin.stat:
+        path: "{{ ees_project_dir }}/{{ item }}"
+      loop:
+        - .nvmrc
+        - .python-version
+        - global.json
+        - package.json
+        - Pipfile
+        - docker-compose.yml
+      register: ees_marker_files
+
+    - name: Fail if the project directory is incomplete
+      ansible.builtin.assert:
+        that: ees_marker_files.results | map(attribute='stat.exists') | reject | list | length == 0
+        fail_msg: >-
+          {{ ees_project_dir }} does not look like an EES checkout - expected to find
+          {{ ees_marker_files.results | rejectattr('stat.exists') | map(attribute='item') | join(', ') }}.
+          Pass -e ees_project_dir=/path/to/explore-education-statistics if the checkout
+          is somewhere other than the parent of this ansible directory.
+
+    # The Node, Python and .NET SDK versions are pinned by files in the repo. Read
+    # them here so the playbook installs exactly what the project asks for.
+    - name: Read the pinned tool versions from the repo
+      ansible.builtin.slurp:
+        src: "{{ ees_project_dir }}/{{ item }}"
+      loop:
+        - .nvmrc
+        - .python-version
+        - global.json
+      register: ees_version_files
+
+    - name: Set the pinned tool versions as facts
+      ansible.builtin.set_fact:
+        ees_node_version: "{{ ees_version_files.results[0].content | b64decode | trim | regex_replace('^v', '') }}"
+        ees_python_version: "{{ ees_version_files.results[1].content | b64decode | trim }}"
+        ees_dotnet_version: "{{ (ees_version_files.results[2].content | b64decode | from_json).sdk.version }}"
+
+    - name: Report what will be installed
+      ansible.builtin.debug:
+        msg:
+          - "Project directory: {{ ees_project_dir }}"
+          - "Node:              {{ ees_node_version }} (nvm at {{ ees_nvm_dir }})"
+          - "Python:            {{ ees_python_version }} (pyenv at {{ ees_pyenv_root }})"
+          - ".NET SDK:          {{ ees_dotnet_version }} (at {{ ees_dotnet_root }})"
+
+  roles:
+    - role: discover
+    - role: system_packages
+    - role: hosts_entries
+    - role: sysctl_limits
+    - role: docker
+    - role: dotnet
+    - role: node
+    - role: python
+    - role: chrome
+      when: ees_install_chrome | bool and not ees_chrome_preinstalled
+    - role: profile
+    - role: project
+
+  post_tasks:
+    - name: Summarise what to do next
+      ansible.builtin.debug:
+        msg:
+          - "Setup complete. Open a new shell (or run 'source ~/.bashrc') to pick up"
+          - "node, pnpm, python, pipenv and dotnet on your PATH."
+          - ""
+          - "You have been added to the 'docker' group. That only takes effect in a new"
+          - "login session - log out and back in, or run 'newgrp docker' in your shell,"
+          - "before using docker without sudo."
+          - ""
+          - "Still to do by hand, because they need credentials or data this playbook"
+          - "cannot fetch for you:"
+          - ""
+          - "  1. Database. The recommended setup is the pre-built development database."
+          - "     Ask a team member for access, download the latest ees-mssql-data-<n>.zip,"
+          - "     and extract ees-mssql into an UNENCRYPTED location. Then:"
+          - "       ln -s /path/to/unencrypted/ees-mssql {{ ees_project_dir }}/data/ees-mssql"
+          - "       sudo chown -R {{ ees_mssql_container_uid }} /path/to/unencrypted/ees-mssql"
+          - "     Alternatively re-run this playbook with -e ees_bootstrap_bare_database=true"
+          - "     to create empty databases with the logins the service expects."
+          - ""
+          - "  2. GitHub Packages NuGet source, if you did not pass a PAT to this run."
+          - "     Some .NET dependencies will not restore without it. See the README."
+          - ""
+          - "Then start the service from {{ ees_project_dir }}, for example:"
+          - "  pnpm start admin"

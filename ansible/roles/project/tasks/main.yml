@@ -1,0 +1,12 @@
+---
+- name: Install the project dependencies
+  ansible.builtin.import_tasks: dependencies.yml
+
+- name: Configure the GitHub Packages NuGet source
+  ansible.builtin.import_tasks: nuget.yml
+
+- name: Trust the ASP.NET Core development certificate
+  ansible.builtin.import_tasks: dev-certs.yml
+
+- name: Prepare the local databases
+  ansible.builtin.import_tasks: databases.yml

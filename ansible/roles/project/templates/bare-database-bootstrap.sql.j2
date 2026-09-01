@@ -1,0 +1,48 @@
+-- Managed by the explore-education-statistics ansible playbook.
+--
+-- Performs the one-off login and contained user creation described by
+-- "Option 2 - Use a bare database" in the project README. Written to be safe to
+-- re-run: every statement is either guarded or idempotent in SQL Server.
+
+USE [master];
+GO
+
+{% for login in ees_sql_logins %}
+IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'{{ login }}')
+    CREATE LOGIN [{{ login }}] WITH PASSWORD = '{{ ees_sql_login_password }}';
+GO
+{% endfor %}
+
+-- The datafactory user needs to read DMV tables and kill reindexing started by
+-- other sessions. This has to happen here rather than in a migration because it
+-- affects master rather than an application database. Azure SQL gets the
+-- equivalent permissions conditionally via the automatic migrations instead.
+GRANT VIEW SERVER STATE TO [datafactory];
+GRANT ALTER ANY CONNECTION TO [datafactory];
+GO
+
+{% for database in ["content", "statistics"] %}
+USE [{{ database }}];
+GO
+
+-- adminapp runs the migrations and administers users and roles.
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'adminapp')
+    CREATE USER [adminapp] FROM LOGIN [adminapp];
+GO
+
+ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+ALTER ROLE [db_securityadmin] ADD MEMBER [adminapp];
+ALTER ROLE [db_accessadmin] ADD MEMBER [adminapp];
+GRANT ALTER ANY USER TO [adminapp];
+GO
+
+{% endfor %}
+
+USE [statistics];
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'datafactory')
+    CREATE USER [datafactory] FROM LOGIN [datafactory];
+GO

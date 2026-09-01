@@ -1,0 +1,19 @@
+---
+# The admin frontend is served over HTTPS on localhost:5021, so the ASP.NET Core
+# development certificate needs to be trusted or every request is a warning.
+# This is best effort - a failure here does not stop the rest of the setup.
+- name: Create and trust the ASP.NET Core development certificate
+  ansible.builtin.command:
+    cmd: dotnet dev-certs https --trust
+  environment: "{{ ees_toolchain_env }}"
+  register: ees_dev_certs
+  changed_when: "'already trusted' not in ees_dev_certs.stdout"
+  failed_when: false
+
+- name: Warn if the development certificate could not be trusted
+  ansible.builtin.debug:
+    msg: >-
+      "dotnet dev-certs https --trust" exited {{ ees_dev_certs.rc }}. The admin
+      frontend will still work but the browser will warn about the certificate.
+      Output was: {{ ees_dev_certs.stdout | default('') }} {{ ees_dev_certs.stderr | default('') }}
+  when: ees_dev_certs.rc != 0

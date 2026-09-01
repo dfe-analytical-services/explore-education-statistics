@@ -1,0 +1,147 @@
+---
+# The machine this runs on is not necessarily bare, so before installing
+# anything look for the tools in the places they are normally found. Anything
+# already present is used as it is - not reinstalled, not moved, and not forced
+# to the version this playbook happens to pin.
+#
+# Passing a location explicitly (-e ees_nvm_dir=... and friends) overrides
+# discovery, because extra vars beat the facts set here.
+
+# ---------------------------------------------------------------------------
+# nvm
+# ---------------------------------------------------------------------------
+
+- name: Look for an existing nvm installation
+  ansible.builtin.stat:
+    path: "{{ item }}/nvm.sh"
+  loop: "{{ ees_nvm_search_paths }}"
+  register: ees_nvm_candidates
+
+- name: Use the existing nvm installation
+  ansible.builtin.set_fact:
+    ees_nvm_dir: "{{ ees_nvm_candidates.results | selectattr('stat.exists') | map(attribute='item') | first }}"
+    ees_nvm_preinstalled: true
+  when: ees_nvm_candidates.results | selectattr('stat.exists') | list | length > 0
+
+# ---------------------------------------------------------------------------
+# pyenv
+# ---------------------------------------------------------------------------
+
+- name: Look for an existing pyenv installation
+  ansible.builtin.stat:
+    path: "{{ item }}/bin/pyenv"
+  loop: "{{ ees_pyenv_search_paths }}"
+  register: ees_pyenv_candidates
+
+- name: Use the existing pyenv installation
+  ansible.builtin.set_fact:
+    ees_pyenv_root: "{{ ees_pyenv_found }}"
+    ees_pyenv_command: "{{ ees_pyenv_found }}/bin/pyenv"
+    ees_pyenv_preinstalled: true
+  vars:
+    ees_pyenv_found: "{{ ees_pyenv_candidates.results | selectattr('stat.exists') | map(attribute='item') | first }}"
+  when: ees_pyenv_candidates.results | selectattr('stat.exists') | list | length > 0
+
+# Catches a pyenv installed somewhere unusual, or by a package manager, where
+# the binary is on the PATH but its root is not one of the usual directories.
+# Prints the executable's path and its root on separate lines. Catches a pyenv
+# installed by a package manager, where the binary is in /usr/bin but the root
+# is still somewhere in the home directory.
+- name: Look for pyenv on the PATH
+  ansible.builtin.shell:
+    cmd: command -v pyenv && pyenv root
+    executable: /bin/bash
+  register: ees_pyenv_on_path
+  failed_when: false
+  changed_when: false
+  when: not ees_pyenv_preinstalled
+
+- name: Use the pyenv found on the PATH
+  ansible.builtin.set_fact:
+    ees_pyenv_command: "{{ ees_pyenv_on_path.stdout_lines[0] | trim }}"
+    ees_pyenv_root: "{{ ees_pyenv_on_path.stdout_lines[1] | trim }}"
+    ees_pyenv_preinstalled: true
+  when:
+    - not ees_pyenv_preinstalled
+    - ees_pyenv_on_path.rc | default(1) == 0
+    - ees_pyenv_on_path.stdout_lines | default([]) | length >= 2
+
+# ---------------------------------------------------------------------------
+# .NET SDK
+# ---------------------------------------------------------------------------
+
+- name: Look for an existing .NET installation
+  ansible.builtin.stat:
+    path: "{{ item }}/dotnet"
+  loop: "{{ ees_dotnet_search_paths }}"
+  register: ees_dotnet_candidates
+
+# Whether an existing install is usable is not a question of version strings -
+# global.json has a rollForward policy - so let the SDK itself decide. Run from
+# the project directory, "dotnet --version" fails if global.json cannot be
+# satisfied and prints the resolved version if it can.
+- name: Check whether an existing .NET SDK satisfies global.json
+  ansible.builtin.command:
+    cmd: "{{ item }}/dotnet --version"
+    chdir: "{{ ees_project_dir }}"
+  environment:
+    DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    DOTNET_NOLOGO: "1"
+  loop: "{{ ees_dotnet_candidates.results | selectattr('stat.exists') | map(attribute='item') | list }}"
+  register: ees_dotnet_checks
+  failed_when: false
+  changed_when: false
+
+- name: Use the existing .NET SDK
+  ansible.builtin.set_fact:
+    ees_dotnet_root: "{{ ees_dotnet_checks.results | selectattr('rc', 'equalto', 0) | map(attribute='item') | first }}"
+    ees_dotnet_preinstalled: true
+  when: ees_dotnet_checks.results | selectattr('rc', 'equalto', 0) | list | length > 0
+
+# ---------------------------------------------------------------------------
+# Docker
+# ---------------------------------------------------------------------------
+
+# Neither of these needs to talk to the daemon, so they answer "is it
+# installed?" without depending on the docker group membership this playbook
+# has not granted yet.
+- name: Check whether Docker Engine and the Compose plugin are already installed
+  ansible.builtin.shell:
+    cmd: docker --version && docker compose version
+    executable: /bin/bash
+  register: ees_docker_check
+  failed_when: false
+  changed_when: false
+
+- name: Use the existing Docker installation
+  ansible.builtin.set_fact:
+    ees_docker_preinstalled: true
+  when: ees_docker_check.rc == 0
+
+# ---------------------------------------------------------------------------
+# Google Chrome
+# ---------------------------------------------------------------------------
+
+- name: Check whether Google Chrome is already installed
+  ansible.builtin.shell:
+    cmd: command -v google-chrome || command -v google-chrome-stable
+    executable: /bin/bash
+  register: ees_chrome_check
+  failed_when: false
+  changed_when: false
+
+- name: Use the existing Google Chrome installation
+  ansible.builtin.set_fact:
+    ees_chrome_preinstalled: true
+  when: ees_chrome_check.rc == 0
+
+# ---------------------------------------------------------------------------
+
+- name: Report what was found and what will be installed
+  ansible.builtin.debug:
+    msg: >-
+      {{ ['nvm:    ' + (ees_nvm_preinstalled | ternary('found at ' + ees_nvm_dir, 'will install ' + ees_nvm_version + ' at ' + ees_nvm_dir)),
+          'pyenv:  ' + (ees_pyenv_preinstalled | ternary('found at ' + ees_pyenv_root, 'will install ' + ees_pyenv_version + ' at ' + ees_pyenv_root)),
+          'dotnet: ' + (ees_dotnet_preinstalled | ternary('found at ' + ees_dotnet_root, 'will install ' + ees_dotnet_version + ' at ' + ees_dotnet_root)),
+          'docker: ' + (ees_docker_preinstalled | ternary('found', 'will install')),
+          'chrome: ' + (ees_chrome_preinstalled | ternary('found', ees_install_chrome | ternary('will install', 'skipped')))] }}

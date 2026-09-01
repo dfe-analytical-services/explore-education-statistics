@@ -1,0 +1,85 @@
+---
+# Skipped when discovery found a working docker with the compose plugin. It
+# might have come from the convenience script, from Ubuntu's own docker.io
+# packages or from somewhere else, and adding Docker's apt repository over the
+# top of that is a good way to end up with two competing installations. The
+# service and group tasks below still run either way.
+- name: Install Docker Engine
+  when: not ees_docker_preinstalled
+  block:
+    - name: Add the Docker apt signing key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+      become: true
+
+    - name: Add the Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ ees_dpkg_architecture.stdout }} signed-by=/etc/apt/keyrings/docker.asc]
+          https://download.docker.com/linux/ubuntu {{ ansible_facts.distribution_release }} stable
+        filename: docker
+        state: present
+        update_cache: true
+      become: true
+
+    - name: Install Docker Engine and the Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+      become: true
+
+- name: Enable and start the Docker service
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  become: true
+
+# Without this every docker and docker compose invocation - including the ones
+# the project's start script makes - needs sudo.
+- name: Add the current user to the docker group
+  ansible.builtin.user:
+    name: "{{ ansible_facts.user_id }}"
+    groups: docker
+    append: true
+  become: true
+  register: ees_docker_group
+
+- name: Note that the docker group needs a new login session
+  ansible.builtin.debug:
+    msg: >-
+      {{ ansible_facts.user_id }} has been added to the docker group. Group membership is
+      only picked up by new login sessions, so log out and back in (or run
+      'newgrp docker') before running docker without sudo.
+  when: ees_docker_group.changed
+
+- name: Read the images declared in docker-compose.yml
+  ansible.builtin.slurp:
+    src: "{{ ees_project_dir }}/docker-compose.yml"
+  register: ees_compose_file
+  when: ees_pull_docker_images | bool
+
+- name: Determine which container images to pull
+  ansible.builtin.set_fact:
+    ees_compose_images: >-
+      {{ (ees_compose_file.content | b64decode | from_yaml).services.values()
+         | map(attribute='image', default='') | select() | unique | list }}
+  when: ees_pull_docker_images | bool
+
+# Pulled individually rather than with "docker compose pull" because the
+# data-screener service builds from a sibling ees-screener-api checkout that
+# most developers will not have.
+- name: Pull the container images used by the local environment
+  ansible.builtin.command:
+    cmd: "docker pull {{ item }}"
+  loop: "{{ ees_compose_images | default([]) }}"
+  become: true
+  register: ees_docker_pull
+  changed_when: "'Image is up to date' not in ees_docker_pull.stdout"

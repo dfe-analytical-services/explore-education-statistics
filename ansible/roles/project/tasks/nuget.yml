@@ -1,0 +1,52 @@
+---
+# Some .NET dependencies come from GitHub Packages rather than nuget.org and
+# need a classic PAT with the read:packages scope to restore. This is optional -
+# skip it here and add the source by hand later if you would rather not put a
+# token on the command line.
+- name: Report that the GitHub Packages source is being skipped
+  ansible.builtin.debug:
+    msg: >-
+      No GitHub credentials supplied, so the GitHub Packages NuGet source has not
+      been configured. Some .NET dependencies will fail to restore until it is.
+      Re-run with -e ees_github_username=... -e ees_github_pat=... or follow
+      "Set up GitHub Packages source" in the README.
+  when: not (ees_github_username and ees_github_pat)
+
+- name: Configure the GitHub Packages NuGet source
+  when: ees_github_username | length > 0 and ees_github_pat | length > 0
+  block:
+    # The token must never reach the repo's own NuGet.Config, which is source
+    # controlled. Everything below is pinned to the user level config instead.
+    - name: Create the user level NuGet configuration directory
+      ansible.builtin.file:
+        path: "{{ ees_home }}/.nuget/NuGet"
+        state: directory
+        mode: "0700"
+
+    - name: List the configured NuGet sources
+      ansible.builtin.command:
+        cmd: dotnet nuget list source --configfile {{ ees_home }}/.nuget/NuGet/NuGet.Config
+      environment: "{{ ees_toolchain_env }}"
+      register: ees_nuget_sources
+      changed_when: false
+
+    # Encrypted password storage is Windows only, so on Linux the token is
+    # stored in clear text. The config file is created 0600 to compensate.
+    - name: Add the GitHub Packages NuGet source
+      ansible.builtin.command:
+        cmd: >-
+          dotnet nuget add source {{ ees_nuget_source_url }}
+          --name {{ ees_nuget_source_name }}
+          --username {{ ees_github_username }}
+          --password {{ ees_github_pat }}
+          --store-password-in-clear-text
+          --configfile {{ ees_home }}/.nuget/NuGet/NuGet.Config
+      environment: "{{ ees_toolchain_env }}"
+      when: ees_nuget_source_name not in ees_nuget_sources.stdout
+      changed_when: true
+      no_log: true
+
+    - name: Restrict access to the user level NuGet configuration
+      ansible.builtin.file:
+        path: "{{ ees_home }}/.nuget/NuGet/NuGet.Config"
+        mode: "0600"

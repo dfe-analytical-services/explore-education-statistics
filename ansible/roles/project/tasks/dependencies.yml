@@ -1,0 +1,22 @@
+---
+- name: Install the PNPM workspace dependencies
+  ansible.builtin.command:
+    cmd: pnpm install --frozen-lockfile
+    chdir: "{{ ees_project_dir }}"
+  environment: "{{ ees_toolchain_env }}"
+  changed_when: true
+
+- name: Restore the .NET local tools
+  ansible.builtin.command:
+    cmd: dotnet tool restore
+    chdir: "{{ ees_project_dir }}"
+  environment: "{{ ees_toolchain_env }}"
+  changed_when: true
+
+# --dev brings in linkchecker, used by the "pnpm run linkchecker" script.
+- name: Install the Python dependencies for the Robot test suite
+  ansible.builtin.command:
+    cmd: "{{ ees_python_prefix }}/bin/pipenv install --dev"
+    chdir: "{{ ees_project_dir }}"
+  environment: "{{ ees_toolchain_env }}"
+  changed_when: true

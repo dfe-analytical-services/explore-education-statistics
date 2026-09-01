@@ -1,0 +1,80 @@
+---
+# Creates the logins and contained users the service expects, for people who are
+# starting from empty databases rather than the pre-built development database.
+# The empty "content" and "statistics" databases themselves are created by the
+# container's own setup-db.sql the first time it starts.
+
+- name: Create the SQL Server data directory
+  ansible.builtin.file:
+    path: "{{ ees_project_dir }}/data/ees-mssql"
+    state: directory
+    owner: "{{ ees_mssql_container_uid }}"
+    mode: "0755"
+  become: true
+  when: not ees_mssql_data.stat.exists
+
+- name: Start the SQL Server container
+  ansible.builtin.command:
+    cmd: docker compose up -d db
+    chdir: "{{ ees_project_dir }}"
+  become: true
+  changed_when: true
+
+- name: Find the SQL Server container
+  ansible.builtin.command:
+    cmd: docker compose ps -q db
+    chdir: "{{ ees_project_dir }}"
+  become: true
+  register: ees_db_container
+  changed_when: false
+
+# The container sleeps before creating the databases, and loading a large data
+# directory can keep the server in script upgrade mode for a while after that,
+# so wait on the databases existing rather than just on the port opening.
+#
+# The password is passed through the environment rather than on the command line
+# so it does not show up in the process list. "docker exec -e NAME" with no
+# value forwards the variable from the client.
+- name: Wait for the content and statistics databases to come up
+  ansible.builtin.command:
+    cmd: >-
+      docker exec -e SQLCMDPASSWORD {{ ees_db_container.stdout }}
+      /opt/mssql-tools/bin/sqlcmd -U sa -b -h -1
+      -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.databases WHERE name IN ('content', 'statistics')"
+  environment:
+    SQLCMDPASSWORD: "{{ ees_sql_sa_password }}"
+  become: true
+  register: ees_db_ready
+  until: ees_db_ready.rc == 0 and ees_db_ready.stdout | trim == "2"
+  retries: 30
+  delay: 10
+  changed_when: false
+
+- name: Create the SQL Server logins and contained users
+  block:
+    # data/sql-scripts is already mounted into the container at /scripts by
+    # docker-compose.yml, so the rendered file is readable from inside it.
+    - name: Render the bootstrap SQL
+      ansible.builtin.template:
+        src: bare-database-bootstrap.sql.j2
+        dest: "{{ ees_project_dir }}/data/sql-scripts/ansible-bare-database-bootstrap.sql"
+        mode: "0600"
+      no_log: true
+
+    - name: Run the bootstrap SQL
+      ansible.builtin.command:
+        cmd: >-
+          docker exec -e SQLCMDPASSWORD {{ ees_db_container.stdout }}
+          /opt/mssql-tools/bin/sqlcmd -U sa -b
+          -i /scripts/ansible-bare-database-bootstrap.sql
+      environment:
+        SQLCMDPASSWORD: "{{ ees_sql_sa_password }}"
+      become: true
+      changed_when: true
+  always:
+    # It contains the login password and it sits inside the source tree, so it
+    # goes even if the run above failed.
+    - name: Remove the rendered bootstrap SQL
+      ansible.builtin.file:
+        path: "{{ ees_project_dir }}/data/sql-scripts/ansible-bare-database-bootstrap.sql"
+        state: absent

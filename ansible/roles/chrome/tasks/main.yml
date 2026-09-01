@@ -1,0 +1,27 @@
+---
+# The Robot Framework UI tests drive Chrome. webdriver-manager downloads a
+# matching chromedriver into ~/.wdm on first run, so only the browser is needed.
+#
+# The whole role is skipped by the playbook when discovery already found Chrome.
+- name: Add the Google Chrome apt signing key
+  ansible.builtin.get_url:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    dest: /etc/apt/keyrings/google-chrome.asc
+    mode: "0644"
+  become: true
+
+- name: Add the Google Chrome apt repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ ees_dpkg_architecture.stdout }} signed-by=/etc/apt/keyrings/google-chrome.asc]
+      https://dl.google.com/linux/chrome/deb/ stable main
+    filename: google-chrome
+    state: present
+    update_cache: true
+  become: true
+
+- name: Install Google Chrome
+  ansible.builtin.apt:
+    name: google-chrome-stable
+    state: present
+  become: true

@@ -1,0 +1,20 @@
+---
+# The .NET integration tests start enough file watchers to exhaust Ubuntu's
+# stock inotify limits, which surfaces as unrelated-looking test failures.
+- name: Raise the inotify limits for the .NET integration tests
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-explore-education-statistics.conf
+    mode: "0644"
+    content: |
+      # Managed by the explore-education-statistics ansible playbook.
+      fs.inotify.max_user_watches={{ ees_inotify_max_user_watches }}
+      fs.inotify.max_user_instances={{ ees_inotify_max_user_instances }}
+  become: true
+  register: ees_sysctl_conf
+
+- name: Apply the raised inotify limits now
+  ansible.builtin.command:
+    cmd: sysctl --load=/etc/sysctl.d/99-explore-education-statistics.conf
+  become: true
+  when: ees_sysctl_conf.changed
+  changed_when: true

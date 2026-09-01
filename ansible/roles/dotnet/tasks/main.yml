@@ -1,0 +1,43 @@
+---
+# Installed with Microsoft's dotnet-install.sh rather than from apt. The exact
+# SDK version global.json pins is not reliably available as a distro package on
+# every Ubuntu release, and a user-local install keeps the pin exact.
+#
+# All skipped when discovery already found an SDK that satisfies global.json.
+
+- name: Install the .NET SDK
+  when: not ees_dotnet_preinstalled
+  block:
+    - name: Download the dotnet-install script
+      ansible.builtin.get_url:
+        url: https://dot.net/v1/dotnet-install.sh
+        dest: /tmp/dotnet-install.sh
+        mode: "0755"
+
+    - name: Install the .NET SDK pinned by global.json
+      ansible.builtin.command:
+        cmd: >-
+          /tmp/dotnet-install.sh
+          --version {{ ees_dotnet_version }}
+          --install-dir {{ ees_dotnet_root }}
+          --no-path
+      changed_when: true
+  always:
+    - name: Remove the dotnet-install script
+      ansible.builtin.file:
+        path: /tmp/dotnet-install.sh
+        state: absent
+
+- name: Verify the .NET SDK resolves the version global.json asks for
+  ansible.builtin.command:
+    cmd: "{{ ees_dotnet_root }}/dotnet --version"
+    chdir: "{{ ees_project_dir }}"
+  environment:
+    DOTNET_ROOT: "{{ ees_dotnet_root }}"
+    DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  register: ees_dotnet_resolved
+  changed_when: false
+
+- name: Report the resolved .NET SDK version
+  ansible.builtin.debug:
+    msg: ".NET SDK {{ ees_dotnet_resolved.stdout }} resolved for {{ ees_project_dir }}"

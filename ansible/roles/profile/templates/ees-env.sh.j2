@@ -1,0 +1,29 @@
+# Managed by the explore-education-statistics ansible playbook.
+# Any edits here will be overwritten the next time the playbook runs - put your
+# own customisations in ~/.bashrc instead.
+
+# --- .NET -------------------------------------------------------------------
+export DOTNET_ROOT="{{ ees_dotnet_root }}"
+# Global tools always land in ~/.dotnet/tools, wherever the SDK itself lives.
+export PATH="$DOTNET_ROOT:{{ ees_dotnet_tools_dir }}:$PATH"
+# Opt out of the .NET CLI's usage telemetry and first-run banner.
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+export DOTNET_NOLOGO=1
+
+# --- Node -------------------------------------------------------------------
+export NVM_DIR="{{ ees_nvm_dir }}"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+
+# --- Python -----------------------------------------------------------------
+export PYENV_ROOT="{{ ees_pyenv_root }}"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv >/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+# --- Project ----------------------------------------------------------------
+# Run the project's start script from anywhere, e.g. "ees content data".
+ees() {
+  (cd "{{ ees_project_dir }}" && pnpm start "$@")
+}

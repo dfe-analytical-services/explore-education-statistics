@@ -1,0 +1,91 @@
+---
+# Ubuntu does not package the Python version .python-version pins, and the Robot
+# test suite is sensitive to it, so build it with pyenv. The build dependencies
+# are installed by the system_packages role.
+# Skipped entirely when discovery found an existing pyenv, which is left on
+# whatever version it is on rather than being checked out at ees_pyenv_version.
+- name: Install pyenv
+  ansible.builtin.git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "{{ ees_pyenv_root }}"
+    version: "{{ ees_pyenv_version }}"
+    depth: 1
+  when: not ees_pyenv_preinstalled
+
+- name: Check whether the Python version pinned by .python-version is already built
+  ansible.builtin.stat:
+    path: "{{ ees_python_prefix }}/bin/python"
+  register: ees_python_binary
+
+# An existing pyenv can predate the pinned Python release and simply not have a
+# build recipe for it, which otherwise shows up as a confusing "definition not
+# found" part way through the run.
+- name: Check that pyenv knows how to build the pinned Python version
+  ansible.builtin.command:
+    cmd: "{{ ees_pyenv_command }} install --list"
+  environment:
+    PYENV_ROOT: "{{ ees_pyenv_root }}"
+  register: ees_pyenv_definitions
+  when: not ees_python_binary.stat.exists
+  changed_when: false
+
+- name: Fail if pyenv is too old for the pinned Python version
+  ansible.builtin.assert:
+    that: ees_python_version in (ees_pyenv_definitions.stdout_lines | map('trim') | list)
+    fail_msg: >-
+      The pyenv at {{ ees_pyenv_root }} has no build definition for Python
+      {{ ees_python_version }}, so it is too old to build what this project pins.
+      Update it - "pyenv update", or "git -C {{ ees_pyenv_root }} fetch --tags &&
+      git -C {{ ees_pyenv_root }} checkout {{ ees_pyenv_version }}" - and run this
+      playbook again.
+  when: not ees_python_binary.stat.exists
+
+# Compiling CPython from source takes a few minutes on a typical machine.
+- name: Build the Python version pinned by .python-version
+  ansible.builtin.command:
+    cmd: "{{ ees_pyenv_command }} install {{ ees_python_version }}"
+  environment:
+    PYENV_ROOT: "{{ ees_pyenv_root }}"
+  when: not ees_python_binary.stat.exists
+  changed_when: true
+
+- name: Check which Python version pyenv currently defaults to
+  ansible.builtin.command:
+    cmd: "{{ ees_pyenv_command }} global"
+  environment:
+    PYENV_ROOT: "{{ ees_pyenv_root }}"
+  register: ees_pyenv_global
+  changed_when: false
+
+# Makes the pinned interpreter the default "python"/"python3" for this user's
+# shells. It only affects pyenv's shims - /usr/bin/python3 and anything apt
+# depends on are left alone.
+#
+# Only done when the playbook installed pyenv itself, for the same reason as the
+# nvm default: an existing pyenv user chose their global on purpose. It costs
+# them nothing, because the repo's committed .python-version already makes pyenv
+# select {{ ees_python_version }} inside the checkout.
+- name: Make the pinned Python version the pyenv default
+  ansible.builtin.command:
+    cmd: "{{ ees_pyenv_command }} global {{ ees_python_version }}"
+  environment:
+    PYENV_ROOT: "{{ ees_pyenv_root }}"
+  when:
+    - not ees_pyenv_preinstalled
+    - ees_pyenv_global.stdout | trim != ees_python_version
+  changed_when: true
+
+# state: present rather than latest, so an existing pipenv is left at whatever
+# version it is on instead of being upgraded out from under the user.
+- name: Install pipenv into the pinned Python
+  ansible.builtin.pip:
+    name: pipenv
+    state: present
+    executable: "{{ ees_python_prefix }}/bin/pip"
+
+- name: Regenerate the pyenv shims so pipenv is on the PATH
+  ansible.builtin.command:
+    cmd: "{{ ees_pyenv_command }} rehash"
+  environment:
+    PYENV_ROOT: "{{ ees_pyenv_root }}"
+  changed_when: true

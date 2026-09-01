@@ -1,0 +1,78 @@
+---
+- name: Update the apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Install base build and CLI tooling
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - build-essential
+      - ca-certificates
+      - curl
+      - git
+      - gnupg
+      - jq
+      - software-properties-common
+      - unzip
+      - wget
+      - zip
+    state: present
+  become: true
+
+- name: Install .NET SDK runtime dependencies
+  ansible.builtin.apt:
+    name:
+      - libicu-dev
+      # certutil, used by "dotnet dev-certs https --trust" to add the development
+      # certificate to the NSS database that Chrome and Firefox read.
+      - libnss3-tools
+    state: present
+  become: true
+
+- name: Install the libraries pyenv needs to build CPython from source
+  ansible.builtin.apt:
+    name:
+      - libbz2-dev
+      - libffi-dev
+      - liblzma-dev
+      - libncurses-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - libssl-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - llvm
+      - tk-dev
+      - xz-utils
+      - zlib1g-dev
+    state: present
+  become: true
+
+- name: Install the shared libraries the Robot test suite's Python packages link against
+  ansible.builtin.apt:
+    name:
+      # opencv-python, used by the visual comparison keywords, dlopens both of these.
+      - libgl1
+      - "{{ 'libglib2.0-0t64' if ansible_facts.distribution_major_version | int >= 24 else 'libglib2.0-0' }}"
+      # Provides /usr/lib/file/magic.mgc, referenced by the MagicFilePath setting.
+      - file
+    state: present
+  become: true
+
+# Both the Docker and Google Chrome apt sources need these, so they live here
+# rather than in whichever of those roles happens to run first.
+- name: Determine the dpkg architecture for third party apt sources
+  ansible.builtin.command:
+    cmd: dpkg --print-architecture
+  register: ees_dpkg_architecture
+  changed_when: false
+
+- name: Create the apt keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  become: true

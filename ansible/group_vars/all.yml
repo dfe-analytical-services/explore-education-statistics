@@ -1,0 +1,148 @@
+---
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+
+# Root of the EES checkout. Defaults to the parent of this ansible directory,
+# i.e. the checkout the playbook itself was cloned as part of.
+ees_project_dir: "{{ playbook_dir | dirname }}"
+
+ees_home: "{{ ansible_facts.env.HOME }}"
+
+# Where the toolchains are installed *if the playbook has to install them*. The
+# discover role looks for existing installations first and points these at what
+# it finds, so these only apply on a machine that does not already have them.
+# All are user-local, so nothing outside the home directory needs to be unpicked
+# to undo the language toolchains.
+#
+# Setting any of these with -e overrides discovery entirely.
+ees_nvm_dir: "{{ ees_home }}/.config/nvm"
+ees_pyenv_root: "{{ ees_home }}/.pyenv"
+ees_dotnet_root: "{{ ees_home }}/.dotnet"
+
+# The directories discovery searches, in priority order. The first hit wins.
+ees_nvm_search_paths: >-
+  {{ [ansible_facts.env.NVM_DIR | default(''),
+      ees_home + '/.nvm',
+      ees_home + '/.config/nvm',
+      ees_nvm_dir] | select | unique | list }}
+
+ees_pyenv_search_paths: >-
+  {{ [ansible_facts.env.PYENV_ROOT | default(''),
+      ees_home + '/.pyenv',
+      ees_pyenv_root] | select | unique | list }}
+
+ees_dotnet_search_paths: >-
+  {{ [ansible_facts.env.DOTNET_ROOT | default(''),
+      ees_home + '/.dotnet',
+      '/usr/share/dotnet',
+      '/usr/lib/dotnet',
+      ees_dotnet_root] | select | unique | list }}
+
+# Set by the discover role when it finds an existing installation. Anything left
+# false here is something the playbook installs itself.
+ees_nvm_preinstalled: false
+ees_pyenv_preinstalled: false
+ees_dotnet_preinstalled: false
+ees_docker_preinstalled: false
+ees_chrome_preinstalled: false
+
+# Global .NET tools always go here regardless of where the SDK itself lives.
+ees_dotnet_tools_dir: "{{ ees_home }}/.dotnet/tools"
+
+# Shell snippet the playbook owns outright. It is sourced from ~/.bashrc, which
+# the playbook only appends a single marked block to.
+ees_env_file: "{{ ees_home }}/.ees-env.sh"
+
+# ---------------------------------------------------------------------------
+# Versions
+# ---------------------------------------------------------------------------
+# Node, Python and the .NET SDK are pinned by files in the repo (.nvmrc,
+# .python-version and global.json). The playbook reads those files at run time
+# rather than duplicating the versions here, so it cannot drift from the repo.
+
+# The versions used when the playbook installs nvm or pyenv itself. An existing
+# installation is left on whatever version it is already on. Bump these as new
+# releases come out - pyenv in particular has to be new enough to know how to
+# build the Python version .python-version asks for.
+ees_nvm_version: "v0.40.7"
+ees_pyenv_version: "v2.8.4"
+
+# Derived tool locations. These reference the pinned versions the playbook reads
+# out of the repo at run time, so they are only resolvable once those facts are
+# set - which is fine, Ansible templates variables lazily at the point of use.
+ees_node_bin: "{{ ees_nvm_dir }}/versions/node/v{{ ees_node_version }}/bin"
+ees_pyenv_bin: "{{ ees_pyenv_root }}/bin"
+# The pyenv binary is not always under $PYENV_ROOT/bin - a distro-packaged pyenv
+# lives in /usr/bin but still keeps its root in the home directory - so discovery
+# records where the executable actually is.
+ees_pyenv_command: "{{ ees_pyenv_bin }}/pyenv"
+ees_pyenv_shims: "{{ ees_pyenv_root }}/shims"
+ees_python_prefix: "{{ ees_pyenv_root }}/versions/{{ ees_python_version }}"
+
+# Azure Functions Core Tools major version, installed globally via npm.
+ees_func_tools_version: "4"
+
+# ---------------------------------------------------------------------------
+# Feature toggles
+# ---------------------------------------------------------------------------
+
+# Install Google Chrome. Required by the Robot Framework UI test suite, which
+# uses webdriver-manager to match a chromedriver to the installed browser.
+ees_install_chrome: true
+
+# Pull the Docker images used by docker-compose.yml up front. Turn this off for
+# a faster run on a slow connection - the images are pulled on first use anyway.
+ees_pull_docker_images: true
+
+# Create the SQL Server logins and contained users described by "Option 2 - Use
+# a bare database" in the README. Leave this off if you are using a pre-built
+# development database, which already contains them.
+ees_bootstrap_bare_database: false
+
+# Password used for the per-component SQL Server logins created by the bare
+# database bootstrap. Override this on the command line if you want something
+# other than the README's example password.
+ees_sql_login_password: "Your_Password123"
+
+# SA password for the local SQL Server container, as set in docker-compose.yml.
+ees_sql_sa_password: "Your_Password123"
+
+# The uid the SQL Server container runs as. Its data directory has to be owned
+# by this uid or the server will not start.
+ees_mssql_container_uid: 10001
+
+# ---------------------------------------------------------------------------
+# GitHub Packages NuGet source (optional)
+# ---------------------------------------------------------------------------
+# Some .NET dependencies are hosted on GitHub Packages. To restore them you
+# need a classic PAT with the read:packages scope. Supply both of these to have
+# the source added to your *user* NuGet.Config - the repo's NuGet.Config is
+# source controlled and is never written to.
+#
+#   ansible-playbook setup.yml -K \
+#     -e ees_github_username=your-github-username \
+#     -e ees_github_pat=ghp_xxx
+#
+ees_github_username: ""
+ees_github_pat: ""
+ees_nuget_source_name: "dfe-analytical-services-github"
+ees_nuget_source_url: "https://nuget.pkg.github.com/dfe-analytical-services/index.json"
+
+# ---------------------------------------------------------------------------
+# Host entries
+# ---------------------------------------------------------------------------
+# "db" and "data-storage" are the hostnames the applications use to reach the
+# SQL Server and Azurite containers. "ees.local" is the local site domain used
+# when Keycloak is the identity provider.
+ees_hosts_entries:
+  - db
+  - data-storage
+  - ees.local
+
+# ---------------------------------------------------------------------------
+# inotify limits
+# ---------------------------------------------------------------------------
+# The .NET integration tests exhaust the stock Ubuntu limits.
+ees_inotify_max_user_watches: 524288
+ees_inotify_max_user_instances: 524288

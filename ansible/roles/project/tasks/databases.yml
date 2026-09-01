@@ -1,0 +1,43 @@
+---
+# follow: true so that the common Linux setup - a symlink from the repo out to
+# an unencrypted filesystem - is stat'd as the directory it points at.
+- name: Check whether the SQL Server data directory is present
+  ansible.builtin.stat:
+    path: "{{ ees_project_dir }}/data/ees-mssql"
+    follow: true
+  register: ees_mssql_data
+
+- name: Explain how to obtain the pre-built development database
+  ansible.builtin.debug:
+    msg:
+      - "{{ ees_project_dir }}/data/ees-mssql does not exist, so the SQL Server"
+      - "container has no data to load. The recommended setup is the pre-built"
+      - "development database - ask a team member for access to the Google Drive"
+      - "folder and download the latest ees-mssql-data-<n>.zip."
+      - ""
+      - "On Linux the extracted ees-mssql directory must live on an unencrypted"
+      - "filesystem and be owned by the container's uid, then be symlinked into"
+      - "the repo:"
+      - "  ln -s /path/to/unencrypted/ees-mssql {{ ees_project_dir }}/data/ees-mssql"
+      - "  sudo chown -R {{ ees_mssql_container_uid }} /path/to/unencrypted/ees-mssql"
+      - ""
+      - "To start from empty databases instead, re-run this playbook with"
+      - "-e ees_bootstrap_bare_database=true"
+  when: not ees_mssql_data.stat.exists
+
+# The container writes its data files as this uid, and exits during startup if
+# it cannot. Done with chown rather than the file module because the path is
+# usually a symlink, which the file module would replace with a directory. The
+# trailing slash makes chown descend into the link target.
+- name: Give the SQL Server container ownership of its data directory
+  ansible.builtin.command:
+    cmd: "chown -R {{ ees_mssql_container_uid }} {{ ees_project_dir }}/data/ees-mssql/"
+  become: true
+  when:
+    - ees_mssql_data.stat.exists
+    - ees_mssql_data.stat.uid != ees_mssql_container_uid
+  changed_when: true
+
+- name: Bootstrap a bare SQL Server database
+  ansible.builtin.import_tasks: bare-database.yml
+  when: ees_bootstrap_bare_database | bool

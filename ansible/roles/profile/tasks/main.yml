@@ -1,0 +1,18 @@
+---
+# Everything the playbook adds to the shell lives in one file it owns outright,
+# so ~/.bashrc only ever gains a single sourcing line and the whole thing can be
+# undone by deleting that block.
+- name: Write the EES shell environment file
+  ansible.builtin.template:
+    src: ees-env.sh.j2
+    dest: "{{ ees_env_file }}"
+    mode: "0644"
+
+- name: Source the EES shell environment file from ~/.bashrc
+  ansible.builtin.blockinfile:
+    path: "{{ ees_home }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED - explore-education-statistics"
+    create: true
+    mode: "0644"
+    block: |
+      [ -s "{{ ees_env_file }}" ] && . "{{ ees_env_file }}"

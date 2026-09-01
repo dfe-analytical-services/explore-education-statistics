@@ -73,6 +73,17 @@ The project is primarily composed of two areas:
 
 ## Getting started
 
+> [!TIP]
+> On Ubuntu, everything in this section can be applied automatically by the
+> [Ansible setup playbook](ansible/README.md):
+>
+> ```bash
+> ./ansible/bootstrap.sh
+> ```
+>
+> It cannot fetch the development database or your GitHub token for you, so read
+> the playbook's README for what is left to do by hand.
+
 ### Requirements
 
 You will need the following groups of dependencies to run the project successfully.

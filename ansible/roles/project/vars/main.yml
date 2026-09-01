@@ -1,0 +1,22 @@
+---
+# Ansible tasks run in a non-interactive shell that never sources ~/.bashrc, so
+# every task that needs the toolchains has to be given them explicitly.
+ees_toolchain_path: "{{ ees_node_bin }}:{{ ees_pyenv_shims }}:{{ ees_pyenv_bin }}:{{ ees_dotnet_root }}:{{ ees_dotnet_tools_dir }}:{{ ansible_facts.env.PATH }}"
+
+ees_toolchain_env:
+  PATH: "{{ ees_toolchain_path }}"
+  DOTNET_ROOT: "{{ ees_dotnet_root }}"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  PYENV_ROOT: "{{ ees_pyenv_root }}"
+
+# The per-component logins the service connects to SQL Server with.
+ees_sql_logins:
+  - adminapp
+  - importer
+  - publisher
+  - notifier
+  - content
+  - data
+  - public_data_processor
+  - datafactory
