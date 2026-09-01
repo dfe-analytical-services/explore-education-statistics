@@ -123,6 +123,13 @@ var basePublicAllowedOrigins = [
 
 var publicSiteAllowedOrigins = union(basePublicAllowedOrigins, environmentConfig.?additionalPublicAllowedOrigins ?? [])
 
+var baseAdminAllowedOrigins = [
+  'https://admin.${environmentConfig.domain!}'
+  'https://${resourceNames.admin.appService}.azurewebsites.net'
+]
+
+var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
+
 module adminModule '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
@@ -130,6 +137,8 @@ module adminModule '../admin/main.bicep' = {
     appServiceSku: adminConfig.appServiceSku!
     adminHostname: 'admin.${environmentConfig.domain!}'
     publicAppUrl: 'https://${environmentConfig.domain!}'
+    signalRAllowedOrigins: adminSiteAllowedOrigins
+    signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!

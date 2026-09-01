@@ -2,6 +2,7 @@ import { ResourceNames } from '../bicep-main-infrastructure-release/resource-nam
 import { MemoryCacheConfig } from '../bicep-main-infrastructure-release/types.bicep'
 import { keyVaultRef } from '../bicep-main-infrastructure-release/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { SignalRSku } from '../common/components/signalr/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -18,6 +19,12 @@ param appServiceSku AppServicePlanSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
+
+@description('The origins supported for CORS calls to the Admin SignalR service.')
+param signalRAllowedOrigins string[]
+
+@description('SKU of the Admin SignalR service.')
+param signalRSku SignalRSku
 
 @description('Whether to display detailed error messages in this environment or not.')
 param detailedErrors bool
@@ -208,3 +215,12 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   }
 }
 
+module adminSignalRService '../common/components/signalr/signalr.bicep' = {
+  name: 'adminSignalRServiceDeploy'
+  params: {
+    signalRName: resourceNames.admin.signalRName
+    sku: signalRSku
+    allowedOrigins: signalRAllowedOrigins
+    hubEventBaseUrl: 'https://${adminHostname}'
+  }
+}
