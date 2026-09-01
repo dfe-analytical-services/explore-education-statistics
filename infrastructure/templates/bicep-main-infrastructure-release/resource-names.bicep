@@ -95,7 +95,7 @@ func getResourceNames(
   analytics: {
     storage: {
       storageAccountName: '${newResourcePrefix}eespapisa'
-      fileShareName: '${newResourcePrefix}-ees-share-anlyt'
+      fileShareName: '${newResourcePrefix}-share-anlyt'
     }
   }
   dataApi: {
@@ -104,9 +104,9 @@ func getResourceNames(
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
   }
   frontDoor: {
-    frontDoorName: '${newResourcePrefix}-ees-${abbreviations.frontDoorProfiles}'
+    frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
     defaultEndpoint: {
-      endpointName: '${newResourcePrefix}-ees-${abbreviations.frontDoorEndpoints}'
+      endpointName: '${newResourcePrefix}-${abbreviations.frontDoorEndpoints}'
     }
   }
   publicApi: {
