@@ -11,3 +11,14 @@
       127.0.0.1    {{ host }}
       {% endfor %}
   become: true
+
+- name: Note that WSL will overwrite these entries
+  ansible.builtin.debug:
+    msg: >-
+      WSL regenerates /etc/hosts every time the distribution starts, which will
+      remove the entries above. Set generateHosts = false under [network] in
+      /etc/wsl.conf, or re-run with -e ees_wsl_disable_generated_hosts=true to
+      have the playbook do it.
+  when:
+    - ees_is_wsl | bool
+    - not ees_wsl_disable_generated_hosts | bool

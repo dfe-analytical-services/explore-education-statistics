@@ -1,0 +1,72 @@
+---
+# Running Ubuntu under WSL2 is the supported way to develop this project on a
+# Windows machine, and the rest of the playbook needs no changes for it. Two
+# WSL settings do have to be adjusted, and both live in /etc/wsl.conf, which
+# WSL only reads when the distribution starts:
+#
+#   [boot] systemd          - off by default, and without it there is nothing to
+#                             run the Docker daemon or to apply /etc/sysctl.d at
+#                             boot.
+#   [network] generateHosts - on by default, and it rewrites /etc/hosts every
+#                             time the distribution starts, throwing away the db,
+#                             data-storage and ees.local entries.
+#
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config
+
+- name: Check whether /etc/wsl.conf exists
+  ansible.builtin.stat:
+    path: /etc/wsl.conf
+  register: ees_wsl_conf
+
+- name: Read the existing WSL configuration
+  ansible.builtin.slurp:
+    src: /etc/wsl.conf
+  register: ees_wsl_conf_content
+  when: ees_wsl_conf.stat.exists
+
+# Whether each setting's section is already there decides how it gets written:
+# into the existing section, or as a whole new one. Adding a second [network]
+# section to a file that already has one is not something WSL's parser handles.
+- name: Note which sections /etc/wsl.conf already has
+  ansible.builtin.set_fact:
+    ees_wsl_conf_sections: >-
+      {{ (ees_wsl_conf_content.content | default('') | b64decode).splitlines()
+         | map('trim') | select('match', '^\[.*\]$') | list }}
+
+- name: Configure WSL
+  vars:
+    ees_wsl_settings: >-
+      {{ ((ees_wsl_enable_systemd | bool) | ternary([{'section': 'boot', 'key': 'systemd', 'value': 'true'}], []))
+         + ((ees_wsl_disable_generated_hosts | bool) | ternary([{'section': 'network', 'key': 'generateHosts', 'value': 'false'}], [])) }}
+  block:
+    - name: Set a WSL option in a section that already exists
+      ansible.builtin.lineinfile:
+        path: /etc/wsl.conf
+        insertafter: "^\\s*\\[{{ item.section }}\\]"
+        regexp: "^\\s*{{ item.key }}\\s*="
+        line: "{{ item.key }} = {{ item.value }}"
+      loop: "{{ ees_wsl_settings }}"
+      when: "'[' ~ item.section ~ ']' in ees_wsl_conf_sections"
+      become: true
+      register: ees_wsl_conf_lines
+
+    - name: Add a WSL option in a section of its own
+      ansible.builtin.blockinfile:
+        path: /etc/wsl.conf
+        create: true
+        mode: "0644"
+        marker: "# {mark} ANSIBLE MANAGED - explore-education-statistics [{{ item.section }}]"
+        block: |
+          [{{ item.section }}]
+          {{ item.key }} = {{ item.value }}
+      loop: "{{ ees_wsl_settings }}"
+      when: "'[' ~ item.section ~ ']' not in ees_wsl_conf_sections"
+      become: true
+      register: ees_wsl_conf_blocks
+
+# Read at the end of the run, to tell the user about the restart in one place.
+- name: Record whether /etc/wsl.conf changed
+  ansible.builtin.set_fact:
+    ees_wsl_conf_changed: >-
+      {{ ((ees_wsl_conf_lines.results | default([])) + (ees_wsl_conf_blocks.results | default([])))
+         | selectattr('changed', 'defined') | selectattr('changed') | list | length > 0 }}

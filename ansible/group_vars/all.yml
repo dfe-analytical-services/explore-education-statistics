@@ -101,6 +101,29 @@ ees_pull_docker_images: true
 ees_bootstrap_bare_database: false
 
 # ---------------------------------------------------------------------------
+# WSL2
+# ---------------------------------------------------------------------------
+# Running Ubuntu under WSL2 is how this playbook covers Windows machines. Set by
+# the playbook itself from the kernel version and WSL_DISTRO_NAME; there should
+# be no need to set it by hand.
+ees_is_wsl: false
+
+# Both of these are written to /etc/wsl.conf, and both need "wsl --shutdown"
+# from Windows before they take effect. Turn either off if you would rather
+# manage that file yourself.
+
+# [boot] systemd. Off by default in WSL, and without it there is no init system
+# to run the Docker daemon or to apply /etc/sysctl.d at boot.
+ees_wsl_enable_systemd: true
+
+# [network] generateHosts. On by default in WSL, and it rewrites /etc/hosts on
+# every start, removing the entries the hosts_entries role adds.
+ees_wsl_disable_generated_hosts: true
+
+# Set by the wsl role, and read in the summary at the end of the run.
+ees_wsl_conf_changed: false
+
+# ---------------------------------------------------------------------------
 # Pre-built development database
 # ---------------------------------------------------------------------------
 # The recommended setup uses a pre-built development database, distributed as an

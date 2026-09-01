@@ -28,6 +28,31 @@
           differ. Continuing anyway.
       when: ansible_facts.distribution_version is not in ["22.04", "24.04"]
 
+    # Running Ubuntu under WSL2 is how this playbook covers Windows machines.
+    # Almost everything is identical; the handful of differences are handled by
+    # the wsl role and by guards in the docker and hosts_entries roles.
+    - name: Detect whether this is running under WSL
+      ansible.builtin.set_fact:
+        ees_is_wsl: true
+      when: >-
+        'microsoft' in ansible_facts.kernel | lower
+        or ansible_facts.env.WSL_DISTRO_NAME is defined
+
+    # /mnt/<drive letter> is a Windows drive mounted into WSL. Crossing that
+    # boundary is slow enough to matter for a repository this size, and chmod and
+    # chown are no-ops there unless the mount was given the metadata option.
+    - name: Warn about a checkout on a Windows drive
+      ansible.builtin.debug:
+        msg: >-
+          {{ ees_project_dir }} is on a Windows drive mounted into WSL. Builds, pnpm
+          installs and file watching are all far slower across that boundary, and
+          Linux ownership and permissions are not honoured on it. Move the checkout
+          into the WSL filesystem, somewhere under {{ ees_home }}, before going
+          further.
+      when:
+        - ees_is_wsl | bool
+        - ees_project_dir is match('/mnt/[a-z](/|$)')
+
     - name: Check the project directory looks like an EES checkout
       ansible.builtin.stat:
         path: "{{ ees_project_dir }}/{{ item }}"
@@ -69,13 +94,15 @@
     - name: Report what will be installed
       ansible.builtin.debug:
         msg:
-          - "Project directory: {{ ees_project_dir }}"
+          - "Project directory: {{ ees_project_dir }}{{ ees_is_wsl | ternary(' (WSL)', '') }}"
           - "Node:              {{ ees_node_version }} (nvm at {{ ees_nvm_dir }})"
           - "Python:            {{ ees_python_version }} (pyenv at {{ ees_pyenv_root }})"
           - ".NET SDK:          {{ ees_dotnet_version }} (at {{ ees_dotnet_root }})"
 
   roles:
     - role: discover
+    - role: wsl
+      when: ees_is_wsl | bool
     - role: system_packages
     - role: hosts_entries
     - role: sysctl_limits
@@ -94,11 +121,19 @@
         msg:
           - "Setup complete. Open a new shell (or run 'source ~/.bashrc') to pick up"
           - "node, pnpm, python, pipenv and dotnet on your PATH."
-          - ""
+
+    # Not true of Docker Desktop's WSL2 integration, which has no docker group.
+    - name: Repeat the docker group reminder
+      ansible.builtin.debug:
+        msg:
           - "You have been added to the 'docker' group. That only takes effect in a new"
           - "login session - log out and back in, or run 'newgrp docker' in your shell,"
           - "before using docker without sudo."
-          - ""
+      when: ees_docker_group_exists.rc == 0
+
+    - name: List what is left to do by hand
+      ansible.builtin.debug:
+        msg:
           - "Still to do by hand, because they need credentials or data this playbook"
           - "cannot fetch for you:"
           - ""
@@ -114,3 +149,16 @@
           - ""
           - "Then start the service from {{ ees_project_dir }}, for example:"
           - "  pnpm start admin"
+
+    - name: Explain the WSL restart still needed
+      ansible.builtin.debug:
+        msg:
+          - "/etc/wsl.conf was changed. WSL only reads it when the distribution starts,"
+          - "so from Windows (PowerShell or Command Prompt) run:"
+          - ""
+          - "  wsl --shutdown"
+          - ""
+          - "and reopen this distribution. Until you do, systemd is not running, so"
+          - "anything that needed it has been skipped - re-run this playbook afterwards"
+          - "to finish those off."
+      when: ees_wsl_conf_changed | bool

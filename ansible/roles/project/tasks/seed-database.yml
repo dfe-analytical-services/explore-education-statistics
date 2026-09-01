@@ -57,6 +57,20 @@
     - ees_mssql_zip | length > 0
     - not ees_mssql_data.stat.exists or ees_mssql_replace_existing | bool
   block:
+    # Extracting several gigabytes onto a Windows drive would be slow, and then
+    # useless: chown and chmod do not take effect on a DrvFs mount unless it was
+    # given the metadata option, so the container could never be handed the data.
+    - name: Refuse to extract the database onto a Windows drive
+      ansible.builtin.assert:
+        that: ees_mssql_extract_dir is not match('/mnt/[a-z](/|$)')
+        fail_msg: >-
+          {{ ees_mssql_extract_dir }} is on a Windows drive mounted into WSL. SQL
+          Server cannot run its data files from there. Extract into the WSL
+          filesystem instead, for example
+          -e ees_mssql_extract_dir={{ ees_home }}/ees-mssql-data - the playbook will
+          symlink it into the data directory.
+      when: ees_is_wsl | bool
+
     # Both of these have to go. Removing only the link would leave the real
     # directory behind, and the unarchive step below would then skip.
     - name: Remove the database directory being replaced

@@ -81,6 +81,9 @@ The project is primarily composed of two areas:
 > ./ansible/bootstrap.sh
 > ```
 >
+> On Windows, run the same playbook inside an Ubuntu WSL2 distribution - it
+> detects WSL and adjusts what it needs to.
+>
 > It cannot fetch the development database or your GitHub token for you, so read
 > the playbook's README for what is left to do by hand.
 

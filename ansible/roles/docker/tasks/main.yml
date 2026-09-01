@@ -1,9 +1,9 @@
 ---
 # Skipped when discovery found a working docker with the compose plugin. It
 # might have come from the convenience script, from Ubuntu's own docker.io
-# packages or from somewhere else, and adding Docker's apt repository over the
-# top of that is a good way to end up with two competing installations. The
-# service and group tasks below still run either way.
+# packages, from Docker Desktop's WSL2 integration or from somewhere else, and
+# adding Docker's apt repository over the top of that is a good way to end up
+# with two competing installations.
 - name: Install Docker Engine
   when: not ees_docker_preinstalled | bool
   block:
@@ -35,21 +35,54 @@
         state: present
       become: true
 
+# Not every working docker is a local systemd service. Docker Desktop's WSL2
+# integration puts the client in the distribution but runs the daemon on the
+# Windows side, and WSL without systemd has no unit to start at all.
+- name: Check whether Docker is managed by a systemd unit
+  ansible.builtin.command:
+    cmd: systemctl list-unit-files docker.service
+  register: ees_docker_unit
+  failed_when: false
+  changed_when: false
+  when: ansible_facts.service_mgr == "systemd"
+
 - name: Enable and start the Docker service
   ansible.builtin.systemd:
     name: docker
     enabled: true
     state: started
   become: true
+  when: ees_docker_unit.rc | default(1) == 0
+
+- name: Explain that the newly installed Docker cannot be started yet
+  ansible.builtin.debug:
+    msg: >-
+      Docker Engine is installed but there is no systemd unit to start it, so the
+      daemon is not running. Under WSL that means systemd is not enabled yet - see
+      the /etc/wsl.conf note at the end of this run, then restart WSL and re-run
+      this playbook.
+  when:
+    - not ees_docker_preinstalled | bool
+    - ees_docker_unit.rc | default(1) != 0
 
 # Without this every docker and docker compose invocation - including the ones
-# the project's start script makes - needs sudo.
+# the project's start script makes - needs sudo. Docker Desktop's WSL2
+# integration reaches the daemon through a proxied socket instead, so there is
+# no docker group there to join.
+- name: Check whether a docker group exists
+  ansible.builtin.command:
+    cmd: getent group docker
+  register: ees_docker_group_exists
+  failed_when: false
+  changed_when: false
+
 - name: Add the current user to the docker group
   ansible.builtin.user:
     name: "{{ ansible_facts.user_id }}"
     groups: docker
     append: true
   become: true
+  when: ees_docker_group_exists.rc == 0
   register: ees_docker_group
 
 - name: Note that the docker group needs a new login session
@@ -73,6 +106,25 @@
          | map(attribute='image', default='') | select() | unique | list }}
   when: ees_pull_docker_images | bool
 
+- name: Check whether the Docker daemon is reachable
+  ansible.builtin.command:
+    cmd: docker info
+  register: ees_docker_info
+  become: true
+  failed_when: false
+  changed_when: false
+  when: ees_pull_docker_images | bool
+
+- name: Note that the container images cannot be pulled yet
+  ansible.builtin.debug:
+    msg: >-
+      The Docker daemon is not running, so the container images have not been
+      pulled. They will be pulled on first use once it is, or re-run this playbook
+      then.
+  when:
+    - ees_pull_docker_images | bool
+    - ees_docker_info.rc | default(1) != 0
+
 # Pulled individually rather than with "docker compose pull" because the
 # data-screener service builds from a sibling ees-screener-api checkout that
 # most developers will not have.
@@ -83,3 +135,4 @@
   become: true
   register: ees_docker_pull
   changed_when: "'Image is up to date' not in ees_docker_pull.stdout"
+  when: ees_docker_info.rc | default(1) == 0

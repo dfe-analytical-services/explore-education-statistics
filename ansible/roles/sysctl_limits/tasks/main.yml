@@ -18,3 +18,16 @@
   become: true
   when: ees_sysctl_conf.changed
   changed_when: true
+
+# WSL only reads /etc/sysctl.d when systemd is running, which it is not until
+# the wsl role's change to /etc/wsl.conf has been picked up by a restart. The
+# sysctl --load above still applies the limits to the instance running now.
+- name: Note that the inotify limits will not survive a WSL restart yet
+  ansible.builtin.debug:
+    msg: >-
+      The raised inotify limits apply to this WSL session but will not be
+      reapplied when the distribution restarts, because systemd is not running
+      yet. Restart WSL as described at the end of this run and they will be.
+  when:
+    - ees_is_wsl | bool
+    - ansible_facts.service_mgr != "systemd"

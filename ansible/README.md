@@ -11,6 +11,9 @@ Tested against Ubuntu 22.04 and 24.04. It will run on other releases but warns
 first, because the third party apt repositories and a couple of package names
 vary between them.
 
+It also covers Windows machines, by way of an Ubuntu distribution under WSL2.
+See [Windows, via WSL2](#windows-via-wsl2).
+
 ## Usage
 
 Clone the repository, then run the bootstrap script from the checkout. It
@@ -57,11 +60,74 @@ cd ansible && ansible-playbook setup.yml \
 | `ees_bootstrap_bare_database` | `false` | Create empty databases with the logins the service needs, instead of using a pre-built development database. |
 | `ees_install_chrome` | `true` | Install Google Chrome for the Robot Framework UI tests. |
 | `ees_pull_docker_images` | `true` | Pull the container images up front rather than on first use. |
+| `ees_wsl_enable_systemd` | `true` | On WSL, set `[boot] systemd` in `/etc/wsl.conf`. |
+| `ees_wsl_disable_generated_hosts` | `true` | On WSL, set `[network] generateHosts = false` in `/etc/wsl.conf`. |
 | `ees_nvm_dir` | `~/.config/nvm` | Where nvm is installed. |
 | `ees_pyenv_root` | `~/.pyenv` | Where pyenv is installed. |
 | `ees_dotnet_root` | `~/.dotnet` | Where the .NET SDK is installed. |
 
 See [`group_vars/all.yml`](group_vars/all.yml) for the full set.
+
+## Windows, via WSL2
+
+Ansible cannot run natively on Windows, so there is no version of this playbook
+that configures a Windows machine directly. What it supports instead is the
+setup most of the team would want anyway: an Ubuntu distribution under WSL2,
+with the whole stack running inside it.
+
+Install WSL2 with an Ubuntu distribution, open it, clone the repository **into
+the WSL filesystem** rather than onto a Windows drive, and run the playbook
+exactly as above:
+
+```bash
+./ansible/bootstrap.sh
+```
+
+The playbook notices it is running under WSL and adjusts. You do not have to
+tell it.
+
+### Keep everything off `/mnt/c`
+
+A checkout under `/mnt/c` - or any other Windows drive mounted into WSL - is a
+bad idea for this project. Crossing that boundary is slow enough to be painful
+for a repository this size, and Linux ownership and permissions are not honoured
+there unless the mount was given the `metadata` option. The playbook warns if it
+finds the checkout there, and refuses outright to extract the development
+database there, because SQL Server could never be given ownership of it.
+
+Put the checkout somewhere under your WSL home directory.
+
+### What it changes about WSL itself
+
+Two settings in `/etc/wsl.conf`, both of which can be turned off with the
+variables in the table above if you would rather manage that file yourself:
+
+| Setting | Why |
+| --- | --- |
+| `[boot] systemd = true` | Off by default in WSL. Without an init system there is nothing to run the Docker daemon, and nothing to apply `/etc/sysctl.d` at boot. |
+| `[network] generateHosts = false` | On by default in WSL, and it rewrites `/etc/hosts` every time the distribution starts, throwing away the `db`, `data-storage` and `ees.local` entries. |
+
+An existing `/etc/wsl.conf` is edited in place - a setting already in the right
+section is updated where it stands, and only a missing section is added, in its
+own marked block.
+
+WSL only reads that file when the distribution starts. **If the playbook changed
+it, run `wsl --shutdown` from Windows, reopen the distribution, and run the
+playbook again** to finish anything that needed systemd. The playbook says so at
+the end of the run when this applies.
+
+### Docker
+
+Either backend works:
+
+- **Docker Desktop** with WSL2 integration enabled for the distribution.
+  Discovery sees the `docker` client on the `PATH`, so nothing is installed, no
+  service is started - the daemon is on the Windows side - and you are not added
+  to a `docker` group, because Docker Desktop reaches the daemon through a
+  proxied socket instead.
+- **Docker Engine inside the distribution**, installed by the playbook as it
+  would be on any other Ubuntu machine. This one needs systemd, so it will not
+  start until after the WSL restart described above.
 
 ## Existing tools are used, not replaced
 
@@ -111,7 +177,9 @@ cd ansible && ansible-playbook setup.yml -e ees_nvm_dir=/opt/nvm
 - Raises `fs.inotify.max_user_watches` and `fs.inotify.max_user_instances` via
   `/etc/sysctl.d`, which the .NET integration tests need.
 - Installs Docker Engine and the Compose plugin from Docker's own apt
-  repository, and adds you to the `docker` group.
+  repository, and adds you to the `docker` group. Skipped when a working docker
+  is already there, including Docker Desktop's WSL2 integration.
+- On WSL, sets `[boot] systemd` and `[network] generateHosts` in `/etc/wsl.conf`.
 - Installs Google Chrome, which the Robot Framework UI tests drive.
 
 ### Toolchains
@@ -240,3 +308,5 @@ pnpm start admin
 
 `ansible-core` only. The playbook uses nothing outside `ansible.builtin`, so
 there are no collections to install and `apt install ansible-core` is enough.
+That holds for the WSL2 setup too - it is the same Ubuntu playbook, run inside
+the distribution, so none of the Windows collections are involved.
