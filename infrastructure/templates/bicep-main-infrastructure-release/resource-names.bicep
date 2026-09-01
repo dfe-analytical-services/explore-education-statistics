@@ -6,6 +6,7 @@ type ResourceNames = {
     appService: string
     appServicePlan: string
     appInsights: string
+    signalRName: string
   }
   analytics: {
     storage: {
@@ -97,6 +98,7 @@ func getResourceNames(
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-admin'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-admin'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-admin'
+    signalRName: '${legacyResourcePrefix}-${abbreviations.signalRServiceSignalR}-ees-admin'
   }
   analytics: {
     storage: {
