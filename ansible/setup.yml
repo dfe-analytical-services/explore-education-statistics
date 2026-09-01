@@ -1,5 +1,5 @@
 ---
-- name: Set up the Explore Education Statistics project on Ubuntu
+- name: Set up a machine to develop Explore Education Statistics
   hosts: local
   gather_facts: true
   become: false

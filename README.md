@@ -74,14 +74,14 @@ The project is primarily composed of two areas:
 ## Getting started
 
 > [!TIP]
-> On Ubuntu, everything in this section can be applied automatically by the
-> [Ansible setup playbook](ansible/README.md):
+> Everything in this section can be applied automatically by the [Ansible setup
+> playbook](ansible/README.md):
 >
 > ```bash
 > ./ansible/bootstrap.sh
 > ```
 >
-> On Windows, run the same playbook inside an Ubuntu WSL2 distribution - it
+> It runs on Ubuntu, and on Windows through an Ubuntu WSL2 distribution, where it
 > detects WSL and adjusts what it needs to.
 >
 > It cannot fetch the development database or your GitHub token for you, so read
@@ -242,7 +242,7 @@ In Linux:
 
 
 > [!TIP]
-> On Ubuntu, the [Ansible setup playbook](ansible/README.md) does all of the above for
+> The [Ansible setup playbook](ansible/README.md) does all of the above for
 > you. Drop the `ees-mssql-data-<number>.zip` into the `data` directory and run
 > `./ansible/bootstrap.sh` - it extracts the archive, puts it in place and sets the
 > ownership. If your home directory is encrypted, add

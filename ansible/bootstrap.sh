@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #
-# Installs Ansible on a freshly formatted Ubuntu machine and runs the EES setup
-# playbook against it. Run this as the user who will be developing on the
-# machine, not as root - it will prompt for a sudo password.
+# Installs Ansible on a freshly formatted machine and runs the EES setup playbook
+# against it. Run this as the user who will be developing on the machine, not as
+# root - it will prompt for a sudo password.
+#
+# On Windows, run this inside an Ubuntu WSL2 distribution.
 #
 #   ./ansible/bootstrap.sh
 #

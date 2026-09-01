@@ -1,18 +1,20 @@
-# Ubuntu setup playbook
+# Development machine setup playbook
 
-An Ansible playbook that takes a freshly formatted Ubuntu machine and leaves it
-able to build, run and test the Explore Education Statistics service.
+An Ansible playbook that takes a freshly formatted machine and leaves it able to
+build, run and test the Explore Education Statistics service.
 
 It automates the manual steps in the ["Getting started"](../README.md#getting-started)
 section of the main README. That section remains the reference for *what* the
 setup is and why; this playbook is just a repeatable way of applying it.
 
+It targets Ubuntu, and covers Windows machines through an Ubuntu distribution
+under WSL2 - see [Windows, via WSL2](#windows-via-wsl2). Everything it installs
+is either Ubuntu packaged or user-local, so it refuses to run on another
+distribution rather than guessing.
+
 Tested against Ubuntu 22.04 and 24.04. It will run on other releases but warns
 first, because the third party apt repositories and a couple of package names
 vary between them.
-
-It also covers Windows machines, by way of an Ubuntu distribution under WSL2.
-See [Windows, via WSL2](#windows-via-wsl2).
 
 ## Usage
 
