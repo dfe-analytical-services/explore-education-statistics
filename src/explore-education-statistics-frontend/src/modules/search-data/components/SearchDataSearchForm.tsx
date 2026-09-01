@@ -18,9 +18,12 @@ import { truncate } from 'lodash';
 import { useRouter } from 'next/router';
 
 interface Props {
+  action?: string;
+  fromHomepage?: boolean;
   isSearchDataSets?: boolean;
   label?: string;
-  onSubmit: (value: string) => void;
+  method?: string;
+  onSubmit?: (value: string) => void;
 }
 
 type AzureSuggestResult =
@@ -33,8 +36,11 @@ const isDataSetResult = (
 };
 
 export default function SearchForm({
+  action,
+  fromHomepage = false,
   isSearchDataSets = false,
   label = 'Search',
+  method,
   onSubmit,
 }: Props) {
   const router = useRouter();
@@ -69,7 +75,7 @@ export default function SearchForm({
     });
 
     function handleEnter(evt: KeyboardEvent) {
-      if (evt.key !== 'Enter') {
+      if (evt.key !== 'Enter' || !onSubmit) {
         return;
       }
 
@@ -217,15 +223,27 @@ export default function SearchForm({
   return (
     <form
       id="searchForm"
-      onSubmit={event => {
-        event.preventDefault();
-        const searchTerm = new FormData(event.currentTarget).get(
-          'search',
-        ) as string;
-        onSubmit(searchTerm || '');
-      }}
+      action={action}
+      method={method}
+      onSubmit={
+        onSubmit
+          ? event => {
+              event.preventDefault();
+              const searchTerm = new FormData(event.currentTarget).get(
+                'search',
+              ) as string;
+              onSubmit(searchTerm || '');
+            }
+          : undefined
+      }
       ref={wrapper}
     >
+      {fromHomepage && (
+        <>
+          <input type="hidden" name="prototype" value="true" />
+          <input type="hidden" name="sortBy" value="relevance" />
+        </>
+      )}
       <label
         htmlFor="search"
         className="govuk-label govuk-label--m"

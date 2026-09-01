@@ -1,7 +1,6 @@
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/home/components/HomePageMasthead.module.scss';
-import HomeSearchForm from '@frontend/modules/home/components/HomeSearchForm';
-// import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
+import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
 import React from 'react';
 
 const HomePageMasthead = () => (
@@ -9,13 +8,25 @@ const HomePageMasthead = () => (
     <div className="govuk-width-container dfe-width-container--wide govuk-!-padding-top-6 govuk-!-padding-bottom-9">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <h1>Explore Education Statistics</h1>
-          <p>
-            View statistical releases, find data sets and create tables from the
-            Department for Education
-          </p>
+          <div className={styles.mastheadMainContent}>
+            <h1
+              className={`govuk-!-margin-bottom-4 govuk-heading-xl ${styles.mastheadTitle}`}
+            >
+              Explore Education Statistics
+            </h1>
+            <p
+              className={`govuk-!-font-size-24 govuk-!-margin-bottom-6 ${styles.mastheadSubtitle}`}
+            >
+              View statistical releases, find data sets and create tables from
+              the Department for Education
+            </p>
 
-          <HomeSearchForm onSubmit={() => {}} />
+            <SearchDataSearchForm
+              method="get"
+              action="/search-releases"
+              fromHomepage
+            />
+          </div>
         </div>
         <div className="govuk-grid-column-one-third">
           <nav role="navigation" aria-labelledby="quick-links">

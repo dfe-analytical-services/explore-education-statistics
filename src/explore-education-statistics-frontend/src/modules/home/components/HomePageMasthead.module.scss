@@ -1,10 +1,46 @@
 @use '~govuk-frontend/dist/govuk/base' as *;
 
+$input-size: 53px;
+
 .masthead {
   background-color: govuk-colour('blue');
   color: govuk-functional-colour('inverse-text');
 
-  *:is(:link, :visited, h1, h2, label, p) {
+  *:is(:link, :visited, h1, h2, label) {
     color: govuk-functional-colour('inverse-text');
   }
+
+  :global(.autocomplete__input) {
+    background-color: govuk-colour('white');
+    border: 0;
+    width: calc(100% - #{$input-size});
+    height: $input-size;
+  }
+
+  :global(.autocomplete__submit-button) {
+    background-color: govuk-colour('blue', $variant: 'tint-80');
+    color: govuk-colour('blue');
+    width: $input-size;
+    height: $input-size;
+  }
+
+  :global(.autocomplete__menu) {
+    margin-right: -$input-size;
+  }
+}
+
+.mastheadMainContent {
+  @include govuk-media-query($from: tablet) {
+    padding-right: govuk-spacing(8);
+  }
+}
+
+.mastheadTitle {
+  @include govuk-media-query($until: tablet) {
+    @include govuk-visually-hidden;
+  }
+}
+
+.mastheadSubtitle {
+  color: govuk-functional-colour('inverse-text');
 }

@@ -12,6 +12,11 @@ import PageFooter from '@frontend/components/PageFooter';
 import PageMeta from '@frontend/components/PageMeta';
 import HomePageHeader from '@frontend/modules/home/components/HomePageHeader';
 import HomePageMasthead from '@frontend/modules/home/components/HomePageMasthead';
+import HomeReleaseLink from '@frontend/modules/home/components/HomeReleaseLink';
+import {
+  latestReleases,
+  popularReleases,
+} from '@frontend/modules/home/data/prototypeHomeReleasesData';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 
@@ -49,14 +54,19 @@ const HomePageRedesign = () => {
 
         <div className="govuk-width-container dfe-width-container--wide">
           <section className="govuk-!-padding-bottom-9">
-            <h2 className="govuk-!-margin-top-6">
+            <h2 className="govuk-!-margin-top-9">
               Latest statistical releases
             </h2>
 
             <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-third">one</div>
-              <div className="govuk-grid-column-one-third">two</div>
-              <div className="govuk-grid-column-one-third">three</div>
+              {latestReleases.map(release => (
+                <div
+                  className="govuk-grid-column-one-third"
+                  key={`${release.publicationSlug}-${release.releaseSlug}`}
+                >
+                  <HomeReleaseLink release={release} onClick={logLinkClick} />
+                </div>
+              ))}
             </div>
             <Link
               to="/find-statistics"
@@ -65,9 +75,20 @@ const HomePageRedesign = () => {
               Explore all of our statistical releases
             </Link>
 
-            <h2 className="govuk-!-margin-top-6">
+            <h2 className="govuk-!-margin-top-9">
               Most popular statistical releases
             </h2>
+
+            <div className="govuk-grid-row">
+              {popularReleases.map(release => (
+                <div
+                  className="govuk-grid-column-one-third"
+                  key={`${release.publicationSlug}-${release.releaseSlug}`}
+                >
+                  <HomeReleaseLink release={release} onClick={logLinkClick} />
+                </div>
+              ))}
+            </div>
             <Link
               to="/find-statistics"
               onClick={() => logLinkClick('Find statistics')}
