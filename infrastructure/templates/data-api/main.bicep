@@ -126,7 +126,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
-    azureFileShares: [
+    azureFileShares: analyticsEnabled ? [
       {
         storageName: analyticsStorageAccount.name
         storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
@@ -134,7 +134,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
         fileShareName: resourceNames.analytics.storage.fileShareName
         mountPath: analyticsFileShareMountPath
       }
-    ]
+    ] : []
     applicationAppSettings: {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger

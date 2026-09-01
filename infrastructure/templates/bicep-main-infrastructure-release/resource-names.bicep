@@ -94,7 +94,7 @@ func getResourceNames(
   }
   analytics: {
     storage: {
-      storageAccountName: '${replace(newResourcePrefix, '-', '')}papisa'
+      storageAccountName: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
       fileShareName: '${newResourcePrefix}-share-anlyt'
     }
   }
