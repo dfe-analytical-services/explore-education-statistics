@@ -106,7 +106,7 @@ var basePublicAllowedOrigins = [
   'https://${reference(afdEndpointResourceId, '2025-06-01').hostName}'
 ]
 
-var publicSiteAllowedOrigins = union(basePublicAllowedOrigins, [environmentConfig.?additionalPublicAllowedOrigins])
+var publicSiteAllowedOrigins = union(basePublicAllowedOrigins, environmentConfig.?additionalPublicAllowedOrigins ?? [])
 
 module adminModule '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
