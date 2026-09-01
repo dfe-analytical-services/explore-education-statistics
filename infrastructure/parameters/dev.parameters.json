@@ -5,9 +5,6 @@
     "skuPublic": {
       "value": "B1 Basic"
     },
-    "skuAdminSignalR": {
-      "value": "Standard_S1"
-    },
     "skuImporter": {
       "value": "P2V2 PremiumV2"
     },
@@ -97,12 +94,6 @@
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
-    },
-    "additionalAdminAllowedOrigins": {
-      "value": [
-        "https://localhost:5021",
-        "http://localhost:5021"
-      ]
     },
     "additionalPublicAllowedOrigins": {
       "value": [

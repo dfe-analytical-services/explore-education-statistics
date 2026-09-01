@@ -5,9 +5,6 @@
     "skuPublic": {
       "value": "P2V2 PremiumV2"
     },
-    "skuAdminSignalR": {
-      "value": "Standard_S1"
-    },
     "skuImporter": {
       "value": "P2V2 PremiumV2"
     },
