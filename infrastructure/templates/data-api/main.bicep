@@ -110,7 +110,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       {
         name: 'StatisticsDb'
         type: 'SQLAzure'
-        connectionString: 'Data Source=tcp:${publicSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=data@${coreSqlServerFqdn};Password=${databaseUserPassword};'
+        connectionString: 'Data Source=tcp:${publicSqlServerFqdn},1433;Initial Catalog=${resourceNames.databases.statisticsDb};User Id=data@${publicSqlServerFqdn};Password=${databaseUserPassword};'
       }
       {
         name: 'ContentDb'
