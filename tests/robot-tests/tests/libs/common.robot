@@ -566,6 +566,15 @@ user checks element does not have class
     ${classes}=    get element attribute    ${element}    class
     should not contain    ${classes}    ${class}
 
+user checks image has loaded
+    [Arguments]    ${selector}    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
+    ${src}=    get element attribute    ${element}    src
+    ${loaded}=    execute javascript
+    ...    return arguments[0].complete && arguments[0].naturalWidth > 0;
+    ...    ARGUMENTS    ${element}
+    should be true    ${loaded}    Image failed to load. src was "${src}"
+
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
     wait until element is enabled    ${element}    ${wait}
