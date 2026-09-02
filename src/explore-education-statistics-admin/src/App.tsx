@@ -14,16 +14,16 @@ import {
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
 import {
-  QueryClientProvider as BaseQueryClientProvider,
   QueryClient,
+  QueryClientProvider as BaseQueryClientProvider,
 } from '@tanstack/react-query';
 import {
   createHead,
   UnheadProvider as BaseUnheadProvider,
 } from '@unhead/react/client';
-import React, { ReactNode, useEffect } from 'react';
-import { Route, Switch, useHistory } from 'react-router';
-import { BrowserRouter } from 'react-router-dom';
+import React, { DependencyList, ReactNode, useEffect } from 'react';
+import { Location, Outlet, RouterProvider, useLocation } from 'react-router';
+import { createBrowserRouter } from 'react-router-dom';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 
@@ -34,57 +34,95 @@ const queryClient = new QueryClient();
 
 const head = createHead();
 
-function ApplicationInsightsTracking() {
-  const appInsights = useApplicationInsights();
-  const history = useHistory();
+const useLocationEffect = (
+  callback: (location: Location) => void,
+  deps: DependencyList = [],
+) => {
+  const location = useLocation();
+
+  callback(location);
 
   useEffect(() => {
-    if (appInsights) {
-      appInsights.trackPageView({
-        uri: history.location.pathname,
-      });
+    callback(location);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callback, location, ...deps]);
+};
 
-      history.listen(location => {
+function ApplicationInsightsTracking() {
+  const appInsights = useApplicationInsights();
+
+  useEffect(() => {
+    document.body.classList.add('js-enabled', 'govuk-frontend-supported');
+  }, []);
+
+  useLocationEffect(
+    location => {
+      if (appInsights) {
         appInsights.trackPageView({
           uri: location.pathname,
         });
-      });
-    }
-
-    document.body.classList.add('js-enabled', 'govuk-frontend-supported');
-  }, [appInsights, history]);
+      }
+    },
+    [appInsights],
+  );
 
   return null;
 }
 
-export default function App() {
+function AppLayout() {
   return (
     <Providers>
       <PageErrorBoundary>
         <NotificationHubContextProvider>
           <ApplicationInsightsTracking />
 
-          <Switch>
-            {Object.entries(publicRoutes).map(([key, route]) => (
-              <Route key={key} {...route} />
-            ))}
-
-            {Object.entries(routes).map(([key, route]) => (
-              <ProtectedRoute key={key} {...route} />
-            ))}
-
-            <ProtectedRoute path="*" component={PageNotFoundPage} />
-          </Switch>
+          <Outlet />
         </NotificationHubContextProvider>
       </PageErrorBoundary>
     </Providers>
   );
 }
 
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      ...Object.entries(publicRoutes).map(([key, route]) => ({
+        id: key,
+        ...route,
+      })),
+
+      ...Object.entries(routes).map(
+        ([key, { element, protectionAction, ...route }]) => ({
+          id: key,
+          element: (
+            <ProtectedRoute protectionAction={protectionAction}>
+              {element}
+            </ProtectedRoute>
+          ),
+          ...route,
+        }),
+      ),
+
+      {
+        path: '*',
+        element: (
+          <ProtectedRoute>
+            <PageNotFoundPage />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
+
 const Providers = composeProviders(
   ConfigContextProvider,
   ApplicationInsightsContextProvider,
-  BrowserRouter,
   NetworkActivityContextProvider,
   UnheadProvider,
   QueryClientProvider,

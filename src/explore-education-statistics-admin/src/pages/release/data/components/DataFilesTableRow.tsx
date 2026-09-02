@@ -5,10 +5,7 @@ import DataUploadCancelButton from '@admin/pages/release/data/components/DataUpl
 import ImporterStatus, {
   terminalImportStatuses,
 } from '@admin/pages/release/data/components/ImporterStatus';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
 import {
   DataFile,
   DataFileImportStatus,
@@ -136,8 +133,8 @@ export default function DataFilesTableRow({
                     )}
                     <p>
                       <Link
-                        to={generatePath<ReleaseDataSetRouteParams>(
-                          releaseApiDataSetDetailsRoute.path,
+                        to={generatePath(
+                          releaseApiDataSetDetailsRoute.fullPath,
                           {
                             publicationId,
                             releaseVersionId,

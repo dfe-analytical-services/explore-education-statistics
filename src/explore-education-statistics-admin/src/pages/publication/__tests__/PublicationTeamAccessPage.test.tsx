@@ -1,18 +1,13 @@
 import PublicationTeamAccessPage from '@admin/pages/publication/PublicationTeamAccessPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import {
-  publicationTeamAccessRoute,
-  PublicationTeamRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationTeamAccessRoute } from '@admin/routes/publicationRoutes';
 import { PublicationWithPermissions } from '@admin/services/publicationService';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { generatePath, Route } from 'react-router';
+import { generatePath } from 'react-router';
 import React from 'react';
-import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import { produce } from 'immer';
 import baseRender from '@common-test/render';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,6 +16,7 @@ import publicationRolesService, {
   UserPublicationRoleInvite,
 } from '@admin/services/user-management/publicationRolesService';
 import { UserPublicationRoleWithUser } from '@admin/services/types/userWithRoles';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/user-management/publicationRolesService');
 
@@ -40,35 +36,31 @@ function createTestQueryClient() {
 }
 
 function renderPage({
-  history = createMemoryHistory(),
   publication,
 }: {
-  history?: MemoryHistory;
   publication?: PublicationWithPermissions;
 } = {}) {
   const queryClient = createTestQueryClient();
 
-  history.push(
-    generatePath<PublicationTeamRouteParams>(publicationTeamAccessRoute.path, {
-      publicationId: 'publication-1',
-    }),
-  );
+  const path = generatePath(publicationTeamAccessRoute.fullPath, {
+    publicationId: 'publication-1',
+  });
 
   return baseRender(
-    <QueryClientProvider client={queryClient}>
-      <Router history={history}>
+    <TestRouterRenderer
+      initialUrl={path}
+      route={publicationTeamAccessRoute.fullPath}
+    >
+      <QueryClientProvider client={queryClient}>
         <PublicationContextProvider
           publication={publication ?? testPublication}
           onPublicationChange={noop}
           onReload={noop}
         >
-          <Route
-            path={publicationTeamAccessRoute.path}
-            component={PublicationTeamAccessPage}
-          />
+          <PublicationTeamAccessPage />
         </PublicationContextProvider>
-      </Router>
-    </QueryClientProvider>,
+      </QueryClientProvider>
+    </TestRouterRenderer>,
   );
 }
 

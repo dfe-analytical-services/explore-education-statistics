@@ -38,152 +38,198 @@ export type ReleaseDataSetChangelogRouteParams = ReleaseDataSetRouteParams & {
 export type ReleaseRouteProps = NavRouteProps;
 
 export const releaseSummaryRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/summary',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/summary',
+  path: 'summary',
   title: 'Summary',
 };
 
 export const releaseSummaryEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/summary/edit',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/summary/edit',
+  path: 'summary/edit',
   title: 'Edit summary',
 };
 
 export const releaseDataRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/data',
+  path: 'data',
   title: 'Data and files',
 };
 
 export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.fileUploads.id}`,
+  fullPath: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.fileUploads.id}`,
+  path: `data#${releaseDataPageTabs.fileUploads.id}`,
   title: 'Data and files',
 };
 
 export const releaseAncillaryFileRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/ancillary/:fileId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/ancillary/:fileId',
+  path: 'ancillary/:fileId',
   title: 'Ancillary file',
 };
 
 export const releaseDataFileReplaceRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replace',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replace',
+  path: 'data/:fileId/replace',
   title: 'Replace data file',
 };
 
 export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replacement-complete',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/data/:fileId/replacement-complete',
+  path: 'data/:fileId/replacement-complete',
   title: 'Replacement complete',
 };
 
 export const releaseApiDataSetsRoute: ReleaseRouteProps = {
-  path: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.apiDataSets.id}`,
+  fullPath: `/publication/:publicationId/release/:releaseVersionId/data#${releaseDataPageTabs.apiDataSets.id}`,
+  path: `data#${releaseDataPageTabs.apiDataSets.id}`,
   title: 'API data sets',
   protectionAction: permissions => permissions.isBauUser,
 };
 
 export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId',
+  path: 'api-data-sets/:dataSetId',
   title: 'API data set details',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetFiltersMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/filters-mapping',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/filters-mapping',
+  path: 'api-data-sets/:dataSetId/filters-mapping',
   title: 'API data set filters mapping',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetIndicatorsMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/indicators-mapping',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/indicators-mapping',
+  path: 'api-data-sets/:dataSetId/indicators-mapping',
   title: 'API data set indicators mapping',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/locations-mapping',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/locations-mapping',
+  path: 'api-data-sets/:dataSetId/locations-mapping',
   title: 'API data set locations mapping',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview',
+  path: 'api-data-sets/:dataSetId/preview',
   title: 'Preview API data set',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewTokenRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
+  path: 'api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
   title: 'API data set preview token',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewTokenLogRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens',
+  path: 'api-data-sets/:dataSetId/preview-tokens',
   title: 'View API data set token log',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetVersionHistoryRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/versions',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/versions',
+  path: 'api-data-sets/:dataSetId/versions',
   title: 'API data set version history',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetChangelogRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
+  path: 'api-data-sets/:dataSetId/changelog/:dataSetVersionId',
   title: 'View API data set token log',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseFootnotesRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/footnotes',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/footnotes',
+  path: 'footnotes',
   title: 'Footnotes',
 };
 
 export const releaseFootnotesCreateRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/create-footnote',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/create-footnote',
+  path: 'create-footnote',
   title: 'Create footnote',
 };
 
 export const releaseFootnotesEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/footnotes/:footnoteId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/footnotes/:footnoteId',
+  path: 'footnotes/:footnoteId',
   title: 'Edit footnote',
 };
 
 export const releaseDataBlocksRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/data-blocks',
+  path: 'data-blocks',
   title: 'Data blocks',
 };
 
 export const releaseTableToolRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/table-tool',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/data-blocks/table-tool',
+  path: 'data-blocks/table-tool',
   title: 'Table tool',
 };
 
 export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/create',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/data-blocks/create',
+  path: 'data-blocks/create',
   title: 'Create data block',
 };
 
 export const releaseDataBlockEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockVersionId',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockVersionId',
+  path: 'data-blocks/:dataBlockVersionId',
   title: 'Edit data block',
 };
 
 export const releaseContentRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/content',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/content',
+  path: 'content',
   title: 'Content',
 };
 
 export const releaseChecklistRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/checklist',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/checklist',
+  path: 'checklist',
   title: 'Publishing checklist',
 };
 
 export const releaseStatusRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/status',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/status',
+  path: 'status',
   title: 'Sign off',
 };
 
 export const releasePreReleaseAccessRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease-access',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/prerelease-access',
+  path: 'prerelease-access',
   title: 'Pre-release access',
 };
 

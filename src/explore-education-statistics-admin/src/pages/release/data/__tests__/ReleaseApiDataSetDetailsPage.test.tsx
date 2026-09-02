@@ -3,10 +3,7 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease as testBaseRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetDetailsPage from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
   ApiDataSetDraftVersion,
@@ -18,7 +15,8 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -144,27 +142,6 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ...testDraftVersion,
     version: '1.0',
     type: 'Major',
-  };
-
-  const defaultTestConfig = {
-    appInsightsKey: '',
-    publicAppUrl: 'http://localhost',
-    publicApiUrl: 'http://public-api',
-    publicApiDocsUrl: 'http://public-api-docs',
-    permittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
-    oidc: {
-      clientId: '',
-      authority: '',
-      knownAuthorities: [''],
-      adminApiScope: '',
-      authorityMetadata: {
-        authorizationEndpoint: '',
-        tokenEndpoint: '',
-        issuer: '',
-        userInfoEndpoint: '',
-        endSessionEndpoint: '',
-      },
-    },
   };
 
   test('renders correctly with data set summary', async () => {
@@ -1699,34 +1676,23 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       user = testBauUser,
     } = options ?? {};
 
+    const path = generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+      publicationId: releaseVersion.publicationId,
+      releaseVersionId: releaseVersion.id,
+      dataSetId,
+    });
+
     return render(
-      <TestConfigContextProvider
-        config={{
-          ...defaultTestConfig,
-        }}
+      <TestRouterRenderer
+        initialUrl={path}
+        route={releaseApiDataSetDetailsRoute.fullPath}
       >
         <AuthContextTestProvider user={user}>
           <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-            <MemoryRouter
-              initialEntries={[
-                generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId: releaseVersion.publicationId,
-                    releaseVersionId: releaseVersion.id,
-                    dataSetId,
-                  },
-                ),
-              ]}
-            >
-              <Route
-                component={ReleaseApiDataSetDetailsPage}
-                path={releaseApiDataSetDetailsRoute.path}
-              />
-            </MemoryRouter>
+            <ReleaseApiDataSetDetailsPage />
           </ReleaseVersionContextProvider>
         </AuthContextTestProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });

@@ -57,7 +57,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
   );
 
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetRouteParams>();
+    useParams<ReleaseDataSetRouteParams>() as ReleaseDataSetRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -215,14 +215,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back
       </Link>
@@ -366,14 +363,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
             {dataSet && (
               <ButtonLink
                 className="govuk-!-margin-top-4"
-                to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataSetId: dataSet.id,
-                  },
-                )}
+                to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                  dataSetId: dataSet.id,
+                })}
               >
                 Continue
               </ButtonLink>

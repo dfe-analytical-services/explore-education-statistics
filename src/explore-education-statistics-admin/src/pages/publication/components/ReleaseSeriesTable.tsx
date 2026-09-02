@@ -1,8 +1,5 @@
 import Link from '@admin/components/Link';
-import {
-  publicationEditReleaseSeriesLegacyLinkRoute,
-  PublicationEditReleaseSeriesLegacyLinkRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationEditReleaseSeriesLegacyLinkRoute } from '@admin/routes/publicationRoutes';
 import { ReleaseSeriesTableEntry } from '@admin/services/publicationService';
 import ReorderableList from '@common/components/ReorderableList';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -14,8 +11,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import Tag from '@common/components/Tag';
 import React, { useEffect, useState } from 'react';
-import { generatePath } from 'react-router';
-import { useHistory } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router';
 
 interface Props {
   canManageReleaseSeries: boolean;
@@ -27,6 +23,7 @@ interface Props {
   onConfirmReordering: (nextSeries: ReleaseSeriesTableEntry[]) => void;
   onDelete: (id: string) => Promise<void> | void;
 }
+
 export default function ReleaseSeriesTable({
   canManageReleaseSeries,
   isReordering,
@@ -37,7 +34,7 @@ export default function ReleaseSeriesTable({
   onConfirmReordering,
   onDelete,
 }: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [releaseSeries, setReleaseSeries] = useState(initialReleaseSeries);
 
   useEffect(() => {
@@ -148,9 +145,9 @@ export default function ReleaseSeriesTable({
                           </ButtonText>
                         }
                         onConfirm={() => {
-                          history.push(
-                            generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
-                              publicationEditReleaseSeriesLegacyLinkRoute.path,
+                          navigate(
+                            generatePath(
+                              publicationEditReleaseSeriesLegacyLinkRoute.fullPath,
                               {
                                 publicationId,
                                 releaseSeriesItemId: seriesItem.id,

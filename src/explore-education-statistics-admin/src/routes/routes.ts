@@ -1,119 +1,120 @@
-import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
-import { RouteProps } from 'react-router';
-
-interface PublicRouteProps extends RouteProps {
-  path: string;
-}
+import { ProtectedRouteProps, PublicRouteProps } from './types';
 
 export type ThemeParams = {
   themeId: string;
 };
 
 export const signInRoute: PublicRouteProps = {
-  path: '/sign-in',
-  exact: true,
+  fullPath: '/sign-in',
+  path: 'sign-in',
 };
 
 export const signedOutRoute: PublicRouteProps = {
-  path: '/signed-out',
-  exact: true,
+  fullPath: '/signed-out',
+  path: 'signed-out',
 };
 
 export const expiredInviteRoute: PublicRouteProps = {
-  path: '/expired-invite',
-  exact: true,
+  fullPath: '/expired-invite',
+  path: 'expired-invite',
 };
 
 export const noInvitationRoute: PublicRouteProps = {
-  path: '/no-invitation',
-  exact: true,
+  fullPath: '/no-invitation',
+  path: 'no-invitation',
 };
 
 export const homeRoute: ProtectedRouteProps = {
-  path: '/',
+  fullPath: '/',
+  path: '',
   protectionAction: permissions => permissions.canAccessAnalystPages,
-  exact: true,
 };
 
 export const publishersGuideRoute: ProtectedRouteProps = {
-  path: '/publishers-guide',
+  fullPath: '/publishers-guide',
+  path: 'publishers-guide',
   protectionAction: permissions => permissions.canAccessAnalystPages,
-  exact: true,
 };
 
 export const dashboardRoute: ProtectedRouteProps = {
-  path: '/dashboard',
+  fullPath: '/dashboard',
+  path: 'dashboard',
   protectionAction: permissions => permissions.canAccessAnalystPages,
-  exact: true,
 };
 
 export const contactUsRoute: ProtectedRouteProps = {
-  path: '/contact-us',
-  exact: true,
+  fullPath: '/contact-us',
+  path: 'contact-us',
 };
 
 export const themesRoute: ProtectedRouteProps = {
-  path: '/themes',
+  fullPath: '/themes',
+  path: 'themes',
   protectionAction: permissions => permissions.canManageAllTaxonomy,
-  exact: true,
 };
 
 export const themeCreateRoute: ProtectedRouteProps = {
-  path: '/themes/create',
+  fullPath: '/themes/create',
+  path: 'themes/create',
   protectionAction: permissions => permissions.canManageAllTaxonomy,
-  exact: true,
 };
 
 export const themeEditRoute: ProtectedRouteProps = {
-  path: '/themes/:themeId/edit',
+  fullPath: '/themes/:themeId/edit',
+  path: 'themes/:themeId/edit',
   protectionAction: permissions => permissions.canManageAllTaxonomy,
-  exact: true,
 };
 
 export const publicationCreateRoute: ProtectedRouteProps = {
-  path: '/theme/:themeId/publications/create',
+  fullPath: '/theme/:themeId/publications/create',
+  path: 'theme/:themeId/publications/create',
   protectionAction: permissions => permissions.canAccessAnalystPages,
-  exact: true,
 };
 
 export const publicationRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId',
+  fullPath: '/publication/:publicationId/*',
+  path: 'publication/:publicationId/*',
+
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const methodologyRoute: ProtectedRouteProps = {
-  path: '/methodology/:methodologyId',
+  fullPath: '/methodology/:methodologyId/*',
+  path: 'methodology/:methodologyId/*',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/*',
+  path: 'publication/:publicationId/release/:releaseVersionId/*',
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseCreateRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/create-release',
+  fullPath: '/publication/:publicationId/create-release',
+  path: 'publication/:publicationId/create-release',
   protectionAction: permissions => permissions.canAccessAnalystPages,
-  exact: true,
 };
 
 export const preReleaseRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease',
+  fullPath: '/publication/:publicationId/release/:releaseVersionId/prerelease',
+  path: 'publication/:publicationId/release/:releaseVersionId/prerelease',
 };
 
 export const educationInNumbersListRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers',
+  fullPath: '/education-in-numbers',
+  path: 'education-in-numbers',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const educationInNumbersCreateRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers/create',
+  fullPath: '/education-in-numbers/create',
+  path: 'education-in-numbers/create',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const educationInNumbersRoute: ProtectedRouteProps = {
-  path: '/education-in-numbers/:educationInNumbersPageId',
+  fullPath: '/education-in-numbers/:educationInNumbersPageId',
+  path: 'education-in-numbers/:educationInNumbersPageId',
   protectionAction: permissions => permissions.isBauUser,
 };

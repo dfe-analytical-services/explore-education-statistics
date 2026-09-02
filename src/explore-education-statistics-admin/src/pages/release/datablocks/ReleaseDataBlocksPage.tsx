@@ -8,7 +8,6 @@ import permissionQueries from '@admin/queries/permissionQueries';
 import {
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
@@ -24,10 +23,11 @@ import SortedTableHeader, {
 } from '@common/components/SortedTableHeader';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
+import React, { useCallback, useMemo, useState } from 'react';
+import { generatePath } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import orderBy from 'lodash/orderBy';
-import { useCallback, useMemo, useState } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
 
 type DataBlockSortColumn =
   'name' | 'dataSetTitle' | 'hasChart' | 'inContent' | 'created';
@@ -43,10 +43,9 @@ const dataBlockSortValues: Record<
   created: dataBlock => dataBlock.created ?? '',
 };
 
-const ReleaseDataBlocksPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleaseDataBlocksPage = () => {
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const queryClient = useQueryClient();
 
@@ -115,13 +114,10 @@ const ReleaseDataBlocksPage = ({
     [listFeaturedTablesQuery, queryClient, releaseVersionId],
   );
 
-  const createPath = generatePath<ReleaseRouteParams>(
-    releaseDataBlockCreateRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-    },
-  );
+  const createPath = generatePath(releaseDataBlockCreateRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+  });
 
   const sortedDataBlocks = useMemo(() => {
     const unfeaturedDataBlocks = dataBlocks.filter(dataBlock => {
@@ -182,7 +178,7 @@ const ReleaseDataBlocksPage = ({
           </WarningMessage>
 
           <ButtonLink
-            to={generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
+            to={generatePath(releaseTableToolRoute.fullPath, {
               publicationId,
               releaseVersionId,
             })}
@@ -275,8 +271,8 @@ const ReleaseDataBlocksPage = ({
                       className="govuk-!-margin-bottom-0"
                       unvisited
                       data-testid={`Edit data block ${dataBlock.name}`}
-                      to={generatePath<ReleaseDataBlockRouteParams>(
-                        releaseDataBlockEditRoute.path,
+                      to={generatePath(
+                        releaseDataBlockEditRoute.fullPath,
                         {
                           publicationId,
                           releaseVersionId,

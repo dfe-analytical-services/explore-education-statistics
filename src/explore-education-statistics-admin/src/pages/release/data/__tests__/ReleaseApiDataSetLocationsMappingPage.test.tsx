@@ -3,10 +3,7 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetLocationsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetLocationsMappingPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  releaseApiDataSetLocationsMappingRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetLocationsMappingRoute } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
@@ -19,7 +16,8 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -1403,29 +1401,23 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
     } = options ?? {};
 
     return render(
-      <AuthContextTestProvider user={user}>
-        <TestConfigContextProvider>
+      <TestRouterRenderer
+        initialUrl={generatePath(
+          releaseApiDataSetLocationsMappingRoute.fullPath,
+          {
+            publicationId: releaseVersion.publicationId,
+            releaseVersionId: releaseVersion.id,
+            dataSetId,
+          },
+        )}
+        route={releaseApiDataSetLocationsMappingRoute.fullPath}
+      >
+        <AuthContextTestProvider user={user}>
           <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-            <MemoryRouter
-              initialEntries={[
-                generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetLocationsMappingRoute.path,
-                  {
-                    publicationId: releaseVersion.publicationId,
-                    releaseVersionId: releaseVersion.id,
-                    dataSetId,
-                  },
-                ),
-              ]}
-            >
-              <Route
-                component={ReleaseApiDataSetLocationsMappingPage}
-                path={releaseApiDataSetLocationsMappingRoute.path}
-              />
-            </MemoryRouter>
+            <ReleaseApiDataSetLocationsMappingPage />
           </ReleaseVersionContextProvider>
-        </TestConfigContextProvider>
-      </AuthContextTestProvider>,
+        </AuthContextTestProvider>
+      </TestRouterRenderer>,
     );
   }
 });

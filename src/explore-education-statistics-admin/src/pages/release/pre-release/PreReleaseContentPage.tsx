@@ -3,21 +3,16 @@ import ReleaseContentPreview from '@admin/pages/release/content/components/Relea
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import featuredTableQueries from '@admin/queries/featuredTableQueries';
 import releaseContentQueries from '@admin/queries/releaseContentQueries';
-import {
-  preReleaseTableToolRoute,
-  PreReleaseTableToolRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseTableToolRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
-const PreReleaseContentPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const PreReleaseContentPage = () => {
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const { data: content, isLoading: isLoadingContent } = useQuery(
     releaseContentQueries.get(releaseVersionId, true),
@@ -36,8 +31,8 @@ const PreReleaseContentPage = ({
 
     return (
       <Link
-        to={generatePath<PreReleaseTableToolRouteParams>(
-          preReleaseTableToolRoute.path,
+        to={generatePath(
+          preReleaseTableToolRoute.fullPath,
           {
             publicationId,
             releaseVersionId,

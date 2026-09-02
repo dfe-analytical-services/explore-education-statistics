@@ -4,15 +4,15 @@ import {
   testReleases,
   testStandardUser,
 } from '@admin/pages/users/__data__/testUserData';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
 import _usersService from '@admin/services/user-management/usersService';
 import _releaseService from '@admin/services/releaseService';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route, generatePath } from 'react-router';
+import { generatePath } from 'react-router';
 import { administrationUserManageRoute } from '@admin/routes/administrationRoutes';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/releaseService');
@@ -77,20 +77,14 @@ describe('ManageUserPage', () => {
     usersService.getUser.mockResolvedValue(testStandardUser);
 
     render(
-      <MemoryRouter
-        initialEntries={[
-          generatePath(administrationUserManageRoute.path, {
-            userId: 'user-1-id',
-          }),
-        ]}
+      <TestRouterRenderer
+        initialUrl={generatePath(administrationUserManageRoute.fullPath, {
+          userId: 'user-1-id',
+        })}
+        route={administrationUserManageRoute.fullPath}
       >
-        <TestConfigContextProvider>
-          <Route
-            component={ManageUserPage}
-            path={administrationUserManageRoute.path}
-          />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+        <ManageUserPage />
+      </TestRouterRenderer>,
     );
 
     expect(await screen.findByText('Details')).toBeInTheDocument();

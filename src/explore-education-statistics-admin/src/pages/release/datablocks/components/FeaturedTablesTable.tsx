@@ -1,10 +1,7 @@
 import Link from '@admin/components/Link';
 import { FeaturedTable } from '@admin/services/featuredTableService';
 import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
-import {
-  releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataBlockEditRoute } from '@admin/routes/releaseRoutes';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
 import ReorderableList from '@common/components/ReorderableList';
@@ -128,8 +125,8 @@ export default function FeaturedTablesTable({
                   dataBlock={dataBlock}
                   featuredTable={featuredTable}
                   key={featuredTable.id}
-                  link={generatePath<ReleaseDataBlockRouteParams>(
-                    releaseDataBlockEditRoute.path,
+                  link={generatePath(
+                    releaseDataBlockEditRoute.fullPath,
                     {
                       publicationId,
                       releaseVersionId,

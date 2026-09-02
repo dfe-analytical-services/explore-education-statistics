@@ -6,9 +6,7 @@ import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQuerie
 import {
   releaseApiDataSetDetailsRoute,
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
   ReleaseDataSetRouteParams,
-  ReleaseFootnoteRouteParams,
   releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
@@ -272,11 +270,11 @@ function Plan({
   );
 
   const apiDataSetsTabRoute = releaseRouteParams
-    ? `${generatePath<ReleaseDataSetRouteParams>(
-        releaseApiDataSetDetailsRoute.path,
-        releaseRouteParams,
-      )}`
-    : undefined;
+      ? `${generatePath(
+          releaseApiDataSetDetailsRoute.fullPath,
+          releaseRouteParams,
+        )}`
+      : undefined;
 
   return (
     <>
@@ -468,8 +466,8 @@ function Plan({
 
                 <ButtonGroup>
                   <ButtonLink
-                    to={`${generatePath<ReleaseDataBlockRouteParams>(
-                      releaseDataBlockEditRoute.path,
+                    to={`${generatePath(
+                      releaseDataBlockEditRoute.fullPath,
                       {
                         publicationId,
                         releaseVersionId,
@@ -612,8 +610,8 @@ function Plan({
 
                   <ButtonGroup>
                     <ButtonLink
-                      to={generatePath<ReleaseFootnoteRouteParams>(
-                        releaseFootnotesEditRoute.path,
+                      to={generatePath(
+                        releaseFootnotesEditRoute.fullPath,
                         {
                           publicationId,
                           releaseVersionId,

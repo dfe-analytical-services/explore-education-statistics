@@ -9,9 +9,10 @@ import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService'
 import { GlobalPermissions } from '@admin/services/authService';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import { createMemoryHistory, History } from 'history';
 import { ReactNode } from 'react';
-import { Router } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/apiDataSetVersionService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -235,7 +236,7 @@ describe('LiveApiDataSetsTable', () => {
         releaseVersionId="release-version-1"
         releaseId="release-1"
       />,
-      { user: testAnalystUser },
+      testAnalystUser
     );
 
     expect(
@@ -305,8 +306,6 @@ describe('LiveApiDataSetsTable', () => {
       previousReleaseIds: [],
     });
 
-    const history = createMemoryHistory();
-
     const { user } = render(
       <LiveApiDataSetsTable
         canUpdateRelease
@@ -315,7 +314,6 @@ describe('LiveApiDataSetsTable', () => {
         releaseVersionId="release-version-1"
         releaseId="release-1"
       />,
-      { history },
     );
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
@@ -351,25 +349,23 @@ describe('LiveApiDataSetsTable', () => {
       });
     });
 
-    expect(history.location.pathname).toBe(
+    await expectLocation(
       '/publication/publication-1/release/release-version-1/api-data-sets/data-set-1',
     );
   });
 
-  function render(
-    ui: ReactNode,
-    options?: {
-      history?: History;
-      user?: User;
-    },
-  ) {
-    const { history = createMemoryHistory(), user = testBauUser } =
-      options ?? {};
-
+  function render(ui: ReactNode, user?: User =testBauUser) {
     return baseRender(
-      <AuthContextTestProvider user={user}>
-        <Router history={history}>{ui}</Router>
-      </AuthContextTestProvider>,
+      <TestRouterRenderer
+        initialUrl="/"
+        route="/"
+        routes={[releaseApiDataSetDetailsRoute.fullPath]}
+        disableTestContext
+      >
+        <AuthContextTestProvider user={user}>
+        {ui}
+        </AuthContextTestProvider>
+      </TestRouterRenderer>,
     );
   }
 });

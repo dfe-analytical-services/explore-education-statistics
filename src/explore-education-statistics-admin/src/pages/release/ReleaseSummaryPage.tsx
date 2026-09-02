@@ -1,10 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  ReleaseRouteParams,
-  releaseSummaryEditRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryEditRoute } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseVersionService from '@admin/services/releaseVersionService';
 import Gate from '@common/components/Gate';
@@ -78,13 +75,10 @@ const ReleaseSummaryPage = () => {
             }
           >
             <ButtonLink
-              to={generatePath<ReleaseRouteParams>(
-                releaseSummaryEditRoute.path,
-                {
-                  publicationId: releaseVersion.publicationId,
-                  releaseVersionId,
-                },
-              )}
+              to={generatePath(releaseSummaryEditRoute.fullPath, {
+                publicationId: releaseVersion.publicationId,
+                releaseVersionId,
+              })}
             >
               Edit release summary
             </ButtonLink>

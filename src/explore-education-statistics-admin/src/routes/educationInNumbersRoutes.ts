@@ -7,23 +7,27 @@ export type EducationInNumbersRouteParams = {
 };
 
 export const educationInNumbersSummaryRoute: EducationInNumbersRouteProps = {
-  path: '/education-in-numbers/:educationInNumbersPageId/summary',
+  fullPath: '/education-in-numbers/:educationInNumbersPageId/summary',
+  path: 'education-in-numbers/:educationInNumbersPageId/summary',
   title: 'Summary',
 };
 
 export const educationInNumbersSummaryEditRoute: EducationInNumbersRouteProps =
   {
-    path: '/education-in-numbers/:educationInNumbersPageId/summary/edit',
+    fullPath: '/education-in-numbers/:educationInNumbersPageId/summary/edit',
+    path: 'education-in-numbers/:educationInNumbersPageId/summary/edit',
     title: 'Edit summary',
   };
 
 export const educationInNumbersContentRoute: EducationInNumbersRouteProps = {
-  path: '/education-in-numbers/:educationInNumbersPageId/content',
+  fullPath: '/education-in-numbers/:educationInNumbersPageId/content',
+  path: 'education-in-numbers/:educationInNumbersPageId/content',
   title: 'Manage content',
 };
 
 export const educationInNumbersSignOffRoute: EducationInNumbersRouteProps = {
-  path: '/education-in-numbers/:educationInNumbersPageId/sign-off',
+  fullPath: '/education-in-numbers/:educationInNumbersPageId/sign-off',
+  path: 'education-in-numbers/:educationInNumbersPageId/sign-off',
   title: 'Sign off',
 };
 

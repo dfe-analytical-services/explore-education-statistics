@@ -1,9 +1,6 @@
 import render from '@common-test/render';
 import PreReleaseTableToolPage from '@admin/pages/release/pre-release/PreReleaseTableToolPage';
-import {
-  preReleaseTableToolRoute,
-  PreReleaseTableToolRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseTableToolRoute } from '@admin/routes/preReleaseRoutes';
 import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
@@ -14,16 +11,16 @@ import _releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';
 import _tableBuilderService, {
-  SubjectMeta,
-  TableDataResponse,
   FeaturedTable,
   Subject,
+  SubjectMeta,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
@@ -371,8 +368,8 @@ describe('PreReleaseTableToolPage', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
 
     renderPage([
-      generatePath<PreReleaseTableToolRouteParams>(
-        preReleaseTableToolRoute.path,
+      generatePath(
+        preReleaseTableToolRoute.fullPath,
         {
           publicationId: 'publication-1',
           releaseVersionId: 'release-1',
@@ -413,23 +410,18 @@ describe('PreReleaseTableToolPage', () => {
   });
 
   const renderPage = (
-    initialEntries: string[] = [
-      generatePath<PreReleaseTableToolRouteParams>(
-        preReleaseTableToolRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-        },
-      ),
-    ],
+    path = generatePath(preReleaseTableToolRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+    }),
   ) => {
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <Route
-          component={PreReleaseTableToolPage}
-          path={preReleaseTableToolRoute.path}
-        />
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={preReleaseTableToolRoute.fullPath}
+      >
+        <PreReleaseTableToolPage />
+      </TestRouterRenderer>,
     );
   };
 });
