@@ -126,7 +126,7 @@ resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
 }
 
 module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
-  name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
+  name: '${appServiceName}KeyVaultSecretsUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
     roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
@@ -138,7 +138,7 @@ module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key
 }
 
 module appServiceCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?certificateUser ?? false) {
-  name: '${appServiceName}KeyVaultCertificateUserRoleAssignmentModule'
+  name: '${appServiceName}KeyVaultCertificateUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
     roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
@@ -197,3 +197,4 @@ module alertsModule 'alerts.bicep' = if (alerts != null) {
 }
 
 output appServiceName string = appService.name
+output appServiceSystemIdentityId string = appService.identity.principalId

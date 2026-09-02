@@ -1,5 +1,6 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -161,5 +162,19 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
     }
     tagValues: tagValues
+  }
+}
+
+module searchIndexDataReaderRoleAssignmentModule '../common/components/search/searchServiceRoleAssignment.bicep' = {
+  name: 'publicSiteSearchIndexDataReaderRoleAssignmentModuleDeploy'
+  params: {
+    searchServiceName: resourceNames.search.service
+    principalIds: [appServiceModule.outputs.appServiceSystemIdentityId]
+    roleAssignmentNameOverride: guid(
+      resourceId('Microsoft.Search/searchServices', resourceNames.search.service),
+      resourceId('Microsoft.Web/sites', appServiceModule.outputs.appServiceName),
+      builtInRoleDefinitionIds.SearchIndexDataReader
+    )
+    role: 'Search Index Data Reader'
   }
 }

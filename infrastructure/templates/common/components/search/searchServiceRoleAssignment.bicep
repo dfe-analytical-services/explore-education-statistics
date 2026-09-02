@@ -16,6 +16,9 @@ param principalIds string[]
 @description('Specifies the role to assign to the service principals')
 param role SearchServiceRole
 
+@description('The name of the role assignment resource. Auto-calculated by default, so little need to use this unless supporting existing role assignments when switching to Bicep.')
+param roleAssignmentNameOverride string?
+
 var rolesToRoleIds = {
   'Search Index Data Contributor': builtInRoleDefinitionIds.SearchIndexDataContributor
   'Search Index Data Reader': builtInRoleDefinitionIds.SearchIndexDataReader
@@ -33,7 +36,7 @@ resource searchServiceRoleAssignments 'Microsoft.Authorization/roleAssignments@2
   scope: searchService
   name: guid(searchService.id, principalId, rolesToRoleIds[role])
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
+    roleDefinitionId: roleAssignmentNameOverride ?? subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
     principalId: principalId
     principalType: 'ServicePrincipal'
   }
