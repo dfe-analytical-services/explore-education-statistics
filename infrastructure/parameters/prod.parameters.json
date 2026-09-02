@@ -11,12 +11,6 @@
     "skuPublisher": {
       "value": "S1 Standard"
     },
-    "slackAlertsChannel": {
-      "value": "C01MCTX47E3"
-    },
-    "publicAppBasicAuth": {
-      "value": "false"
-    },
     "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 5 0 * * *"
     },
@@ -26,17 +20,8 @@
     "useSubnets": {
       "value": true
     },
-    "autoscaleAppServices": {
-      "value": true
-    },
     "domain": {
       "value": "explore-education-statistics.service.gov.uk"
-    },
-    "contentApiUrl": {
-      "value": "content.explore-education-statistics.service.gov.uk"
-    },
-    "dataApiUrl": {
-      "value": "data.explore-education-statistics.service.gov.uk"
     },
     "storageAccountPrefix": {
       "value": "sa"
@@ -64,9 +49,6 @@
     },
     "capacityStatisticsDb": {
       "value": 12
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "value": 1000000
     },
     "maxContentDbSizeBytes": {
       "value": 4294967296
