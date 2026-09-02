@@ -11,16 +11,15 @@ import releaseDataFileService, {
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
 import dataReplacementService from '@admin/services/dataReplacementService';
-import useToggle from '@common/hooks/useToggle';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { generatePath } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import styles from './DataFilesTable.module.scss';
 
 interface Props {
@@ -28,7 +27,6 @@ interface Props {
   publicationId: string;
   releaseVersionId: string;
   onConfirmAction?: () => void;
-  onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTableRow({
@@ -36,10 +34,8 @@ export default function DataFilesReplacementTableRow({
   publicationId,
   releaseVersionId,
   onConfirmAction,
-  onReplacementStatusChange,
 }: Props) {
-  const [fetchPlan, toggleFetchPlan] = useToggle(false);
-  const [canCancel, toggleCanCancel] = useToggle(false);
+  const queryClient = useQueryClient();
 
   const { data: replacementDataFile, isLoading } = useQuery({
     ...releaseDataFileQueries.getDataFile(
@@ -55,46 +51,33 @@ export default function DataFilesReplacementTableRow({
       dataFile.id,
       dataFile.replacedByDataFileId ?? '',
     ),
-    enabled: fetchPlan,
+    // A replacement plan can only be produced once the replacement file has
+    // finished importing.
+    enabled: replacementDataFile?.status === 'COMPLETE',
   });
-
-  useEffect(() => {
-    if (replacementDataFile?.status === 'COMPLETE') {
-      toggleFetchPlan.on();
-    }
-  }, [replacementDataFile?.status, toggleFetchPlan, toggleCanCancel]);
-
-  useEffect(() => {
-    onReplacementStatusChange({
-      ...dataFile,
-      ...(dataFile.replacedByDataFile && {
-        replacedByDataFile: {
-          ...dataFile.replacedByDataFile,
-          hasValidReplacementPlan: plan?.valid ?? false,
-        },
-      }),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plan, onReplacementStatusChange]);
 
   const handleStatusChange = async (
     _: DataFile,
     replacementImportStatus: DataFileImportStatus,
   ) => {
-    if (replacementImportStatus.status === 'COMPLETE') {
-      toggleFetchPlan.on();
-      toggleCanCancel.on();
-
-      onReplacementStatusChange({
-        ...dataFile,
-        ...(dataFile.replacedByDataFile && {
-          replacedByDataFile: {
-            ...dataFile.replacedByDataFile,
-            status: replacementImportStatus.status,
-          },
-        }),
-      });
+    if (replacementImportStatus.status !== 'COMPLETE') {
+      return;
     }
+
+    await Promise.all([
+      // Refresh the replacement file so its status becomes COMPLETE, which in
+      // turn enables the replacement plan query above.
+      queryClient.invalidateQueries({
+        queryKey: releaseDataFileQueries.getDataFile(
+          releaseVersionId,
+          dataFile.replacedByDataFileId ?? '',
+        ).queryKey,
+      }),
+      // Refresh the main data file list too
+      queryClient.invalidateQueries({
+        queryKey: releaseDataFileQueries.list(releaseVersionId).queryKey,
+      }),
+    ]);
   };
 
   if (!replacementDataFile) {
@@ -150,7 +133,7 @@ export default function DataFilesReplacementTableRow({
             <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
           </Link>
           <>
-            {(canCancel || replacementDataFile.status === 'COMPLETE') && (
+            {replacementDataFile.status === 'COMPLETE' && (
               <ModalConfirm
                 title="Cancel data replacement"
                 triggerButton={

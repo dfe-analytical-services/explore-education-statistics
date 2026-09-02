@@ -1,4 +1,5 @@
-import releaseDataFileService, {
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
+import {
   DataFile,
   DataFileImportStatus,
   ImportStatusCode,
@@ -8,9 +9,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ProgressBar from '@common/components/ProgressBar';
 import Tag, { TagProps } from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
-import useInterval from '@common/hooks/useInterval';
-import useMounted from '@common/hooks/useMounted';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React from 'react';
 
 const getImportStatusLabel = (
   statusCode: ImportStatusCode,
@@ -94,37 +94,25 @@ const ImporterStatus = ({
   releaseVersionId,
   onStatusChange,
 }: ImporterStatusProps) => {
-  const [currentStatus, setCurrentStatus] = useState<StatusState>({
+  const { data } = useQuery({
+    ...releaseDataFileQueries.importStatus(releaseVersionId, dataFile.id),
+    enabled: dataFile.status !== 'COMPLETE',
+    // Poll every 5 seconds until the import reaches a status it can't move on from.
+    refetchInterval: nextStatus =>
+      nextStatus && terminalImportStatuses.includes(nextStatus.status)
+        ? false
+        : 5000,
+    onSuccess: nextStatus => {
+      if (nextStatus.status !== dataFile.status) {
+        onStatusChange?.(dataFile, nextStatus);
+      }
+    },
+  });
+
+  const currentStatus: StatusState = data ?? {
     status: dataFile.status,
     percentageComplete: 0,
-  });
-
-  const fetchStatus = useCallback(async () => {
-    const nextStatus = await releaseDataFileService.getDataFileImportStatus(
-      releaseVersionId,
-      dataFile.id,
-    );
-
-    setCurrentStatus(nextStatus);
-
-    if (onStatusChange && nextStatus.status !== dataFile.status) {
-      onStatusChange(dataFile, nextStatus);
-    }
-  }, [releaseVersionId, dataFile, onStatusChange]);
-
-  const [cancelInterval] = useInterval(fetchStatus, 5000);
-
-  useMounted(() => {
-    if (dataFile.status !== 'COMPLETE') {
-      fetchStatus();
-    }
-  });
-
-  useEffect(() => {
-    if (terminalImportStatuses.includes(currentStatus.status)) {
-      cancelInterval();
-    }
-  }, [cancelInterval, currentStatus]);
+  };
 
   const hasTerminalStatus = terminalImportStatuses.includes(
     currentStatus.status,

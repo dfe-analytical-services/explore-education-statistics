@@ -8,7 +8,7 @@
 *.ipr
 *.iws
 
-# AI
+## AI
 .claude
 
 ## Application

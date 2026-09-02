@@ -273,6 +273,9 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
   params: {
     location: location
     resourceNames: resourceNames
+    environmentName: environmentName
+    publicApiUrl: publicUrls.publicApi
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }

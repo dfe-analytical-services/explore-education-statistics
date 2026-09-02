@@ -118,8 +118,18 @@ public class ReplacementService(
                     && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
 
-                replacementReleaseFile.FilterSequence = ReplaceFilterSequence(originalReleaseFile, mapping);
-                replacementReleaseFile.IndicatorSequence = ReplaceIndicatorSequence(originalReleaseFile, mapping);
+                replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
+                    originalReleaseFile,
+                    replacementSubjectId,
+                    mapping,
+                    cancellationToken
+                );
+                replacementReleaseFile.IndicatorSequence = await ReplaceIndicatorSequence(
+                    originalReleaseFile,
+                    replacementSubjectId,
+                    mapping,
+                    cancellationToken
+                );
                 replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
                 // To remove original, we first unlink the files. If we don't do this,
@@ -637,9 +647,11 @@ public class ReplacementService(
         );
     }
 
-    private static List<FilterSequenceEntry>? ReplaceFilterSequence(
+    private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(
         ReleaseFile originalReleaseFile,
-        DataSetMapping mapping
+        Guid replacementSubjectId,
+        DataSetMapping mapping,
+        CancellationToken cancellationToken
     )
     {
         // If the sequence is null then leave it so we continue to fallback to ordering by label alphabetically
@@ -648,15 +660,25 @@ public class ReplacementService(
             return null;
         }
 
+        var replacementFilters = await statisticsDbContext
+            .Filter.AsNoTracking()
+            .Include(f => f.FilterGroups)
+                .ThenInclude(g => g.FilterItems)
+            .Where(f => f.SubjectId == replacementSubjectId)
+            .ToListAsync(cancellationToken);
+
         return ReplacementServiceHelper.ReplaceFilterSequence(
             originalSequence: originalReleaseFile.FilterSequence,
-            mapping: mapping
+            mapping: mapping,
+            replacementFilters
         );
     }
 
-    private static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
+    private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
         ReleaseFile originalReleaseFile,
-        DataSetMapping mapping
+        Guid replacementSubjectId,
+        DataSetMapping mapping,
+        CancellationToken cancellationToken
     )
     {
         // If the sequence is null then leave it so we continue to fallback to ordering by label alphabetically
@@ -665,23 +687,25 @@ public class ReplacementService(
             return null;
         }
 
+        var replacementIndicatorGroups = await statisticsDbContext
+            .IndicatorGroup.AsNoTracking()
+            .Include(ig => ig.Indicators)
+            .Where(ig => ig.SubjectId == replacementSubjectId)
+            .ToListAsync(cancellationToken);
+
         var originalGroupIdToLabelMap = mapping
             .IndicatorMappings.Values.Select(i => new { Id = i.OriginalGroupId, Label = i.OriginalGroupLabel })
             .Distinct()
             .ToDictionary(ig => ig.Id, ig => ig.Label);
 
-        var replacementGroupLabelToIdMap = mapping
-            .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
-            .Select(indMap => new { Id = indMap.ReplacementGroupId!.Value, Label = indMap.ReplacementGroupLabel! })
-            .Concat(mapping.UnmappedReplacementIndicators.Select(i => new { Id = i.GroupId, Label = i.GroupLabel }))
-            .Distinct()
-            .ToDictionary(ig => ig.Label, ig => ig.Id);
+        var replacementGroupLabelToIdMap = replacementIndicatorGroups.ToDictionary(ig => ig.Label, ig => ig.Id);
 
         return ReplacementServiceHelper.ReplaceIndicatorSequence(
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroupIdToLabelMap,
             replacementGroupLabelToIdMap: replacementGroupLabelToIdMap,
-            originalSequence: originalSequence
+            originalSequence: originalSequence,
+            replacementIndicatorGroups
         );
     }
 

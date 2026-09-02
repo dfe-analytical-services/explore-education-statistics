@@ -1,25 +1,16 @@
-import releaseDataFileService, {
-  DataSetScreenerProgress,
-  DataSetUpload,
+import {
   DataSetUploadScreeningStatus,
   ScreenerTestResult,
 } from '@admin/services/releaseDataFileService';
 import ProgressBar from '@common/components/ProgressBar';
-import useInterval from '@common/hooks/useInterval';
-import useMounted from '@common/hooks/useMounted';
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import Tag, { TagProps } from '@common/components/Tag';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 
-export type ScreenerStatusChangeHandler = (
-  dataSetUpload: DataSetUpload,
-  progress: DataSetScreenerProgress,
-) => void;
-
 interface Props {
-  dataSetUpload: DataSetUpload;
-  releaseVersionId: string;
-  onStatusChange?: ScreenerStatusChangeHandler;
+  dataSetTitle: string;
+  percentageComplete: number;
+  status: DataSetUploadScreeningStatus;
 }
 
 export const getScreenerTestResultStatusLabel = (
@@ -89,11 +80,6 @@ export const getDataSetUploadScreeningStatusColour = (
   }
 };
 
-type StatusState = Pick<
-  DataSetScreenerProgress,
-  'status' | 'percentageComplete' | 'stage' | 'completed'
->;
-
 export const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
   'ScreenerError',
   'PendingReview',
@@ -102,52 +88,16 @@ export const terminalScreeningStatuses: DataSetUploadScreeningStatus[] = [
 ];
 
 export default function ScreenerStatus({
-  dataSetUpload,
-  releaseVersionId,
-  onStatusChange,
+  dataSetTitle,
+  percentageComplete,
+  status,
 }: Props) {
-  const [currentStatus, setCurrentStatus] = useState<StatusState>({
-    status: dataSetUpload.screeningStatus,
-    percentageComplete: 0,
-    stage: 'PENDING',
-    completed: false,
-  });
-
-  const fetchStatus = useCallback(async () => {
-    const nextStatus = await releaseDataFileService.getDataFileScreeningStatus(
-      releaseVersionId,
-      dataSetUpload.id,
-    );
-
-    setCurrentStatus(nextStatus);
-
-    if (onStatusChange && nextStatus.status !== dataSetUpload.screeningStatus) {
-      onStatusChange(dataSetUpload, nextStatus);
-    }
-  }, [releaseVersionId, dataSetUpload, onStatusChange]);
-
-  const [cancelInterval] = useInterval(fetchStatus, 5000);
-
-  useMounted(() => {
-    if (!terminalScreeningStatuses.includes(dataSetUpload.screeningStatus)) {
-      fetchStatus();
-    }
-  });
-
-  useEffect(() => {
-    if (terminalScreeningStatuses.includes(currentStatus.status)) {
-      cancelInterval();
-    }
-  }, [cancelInterval, currentStatus]);
-
-  const hasTerminalStatus = terminalScreeningStatuses.includes(
-    currentStatus.status,
-  );
+  const hasTerminalStatus = terminalScreeningStatuses.includes(status);
 
   return (
     <>
-      <Tag colour={getDataSetUploadScreeningStatusColour(currentStatus.status)}>
-        {getDataSetUploadScreeningStatusLabel(currentStatus.status)}
+      <Tag colour={getDataSetUploadScreeningStatusColour(status)}>
+        {getDataSetUploadScreeningStatusLabel(status)}
       </Tag>
 
       {!hasTerminalStatus && (
@@ -156,9 +106,9 @@ export default function ScreenerStatus({
 
       {!hasTerminalStatus && (
         <ProgressBar
-          testId={`${dataSetUpload.dataSetTitle}-screener-progress-bar`}
+          testId={`${dataSetTitle}-screener-progress-bar`}
           className="govuk-!-margin-top-2"
-          value={currentStatus.percentageComplete}
+          value={percentageComplete}
           width={200}
         />
       )}

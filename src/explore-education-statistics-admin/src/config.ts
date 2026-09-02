@@ -25,7 +25,15 @@ let config: Config;
 
 export async function getConfig(): Promise<Config> {
   if (!config) {
-    config = await fetch('/api/config').then(r => r.json());
+    const fetchedConfig: Config = await fetch('/api/config').then(r =>
+      r.json(),
+    );
+
+    config = {
+      ...fetchedConfig,
+      // Remove trailing slashes
+      publicAppUrl: fetchedConfig.publicAppUrl.replace(/\/+$/, ''),
+    };
   }
   return config;
 }

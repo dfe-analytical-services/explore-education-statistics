@@ -233,7 +233,7 @@
   {
     "publication_summary": "Initial outputs from DfE's Childcare Experiences Survey (aka \u201cYour Childcare\u201d), understanding working parents' experiences of the expanded childcare entitlement",
     "publication_title": "Expansion to early childcare entitlements: Childcare Experiences Survey",
-    "published": "25 Sep 2025",
+    "published": "1 Sep 2026",
     "release_type": "Management information",
     "theme": "Early years"
   },
@@ -635,6 +635,13 @@
     "published": "30 Apr 2026",
     "release_type": "Official statistics in development",
     "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Ad hoc experimental statistics publication presenting analysis of earnings and lifetime repayments forecasts for England",
+    "publication_title": "Student loan forecasts - earnings",
+    "published": "27 Aug 2026",
+    "release_type": "Ad hoc statistics",
+    "theme": "Finance and funding"
   },
   {
     "publication_summary": "Student loan forecasts for English borrower entrants, outlay and repayments, with average loan amounts, lifetime repayments and cost to government",

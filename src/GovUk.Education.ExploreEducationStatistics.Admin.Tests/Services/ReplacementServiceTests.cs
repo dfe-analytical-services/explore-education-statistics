@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -248,30 +247,35 @@ public class ReplacementServiceTests
 
         var originalFilterGroup1 = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { originalFilterItem1 },
         };
 
         var originalFilterGroup2 = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { originalFilterItem2 },
         };
 
         var replacementFilterGroup1 = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { replacementFilterItem1 },
         };
 
         var replacementFilterGroup2 = new FilterGroup
         {
+            Id = Guid.NewGuid(),
             Label = "Default group - not changing",
             FilterItems = new List<FilterItem> { replacementFilterItem2 },
         };
 
         var originalFilter1 = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = originalReleaseSubject.Subject,
@@ -280,6 +284,7 @@ public class ReplacementServiceTests
 
         var originalFilter2 = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 2 - not changing",
             Name = "test_filter_2_not_changing",
             Subject = originalReleaseSubject.Subject,
@@ -288,6 +293,7 @@ public class ReplacementServiceTests
 
         var replacementFilter1 = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 1 - not changing",
             Name = "test_filter_1_not_changing",
             Subject = replacementReleaseSubject.Subject,
@@ -296,6 +302,7 @@ public class ReplacementServiceTests
 
         var replacementFilter2 = new Filter
         {
+            Id = Guid.NewGuid(),
             Label = "Test filter 2 - not changing",
             Name = "test_filter_2_not_changing",
             Subject = replacementReleaseSubject.Subject,
@@ -502,6 +509,71 @@ public class ReplacementServiceTests
                     .DefaultDataSetMapping()
                     .WithOriginalDataFile(originalFile)
                     .WithReplacementDataFile(replacementFile)
+                    .WithFilterMappings(
+                        new Dictionary<Guid, FilterMapping>
+                        {
+                            {
+                                originalFilter1.Id,
+                                CreateFilterMapping(
+                                    original: originalFilter1,
+                                    replacement: replacementFilter1,
+                                    filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                                    {
+                                        {
+                                            originalFilterGroup1.Id,
+                                            CreateFilterGroupMapping(
+                                                original: originalFilterGroup1,
+                                                replacement: replacementFilterGroup1,
+                                                filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                                {
+                                                    {
+                                                        originalFilterItem1.Id,
+                                                        new FilterItemMapping
+                                                        {
+                                                            OriginalId = originalFilterItem1.Id,
+                                                            OriginalLabel = originalFilterItem1.Label,
+                                                            ReplacementId = replacementFilterItem1.Id,
+                                                            ReplacementLabel = replacementFilterItem1.Label,
+                                                        }
+                                                    },
+                                                }
+                                            )
+                                        },
+                                    }
+                                )
+                            },
+                            {
+                                originalFilter2.Id,
+                                CreateFilterMapping(
+                                    original: originalFilter2,
+                                    replacement: replacementFilter2,
+                                    filterGroupMappings: new Dictionary<Guid, FilterGroupMapping>
+                                    {
+                                        {
+                                            originalFilterGroup2.Id,
+                                            CreateFilterGroupMapping(
+                                                original: originalFilterGroup2,
+                                                replacement: replacementFilterGroup2,
+                                                filterItemMappings: new Dictionary<Guid, FilterItemMapping>
+                                                {
+                                                    {
+                                                        originalFilterItem2.Id,
+                                                        new FilterItemMapping
+                                                        {
+                                                            OriginalId = originalFilterItem2.Id,
+                                                            OriginalLabel = originalFilterItem2.Label,
+                                                            ReplacementId = replacementFilterItem2.Id,
+                                                            ReplacementLabel = replacementFilterItem2.Label,
+                                                        }
+                                                    },
+                                                }
+                                            )
+                                        },
+                                    }
+                                )
+                            },
+                        }
+                    )
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -3130,7 +3202,9 @@ public class ReplacementServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
+            statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
+            new LocationRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,
@@ -3164,7 +3238,6 @@ public class ReplacementServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3177,7 +3250,6 @@ public class ReplacementServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -3186,7 +3258,6 @@ public class ReplacementServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3197,7 +3268,6 @@ public class ReplacementServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

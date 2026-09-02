@@ -104,7 +104,11 @@ public class EducationInNumbersContentServiceTests
                                             {
                                                 Slug = "release-slug",
                                                 PublicationId = Guid.NewGuid(),
-                                                Publication = new Publication { Slug = "publication-slug" },
+                                                Publication = new Publication
+                                                {
+                                                    Slug = "publication-slug",
+                                                    Title = "Publication title",
+                                                },
 
                                                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                                                 Year = 1984,
@@ -164,6 +168,8 @@ public class EducationInNumbersContentServiceTests
             Assert.Equal(2, apiQueryStatTile.DecimalPlaces);
             Assert.Equal("publication-slug", apiQueryStatTile.PublicationSlug);
             Assert.Equal("release-slug", apiQueryStatTile.ReleaseSlug);
+            Assert.Equal("Publication title", apiQueryStatTile.PublicationLabel);
+            Assert.Equal("Calendar year 1984", apiQueryStatTile.ReleaseLabel);
 
             var blockBGenericType = Assert.Single(viewModel.Content[1].Content);
             var blockB = Assert.IsType<EinHtmlBlockViewModel>(blockBGenericType);
@@ -1032,6 +1038,8 @@ public class EducationInNumbersContentServiceTests
             Assert.Null(apiTile.DecimalPlaces);
             Assert.Null(apiTile.PublicationSlug);
             Assert.Null(apiTile.ReleaseSlug);
+            Assert.Null(apiTile.PublicationLabel);
+            Assert.Null(apiTile.ReleaseLabel);
 
             var dbTile = await context.EinTiles.SingleAsync();
             Assert.Equal(viewModel.Id, dbTile.Id);
@@ -1338,6 +1346,8 @@ public class EducationInNumbersContentServiceTests
 
             Assert.Equal(publication.Slug, apiTile.PublicationSlug);
             Assert.Equal(publication.Releases[0].Slug, apiTile.ReleaseSlug);
+            Assert.Equal(publication.Title, apiTile.PublicationLabel);
+            Assert.Equal(publication.Releases[0].Title, apiTile.ReleaseLabel);
 
             var dbTile = await contentDbContext.EinTiles.OfType<EinApiQueryStatTile>().SingleAsync();
             Assert.Equal(_tileAId, dbTile.Id);

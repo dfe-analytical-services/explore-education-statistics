@@ -222,7 +222,7 @@ In Linux:
   - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
     `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
     using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
-  - The Docker container user needs ownership fo the ees-mssql folder. Run  
+  - The Docker container user needs ownership of the ees-mssql folder. Run
   `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
    permissions.
 
@@ -529,7 +529,8 @@ ees content data
 
 ### Running Azure Search locally
 
-We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications. To get this running locally, you will need to add the correct variables to a `.env.local` in the frontend project directory.
+We use [Azure Search](https://docs.microsoft.com/azure/search/) in our frontend project to search publications.
+To get this running locally, you will need to add the correct variables to a `.env.local` in the frontend project directory.
 
 ```
 AZURE_SEARCH_QUERY_KEY=
@@ -567,6 +568,36 @@ The project currently uses [PNPM](https://pnpm.io) and [PNPM workspaces](https:/
 adopted a monorepo project structure and have dependencies between sub-projects. These dependencies
 are established using symlinks that PNPM creates.
 
+#### Where PNPM settings live
+
+From PNPM 11 onwards only auth and registry settings are read from `.npmrc`. Every other setting
+lives in [`pnpm-workspace.yaml`](pnpm-workspace.yaml), in camelCase, alongside the workspace package
+list. See the [PNPM settings reference](https://pnpm.io/settings).
+
+PNPM also does not run dependency build scripts unless they are explicitly allowed, via `allowBuilds`
+in `pnpm-workspace.yaml`. If a dependency that needs to compile or download a binary is added, run:
+
+```bash
+pnpm approve-builds
+```
+
+Packages left out of `allowBuilds` will fail the install rather than warn, because `strictDepBuilds`
+defaults to on.
+
+#### Recently published packages
+
+PNPM refuses to install packages published within the last 12 hours (`minimumReleaseAge` setting in
+`pnpm-workspace.yaml`), as a guard against a compromised release being pulled in before anyone notices.
+This applies to the committed lockfile, and the check runs on `pnpm run` and `pnpm exec` too, not just `pnpm i`.
+
+So a lockfile committed on the same day a dependency publishes will fail until it ages out. If that
+blocks something urgent, exclude the specific package rather than turning the policy off:
+
+```yaml
+minimumReleaseAgeExclude:
+  - some-package
+```
+
 - `explore-education-statistics-admin`
   - Contains the admin frontend application.
   - Single page application based on Create React App.
@@ -574,12 +605,12 @@ are established using symlinks that PNPM creates.
 - `explore-education-statistics-frontend`
   - Contains the public frontend application.
   - This is a server side rendered Next application.
-    
+
 - `explore-education-statistics-common`
   - Contains common code between the other sub-projects for re-use.
 
 - `explore-education-statistics-ckeditor`
- - Contains the customised CKEditor build for the admin application.
+  - Contains the customised CKEditor build for the admin application.
 
 #### Adding dependencies
 
@@ -598,9 +629,8 @@ When adding new NPM dependencies, be aware that we need to be careful about wher
 - `explore-education-statistics-commmon` dependencies are in `dependencies` as these must all be 
   included in the final build (admin or public).
   
-- `explore-education-statistics-admin` dependencies are in `dependencies` simply for consistency
-  and simplicity. We need all dependencies to create the build, so it doesn't make sense to split 
-  out separate `devDependencies`.
+- `explore-education-statistics-admin` dependencies are in either `dependencies` or 
+  `devDependencies`.
 
 To install new dependencies, you will need to use PNPM to do this, with the following steps:
 
@@ -632,8 +662,8 @@ These scripts can generally be run from most `package.json` files across the pro
 - `pnpm lint` - Lint projects using Stylelint and ESLint.
   - `pnpm lint:js` - Run ESLint only.
   - `pnpm lint:style` - Run Stylelint only.
-- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
 
+- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
   - `pnpm fix:js` - Fix only ESLint lints.
   - `pnpm fix:style` - Fix only Stylelint lints.
 
@@ -797,7 +827,7 @@ If you're using a custom BaseIntermediateOutputPath or MSBuildProjectExtensionsP
 Use the --msbuildprojectextensionspath option
 ```
 Then what you should do is set the value of the option parameter `msbuildprojectextensionspath` to the `artifacts` folder of the application you are making changes to; for example:
-1) for the Admin applcation (ContentDbContext):
+1) for the Admin application (ContentDbContext):
 ```sh
 dotnet ef migrations add <TICKET_NUMBER>_<MIGRATION_DESCRIPTION> --context ContentDbContext --output-dir Migrations/ContentMigrations -v --msbuildprojectextensionspath ~\<REPOSITORY_DIRECTORY>\explore-education-statistics\src\artifacts\obj\GovUk.Education.ExploreEducationStatistics.Admin\
 ```
@@ -861,7 +891,7 @@ docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.jso
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 
-During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthly
+During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthy
 period before the scheduled Publisher Functions run. For this, we provide 2 Functions that can be triggered by HTTP requests; one stages scheduled Releases, whilst the other completes the
 publishing process for any staged Releases and makes them live.
 

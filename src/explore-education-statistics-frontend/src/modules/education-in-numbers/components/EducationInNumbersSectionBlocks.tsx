@@ -1,6 +1,7 @@
 import InsetText from '@common/components/InsetText';
 import EinContentBlockRenderer from '@common/modules/education-in-numbers/components/EinContentBlockRenderer';
 import { EinContentBlock } from '@common/services/types/einBlocks';
+import Link from '@frontend/components/Link';
 import React from 'react';
 
 interface Props {
@@ -11,7 +12,11 @@ const EducationInNumbersSectionBlocks = ({ blocks }: Props) => {
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => (
-        <EinContentBlockRenderer key={block.id} block={block} />
+        <EinContentBlockRenderer
+          key={block.id}
+          block={block}
+          renderLink={linkProps => <Link {...linkProps} />}
+        />
       ))}
     </>
   ) : (

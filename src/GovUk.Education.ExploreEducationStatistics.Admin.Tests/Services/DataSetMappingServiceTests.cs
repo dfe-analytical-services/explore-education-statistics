@@ -1,13 +1,19 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -18,14 +24,19 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
         var originalIndicator2Id = Guid.NewGuid();
         var originalIndicator3Id = Guid.NewGuid();
         var originalIndicator4Id = Guid.NewGuid();
 
+        var replacementIndicator1Id = Guid.NewGuid();
+        var replacementIndicator2Id = Guid.NewGuid();
+        var replacementIndicator3Id = Guid.NewGuid();
         var replacementIndicator4Id = Guid.NewGuid();
         var replacementIndicator5Id = Guid.NewGuid();
+        var replacementIndicator6Id = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -36,7 +47,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -66,7 +82,7 @@ public class DataSetMappingServiceTests
                         OriginalColumnName = "original_indicator_2",
                         OriginalGroupId = Guid.NewGuid(),
                         OriginalGroupLabel = "Original indicator 2 group label",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementIndicator1Id,
                         ReplacementLabel = "Replacement indicator 1 - that will be unset",
                         ReplacementColumnName = "replacement_indicator_1",
                         ReplacementGroupId = Guid.NewGuid(),
@@ -83,7 +99,7 @@ public class DataSetMappingServiceTests
                         OriginalColumnName = "original_indicator_3",
                         OriginalGroupId = Guid.NewGuid(),
                         OriginalGroupLabel = "Original indicator 3 group label",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementIndicator2Id,
                         ReplacementLabel = "Replacement indicator 2 - that will be unset",
                         ReplacementColumnName = "replacement_indicator_2",
                         ReplacementGroupId = Guid.NewGuid(),
@@ -100,7 +116,7 @@ public class DataSetMappingServiceTests
                         OriginalColumnName = "original_indicator_4",
                         OriginalGroupId = Guid.NewGuid(),
                         OriginalGroupLabel = "Original indicator 4 group label",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementIndicator3Id,
                         ReplacementLabel = "Replacement indicator 3 - that will remain",
                         ReplacementColumnName = "replacement_indicator_3",
                         ReplacementGroupId = Guid.NewGuid(),
@@ -109,36 +125,57 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementIndicators =
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Replacement indicator group label",
+            SubjectId = replacementSubjectId,
+            Indicators =
             [
-                new UnmappedIndicator
+                new Indicator
+                {
+                    Id = replacementIndicator1Id,
+                    Label = "Replacement indicator 1 - that will be unset",
+                    Name = "replacement_indicator_1",
+                },
+                new Indicator
+                {
+                    Id = replacementIndicator2Id,
+                    Label = "Replacement indicator 2 - that will be unset",
+                    Name = "replacement_indicator_2",
+                },
+                new Indicator
+                {
+                    Id = replacementIndicator3Id,
+                    Label = "Replacement indicator 3 - that will remain",
+                    Name = "replacement_indicator_3",
+                },
+                new Indicator
                 {
                     Id = replacementIndicator4Id,
                     Label = "Replacement indicator 4 - that will be mapped to Original indicator 1",
-                    ColumnName = "replacement_indicator_4",
-                    GroupId = Guid.NewGuid(),
-                    GroupLabel = "Replacement indicator 4 group label",
+                    Name = "replacement_indicator_4",
                 },
-                new UnmappedIndicator
+                new Indicator
                 {
                     Id = replacementIndicator5Id,
                     Label = "Replacement indicator 5 - that will be mapped to Original indicator 2",
-                    ColumnName = "replacement_indicator_5",
-                    GroupId = Guid.NewGuid(),
-                    GroupLabel = "Replacement indicator 5 group label",
+                    Name = "replacement_indicator_5",
                 },
-                new UnmappedIndicator
+                new Indicator
                 {
-                    Id = Guid.NewGuid(),
-                    Label = "Replacement indicator 6 - that will be remain unmapped",
-                    ColumnName = "replacement_indicator_6",
-                    GroupId = Guid.NewGuid(),
-                    GroupLabel = "Replacement indicator 6 group label",
+                    Id = replacementIndicator6Id,
+                    Label = "Replacement indicator 6 - that will remain unmapped",
+                    Name = "replacement_indicator_6",
                 },
             ],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -147,9 +184,16 @@ public class DataSetMappingServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateIndicatorMappings(
                 releaseVersion.Id,
@@ -224,22 +268,34 @@ public class DataSetMappingServiceTests
                 () => Assert.Equal("replacement_indicator_3", originalIndicator4Mapping.ReplacementColumnName),
                 () => Assert.Equal(MapStatus.AutoSet, originalIndicator4Mapping.Status)
             );
+        }
 
-            var unmappedReplacementIndicators = dbMapping.UnmappedReplacementIndicators.ToList();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    Updates = [new() { OriginalId = originalIndicator3Id, NewReplacementId = replacementIndicator1Id }],
+                },
+                CancellationToken.None
+            );
+
+            var indicatorMappingList = result.AssertRight();
+
+            var originalIndicator3Mapping = indicatorMappingList.Single(indMap =>
+                indMap.OriginalColumnName == "original_indicator_3"
+            );
+
             Assert.Multiple(
-                () => Assert.Equal(3, unmappedReplacementIndicators.Count),
-                () =>
-                    Assert.NotNull(
-                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_1")
-                    ),
-                () =>
-                    Assert.NotNull(
-                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_2")
-                    ),
-                () =>
-                    Assert.NotNull(
-                        unmappedReplacementIndicators.FirstOrDefault(x => x.ColumnName == "replacement_indicator_6")
-                    )
+                () => Assert.Equal(replacementIndicator1Id, originalIndicator3Mapping.ReplacementId),
+                () => Assert.Equal("replacement_indicator_1", originalIndicator3Mapping.ReplacementColumnName),
+                () => Assert.Equal(MapStatus.ManuallySet, originalIndicator3Mapping.Status)
             );
         }
     }
@@ -265,6 +321,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -275,7 +332,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -283,7 +345,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = new Dictionary<Guid, IndicatorMapping>(),
-            UnmappedReplacementIndicators = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -410,6 +471,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
 
@@ -424,7 +486,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -444,7 +511,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementIndicators = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -488,6 +554,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalIndicator1Id = Guid.NewGuid();
 
@@ -502,7 +569,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -522,7 +594,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementIndicators = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -568,16 +639,136 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
+    public async Task UpdateIndicatorMapping_ReplacementIndicatorClaimedByAnotherMapping_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
+
+        var originalIndicator1Id = Guid.NewGuid();
+        var originalIndicator2Id = Guid.NewGuid();
+
+        var replacementIndicatorId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            IndicatorMappings = new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    originalIndicator1Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator1Id,
+                        OriginalColumnName = "original_indicator_1",
+                        ReplacementId = replacementIndicatorId,
+                        ReplacementColumnName = "replacement_indicator",
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    originalIndicator2Id,
+                    new IndicatorMapping
+                    {
+                        OriginalId = originalIndicator2Id,
+                        OriginalColumnName = "original_indicator_2",
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+        };
+
+        var replacementIndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Replacement indicator group label",
+            SubjectId = replacementSubjectId,
+            Indicators =
+            [
+                new Indicator
+                {
+                    Id = replacementIndicatorId,
+                    Label = "Replacement indicator",
+                    Name = "replacement_indicator",
+                },
+            ],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.IndicatorGroup.Add(replacementIndicatorGroup);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
+
+            var result = await service.UpdateIndicatorMappings(
+                releaseVersion.Id,
+                new IndicatorMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    Updates = [new() { OriginalId = originalIndicator2Id, NewReplacementId = replacementIndicatorId }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasError(
+                expectedPath: "Updates.NewReplacementId",
+                expectedCode: "UnmappedIndicatorMatchingReplacementIdNotFound"
+            );
+        }
+    }
+
+    [Fact]
     public async Task UpdateLocationMappings_Success()
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var loc1Id = Guid.NewGuid();
         var loc2Id = Guid.NewGuid();
         var loc3Id = Guid.NewGuid();
+        var loc4Id = Guid.NewGuid();
         var replacementLocId = Guid.NewGuid();
-        var newlyUnmappedLocId = Guid.NewGuid();
+        var displacedReplacementLocId = Guid.NewGuid();
         var loc3ReplacementId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
@@ -603,7 +794,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = loc2Id,
                         OriginalGeographicLevel = GeographicLevel.Country,
-                        ReplacementId = newlyUnmappedLocId,
+                        ReplacementId = displacedReplacementLocId,
                         ReplacementName = "Old Country Name",
                         ReplacementCode = "E9200002",
                         ReplacementGeographicLevel = GeographicLevel.Country,
@@ -620,17 +811,35 @@ public class DataSetMappingServiceTests
                         Status = MapStatus.Unset,
                     }
                 },
-            },
-            UnmappedReplacementLocations =
-            [
-                new UnmappedLocation
                 {
-                    Id = replacementLocId,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
-                    Name = "New LA",
-                    Code = "301",
+                    loc4Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc4Id,
+                        OriginalGeographicLevel = GeographicLevel.Country,
+                        Status = MapStatus.Unset,
+                    }
                 },
-            ],
+            },
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
+        };
+        var displacedReplacementLocation = new Location
+        {
+            Id = displacedReplacementLocId,
+            GeographicLevel = GeographicLevel.Country,
+            Country = new Country("E9200002", "Old Country Name"),
+        };
+        var loc3ReplacementLocation = new Location
+        {
+            Id = loc3ReplacementId,
+            GeographicLevel = GeographicLevel.Region,
+            Region = new Region("E12000003", "Yorkshire and The Humber"),
         };
 
         var originalReleaseFile = new ReleaseFile
@@ -641,10 +850,17 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -653,9 +869,40 @@ public class DataSetMappingServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            statisticsDbContext.Location.AddRange(
+                replacementLocation,
+                displacedReplacementLocation,
+                loc3ReplacementLocation
+            );
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = displacedReplacementLocation,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = loc3ReplacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateLocationMappings(
                 releaseVersion.Id,
@@ -673,10 +920,12 @@ public class DataSetMappingServiceTests
             );
 
             var locationMappingList = result.AssertRight();
-            Assert.Equal(3, locationMappingList.Count);
+            Assert.Equal(4, locationMappingList.Count);
 
             var map1 = locationMappingList.Single(m => m.OriginalId == loc1Id);
             Assert.Equal(replacementLocId, map1.ReplacementId);
+            Assert.Equal("New LA", map1.ReplacementName);
+            Assert.Equal("301", map1.ReplacementCode);
             Assert.Equal(MapStatus.ManuallySet, map1.Status);
 
             var map2 = locationMappingList.Single(m => m.OriginalId == loc2Id);
@@ -687,17 +936,122 @@ public class DataSetMappingServiceTests
             Assert.Equal(loc3ReplacementId, map3.ReplacementId);
             Assert.Equal(MapStatus.Unset, map3.Status);
         }
+    }
+
+    [Fact]
+    public async Task UpdateLocationMappings_ReplacementLocationClaimedByAnotherMapping_Fail()
+    {
+        var originalDataFileId = Guid.NewGuid();
+        var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
+
+        var loc1Id = Guid.NewGuid();
+        var loc2Id = Guid.NewGuid();
+
+        var replacementLocId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File { Id = originalDataFileId },
+        };
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersionId = releaseVersion.Id,
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFileId = originalDataFileId,
+            ReplacementDataFileId = replacementDataFileId,
+            LocationMappings = new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    loc1Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc1Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        ReplacementId = replacementLocId,
+                        ReplacementGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.AutoSet,
+                    }
+                },
+                {
+                    loc2Id,
+                    new LocationMapping
+                    {
+                        OriginalId = loc2Id,
+                        OriginalGeographicLevel = GeographicLevel.LocalAuthority,
+                        Status = MapStatus.Unset,
+                    }
+                },
+            },
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var dbMapping = contentDbContext.DataSetMappings.Single();
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
 
-            Assert.Single(dbMapping.UnmappedReplacementLocations);
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.Location.Add(replacementLocation);
+            statisticsDbContext.Observation.Add(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
 
-            // Check that the old replacement from loc2 was moved back to unmapped
-            Assert.Contains(dbMapping.UnmappedReplacementLocations, l => l.Id == newlyUnmappedLocId);
-            // Check that the new replacement was removed from unmapped
-            Assert.DoesNotContain(dbMapping.UnmappedReplacementLocations, l => l.Id == replacementLocId);
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
+
+            var result = await service.UpdateLocationMappings(
+                releaseVersion.Id,
+                new LocationMappingUpdatesRequest
+                {
+                    OriginalDataFileId = originalDataFileId,
+                    ReplacementDataFileId = replacementDataFileId,
+                    Updates = [new() { OriginalId = loc2Id, NewReplacementId = replacementLocId }],
+                },
+                CancellationToken.None
+            );
+
+            var validationProblem = result.AssertBadRequestWithValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasError(
+                expectedPath: "Updates.NewReplacementId",
+                expectedCode: "UnmappedLocationMatchingReplacementLocationIdNotFound"
+            );
         }
     }
 
@@ -749,6 +1103,7 @@ public class DataSetMappingServiceTests
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
@@ -791,6 +1146,7 @@ public class DataSetMappingServiceTests
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
@@ -839,6 +1195,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
@@ -857,7 +1214,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -897,6 +1259,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -907,7 +1270,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var locId = Guid.NewGuid();
@@ -922,7 +1290,6 @@ public class DataSetMappingServiceTests
                     new LocationMapping { OriginalId = locId }
                 },
             },
-            UnmappedReplacementLocations = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -961,6 +1328,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -971,7 +1339,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var locId = Guid.NewGuid();
@@ -988,13 +1361,18 @@ public class DataSetMappingServiceTests
                     new LocationMapping { OriginalId = locId, OriginalGeographicLevel = GeographicLevel.Region }
                 },
             },
-            UnmappedReplacementLocations =
-            [
-                new UnmappedLocation { Id = replacementLocId, GeographicLevel = GeographicLevel.LocalAuthority },
-            ],
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = replacementLocId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("301", null, "New LA"),
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(releaseVersion);
@@ -1003,9 +1381,24 @@ public class DataSetMappingServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            statisticsDbContext.Location.Add(replacementLocation);
+            statisticsDbContext.Observation.Add(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementSubjectId,
+                    Location = replacementLocation,
+                }
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
             var result = await service.UpdateLocationMappings(
                 releaseVersion.Id,
                 new LocationMappingUpdatesRequest
@@ -1030,6 +1423,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalFilter1Id = Guid.NewGuid();
         var originalFilter1Group1Id = Guid.NewGuid();
@@ -1056,7 +1450,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -1141,32 +1540,65 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
-            [
-                new UnmappedFilter
-                {
-                    Id = replacementFilter1Id,
-                    Label = "Replacement filter 1",
-                    ColumnName = "replacement_filter_1",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilter1Group1Id,
-                            Label = "Original filter 1 group 1",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementFilter1Group1Item1Id,
-                                    Label = "Original filter 1 group 1 item 1",
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilter1Id,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter 1",
+                Name = "replacement_filter_1",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = replacementFilter1Group1Id,
+                        FilterId = replacementFilter1Id,
+                        Label = "Original filter 1 group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = replacementFilter1Group1Item1Id,
+                                FilterGroupId = replacementFilter1Group1Id,
+                                Label = "Original filter 1 group 1 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+            new Filter
+            {
+                Id = previouslyMappedReplacementFilter2Id,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter 2",
+                Name = "replacement_filter_2",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = previouslyMappedReplacementFilter2Group1Id,
+                        FilterId = previouslyMappedReplacementFilter2Id,
+                        Label = "Replacement filter 2 group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = previouslyMappedReplacementFilter2Group1Item1Id,
+                                FilterGroupId = previouslyMappedReplacementFilter2Group1Id,
+                                Label = "Replacement filter 2 group 1 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1179,7 +1611,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -1240,18 +1672,6 @@ public class DataSetMappingServiceTests
             var filter2Group1Item1 = filter2Group1.FilterItemMappings[originalFilter2Group1Item1Id];
             Assert.Null(filter2Group1Item1.ReplacementId);
             Assert.Equal(MapStatus.ParentNotMapped, filter2Group1Item1.Status);
-
-            Assert.Single(dbMapping.UnmappedReplacementFilters);
-            var newlyUnmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
-            Assert.Equal(previouslyMappedReplacementFilter2Id, newlyUnmappedFilter.Id);
-            Assert.Equal("Replacement filter 2", newlyUnmappedFilter.Label);
-            var newlyUnmappedGroup = Assert.Single(newlyUnmappedFilter.UnmappedReplacementFilterGroups);
-            Assert.Equal(previouslyMappedReplacementFilter2Group1Id, newlyUnmappedGroup.Id);
-            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(
-                previouslyMappedReplacementFilter2Group1Item1Id,
-                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
-            );
         }
     }
 
@@ -1260,6 +1680,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1270,7 +1691,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -1333,32 +1759,65 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
-            [
-                new UnmappedFilter
-                {
-                    Id = newReplacementFilterId,
-                    Label = "New replacement filter",
-                    ColumnName = "new_replacement_filter",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = newReplacementFilterGroup1Id,
-                            Label = "Original filter group 1",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = newReplacementFilterGroup1Item1Id,
-                                    Label = "Original filter group 1 item 1",
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = oldReplacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Old replacement filter",
+                Name = "old_replacement_filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = oldReplacementFilterGroup1Id,
+                        FilterId = oldReplacementFilterId,
+                        Label = "Old replacement filter group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = oldReplacementFilterGroup1Item1Id,
+                                FilterGroupId = oldReplacementFilterGroup1Id,
+                                Label = "Old replacement filter group 1 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+            new Filter
+            {
+                Id = newReplacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "New replacement filter",
+                Name = "new_replacement_filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = newReplacementFilterGroup1Id,
+                        FilterId = newReplacementFilterId,
+                        Label = "Original filter group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = newReplacementFilterGroup1Item1Id,
+                                FilterGroupId = newReplacementFilterGroup1Id,
+                                Label = "Original filter group 1 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1371,7 +1830,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -1419,20 +1878,6 @@ public class DataSetMappingServiceTests
             Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
             Assert.Equal("Original filter group 1 item 1", item1.ReplacementLabel);
             Assert.Equal(MapStatus.AutoSet, item1.Status);
-
-            Assert.Single(dbMapping.UnmappedReplacementFilters);
-            var unmappedFilter = dbMapping.UnmappedReplacementFilters.Single();
-            Assert.Equal(oldReplacementFilterId, unmappedFilter.Id);
-            Assert.Equal("Old replacement filter", unmappedFilter.Label);
-            Assert.Equal("old_replacement_filter", unmappedFilter.ColumnName);
-
-            var unmappedGroup = Assert.Single(unmappedFilter.UnmappedReplacementFilterGroups);
-            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
-
-            var unmappedItem = Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedItem.Id);
-            Assert.Equal("Old replacement filter group 1 item 1", unmappedItem.Label);
         }
     }
 
@@ -1457,6 +1902,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1467,7 +1913,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -1475,7 +1926,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1511,6 +1961,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1521,7 +1972,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var filterDoesNotExistId = Guid.NewGuid();
@@ -1531,7 +1987,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1572,6 +2027,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1582,7 +2038,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -1599,7 +2060,6 @@ public class DataSetMappingServiceTests
                     new FilterMapping { OriginalId = originalFilterId }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1643,6 +2103,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1653,7 +2114,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -1685,7 +2151,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1726,6 +2191,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -1736,7 +2202,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -1780,7 +2251,6 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1821,6 +2291,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalFilterId = Guid.NewGuid();
         var originalFilterGroup1Id = Guid.NewGuid();
@@ -1845,7 +2316,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -1912,27 +2388,57 @@ public class DataSetMappingServiceTests
                                 }
                             },
                         },
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = newReplacementFilterGroup1Id,
-                                Label = "New replacement filter group 1",
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem
-                                    {
-                                        Id = newReplacementFilterGroup1Item1Id,
-                                        Label = "Original filter group 1 item 1",
-                                    },
-                                ],
-                            },
-                        ],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = newReplacementFilterGroup1Id,
+                        FilterId = replacementFilterId,
+                        Label = "New replacement filter group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = newReplacementFilterGroup1Item1Id,
+                                FilterGroupId = newReplacementFilterGroup1Id,
+                                Label = "Original filter group 1 item 1",
+                            },
+                        ],
+                    },
+                    new FilterGroup
+                    {
+                        Id = oldReplacementFilterGroup2Id,
+                        FilterId = replacementFilterId,
+                        Label = "Old replacement filter group 2",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = oldReplacementFilterGroup2Item1Id,
+                                FilterGroupId = oldReplacementFilterGroup2Id,
+                                Label = "Old replacement filter group 2 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1945,7 +2451,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -1997,16 +2503,6 @@ public class DataSetMappingServiceTests
             var group2Item1 = group2.FilterItemMappings[originalFilterGroup2Item1Id];
             Assert.Null(group2Item1.ReplacementId);
             Assert.Equal(MapStatus.ParentNotMapped, group2Item1.Status);
-
-            Assert.Single(filter.UnmappedReplacementFilterGroups);
-            var newlyUnmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
-            Assert.Equal(oldReplacementFilterGroup2Id, newlyUnmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 2", newlyUnmappedGroup.Label);
-            Assert.Single(newlyUnmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(
-                oldReplacementFilterGroup2Item1Id,
-                newlyUnmappedGroup.UnmappedReplacementFilterItems.Single().Id
-            );
         }
     }
 
@@ -2015,6 +2511,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2025,7 +2522,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -2037,6 +2539,8 @@ public class DataSetMappingServiceTests
 
         var newReplacementFilterGroup1Id = Guid.NewGuid();
         var newReplacementFilterGroup1Item1Id = Guid.NewGuid();
+
+        var replacementFilterId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
@@ -2050,7 +2554,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = originalFilterId,
                         OriginalLabel = "Original filter",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementFilterId,
                         ReplacementLabel = "Replacement filter",
                         Status = MapStatus.AutoSet,
                         FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
@@ -2081,27 +2585,57 @@ public class DataSetMappingServiceTests
                                 }
                             },
                         },
-                        UnmappedReplacementFilterGroups =
-                        [
-                            new UnmappedFilterGroup
-                            {
-                                Id = newReplacementFilterGroup1Id,
-                                Label = "New replacement filter group 1",
-                                UnmappedReplacementFilterItems =
-                                [
-                                    new UnmappedFilterItem
-                                    {
-                                        Id = newReplacementFilterGroup1Item1Id,
-                                        Label = "Original filter group 1 item 1",
-                                    },
-                                ],
-                            },
-                        ],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = newReplacementFilterGroup1Id,
+                        FilterId = replacementFilterId,
+                        Label = "New replacement filter group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = newReplacementFilterGroup1Item1Id,
+                                FilterGroupId = newReplacementFilterGroup1Id,
+                                Label = "Original filter group 1 item 1",
+                            },
+                        ],
+                    },
+                    new FilterGroup
+                    {
+                        Id = oldReplacementFilterGroup1Id,
+                        FilterId = replacementFilterId,
+                        Label = "Old replacement filter group 1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = oldReplacementFilterGroup1Item1Id,
+                                FilterGroupId = oldReplacementFilterGroup1Id,
+                                Label = "Old replacement filter group 1 item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2114,7 +2648,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -2150,13 +2684,6 @@ public class DataSetMappingServiceTests
             var item1 = group1.FilterItemMappings[originalFilterGroup1Item1Id];
             Assert.Equal(newReplacementFilterGroup1Item1Id, item1.ReplacementId);
             Assert.Equal(MapStatus.AutoSet, item1.Status);
-
-            Assert.Single(filter.UnmappedReplacementFilterGroups);
-            var unmappedGroup = filter.UnmappedReplacementFilterGroups.Single();
-            Assert.Equal(oldReplacementFilterGroup1Id, unmappedGroup.Id);
-            Assert.Equal("Old replacement filter group 1", unmappedGroup.Label);
-            Assert.Single(unmappedGroup.UnmappedReplacementFilterItems);
-            Assert.Equal(oldReplacementFilterGroup1Item1Id, unmappedGroup.UnmappedReplacementFilterItems.Single().Id);
         }
     }
 
@@ -2165,6 +2692,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2175,7 +2703,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var groupDoesNotExistId = Guid.NewGuid();
@@ -2185,7 +2718,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2226,6 +2758,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2236,7 +2769,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -2263,11 +2801,9 @@ public class DataSetMappingServiceTests
                                 new FilterGroupMapping { OriginalId = originalFilterGroupId, Status = MapStatus.Unset }
                             },
                         },
-                        UnmappedReplacementFilterGroups = [],
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2311,6 +2847,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var originalFilterId = Guid.NewGuid();
         var originalFilterGroupId = Guid.NewGuid();
@@ -2331,7 +2868,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var mapping = new DataSetMapping
@@ -2383,22 +2925,51 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = newReplacementFilterItem1Id,
-                                            Label = "New replacement filter item 1",
-                                        },
-                                    ],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = replacementFilterGroupId,
+                        FilterId = replacementFilterId,
+                        Label = "Replacement filter group",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = newReplacementFilterItem1Id,
+                                FilterGroupId = replacementFilterGroupId,
+                                Label = "New replacement filter item 1",
+                            },
+                            new FilterItem
+                            {
+                                Id = oldReplacementFilterItem2Id,
+                                FilterGroupId = replacementFilterGroupId,
+                                Label = "Old replacement filter item 2",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2411,7 +2982,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -2458,11 +3029,6 @@ public class DataSetMappingServiceTests
             var item2 = group.FilterItemMappings[originalFilterItem2Id];
             Assert.Null(item2.ReplacementId);
             Assert.Equal(MapStatus.ManuallySet, item2.Status);
-
-            Assert.Single(group.UnmappedReplacementFilterItems);
-            var newlyUnmappedItem = group.UnmappedReplacementFilterItems.Single();
-            Assert.Equal(oldReplacementFilterItem2Id, newlyUnmappedItem.Id);
-            Assert.Equal("Old replacement filter item 2", newlyUnmappedItem.Label);
         }
     }
 
@@ -2471,6 +3037,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2481,7 +3048,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -2490,6 +3062,9 @@ public class DataSetMappingServiceTests
 
         var oldReplacementFilterItem1Id = Guid.NewGuid();
         var newReplacementFilterItem1Id = Guid.NewGuid();
+
+        var replacementFilterId = Guid.NewGuid();
+        var replacementFilterGroupId = Guid.NewGuid();
 
         var mapping = new DataSetMapping
         {
@@ -2503,7 +3078,7 @@ public class DataSetMappingServiceTests
                     {
                         OriginalId = originalFilterId,
                         OriginalLabel = "Original filter",
-                        ReplacementId = Guid.NewGuid(),
+                        ReplacementId = replacementFilterId,
                         ReplacementLabel = "Replacement filter",
                         Status = MapStatus.AutoSet,
                         FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
@@ -2514,7 +3089,7 @@ public class DataSetMappingServiceTests
                                 {
                                     OriginalId = originalFilterGroupId,
                                     OriginalLabel = "Original filter group",
-                                    ReplacementId = Guid.NewGuid(),
+                                    ReplacementId = replacementFilterGroupId,
                                     ReplacementLabel = "Replacement filter group",
                                     Status = MapStatus.AutoSet,
                                     FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
@@ -2531,22 +3106,51 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems =
-                                    [
-                                        new UnmappedFilterItem
-                                        {
-                                            Id = newReplacementFilterItem1Id,
-                                            Label = "New replacement filter item 1",
-                                        },
-                                    ],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = replacementFilterGroupId,
+                        FilterId = replacementFilterId,
+                        Label = "Replacement filter group",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = newReplacementFilterItem1Id,
+                                FilterGroupId = replacementFilterGroupId,
+                                Label = "New replacement filter item 1",
+                            },
+                            new FilterItem
+                            {
+                                Id = oldReplacementFilterItem1Id,
+                                FilterGroupId = replacementFilterGroupId,
+                                Label = "Old replacement filter item 1",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2559,7 +3163,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -2592,11 +3196,6 @@ public class DataSetMappingServiceTests
             Assert.Equal(newReplacementFilterItem1Id, item1.ReplacementId);
             Assert.Equal("New replacement filter item 1", item1.ReplacementLabel);
             Assert.Equal(MapStatus.ManuallySet, item1.Status);
-
-            Assert.Single(group.UnmappedReplacementFilterItems);
-            var unmappedItem = group.UnmappedReplacementFilterItems.Single();
-            Assert.Equal(oldReplacementFilterItem1Id, unmappedItem.Id);
-            Assert.Equal("Old replacement filter item 1", unmappedItem.Label);
         }
     }
 
@@ -2605,6 +3204,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2615,7 +3215,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var itemDoesNotExistId = Guid.NewGuid();
@@ -2625,7 +3230,6 @@ public class DataSetMappingServiceTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             FilterMappings = new Dictionary<Guid, FilterMapping>(),
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2666,6 +3270,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2676,7 +3281,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -2717,14 +3327,12 @@ public class DataSetMappingServiceTests
                                             }
                                         },
                                     },
-                                    UnmappedReplacementFilterItems = [],
                                 }
                             },
                         },
                     }
                 },
             },
-            UnmappedReplacementFilters = [],
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -2768,6 +3376,7 @@ public class DataSetMappingServiceTests
     {
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
         var originalReleaseFile = new ReleaseFile
@@ -2778,7 +3387,12 @@ public class DataSetMappingServiceTests
         var replacementReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = replacementDataFileId },
+            File = new Content.Model.File
+            {
+                Id = replacementDataFileId,
+                Type = FileType.Data,
+                SubjectId = replacementSubjectId,
+            },
         };
 
         var originalFilterId = Guid.NewGuid();
@@ -2829,28 +3443,40 @@ public class DataSetMappingServiceTests
                     }
                 },
             },
-            UnmappedReplacementFilters =
-            [
-                new UnmappedFilter
-                {
-                    Id = replacementFilterId,
-                    Label = "Replacement filter label",
-                    ColumnName = "replacement_filter",
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilterGroupId,
-                            Label = "Different group label",
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem { Id = replacementFilterItemId, Label = "Different item label" },
-                            ],
-                        },
-                    ],
-                },
-            ],
         };
+
+        List<Filter> replacementFilters =
+        [
+            new Filter
+            {
+                Id = replacementFilterId,
+                SubjectId = replacementSubjectId,
+                Label = "Replacement filter label",
+                Name = "replacement_filter",
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = replacementFilterGroupId,
+                        FilterId = replacementFilterId,
+                        Label = "Different group label",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = replacementFilterItemId,
+                                FilterGroupId = replacementFilterGroupId,
+                                Label = "Different item label",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+        statisticsDbContext.Filter.AddRange(replacementFilters);
+        await statisticsDbContext.SaveChangesAsync();
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2863,7 +3489,7 @@ public class DataSetMappingServiceTests
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var service = SetupDataSetMappingService(contentDbContext);
+            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext);
 
             var result = await service.UpdateFilterMappings(
                 releaseVersion.Id,
@@ -2912,18 +3538,22 @@ public class DataSetMappingServiceTests
             var item = group.FilterItemMappings[originalFilterItemId];
             Assert.Equal(replacementFilterItemId, item.ReplacementId);
             Assert.Equal(MapStatus.ManuallySet, item.Status);
-
-            Assert.Empty(dbMapping.UnmappedReplacementFilters);
-            Assert.Empty(filter.UnmappedReplacementFilterGroups);
-            Assert.Empty(group.UnmappedReplacementFilterItems);
         }
     }
 
     private static DataSetMappingService SetupDataSetMappingService(
         ContentDbContext contentDbContext,
+        StatisticsDbContext? statisticsDbContext = null,
         IUserService? userService = null
     )
     {
-        return new DataSetMappingService(contentDbContext, userService ?? MockUtils.AlwaysTrueUserService().Object);
+        statisticsDbContext ??= StatisticsDbUtils.InMemoryStatisticsDbContext();
+
+        return new DataSetMappingService(
+            contentDbContext,
+            statisticsDbContext,
+            new LocationRepository(statisticsDbContext),
+            userService ?? MockUtils.AlwaysTrueUserService().Object
+        );
     }
 }

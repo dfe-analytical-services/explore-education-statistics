@@ -13,7 +13,6 @@ FROM base AS builder
 ARG BUILD_BUILDNUMBER
 ENV BUILD_BUILDNUMBER=$BUILD_BUILDNUMBER
 
-COPY .npmrc .
 COPY package.json .
 COPY pnpm-lock.yaml .
 COPY pnpm-workspace.yaml .
@@ -28,7 +27,6 @@ RUN pnpm --filter=explore-education-statistics-frontend build
 
 FROM base AS runner
 
-COPY --from=builder /app/.npmrc .
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/pnpm-lock.yaml .
 COPY --from=builder /app/pnpm-workspace.yaml .

@@ -7,12 +7,13 @@ import ReleaseDataReorderSection from '@admin/pages/release/data/components/Rele
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import permissionService from '@admin/services/permissionService';
-import { DataFile } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router';
 
@@ -28,7 +29,6 @@ const ReleaseDataPage = () => {
     : undefined;
   const defaultTabTitle = releaseDataPageTabs.dataUploads.title;
 
-  const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
   const [tabTitle, setTabTitle] = useState<string>(
     tabTitleFromHash ?? defaultTabTitle,
   );
@@ -37,6 +37,14 @@ const ReleaseDataPage = () => {
     () => permissionService.canUpdateRelease(releaseVersionId),
     [releaseVersionId],
   );
+
+  const { data: dataFiles = [] } = useQuery(
+    releaseDataFileQueries.list(releaseVersionId),
+  );
+
+  const completeDataFilesCount = dataFiles.filter(
+    file => file.status === 'COMPLETE',
+  ).length;
 
   return (
     <>
@@ -58,7 +66,6 @@ const ReleaseDataPage = () => {
               publicationId={releaseVersion.publicationId}
               releaseVersionId={releaseVersionId}
               canUpdateRelease={canUpdateRelease}
-              onDataFilesChange={setDataFiles}
             />
           </TabsSection>
           <TabsSection
@@ -79,7 +86,7 @@ const ReleaseDataPage = () => {
             <ReleaseDataGuidanceSection
               // Track data files so that we can re-render this
               // section automatically whenever there is a change
-              key={dataFiles.filter(file => file.status === 'COMPLETE').length}
+              key={completeDataFilesCount}
               releaseVersionId={releaseVersionId}
               canUpdateRelease={canUpdateRelease}
             />
@@ -90,7 +97,7 @@ const ReleaseDataPage = () => {
             lazy
           >
             <ReleaseDataReorderSection
-              key={dataFiles.filter(file => file.status === 'COMPLETE').length}
+              key={completeDataFilesCount}
               releaseVersionId={releaseVersionId}
               canUpdateRelease={canUpdateRelease}
             />

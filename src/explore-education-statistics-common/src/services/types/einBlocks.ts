@@ -9,25 +9,47 @@ export interface EinBaseBlock {
 export type EinContentBlock = EinHtmlBlock | EinTileGroupBlock;
 export type EinBlockType = EinContentBlock['type'];
 
+export type EinTile = EinFreeTextStatTile | EinApiQueryStatTile;
+export type EinTileType = EinTile['type'];
+
 export interface EinHtmlBlock extends EinBaseBlock {
   type: 'HtmlBlock';
   body: string;
 }
 
-export type EinFreeTextStatTile = {
+export interface EinBaseTile {
   id: string;
-  type: 'FreeTextStatTile';
+  // Tiles are created empty then updated, hence optionality
+  title?: string;
   order: number;
-  title: string;
-  statistic: string;
-  trend: string;
+}
+
+export interface EinFreeTextStatTile extends EinBaseTile {
+  type: 'FreeTextStatTile';
+  statistic?: string;
+  trend?: string;
   linkUrl?: string;
   linkText?: string;
-};
+}
+
+export interface EinApiQueryStatTile extends EinBaseTile {
+  type: 'ApiQueryStatTile';
+  dataSetId?: string;
+  version?: string;
+  isLatestVersion: boolean;
+  query?: string;
+  statistic?: string;
+  indicatorUnit?: string;
+  decimalPlaces?: number;
+  publicationSlug?: string;
+  releaseSlug?: string;
+  publicationLabel?: string;
+  releaseLabel?: string;
+}
 
 export interface EinTileGroupBlock extends EinBaseBlock {
   type: 'TileGroupBlock';
-  tiles: EinFreeTextStatTile[];
+  tiles: EinTile[];
   title?: string;
 }
 

@@ -6,6 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
@@ -20,6 +23,7 @@ public class DataSetMappingServicePermissionTests
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
         contentDbContext.ReleaseVersions.Add(releaseVersion);
         await contentDbContext.SaveChangesAsync();
@@ -31,6 +35,7 @@ public class DataSetMappingServicePermissionTests
             {
                 var service = SetupDataSetMappingService(
                     contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     userService: userService.Object
                 );
                 return service.UpdateFilterMappings(
@@ -48,6 +53,7 @@ public class DataSetMappingServicePermissionTests
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
         contentDbContext.ReleaseVersions.Add(releaseVersion);
         await contentDbContext.SaveChangesAsync();
@@ -59,6 +65,7 @@ public class DataSetMappingServicePermissionTests
             {
                 var service = SetupDataSetMappingService(
                     contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     userService: userService.Object
                 );
                 return service.UpdateIndicatorMappings(
@@ -76,6 +83,7 @@ public class DataSetMappingServicePermissionTests
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
 
         contentDbContext.ReleaseVersions.Add(releaseVersion);
         await contentDbContext.SaveChangesAsync();
@@ -87,6 +95,7 @@ public class DataSetMappingServicePermissionTests
             {
                 var service = SetupDataSetMappingService(
                     contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     userService: userService.Object
                 );
                 return service.UpdateLocationMappings(
@@ -99,9 +108,15 @@ public class DataSetMappingServicePermissionTests
 
     private static DataSetMappingService SetupDataSetMappingService(
         ContentDbContext contentDbContext,
+        StatisticsDbContext statisticsDbContext,
         IUserService? userService = null
     )
     {
-        return new DataSetMappingService(contentDbContext, userService ?? Mock.Of<IUserService>(MockBehavior.Strict));
+        return new DataSetMappingService(
+            contentDbContext,
+            statisticsDbContext,
+            new LocationRepository(statisticsDbContext),
+            userService ?? Mock.Of<IUserService>(MockBehavior.Strict)
+        );
     }
 }

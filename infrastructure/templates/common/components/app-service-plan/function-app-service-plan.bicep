@@ -1,5 +1,5 @@
 import { cpuPercentageConfig, memoryPercentageConfig } from '../alerts/dynamicAlertConfig.bicep'
-import { AppServicePlanSku } from 'types.bicep'
+import { FunctionAppServicePlanSku } from 'types.bicep'
 
 @description('Specifies the App Service plan name')
 param planName string
@@ -8,12 +8,7 @@ param planName string
 param location string
 
 @description('The SKU for the plan')
-param sku AppServicePlanSku
-
-@description('The kind of plan to deploy. Impacted by application type and desired OS. See https://github.com/Azure/app-service-linux-docs/blob/master/Things_You_Should_Know/kind_property.md#app-service-resource-kind-reference.')
-param kind 
-  | 'app'
-  | 'functionapp'
+param sku FunctionAppServicePlanSku
 
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
@@ -34,7 +29,7 @@ param tagValues object
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: planName
   location: location
-  kind: kind
+  kind: 'functionapp'
   sku: sku
   properties: {
     reserved: operatingSystem == 'Linux'

@@ -222,22 +222,18 @@ def validate_environment_variables():
 # If running all tests, or admin, admin_and_public, admin_and_public_2, public_api or seed_data suites,
 # these change data on environments and require test themes and user authentication.
 #
-# We check for both explicit forward slashes AND OS-specific separators here, as in Windows
-# we can expect to get either scenario depending upon how we're running these tests e.g.
-# Git Bash versus Command Prompt versus IDEs.  {os.sep} in Windows always evaluates to
-# `\\` whereas any of these run options above may choose to either supply forward slashes or
-# back slashes.
+# We normalise the path to forward slashes before matching, as in Windows we can expect either
+# separator depending upon how we're running these tests e.g. Git Bash versus Command Prompt
+# versus IDEs. The path may also be relative (`.\tests`), trailing-slashed or absolute.
 def includes_data_changing_tests(arguments: argparse.Namespace):
+    tests_path = arguments.tests.replace("\\", "/").rstrip("/").removeprefix("./")
+
     return (
-        arguments.tests == "tests"
-        or arguments.tests == "tests/"
-        or arguments.tests == f"tests{os.sep}"
-        or f"{os.sep}admin" in arguments.tests
-        or "/admin" in arguments.tests
-        or f"{os.sep}public_api" in arguments.tests
-        or "/public_api" in arguments.tests
-        or f"{os.sep}seed_data" in arguments.tests
-        or "/seed_data" in arguments.tests
+        tests_path == "tests"
+        or tests_path.endswith("/tests")
+        or "/admin" in tests_path
+        or "/public_api" in tests_path
+        or "/seed_data" in tests_path
     )
 
 

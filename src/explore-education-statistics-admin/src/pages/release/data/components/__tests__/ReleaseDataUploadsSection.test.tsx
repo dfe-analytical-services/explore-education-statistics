@@ -1232,6 +1232,11 @@ describe('ReleaseDataUploadsSection', () => {
         testCompleteImportStatus,
       );
       releaseDataFileService.getDataFile.mockResolvedValue(testDataFiles[1]);
+      // Uploading the replacement below flips `data-1` back to `QUEUED`, which
+      // restarts its importer polling and so triggers a status change.
+      permissionService.getDataFilePermissions.mockResolvedValue(
+        {} as DataFilePermissions,
+      );
 
       const { user } = renderWithTestConfig(
         <MemoryRouter>

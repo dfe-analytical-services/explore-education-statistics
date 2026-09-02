@@ -65,6 +65,11 @@ public static class ValidationMessages
         Message: "Only a finalised data set version can be unfinalised."
     );
 
+    public static readonly LocalizableMessage InitialDataSetVersionCanNotBeUnfinalised = new(
+        Code: nameof(InitialDataSetVersionCanNotBeUnfinalised),
+        Message: "The initial data set version cannot be unfinalised."
+    );
+
     public static readonly LocalizableMessage ImportInManualMappingStateNotFound = new(
         Code: nameof(ImportInManualMappingStateNotFound),
         Message: "An import in mapping state could not be found."

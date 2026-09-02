@@ -1,8 +1,5 @@
 import { EinEditableContentSection } from '@admin/services/educationInNumbersContentService';
-import {
-  EinContentBlock,
-  EinFreeTextStatTile,
-} from '@common/services/types/einBlocks';
+import { EinContentBlock, EinTile } from '@common/services/types/einBlocks';
 
 type BlockMeta = {
   sectionId: string;
@@ -34,32 +31,32 @@ export type AddBlockToSection = {
   };
 };
 
-export type AddFreeTextStatTileToBlock = {
-  type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK';
+export type AddTileToBlock = {
+  type: 'ADD_TILE_TO_BLOCK';
   payload: {
-    tile: EinFreeTextStatTile;
+    tile: EinTile;
     meta: BlockMeta;
   };
 };
 
-export type UpdateFreeTextStatTileInBlock = {
-  type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK';
+export type UpdateTileInBlock = {
+  type: 'UPDATE_TILE_IN_BLOCK';
   payload: {
-    tile: EinFreeTextStatTile;
+    tile: EinTile;
     meta: TileMeta;
   };
 };
 
-export type ReorderFreeTextStatTilesInBlock = {
-  type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK';
+export type ReorderTilesInBlock = {
+  type: 'REORDER_TILES_IN_BLOCK';
   payload: {
-    tiles: EinFreeTextStatTile[];
+    tiles: EinTile[];
     meta: BlockMeta;
   };
 };
 
-export type DeleteFreeTextStatTileFromBlock = {
-  type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK';
+export type DeleteTileFromBlock = {
+  type: 'DELETE_TILE_FROM_BLOCK';
   payload: {
     meta: TileMeta;
   };
@@ -99,10 +96,10 @@ export type EducationInNumbersPageDispatchAction =
   | RemoveBlockFromSection
   | UpdateBlockFromSection
   | AddBlockToSection
-  | AddFreeTextStatTileToBlock
-  | UpdateFreeTextStatTileInBlock
-  | ReorderFreeTextStatTilesInBlock
-  | DeleteFreeTextStatTileFromBlock
+  | AddTileToBlock
+  | UpdateTileInBlock
+  | ReorderTilesInBlock
+  | DeleteTileFromBlock
   | UpdateSectionContent
   | AddContentSection
   | SetEducationInNumbersPageContent

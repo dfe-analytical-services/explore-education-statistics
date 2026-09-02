@@ -5,15 +5,6 @@
     "skuPublic": {
       "value": "P2V2 PremiumV2"
     },
-    "skuData": {
-      "value": "P1V2 PremiumV2"
-    },
-    "skuContent": {
-      "value": "P1V2 PremiumV2"
-    },
-    "skuAdmin": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },

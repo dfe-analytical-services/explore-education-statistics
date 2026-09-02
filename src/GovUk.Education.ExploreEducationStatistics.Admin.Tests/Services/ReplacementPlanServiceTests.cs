@@ -416,53 +416,18 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementFilter.Id,
-                    ColumnName = replacementFilter.Name,
-                    Label = replacementFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementFilterGroup.Id,
-                            Label = replacementFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementFilterItem.Id,
-                                    Label = replacementFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ])
             .WithIndicatorMappings(
                 new Dictionary<Guid, IndicatorMapping>
                 {
                     { originalIndicator.Id, CreateIndicatorMapping(originalIndicator, originalIndicatorGroup) },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementIndicator.Id,
-                    ColumnName = replacementIndicator.Name,
-                    Label = replacementIndicator.Label,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
                     { originalLocation.Id, CreateLocationMapping(originalLocation) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1157,11 +1122,7 @@ public class ReplacementPlanServiceTests
                                                 originalDefaultFilterItem.Id,
                                                 new FilterItemMapping { OriginalId = originalDefaultFilterItem.Id }
                                             },
-                                        },
-                                        unmappedReplacementFilterItems:
-                                        [
-                                            new UnmappedFilterItem { Id = replacementDefaultFilterItem.Id },
-                                        ]
+                                        }
                                     )
                                 },
                             }
@@ -1436,31 +1397,7 @@ public class ReplacementPlanServiceTests
                         )
                     },
                 }
-            )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementNewlyIntroducedFilter.Id,
-                    ColumnName = replacementNewlyIntroducedFilter.Name,
-                    Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -1651,31 +1588,7 @@ public class ReplacementPlanServiceTests
                         )
                     },
                 }
-            )
-            .WithUnmappedReplacementFilters([
-                new UnmappedFilter
-                {
-                    Id = replacementNewlyIntroducedFilter.Id,
-                    ColumnName = replacementNewlyIntroducedFilter.Name,
-                    Label = replacementNewlyIntroducedFilter.Label,
-                    UnmappedReplacementFilterGroups =
-                    [
-                        new UnmappedFilterGroup
-                        {
-                            Id = replacementNewlyIntroducedFilterGroup.Id,
-                            Label = replacementNewlyIntroducedFilterGroup.Label,
-                            UnmappedReplacementFilterItems =
-                            [
-                                new UnmappedFilterItem
-                                {
-                                    Id = replacementNewlyIntroducedFiltersFilterItem.Id,
-                                    Label = replacementNewlyIntroducedFiltersFilterItem.Label,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ]);
+            );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
@@ -2784,23 +2697,12 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementNewIndicator.Id,
-                    Label = replacementNewIndicator.Label,
-                    ColumnName = replacementNewIndicator.Name,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
                     { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3078,23 +2980,12 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([
-                new UnmappedIndicator
-                {
-                    Id = replacementIndicatorAUpdated.Id,
-                    Label = replacementIndicatorAUpdated.Label,
-                    ColumnName = replacementIndicatorAUpdated.Name,
-                    GroupId = replacementIndicatorGroup.Id,
-                    GroupLabel = replacementIndicatorGroup.Label,
-                },
-            ])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
                     { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
                 }
-            )
-            .WithUnmappedReplacementLocations([]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3376,7 +3267,6 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
@@ -3391,16 +3281,7 @@ public class ReplacementPlanServiceTests
                     },
                     { originalLocationBirmingham.Id, CreateLocationMapping(originalLocationBirmingham) },
                 }
-            )
-            .WithUnmappedReplacementLocations([
-                new UnmappedLocation
-                {
-                    Id = replacementLocationNott.Id,
-                    GeographicLevel = replacementLocationNott.GeographicLevel,
-                    Name = replacementLocationNott.ToLocationAttribute().Name!,
-                    Code = replacementLocationNott.ToLocationAttribute().GetCodeOrFallback(),
-                },
-            ]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3419,6 +3300,38 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(
+                locationEng,
+                replacementLocationDerby,
+                locationLeicester,
+                replacementLocationNott
+            );
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = locationEng,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationDerby,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = locationLeicester,
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationNott,
+                }
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -3726,22 +3639,12 @@ public class ReplacementPlanServiceTests
                     },
                 }
             )
-            .WithUnmappedReplacementIndicators([])
             .WithLocationMappings(
                 new Dictionary<Guid, LocationMapping>
                 {
                     { originalLocationDerby.Id, CreateLocationMapping(originalLocationDerby) },
                 }
-            )
-            .WithUnmappedReplacementLocations([
-                new UnmappedLocation
-                {
-                    Id = replacementLocationDerby.Id,
-                    GeographicLevel = replacementLocationDerby.GeographicLevel,
-                    Name = replacementLocationDerby.ToLocationAttribute().Name!,
-                    Code = replacementLocationDerby.ToLocationAttribute().GetCodeOrFallback(),
-                },
-            ]);
+            );
 
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3760,6 +3663,15 @@ public class ReplacementPlanServiceTests
             statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Location.AddRange(replacementLocationDerby);
+            statisticsDbContext.Observation.AddRange(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = replacementReleaseSubject.SubjectId,
+                    Location = replacementLocationDerby,
+                }
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -3869,7 +3781,9 @@ public class ReplacementPlanServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
+            statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
+            new LocationRepository(statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,
@@ -3882,7 +3796,6 @@ public class ReplacementPlanServiceTests
         Filter original,
         Filter? replacement = null,
         Dictionary<Guid, FilterGroupMapping>? filterGroupMappings = null,
-        List<UnmappedFilterGroup>? unmappedReplacementFilterGroups = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3895,7 +3808,6 @@ public class ReplacementPlanServiceTests
             ReplacementColumnName = replacement?.Name,
             ReplacementLabel = replacement?.Label,
             FilterGroupMappings = filterGroupMappings ?? [],
-            UnmappedReplacementFilterGroups = unmappedReplacementFilterGroups ?? [],
             Status = status,
         };
     }
@@ -3904,7 +3816,6 @@ public class ReplacementPlanServiceTests
         FilterGroup original,
         FilterGroup? replacement = null,
         Dictionary<Guid, FilterItemMapping>? filterItemMappings = null,
-        List<UnmappedFilterItem>? unmappedReplacementFilterItems = null,
         MapStatus status = MapStatus.Unset
     )
     {
@@ -3915,7 +3826,6 @@ public class ReplacementPlanServiceTests
             ReplacementId = replacement?.Id,
             ReplacementLabel = replacement?.Label,
             FilterItemMappings = filterItemMappings ?? [],
-            UnmappedReplacementFilterItems = unmappedReplacementFilterItems ?? [],
             Status = status,
         };
     }

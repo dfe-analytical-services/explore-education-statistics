@@ -1,20 +1,90 @@
 *** Settings ***
 Library             ../../libs/admin_api.py
+Library             ../../libs/public_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
+Resource            ../../libs/public-api-common.robot
 
 Suite Setup         user signs in as bau1
-Suite Teardown      user closes the browser
+Suite Teardown      run keywords    user closes the browser    AND    user removes ein page if exists    ui-test-page
 Test Setup          fail test fast if required
 
-Force Tags          Admin    Local    Dev    AltersData
+Force Tags          Admin    PublicApi    Local    Dev    AltersData
+
+
+*** Variables ***
+${PUBLICATION_NAME}=        EiN API query tile %{RUN_IDENTIFIER}
+${RELEASE_NAME}=            Academic year 3000/01
+${SUBJECT_NAME}=            ${PUBLICATION_NAME} - Subject 1
+${INDICATOR_LABEL}=         Authorised absence rate
+${DATA_SET_VERSION_1}=      1.0.0
+${DATA_SET_VERSION_2}=      1.0.1    # replacing a data file always creates a patch version
+${TILE_1_TITLE}=            ${INDICATOR_LABEL}
+${TILE_1_STATISTIC}=        3.0%    # 3.01996 in the source data, formatted using the indicator's unit (%) and decimal places (1)
+${TILE_2_TITLE}=            ${INDICATOR_LABEL} (updated)
+${TILE_2_STATISTIC}=        9.9%    # 9.87654 in the replacement data
 
 
 *** Test Cases ***
+Create publication and release to hold an API data set
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    user creates test release via api    ${PUBLICATION_ID}    AY    3000
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Upload subject for the API data set
+    user uploads subject and waits until complete    ${SUBJECT_NAME}    tiny-two-filters.csv
+    ...    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
+
+Add data guidance to subject
+    user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
+
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
+    ...    ${SUBJECT_NAME} Main guidance content
+
+Create API data set
+    user scrolls to the top of the page
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
+    user creates API data set and opens details    ${SUBJECT_NAME}
+    user waits until draft API data set status contains    Ready
+
+    ${current_url}=    get location
+    ${API_DATA_SET_ID}=    fetch from right    ${current_url}    /
+    check that variable is not empty    API_DATA_SET_ID    ${API_DATA_SET_ID}
+    set suite variable    ${API_DATA_SET_ID}
+
+Publish the release so the API data set has a live version
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+    user approves release for immediate publication
+
+Build the query for the API query stat tile
+    ${meta}=    wait until keyword succeeds    10x    %{WAIT_SMALL}s
+    ...    user gets api data set meta via api    ${API_DATA_SET_ID}
+
+    ${indicator_id}=    user gets API data set indicator id    ${meta}    ${INDICATOR_LABEL}
+    ${colour_id}=    user gets API data set filter option id    ${meta}    Colour    Blue
+    ${school_type_id}=    user gets API data set filter option id    ${meta}    School type    Total
+
+    # An ApiQueryStatTile requires a query returning exactly one indicator and a single
+    # national result for the latest time period. These filters narrow the data set down
+    # to its one National row.
+    ${API_QUERY}=    catenate    SEPARATOR=
+    ...    {"criteria":{"and":[
+    ...    {"filters":{"eq":"${colour_id}"}},
+    ...    {"filters":{"eq":"${school_type_id}"}}
+    ...    ]},"indicators":["${indicator_id}"]}
+    set suite variable    ${API_QUERY}
+
 Remove UI test page if exists via API
     user removes ein page if exists    ui-test-page
 
 Go to EiN management page
+    user navigates to admin dashboard
     user clicks link    Platform administration
     user waits until h1 is visible    Platform administration
 
@@ -88,7 +158,7 @@ Add a group block
     user clicks button    Save group heading
 
 Add free text stat tile
-    user clicks button    Add new tile
+    user clicks button    Add new free text stat tile
     user waits until page contains element    testid:freeTextStatTile-editForm
 
     user enters text into element    //input[@name="title"]    Tile title
@@ -100,6 +170,26 @@ Add free text stat tile
     user clicks button    Save
     user waits until page contains element
     ...    xpath://*[@data-testid="free-text-stat-tile-title" and text()="Tile title"]
+
+Add API query stat tile
+    user clicks button    Add new API query stat tile
+    user waits until page contains element    testid:apiQueryStatTile-editForm
+
+    user enters text into element    //input[@name="title"]    ${TILE_1_TITLE}
+    user enters text into element    //input[@name="dataSetId"]    ${API_DATA_SET_ID}
+    user enters text into element    //input[@name="version"]    ${DATA_SET_VERSION_1}
+    user enters text into element    //textarea[@name="query"]    ${API_QUERY}
+
+    user clicks button    Save
+    user waits until page does not contain element    testid:apiQueryStatTile-editForm    %{WAIT_LONG}
+
+Validate API query stat tile in editing mode
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
+
+    # The tile was queried against the data set's only live version, so it should not
+    # be flagged as out of date.
+    user checks page does not contain element    testid:api-query-stat-tile-not-latest-tag
+    user checks page does not contain element    testid:apiQueryStatTile-notLatestVersionWarning
 
 Validate content preview
     user clicks element    id:editingMode-preview
@@ -113,6 +203,8 @@ Validate content preview
     user checks page contains    Over 9000!
     user checks page contains    It's up a lot!
     user checks page contains link with text and url    A link to somewhere    http://test.link
+
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
 
 Publish page
     user clicks link    Sign off
@@ -150,6 +242,69 @@ Check page appears on public site
     user checks page contains    It's up a lot!
     user checks page contains link with text and url    A link to somewhere    http://test.link
 
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
+
+Create release amendment and replace the API data set's data file
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+    user clicks link    Data and files
+    user waits until page contains data uploads table
+
+    user uploads subject replacement    ${SUBJECT_NAME}    tiny-two-filters-patch-auto.csv
+    ...    tiny-two-filters-patch-auto.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user waits until page contains element    testid:Data file replacements table
+
+    # The replacement is not valid until its API data set version has been finalised.
+    user confirms replacement upload    ${SUBJECT_NAME}    Error
+
+Finalise the new API data set version
+    user clicks link in table cell    1    4    View details    testid:Data file replacements table
+    user waits until page contains element    testid:Replacement Title
+
+    # The replacement data is structurally identical, so all of its mappings are automatic.
+    user waits until h3 is visible    API data set locations: OK    %{WAIT_DATA_FILE_IMPORT}
+    user waits until h3 is visible    API data set filters: OK
+    user waits until h3 is visible    API data set indicators: OK
+    user waits until h3 is visible    API data set has to be finalized: ERROR
+
+    user clicks link    go to the API data sets tab
+    user waits until h3 is visible    Draft version details
+    user checks summary list contains    Version    v${DATA_SET_VERSION_2}    id:draft-version-summary
+    ...    wait=%{WAIT_LONG}
+
+    user clicks button    Finalise this data set version
+    user waits for caches to expire
+    user waits until h2 is visible    Mappings finalised
+    user waits until page contains    Draft API data set version is ready to be published
+
+Confirm the data replacement
+    user clicks link    Back to API data sets
+    user clicks link    Data uploads
+    user clicks link containing text    View details    testId:Actions
+
+    user waits until h3 is visible    API data set has to be finalized: OK
+    user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete
+
+Publish the release amendment
+    user clicks link    Back
+    user navigates to content page    ${PUBLICATION_NAME}
+
+    user clicks button    Add note    id:release-notes
+    user enters text into element    id:create-release-note-form-reason    Test release note
+    user clicks button    Save note
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note
+
+    user approves release for immediate publication
+
+Check published page tile is flagged as not using the latest data
+    user waits for caches to expire
+    user navigates to    ${test_page_url}
+    user waits until h1 is visible    UI test page
+
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
+    ...    is_latest_version=${False}
+
 Validate Manage Education in Numbers entry
     user navigates to    %{ADMIN_URL}/education-in-numbers
 
@@ -184,6 +339,27 @@ Add a text block to new section
     user adds content to accordion section text block    Second section    1
     ...    More text block content    testid:accordion
 
+Add API query stat tile using the latest API data set version
+    user opens accordion section    Content section title    testid:accordion
+
+    user clicks button    Add new API query stat tile
+    user waits until page contains element    testid:apiQueryStatTile-editForm
+
+    user enters text into element    //input[@name="title"]    ${TILE_2_TITLE}
+    user enters text into element    //input[@name="dataSetId"]    ${API_DATA_SET_ID}
+    user enters text into element    //input[@name="version"]    ${DATA_SET_VERSION_2}
+    user enters text into element    //textarea[@name="query"]    ${API_QUERY}
+
+    user clicks button    Save
+    user waits until page does not contain element    testid:apiQueryStatTile-editForm    %{WAIT_LONG}
+
+Validate API query stat tiles in editing mode
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
+    ...    is_latest_version=${False}
+    user checks API query stat tile is displayed    ${TILE_2_TITLE}    ${TILE_2_STATISTIC}
+
+    user waits until page contains element    testid:apiQueryStatTile-notLatestVersionWarning    limit=1
+
 Publish amendment
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
@@ -212,5 +388,40 @@ Check amendment on public site
     user checks page contains    It's up a lot!
     user checks page contains link with text and url    A link to somewhere    http://test.link
 
+    user checks API query stat tile is displayed    ${TILE_1_TITLE}    ${TILE_1_STATISTIC}
+    ...    is_latest_version=${False}
+    user checks API query stat tile is displayed    ${TILE_2_TITLE}    ${TILE_2_STATISTIC}
+
     user checks page contains    Second section
     user checks page contains    More text block content
+
+
+*** Keywords ***
+user checks API query stat tile is displayed
+    [Arguments]    ${title}    ${statistic}    ${is_latest_version}=${True}
+
+    ${tile_xpath}=    catenate    SEPARATOR=${SPACE}
+    ...    xpath://*[@data-testid="api-query-stat-tile-tile"
+    ...    and .//*[@data-testid="api-query-stat-tile-title" and normalize-space()="${title}"]]
+    user waits until page contains element    ${tile_xpath}
+
+    user waits until parent contains element    ${tile_xpath}
+    ...    xpath:.//*[@data-testid="api-query-stat-tile-statistic" and normalize-space()="${statistic}"]
+
+    user waits until parent contains element    ${tile_xpath}
+    ...    xpath:.//*[@data-testid="api-query-stat-tile-link-release" and normalize-space()="${RELEASE_NAME}"]
+
+    ${link_xpath}=    catenate    SEPARATOR=${SPACE}
+    ...    xpath:.//a[@data-testid="api-query-stat-tile-link"
+    ...    and contains(@href, "/find-statistics/")
+    ...    and normalize-space()="${PUBLICATION_NAME}"]
+    user waits until parent contains element    ${tile_xpath}    ${link_xpath}
+
+    ${tag_xpath}=    catenate    SEPARATOR=${SPACE}
+    ...    xpath:.//*[@data-testid="api-query-stat-tile-not-latest-tag"
+    ...    and normalize-space()="Not the latest data"]
+    IF    ${is_latest_version}
+        user waits until parent does not contain element    ${tile_xpath}    ${tag_xpath}
+    ELSE
+        user waits until parent contains element    ${tile_xpath}    ${tag_xpath}
+    END

@@ -24,7 +24,7 @@ export const dataApi = new Client({
 });
 
 export const frontendApi = new Client({
-  baseURL: `${process.env.PUBLIC_URL}api`,
+  baseURL: `${process.env.PUBLIC_URL}/api`,
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });

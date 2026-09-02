@@ -18,13 +18,10 @@ public record DataSetMapping
     public File ReplacementDataFile { get; init; } = null!;
 
     public Dictionary<Guid, IndicatorMapping> IndicatorMappings { get; init; } = null!;
-    public List<UnmappedIndicator> UnmappedReplacementIndicators { get; init; } = [];
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
-    public List<UnmappedLocation> UnmappedReplacementLocations { get; init; } = [];
 
     public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
-    public List<UnmappedFilter> UnmappedReplacementFilters { get; set; } = []; // EES-7370 Change set -> init
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -64,16 +61,6 @@ public record DataSetMapping
                 .HasColumnType("nvarchar(max)");
 
             builder
-                .Property(x => x.UnmappedReplacementIndicators)
-                .HasConversion(
-                    unmappedIndicators => JsonSerializer.Serialize(unmappedIndicators, JsonOptions),
-                    unmappedIndicatorsString =>
-                        JsonSerializer.Deserialize<List<UnmappedIndicator>>(unmappedIndicatorsString, JsonOptions)
-                        ?? new List<UnmappedIndicator>(),
-                    ValueComparer.CreateDefault<List<UnmappedIndicator>>(false)
-                );
-
-            builder
                 .Property(x => x.LocationMappings)
                 .HasConversion(
                     locationMappings => JsonSerializer.Serialize(locationMappings, JsonOptions),
@@ -85,16 +72,6 @@ public record DataSetMapping
                 .HasColumnType("nvarchar(max)");
 
             builder
-                .Property(x => x.UnmappedReplacementLocations)
-                .HasConversion(
-                    unmappedLocations => JsonSerializer.Serialize(unmappedLocations, JsonOptions),
-                    unmappedLocationsString =>
-                        JsonSerializer.Deserialize<List<UnmappedLocation>>(unmappedLocationsString, JsonOptions)
-                        ?? new List<UnmappedLocation>(),
-                    ValueComparer.CreateDefault<List<UnmappedLocation>>(false)
-                );
-
-            builder
                 .Property(x => x.FilterMappings)
                 .HasConversion(
                     filterMappings => JsonSerializer.Serialize(filterMappings, JsonOptions),
@@ -104,16 +81,6 @@ public record DataSetMapping
                     ValueComparer.CreateDefault<Dictionary<Guid, FilterMapping>>(false)
                 )
                 .HasColumnType("nvarchar(max)");
-
-            builder
-                .Property(x => x.UnmappedReplacementFilters)
-                .HasConversion(
-                    unmappedFilters => JsonSerializer.Serialize(unmappedFilters, JsonOptions),
-                    unmappedFiltersString =>
-                        JsonSerializer.Deserialize<List<UnmappedFilter>>(unmappedFiltersString, JsonOptions)
-                        ?? new List<UnmappedFilter>(),
-                    ValueComparer.CreateDefault<List<UnmappedFilter>>(false)
-                );
         }
     }
 }
@@ -124,15 +91,6 @@ public enum MapStatus
     ManuallySet, // user manually mapped this (whether to another Id or nothing)
     AutoSet, // automatically mapped when the initial mapping was created
     ParentNotMapped,
-}
-
-public record UnmappedIndicator
-{
-    public Guid Id { get; set; }
-    public string Label { get; set; } = "";
-    public string ColumnName { get; set; } = "";
-    public Guid GroupId { get; set; }
-    public string GroupLabel { get; set; } = "";
 }
 
 public record IndicatorMapping
@@ -152,14 +110,6 @@ public record IndicatorMapping
     public MapStatus Status { get; set; }
 }
 
-public record UnmappedLocation
-{
-    public Guid Id { get; set; }
-    public GeographicLevel GeographicLevel { get; set; }
-    public string Code { get; set; } = "";
-    public string Name { get; set; } = "";
-}
-
 public record LocationMapping
 {
     public Guid OriginalId { get; set; }
@@ -173,16 +123,6 @@ public record LocationMapping
     public string? ReplacementName { get; set; } = "";
 
     public MapStatus Status { get; set; }
-}
-
-public record UnmappedFilter
-{
-    public Guid Id { get; set; }
-    public string Label { get; set; } = "";
-    public string ColumnName { get; set; } = "";
-
-    // All child groups of an unmapped filter must also be unmapped
-    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
 }
 
 public record UnmappedFilterGroup
@@ -211,7 +151,9 @@ public record FilterMapping
     public string? ReplacementColumnName { get; set; }
 
     public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
-    public List<UnmappedFilterGroup> UnmappedReplacementFilterGroups { get; set; } = [];
+
+    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
+    public List<UnmappedFilterGroup>? UnmappedReplacementFilterGroups { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }
@@ -225,7 +167,9 @@ public record FilterGroupMapping
     public string? ReplacementLabel { get; set; }
 
     public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
-    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
+
+    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
+    public List<UnmappedFilterItem>? UnmappedReplacementFilterItems { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }

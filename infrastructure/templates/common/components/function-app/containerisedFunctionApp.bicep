@@ -7,7 +7,7 @@ import { AzureFileShareMount } from '../storage/types.bicep'
 
 import { EntraIdAuthentication } from '../../../public-api/types.bicep'
 
-import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
@@ -69,7 +69,7 @@ param appServicePlanName string
 param applicationInsightsConnectionString string
 
 @description('Specifies the SKU for the Function App hosting plan')
-param sku AppServicePlanSku
+param sku FunctionAppServicePlanSku
 
 @description('The minimum number of instances for the function app.')
 param minimumInstanceCount int = 1
@@ -170,12 +170,11 @@ var fileServiceAlerts = alerts != null
     }
   : null
 
-module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../app-service-plan/function-app-service-plan.bicep' = {
   name: appServicePlanName
   params: {
     planName: appServicePlanName
     location: location
-    kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
     maximumElasticWorkerCount: maximumInstanceCount
@@ -357,23 +356,12 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   }
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = {
-  parent: functionApp
-  name: 'azurestorageaccounts'
-  properties: reduce(
-    azureFileShares,
-    {},
-    (cur, next) =>
-      union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      })
-  )
+module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
+  name: '${functionApp.name}AzureStorageAccountsConfigModuleDeploy'
+  params: {
+    siteName: functionApp.name
+    azureFileShares: azureFileShares
+  }
 }
 
 module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpoints.?functionApp != null) {

@@ -35,30 +35,15 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, FilterMapping> filterMappings
     ) => generator.ForInstance(m => m.SetFilterMappings(filterMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementFilters(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedFilter> unmappedFilters
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementFilters(unmappedFilters));
-
     public static Generator<DataSetMapping> WithIndicatorMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => generator.ForInstance(m => m.SetIndicatorMappings(indicatorMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementIndicators(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementIndicators(unmappedIndicators));
-
     public static Generator<DataSetMapping> WithLocationMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, LocationMapping> locationMappings
     ) => generator.ForInstance(m => m.SetLocationMappings(locationMappings));
-
-    public static Generator<DataSetMapping> WithUnmappedReplacementLocations(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedLocation> unmappedLocations
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementLocations(unmappedLocations));
 
     public static InstanceSetters<DataSetMapping> SetDefaults(this InstanceSetters<DataSetMapping> setters) =>
         setters
@@ -93,28 +78,13 @@ public static class DataSetMappingGeneratorExtensions
         Dictionary<Guid, FilterMapping> filterMappings
     ) => setters.Set(m => m.FilterMappings, filterMappings);
 
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementFilters(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedFilter> unmappedFilters
-    ) => setters.Set(m => m.UnmappedReplacementFilters, unmappedFilters);
-
     public static InstanceSetters<DataSetMapping> SetIndicatorMappings(
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => setters.Set(m => m.IndicatorMappings, indicatorMappings);
 
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementIndicators(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => setters.Set(m => m.UnmappedReplacementIndicators, unmappedIndicators);
-
     public static InstanceSetters<DataSetMapping> SetLocationMappings(
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, LocationMapping> locationMappings
     ) => setters.Set(m => m.LocationMappings, locationMappings);
-
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementLocations(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedLocation> unmappedLocations
-    ) => setters.Set(m => m.UnmappedReplacementLocations, unmappedLocations);
 }

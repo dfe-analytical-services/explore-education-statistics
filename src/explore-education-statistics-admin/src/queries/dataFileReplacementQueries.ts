@@ -1,7 +1,7 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import dataReplacementService from '@admin/services/dataReplacementService';
 
-const dataFileReplacementQueries = createQueryKeys('user', {
+const dataFileReplacementQueries = createQueryKeys('dataFileReplacement', {
   getReplacementPlan(
     releaseVersionId: string,
     dataFileId: string,
