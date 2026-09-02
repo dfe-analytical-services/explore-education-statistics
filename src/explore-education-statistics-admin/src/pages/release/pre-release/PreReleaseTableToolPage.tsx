@@ -18,16 +18,14 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { useQuery } from '@tanstack/react-query';
 
-const PreReleaseTableToolPage = ({
-  match,
-}: RouteComponentProps<PreReleaseTableToolRouteParams>) => {
-  const { publicationId, releaseVersionId, dataBlockId } = match.params;
+const PreReleaseTableToolPage = () => {
+  const { publicationId, releaseVersionId, dataBlockId } =
+    useParams<PreReleaseTableToolRouteParams>();
 
   const { data: publication, isLoading: isPublicationLoading } = useQuery(
     publicationQueries.get(publicationId),

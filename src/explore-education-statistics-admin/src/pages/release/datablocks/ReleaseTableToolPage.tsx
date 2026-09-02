@@ -6,15 +6,13 @@ import {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { useQuery } from '@tanstack/react-query';
 import publicationQueries from '@admin/queries/publicationQueries';
 
-const ReleaseTableToolPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseVersionId, publicationId } = match.params;
+const ReleaseTableToolPage = () => {
+  const { releaseVersionId, publicationId } = useParams<ReleaseRouteParams>();
   const { releaseVersion } = useReleaseVersionContext();
 
   const { data: publication, isLoading } = useQuery(

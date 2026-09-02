@@ -21,12 +21,10 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useMemo } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const PublicationPageContainer = ({
-  match,
-}: RouteComponentProps<PublicationRouteParams>) => {
-  const { publicationId } = match.params;
+const PublicationPageContainer = () => {
+  const { publicationId } = useParams<PublicationRouteParams>();
   const {
     value: publication,
     setState: setPublication,

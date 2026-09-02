@@ -18,15 +18,16 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 interface MatchProps {
   publicationId: string;
   releaseVersionId: string;
 }
 
-const ReleasePageContainer = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleasePageContainer = () => {
+  const { publicationId, releaseVersionId } = useParams<MatchProps>();
 
   const { user } = useAuthContext();
 

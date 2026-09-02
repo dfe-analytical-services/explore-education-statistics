@@ -5,20 +5,21 @@ import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContex
 import logger from '@common/services/logger';
 import { isAxiosError } from 'axios';
 import React, { Component, ReactNode } from 'react';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { useHistory } from 'react-router-dom';
 
 interface State {
   errorCode?: number;
 }
 
-interface Props extends RouteComponentProps {
+interface Props {
   children: ReactNode;
+  history: ReturnType<typeof useHistory>;
 }
 
 /**
  * This component is responsible for rendering error pages of
  * specific types, or a fallback "Service problems" page
- * dependant on the type of error encountered.
+ * dependent on the type of error encountered.
  */
 class PageErrorBoundary extends Component<Props, State> {
   public state: State = {};
@@ -106,4 +107,10 @@ class PageErrorBoundary extends Component<Props, State> {
   }
 }
 
-export default withRouter(PageErrorBoundary);
+function PageErrorBoundaryWithRouter({ children }: { children: ReactNode }) {
+  const history = useHistory();
+
+  return <PageErrorBoundary history={history}>{children}</PageErrorBoundary>;
+}
+
+export default PageErrorBoundaryWithRouter;

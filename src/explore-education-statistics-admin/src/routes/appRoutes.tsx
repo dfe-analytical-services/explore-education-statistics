@@ -48,23 +48,24 @@ import {
   themeEditRoute,
   themesRoute,
 } from '@admin/routes/routes';
+import { RouteProps } from 'react-router';
 
-export const publicRoutes = {
+export const publicRoutes: Record<string, RouteProps> = {
   signInRoute: {
     ...signInRoute,
-    component: SignInPage,
+    children: <SignInPage />,
   },
   signedOutRoute: {
     ...signedOutRoute,
-    component: SignedOutPage,
+    children: <SignedOutPage />,
   },
   expiredInviteRoute: {
     ...expiredInviteRoute,
-    component: ExpiredInvitePage,
+    children: <ExpiredInvitePage />,
   },
   noInvitationRoute: {
     ...noInvitationRoute,
-    component: NoInvitationPage,
+    children: <NoInvitationPage />,
   },
 };
 
@@ -73,75 +74,75 @@ const appRoutes: Record<string, ProtectedRouteProps> = {
   ...documentationRoutes,
   homeRoute: {
     ...homeRoute,
-    component: AdminDashboardPage,
+    children: <AdminDashboardPage />,
   },
   publishersGuideRoute: {
     ...publishersGuideRoute,
-    component: PublishersGuide,
+    children: <PublishersGuide />,
   },
   dashboardRoute: {
     ...dashboardRoute,
-    component: AdminDashboardPage,
+    children: <AdminDashboardPage />,
   },
   contactUsRoute: {
     ...contactUsRoute,
-    component: ContactUsPage,
+    children: <ContactUsPage />,
   },
   themesRoute: {
     ...themesRoute,
-    component: ThemesPage,
+    children: <ThemesPage />,
   },
   themeCreateRoute: {
     ...themeCreateRoute,
-    component: ThemeCreatePage,
+    children: <ThemeCreatePage />,
   },
   themeEditRoute: {
     ...themeEditRoute,
-    component: ThemeEditPage,
+    children: <ThemeEditPage />,
   },
   publicationCreateRoute: {
     ...publicationCreateRoute,
-    component: PublicationCreatePage,
+    children: <PublicationCreatePage />,
   },
   methodologyRoute: {
     ...methodologyRoute,
-    component: MethodologyPage,
+    children: <MethodologyPage />,
   },
   preReleaseRoute: {
     ...preReleaseRoute,
-    component: PreReleasePageContainer,
+    children: <PreReleasePageContainer />,
   },
   preReleaseContentRoute: {
     ...preReleaseContentRoute,
-    component: PreReleaseContentPage,
+    children: <PreReleaseContentPage />,
   },
   preReleaseTableToolRoute: {
     ...preReleaseTableToolRoute,
-    component: PreReleaseTableToolPage,
+    children: <PreReleaseTableToolPage />,
   },
   releaseRoute: {
     ...releaseRoute,
-    component: ReleasePageContainer,
+    children: <ReleasePageContainer />,
   },
   releaseCreateRoute: {
     ...releaseCreateRoute,
-    component: ReleaseCreatePage,
+    children: <ReleaseCreatePage />,
   },
   publicationRoute: {
     ...publicationRoute,
-    component: PublicationPageContainer,
+    children: <PublicationPageContainer />,
   },
   educationInNumbersListRoute: {
     ...educationInNumbersListRoute,
-    component: EducationInNumbersListPage,
+    children: <EducationInNumbersListPage />,
   },
   educationInNumbersCreateRoute: {
     ...educationInNumbersCreateRoute,
-    component: EducationInNumbersCreatePage,
+    children: <EducationInNumbersCreatePage />,
   },
   educationInNumbersRoute: {
     ...educationInNumbersRoute,
-    component: EducationInNumbersPage,
+    children: <EducationInNumbersPage />,
   },
 };
 

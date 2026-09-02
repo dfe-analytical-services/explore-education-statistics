@@ -8,15 +8,13 @@ import PreReleaseAccessForm from '@admin/pages/users/components/PreReleaseAccess
 import PublicationAccessForm from '@admin/pages/users/components/PublicationAccessForm';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import releaseQueries from '@admin/queries/releaseQueries';
+import { useParams } from 'react-router-dom';
 
-export default function ManageUserPage({
-  match,
-}: RouteComponentProps<{ userId: string }>) {
-  const { userId } = match.params;
+export default function ManageUserPage() {
+  const { userId } = useParams<{ userId: string }>();
 
   const {
     data: user,

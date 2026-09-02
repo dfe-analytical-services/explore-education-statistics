@@ -18,12 +18,11 @@ import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const EducationInNumbersPage = ({
-  match,
-}: RouteComponentProps<EducationInNumbersRouteParams>) => {
-  const { educationInNumbersPageId } = match.params;
+const EducationInNumbersPage = () => {
+  const { educationInNumbersPageId } =
+    useParams<EducationInNumbersRouteParams>();
 
   const {
     value: educationInNumbersPage,

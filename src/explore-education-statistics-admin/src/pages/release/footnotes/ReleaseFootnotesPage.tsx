@@ -16,12 +16,11 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseFootnotesPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleaseFootnotesPage = () => {
+  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
   const [isReordering, toggleIsReordering] = useToggle(false);
 
   const { value: canUpdateRelease = false, isLoading: isPermissionLoading } =

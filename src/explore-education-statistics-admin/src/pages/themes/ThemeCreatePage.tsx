@@ -5,9 +5,11 @@ import { ThemeParams, themesRoute } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useHistory } from 'react-router-dom';
 
-const ThemeCreatePage = ({ history }: RouteComponentProps<ThemeParams>) => {
+const ThemeCreatePage = () => {
+  const history = useHistory();
+
   return (
     <Page
       title="Create theme"

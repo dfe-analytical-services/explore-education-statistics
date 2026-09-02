@@ -5,8 +5,8 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContentEdit from '@admin/pages/release/content/components/ReleaseContentEdit';
 import ReleaseContentPreview from '@admin/pages/release/content/components/ReleaseContentPreview';
 import {
-  ReleaseContentProvider,
   ReleaseContentContextState,
+  ReleaseContentProvider,
   useReleaseContentState,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import styles from '@admin/pages/release/content/ReleaseContentPage.module.scss';
@@ -22,7 +22,7 @@ import featuredTableService from '@admin/services/featuredTableService';
 import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release, featuredTables } =
@@ -179,10 +179,8 @@ const ReleaseContentPageLoaded = () => {
   );
 };
 
-const ReleaseContentPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseVersionId } = match.params;
+const ReleaseContentPage = () => {
+  const { releaseVersionId } = useParams<ReleaseRouteParams>();
 
   const { value, isLoading } =
     useAsyncRetry<ReleaseContentContextState>(async () => {

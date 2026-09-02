@@ -11,13 +11,10 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
-const PreReleaseContentPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const PreReleaseContentPage = () => {
+  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
 
   const { data: content, isLoading: isLoadingContent } = useQuery(
     releaseContentQueries.get(releaseVersionId, true),

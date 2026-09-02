@@ -1,8 +1,8 @@
 import Link from '@admin/components/Link';
 import PageTitle from '@admin/components/PageTitle';
 import {
-  PreReleaseMethodologyRouteParams,
   preReleaseMethodologyRoute,
+  PreReleaseMethodologyRouteParams,
 } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import methodologyService, {
@@ -17,17 +17,16 @@ import TagGroup from '@common/components/TagGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
   methodologyVersions: MethodologyVersionSummary[];
 }
 
-const PreReleaseMethodologiesPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const PreReleaseMethodologiesPage = () => {
+  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, latestMethodologyVersions] = await Promise.all([

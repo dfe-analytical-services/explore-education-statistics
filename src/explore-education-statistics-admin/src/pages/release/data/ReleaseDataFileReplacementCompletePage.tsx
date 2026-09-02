@@ -12,13 +12,13 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import { useParams } from 'react-router-dom';
 
-const ReleaseDataFileReplacementCompletePage = ({
-  match,
-}: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
-  const { publicationId, releaseVersionId, fileId } = match.params;
+const ReleaseDataFileReplacementCompletePage = () => {
+  const { publicationId, releaseVersionId, fileId } =
+    useParams<ReleaseDataFileReplaceRouteParams>();
 
   const {
     value: dataSetAccoutrements,

@@ -19,7 +19,7 @@ import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { formatInTimeZone } from 'date-fns-tz';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
@@ -45,10 +45,8 @@ export const calculatePraPeriodAdvice = (
   return `Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dateScheduledForPublish}.`;
 };
 
-const PreReleasePageContainer = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const PreReleasePageContainer = () => {
+  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
 
   const config = useConfig();
   const { user } = useAuthContext();

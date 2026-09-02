@@ -8,13 +8,11 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useHistory, useParams } from 'react-router-dom';
 
-export default function PublicationCreatePage({
-  history,
-  match,
-}: RouteComponentProps<{ themeId: string }>) {
-  const { themeId } = match.params;
+export default function PublicationCreatePage() {
+  const { themeId } = useParams<{ themeId: string }>();
+  const history = useHistory();
 
   const { value: theme, isLoading } = useAsyncHandledRetry(
     () => themeService.getTheme(themeId),

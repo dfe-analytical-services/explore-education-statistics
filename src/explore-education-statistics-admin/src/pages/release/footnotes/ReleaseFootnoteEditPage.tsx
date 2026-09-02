@@ -11,12 +11,11 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseFootnoteEditPage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseFootnoteRouteParams>) => {
-  const { publicationId, releaseVersionId, footnoteId } = match.params;
+const ReleaseFootnoteEditPage = ({ history }: RouteComponentProps) => {
+  const { publicationId, releaseVersionId, footnoteId } =
+    useParams<ReleaseFootnoteRouteParams>();
 
   const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
     useAsyncHandledRetry(

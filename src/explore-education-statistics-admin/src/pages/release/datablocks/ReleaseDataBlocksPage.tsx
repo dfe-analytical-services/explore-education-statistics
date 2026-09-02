@@ -20,13 +20,12 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import React, { useCallback, useMemo } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 
-const ReleaseDataBlocksPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleaseDataBlocksPage = () => {
+  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
 
   const queryClient = useQueryClient();
 
