@@ -1,5 +1,6 @@
 import { ConnectionString } from 'types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
+import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 
 @description('Name of the App Service.')
 param appServiceName string
@@ -124,7 +125,7 @@ module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key
   params: {
     keyVaultName: keyVaultName!
     roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
-      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), 'Microsoft.Web/sites/${appServiceName}')
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
     principalIds: [appService.identity.principalId]
     role: 'Secrets User'

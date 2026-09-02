@@ -1,6 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { DockerRegistryConfig } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -54,8 +53,16 @@ param dataApiPublicHostname string
 @description('Public hostname of the public API.')
 param publicApiPublicHostname string
 
-@description('Credentials for the ACR hosting Docker images for this App Service.')
-param dockerCredentials DockerRegistryConfig
+@description('URL for the ACR hosting Docker images for this App Service.')
+param dockerRegistryUrl string
+
+@secure()
+@description('Username for the user pulling Docker images for this App Service.')
+param dockerPullUsername string
+
+@secure()
+@description('Password for the user pulling Docker images for this App Service.')
+param dockerPullPassword string
 
 @description('GA tracking ID.')
 param googleAnalyticsTrackingId string
@@ -131,9 +138,9 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       BASIC_AUTH_PASSWORD: publicAppBasicAuthPassword
       CONTENT_API_BASE_URL: 'https://${contentApiPublicHostname}/api'
       DATA_API_BASE_URL: 'https://${dataApiPublicHostname}/api'
-      DOCKER_REGISTRY_SERVER_URL: dockerCredentials.acrUrl
-      DOCKER_REGISTRY_SERVER_USERNAME: dockerCredentials.username
-      DOCKER_REGISTRY_SERVER_PASSWORD: dockerCredentials.password
+      DOCKER_REGISTRY_SERVER_URL: dockerRegistryUrl
+      DOCKER_REGISTRY_SERVER_USERNAME: dockerPullUsername
+      DOCKER_REGISTRY_SERVER_PASSWORD: dockerPullPassword
       NOTIFICATION_API_BASE_URL: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
       GA_TRACKING_ID: googleAnalyticsTrackingId
       NEXT_CONFIG_MODE: 'server'

@@ -2,6 +2,7 @@ using '../main.bicep'
 
 param environmentConfigParam = {
   environmentIdentifier: 's101t01'
+  environmentName: 'Test'
   domain: 'test.explore-education-statistics.service.gov.uk'
   publicApiUrl: 'pp-api.education.gov.uk/statistics-test'
   publicApiDocsUrl: 'pp-api.education.gov.uk/statistics-test/docs'
@@ -38,3 +39,16 @@ param dataApiConfigParam = {
     name: 'S1'
   }
 }
+
+param publicApiConfigParam = {
+  publicUrl: 'pp-api.education.gov.uk/statistics-test'
+}
+
+param publicSiteConfigParam = {
+  appServiceSku: {
+    tier: 'Basic'
+    name: 'B1'
+  }
+  googleAnalyticsTrackingId: 'G-ZQ5V7CBWMJ'
+}
+
