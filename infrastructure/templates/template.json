@@ -5,12 +5,6 @@
     "domain": {
       "type": "string"
     },
-    "contentApiUrl": {
-      "type": "string"
-    },
-    "dataApiUrl": {
-      "type": "string"
-    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -147,29 +141,6 @@
       "type": "string",
       "metadata": {
         "description": "Number of days to retain database audit logs for in blob storage"
-      }
-    },
-    "publicAppBasicAuth": {
-      "type": "string",
-      "defaultValue": "true",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
-      "metadata": {
-        "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppBasicAuthUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppBasicAuthPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
     },
     "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
@@ -326,55 +297,9 @@
         "description": "Number of days to retain blobs after delete"
       }
     },
-    "autoscaleAppServices": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "storageAccountPrefix": {
       "type": "string",
       "defaultValue": "storage"
-    },
-    "memoryCacheEnabled": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether or not short-lived in-memory caching of specific responses is enabled"
-      }
-    },
-    "memoryCacheMaxCacheSizeMb": {
-      "type": "int",
-      "defaultValue": 50,
-      "metadata": {
-        "description": "Max size of in-memory cache in MBs.  This is an approximation based on the size of the cached objects in JSON notation."
-      }
-    },
-    "memoryCacheExpirationScanFrequencySeconds": {
-      "type": "int",
-      "defaultValue": 50,
-      "metadata": {
-        "description": "The frequency of scans to evict expired entries from the in-memory cache."
-      }
-    },
-    "memoryCacheOverridesDurationInSeconds": {
-      "type": "int",
-      "defaultValue": -1,
-      "metadata": {
-        "description": "Override duration in seconds for all entities cached in memory"
-      }
-    },
-    "memoryCacheOverridesExpirySchedule": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Override cron expression for all entities cached in memory"
-      }
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "type": "int",
-      "defaultValue": 25000,
-      "metadata": {
-        "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
-      }
     },
     "publisherFunctionAppTimeZone": {
       "type": "string",
@@ -382,15 +307,6 @@
       "metadata": {
         "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
       }
-    },
-    "branch": {
-      "type": "string",
-      "defaultValue": "master",
-      "allowedValues": [
-        "master",
-        "dev",
-        "test"
-      ]
     },
     "licenseTypeContentDb": {
       "type": "string",
@@ -471,12 +387,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "slackAlertsChannel": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack channel to post Azure alerts to"
-      }
-    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -518,8 +428,6 @@
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
-    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
-    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageVnetRules": [
       {
@@ -600,8 +508,6 @@
     ],
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
-    "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
-    "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
@@ -974,14 +880,6 @@
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
-    "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
-    "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
-    "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
-    "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
-    "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
-    "ees-sql-password-notifier": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-notifier')]",
-    "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
-    "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
@@ -999,7 +897,6 @@
         }
       ]
     },
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
@@ -1010,14 +907,9 @@
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
-    "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
-    "screenerStorageAccountConnectionStringSecretKey": "[concat(parameters('subscription'), parameters('environment'), 'sapisafn-connection-string')]",
-    "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
     "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
-    "nlSearchFunctionAppName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fa-nlsearch')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
