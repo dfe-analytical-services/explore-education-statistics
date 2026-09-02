@@ -22,7 +22,7 @@ interface Props {
   featuredTables: FeaturedTable[];
   publicationId: string;
   releaseVersionId: string;
-  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
+  handleDeleteConfirm: (deletedDataBlockVersionId?: string) => Promise<void>;
   onSaveOrder: (reorderedTables: FeaturedTable[]) => Promise<void>;
 }
 
@@ -51,7 +51,7 @@ export default function FeaturedTablesTable({
         list={currentFeaturedTables.reduce<ReorderableListItem[]>(
           (acc, featuredTable) => {
             const dataBlock = dataBlocks.find(
-              block => block.id === featuredTable.dataBlockId,
+              block => block.id === featuredTable.dataBlockVersionId,
             );
             if (dataBlock) {
               acc.push({
@@ -119,7 +119,7 @@ export default function FeaturedTablesTable({
           <tbody>
             {currentFeaturedTables.map(featuredTable => {
               const dataBlock = dataBlocks.find(
-                block => block.id === featuredTable.dataBlockId,
+                block => block.id === featuredTable.dataBlockVersionId,
               );
               return dataBlock ? (
                 <FeaturedTablesRow
@@ -132,7 +132,7 @@ export default function FeaturedTablesTable({
                     {
                       publicationId,
                       releaseVersionId,
-                      dataBlockId: featuredTable.dataBlockId,
+                      dataBlockVersionId: featuredTable.dataBlockVersionId,
                     },
                   )}
                   releaseVersionId={releaseVersionId}
@@ -153,7 +153,7 @@ interface FeaturedTablesRowProps {
   featuredTable: FeaturedTable;
   link: string;
   releaseVersionId: string;
-  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
+  handleDeleteConfirm: (deletedDataBlockVersionId?: string) => Promise<void>;
 }
 
 function FeaturedTablesRow({
@@ -191,7 +191,7 @@ function FeaturedTablesRow({
         {canUpdateRelease && (
           <DataBlockDeletePlanModal
             releaseVersionId={releaseVersionId}
-            dataBlockId={dataBlock.id}
+            dataBlockVersionId={dataBlock.id}
             onConfirm={() => handleDeleteConfirm(dataBlock.id)}
           />
         )}

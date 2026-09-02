@@ -213,8 +213,8 @@ public class ReleaseDataContentDataSetMetaTimePeriodRangeDtoBuilder
 public class ReleaseDataContentFeaturedTableDtoBuilder
 {
     private Guid _featuredTableId = Guid.NewGuid();
+    private Guid _dataBlockVersionId = Guid.NewGuid();
     private Guid _dataBlockId = Guid.NewGuid();
-    private Guid _dataBlockParentId = Guid.NewGuid();
     private string _summary = "Summary";
     private string _title = "Title";
 
@@ -222,8 +222,8 @@ public class ReleaseDataContentFeaturedTableDtoBuilder
         new()
         {
             FeaturedTableId = _featuredTableId,
+            DataBlockVersionId = _dataBlockVersionId,
             DataBlockId = _dataBlockId,
-            DataBlockParentId = _dataBlockParentId,
             Summary = _summary,
             Title = _title,
         };
@@ -234,15 +234,15 @@ public class ReleaseDataContentFeaturedTableDtoBuilder
         return this;
     }
 
-    public ReleaseDataContentFeaturedTableDtoBuilder WithDataBlockId(Guid dataBlockId)
+    public ReleaseDataContentFeaturedTableDtoBuilder WithDataBlockVersionId(Guid dataBlockVersionId)
     {
-        _dataBlockId = dataBlockId;
+        _dataBlockVersionId = dataBlockVersionId;
         return this;
     }
 
-    public ReleaseDataContentFeaturedTableDtoBuilder WithDataBlockParentId(Guid dataBlockParentId)
+    public ReleaseDataContentFeaturedTableDtoBuilder WithDataBlockId(Guid dataBlockId)
     {
-        _dataBlockParentId = dataBlockParentId;
+        _dataBlockId = dataBlockId;
         return this;
     }
 

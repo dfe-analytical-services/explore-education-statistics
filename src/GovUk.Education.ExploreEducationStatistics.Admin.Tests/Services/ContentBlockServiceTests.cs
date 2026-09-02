@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -88,14 +88,20 @@ public class ContentBlockServiceTests
 
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
+            Content =
+            [
                 new HtmlBlock { Order = 1 },
                 new HtmlBlock { Order = 2 },
-                new DataBlock { Id = contentBlockId, Order = 3 },
+                new DataBlockVersionLink
+                {
+                    Id = contentBlockId,
+                    Order = 3,
+                    DataBlockVersionId = contentBlockId,
+                    DataBlockVersion = new DataBlockVersion { Id = contentBlockId },
+                },
                 new HtmlBlock { Order = 4 },
                 new HtmlBlock { Order = 5 },
-            },
+            ],
             ReleaseVersion = new ReleaseVersion(),
         };
 
@@ -126,16 +132,15 @@ public class ContentBlockServiceTests
             Assert.Equal(1, dbContentSection.Content[0].Order);
             Assert.Equal(contentBlocks[1].Id, dbContentSection.Content[1].Id);
             Assert.Equal(2, dbContentSection.Content[1].Order);
-            // NOTE: Skip contentBlocks[2] as it will be deleted
+
+            // Data blocks are detached, not deleted - verify that the content block's associated data block version still exists
+            Assert.Single(context.DataBlockVersions);
+            Assert.Empty(context.DataBlockVersionLinks);
+
             Assert.Equal(contentBlocks[3].Id, dbContentSection.Content[2].Id);
             Assert.Equal(3, dbContentSection.Content[2].Order);
             Assert.Equal(contentBlocks[4].Id, dbContentSection.Content[3].Id);
             Assert.Equal(4, dbContentSection.Content[3].Order);
-
-            var dataBlocks = context.DataBlocks.ToList();
-            var dataBlock = Assert.Single(dataBlocks);
-            Assert.Equal(0, dataBlock.Order);
-            Assert.Null(dataBlock.ContentSectionId);
         }
     }
 
@@ -184,7 +189,7 @@ public class ContentBlockServiceTests
             Assert.Equal(1, dbContentSection.Content[0].Order);
             Assert.Equal(contentBlocks[1].Id, dbContentSection.Content[1].Id);
             Assert.Equal(2, dbContentSection.Content[1].Order);
-            // NOTE: Skip contentBlocks[2] as it will be deleted
+            // Skip contentBlocks[2] as it will be deleted
             Assert.Equal(contentBlocks[3].Id, dbContentSection.Content[2].Id);
             Assert.Equal(3, dbContentSection.Content[2].Order);
             Assert.Equal(contentBlocks[4].Id, dbContentSection.Content[3].Id);
@@ -195,21 +200,21 @@ public class ContentBlockServiceTests
     [Fact]
     public async Task DeleteSectionContentBlocks()
     {
-        var dataBlockId = Guid.NewGuid();
+        var dataBlockVersionId = Guid.NewGuid();
 
         var contentSection = new ContentSection
         {
-            Content = new List<ContentBlock>
-            {
+            Content =
+            [
                 new HtmlBlock(),
-                new DataBlock { Id = dataBlockId },
+                new DataBlockVersionLink { Id = dataBlockVersionId },
                 new EmbedBlockLink
                 {
                     EmbedBlock = new EmbedBlock { Title = "title", Url = "https://" },
                 },
                 new HtmlBlock(),
                 new HtmlBlock(),
-            },
+            ],
             ReleaseVersion = new ReleaseVersion(),
         };
 
@@ -236,10 +241,8 @@ public class ContentBlockServiceTests
             Assert.Empty(dbContentSection.Content);
 
             var dbContentBlocks = context.ContentBlocks.ToList();
-            var dataBlock = Assert.Single(dbContentBlocks);
-            Assert.Equal(dataBlockId, dataBlock.Id);
-            Assert.Null(dataBlock.ContentSectionId);
-            Assert.Equal(0, dataBlock.Order);
+            Assert.Empty(context.ContentBlocks);
+            Assert.Empty(context.DataBlockVersionLinks);
 
             var embedBlocks = context.EmbedBlocks.ToList();
             Assert.Empty(embedBlocks);

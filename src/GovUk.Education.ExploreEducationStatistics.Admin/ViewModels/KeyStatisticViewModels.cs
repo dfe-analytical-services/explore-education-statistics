@@ -41,16 +41,16 @@ public abstract record KeyStatisticViewModel
 [JsonKnownThisType(nameof(KeyStatisticDataBlock))]
 public record KeyStatisticDataBlockViewModel : KeyStatisticViewModel
 {
-    public required Guid DataBlockId { get; init; }
+    public required Guid DataBlockVersionId { get; init; }
 
-    public required Guid DataBlockParentId { get; init; }
+    public required Guid DataBlockId { get; init; }
 
     public static KeyStatisticDataBlockViewModel FromKeyStatisticDataBlock(KeyStatisticDataBlock model) =>
         new()
         {
             Id = model.Id,
+            DataBlockVersionId = model.DataBlockVersionId,
             DataBlockId = model.DataBlockId,
-            DataBlockParentId = model.DataBlockParentId,
             Trend = model.Trend,
             GuidanceTitle = model.GuidanceTitle,
             GuidanceText = model.GuidanceText,

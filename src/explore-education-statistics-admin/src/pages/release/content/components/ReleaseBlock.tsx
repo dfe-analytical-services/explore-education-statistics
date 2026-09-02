@@ -35,7 +35,7 @@ const ReleaseBlock = ({
     );
   }
 
-  if (block.type === 'DataBlock') {
+  if (block.type === 'DataBlockVersionLink') {
     return (
       <Gate condition={!!visible}>
         <DataBlockTabs

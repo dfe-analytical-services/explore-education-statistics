@@ -17,8 +17,8 @@ SELECT ContentBlock.Id                              AS ContentBlockId,
 FROM ContentBlock
 LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
 LEFT JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
-LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
-LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
+LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockVersionId
+LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockVersionId
 WHERE ContentBlock.Type = 'DataBlock'
   AND ReleaseVersions.Published IS NOT NULL
   AND ReleaseVersions.SoftDeleted = 0
@@ -26,9 +26,9 @@ WHERE ContentBlock.Type = 'DataBlock'
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
     -- Include DataBlocks that are Key Statistics
-    OR KeyStatisticsDataBlock.DataBlockId IS NOT NULL
+    OR KeyStatisticsDataBlock.DataBlockVersionId IS NOT NULL
     -- Include DataBlocks that are Featured Tables
-    OR FeaturedTables.DataBlockId IS NOT NULL
+    OR FeaturedTables.DataBlockVersionId IS NOT NULL
     )
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(

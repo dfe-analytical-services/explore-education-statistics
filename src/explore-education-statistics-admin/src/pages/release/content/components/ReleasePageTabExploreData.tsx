@@ -100,7 +100,9 @@ const ReleasePageTabExploreData = ({
             handleFeaturedTableItemClick ? (
               <ButtonText
                 onClick={() => {
-                  handleFeaturedTableItemClick?.(featuredTable.dataBlockId);
+                  handleFeaturedTableItemClick?.(
+                    featuredTable.dataBlockVersionId,
+                  );
                 }}
               >
                 View, edit or download{' '}
@@ -115,10 +117,10 @@ const ReleasePageTabExploreData = ({
                         {
                           publicationId: publication.id,
                           releaseVersionId: release.id,
-                          dataBlockId: featuredTable.dataBlockId,
+                          dataBlockVersionId: featuredTable.dataBlockVersionId,
                         },
                       )
-                    : `${publicAppUrl}/data-tables/fast-track/${featuredTable.dataBlockParentId}`
+                    : `${publicAppUrl}/data-tables/fast-track/${featuredTable.dataBlockId}`
                 }
               >
                 View, edit or download{' '}

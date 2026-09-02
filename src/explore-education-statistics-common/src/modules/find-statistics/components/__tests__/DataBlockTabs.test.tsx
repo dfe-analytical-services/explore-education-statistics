@@ -53,10 +53,10 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'block-1',
-    dataBlockParentId: 'block-1-parent',
+    dataBlockId: 'block-1',
     dataSetName: 'Test data set',
     dataSetId: 'test-data-set',
-    type: 'DataBlock',
+    type: 'DataBlockVersionLink',
     heading: '',
     order: 0,
     name: 'Test data block',
@@ -109,10 +109,10 @@ describe('DataBlockTabs', () => {
 
   const testDataBlockMap: DataBlock = {
     id: 'block-1',
-    dataBlockParentId: 'block-1-parent',
+    dataBlockId: 'block-1',
     dataSetId: 'test-data-set',
     dataSetName: 'Test data set',
-    type: 'DataBlock',
+    type: 'DataBlockVersionLink',
     heading: '',
     order: 0,
     name: 'Test data block',
@@ -184,7 +184,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getByText('Could not load content')).toBeInTheDocument();
@@ -219,7 +219,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.queryByText('Could not load content')).toBeInTheDocument();
@@ -250,7 +250,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -287,7 +287,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -323,7 +323,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -360,7 +360,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -392,12 +392,12 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
         1,
       );
 
@@ -432,7 +432,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -474,12 +474,12 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
       );
 
       expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
         'release-1',
-        'block-1-parent',
+        'block-1',
         1,
       );
 
@@ -506,7 +506,7 @@ describe('DataBlockTabs', () => {
 
     expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledWith(
       'release-1',
-      'block-1-parent',
+      'block-1',
       2,
     );
     expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledTimes(2);
@@ -582,7 +582,7 @@ describe('DataBlockTabs', () => {
           dataBlock={{
             ...testDataBlock,
             id: 'block-2-id',
-            dataBlockParentId: 'block-2-parent-id',
+            dataBlockId: 'block-2-id',
             query: {
               subjectId: '1',
               timePeriod: {
