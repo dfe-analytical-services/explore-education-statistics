@@ -2,6 +2,9 @@ import { abbreviations } from '../common/abbreviations.bicep'
 
 @export()
 type ResourceNames = {
+  acr: {
+    serverName: string
+  }
   admin: {
     appService: string
     appServicePlan: string
@@ -64,6 +67,10 @@ type ResourceNames = {
   keyVault: {
     keyVault: string
     secrets: {
+      acr: {
+        dockerPullUsername: string
+        dockerPullPassword: string
+      }
       admin: {
         adminSignalrConnectionString: string
         adminGovUkNotifyApiKey: string
@@ -104,7 +111,10 @@ func getResourceNames(
   screenerResourcePrefix string,
   newResourcePrefix string) ResourceNames => {
 
-  admin: {
+    acr: {
+      serverName: 'eesacr'
+    }
+    admin: {
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-admin'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-admin'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-admin'
@@ -166,6 +176,10 @@ func getResourceNames(
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     secrets: {
+      acr: {
+        dockerPullUsername: 'DOCKER-REGISTRY-SERVER-USERNAME'
+        dockerPullPassword: 'DOCKER-REGISTRY-SERVER-PASSWORD'
+      }
       admin: {
         adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'
         adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'

@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuPublic": {
-      "value": "B1 Basic"
-    },
     "skuImporter": {
       "value": "P2V2 PremiumV2"
     },
@@ -41,20 +38,8 @@
     "dataApiUrl": {
       "value": "data.dev.explore-education-statistics.service.gov.uk"
     },
-    "publicApiUrl": {
-      "value": "pp-api.education.gov.uk/statistics-dev"
-    },
-    "publicApiDocsUrl": {
-      "value": "pp-api.education.gov.uk/statistics-dev/docs"
-    },
-    "defaultPublicSiteCacheMaxAgeSeconds": {
-      "value": "10"
-    },
     "storageAccountPrefix": {
       "value": "sa"
-    },
-    "publicAppGATrackingId": {
-      "value": "G-GRPHH2FN0L"
     },
     "memoryCacheOverridesDurationInSeconds": {
       "value": 10
@@ -99,9 +84,6 @@
       "value": [
         "http://localhost:3000"
       ]
-    },
-    "publicAppCompressionDisable": {
-      "value": true
     },
     "sqlServerPublicNetworkAccess": {
       "value": "Disabled"
