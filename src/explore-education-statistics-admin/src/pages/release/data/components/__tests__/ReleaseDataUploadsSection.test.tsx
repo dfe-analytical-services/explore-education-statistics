@@ -167,6 +167,7 @@ describe('ReleaseDataUploadsSection', () => {
     mapping: {
       indicators: { mappings: {}, candidates: {} },
       locations: { mappings: {}, candidates: {} },
+      filters: { mappings: {}, candidates: {} },
     },
   };
 
