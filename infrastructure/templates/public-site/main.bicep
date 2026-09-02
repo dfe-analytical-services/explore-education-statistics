@@ -117,7 +117,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     kind: 'app,linux,container'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+      certificateUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     vnetLink: {
       vnetName: resourceNames.vnet.vnet

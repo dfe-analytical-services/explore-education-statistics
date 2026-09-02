@@ -93,7 +93,10 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appServiceName: resourceNames.contentApi.appService
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {

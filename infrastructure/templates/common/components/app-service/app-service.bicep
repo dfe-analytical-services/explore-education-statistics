@@ -14,8 +14,12 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
 @description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
 param kind 'app' | 'app,linux,container' = 'app'
 
-@description('Name of Key Vault to allow secret access to from this App Service.')
-param keyVaultName string?
+@description('Details of common Key Vault roles to apply to this App Service.')
+param keyVaultRoles {
+  keyVaultName: string
+  secretsUser: bool?
+  certificateUser: bool?
+}?
 
 @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
 param legacyKeyVaultRoleAssignmentName bool = false
@@ -121,15 +125,27 @@ resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   })
 }
 
-module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
+module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
   name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
   params: {
-    keyVaultName: keyVaultName!
+    keyVaultName: keyVaultRoles!.keyVaultName!
     roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
-      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
     principalIds: [appService.identity.principalId]
     role: 'Secrets User'
+  }
+}
+
+module appServiceCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?certificateUser ?? false) {
+  name: '${appServiceName}KeyVaultCertificateUserRoleAssignmentModule'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${appServiceName}')
+      : null
+    principalIds: [appService.identity.principalId]
+    role: 'Certificate User'
   }
 }
 
