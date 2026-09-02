@@ -124,10 +124,6 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       certificateUser: true
     }
     legacyKeyVaultRoleAssignmentName: true
-    vnetLink: {
-      vnetName: resourceNames.vnet.vnet
-      subnetName: resourceNames.vnet.subnets.publicSite
-    }
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices

@@ -61,7 +61,6 @@ type ResourceNames = {
       admin: string
       contentApi: string
       dataApi: string
-      publicSite: string
     }
   }
   keyVault: {
@@ -170,7 +169,6 @@ func getResourceNames(
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
-      publicSite: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-public-site'
     }
   }
   keyVault: {
