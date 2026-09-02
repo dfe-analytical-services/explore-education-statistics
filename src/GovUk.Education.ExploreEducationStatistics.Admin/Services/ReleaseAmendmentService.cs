@@ -206,8 +206,7 @@ public class ReleaseAmendmentService(
         // original release's DataBlockVersionLinks up front. Only data blocks that are placed in a content section
         // have a link, so versions without one are unattached.
         var originalDataBlockVersionLinksByVersionId = context
-            .ContentBlocks.OfType<DataBlockVersionLink>()
-            .Where(link => link.ReleaseVersionId == originalReleaseVersion.Id)
+            .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == originalReleaseVersion.Id)
             .ToList()
             .ToDictionary(link => link.DataBlockVersionId);
 

@@ -72,8 +72,6 @@ public class EmbedBlockLink : ContentBlock
 
 public class DataBlockVersionLink : ContentBlock
 {
-    public DataBlockVersionLink() { }
-
     public Guid DataBlockVersionId { get; set; }
 
     [JsonIgnore]

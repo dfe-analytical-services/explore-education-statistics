@@ -295,7 +295,7 @@ public class ContentService : IContentService
             .OnSuccessDo(block => _hubContext.Clients.Group(releaseVersionId.ToString()).ContentBlockUpdated(block));
     }
 
-    public Task<Either<ActionResult, DataBlockVersionViewModel?>> AttachDataBlock(
+    public Task<Either<ActionResult, DataBlockVersionViewModel>> AttachDataBlock(
         Guid releaseVersionId,
         Guid contentSectionId,
         DataBlockAttachRequest request
@@ -310,8 +310,6 @@ public class ContentService : IContentService
                 var existingDataBlockVersionLink = await _context.DataBlockVersionLinks.FirstOrDefaultAsync(link =>
                     link.DataBlockVersionId == request.DataBlockVersionId && link.ReleaseVersionId == releaseVersionId
                 );
-
-                var dataBlockVersion = await _context.DataBlockVersions.FindAsync(request.DataBlockVersionId);
 
                 if (existingDataBlockVersionLink is not null)
                 {
@@ -330,7 +328,7 @@ public class ContentService : IContentService
                 };
 
                 return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlockVersionLink)
-                    .OnSuccess(contentBlockViewModel => contentBlockViewModel as DataBlockVersionViewModel);
+                    .OnSuccess(contentBlockViewModel => (DataBlockVersionViewModel)contentBlockViewModel);
             });
     }
 

@@ -52,7 +52,7 @@ const ReleaseContentPageLoaded = () => {
           return (
             <ButtonText
               onClick={() => {
-                // the url format is `/data-tables/fast-track/<data-block-id>?featuredTables`
+                // the url format is `/data-tables/fast-track/<data-block-version-id>?featuredTables`
                 // so split twice to get the dataBlockId.
                 const dataBlockId = url.split('fast-track/')[1].split('?')[0];
                 const featuredTable = featuredTables?.find(

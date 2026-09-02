@@ -112,14 +112,14 @@ describe('ReleasePageTabExploreData', () => {
     featuredTables: [
       {
         featuredTableId: 'featured-table-1-id',
-        dataBlockVersionId: 'featured-table-1-data-block-id',
+        dataBlockVersionId: 'featured-table-1-data-block-version-id',
         dataBlockId: 'featured-table-1-data-block-id',
         title: 'Featured table 1',
         summary: 'Featured table 1 description',
       },
       {
         featuredTableId: 'featured-table-2-id',
-        dataBlockVersionId: 'featured-table-2-data-block-id',
+        dataBlockVersionId: 'featured-table-2-data-block-version-id',
         dataBlockId: 'featured-table-2-data-block-id',
         title: 'Featured table 2',
         summary: 'Featured table 2 description',
@@ -333,7 +333,7 @@ describe('ReleasePageTabExploreData', () => {
     expect(featuredTableItems).toHaveLength(2);
     expect(within(featuredTableItems[0]).getByRole('link')).toHaveAttribute(
       'href',
-      '/publication/publication-id/release/Release-title-id/prerelease/table-tool/featured-table-1-data-block-id',
+      '/publication/publication-id/release/Release-title-id/prerelease/table-tool/featured-table-1-data-block-version-id',
     );
   });
 
