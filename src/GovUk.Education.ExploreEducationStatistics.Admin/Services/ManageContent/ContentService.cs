@@ -316,12 +316,19 @@ public class ContentService : IContentService
                     return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
                 }
 
+                var dataBlockVersion = await _context.DataBlockVersions.FindAsync(request.DataBlockVersionId);
+
+                if (dataBlockVersion is null)
+                {
+                    return NotFound<DataBlockVersionViewModel>();
+                }
+
                 var dataBlockVersionLink = new DataBlockVersionLink
                 {
                     // A DataBlockVersionLink shares its Id with the DataBlockVersion it points at. See
                     // ReleaseAmendmentService.CopyDataBlockVersion for the rest of this invariant.
                     Id = request.DataBlockVersionId,
-                    DataBlockVersionId = request.DataBlockVersionId,
+                    DataBlockVersion = dataBlockVersion,
                     ReleaseVersionId = releaseVersionId,
                     ContentSectionId = contentSectionId,
                     Created = DateTime.UtcNow,
