@@ -11,9 +11,6 @@
     "skuPublisher": {
       "value": "B1 Basic"
     },
-    "slackAlertsChannel": {
-      "value": "C067Z1K68UD"
-    },
     "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 0 * * * *"
     },
@@ -32,20 +29,8 @@
     "domain": {
       "value": "dev.explore-education-statistics.service.gov.uk"
     },
-    "contentApiUrl": {
-      "value": "content.dev.explore-education-statistics.service.gov.uk"
-    },
-    "dataApiUrl": {
-      "value": "data.dev.explore-education-statistics.service.gov.uk"
-    },
     "storageAccountPrefix": {
       "value": "sa"
-    },
-    "memoryCacheOverridesDurationInSeconds": {
-      "value": 10
-    },
-    "branch": {
-      "value": "dev"
     },
     "skuContentDb": {
       "value": "Standard"
