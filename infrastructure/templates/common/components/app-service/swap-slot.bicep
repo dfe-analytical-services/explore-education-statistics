@@ -6,6 +6,12 @@ param appServiceName string
 @description('Id of the App Service Plan that the owning App Service belongs to.')
 param appServicePlanId string
 
+@description('The operating system to use to host App Services.')
+param operatingSystem 'Windows' | 'Linux' = 'Linux'
+
+@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
+param kind 'app' | 'app,linux,container' = 'app'
+
 @description('Name of the swap slot.')
 param slotName string
 
@@ -26,12 +32,13 @@ param tagValues object
 
 resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
   name: '${appServiceName}/${slotName}'
-  kind: 'app'
+  kind: kind
   location: resourceGroup().location
   tags: tagValues
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true
+    reserved: operatingSystem == 'Linux'
     siteConfig: {
       http20Enabled: true
       minTlsVersion: minTlsVersion

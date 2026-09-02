@@ -127,6 +127,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
+    swapSlotEnabled: false
     allowedOrigins: allowedOrigins
     alerts: deployAlerts ? {
       appServiceHealth: true

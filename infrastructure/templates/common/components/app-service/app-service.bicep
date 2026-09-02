@@ -48,6 +48,9 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling in this environment.')
 param autoscaleEnabled bool
 
+@description('Whether or not to enable slot swapping. Deploys a swap slot if enabled.')
+param swapSlotEnabled bool = true
+
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
 
@@ -158,7 +161,7 @@ module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
   }
 }
 
-module stagingSlotModule 'swap-slot.bicep' = {
+module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
   name: '${appServiceName}${deploySlotName}Deploy'
   params: {
     appServiceName: appService.name
