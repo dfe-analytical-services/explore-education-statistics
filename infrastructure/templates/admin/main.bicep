@@ -155,6 +155,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       App__Url: 'https://${adminHostname}'
       App__EnableSwagger: enableSwagger

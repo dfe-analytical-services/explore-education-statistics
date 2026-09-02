@@ -674,17 +674,6 @@
         "criterionType": "StaticThresholdCriterion"
       },
       {
-        "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
-        "description": "Public App Service - Response Time",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "HttpResponseTime",
-        "threshold": 12,
-        "operator": "GreaterThan",
-        "timeAggregation": "Average",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBCpuPercent')]",
         "description": "Statistics Replica DB CPU percentage",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",

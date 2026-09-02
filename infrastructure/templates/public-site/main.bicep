@@ -127,6 +127,12 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      responseTimeSeconds: 12
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       APP_ENV: environmentName
       AZURE_SEARCH_ENDPOINT: searchService.properties.endpoint
