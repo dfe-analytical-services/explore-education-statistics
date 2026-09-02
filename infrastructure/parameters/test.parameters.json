@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuPublic": {
-      "value": "B1 Basic"
-    },
     "skuImporter": {
       "value": "P1V2 PremiumV2"
     },
@@ -34,15 +31,6 @@
     },
     "dataApiUrl": {
       "value": "data.test.explore-education-statistics.service.gov.uk"
-    },
-    "publicApiUrl": {
-      "value": "pp-api.education.gov.uk/statistics-test"
-    },
-    "publicApiDocsUrl": {
-      "value": "pp-api.education.gov.uk/statistics-test/docs"
-    },
-    "publicAppGATrackingId": {
-      "value": "G-ZQ5V7CBWMJ"
     },
     "branch": {
       "value": "test"
@@ -81,9 +69,6 @@
       "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
-      "value": true
-    },
-    "publicAppCompressionDisable": {
       "value": true
     }
   }

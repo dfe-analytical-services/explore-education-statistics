@@ -11,16 +11,6 @@
     "dataApiUrl": {
       "type": "string"
     },
-    "publicApiUrl": {
-      "type": "string"
-    },
-    "publicApiDocsUrl": {
-      "type": "string"
-    },
-    "defaultPublicSiteCacheMaxAgeSeconds": {
-      "type": "string",
-      "defaultValue": "30"
-    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -34,21 +24,6 @@
       "metadata": {
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
-    },
-    "skuPublic": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
     },
     "skuImporter": {
       "type": "string",
@@ -195,20 +170,6 @@
       "type": "securestring",
       "metadata": {
         "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppGATrackingId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
-      }
-    },
-    "publicAppCompressionDisable": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
     "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
@@ -514,55 +475,6 @@
       "type": "string",
       "metadata": {
         "description": "Slack channel to post Azure alerts to"
-      }
-    },
-    "containerRegistryName": {
-      "type": "string",
-      "defaultValue": "eesacr",
-      "metadata": {
-        "description": "The name of the Container registry"
-      }
-    },
-    "dockerRegistryServerUrl": {
-      "type": "string",
-      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
-      "metadata": {
-        "description": "The URL of the Container registry"
-      }
-    },
-    "dockerRegistryServerUsername": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The username to log in to the Container registry"
-      }
-    },
-    "dockerRegistryServerPassword": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The password to log in to the Container registry"
-      }
-    },
-    "searchIndexName": {
-      "type": "string",
-      "defaultValue": "index-1",
-      "metadata": {
-        "description": "The name of the Azure AI Search index used by the public frontend application"
-      }
-    },
-    "datasetsSearchIndexName": {
-      "type": "string",
-      "defaultValue": "nl-search-dataset-index",
-      "metadata": {
-        "description": "The name of the Azure AI Search data set index used by the public frontend application"
-      }
-    },
-    "nlSearchFunctionRoute": {
-      "type": "string",
-      "defaultValue": "/api/natural_language_search_function",
-      "metadata": {
-        "description": "The HTTP route of the Natural Language Search function, relative to the Natural Language Search Function app host."
       }
     },
     "publicDataDbExists": {
@@ -2971,74 +2883,6 @@
         "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
         "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "name": "[concat(variables('publicAppName'), '-autoscale')]",
-      "apiVersion": "2014-04-01",
-      "type": "Microsoft.Insights/autoscaleSettings",
-      "location": "[resourceGroup().location]",
-      "tags": {},
-      "properties": {
-        "name": "[concat(variables('publicAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscaleAppServices')]",
-        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-        "profiles": [
-          {
-            "name": "Auto created scale condition",
-            "capacity": {
-              "minimum": 2,
-              "maximum": 10,
-              "default": 2
-            },
-            "rules": [
-              {
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-                  "operator": "GreaterThan",
-                  "statistic": "Average",
-                  "threshold": 70,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              },
-              {
-                "scaleAction": {
-                  "direction": "Decrease",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-                  "operator": "LessThan",
-                  "statistic": "Average",
-                  "threshold": 30,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              }
-            ]
-          }
-        ],
-        "notifications": [],
-        "targetResourceLocation": ""
       }
     },
     {

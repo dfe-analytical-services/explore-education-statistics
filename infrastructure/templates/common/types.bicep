@@ -32,10 +32,3 @@ type MonthOfYear =
   | 'October'
   | 'November'
   | 'December'
-
-  @export()
-  type DockerRegistryConfig = {
-    acrUrl: string
-    username: string
-    password: string
-  }

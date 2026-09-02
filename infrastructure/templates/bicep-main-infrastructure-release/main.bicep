@@ -4,6 +4,8 @@ import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
+import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
+import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
 //
 // Tagging config.
@@ -72,6 +74,26 @@ var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 
 
 //
+// Public API-specific config.
+//
+param publicApiConfigParam PublicApiConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var publicApiConfig = mergePublicApiConfig(publicApiConfigParam)
+
+
+
+//
+// Public site-specific config.
+//
+param publicSiteConfigParam PublicSiteConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
+
+
+
+//
 // Secret pipeline variables (required to be top-level params).
 //
 
@@ -129,6 +151,15 @@ var baseAdminAllowedOrigins = [
 ]
 
 var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
+
+var contentApiPublicHostname = '${environmentConfig.environmentName! == 'Pre-Production' ? 'cont' : 'content'}.${environmentConfig.domain!}'
+var dataApiPublicHostname = 'data.${environmentConfig.domain!}'
+
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: resourceNames.keyVault.keyVault
+}
+
+var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
 
 module adminModule '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
@@ -200,6 +231,34 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: dataApiAzureSqlPassword
+    tagValues: tags
+  }
+}
+
+module publicSiteModuleDeploy '../public-site/main.bicep' = {
+  name: 'publicSiteModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: publicSiteConfig.appServiceSku!
+    environmentName: environmentConfig.environmentName!
+    googleAnalyticsTrackingId: publicSiteConfig.googleAnalyticsTrackingId!
+    defaultCacheMaxAgeSeconds: publicSiteConfig.defaultCacheMaxAgeSeconds!
+    publicApiPublicHostname: publicApiConfig.publicUrl!
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    contentApiPublicHostname: contentApiPublicHostname
+    dataApiPublicHostname: dataApiPublicHostname
+    dockerRegistryUrl: dockerRegistryUrl
+    dockerPullUsername: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
+    dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
+    autoscaleAppServices: environmentConfig.autoscaleAppServices!
+    allowedOrigins: publicSiteAllowedOrigins
+    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
+    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    deployAlerts: true
+    detailedErrors: environmentConfig.detailedErrors!
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     tagValues: tags
   }
 }
