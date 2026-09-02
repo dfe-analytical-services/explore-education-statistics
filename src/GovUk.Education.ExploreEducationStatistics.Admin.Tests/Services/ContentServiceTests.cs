@@ -557,7 +557,17 @@ public class ContentServiceTests
 
             var dataBlockViewModel = result.AssertRight();
             Assert.Equal(dataBlockVersion.Id, dataBlockViewModel.Id);
+
+            // The view model's DataBlockVersion-derived fields are mapped through the new link's
+            // DataBlockVersion navigation, so assert on several of them rather than just one.
             Assert.Equal(dataBlock.Id, dataBlockViewModel.DataBlockId);
+            Assert.Equal(dataBlockVersion.Heading, dataBlockViewModel.Heading);
+            Assert.Equal(dataBlockVersion.Name, dataBlockViewModel.Name);
+            Assert.Equal(dataBlockVersion.Source, dataBlockViewModel.Source);
+
+            // Query and Table are mapped as deep copies, so compare a field rather than the instances.
+            Assert.Equal(dataBlockVersion.Query.SubjectId, dataBlockViewModel.Query.SubjectId);
+            Assert.NotNull(dataBlockViewModel.Table.TableHeaders);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
