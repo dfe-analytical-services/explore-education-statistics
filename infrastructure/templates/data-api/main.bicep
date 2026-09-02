@@ -137,6 +137,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
         mountPath: analyticsFileShareMountPath
       }
     ] : []
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger

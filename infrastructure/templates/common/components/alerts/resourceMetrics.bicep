@@ -139,6 +139,7 @@ type SiteMetric = {
     | 'Http403'
     | 'Http4xx'
     | 'Http5xx'
+    | 'HttpResponseTime'
 }
 
 type StorageAccountMetric = {

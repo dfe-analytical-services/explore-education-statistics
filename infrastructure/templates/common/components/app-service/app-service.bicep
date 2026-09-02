@@ -57,6 +57,7 @@ param websitePort int?
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  responseTimeSeconds: int?
   alertsGroupName: string
 }?
 
