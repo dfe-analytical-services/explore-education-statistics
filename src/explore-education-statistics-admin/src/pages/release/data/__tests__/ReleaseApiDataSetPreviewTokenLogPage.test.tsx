@@ -1,11 +1,7 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetPreviewTokenLogPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewTokenLogPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  releaseApiDataSetPreviewTokenLogRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetPreviewTokenLogRoute } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
 } from '@admin/services/apiDataSetService';
@@ -15,7 +11,8 @@ import _previewTokenService, {
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -227,28 +224,21 @@ describe('ReleaseApiDataSetPreviewTokenLogPage', () => {
   });
 
   function renderPage() {
+    const path = generatePath(releaseApiDataSetPreviewTokenLogRoute.fullPath, {
+      publicationId: testRelease.publicationId,
+      releaseVersionId: testRelease.id,
+      dataSetId: 'data-set-id',
+    });
+
     return render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer
+        initialUrl={path}
+        route={releaseApiDataSetPreviewTokenLogRoute.fullPath}
+      >
         <ReleaseVersionContextProvider releaseVersion={testRelease}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetRouteParams>(
-                releaseApiDataSetPreviewTokenLogRoute.path,
-                {
-                  publicationId: testRelease.publicationId,
-                  releaseVersionId: testRelease.id,
-                  dataSetId: 'data-set-id',
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetPreviewTokenLogPage}
-              path={releaseApiDataSetPreviewTokenLogRoute.path}
-            />
-          </MemoryRouter>
+          <ReleaseApiDataSetPreviewTokenLogPage />
         </ReleaseVersionContextProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });

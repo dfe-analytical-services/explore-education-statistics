@@ -1,14 +1,8 @@
 import Link from '@admin/components/Link';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
-import {
-  MethodologyRouteParams,
-  methodologyContentRoute,
-} from '@admin/routes/methodologyRoutes';
-import {
-  ReleaseRouteParams,
-  releaseContentRoute,
-} from '@admin/routes/releaseRoutes';
+import { methodologyContentRoute } from '@admin/routes/methodologyRoutes';
+import { releaseContentRoute } from '@admin/routes/releaseRoutes';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
@@ -128,7 +122,7 @@ function PublicationRow({
           <td>Release</td>
           <td>
             <Link
-              to={generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
+              to={generatePath(releaseContentRoute.fullPath, {
                 publicationId: releaseVersion.publication.id,
                 releaseVersionId: releaseVersion.id,
               })}
@@ -148,12 +142,9 @@ function PublicationRow({
           <td>Methodology</td>
           <td>
             <Link
-              to={generatePath<MethodologyRouteParams>(
-                methodologyContentRoute.path,
-                {
-                  methodologyId: methodology.id,
-                },
-              )}
+              to={generatePath(methodologyContentRoute.fullPath, {
+                methodologyId: methodology.id,
+              })}
             >
               Review this page
               <VisuallyHidden> for {methodology.title}</VisuallyHidden>

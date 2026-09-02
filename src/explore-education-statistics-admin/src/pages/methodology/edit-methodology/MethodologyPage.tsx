@@ -17,12 +17,11 @@ import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const MethodologyPage = ({
-  match,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+const MethodologyPage = () => {
+  const { methodologyId } =
+    useParams<MethodologyRouteParams>() as MethodologyRouteParams;
 
   const {
     value: methodology,

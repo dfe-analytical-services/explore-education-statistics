@@ -1,8 +1,5 @@
 import ReleaseDataBlocksPage from '@admin/pages/release/datablocks/ReleaseDataBlocksPage';
-import {
-  releaseDataBlocksRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataBlocksRoute } from '@admin/routes/releaseRoutes';
 import _dataBlockService, {
   DeleteDataBlockPlan,
   ReleaseDataBlockSummary,
@@ -15,8 +12,8 @@ import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router';
-import { Route } from 'react-router-dom';
+import { generatePath } from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/featuredTableService');
@@ -653,19 +650,15 @@ describe('ReleaseDataBlocksPage', () => {
 
   const renderPage = () => {
     return render(
-      <MemoryRouter
-        initialEntries={[
-          generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
-            releaseVersionId: 'release-1',
-            publicationId: 'publication-1',
-          }),
-        ]}
+      <TestRouterRenderer
+        initialUrl={generatePath(releaseDataBlocksRoute.fullPath, {
+          releaseVersionId: 'release-1',
+          publicationId: 'publication-1',
+        })}
+        route={releaseDataBlocksRoute.fullPath}
       >
-        <Route
-          path={releaseDataBlocksRoute.path}
-          component={ReleaseDataBlocksPage}
-        />
-      </MemoryRouter>,
+        <ReleaseDataBlocksPage />
+      </TestRouterRenderer>,
     );
   };
 });

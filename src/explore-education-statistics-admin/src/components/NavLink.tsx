@@ -13,14 +13,16 @@ const NavLink = ({ children, className, to, ...props }: Props) => {
   return (
     <RouterNavLink
       {...props}
+      end
       to={to}
-      activeClassName={styles.currentPage}
-      className={classNames(
-        'govuk-link',
-        'govuk-link--no-visited-state',
-        className,
-      )}
-      exact
+      className={({ isActive }) =>
+        classNames(
+          'govuk-link',
+          'govuk-link--no-visited-state',
+          className,
+          isActive ? styles.currentPage : undefined,
+        )
+      }
     >
       {children}
     </RouterNavLink>

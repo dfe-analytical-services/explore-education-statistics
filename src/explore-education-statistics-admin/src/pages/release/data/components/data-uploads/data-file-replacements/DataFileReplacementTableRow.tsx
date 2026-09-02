@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
-import {
-  releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataFileReplaceRoute } from '@admin/routes/releaseRoutes';
 import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQueries';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import {
@@ -122,14 +119,11 @@ export default function DataFileReplacementTableRow({
       <td data-testid="Actions">
         <ButtonGroup className={styles.actions}>
           <Link
-            to={generatePath<ReleaseDataFileReplaceRouteParams>(
-              releaseDataFileReplaceRoute.path,
-              {
-                publicationId,
-                releaseVersionId,
-                fileId: dataFile.id,
-              },
-            )}
+            to={generatePath(releaseDataFileReplaceRoute.fullPath, {
+              publicationId,
+              releaseVersionId,
+              fileId: dataFile.id,
+            })}
           >
             View details
             <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>

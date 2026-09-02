@@ -1,8 +1,5 @@
 import Link from '@admin/components/Link';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -57,14 +54,11 @@ export default function DataFileDeleteBlockedModal({
       )}
       <p>
         <Link
-          to={generatePath<ReleaseDataSetRouteParams>(
-            releaseApiDataSetDetailsRoute.path,
-            {
-              publicationId,
-              releaseVersionId,
-              dataSetId: publicApiDataSetId,
-            },
-          )}
+          to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+            publicationId,
+            releaseVersionId,
+            dataSetId: publicApiDataSetId,
+          })}
         >
           Go to API data set
         </Link>

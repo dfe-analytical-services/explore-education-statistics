@@ -1,8 +1,6 @@
 import {
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService, {
   ReleaseDataBlockSummary,
@@ -11,7 +9,7 @@ import { FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React, { useMemo } from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import ButtonLink from '@admin/components/ButtonLink';
 
 const emptyDataBlocks: ReleaseDataBlockSummary[] = [];
@@ -29,7 +27,7 @@ const DataBlockSelector = ({
   releaseVersionId,
   dataBlockVersionId,
 }: Props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { value: dataBlocks = emptyDataBlocks, isLoading } = useAsyncRetry(
     () => dataBlockService.listDataBlocks(releaseVersionId),
@@ -47,8 +45,8 @@ const DataBlockSelector = ({
     return null;
   }
 
-  const releaseDataBlockPath = generatePath<ReleaseRouteParams>(
-    releaseDataBlockCreateRoute.path,
+  const releaseDataBlockPath = generatePath(
+    releaseDataBlockCreateRoute.fullPath,
     {
       publicationId,
       releaseVersionId,
@@ -71,15 +69,12 @@ const DataBlockSelector = ({
         value={dataBlockVersionId}
         options={dataBlockOptions}
         onChange={e => {
-          history.push(
-            generatePath<ReleaseDataBlockRouteParams>(
-              releaseDataBlockEditRoute.path,
-              {
-                publicationId,
-                releaseVersionId,
-                dataBlockVersionId: e.target.value,
-              },
-            ),
+          navigate(
+            generatePath(releaseDataBlockEditRoute.fullPath, {
+              publicationId,
+              releaseVersionId,
+              dataBlockVersionId: e.target.value,
+            }),
           );
         }}
       />

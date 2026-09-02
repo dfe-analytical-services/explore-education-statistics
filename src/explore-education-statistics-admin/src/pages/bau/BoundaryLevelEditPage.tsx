@@ -12,17 +12,18 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Page from '@admin/components/Page';
 import { useQuery } from '@tanstack/react-query';
 import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Yup from '@common/validation/yup';
 import { ObjectSchema } from 'yup';
+import { useNavigate } from 'react-router';
 
 export default function BoundaryLevelEditPage() {
   interface FormValues {
     boundaryLevelLabel: string;
   }
 
-  const { id } = useParams<{ id: string }>();
-  const history = useHistory();
+  const { id } = useParams<{ id: string }>() as { id: string };
+  const navigate = useNavigate();
   const boundaryDataPath = '/administration/boundary-data';
 
   const {
@@ -39,9 +40,9 @@ export default function BoundaryLevelEditPage() {
       });
 
       reloadBoundaryLevel();
-      history.push(boundaryDataPath);
+      navigate(boundaryDataPath);
     },
-    [id, boundaryDataPath, reloadBoundaryLevel, history],
+    [id, boundaryDataPath, reloadBoundaryLevel, navigate],
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {

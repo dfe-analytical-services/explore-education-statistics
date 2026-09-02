@@ -3,16 +3,15 @@ import {
   testPublicationSummaries,
   testReleases,
 } from '@admin/pages/users/__data__/testUserData';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService from '@admin/services/publicationService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { administrationUserInviteRoute } from '@admin/routes/administrationRoutes';
 import _releaseService from '@admin/services/releaseService';
 import { PublicationRole } from '@admin/services/types/PublicationRole';
 import _userInvitesService from '@admin/services/user-management/userInvitesService';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/releaseService');
@@ -457,14 +456,12 @@ describe('UserInvitePage', () => {
     releaseService.getReleases.mockResolvedValue(testReleases);
 
     return render(
-      <MemoryRouter initialEntries={[administrationUserInviteRoute.path]}>
-        <TestConfigContextProvider>
-          <Route
-            component={UserInvitePage}
-            path={administrationUserInviteRoute.path}
-          />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={administrationUserInviteRoute.fullPath}
+        route={administrationUserInviteRoute.fullPath}
+      >
+        <UserInvitePage />
+      </TestRouterRenderer>,
     );
   };
 });

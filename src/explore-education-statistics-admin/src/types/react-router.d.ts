@@ -1,3 +1,4 @@
+/*
 declare module 'react-router' {
   export * from 'react-router/index';
 
@@ -7,3 +8,4 @@ declare module 'react-router' {
     },
   >(pattern: string, params: Params): string;
 }
+*/

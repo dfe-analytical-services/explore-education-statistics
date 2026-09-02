@@ -25,43 +25,43 @@ import { NavRouteProps } from '@admin/routes/types';
 const publicationPageRoutes: NavRouteProps[] = [
   {
     ...publicationReleasesRoute,
-    component: PublicationReleasesPage,
+    element: <PublicationReleasesPage />,
   },
   {
     ...publicationMethodologiesRoute,
-    component: PublicationMethodologiesPage,
+    element: <PublicationMethodologiesPage />,
   },
   {
     ...publicationDetailsRoute,
-    component: PublicationDetailsPage,
+    element: <PublicationDetailsPage />,
   },
   {
     ...publicationContactRoute,
-    component: PublicationContactPage,
+    element: <PublicationContactPage />,
   },
   {
     ...publicationTeamAccessRoute,
-    component: PublicationTeamAccessPage,
+    element: <PublicationTeamAccessPage />,
   },
   {
     ...publicationReleaseSeriesRoute,
-    component: PublicationReleaseSeriesPage,
+    element: <PublicationReleaseSeriesPage />,
   },
   {
     ...publicationAdoptMethodologyRoute,
-    component: PublicationAdoptMethodologyPage,
+    element: <PublicationAdoptMethodologyPage />,
   },
   {
     ...publicationExternalMethodologyRoute,
-    component: PublicationExternalMethodologyPage,
+    element: <PublicationExternalMethodologyPage />,
   },
   {
     ...publicationCreateReleaseSeriesLegacyLinkRoute,
-    component: PublicationCreateReleaseSeriesLegacyLinkPage,
+    element: <PublicationCreateReleaseSeriesLegacyLinkPage />,
   },
   {
     ...publicationEditReleaseSeriesLegacyLinkRoute,
-    component: PublicationEditReleaseSeriesLegacyLinkPage,
+    element: <PublicationEditReleaseSeriesLegacyLinkPage />,
   },
 ];
 

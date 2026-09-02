@@ -1,14 +1,13 @@
 import PreReleaseMethodologiesPage from '@admin/pages/release/pre-release/PreReleaseMethodologiesPage';
 import { preReleaseMethodologiesRoute } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import _methodologyService from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');
@@ -272,21 +271,19 @@ describe('PreReleaseMethodologiesPage', () => {
     ).toHaveAttribute('href', 'http://hiveit.co.uk');
   });
 
-  const renderPage = (
-    initialEntries: string[] = [
-      generatePath<ReleaseRouteParams>(preReleaseMethodologiesRoute.path, {
-        publicationId: 'publication-1',
-        releaseVersionId: 'release-1',
-      }),
-    ],
-  ) => {
+  const renderPage = () => {
+    const path = generatePath(preReleaseMethodologiesRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+    });
+
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <Route
-          component={PreReleaseMethodologiesPage}
-          path={preReleaseMethodologiesRoute.path}
-        />
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={preReleaseMethodologiesRoute.fullPath}
+      >
+        <PreReleaseMethodologiesPage />
+      </TestRouterRenderer>,
     );
   };
 });

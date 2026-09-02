@@ -1,19 +1,15 @@
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import EducationInNumbersSummaryForm, {
   EducationInNumbersSummaryFormValues,
 } from '@admin/pages/education-in-numbers/components/EducationInNumbersSummaryForm';
-import {
-  EducationInNumbersRouteParams,
-  educationInNumbersSummaryRoute,
-} from '@admin/routes/educationInNumbersRoutes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import ButtonText from '@common/components/ButtonText';
-import { useHistory } from 'react-router-dom';
 
 const EducationInNumbersSummaryEditPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const {
     educationInNumbersPageId,
@@ -34,13 +30,10 @@ const EducationInNumbersSummaryEditPage = () => {
 
     onEducationInNumbersPageChange(nextPage);
 
-    history.push(
-      generatePath<EducationInNumbersRouteParams>(
-        educationInNumbersSummaryRoute.path,
-        {
-          educationInNumbersPageId,
-        },
-      ),
+    navigate(
+      generatePath(educationInNumbersSummaryRoute.fullPath, {
+        educationInNumbersPageId,
+      }),
     );
   };
 
@@ -49,7 +42,7 @@ const EducationInNumbersSummaryEditPage = () => {
       <h2>Edit page summary</h2>
       <EducationInNumbersSummaryForm
         cancelButton={
-          <ButtonText onClick={() => history.goBack()}>Cancel</ButtonText>
+          <ButtonText onClick={() => navigate(-1)}>Cancel</ButtonText>
         }
         initialValues={educationInNumbersPage}
         isEditForm

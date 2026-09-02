@@ -1,23 +1,20 @@
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
-import {
-  MethodologyRouteParams,
-  methodologySummaryRoute,
-} from '@admin/routes/methodologyRoutes';
+import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
 import { methodologyRoute } from '@admin/routes/routes';
 import _methodologyService from '@admin/services/methodologyService';
 import _methodologyContentService from '@admin/services/methodologyContentService';
 import _permissionService from '@admin/services/permissionService';
-import { generatePath, MemoryRouter } from 'react-router';
+import { generatePath } from 'react-router';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import testMethodology, {
   testMethodologyAmendment,
   testMethodologyContent,
 } from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -144,19 +141,16 @@ describe('MethodologyPage', () => {
   });
 
   function renderPage() {
-    const path = generatePath<MethodologyRouteParams>(
-      methodologySummaryRoute.path,
-      {
-        methodologyId: 'm1',
-      },
-    );
+    const path = generatePath(methodologySummaryRoute.fullPath, {
+      methodologyId: 'm1',
+    });
 
     render(
-      <MemoryRouter initialEntries={[path]}>
+      <TestRouterRenderer initialUrl={path} route={methodologyRoute.fullPath}>
         <TestConfigContextProvider>
-          <Route component={MethodologyPage} path={methodologyRoute.path} />
+          <MethodologyPage />
         </TestConfigContextProvider>
-      </MemoryRouter>,
+      </TestRouterRenderer>,
     );
   }
 });

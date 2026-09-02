@@ -5,13 +5,14 @@ import {
 import _educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import EducationInNumbersSummaryEditPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryEditPage';
+import * as router from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/educationInNumbersService');
 
@@ -47,12 +48,7 @@ describe('EducationInNumbersSummaryEditPage', () => {
       updatedPage,
     );
     const onEducationInNumbersPageChange = jest.fn();
-    const history = createMemoryHistory();
-    const { user } = renderPage(
-      testPage,
-      history,
-      onEducationInNumbersPageChange,
-    );
+    const { user } = renderPage(testPage, onEducationInNumbersPageChange);
 
     await user.clear(screen.getByLabelText('Title'));
     await user.type(screen.getByLabelText('Title'), 'Updated title');
@@ -67,38 +63,40 @@ describe('EducationInNumbersSummaryEditPage', () => {
         description: 'Page 1 description',
       });
       expect(onEducationInNumbersPageChange).toHaveBeenCalledWith(updatedPage);
-      expect(history.location.pathname).toBe(
-        '/education-in-numbers/page-1-id/summary',
-      );
     });
+
+    await expectLocation('/education-in-numbers/page-1-id/summary');
   });
 
-  test('clicking cancel calls history.goBack', async () => {
-    const history = createMemoryHistory();
-    history.goBack = jest.fn();
-    const { user } = renderPage(testPage, history);
+  test('clicking cancel calls useNavigate(-1)', async () => {
+    const mockNavigate = jest.fn();
+
+    jest.spyOn(router, 'useNavigate').mockImplementation(() => mockNavigate);
+
+    const { user } = renderPage(testPage);
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(history.goBack).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   function renderPage(
     page: EinSummary,
-    history: MemoryHistory = createMemoryHistory(),
     onEducationInNumbersPageChange: EducationInNumbersPageContextState['onEducationInNumbersPageChange'] = () => {},
   ) {
     return render(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersPageContextProvider
-            educationInNumbersPage={page}
-            onEducationInNumbersPageChange={onEducationInNumbersPageChange}
-          >
-            <EducationInNumbersSummaryEditPage />
-          </EducationInNumbersPageContextProvider>
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer
+        initialUrl="/"
+        route="/"
+        routes={[educationInNumbersSummaryRoute.fullPath]}
+      >
+        <EducationInNumbersPageContextProvider
+          educationInNumbersPage={page}
+          onEducationInNumbersPageChange={onEducationInNumbersPageChange}
+        >
+          <EducationInNumbersSummaryEditPage />
+        </EducationInNumbersPageContextProvider>
+      </TestRouterRenderer>,
     );
   }
 });

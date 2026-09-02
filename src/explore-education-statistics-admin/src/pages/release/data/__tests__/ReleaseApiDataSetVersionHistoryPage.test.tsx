@@ -1,13 +1,9 @@
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  releaseApiDataSetVersionHistoryRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetVersionHistoryRoute } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
   ApiDataSetLiveVersionSummary,
@@ -17,7 +13,8 @@ import { GlobalPermissions } from '@admin/services/authService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -318,33 +315,29 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
   function renderPage(options?: { user?: User }) {
     const { user = testBauUser } = options ?? {};
 
+    const path = generatePath(releaseApiDataSetVersionHistoryRoute.fullPath, {
+      publicationId: testRelease.publicationId,
+      releaseVersionId: testRelease.id,
+      dataSetId: 'data-set-id',
+    });
+
     return render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer
+        initialUrl={path}
+        route={releaseApiDataSetVersionHistoryRoute.fullPath}
+      >
         <AuthContextTestProvider user={user}>
           <ReleaseVersionContextProvider releaseVersion={testRelease}>
-            <MemoryRouter
-              initialEntries={[
-                generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetVersionHistoryRoute.path,
-                  {
-                    publicationId: testRelease.publicationId,
-                    releaseVersionId: testRelease.id,
-                    dataSetId: 'data-set-id',
-                  },
-                ),
-              ]}
+            <ProtectedRoute
+              protectionAction={
+                releaseApiDataSetVersionHistoryRoute.protectionAction
+              }
             >
-              <ProtectedRoute
-                component={ReleaseApiDataSetVersionHistoryPage}
-                path={releaseApiDataSetVersionHistoryRoute.path}
-                protectionAction={
-                  releaseApiDataSetVersionHistoryRoute.protectionAction
-                }
-              />
-            </MemoryRouter>
+              <ReleaseApiDataSetVersionHistoryPage />
+            </ProtectedRoute>
           </ReleaseVersionContextProvider>
         </AuthContextTestProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });
