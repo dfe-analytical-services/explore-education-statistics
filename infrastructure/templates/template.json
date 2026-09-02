@@ -908,8 +908,6 @@
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
@@ -917,29 +915,13 @@
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
     "apiVersions": {
-      "afdEndpoint": "2025-06-01",
-      "nlSearchFunctionApp": "2025-03-01",
-      "searchService": "2025-05-01"
+      "afdEndpoint": "2025-06-01"
     },
     "resourceIds": {
       "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "scope": "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
-      "name": "[guid(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), resourceId('Microsoft.Web/sites', variables('publicAppName')), variables('searchIndexDataReaderRoleId'))]",
-      "properties": {
-        "roleDefinitionId": "[variables('searchIndexDataReaderRoleId')]",
-        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('publicAppName')), '2025-03-01', 'Full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
-      ]
-    },
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
