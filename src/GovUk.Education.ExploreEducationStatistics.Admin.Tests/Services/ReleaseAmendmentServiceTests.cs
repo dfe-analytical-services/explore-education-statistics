@@ -522,8 +522,7 @@ public class ReleaseAmendmentServiceTests
 
             // Check EmbedBlocks have been copied over OK.
             var amendmentEmbedBlockLink = await contentDbContext
-                .ContentBlocks.OfType<EmbedBlockLink>()
-                .Include(embedBlockLink => embedBlockLink.EmbedBlock)
+                .EmbedBlockLinks.Include(embedBlockLink => embedBlockLink.EmbedBlock)
                 .SingleAsync(block => block.ReleaseVersionId == amendment.Id);
 
             var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(

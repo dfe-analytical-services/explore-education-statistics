@@ -196,8 +196,7 @@ public class DataBlockService : IDataBlockService
                 // A DataBlockVersionLink exists only for as long as its DataBlockVersion is placed in a content
                 // section, so the presence of a link is what makes a data block "in content".
                 var dataBlockVersionIdsInContent = await _context
-                    .ContentBlocks.OfType<DataBlockVersionLink>()
-                    .Where(link => link.ReleaseVersionId == releaseVersion.Id)
+                    .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == releaseVersion.Id)
                     .Select(link => link.DataBlockVersionId)
                     .ToListAsync();
 
@@ -432,8 +431,7 @@ public class DataBlockService : IDataBlockService
             .Select(dataBlockVersion => dataBlockVersion.Id)
             .ToList();
         var dependentDataBlockVersionLinks = await _context
-            .ContentBlocks.OfType<DataBlockVersionLink>()
-            .Where(link => dependentDataBlockVersionIds.Contains(link.DataBlockVersionId))
+            .DataBlockVersionLinks.Where(link => dependentDataBlockVersionIds.Contains(link.DataBlockVersionId))
             .ToListAsync();
         _context.ContentBlocks.RemoveRange(dependentDataBlockVersionLinks);
         _context.DataBlockVersions.RemoveRange(dependentDataBlockVersions);
@@ -510,16 +508,18 @@ public class DataBlockService : IDataBlockService
                 // A DataBlockVersion that is placed in a content section has a DataBlockVersionLink, so the versions
                 // without one are the unattached data blocks.
                 var dataBlockVersionIdsInContent = await _context
-                    .ContentBlocks.OfType<DataBlockVersionLink>()
-                    .Where(link => link.ReleaseVersionId == releaseVersion.Id)
+                    .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == releaseVersion.Id)
                     .Select(link => link.DataBlockVersionId)
                     .ToListAsync();
+
+                var attachedDataBlockVersionIds = dataBlockVersionIdsAttachedToKeyStats
+                    .Concat(dataBlockVersionIdsInContent)
+                    .ToList();
 
                 var unattachedDataBlockVersions = await _context
                     .DataBlockVersions.Where(dataBlockVersion =>
                         dataBlockVersion.ReleaseVersionId == releaseVersion.Id
-                        && !dataBlockVersionIdsInContent.Contains(dataBlockVersion.Id)
-                        && !dataBlockVersionIdsAttachedToKeyStats.Contains(dataBlockVersion.Id)
+                        && !attachedDataBlockVersionIds.Contains(dataBlockVersion.Id)
                     )
                     .ToListAsync();
 
@@ -533,9 +533,9 @@ public class DataBlockService : IDataBlockService
     public async Task<bool> IsUnattachedDataBlock(Guid releaseVersionId, DataBlockVersion dataBlockVersion)
     {
         // A DataBlockVersion only has a DataBlockVersionLink for as long as it is placed in a content section.
-        var isInContent = await _context
-            .ContentBlocks.OfType<DataBlockVersionLink>()
-            .AnyAsync(link => link.DataBlockVersionId == dataBlockVersion.Id);
+        var isInContent = await _context.DataBlockVersionLinks.AnyAsync(link =>
+            link.DataBlockVersionId == dataBlockVersion.Id
+        );
 
         return !isInContent
             && await _context

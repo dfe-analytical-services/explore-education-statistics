@@ -12,7 +12,7 @@ import React, { ReactNode } from 'react';
 describe('FeaturedTableLinkInsertForm ', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
-      dataBlockVersionId: 'data-block-id-1',
+      dataBlockVersionId: 'data-block-version-id-1',
       dataBlockId: 'data-block-id-1',
       description: 'description text 1',
       id: 'id-1',
@@ -20,7 +20,7 @@ describe('FeaturedTableLinkInsertForm ', () => {
       order: 0,
     },
     {
-      dataBlockVersionId: 'data-block-id-2',
+      dataBlockVersionId: 'data-block-version-id-2',
       dataBlockId: 'data-block-id-2',
       description: 'description text 2',
       id: 'id-2',
@@ -28,7 +28,7 @@ describe('FeaturedTableLinkInsertForm ', () => {
       order: 1,
     },
     {
-      dataBlockVersionId: 'data-block-id-3',
+      dataBlockVersionId: 'data-block-version-id-3',
       dataBlockId: 'data-block-id-3',
       description: 'description text 3',
       id: 'id-3',
