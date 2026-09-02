@@ -170,7 +170,7 @@ module searchIndexDataReaderRoleAssignmentModule '../common/components/search/se
     roleAssignmentNameOverride: guid(
       resourceId('Microsoft.Search/searchServices', resourceNames.search.service),
       resourceId('Microsoft.Web/sites', appServiceModule.outputs.appServiceName),
-      builtInRoleDefinitionIds.SearchIndexDataReader
+      subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.SearchIndexDataReader)
     )
     role: 'Search Index Data Reader'
   }
