@@ -108,24 +108,33 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
   }
 }
 
+var baseSettings = union(applicationAppSettings, {
+  APPINSIGHTS_INSTRUMENTATIONKEY: reference(
+    resourceId('Microsoft.Insights/components', appInsightsName),
+    '2020-02-02'
+  ).InstrumentationKey
+  AppInsights__InstrumentationKey: reference(
+    resourceId('Microsoft.Insights/components', appInsightsName),
+    '2020-02-02'
+  ).InstrumentationKey
+  WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
+  ASPNETCORE_DETAILEDERRORS: detailedErrors
+  WEBSITES_PORT: websitePort
+})
+
+var osSpecificSettings = union(baseSettings,
+  kind != 'app,linux,container' ? {
+    WEBSITE_RUN_FROM_PACKAGE: '1'
+  } : {},
+  operatingSystem == 'Windows' ? {
+    WEBSITE_LOAD_CERTIFICATES: '*'
+  } : {}
+)
+
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
   name: 'appsettings'
-  properties: union(applicationAppSettings, {
-    APPINSIGHTS_INSTRUMENTATIONKEY: reference(
-      resourceId('Microsoft.Insights/components', appInsightsName),
-      '2020-02-02'
-    ).InstrumentationKey
-    AppInsights__InstrumentationKey: reference(
-      resourceId('Microsoft.Insights/components', appInsightsName),
-      '2020-02-02'
-    ).InstrumentationKey
-    WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
-    WEBSITE_RUN_FROM_PACKAGE: kind != 'app,linux,container' ? '1' : null
-    WEBSITE_LOAD_CERTIFICATES: operatingSystem == 'Windows' ? '*' : null
-    ASPNETCORE_DETAILEDERRORS: detailedErrors
-    WEBSITES_PORT: websitePort
-  })
+  properties: osSpecificSettings
 }
 
 module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
@@ -165,6 +174,8 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
   name: '${appServiceName}${deploySlotName}Deploy'
   params: {
     appServiceName: appService.name
+    kind: kind
+    operatingSystem: operatingSystem
     slotName: deploySlotName
     appServicePlanId: appServicePlanId
     minTlsVersion: minTlsVersion

@@ -34,9 +34,9 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 // role.
 resource searchServiceRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: searchService
-  name: guid(searchService.id, principalId, rolesToRoleIds[role])
+  name: roleAssignmentNameOverride ?? guid(searchService.id, principalId, rolesToRoleIds[role])
   properties: {
-    roleDefinitionId: roleAssignmentNameOverride ?? subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
     principalId: principalId
     principalType: 'ServicePrincipal'
   }
