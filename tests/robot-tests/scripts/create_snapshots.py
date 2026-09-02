@@ -16,11 +16,8 @@ from selenium.common import NoSuchElementException  # noqa: E402
 from selenium.webdriver.chrome.options import Options  # noqa: E402
 from selenium.webdriver.common.by import By  # noqa: E402
 from selenium.webdriver.support.ui import Select, WebDriverWait  # noqa: E402
-from tests.libs.snapshot_notifications import (  # noqa: E402
-    SnapshotNotifier,
-    snapshot_process_failed,
-    snapshots_do_not_match,
-)
+from tests.libs.snapshot_notification import snapshot_process_failed, snapshots_do_not_match  # noqa: E402
+from tests.libs.snapshot_notifier import SnapshotNotifier  # noqa: E402
 
 """
 Script to check find statistics, table tool, methodologies and data catalogue snapshots.
