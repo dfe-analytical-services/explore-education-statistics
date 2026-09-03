@@ -305,6 +305,8 @@ public static class ReleaseVersionGeneratorExtensions
                     {
                         dataBlockVersion.ReleaseVersion = releaseVersion;
                         dataBlockVersion.ReleaseVersionId = releaseVersion.Id;
+                        dataBlockVersion.ContentBlock.ReleaseVersion = releaseVersion;
+                        dataBlockVersion.ContentBlock.ReleaseVersionId = releaseVersion.Id;
                     });
                 }
             );

@@ -70,7 +70,7 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
     {
         var releaseVersion = await contentDbContext
             .ReleaseVersions.Include(rv => rv.DataBlockVersions)
-                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlock)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .SingleAsync(rv => rv.Id == releaseVersionId);
 
         // Set Published to the actual published date, maintaining a record of when the release version was actually published.
@@ -127,44 +127,44 @@ public class ReleaseService(ContentDbContext contentDbContext) : IReleaseService
 
     private async Task UpdatePublishedDataBlockVersions(ReleaseVersion releaseVersion)
     {
-        // Update all of the DataBlocks to point their "LatestPublishedVersions" to the "latest" versions
+        // Update all of the DataBlockParents to point their "LatestPublishedVersions" to the "latest" versions
         // on the Release. Mark the "latest" version as null until a Release Amendment is created.
-        var latestDataBlocks = releaseVersion
-            .DataBlockVersions.Select(dataBlockVersion => dataBlockVersion.DataBlock)
+        var latestDataBlockParents = releaseVersion
+            .DataBlockVersions.Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .ToList();
 
-        latestDataBlocks.ForEach(latestDataBlock =>
+        latestDataBlockParents.ForEach(latestDataBlockParent =>
         {
             // Promote the LatestDraftVersion as the newly published version.
-            latestDataBlock.LatestPublishedVersion = latestDataBlock.LatestDraftVersion;
-            latestDataBlock.LatestPublishedVersionId = latestDataBlock.LatestDraftVersionId;
-            latestDataBlock.LatestPublishedVersion!.Published = DateTime.UtcNow;
+            latestDataBlockParent.LatestPublishedVersion = latestDataBlockParent.LatestDraftVersion;
+            latestDataBlockParent.LatestPublishedVersionId = latestDataBlockParent.LatestDraftVersionId;
+            latestDataBlockParent.LatestPublishedVersion!.Published = DateTime.UtcNow;
 
             // Remove the LatestDraftVersion completely until such a point in the future as a Release Amendment is
             // created that will contain this Data Block as a Draft.
-            latestDataBlock.LatestDraftVersionId = null;
+            latestDataBlockParent.LatestDraftVersionId = null;
         });
 
         // Find all DataBlockVersions that were part of the previously published Release, if any, and update them
         // to no longer have a Published version.
         if (releaseVersion.PreviousVersionId != null)
         {
-            var latestDataBlockIds = latestDataBlocks.Select(dataBlock => dataBlock.Id);
+            var latestDataBlockParentIds = latestDataBlockParents.Select(dataBlockParent => dataBlockParent.Id);
 
             var removedDataBlockVersions = await contentDbContext
                 .DataBlockVersions.Where(dataBlockVersion =>
                     dataBlockVersion.ReleaseVersionId == releaseVersion.PreviousVersionId
-                    && !latestDataBlockIds.Contains(dataBlockVersion.DataBlockId)
+                    && !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId)
                 )
-                .Include(dataBlockVersion => dataBlockVersion.DataBlock)
+                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToListAsync();
 
-            // Update all of the removed DataBlockVersions' DataBlocks to point their
+            // Update all of the removed DataBlockVersions' DataBlockParents to point their
             // "LatestPublishedVersions" to null, as they should no longer be publicly accessible.
             removedDataBlockVersions.ForEach(latestDataBlockVersion =>
             {
-                var latestDataBlock = latestDataBlockVersion.DataBlock;
-                latestDataBlock.LatestPublishedVersionId = null;
+                var parent = latestDataBlockVersion.DataBlockParent;
+                parent.LatestPublishedVersionId = null;
             });
         }
     }

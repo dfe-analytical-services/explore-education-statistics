@@ -20,7 +20,7 @@ public class DataBlocksController : ControllerBase
     }
 
     [HttpPost("releases/{releaseVersionId:guid}/data-blocks")]
-    public async Task<ActionResult<DataBlockVersionViewModel>> CreateDataBlock(
+    public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
         Guid releaseVersionId,
         DataBlockCreateRequest dataBlock
     )
@@ -54,13 +54,13 @@ public class DataBlocksController : ControllerBase
     }
 
     [HttpGet("data-blocks/{dataBlockVersionId:guid}")]
-    public async Task<ActionResult<DataBlockVersionViewModel>> GetDataBlock(Guid dataBlockVersionId)
+    public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid dataBlockVersionId)
     {
         return await _dataBlockService.Get(dataBlockVersionId).HandleFailuresOrOk();
     }
 
     [HttpPut("data-blocks/{dataBlockVersionId:guid}")]
-    public async Task<ActionResult<DataBlockVersionViewModel>> UpdateDataBlock(
+    public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(
         Guid dataBlockVersionId,
         DataBlockUpdateRequest dataBlock
     )
@@ -69,7 +69,7 @@ public class DataBlocksController : ControllerBase
     }
 
     [HttpGet("release/{releaseVersionId:guid}/data-blocks/unattached")]
-    public async Task<ActionResult<List<DataBlockVersionViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
+    public async Task<ActionResult<List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
     {
         return await _dataBlockService.GetUnattachedDataBlocks(releaseVersionId).HandleFailuresOrOk();
     }

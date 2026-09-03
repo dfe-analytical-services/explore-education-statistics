@@ -230,8 +230,8 @@ describe('PreReleaseTableToolPage', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'block-1',
-      dataBlockVersionId: 'block-1',
       dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1-parent',
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',
@@ -264,7 +264,7 @@ describe('PreReleaseTableToolPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
-    dataBlockId: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetId: 'data-set-1',
     dataSetName: 'Test data set',
     name: 'Test block',
@@ -357,7 +357,7 @@ describe('PreReleaseTableToolPage', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('renders correctly on step 5 with `dataBlockVersionId` route param', async () => {
+  test('renders correctly on step 5 with `dataBlockId` route param', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
     releaseVersionService.getReleaseVersion.mockResolvedValue(testRelease);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
@@ -376,7 +376,7 @@ describe('PreReleaseTableToolPage', () => {
         {
           publicationId: 'publication-1',
           releaseVersionId: 'release-1',
-          dataBlockVersionId: 'block-1',
+          dataBlockId: 'block-1',
         },
       ),
     ]);

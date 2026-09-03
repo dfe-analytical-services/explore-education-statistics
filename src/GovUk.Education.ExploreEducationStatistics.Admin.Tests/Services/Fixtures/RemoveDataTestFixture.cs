@@ -258,7 +258,7 @@ public class RemoveDataSetTestFixture
             .ReturnsAsync(deleteDataBlockPlan);
 
         DataBlockService
-            .Setup(service => service.DeleteDataBlockVersions(It.IsAny<DeleteDataBlockPlanViewModel>()))
+            .Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
             .ReturnsAsync(Unit.Instance);
     }
 

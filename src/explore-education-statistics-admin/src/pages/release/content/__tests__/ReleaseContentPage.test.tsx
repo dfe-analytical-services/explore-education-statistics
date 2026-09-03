@@ -75,7 +75,7 @@ describe('ReleaseContentPage', () => {
           {
             id: 'block-1',
             order: 1,
-            body: '<p>Section 1 content</p><p><a href="/data-table/fast-track/data-block-1?featuredTable=true" data-featured-table>featured table link</a></p>',
+            body: '<p>Section 1 content</p><p><a href="/data-table/fast-track/data-block-parent-1?featuredTable=true" data-featured-table>featured table link</a></p>',
             type: 'HtmlBlock',
             comments: [],
           },
@@ -188,16 +188,16 @@ describe('ReleaseContentPage', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'featured-table-1',
-      dataBlockVersionId: 'data-block-1',
       dataBlockId: 'data-block-1',
+      dataBlockParentId: 'data-block-parent-1',
       description: '',
       name: 'Featured table 1',
       order: 0,
     },
     {
       id: 'featured-table-2',
-      dataBlockVersionId: 'data-block-2',
       dataBlockId: 'data-block-2',
+      dataBlockParentId: 'data-block-parent-2',
       description: '',
       name: 'Featured table 2',
       order: 0,
@@ -357,8 +357,8 @@ describe('ReleaseContentPage', () => {
   const testTableToolFeaturedTables: TableToolFeaturedTable[] = [
     {
       id: 'featured-table-1',
-      dataBlockVersionId: 'data-block-1',
       dataBlockId: 'data-block-1',
+      dataBlockParentId: 'data-block-parent-1',
       description: '',
       name: 'Featured table 1',
       order: 0,
@@ -366,8 +366,8 @@ describe('ReleaseContentPage', () => {
     },
     {
       id: 'featured-table-2',
-      dataBlockVersionId: 'data-block-2',
       dataBlockId: 'data-block-2',
+      dataBlockParentId: 'data-block-parent-2',
       description: '',
       name: 'Featured table 2',
       order: 0,
@@ -401,7 +401,7 @@ describe('ReleaseContentPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'data-block-1',
-    dataBlockId: 'data-block-1',
+    dataBlockParentId: 'data-block-parent-1',
     dataSetId: 'data-set-1',
     dataSetName: 'Test data set',
     name: 'Test block',
@@ -780,7 +780,7 @@ describe('ReleaseContentPage', () => {
         }),
       ).toHaveAttribute(
         'href',
-        '/data-table/fast-track/data-block-1?featuredTable=true',
+        '/data-table/fast-track/data-block-parent-1?featuredTable=true',
       );
     });
   });

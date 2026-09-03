@@ -4,7 +4,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 
 export type PreReleaseTableToolRouteParams = ReleaseRouteParams & {
-  dataBlockVersionId?: string;
+  dataBlockId?: string;
 };
 
 export type PreReleaseMethodologyRouteParams = ReleaseRouteParams & {
@@ -30,7 +30,7 @@ export const preReleaseMethodologyRoute: ReleaseRouteProps = {
 };
 
 export const preReleaseTableToolRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/table-tool/:dataBlockVersionId?',
+  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/table-tool/:dataBlockId?',
   title: 'Table tool',
   exact: true,
 };

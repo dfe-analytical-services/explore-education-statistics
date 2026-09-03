@@ -283,7 +283,7 @@ public abstract class ReleaseVersionServiceTests
                 .ReturnsAsync(new DeleteDataBlockPlanViewModel());
 
             dataBlockService
-                .Setup(service => service.DeleteDataBlockVersions(It.IsAny<DeleteDataBlockPlanViewModel>()))
+                .Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlanViewModel>()))
                 .ReturnsAsync(Unit.Instance);
 
             dataImportService
@@ -788,7 +788,7 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 var validationProblem = result.AssertBadRequestWithValidationProblem();
-                validationProblem.AssertHasErrors([.. expectedValidationErrors]);
+                validationProblem.AssertHasErrors(expectedValidationErrors.ToList());
             }
         }
 
@@ -1844,7 +1844,13 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(
                     new BadRequestObjectResult(
-                        new ValidationProblemViewModel { Errors = [new() { Path = "error path", Code = "error code" }] }
+                        new ValidationProblemViewModel
+                        {
+                            Errors = new ErrorViewModel[]
+                            {
+                                new() { Path = "error path", Code = "error code" },
+                            },
+                        }
                     )
                 );
 
@@ -1939,8 +1945,8 @@ public abstract class ReleaseVersionServiceTests
 
             // A DataBlock on the ReleaseVersion being deleted, which is also used as a KeyStatistic. The
             // KeyStatistic has to be removed before the DataBlock.
-            var dataBlock = _dataFixture
-                .DefaultDataBlock()
+            var dataBlockParent = _dataFixture
+                .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(
                     _dataFixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
                 )
@@ -1948,7 +1954,7 @@ public abstract class ReleaseVersionServiceTests
 
             var keyStatistic = new KeyStatisticDataBlock
             {
-                DataBlockVersion = dataBlock.LatestPublishedVersion!,
+                DataBlock = dataBlockParent.LatestPublishedVersion!.ContentBlock,
                 ReleaseVersionId = releaseVersion.Id,
             };
 
@@ -1983,7 +1989,7 @@ public abstract class ReleaseVersionServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseVersions.AddRange(releaseVersion, anotherReleaseVersion);
-                context.DataBlocks.Add(dataBlock);
+                context.DataBlockParents.Add(dataBlockParent);
                 context.KeyStatisticsDataBlock.Add(keyStatistic);
                 context.MethodologyVersions.AddRange(
                     methodologyScheduledWithRelease,
@@ -2141,7 +2147,7 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Empty(contentDbContext.KeyStatisticsDataBlock);
                 Assert.Empty(contentDbContext.KeyStatistics);
                 Assert.Empty(contentDbContext.DataBlockVersions);
-                Assert.Empty(contentDbContext.DataBlocks);
+                Assert.Empty(contentDbContext.DataBlockParents);
 
                 // We expect the Statistics ReleaseVersion to be deleted immediately for test ReleaseVersions,
                 // as they do not use Subjects large enough to warrant using the stored procedure that cleans up
@@ -2187,7 +2193,13 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(
                     new BadRequestObjectResult(
-                        new ValidationProblemViewModel { Errors = [new() { Path = "error path", Code = "error code" }] }
+                        new ValidationProblemViewModel
+                        {
+                            Errors = new ErrorViewModel[]
+                            {
+                                new() { Path = "error path", Code = "error code" },
+                            },
+                        }
                     )
                 );
 

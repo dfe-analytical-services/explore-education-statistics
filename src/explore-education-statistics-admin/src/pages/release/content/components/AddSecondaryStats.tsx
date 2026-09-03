@@ -73,7 +73,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
       id="secondaryStats-dataBlockSelectForm"
       releaseVersionId={release.id}
       label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
-      onSelect={async selectedDataBlockVersionId => {
+      onSelect={async selectedDataBlockId => {
         await Promise.all(
           release.keyStatisticsSecondarySection.content.map(async content => {
             await deleteContentSectionBlock({
@@ -90,7 +90,7 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
           sectionId: release.keyStatisticsSecondarySection.id,
           sectionKey: 'keyStatisticsSecondarySection',
           block: {
-            dataBlockVersionId: selectedDataBlockVersionId,
+            contentBlockId: selectedDataBlockId,
             order: 0,
           },
         });

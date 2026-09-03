@@ -20,7 +20,7 @@ export interface ReleaseDataBlockSummary {
 export type UpdateReleaseDataBlock = ReleaseDataBlock;
 export type CreateReleaseDataBlock = OmitStrict<
   DataBlock,
-  'id' | 'order' | 'type' | 'dataBlockId'
+  'id' | 'order' | 'type' | 'dataBlockParentId'
 >;
 
 export interface DependentDataBlock {
@@ -45,8 +45,8 @@ const dataBlockService = {
     return client.get(`/releases/${releaseVersionId}/data-blocks`);
   },
 
-  getDataBlock(dataBlockVersionId: string): Promise<ReleaseDataBlock> {
-    return client.get<ReleaseDataBlock>(`/data-blocks/${dataBlockVersionId}`);
+  getDataBlock(dataBlockId: string): Promise<ReleaseDataBlock> {
+    return client.get<ReleaseDataBlock>(`/data-blocks/${dataBlockId}`);
   },
 
   createDataBlock(
@@ -57,11 +57,11 @@ const dataBlockService = {
   },
 
   updateDataBlock(
-    dataBlockVersionId: string,
+    dataBlockId: string,
     dataBlock: UpdateReleaseDataBlock,
   ): Promise<ReleaseDataBlock> {
     return client.put<ReleaseDataBlock>(
-      `/data-blocks/${dataBlockVersionId}`,
+      `/data-blocks/${dataBlockId}`,
       dataBlock,
     );
   },

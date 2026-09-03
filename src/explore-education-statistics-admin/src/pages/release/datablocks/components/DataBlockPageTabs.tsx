@@ -110,7 +110,7 @@ const DataBlockPageTabs = ({
             : // for maps, set TableDataSubjectMeta location values to LocationGeoJsonOption[], instead of LocationOption[]
               await tableBuilderService.getDataBlockGeoJson(
                 releaseVersionId,
-                dataBlock.dataBlockId,
+                dataBlock.dataBlockParentId,
                 getMapInitialBoundaryLevel(dataBlock.charts[0]),
               ),
       },
@@ -151,19 +151,19 @@ const DataBlockPageTabs = ({
       originalDescription,
       newName,
       newDescription,
-      dataBlockVersionId,
+      dataBlockId,
     }: {
       originalName?: string;
       originalDescription?: string;
       newName?: string;
       newDescription?: string;
-      dataBlockVersionId: string;
+      dataBlockId: string;
     }) => {
       switch (true) {
         case !!(originalName && !newName):
           await featuredTableService.deleteFeaturedTable(
             releaseVersionId,
-            dataBlockVersionId,
+            dataBlockId,
           );
           break;
 
@@ -171,7 +171,7 @@ const DataBlockPageTabs = ({
           await featuredTableService.createFeaturedTable(releaseVersionId, {
             name: newName ?? '',
             description: newDescription ?? '',
-            dataBlockVersionId,
+            dataBlockId,
           });
           break;
 
@@ -181,7 +181,7 @@ const DataBlockPageTabs = ({
         ):
           await featuredTableService.updateFeaturedTable(
             releaseVersionId,
-            dataBlockVersionId,
+            dataBlockId,
             {
               name: newName ?? '',
               description: newDescription ?? '',
@@ -214,7 +214,7 @@ const DataBlockPageTabs = ({
             originalDescription: dataBlock?.highlightDescription,
             newName: dataBlockToSave.highlightName,
             newDescription: dataBlockToSave.highlightDescription,
-            dataBlockVersionId: dataBlockToSave.id,
+            dataBlockId: dataBlockToSave.id,
           });
 
           return dataBlocksService.updateDataBlock(
@@ -232,7 +232,7 @@ const DataBlockPageTabs = ({
           originalDescription: dataBlock?.highlightDescription,
           newName: dataBlockToSave.highlightName,
           newDescription: dataBlockToSave.highlightDescription,
-          dataBlockVersionId: newDataBlock.id,
+          dataBlockId: newDataBlock.id,
         });
 
         return newDataBlock;

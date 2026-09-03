@@ -549,7 +549,7 @@ public class DataSetMappingServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
             Name = "Test DataBlock",
             Query = new FullTableQuery
@@ -582,7 +582,7 @@ public class DataSetMappingServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             await contentDbContext.SaveChangesAsync();
         }
 

@@ -119,7 +119,7 @@ public class ContentService : IContentService
             ReleaseSlug = releaseSlug;
         }
 
-        public string Key => PublicContentDataBlockPath(PublicationSlug, ReleaseSlug);
+        public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
 
         public IBlobContainer Container => PublicContent;
     }

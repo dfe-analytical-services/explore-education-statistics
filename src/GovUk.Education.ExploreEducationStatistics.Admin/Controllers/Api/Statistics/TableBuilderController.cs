@@ -56,29 +56,29 @@ public class TableBuilderController(
             .HandleFailuresOr(Ok);
     }
 
-    [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockId:guid}")]
+    [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
     public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
         Guid releaseVersionId,
-        Guid dataBlockId,
+        Guid dataBlockParentId,
         CancellationToken cancellationToken = default
     )
     {
         return await dataBlockService
-            .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
+            .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
             .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, cancellationToken))
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockId:guid}/geojson")]
+    [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/geojson")]
     public async Task<ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>> QueryForDataBlockWithGeoJson(
         Guid releaseVersionId,
-        Guid dataBlockId,
+        Guid dataBlockParentId,
         [FromQuery] long boundaryLevelId,
         CancellationToken cancellationToken = default
     )
     {
         return await dataBlockService
-            .GetDataBlockVersionForRelease(releaseVersionId, dataBlockId)
+            .GetDataBlockVersionForRelease(releaseVersionId, dataBlockParentId)
             .OnSuccess(dataBlockVersion =>
                 GetLocations(releaseVersionId, dataBlockVersion, boundaryLevelId, cancellationToken)
             )
@@ -91,7 +91,7 @@ public class TableBuilderController(
     )
     {
         return privateBlobCacheService.GetOrCreateAsync(
-            cacheKey: new DataBlockVersionTableResultCacheKey(dataBlockVersion),
+            cacheKey: new DataBlockTableResultCacheKey(dataBlockVersion),
             createIfNotExistsFn: () =>
                 userService
                     .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)

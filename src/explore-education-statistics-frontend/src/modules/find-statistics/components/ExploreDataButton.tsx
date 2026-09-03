@@ -34,7 +34,7 @@ const ExploreDataButton = ({ block, hiddenText }: Props) => {
         </>
       ) : (
         <ButtonLink
-          to={`/data-tables/fast-track/${block.dataBlockId}`}
+          to={`/data-tables/fast-track/${block.dataBlockParentId}`}
           onClick={() => {
             toggleButtonClicked.on();
             logEvent({

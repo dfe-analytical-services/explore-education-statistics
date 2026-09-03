@@ -29,7 +29,7 @@ const seoRedirects = {
   '/data-table': '/',
   '/data-tables%20-%20spring%20%0a2022': '/',
   '/data-tables/fast-track/%5bdatablockid%5d': '/',
-  '/data-tables/fast-track/%5bdataBlockid%5d': '/',
+  '/data-tables/fast-track/%5bdatablockparentid%5d': '/',
   '/data-tables/fast-track/0164bb4a-6777-4d8f-a1a0-34ce69f75153':
     '/data-tables',
   '/data-tables/fast-track/02b8c449-017b-4cd3-8db9-f96fba507c1c':

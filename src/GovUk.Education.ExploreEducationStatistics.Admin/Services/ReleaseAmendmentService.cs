@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -58,20 +58,13 @@ public class ReleaseAmendmentService(
             createdDate
         );
 
-        // Create maps of the original data blocks (keyed by their original DataBlockVersion Id, which is what
-        // FeaturedTable.DataBlockVersionId, KeyStatisticDataBlock.DataBlockVersionId and
-        // DataBlockVersionLink.DataBlockVersionId all reference) to their amended DataBlockVersion and amended
-        // DataBlockVersionLink counterparts.
-        var originalVersionIdToAmendedVersion = dataBlockVersionAmendments.ToDictionary(
-            amendment => amendment.OriginalVersionId,
-            amendment => amendment.AmendedVersion
-        );
-
-        // Only data blocks that were placed in a content section have an amended link, as a DataBlockVersionLink
-        // exists only for the duration of a DataBlockVersion's placement in a ContentSection.
-        var originalVersionIdToAmendedLink = dataBlockVersionAmendments
-            .Where(amendment => amendment.AmendedLink is not null)
-            .ToDictionary(amendment => amendment.OriginalVersionId, amendment => amendment.AmendedLink!);
+        // Create a map of the original DataBlocks to their amended counterparts.
+        var originalDataBlockVersionsToAmendments = dataBlockVersionAmendments
+            .Select(dataBlockVersionAmendment => dataBlockVersionAmendment.DataBlockParent)
+            .ToDictionary(
+                dataBlockParent => dataBlockParent.LatestPublishedVersion!,
+                dataBlockParent => dataBlockParent.LatestDraftVersion!
+            );
 
         var amendmentReleaseVersion = new ReleaseVersion
         {
@@ -96,34 +89,30 @@ public class ReleaseAmendmentService(
             Version = originalReleaseVersion.Version + 1,
             PreviousVersionId = originalReleaseVersion.Id,
 
-            DataBlockVersions = dataBlockVersionAmendments.Select(amendment => amendment.AmendedVersion).ToList(),
+            DataBlockVersions = dataBlockVersionAmendments,
             KeyStatistics = CopyKeyStatistics(
                 originalReleaseVersion,
                 amendmentReleaseVersionId,
                 createdByUserId,
-                originalVersionIdToAmendedVersion
+                originalDataBlockVersionsToAmendments
             ),
             Content = CopyContent(
                 originalReleaseVersion,
                 createdDate,
                 amendmentReleaseVersionId,
-                originalVersionIdToAmendedLink
+                originalDataBlockVersionsToAmendments
             ),
             FeaturedTables = CopyFeaturedTables(
                 originalReleaseVersion,
                 amendmentReleaseVersionId,
                 createdByUserId,
-                originalVersionIdToAmendedVersion
+                originalDataBlockVersionsToAmendments
             ),
             RelatedInformation = CopyRelatedInformation(originalReleaseVersion),
             Updates = CopyUpdates(originalReleaseVersion, amendmentReleaseVersionId, createdDate, createdByUserId),
         };
 
         context.ReleaseVersions.Add(amendmentReleaseVersion);
-
-        // Every amended DataBlockVersionLink is placed in a content section, and so is persisted via that section's
-        // Content collection (in CopyContentBlocks). Unattached data blocks have no link to add.
-
         await context.SaveChangesAsync();
         return amendmentReleaseVersion;
     }
@@ -132,9 +121,14 @@ public class ReleaseAmendmentService(
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         Guid createdByUserId,
-        Dictionary<Guid, DataBlockVersion> originalVersionIdToAmendedVersion
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
     )
     {
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
+
         return originalReleaseVersion
             .KeyStatistics.Select<KeyStatistic, KeyStatistic>(originalKeyStat =>
             {
@@ -176,12 +170,10 @@ public class ReleaseAmendmentService(
                         Trend = originalKeyStatDataBlock.Trend,
                         GuidanceText = originalKeyStatDataBlock.GuidanceText,
                         GuidanceTitle = originalKeyStatDataBlock.GuidanceTitle,
-                        DataBlockId = originalKeyStatDataBlock.DataBlockId,
+                        DataBlockParentId = originalKeyStatDataBlock.DataBlockParentId,
 
                         // Link to the new version of the DataBlock from the original.
-                        DataBlockVersionId = originalVersionIdToAmendedVersion[
-                            originalKeyStatDataBlock.DataBlockVersionId
-                        ].Id,
+                        DataBlockId = originalDataBlockIdsToAmendments[originalKeyStatDataBlock.DataBlockId].Id,
 
                         // Mark this as being created by the current user.
                         CreatedById = createdByUserId,
@@ -195,128 +187,97 @@ public class ReleaseAmendmentService(
             .ToList();
     }
 
-    private List<DataBlockVersionAmendment> CopyDataBlockVersions(
+    private List<DataBlockVersion> CopyDataBlockVersions(
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         DateTime createdDate
     )
     {
-        // The positional/locking state of a data block now lives on its DataBlockVersionLink (a ContentBlock) rather
-        // than on its DataBlockVersion, and there is no navigation from a version back to its link, so load the
-        // original release's DataBlockVersionLinks up front. Only data blocks that are placed in a content section
-        // have a link, so versions without one are unattached.
-        var originalDataBlockVersionLinksByVersionId = context
-            .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == originalReleaseVersion.Id)
-            .ToList()
-            .ToDictionary(link => link.DataBlockVersionId);
-
         return originalReleaseVersion
             .DataBlockVersions.Select(originalDataBlockVersion =>
             {
-                // Create a new entry in the DataBlock history in the form of a new DataBlockVersion, accompanied by a
-                // new DataBlockVersionLink if the original data block was placed in a content section.
-                var amendment = CopyDataBlockVersion(
+                // Create a new entry in the DataBlock history in the form of a new DataBlockVersion.
+                var copiedDataBlockVersion = CopyDataBlockVersion(
                     originalDataBlockVersion,
-                    originalDataBlockVersionLinksByVersionId.GetValueOrDefault(originalDataBlockVersion.Id),
                     amendmentReleaseVersionId,
                     createdDate
                 );
 
                 // Set the new DataBlockVersion to be the new Draft version.
-                amendment.AmendedVersion.DataBlock.LatestDraftVersion = amendment.AmendedVersion;
-                amendment.AmendedVersion.DataBlock.LatestDraftVersionId = amendment.AmendedVersion.Id;
-                return amendment;
+                copiedDataBlockVersion.DataBlockParent.LatestDraftVersion = copiedDataBlockVersion;
+                copiedDataBlockVersion.DataBlockParent.LatestDraftVersionId = copiedDataBlockVersion.Id;
+                return copiedDataBlockVersion;
             })
             .ToList();
     }
 
-    private static DataBlockVersionAmendment CopyDataBlockVersion(
+    private DataBlockVersion CopyDataBlockVersion(
         DataBlockVersion originalDataBlockVersion,
-        DataBlockVersionLink? originalDataBlockVersionLink,
         Guid amendmentReleaseVersionId,
         DateTime createdDate
     )
     {
-        // The amended DataBlockVersionLink (a ContentBlock) shares its Id with the amended DataBlockVersion it points
-        // to. This shared-Id invariant is relied upon by FeaturedTable.DataBlockVersionId and
-        // KeyStatisticDataBlock.DataBlockVersionId, which are matched against the DataBlockVersion's Id.
-        var amendedId = Guid.NewGuid();
+        var originalContentBlock = originalDataBlockVersion.ContentBlock;
 
-        var amendedDataBlockVersion = new DataBlockVersion
+        // Not copying Comments.
+        var copiedContentBlock = new DataBlock
         {
-            Id = amendedId,
+            // Assign a new Id.
+            Id = Guid.NewGuid(),
+
+            // Assign this new DataBlockVersion to the amended release version.
+            ReleaseVersionId = amendmentReleaseVersionId,
 
             // Copy over fields that we want to carry over into the amended version.
-            DataBlock = originalDataBlockVersion.DataBlock,
-            DataBlockId = originalDataBlockVersion.DataBlockId,
+            Name = originalContentBlock.Name,
+            Charts = originalContentBlock.Charts,
+            Heading = originalContentBlock.Heading,
+            Order = originalContentBlock.Order,
+            Query = originalContentBlock.Query,
+            Source = originalContentBlock.Source,
+            Table = originalContentBlock.Table,
+            // EES-4637 - we need to decide on how we're being consistent with Created
+            // dates in Release Amendments.
+            Created = createdDate,
+            Updated = null,
+
+            // Explicitly list out fields that we're deliberately not carrying over
+            // into the amended ContentBlock, for clarity.
+            Comments = new List<Comment>(),
+            ContentSection = null,
+            ContentSectionId = null,
+            Locked = null,
+            LockedBy = null,
+            LockedById = null,
+        };
+
+        return new DataBlockVersion
+        {
+            // Keep a one-to-one relationship between DataBlockVersions and their backing ContentBlocks.
+            // This will make it easier to migrate DataBlocks out of the ContentBlock model in the future.
+            Id = copiedContentBlock.Id,
+
+            // Copy over fields that we want to carry over into the amended version.
+            DataBlockParent = originalDataBlockVersion.DataBlockParent,
+            DataBlockParentId = originalDataBlockVersion.DataBlockParentId,
 
             // Assign this new DataBlockVersion to the amended release version.
             ReleaseVersionId = amendmentReleaseVersionId,
 
             // Assign new field values to this new DataBlockVersion where we deliberately want separate
             // values from the original.
+            // Created = createdDate,
             Version = originalDataBlockVersion.Version + 1,
 
-            // Copy over the content fields that we want to carry over into the amended version.
-            Name = originalDataBlockVersion.Name,
-            Charts = originalDataBlockVersion.Charts,
-            Heading = originalDataBlockVersion.Heading,
-            Query = originalDataBlockVersion.Query,
-            Source = originalDataBlockVersion.Source,
-            Table = originalDataBlockVersion.Table,
+            // Link the newly created ContentBlock to this DataBlockVersion.
+            ContentBlock = copiedContentBlock,
 
-            // Explicitly list out fields that we're deliberately not carrying over, for clarity.
-            // EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
-            // Created = createdDate,
+            // Explicitly list out fields that we're deliberately not carrying over
+            // into the amended ContentBlock, for clarity.
             Updated = null,
             Published = null,
         };
-
-        // An unattached data block has no link to copy. Its amended version will only gain one if it is placed in a
-        // content section of the amendment.
-        var amendedDataBlockVersionLink = originalDataBlockVersionLink is null
-            ? null
-            : new DataBlockVersionLink
-            {
-                Id = amendedId,
-                DataBlockVersionId = amendedId,
-                DataBlockVersion = amendedDataBlockVersion,
-
-                // Assign this new DataBlockVersionLink to the amended release version.
-                ReleaseVersionId = amendmentReleaseVersionId,
-
-                // Copy over positional fields that we want to carry over into the amended version.
-                Order = originalDataBlockVersionLink.Order,
-                Created = createdDate,
-
-                // Explicitly list out fields that we're deliberately not carrying over, for clarity.
-                Updated = null,
-                Comments = [],
-
-                // The amended content section is assigned in CopyContentBlocks.
-                Locked = null,
-                LockedBy = null,
-                LockedById = null,
-            };
-
-        return new DataBlockVersionAmendment(
-            OriginalVersionId: originalDataBlockVersion.Id,
-            AmendedVersion: amendedDataBlockVersion,
-            AmendedLink: amendedDataBlockVersionLink
-        );
     }
-
-    /// <summary>
-    /// Holds the amended <see cref="DataBlockVersion"/> produced when copying a data block during a release amendment,
-    /// keyed by the original <see cref="DataBlockVersion"/>'s Id. <see cref="AmendedLink"/> is null if the original
-    /// data block was unattached, as a <see cref="DataBlockVersionLink"/> exists only while a
-    /// <see cref="DataBlockVersion"/> is placed in a <see cref="ContentSection"/>.
-    /// </summary>
-    private record DataBlockVersionAmendment(
-        Guid OriginalVersionId,
-        DataBlockVersion AmendedVersion,
-        DataBlockVersionLink? AmendedLink
-    );
 
     /// <summary>
     /// Copies ContentSections, using newly-cloned ContentBlocks in new ContentSections rather than the original ones.
@@ -325,7 +286,7 @@ public class ReleaseAmendmentService(
         ReleaseVersion originalReleaseVersion,
         DateTime createdDate,
         Guid amendmentReleaseVersionId,
-        Dictionary<Guid, DataBlockVersionLink> originalVersionIdToAmendedLink
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
     ) =>
         originalReleaseVersion
             .Content.Select(originalSection =>
@@ -350,7 +311,7 @@ public class ReleaseAmendmentService(
                         contentSectionAmendmentId: contentSectionAmendmentId,
                         amendmentReleaseVersionId: amendmentReleaseVersionId,
                         createdDate: createdDate,
-                        originalVersionIdToAmendedLink: originalVersionIdToAmendedLink
+                        originalDataBlockVersionsToAmendments: originalDataBlockVersionsToAmendments
                     ),
                 };
             })
@@ -361,20 +322,20 @@ public class ReleaseAmendmentService(
         Guid contentSectionAmendmentId,
         Guid amendmentReleaseVersionId,
         DateTime createdDate,
-        Dictionary<Guid, DataBlockVersionLink> originalVersionIdToAmendedLink
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
     )
     {
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
+
         return originalSectionContent
             .Select<ContentBlock, ContentBlock>(originalContentBlock =>
             {
-                if (originalContentBlock is DataBlockVersionLink originalDataBlockVersionLink)
+                if (originalContentBlock is DataBlock)
                 {
-                    // Place the already-created amended DataBlockVersionLink into this amended content section.
-                    var amendedDataBlockVersionLink = originalVersionIdToAmendedLink[
-                        originalDataBlockVersionLink.DataBlockVersionId
-                    ];
-                    amendedDataBlockVersionLink.ContentSectionId = contentSectionAmendmentId;
-                    return amendedDataBlockVersionLink;
+                    return originalDataBlockIdsToAmendments[originalContentBlock.Id];
                 }
 
                 if (originalContentBlock is HtmlBlock originalHtmlBlock)
@@ -430,9 +391,14 @@ public class ReleaseAmendmentService(
         ReleaseVersion originalReleaseVersion,
         Guid amendmentReleaseVersionId,
         Guid createdByUserId,
-        Dictionary<Guid, DataBlockVersion> originalVersionIdToAmendedVersion
+        Dictionary<DataBlockVersion, DataBlockVersion> originalDataBlockVersionsToAmendments
     )
     {
+        var originalDataBlockIdsToAmendments = originalDataBlockVersionsToAmendments.ToDictionary(
+            kvp => kvp.Key.ContentBlockId,
+            kvp => kvp.Value.ContentBlock
+        );
+
         return originalReleaseVersion
             .FeaturedTables.Select(originalFeaturedTable => new FeaturedTable
             {
@@ -442,9 +408,10 @@ public class ReleaseAmendmentService(
                 // Assign it to the amended release version.
                 ReleaseVersionId = amendmentReleaseVersionId,
 
-                // Link it to the amended version of the original DataBlock, but to the same overarching DataBlock.
-                DataBlockVersion = originalVersionIdToAmendedVersion[originalFeaturedTable.DataBlockVersionId],
-                DataBlockId = originalFeaturedTable.DataBlockId,
+                // Link it to the amended version of the original DataBlock, but to the same overarching
+                // DataBlockParent.
+                DataBlock = originalDataBlockIdsToAmendments[originalFeaturedTable.DataBlockId],
+                DataBlockParentId = originalFeaturedTable.DataBlockParentId,
 
                 // Copy over certain fields from the original.
                 Description = originalFeaturedTable.Description,
@@ -630,14 +597,17 @@ internal static class ReleaseAmendmentQueryableExtensions
             .Include(releaseVersion => releaseVersion.Content)
                 .ThenInclude(contentSection => contentSection.Content)
             .Include(releaseVersion => releaseVersion.KeyStatistics)
-                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlockVersion)
+                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
             .Include(releaseVersion => releaseVersion.FeaturedTables)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlock)
-                    .ThenInclude(dataBlock => dataBlock.LatestDraftVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlock)
-                    .ThenInclude(dataBlock => dataBlock.LatestPublishedVersion);
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                        .ThenInclude(dataBlockVersion =>
+                            dataBlockVersion != null ? dataBlockVersion.ContentBlock : null
+                        );
     }
 }

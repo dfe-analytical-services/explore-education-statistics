@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
 public class DataBlockAttachRequest
 {
-    public Guid DataBlockVersionId { get; set; }
+    public Guid ContentBlockId { get; set; }
 
     public int? Order { get; set; }
 }

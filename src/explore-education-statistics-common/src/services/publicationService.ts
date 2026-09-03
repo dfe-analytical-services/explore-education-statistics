@@ -110,7 +110,7 @@ export type KeyStatisticType =
 
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';
-  dataBlockId: string;
+  dataBlockParentId: string;
   dataBlockVersionId?: string;
 }
 
@@ -174,11 +174,11 @@ export interface HtmlBlockViewModel {
 
 export interface DataBlockViewModel {
   id: string;
-  type: 'DataBlockVersionLink';
+  type: 'DataBlock';
   dataBlockVersion: {
     charts: Chart[];
     dataBlockVersionId: string;
-    dataBlockId: string;
+    dataBlockParentId: string;
     heading: string;
     highlightDescription?: string;
     highlightName?: string;
@@ -251,8 +251,8 @@ export interface DataSetItem {
 
 export interface FeaturedTableItem {
   featuredTableId: string;
-  dataBlockVersionId: string;
   dataBlockId: string;
+  dataBlockParentId: string;
   title: string;
   summary: string;
 }

@@ -8,14 +8,11 @@ const dataBlockQueries = createQueryKeys('dataBlocks', {
       queryFn: () => dataBlockService.listDataBlocks(releaseId),
     };
   },
-  getDeleteBlockPlan(releaseVersionId: string, dataBlockVersionId: string) {
+  getDeleteBlockPlan(releaseVersionId: string, dataBlockId: string) {
     return {
-      queryKey: [releaseVersionId, dataBlockVersionId],
+      queryKey: [releaseVersionId, dataBlockId],
       queryFn: () =>
-        dataBlockService.getDeleteBlockPlan(
-          releaseVersionId,
-          dataBlockVersionId,
-        ),
+        dataBlockService.getDeleteBlockPlan(releaseVersionId, dataBlockId),
     };
   },
 });

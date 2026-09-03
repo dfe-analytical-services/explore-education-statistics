@@ -17,7 +17,7 @@ import downloadService from '@common/services/downloadService';
 interface Props {
   capMaxHeight?: boolean;
   captionTitle?: string;
-  dataBlockVersionId?: string;
+  dataBlockId?: string;
   defaultCaptionId?: string;
   defaultFootnotesId?: string;
   footnotesClassName?: string;
@@ -35,7 +35,7 @@ interface Props {
 const TimePeriodDataTable = ({
   capMaxHeight,
   captionTitle,
-  dataBlockVersionId,
+  dataBlockId,
   defaultCaptionId = 'dataTableCaption',
   defaultFootnotesId = 'dataTableFootnotes',
   footnotesClassName,
@@ -68,8 +68,8 @@ const TimePeriodDataTable = ({
       query,
     });
 
-    const captionId = dataBlockVersionId
-      ? `dataTableCaption-${dataBlockVersionId}`
+    const captionId = dataBlockId
+      ? `dataTableCaption-${dataBlockId}`
       : defaultCaptionId;
 
     const coalescedReleaseVersionId =
@@ -104,7 +104,7 @@ const TimePeriodDataTable = ({
             )}
           </WarningMessage>
         )}
-        {dataBlockVersionId && query && (
+        {dataBlockId && query && (
           <TableExportMenu
             fileName={captionTitle}
             fullTable={fullTable}
@@ -129,8 +129,8 @@ const TimePeriodDataTable = ({
           tableJson={tableJson}
           footnotesClassName={footnotesClassName}
           footnotesId={
-            dataBlockVersionId
-              ? `dataTableFootnotes-${dataBlockVersionId}`
+            dataBlockId
+              ? `dataTableFootnotes-${dataBlockId}`
               : defaultFootnotesId
           }
           footnotesHeadingHiddenText={footnotesHeadingHiddenText}

@@ -9,12 +9,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 public record FastTrackViewModel
 {
     /// <summary>
-    /// This "DataBlockId" field is the Id that is unchanging between versions of the same DataBlock
+    /// This "DataBlockParentId" field is the Id that is unchanging between versions of the same DataBlock
     /// throughout Release Amendments. We will use [JsonPropertyName] to ensure that existing JSON is unchanged
     /// for now, whilst being able to be explicit about which Id is being referred to in the back-end code.
     /// </summary>
     [JsonProperty("id")]
-    public Guid DataBlockId { get; set; }
+    public Guid DataBlockParentId { get; set; }
 
     public TableBuilderConfiguration Configuration { get; set; }
 

@@ -145,7 +145,7 @@ describe('EditableKeyStat', () => {
       trend: 'Trend',
       guidanceTitle: 'Guidance title',
       guidanceText: 'Guidance text',
-      dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1',
     };
 
     test('renders correctly', async () => {

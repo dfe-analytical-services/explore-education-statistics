@@ -6,7 +6,7 @@ export interface Table {
   tableHeaders: UnmappedTableHeadersConfig;
 }
 
-export type BlockType = 'HtmlBlock' | 'DataBlockVersionLink' | 'EmbedBlockLink';
+export type BlockType = 'HtmlBlock' | 'DataBlock' | 'EmbedBlockLink';
 
 export interface BaseBlock {
   id: string;
@@ -22,7 +22,7 @@ export interface HtmlBlock extends BaseBlock {
 export type ContentBlock = HtmlBlock;
 
 export interface DataBlock extends BaseBlock {
-  type: 'DataBlockVersionLink';
+  type: 'DataBlock';
   name: string;
   dataSetName?: string;
   dataSetId?: string;
@@ -33,7 +33,7 @@ export interface DataBlock extends BaseBlock {
   query: TableDataQuery;
   charts: Chart[];
   table: Table;
-  dataBlockId: string;
+  dataBlockParentId: string;
 }
 
 export interface EmbedBlock extends BaseBlock {

@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record KeyStatisticDataBlockCreateRequest
 {
-    public Guid DataBlockVersionId { get; set; }
+    public Guid DataBlockId { get; set; }
 
     [MaxLength(KeyStatistic.TrendMaxLength)]
     public string? Trend { get; set; }

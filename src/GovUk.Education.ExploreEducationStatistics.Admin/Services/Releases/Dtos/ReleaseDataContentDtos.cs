@@ -142,8 +142,8 @@ public record ReleaseDataContentDataSetMetaTimePeriodRangeDto
 public record ReleaseDataContentFeaturedTableDto
 {
     public required Guid FeaturedTableId { get; init; }
-    public required Guid DataBlockVersionId { get; init; }
     public required Guid DataBlockId { get; init; }
+    public required Guid DataBlockParentId { get; init; }
     public required string Title { get; init; }
     public required string Summary { get; init; }
 
@@ -151,8 +151,8 @@ public record ReleaseDataContentFeaturedTableDto
         new()
         {
             FeaturedTableId = featuredTable.Id,
-            DataBlockVersionId = featuredTable.DataBlockVersionId,
             DataBlockId = featuredTable.DataBlockId,
+            DataBlockParentId = featuredTable.DataBlockParentId,
             Summary = featuredTable.Description ?? "",
             Title = featuredTable.Name,
         };

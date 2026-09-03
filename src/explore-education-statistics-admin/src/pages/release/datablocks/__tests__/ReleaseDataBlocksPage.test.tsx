@@ -75,16 +75,16 @@ describe('ReleaseDataBlocksPage', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'featured-1',
-      dataBlockVersionId: 'block-1',
       dataBlockId: 'block-1',
+      dataBlockParentId: 'block-parent-1',
       description: 'Featured 1 description',
       name: 'Featured 1',
       order: 0,
     },
     {
       id: 'featured-2',
-      dataBlockVersionId: 'block-3',
       dataBlockId: 'block-3',
+      dataBlockParentId: 'block-parent-3',
       description: 'Featured 2 description',
       name: 'Featured 3',
       order: 1,

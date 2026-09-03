@@ -73,7 +73,9 @@ const ReleaseExploreDataPage = ({
           title={featuredTable.title}
           description={featuredTable.summary}
           actions={
-            <Link to={`/data-tables/fast-track/${featuredTable.dataBlockId}`}>
+            <Link
+              to={`/data-tables/fast-track/${featuredTable.dataBlockParentId}`}
+            >
               View, edit or download{' '}
               <VisuallyHidden>{featuredTable.title}</VisuallyHidden>
             </Link>

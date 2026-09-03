@@ -118,7 +118,7 @@ const DataBlockTabs = ({
                 <TimePeriodDataTable
                   key={dataBlock.id}
                   captionTitle={dataBlock?.heading}
-                  dataBlockVersionId={dataBlock.id}
+                  dataBlockId={dataBlock.id}
                   ref={dataTableRef}
                   footnotesHeadingHiddenText={`for ${dataBlock?.heading}`}
                   fullTable={fullTable}

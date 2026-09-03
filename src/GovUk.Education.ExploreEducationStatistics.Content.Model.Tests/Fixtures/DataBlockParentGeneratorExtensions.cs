@@ -4,74 +4,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class DataBlockGeneratorExtensions
 {
-    public static Generator<DataBlock> DefaultDataBlock(this DataFixture fixture) =>
-        fixture.Generator<DataBlock>().WithDefaults();
+    public static Generator<DataBlockParent> DefaultDataBlockParent(this DataFixture fixture) =>
+        fixture.Generator<DataBlockParent>().WithDefaults();
 
-    public static Generator<DataBlock> WithDefaults(this Generator<DataBlock> generator) =>
-        generator.ForInstance(dataBlock => dataBlock.SetDefaults());
+    public static Generator<DataBlockParent> WithDefaults(this Generator<DataBlockParent> generator) =>
+        generator.ForInstance(dataBlockParent => dataBlockParent.SetDefaults());
 
-    public static Generator<DataBlock> WithLatestDraftVersion(
-        this Generator<DataBlock> generator,
+    public static Generator<DataBlockParent> WithLatestDraftVersion(
+        this Generator<DataBlockParent> generator,
         DataBlockVersion? version
-    ) => generator.ForInstance(dataBlock => dataBlock.SetLatestDraftVersion(version));
+    ) => generator.ForInstance(dataBlockParent => dataBlockParent.SetLatestDraftVersion(version));
 
-    public static Generator<DataBlock> WithLatestDraftVersion(
-        this Generator<DataBlock> generator,
+    public static Generator<DataBlockParent> WithLatestDraftVersion(
+        this Generator<DataBlockParent> generator,
         Func<DataBlockVersion> version
-    ) => generator.ForInstance(dataBlock => dataBlock.SetLatestDraftVersion(version));
+    ) => generator.ForInstance(dataBlockParent => dataBlockParent.SetLatestDraftVersion(version));
 
-    public static Generator<DataBlock> WithLatestPublishedVersion(
-        this Generator<DataBlock> generator,
+    public static Generator<DataBlockParent> WithLatestPublishedVersion(
+        this Generator<DataBlockParent> generator,
         DataBlockVersion? version
-    ) => generator.ForInstance(dataBlock => dataBlock.SetLatestPublishedVersion(version));
+    ) => generator.ForInstance(dataBlockParent => dataBlockParent.SetLatestPublishedVersion(version));
 
-    public static Generator<DataBlock> WithLatestPublishedVersion(
-        this Generator<DataBlock> generator,
+    public static Generator<DataBlockParent> WithLatestPublishedVersion(
+        this Generator<DataBlockParent> generator,
         Func<DataBlockVersion?> version
-    ) => generator.ForInstance(dataBlock => dataBlock.SetLatestPublishedVersion(version));
+    ) => generator.ForInstance(dataBlockParent => dataBlockParent.SetLatestPublishedVersion(version));
 
-    public static InstanceSetters<DataBlock> SetDefaults(this InstanceSetters<DataBlock> setters) =>
-        setters.SetDefault(dataBlock => dataBlock.Id);
+    public static InstanceSetters<DataBlockParent> SetDefaults(this InstanceSetters<DataBlockParent> setters) =>
+        setters.SetDefault(dataBlockParent => dataBlockParent.Id);
 
-    public static InstanceSetters<DataBlock> SetLatestDraftVersion(
-        this InstanceSetters<DataBlock> setters,
+    public static InstanceSetters<DataBlockParent> SetLatestDraftVersion(
+        this InstanceSetters<DataBlockParent> setters,
         DataBlockVersion? version
     ) => setters.SetLatestDraftVersion(() => version);
 
-    public static InstanceSetters<DataBlock> SetLatestDraftVersion(
-        this InstanceSetters<DataBlock> setters,
+    public static InstanceSetters<DataBlockParent> SetLatestDraftVersion(
+        this InstanceSetters<DataBlockParent> setters,
         Func<DataBlockVersion?> version
     ) =>
         setters.Set(
-            (_, dataBlock, _) =>
+            (_, dataBlockParent, _) =>
             {
                 var dataBlockVersion = version.Invoke();
-                dataBlock.LatestDraftVersion = dataBlockVersion;
-                dataBlock.LatestDraftVersionId = dataBlockVersion?.Id;
+                dataBlockParent.LatestDraftVersion = dataBlockVersion;
+                dataBlockParent.LatestDraftVersionId = dataBlockVersion?.Id;
 
-                dataBlockVersion?.DataBlock = dataBlock;
+                if (dataBlockVersion != null)
+                {
+                    dataBlockVersion.DataBlockParent = dataBlockParent;
+                }
             }
         );
 
-    public static InstanceSetters<DataBlock> SetLatestPublishedVersion(
-        this InstanceSetters<DataBlock> setters,
+    public static InstanceSetters<DataBlockParent> SetLatestPublishedVersion(
+        this InstanceSetters<DataBlockParent> setters,
         DataBlockVersion? version
     ) => setters.SetLatestPublishedVersion(() => version);
 
-    public static InstanceSetters<DataBlock> SetLatestPublishedVersion(
-        this InstanceSetters<DataBlock> setters,
+    public static InstanceSetters<DataBlockParent> SetLatestPublishedVersion(
+        this InstanceSetters<DataBlockParent> setters,
         Func<DataBlockVersion?> version
     ) =>
         setters.Set(
-            (_, dataBlock, _) =>
+            (_, dataBlockParent, _) =>
             {
                 var dataBlockVersion = version.Invoke();
-                dataBlock.LatestPublishedVersion = dataBlockVersion;
-                dataBlock.LatestPublishedVersionId = dataBlockVersion?.Id;
+                dataBlockParent.LatestPublishedVersion = dataBlockVersion;
+                dataBlockParent.LatestPublishedVersionId = dataBlockVersion?.Id;
 
-                dataBlock.LatestDraftVersion ??= dataBlockVersion;
+                if (dataBlockParent.LatestDraftVersion == null)
+                {
+                    dataBlockParent.LatestDraftVersion = dataBlockVersion;
+                }
 
-                dataBlockVersion?.DataBlock = dataBlock;
+                if (dataBlockVersion != null)
+                {
+                    dataBlockVersion.DataBlockParent = dataBlockParent;
+                }
             }
         );
 }

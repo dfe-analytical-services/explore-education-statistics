@@ -47,22 +47,20 @@ const ReleaseDataBlocksPage = ({
     useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
   const handleDeleteConfirm = useCallback(
-    async (deletedDataBlockVersionId?: string) => {
-      if (!deletedDataBlockVersionId) {
+    async (deletedDataBlockId?: string) => {
+      if (!deletedDataBlockId) {
         return;
       }
 
       queryClient.setQueryData(
         listDataBlocksQuery.queryKey,
-        dataBlocks.filter(
-          dataBlock => dataBlock.id !== deletedDataBlockVersionId,
-        ),
+        dataBlocks.filter(dataBlock => dataBlock.id !== deletedDataBlockId),
       );
 
       queryClient.setQueryData(
         listFeaturedTablesQuery.queryKey,
         featuredTables.filter(
-          table => table.dataBlockVersionId !== deletedDataBlockVersionId,
+          table => table.dataBlockId !== deletedDataBlockId,
         ),
       );
       await queryClient.invalidateQueries([
@@ -103,9 +101,7 @@ const ReleaseDataBlocksPage = ({
   }
 
   const filteredDataBlocks = dataBlocks.filter(dataBlock => {
-    return !featuredTables.find(
-      table => table.dataBlockVersionId === dataBlock.id,
-    );
+    return !featuredTables.find(table => table.dataBlockId === dataBlock.id);
   });
 
   return (
@@ -206,7 +202,7 @@ const ReleaseDataBlocksPage = ({
                           {
                             publicationId,
                             releaseVersionId,
-                            dataBlockVersionId: dataBlock.id,
+                            dataBlockId: dataBlock.id,
                           },
                         )}
                       >
@@ -215,7 +211,7 @@ const ReleaseDataBlocksPage = ({
                       {canUpdateRelease && (
                         <DataBlockDeletePlanModal
                           releaseVersionId={releaseVersionId}
-                          dataBlockVersionId={dataBlock.id}
+                          dataBlockId={dataBlock.id}
                           onConfirm={() => handleDeleteConfirm(dataBlock.id)}
                         />
                       )}

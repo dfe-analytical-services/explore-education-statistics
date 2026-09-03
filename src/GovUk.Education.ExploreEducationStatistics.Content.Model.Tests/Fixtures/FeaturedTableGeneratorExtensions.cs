@@ -18,15 +18,15 @@ public static class FeaturedTableGeneratorExtensions
         ReleaseVersion releaseVersion
     ) => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
 
-    public static Generator<FeaturedTable> WithDataBlockVersion(
-        this Generator<FeaturedTable> generator,
-        DataBlockVersion dataBlockVersion
-    ) => generator.ForInstance(s => s.SetDataBlockVersion(dataBlockVersion));
-
     public static Generator<FeaturedTable> WithDataBlock(
         this Generator<FeaturedTable> generator,
         DataBlock dataBlock
     ) => generator.ForInstance(s => s.SetDataBlock(dataBlock));
+
+    public static Generator<FeaturedTable> WithDataBlockParent(
+        this Generator<FeaturedTable> generator,
+        DataBlockParent dataBlockParent
+    ) => generator.ForInstance(s => s.SetDataBlockParent(dataBlockParent));
 
     public static Generator<FeaturedTable> WithCreated(
         this Generator<FeaturedTable> generator,
@@ -45,8 +45,8 @@ public static class FeaturedTableGeneratorExtensions
             .SetDefault(featuredTable => featuredTable.Id)
             .SetDefault(featuredTable => featuredTable.Name)
             .SetDefault(featuredTable => featuredTable.Description)
-            .SetDefault(featuredTable => featuredTable.DataBlockVersionId)
             .SetDefault(featuredTable => featuredTable.DataBlockId)
+            .SetDefault(featuredTable => featuredTable.DataBlockParentId)
             .SetDefault(featuredTable => featuredTable.Order, offset: 1)
             .Set(featuredTable => featuredTable.Created, DateTime.UtcNow.AddDays(-1))
             .SetDefault(featuredTable => featuredTable.CreatedById);
@@ -59,15 +59,15 @@ public static class FeaturedTableGeneratorExtensions
         ReleaseVersion releaseVersion
     ) => setters.Set(s => s.ReleaseVersion, releaseVersion).Set(s => s.ReleaseVersionId, releaseVersion.Id);
 
-    public static InstanceSetters<FeaturedTable> SetDataBlockVersion(
-        this InstanceSetters<FeaturedTable> setters,
-        DataBlockVersion dataBlockVersion
-    ) => setters.Set(s => s.DataBlockVersion, dataBlockVersion).Set(s => s.DataBlockVersionId, dataBlockVersion.Id);
-
     public static InstanceSetters<FeaturedTable> SetDataBlock(
         this InstanceSetters<FeaturedTable> setters,
         DataBlock dataBlock
     ) => setters.Set(s => s.DataBlock, dataBlock).Set(s => s.DataBlockId, dataBlock.Id);
+
+    public static InstanceSetters<FeaturedTable> SetDataBlockParent(
+        this InstanceSetters<FeaturedTable> setters,
+        DataBlockParent dataBlockParent
+    ) => setters.Set(s => s.DataBlockParent, dataBlockParent).Set(s => s.DataBlockParentId, dataBlockParent.Id);
 
     public static InstanceSetters<FeaturedTable> SetUpdated(
         this InstanceSetters<FeaturedTable> setters,

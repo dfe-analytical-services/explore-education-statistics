@@ -26,7 +26,7 @@ describe('EditableKeyStatTextForm', () => {
       id: 'keyStat-2',
       type: 'KeyStatisticDataBlock',
       guidanceTitle: 'Key stat 2 guidance title',
-      dataBlockId: 'block-2',
+      dataBlockParentId: 'block-2',
     },
     {
       id: 'keyStat-3',

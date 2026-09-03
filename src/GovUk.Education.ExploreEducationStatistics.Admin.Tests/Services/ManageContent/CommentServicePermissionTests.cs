@@ -27,7 +27,7 @@ public class CommentServicePermissionTests
             new ContentSection
             {
                 Id = ContentSectionId,
-                Content = new List<ContentBlock> { new DataBlockVersionLink { Id = ContentBlockId } },
+                Content = new List<ContentBlock> { new DataBlock { Id = ContentBlockId } },
             }
         ),
     };

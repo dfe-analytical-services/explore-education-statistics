@@ -125,9 +125,10 @@ public abstract class ReleaseServiceTests
         [Fact]
         public async Task WithTemplate()
         {
-            var dataBlockVersionLink1 = new DataBlockVersionLink
+            var dataBlock1 = new DataBlock
             {
                 Id = Guid.NewGuid(),
+                Name = "Data Block 1",
                 Order = 2,
                 Comments =
                 [
@@ -136,7 +137,7 @@ public abstract class ReleaseServiceTests
                 ],
             };
 
-            var dataBlockVersionLink2 = new DataBlockVersionLink { Id = Guid.NewGuid() };
+            var dataBlock2 = new DataBlock { Id = Guid.NewGuid(), Name = "Data Block 2" };
 
             var templateReleaseVersion = new ReleaseVersion
             {
@@ -160,8 +161,8 @@ public abstract class ReleaseServiceTests
                                     new Comment { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
                                 ],
                             },
-                            dataBlockVersionLink1,
-                            dataBlockVersionLink2,
+                            dataBlock1,
+                            dataBlock2,
                         ],
                     }
                 ),
@@ -235,10 +236,8 @@ public abstract class ReleaseServiceTests
                 );
 
                 // Data Blocks should not be copied when created from a template.
-                Assert.Equal(2, context.DataBlockVersionLinks.Count());
-                Assert.Empty(
-                    context.DataBlockVersionLinks.Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId)
-                );
+                Assert.Equal(2, context.DataBlocks.Count());
+                Assert.Empty(context.DataBlocks.Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
             }
         }
 

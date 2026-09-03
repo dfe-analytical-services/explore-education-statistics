@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 interface Props {
   id: string;
   releaseVersionId: string;
-  onSelect: (selectedDataBlockVersionId: string) => void;
+  onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
   label?: string;
@@ -25,14 +25,13 @@ const DataBlockSelectForm = ({
   label = 'Select a data block',
 }: Props) => {
   const { unattachedDataBlocks, release } = useReleaseContentState();
-  const [selectedDataBlockVersionId, setSelectedDataBlockVersionId] =
-    useState('');
+  const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const getChartFile = useGetChartFile(release.id);
 
-  const getDataBlockPreview = (dataBlockVersionId: string) => {
+  const getDataBlockPreview = (dataBlockId: string) => {
     const selectedDataBlock = unattachedDataBlocks.find(
-      dataBlock => dataBlock.id === dataBlockVersionId,
+      dataBlock => dataBlock.id === dataBlockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -60,8 +59,8 @@ const DataBlockSelectForm = ({
         id={`${id}-selectedDataBlock`}
         name="selectedDataBlock"
         label={label}
-        value={selectedDataBlockVersionId}
-        onChange={e => setSelectedDataBlockVersionId(e.target.value)}
+        value={selectedDataBlockId}
+        onChange={e => setSelectedDataBlockId(e.target.value)}
         order={['style']}
         options={[
           {
@@ -79,13 +78,11 @@ const DataBlockSelectForm = ({
         Cancel
       </Button>
 
-      {getDataBlockPreview(selectedDataBlockVersionId)}
+      {getDataBlockPreview(selectedDataBlockId)}
 
-      {selectedDataBlockVersionId !== '' && (
+      {selectedDataBlockId !== '' && (
         <ButtonGroup>
-          <Button onClick={() => onSelect(selectedDataBlockVersionId)}>
-            Embed
-          </Button>
+          <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
           {!hideCancel && (
             <Button variant="secondary" onClick={onCancel}>
               Cancel

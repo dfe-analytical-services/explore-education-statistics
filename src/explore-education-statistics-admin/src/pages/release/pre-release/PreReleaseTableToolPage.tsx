@@ -27,7 +27,7 @@ import { useQuery } from '@tanstack/react-query';
 const PreReleaseTableToolPage = ({
   match,
 }: RouteComponentProps<PreReleaseTableToolRouteParams>) => {
-  const { publicationId, releaseVersionId, dataBlockVersionId } = match.params;
+  const { publicationId, releaseVersionId, dataBlockId } = match.params;
 
   const { data: publication, isLoading: isPublicationLoading } = useQuery(
     publicationQueries.get(publicationId),
@@ -44,9 +44,9 @@ const PreReleaseTableToolPage = ({
         tableBuilderService.listReleaseSubjects(releaseVersionId),
       ]);
 
-      if (dataBlockVersionId) {
+      if (dataBlockId) {
         const { table, query } =
-          await dataBlockService.getDataBlock(dataBlockVersionId);
+          await dataBlockService.getDataBlock(dataBlockId);
 
         const [subjectMeta, tableData] = await Promise.all([
           tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),
@@ -94,7 +94,7 @@ const PreReleaseTableToolPage = ({
           locationIds: [],
         },
       };
-    }, [publicationId, releaseVersionId, dataBlockVersionId]);
+    }, [publicationId, releaseVersionId, dataBlockId]);
 
   const isLoading =
     isReleaseLoading || isTableToolStateLoading || isPublicationLoading;
@@ -127,7 +127,7 @@ const PreReleaseTableToolPage = ({
                   {
                     publicationId,
                     releaseVersionId,
-                    dataBlockVersionId: featuredTable.dataBlockVersionId,
+                    dataBlockId: featuredTable.dataBlockId,
                   },
                 )}
               >

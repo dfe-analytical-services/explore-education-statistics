@@ -1567,7 +1567,7 @@ describe('TimePeriodDataTable', () => {
     expect(table).toMatchSnapshot();
   });
 
-  test('renders table correctly with no `dataBlockVersionId` ', () => {
+  test('renders table correctly with no `dataBlockId` ', () => {
     const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
@@ -1639,7 +1639,7 @@ describe('TimePeriodDataTable', () => {
     );
   });
 
-  test('renders table & caption correctly with `dataBlockVersionId`', () => {
+  test('renders table & caption correctly with `dataBlockId`', () => {
     const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
@@ -1694,7 +1694,7 @@ describe('TimePeriodDataTable', () => {
 
     render(
       <TimePeriodDataTable
-        dataBlockVersionId="test-datablock-id"
+        dataBlockId="test-datablock-id"
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
           tableHeadersConfig,

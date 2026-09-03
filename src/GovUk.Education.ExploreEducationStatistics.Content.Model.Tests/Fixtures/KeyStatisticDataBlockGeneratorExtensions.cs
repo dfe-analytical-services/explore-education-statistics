@@ -24,16 +24,6 @@ public static class KeyStatisticDataBlockGeneratorExtensions
     public static Generator<KeyStatisticDataBlock> WithId(this Generator<KeyStatisticDataBlock> generator, Guid id) =>
         generator.ForInstance(s => s.SetId(id));
 
-    public static Generator<KeyStatisticDataBlock> WithDataBlockVersion(
-        this Generator<KeyStatisticDataBlock> generator,
-        DataBlockVersion dataBlockVersion
-    ) => generator.ForInstance(s => s.SetDataBlockVersion(dataBlockVersion));
-
-    public static Generator<KeyStatisticDataBlock> WithDataBlockVersionId(
-        this Generator<KeyStatisticDataBlock> generator,
-        Guid dataBlockVersionId
-    ) => generator.ForInstance(s => s.SetDataBlockVersionId(dataBlockVersionId));
-
     public static Generator<KeyStatisticDataBlock> WithDataBlock(
         this Generator<KeyStatisticDataBlock> generator,
         DataBlock dataBlock
@@ -43,6 +33,16 @@ public static class KeyStatisticDataBlockGeneratorExtensions
         this Generator<KeyStatisticDataBlock> generator,
         Guid dataBlockId
     ) => generator.ForInstance(s => s.SetDataBlockId(dataBlockId));
+
+    public static Generator<KeyStatisticDataBlock> WithDataBlockParent(
+        this Generator<KeyStatisticDataBlock> generator,
+        DataBlockParent dataBlockParent
+    ) => generator.ForInstance(s => s.SetDataBlockParent(dataBlockParent));
+
+    public static Generator<KeyStatisticDataBlock> WithDataBlockParentId(
+        this Generator<KeyStatisticDataBlock> generator,
+        Guid dataBlockParentId
+    ) => generator.ForInstance(s => s.SetDataBlockParentId(dataBlockParentId));
 
     public static Generator<KeyStatisticDataBlock> WithGuidanceText(
         this Generator<KeyStatisticDataBlock> generator,
@@ -89,16 +89,6 @@ public static class KeyStatisticDataBlockGeneratorExtensions
         Guid id
     ) => setters.Set(db => db.Id, id);
 
-    public static InstanceSetters<KeyStatisticDataBlock> SetDataBlockVersion(
-        this InstanceSetters<KeyStatisticDataBlock> setters,
-        DataBlockVersion dataBlockVersion
-    ) => setters.Set(db => db.DataBlockVersion, dataBlockVersion).SetDataBlockVersionId(dataBlockVersion.Id);
-
-    public static InstanceSetters<KeyStatisticDataBlock> SetDataBlockVersionId(
-        this InstanceSetters<KeyStatisticDataBlock> setters,
-        Guid dataBlockVersionId
-    ) => setters.Set(db => db.DataBlockVersionId, dataBlockVersionId);
-
     public static InstanceSetters<KeyStatisticDataBlock> SetDataBlock(
         this InstanceSetters<KeyStatisticDataBlock> setters,
         DataBlock dataBlock
@@ -108,6 +98,16 @@ public static class KeyStatisticDataBlockGeneratorExtensions
         this InstanceSetters<KeyStatisticDataBlock> setters,
         Guid dataBlockId
     ) => setters.Set(db => db.DataBlockId, dataBlockId);
+
+    public static InstanceSetters<KeyStatisticDataBlock> SetDataBlockParent(
+        this InstanceSetters<KeyStatisticDataBlock> setters,
+        DataBlockParent dataBlockParent
+    ) => setters.Set(db => db.DataBlockParent, dataBlockParent).SetDataBlockParentId(dataBlockParent.Id);
+
+    public static InstanceSetters<KeyStatisticDataBlock> SetDataBlockParentId(
+        this InstanceSetters<KeyStatisticDataBlock> setters,
+        Guid dataBlockParentId
+    ) => setters.Set(db => db.DataBlockParentId, dataBlockParentId);
 
     public static InstanceSetters<KeyStatisticDataBlock> SetGuidanceText(
         this InstanceSetters<KeyStatisticDataBlock> setters,
