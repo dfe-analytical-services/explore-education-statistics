@@ -11,23 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataBlockService
 {
-    Task<Either<ActionResult, DataBlockVersionViewModel>> Create(
-        Guid releaseVersionId,
-        DataBlockCreateRequest createRequest
-    );
+    Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseVersionId, DataBlockCreateRequest createRequest);
 
     Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockVersionId);
 
-    Task<Either<ActionResult, DataBlockVersionViewModel>> Get(Guid dataBlockVersionId);
+    Task<Either<ActionResult, DataBlockViewModel>> Get(Guid dataBlockVersionId);
 
     Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId);
 
-    Task<Either<ActionResult, DataBlockVersionViewModel>> Update(
+    Task<Either<ActionResult, DataBlockViewModel>> Update(
         Guid dataBlockVersionId,
         DataBlockUpdateRequest updateRequest
     );
 
-    Task<Either<ActionResult, Unit>> DeleteDataBlockVersions(DeleteDataBlockPlanViewModel deletePlan);
+    Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlanViewModel deletePlan);
 
     Task<Either<ActionResult, DeleteDataBlockPlanViewModel>> GetDeletePlan(
         Guid releaseVersionId,
@@ -40,11 +37,14 @@ public interface IDataBlockService
 
     Task InvalidateCachedDataBlocks(Guid releaseVersionId);
 
-    Task<Either<ActionResult, List<DataBlockVersionViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId);
+    Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId);
 
     Task<bool> IsUnattachedDataBlock(Guid releaseVersionId, DataBlockVersion dataBlockVersion);
 
-    Task<List<DataBlockVersion>> ListDataBlocks(Guid releaseVersionId);
+    Task<List<DataBlock>> ListDataBlocks(Guid releaseVersionId);
 
-    Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(Guid releaseVersionId, Guid dataBlockId);
+    Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+        Guid releaseVersionId,
+        Guid dataBlockParentId
+    );
 }

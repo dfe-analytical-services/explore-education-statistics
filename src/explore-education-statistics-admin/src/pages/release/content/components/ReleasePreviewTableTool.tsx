@@ -31,9 +31,7 @@ const ReleasePreviewTableTool = ({
   releaseType,
   publication,
 }: Props) => {
-  const [dataBlockVersionId, setDataBlockVersionId] = useState(
-    featuredTableId ?? '',
-  );
+  const [dataBlockId, setDataBlockId] = useState(featuredTableId ?? '');
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
@@ -43,9 +41,8 @@ const ReleasePreviewTableTool = ({
       tableBuilderService.listReleaseSubjects(releaseVersionId),
     ]);
 
-    if (dataBlockVersionId) {
-      const { table, query } =
-        await dataBlockService.getDataBlock(dataBlockVersionId);
+    if (dataBlockId) {
+      const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
 
       const [subjectMeta, tableData] = await Promise.all([
         tableBuilderService.getSubjectMeta(query.subjectId, releaseVersionId),
@@ -90,7 +87,7 @@ const ReleasePreviewTableTool = ({
         locationIds: [],
       },
     };
-  }, [releaseVersionId, dataBlockVersionId]);
+  }, [releaseVersionId, dataBlockId]);
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -102,11 +99,11 @@ const ReleasePreviewTableTool = ({
             themeMeta={[]}
             hidePublicationStep
             initialState={initialState}
-            onSubjectStepBack={() => setDataBlockVersionId('')}
+            onSubjectStepBack={() => setDataBlockId('')}
             renderFeaturedTableLink={featuredTable => (
               <ButtonText
                 onClick={() => {
-                  setDataBlockVersionId(featuredTable.dataBlockVersionId);
+                  setDataBlockId(featuredTable.dataBlockId);
                 }}
               >
                 {featuredTable.name}

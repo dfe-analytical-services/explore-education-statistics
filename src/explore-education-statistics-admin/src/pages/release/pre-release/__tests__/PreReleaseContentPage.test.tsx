@@ -49,7 +49,7 @@ describe('PreReleaseContentPage', () => {
           {
             id: 'block-1',
             order: 1,
-            body: '<p>Section 1 content</p><p><a href="/data-table/fast-track/data-block-1?featuredTable=true" data-featured-table>featured table link</a></p>',
+            body: '<p>Section 1 content</p><p><a href="/data-table/fast-track/data-block-parent-1?featuredTable=true" data-featured-table>featured table link</a></p>',
             type: 'HtmlBlock',
             comments: [],
           },
@@ -149,16 +149,16 @@ describe('PreReleaseContentPage', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'featured-table-1',
-      dataBlockVersionId: 'data-block-1',
       dataBlockId: 'data-block-1',
+      dataBlockParentId: 'data-block-parent-1',
       description: '',
       name: 'Featured table 1',
       order: 0,
     },
     {
       id: 'featured-table-2',
-      dataBlockVersionId: 'data-block-2',
       dataBlockId: 'data-block-2',
+      dataBlockParentId: 'data-block-parent-2',
       description: '',
       name: 'Featured table 2',
       order: 0,

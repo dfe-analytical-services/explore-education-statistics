@@ -4,8 +4,8 @@ export interface FeaturedTable {
   id: string;
   name: string;
   description: string;
-  dataBlockVersionId: string;
   dataBlockId: string;
+  dataBlockParentId: string;
   order: number;
 }
 
@@ -15,7 +15,7 @@ export interface FeaturedTableBasic {
 }
 
 export type FeaturedTableCreateRequest = FeaturedTableBasic & {
-  dataBlockVersionId: string;
+  dataBlockId: string;
 };
 
 type FeaturedTableUpdateRequest = FeaturedTableBasic;
@@ -23,11 +23,9 @@ type FeaturedTableUpdateRequest = FeaturedTableBasic;
 const featuredTableService = {
   getFeaturedTable(
     releaseId: string,
-    dataBlockVersionId: string,
+    dataBlockId: string,
   ): Promise<FeaturedTable> {
-    return client.get(
-      `/releases/${releaseId}/featured-tables/${dataBlockVersionId}`,
-    );
+    return client.get(`/releases/${releaseId}/featured-tables/${dataBlockId}`);
   },
   listFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
     return client.get(`/releases/${releaseId}/featured-tables`);
@@ -40,20 +38,17 @@ const featuredTableService = {
   },
   updateFeaturedTable(
     releaseId: string,
-    dataBlockVersionId: string,
+    dataBlockId: string,
     featuredTable: FeaturedTableUpdateRequest,
   ): Promise<FeaturedTable> {
     return client.post(
-      `/releases/${releaseId}/featured-tables/${dataBlockVersionId}`,
+      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
       featuredTable,
     );
   },
-  deleteFeaturedTable(
-    releaseId: string,
-    dataBlockVersionId: string,
-  ): Promise<void> {
+  deleteFeaturedTable(releaseId: string, dataBlockId: string): Promise<void> {
     return client.delete(
-      `/releases/${releaseId}/featured-tables/${dataBlockVersionId}`,
+      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
     );
   },
   reorderFeaturedTables(

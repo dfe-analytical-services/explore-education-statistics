@@ -7,40 +7,40 @@ import formatPretty from '@common/utils/number/formatPretty';
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 
 const tableBuilderQueries = createQueryKeys('tableBuilder', {
-  getDataBlockTable(releaseVersionId: string, dataBlockId: string) {
+  getDataBlockTable(releaseVersionId: string, dataBlockParentId: string) {
     return {
-      queryKey: [releaseVersionId, dataBlockId],
+      queryKey: [releaseVersionId, dataBlockParentId],
       queryFn: async () =>
         tableBuilderService.getDataBlockTableData(
           releaseVersionId,
-          dataBlockId,
+          dataBlockParentId,
         ),
     };
   },
 
   getDataBlockGeoJson(
     releaseVersionId: string,
-    dataBlockId: string,
+    dataBlockParentId: string,
     boundaryLevelId: number,
   ) {
     return {
-      queryKey: [releaseVersionId, dataBlockId, boundaryLevelId],
+      queryKey: [releaseVersionId, dataBlockParentId, boundaryLevelId],
       queryFn: async () =>
         tableBuilderService.getDataBlockGeoJson(
           releaseVersionId,
-          dataBlockId,
+          dataBlockParentId,
           boundaryLevelId,
         ),
     };
   },
 
-  getKeyStat(releaseVersionId: string, dataBlockId: string) {
+  getKeyStat(releaseVersionId: string, dataBlockParentId: string) {
     return {
-      queryKey: [releaseVersionId, dataBlockId],
+      queryKey: [releaseVersionId, dataBlockParentId],
       queryFn: async () => {
         const tableData = await tableBuilderService.getDataBlockTableData(
           releaseVersionId,
-          dataBlockId,
+          dataBlockParentId,
         );
 
         const [indicator] = tableData.subjectMeta.indicators;

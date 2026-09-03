@@ -1,11 +1,9 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations.Schema;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -13,13 +11,17 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; set; }
 
-    public Guid DataBlockId { get; set; }
+    public Guid DataBlockParentId { get; set; }
 
-    public DataBlock DataBlock { get; set; } = null!;
+    public DataBlockParent DataBlockParent { get; set; }
 
     public Guid ReleaseVersionId { get; set; }
 
     public ReleaseVersion ReleaseVersion { get; set; } = null!;
+
+    public Guid ContentBlockId { get; set; }
+
+    public DataBlock ContentBlock { get; set; }
 
     public int Version { get; set; }
 
@@ -29,41 +31,103 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DateTime? Updated { get; set; }
 
-    public string Heading { get; set; } = string.Empty;
-
-    public string Name { get; set; } = string.Empty;
-
-    public string? Source { get; set; }
-
-    public FullTableQuery Query { get; set; }
-
-    [JsonIgnore]
-    public List<IChart> Charts
+    //
+    // EES-4640 - delegate methods to underlying ContentBlock of type "DataBlock" are included below.
+    // This is to make the effort in removing DataBlocks from the ContentBlock table easier for EES-4640, as
+    // their DataBlock fields will eventually be incorporated into DataBlockVersion. These delegate methods
+    // help DataBlockVersion to encapsulate properties from the underlying ContentBlock DataBlock.
+    //
+    [NotMapped]
+    public ContentSection? ContentSection
     {
-        get
-        {
-            return ChartsInternal
-                .Select(chart =>
-                {
-                    if (chart.Title.IsNullOrEmpty())
-                    {
-                        chart.Title = Heading;
-                    }
-                    return chart;
-                })
-                .ToList();
-        }
-        set => ChartsInternal = value;
+        get => ContentBlock.ContentSection;
+        set => ContentBlock.ContentSection = value;
     }
 
-    // NOTE: We serialize ChartsInternal into JSON rather than Charts so that a chart title is set to null in the
-    // database JSON. If we serialized Charts, then the serialization would run through Chart's getter, and so set
-    // a chart title that is identical to the table heading. So to keep the database-stored chart JSON pure, we set
-    // this JsonProperty, preventing the need to migrate existing charts, and Chart's getter will provide the table
-    // heading in request responses when necessary.
-    [JsonProperty("Charts")]
     [NotMapped]
-    private List<IChart> ChartsInternal { get; set; } = new();
+    public Guid? ContentSectionId
+    {
+        get => ContentBlock.ContentSectionId;
+        set => ContentBlock.ContentSectionId = value;
+    }
 
-    public TableBuilderConfiguration Table { get; set; }
+    [NotMapped]
+    public int Order
+    {
+        get => ContentBlock.Order;
+        set => ContentBlock.Order = value;
+    }
+
+    [NotMapped]
+    public List<Comment> Comments
+    {
+        get => ContentBlock.Comments;
+        set => ContentBlock.Comments = value;
+    }
+
+    [NotMapped]
+    public DateTime? Locked
+    {
+        get => ContentBlock.Locked;
+        set => ContentBlock.Locked = value;
+    }
+
+    [NotMapped]
+    public DateTime? LockedUntil => ContentBlock.LockedUntil;
+
+    [NotMapped]
+    public User? LockedBy
+    {
+        get => ContentBlock.LockedBy;
+        set => ContentBlock.LockedBy = value;
+    }
+
+    [NotMapped]
+    public Guid? LockedById
+    {
+        get => ContentBlock.LockedById;
+        set => ContentBlock.LockedById = value;
+    }
+
+    [NotMapped]
+    public string Heading
+    {
+        get => ContentBlock.Heading;
+        set => ContentBlock.Heading = value;
+    }
+
+    [NotMapped]
+    public string Name
+    {
+        get => ContentBlock.Name;
+        set => ContentBlock.Name = value;
+    }
+
+    [NotMapped]
+    public string? Source
+    {
+        get => ContentBlock.Source;
+        set => ContentBlock.Source = value;
+    }
+
+    [NotMapped]
+    public FullTableQuery Query
+    {
+        get => ContentBlock.Query;
+        set => ContentBlock.Query = value;
+    }
+
+    [NotMapped]
+    public List<IChart> Charts
+    {
+        get => ContentBlock.Charts;
+        set => ContentBlock.Charts = value;
+    }
+
+    [NotMapped]
+    public TableBuilderConfiguration Table
+    {
+        get => ContentBlock.Table;
+        set => ContentBlock.Table = value;
+    }
 }

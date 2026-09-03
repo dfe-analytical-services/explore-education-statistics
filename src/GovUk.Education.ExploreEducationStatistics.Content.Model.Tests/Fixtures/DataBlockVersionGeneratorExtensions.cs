@@ -28,6 +28,9 @@ public static class DataBlockVersionGeneratorExtensions
         Guid subjectId
     ) => generator.ForInstance(d => d.SetSubjectId(subjectId));
 
+    public static Generator<DataBlockVersion> WithOrder(this Generator<DataBlockVersion> generator, int order) =>
+        generator.ForInstance(d => d.SetOrder(order));
+
     public static Generator<DataBlockVersion> WithVersion(this Generator<DataBlockVersion> generator, int version) =>
         generator.ForInstance(d => d.SetVersion(version));
 
@@ -64,8 +67,10 @@ public static class DataBlockVersionGeneratorExtensions
             .SetDefault(d => d.Id)
             .SetDefault(d => d.Version)
             .SetDefault(d => d.Created)
+            .Set(d => d.ContentBlock, (_, dataBlockVersion) => new DataBlock { Id = dataBlockVersion.Id })
             .SetDefault(d => d.Heading)
             .SetDefault(d => d.Name)
+            .SetDefault(d => d.Order, offset: 1)
             .SetDefault(d => d.Source)
             .SetDefault(d => d.Version)
             .SetQuery(
@@ -85,6 +90,18 @@ public static class DataBlockVersionGeneratorExtensions
                         Columns = new List<TableHeader> { new(Guid.NewGuid().ToString(), TableHeaderType.Filter) },
                     },
                 }
+            )
+            .Set(
+                d => d.Comments,
+                (_, dataBlockVersion) =>
+                    Enumerable
+                        .Range(1, 2)
+                        .Select(num => new Comment
+                        {
+                            Id = Guid.NewGuid(),
+                            Content = $"{dataBlockVersion.Name} comment {num}",
+                        })
+                        .ToList()
             );
 
     public static InstanceSetters<DataBlockVersion> SetReleaseVersion(
@@ -100,6 +117,11 @@ public static class DataBlockVersionGeneratorExtensions
         this InstanceSetters<DataBlockVersion> setters,
         Guid releaseVersionId
     ) => setters.Set(d => d.ReleaseVersionId, releaseVersionId);
+
+    public static InstanceSetters<DataBlockVersion> SetOrder(
+        this InstanceSetters<DataBlockVersion> setters,
+        int order
+    ) => setters.Set(d => d.Order, order);
 
     public static InstanceSetters<DataBlockVersion> SetVersion(
         this InstanceSetters<DataBlockVersion> setters,

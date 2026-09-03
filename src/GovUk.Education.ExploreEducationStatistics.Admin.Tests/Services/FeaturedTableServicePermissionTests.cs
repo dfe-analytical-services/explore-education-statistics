@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -66,7 +66,7 @@ public class FeaturedTableServicePermissionTests
                 var service = SetupService(userService: userService.Object);
                 return service.Update(
                     releaseVersionId: _releaseVersion.Id,
-                    dataBlockVersionId: Guid.NewGuid(),
+                    dataBlockId: Guid.NewGuid(),
                     new FeaturedTableUpdateRequest()
                 );
             });
@@ -80,7 +80,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(userService =>
             {
                 var service = SetupService(userService: userService.Object);
-                return service.Delete(releaseVersionId: _releaseVersion.Id, dataBlockVersionId: Guid.NewGuid());
+                return service.Delete(releaseVersionId: _releaseVersion.Id, dataBlockId: Guid.NewGuid());
             });
     }
 

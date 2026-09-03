@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -19,11 +19,11 @@ public class FeaturedTableController : ControllerBase
         _featuredTableService = featuredTableService;
     }
 
-    [HttpGet("releases/{releaseVersionId:guid}/featured-tables/{dataBlockVersionId:guid}")]
-    public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockVersionId)
+    [HttpGet("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
+    public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _featuredTableService
-            .Get(releaseVersionId: releaseVersionId, dataBlockVersionId: dataBlockVersionId)
+            .Get(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
             .HandleFailuresOrOk();
     }
 
@@ -42,23 +42,23 @@ public class FeaturedTableController : ControllerBase
         return await _featuredTableService.Create(releaseVersionId, request).HandleFailuresOrOk();
     }
 
-    [HttpPost("releases/{releaseVersionId:guid}/featured-tables/{dataBlockVersionId:guid}")]
+    [HttpPost("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
     public async Task<ActionResult<FeaturedTableViewModel>> Update(
         Guid releaseVersionId,
-        Guid dataBlockVersionId,
+        Guid dataBlockId,
         FeaturedTableUpdateRequest request
     )
     {
         return await _featuredTableService
-            .Update(releaseVersionId: releaseVersionId, dataBlockVersionId: dataBlockVersionId, request: request)
+            .Update(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId, request: request)
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("releases/{releaseVersionId:guid}/featured-tables/{dataBlockVersionId:guid}")]
-    public async Task<ActionResult> Delete(Guid releaseVersionId, Guid dataBlockVersionId)
+    [HttpDelete("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
+    public async Task<ActionResult> Delete(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _featuredTableService
-            .Delete(releaseVersionId: releaseVersionId, dataBlockVersionId: dataBlockVersionId)
+            .Delete(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
             .HandleFailuresOrNoContent();
     }
 

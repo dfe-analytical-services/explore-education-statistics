@@ -7,12 +7,20 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 
-public class DataBlockVersionTableResultCacheKey(DataBlockVersion dataBlockVersion) : IBlobCacheKey
+// EES-4640 - ideally this should be renamed to "DataBlockVersionTableResultCacheKey" when DataBlock is removed
+// from the DataBlock model.
+public class DataBlockTableResultCacheKey : IBlobCacheKey
 {
-    private Guid ReleaseVersionId { get; } = dataBlockVersion.ReleaseVersionId;
-    private Guid DataBlockVersionId { get; } = dataBlockVersion.Id;
+    private Guid ReleaseVersionId { get; }
+    private Guid DataBlockId { get; }
+
+    public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion)
+    {
+        ReleaseVersionId = dataBlockVersion.ReleaseVersionId;
+        DataBlockId = dataBlockVersion.Id;
+    }
 
     public IBlobContainer Container => PrivateContent;
 
-    public string Key => PrivateContentDataBlockPath(ReleaseVersionId, DataBlockVersionId);
+    public string Key => PrivateContentDataBlockPath(ReleaseVersionId, DataBlockId);
 }

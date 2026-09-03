@@ -288,14 +288,14 @@ public class ContentService : IContentService
                 return blockToUpdate switch
                 {
                     HtmlBlock htmlBlock => await UpdateHtmlBlock(htmlBlock, request.Body),
-                    DataBlockVersionLink _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
+                    DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
                     _ => throw new ArgumentOutOfRangeException(),
                 };
             })
             .OnSuccessDo(block => _hubContext.Clients.Group(releaseVersionId.ToString()).ContentBlockUpdated(block));
     }
 
-    public Task<Either<ActionResult, DataBlockVersionViewModel>> AttachDataBlock(
+    public Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(
         Guid releaseVersionId,
         Guid contentSectionId,
         DataBlockAttachRequest request
@@ -307,35 +307,26 @@ public class ContentService : IContentService
             {
                 var (_, section) = tuple;
 
-                var existingDataBlockVersionLink = await _context.DataBlockVersionLinks.FirstOrDefaultAsync(link =>
-                    link.DataBlockVersionId == request.DataBlockVersionId && link.ReleaseVersionId == releaseVersionId
+                var dataBlockVersion = _context.DataBlockVersions.SingleOrDefault(block =>
+                    block.Id == request.ContentBlockId
                 );
 
-                if (existingDataBlockVersionLink is not null)
+                if (dataBlockVersion == null)
+                {
+                    return NotFound<DataBlockViewModel>();
+                }
+
+                if (dataBlockVersion.ContentSectionId.HasValue)
                 {
                     return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
                 }
 
-                var dataBlockVersion = await _context.DataBlockVersions.FindAsync(request.DataBlockVersionId);
-
-                if (dataBlockVersion is null)
-                {
-                    return NotFound<DataBlockVersionViewModel>();
-                }
-
-                var dataBlockVersionLink = new DataBlockVersionLink
-                {
-                    // A DataBlockVersionLink shares its Id with the DataBlockVersion it points at. See
-                    // ReleaseAmendmentService.CopyDataBlockVersion for the rest of this invariant.
-                    Id = request.DataBlockVersionId,
-                    DataBlockVersion = dataBlockVersion,
-                    ReleaseVersionId = releaseVersionId,
-                    ContentSectionId = contentSectionId,
-                    Created = DateTime.UtcNow,
-                };
-
-                return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlockVersionLink)
-                    .OnSuccess(contentBlockViewModel => (DataBlockVersionViewModel)contentBlockViewModel);
+                return await AddContentBlockToContentSectionAndSave(
+                        request.Order,
+                        section,
+                        dataBlockVersion.ContentBlock
+                    )
+                    .OnSuccess(contentBlockViewModel => contentBlockViewModel as DataBlockViewModel);
             });
     }
 
@@ -356,12 +347,6 @@ public class ContentService : IContentService
         section.Content.Add(newContentBlock);
 
         _context.ContentSections.Update(section);
-
-        // A new block may already carry an Id - a DataBlockVersionLink shares its Id with the DataBlockVersion it
-        // points at - which the Update above would otherwise take as an existing row to update rather than a new
-        // one to insert. Mark it as newly added explicitly.
-        _context.ContentBlocks.Add(newContentBlock);
-
         await _context.SaveChangesAsync();
         return new Either<ActionResult, IContentBlockViewModel>(_mapper.Map<IContentBlockViewModel>(newContentBlock));
     }

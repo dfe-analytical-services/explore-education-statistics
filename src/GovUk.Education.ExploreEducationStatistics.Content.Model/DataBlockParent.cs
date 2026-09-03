@@ -1,7 +1,7 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class DataBlock
+public class DataBlockParent
 {
     public Guid Id { get; set; }
 

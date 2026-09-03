@@ -7,7 +7,7 @@ export type ReleaseRouteParams = {
 };
 
 export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
-  dataBlockVersionId: string;
+  dataBlockId: string;
 };
 
 export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
@@ -163,7 +163,7 @@ export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataBlockEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockVersionId',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockId',
   title: 'Edit data block',
 };
 

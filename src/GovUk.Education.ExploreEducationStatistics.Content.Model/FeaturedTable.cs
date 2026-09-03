@@ -13,13 +13,13 @@ public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public int Order { get; set; }
 
-    public Guid DataBlockVersionId { get; set; }
-
-    public DataBlockVersion DataBlockVersion { get; set; } = null!;
-
     public Guid DataBlockId { get; set; }
 
     public DataBlock DataBlock { get; set; } = null!;
+
+    public Guid DataBlockParentId { get; set; }
+
+    public DataBlockParent DataBlockParent { get; set; } = null!;
 
     public Guid ReleaseVersionId { get; set; }
 

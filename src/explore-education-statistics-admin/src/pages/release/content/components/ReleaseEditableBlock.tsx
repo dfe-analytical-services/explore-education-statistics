@@ -347,7 +347,7 @@ const ReleaseEditableBlock = ({
 
   function renderBlock() {
     switch (block.type) {
-      case 'DataBlockVersionLink':
+      case 'DataBlock':
         return (
           <CommentsWrapper
             commentType="block"
@@ -365,7 +365,7 @@ const ReleaseEditableBlock = ({
                 {
                   publicationId,
                   releaseVersionId,
-                  dataBlockVersionId: block.id,
+                  dataBlockId: block.id,
                 },
               )}
               removeButtonLabel={removeButtonLabel}

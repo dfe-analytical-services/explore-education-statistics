@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -64,8 +63,8 @@ public class ContentDbContext : DbContext
     public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
     public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
     public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
-    public virtual DbSet<DataBlockVersionLink> DataBlockVersionLinks { get; set; }
     public virtual DbSet<DataBlock> DataBlocks { get; set; }
+    public virtual DbSet<DataBlockParent> DataBlockParents { get; set; }
     public virtual DbSet<DataBlockVersion> DataBlockVersions { get; set; }
     public virtual DbSet<DataSetUpload> DataSetUploads { get; set; }
     public virtual DbSet<DataImport> DataImports { get; set; }
@@ -121,6 +120,7 @@ public class ContentDbContext : DbContext
         ConfigureDataSetFileVersionGeographicLevel(modelBuilder);
         ConfigureContentBlock(modelBuilder);
         ConfigureReleaseVersion(modelBuilder);
+        ConfigureDataBlock(modelBuilder);
         ConfigureHtmlBlock(modelBuilder);
         ConfigureEmbedBlockLink(modelBuilder);
         ConfigureFeaturedTable(modelBuilder);
@@ -131,7 +131,7 @@ public class ContentDbContext : DbContext
         ConfigureGlossaryEntry(modelBuilder);
         ConfigureKeyStatisticsDataBlock(modelBuilder);
         ConfigureKeyStatisticsText(modelBuilder);
-        ConfigureDataBlock(modelBuilder);
+        ConfigureDataBlockParent(modelBuilder);
         ConfigureDataBlockVersion(modelBuilder);
         ConfigurePageFeedback(modelBuilder);
         ConfigureReleasePublishingFeedback(modelBuilder);
@@ -495,7 +495,6 @@ public class ContentDbContext : DbContext
             entity
                 .Property(e => e.Locked)
                 .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-            entity.HasOne(e => e.ReleaseVersion).WithMany().OnDelete(DeleteBehavior.NoAction);
         });
     }
 
@@ -559,6 +558,34 @@ public class ContentDbContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
     }
 
+    private static void ConfigureDataBlock(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<DataBlock>().Property(block => block.Heading).HasColumnName("DataBlock_Heading");
+
+        modelBuilder
+            .Entity<DataBlock>()
+            .Property(block => block.Query)
+            .HasColumnName("DataBlock_Query")
+            .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<FullTableQuery>(v));
+
+        modelBuilder
+            .Entity<DataBlock>()
+            .Property(block => block.Charts)
+            .HasColumnName("DataBlock_Charts")
+            .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<IChart>>(v));
+
+        modelBuilder
+            .Entity<DataBlock>()
+            .Property(block => block.Table)
+            .HasColumnName("DataBlock_Table")
+            .HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v)
+            );
+
+        modelBuilder.Entity<DataBlock>().Navigation(block => block.DataBlockVersion).AutoInclude();
+    }
+
     private static void ConfigureHtmlBlock(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<HtmlBlock>().Property(block => block.Body).HasColumnName("Body");
@@ -575,11 +602,7 @@ public class ContentDbContext : DbContext
 
     private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
     {
-        modelBuilder
-            .Entity<FeaturedTable>()
-            .HasOne(ft => ft.DataBlockVersion)
-            .WithOne()
-            .OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<FeaturedTable>().HasOne(ft => ft.DataBlock).WithOne();
     }
 
     private static void ConfigurePermalink(ModelBuilder modelBuilder)
@@ -670,7 +693,7 @@ public class ContentDbContext : DbContext
 
         modelBuilder
             .Entity<KeyStatisticDataBlock>()
-            .HasOne(ks => ks.DataBlockVersion)
+            .HasOne(ks => ks.DataBlock)
             .WithMany()
             // WARN: This is necessary - otherwise an automatically generated cascade delete is added for when an
             // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock
@@ -678,21 +701,21 @@ public class ContentDbContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
     }
 
-    private static void ConfigureDataBlock(ModelBuilder modelBuilder)
+    private static void ConfigureDataBlockParent(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DataBlock>().ToTable("DataBlocks");
+        modelBuilder.Entity<DataBlockParent>().ToTable("DataBlocks");
 
         modelBuilder
-            .Entity<DataBlock>()
+            .Entity<DataBlockParent>()
             .HasOne(dataBlock => dataBlock.LatestDraftVersion)
             .WithOne()
-            .HasForeignKey<DataBlock>(version => version.LatestDraftVersionId);
+            .HasForeignKey<DataBlockParent>(version => version.LatestDraftVersionId);
 
         modelBuilder
-            .Entity<DataBlock>()
+            .Entity<DataBlockParent>()
             .HasOne(dataBlock => dataBlock.LatestPublishedVersion)
             .WithOne()
-            .HasForeignKey<DataBlock>(version => version.LatestPublishedVersionId)
+            .HasForeignKey<DataBlockParent>(version => version.LatestPublishedVersionId)
             .IsRequired(false);
     }
 
@@ -700,7 +723,7 @@ public class ContentDbContext : DbContext
     {
         modelBuilder.Entity<DataBlockVersion>().ToTable("DataBlockVersions");
 
-        modelBuilder.Entity<DataBlockVersion>().Property(v => v.DataBlockId).HasColumnName("DataBlockId");
+        modelBuilder.Entity<DataBlockVersion>().Property(v => v.DataBlockParentId).HasColumnName("DataBlockId");
 
         modelBuilder
             .Entity<DataBlockVersion>()
@@ -717,35 +740,12 @@ public class ContentDbContext : DbContext
             .Property(v => v.Updated)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-        modelBuilder
-            .Entity<DataBlockVersion>()
-            .Property(v => v.Query)
-            .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<FullTableQuery>(v));
+        modelBuilder.Entity<DataBlockVersion>().HasOne(v => v.ContentBlock).WithOne(db => db.DataBlockVersion);
 
-        // The Charts getter builds a new List on every read, so EF's default reference comparison would see the
-        // property as changed on every DetectChanges - marking the DataBlockVersion as Modified, and so having
-        // DbContextUtils.UpdateTimestamps stamp an Updated date, on any save that merely touches its graph.
-        // Compare and snapshot by serialized value instead.
-        modelBuilder
-            .Entity<DataBlockVersion>()
-            .Property(v => v.Charts)
-            .HasConversion(
-                v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<List<IChart>>(v),
-                new ValueComparer<List<IChart>>(
-                    (left, right) => JsonConvert.SerializeObject(left) == JsonConvert.SerializeObject(right),
-                    charts => JsonConvert.SerializeObject(charts).GetHashCode(),
-                    charts => JsonConvert.DeserializeObject<List<IChart>>(JsonConvert.SerializeObject(charts))!
-                )
-            );
-
-        modelBuilder
-            .Entity<DataBlockVersion>()
-            .Property(v => v.Table)
-            .HasConversion(
-                v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v)
-            );
+        // Automatically include the backing ContentBlock of type "DataBlock" whenever we retrieve
+        // DataBlockVersions, as DataBlockVersions encapsulate their backing ContentBlocks and will replace them
+        // entirely in EES-4640.
+        modelBuilder.Entity<DataBlockVersion>().Navigation(v => v.ContentBlock).AutoInclude();
     }
 
     private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)

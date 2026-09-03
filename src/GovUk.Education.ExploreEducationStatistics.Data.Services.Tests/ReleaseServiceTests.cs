@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -862,7 +862,7 @@ public class ReleaseServiceTests
         var import1 = new DataImport { File = releaseFile1.File, Status = DataImportStatus.COMPLETE };
         var import2 = new DataImport { File = releaseFile2.File, Status = DataImportStatus.COMPLETE };
 
-        var dataBlockVersion1 = new DataBlockVersion
+        var dataBlock1 = new DataBlock
         {
             Name = "Test data block 1",
             Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
@@ -870,12 +870,12 @@ public class ReleaseServiceTests
         };
         var featuredTable1 = new FeaturedTable
         {
-            DataBlockVersion = dataBlockVersion1,
+            DataBlock = dataBlock1,
             Name = "Test featured table name 1",
             Description = "Test featured table description 1",
         };
 
-        var dataBlockVersion2 = new DataBlockVersion
+        var dataBlock2 = new DataBlock
         {
             Name = "Test data block 2",
             Query = new FullTableQuery { SubjectId = releaseSubject2.Subject.Id },
@@ -883,7 +883,7 @@ public class ReleaseServiceTests
         };
         var featuredTable2 = new FeaturedTable
         {
-            DataBlockVersion = dataBlockVersion2,
+            DataBlock = dataBlock2,
             Name = "Test featured table name 2",
             Description = "Test featured table description 2",
         };
@@ -897,7 +897,7 @@ public class ReleaseServiceTests
             await contentDbContext.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
             await contentDbContext.DataImports.AddRangeAsync(import1, import2);
             // Order is reversed
-            await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion2, dataBlockVersion1);
+            await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock2, dataBlock1);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -925,13 +925,13 @@ public class ReleaseServiceTests
             Assert.Equal(featuredTable1.Name, featuredTables[0].Name);
             Assert.Equal(featuredTable1.Description, featuredTables[0].Description);
             Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
-            Assert.Equal(dataBlockVersion1.Id, featuredTables[0].DataBlockVersionId);
+            Assert.Equal(dataBlock1.Id, featuredTables[0].DataBlockId);
 
             Assert.Equal(featuredTable2.Id, featuredTables[1].Id);
             Assert.Equal(featuredTable2.Name, featuredTables[1].Name);
             Assert.Equal(featuredTable2.Description, featuredTables[1].Description);
             Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
-            Assert.Equal(dataBlockVersion2.Id, featuredTables[1].DataBlockVersionId);
+            Assert.Equal(dataBlock2.Id, featuredTables[1].DataBlockId);
         }
     }
 
@@ -961,7 +961,7 @@ public class ReleaseServiceTests
 
         var import1 = new DataImport { File = releaseFile1.File, Status = DataImportStatus.STAGE_1 };
 
-        var dataBlockVersion1 = new DataBlockVersion
+        var dataBlock1 = new DataBlock
         {
             Name = "Test data block",
             Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
@@ -975,7 +975,7 @@ public class ReleaseServiceTests
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             await contentDbContext.AddAsync(releaseFile1);
             await contentDbContext.AddAsync(import1);
-            await contentDbContext.AddRangeAsync(dataBlockVersion1);
+            await contentDbContext.AddRangeAsync(dataBlock1);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1027,7 +1027,7 @@ public class ReleaseServiceTests
 
         var import1 = new DataImport { File = releaseFile1.File, Status = DataImportStatus.NOT_FOUND };
 
-        var dataBlockVersion1 = new DataBlockVersion
+        var dataBlock1 = new DataBlock
         {
             Name = "Test data block",
             Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
@@ -1041,7 +1041,7 @@ public class ReleaseServiceTests
             contentDbContext.ReleaseVersions.Add(releaseVersion);
             await contentDbContext.AddAsync(releaseFile1);
             await contentDbContext.AddAsync(import1);
-            await contentDbContext.AddRangeAsync(dataBlockVersion1);
+            await contentDbContext.AddRangeAsync(dataBlock1);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1094,14 +1094,14 @@ public class ReleaseServiceTests
         var import1 = new DataImport { File = releaseFile1.File, Status = DataImportStatus.COMPLETE };
 
         // Subject does not match
-        var dataBlockVersion1 = new DataBlockVersion
+        var dataBlock1 = new DataBlock
         {
             Name = "Test data block",
             Query = new FullTableQuery { SubjectId = Guid.NewGuid() },
         };
         var featuredTable1 = new FeaturedTable
         {
-            DataBlockVersion = dataBlockVersion1,
+            DataBlock = dataBlock1,
             Name = "Test featured table name",
             Description = "Test featured table description",
         };
@@ -1114,7 +1114,7 @@ public class ReleaseServiceTests
             await contentDbContext.ReleaseFiles.AddAsync(releaseFile1);
             await contentDbContext.FeaturedTables.AddAsync(featuredTable1);
             await contentDbContext.DataImports.AddAsync(import1);
-            await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion1);
+            await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock1);
             await contentDbContext.SaveChangesAsync();
         }
 

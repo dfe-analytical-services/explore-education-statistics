@@ -15,7 +15,7 @@ public record LocationsForDataBlockCacheKey : IBlobCacheKey
     public LocationsForDataBlockCacheKey(DataBlockVersion dataBlockVersion, long boundaryLevelId)
         : this(
             releaseVersionId: dataBlockVersion.ReleaseVersionId,
-            dataBlockId: dataBlockVersion.DataBlockId,
+            dataBlockId: dataBlockVersion.DataBlockParentId,
             boundaryLevelId: boundaryLevelId
         ) { }
 

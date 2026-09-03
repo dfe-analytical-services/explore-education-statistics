@@ -35,7 +35,7 @@ const ReleaseDataBlockEditPage = ({
   history,
 }: RouteComponentProps<ReleaseDataBlockRouteParams>) => {
   const {
-    params: { publicationId, releaseVersionId, dataBlockVersionId },
+    params: { publicationId, releaseVersionId, dataBlockId },
   } = match;
 
   const replacementFileId =
@@ -51,7 +51,7 @@ const ReleaseDataBlockEditPage = ({
     setState: setModel,
   } = useAsyncHandledRetry<Model>(async () => {
     const [dataBlock, canUpdateRelease] = await Promise.all([
-      dataBlocksService.getDataBlock(dataBlockVersionId),
+      dataBlocksService.getDataBlock(dataBlockId),
       permissionService.canUpdateRelease(releaseVersionId),
     ]);
 
@@ -59,7 +59,7 @@ const ReleaseDataBlockEditPage = ({
       dataBlock,
       canUpdateRelease,
     };
-  }, [releaseVersionId, dataBlockVersionId]);
+  }, [releaseVersionId, dataBlockId]);
 
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: ReleaseDataBlock) => {
@@ -128,7 +128,7 @@ const ReleaseDataBlockEditPage = ({
           canUpdate={canUpdateRelease}
           publicationId={publicationId}
           releaseVersionId={releaseVersionId}
-          dataBlockVersionId={dataBlockVersionId}
+          dataBlockId={dataBlockId}
         />
 
         <hr className="govuk-!-margin-bottom-6" />
@@ -158,7 +158,7 @@ const ReleaseDataBlockEditPage = ({
                 <SummaryListItem term="Fast track URL">
                   <UrlContainer
                     id="fastTrackUrl"
-                    url={`${config.publicAppUrl}/data-tables/fast-track/${dataBlock.dataBlockId}`}
+                    url={`${config.publicAppUrl}/data-tables/fast-track/${dataBlock.dataBlockParentId}`}
                   />
                 </SummaryListItem>
                 {dataBlock.dataSetName && (
@@ -171,7 +171,7 @@ const ReleaseDataBlockEditPage = ({
               {canUpdateRelease && (
                 <DataBlockDeletePlanModal
                   releaseVersionId={releaseVersionId}
-                  dataBlockVersionId={dataBlockVersionId}
+                  dataBlockId={dataBlockId}
                   triggerButtonVariant="BUTTON"
                   onConfirm={handleDataBlockDelete}
                 />
@@ -179,7 +179,7 @@ const ReleaseDataBlockEditPage = ({
 
               {canUpdateRelease ? (
                 <DataBlockPageTabs
-                  key={dataBlockVersionId}
+                  key={dataBlockId}
                   releaseVersionId={releaseVersionId}
                   dataBlock={dataBlock}
                   onDataBlockSave={handleDataBlockSave}

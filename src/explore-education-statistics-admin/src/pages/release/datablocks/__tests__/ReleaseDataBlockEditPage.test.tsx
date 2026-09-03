@@ -114,7 +114,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
-    dataBlockId: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetId: 'data-set-1',
     dataSetName: 'Test data set',
     name: 'Test name 1',
@@ -239,7 +239,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
     expect(screen.queryByTestId('Highlight name')).not.toBeInTheDocument();
     expect(screen.getByLabelText('URL')).toHaveValue(
-      'http://localhost/data-tables/fast-track/block-1',
+      'http://localhost/data-tables/fast-track/block-1-parent',
     );
   });
 
@@ -490,7 +490,7 @@ describe('ReleaseDataBlockEditPage', () => {
         screen.getByTestId('Featured table description'),
       ).toHaveTextContent('Test highlight description 1');
       expect(screen.getByLabelText('URL')).toHaveValue(
-        'http://localhost/data-tables/fast-track/block-1',
+        'http://localhost/data-tables/fast-track/block-1-parent',
       );
     });
 
@@ -519,7 +519,7 @@ describe('ReleaseDataBlockEditPage', () => {
       ).not.toBeInTheDocument();
 
       expect(screen.getByLabelText('URL')).toHaveValue(
-        'http://localhost/data-tables/fast-track/block-1',
+        'http://localhost/data-tables/fast-track/block-1-parent',
       );
     });
 
@@ -599,7 +599,7 @@ describe('ReleaseDataBlockEditPage', () => {
               {
                 publicationId: 'publication-1',
                 releaseVersionId: 'release-1',
-                dataBlockVersionId: 'block-1',
+                dataBlockId: 'block-1',
               },
             ),
           ]}

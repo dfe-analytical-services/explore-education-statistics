@@ -88,10 +88,10 @@ const defaultTable: Table = {
 export function generateEditableDataBlock({
   charts = [],
   comments = [],
-  dataBlockId = 'data-block-id',
+  dataBlockParentId = 'data-block-parent-id',
   dataSetId = 'data-set-id',
   heading = 'Data block heading',
-  id = 'data-block-version-id',
+  id = 'data-block-id',
   locked,
   lockedUntil,
   lockedBy,
@@ -104,7 +104,7 @@ export function generateEditableDataBlock({
   return {
     charts,
     comments,
-    dataBlockId,
+    dataBlockParentId,
     dataSetId,
     heading,
     id,
@@ -116,6 +116,6 @@ export function generateEditableDataBlock({
     query,
     source,
     table,
-    type: 'DataBlockVersionLink',
+    type: 'DataBlock',
   };
 }

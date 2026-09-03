@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -62,12 +62,7 @@ public class ReleaseChecklistServiceTests
                 new ContentSection
                 {
                     Type = ContentSectionType.Generic,
-                    Content =
-                    [
-                        new HtmlBlock { Body = "<p>Test</p>" },
-                        new DataBlockVersionLink(),
-                        new HtmlBlock { Body = "" },
-                    ],
+                    Content = [new HtmlBlock { Body = "<p>Test</p>" }, new DataBlock(), new HtmlBlock { Body = "" }],
                 },
             ],
             RelatedDashboardsSection = new ContentSection
@@ -290,6 +285,7 @@ public class ReleaseChecklistServiceTests
             await context.SaveChangesAsync();
         }
 
+        var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
         var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
@@ -334,6 +330,8 @@ public class ReleaseChecklistServiceTests
 
             releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
+            dataBlockService.Setup(s => s.ListDataBlocks(releaseVersion.Id)).ReturnsAsync([new(), new()]);
+
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync([]);
@@ -354,6 +352,7 @@ public class ReleaseChecklistServiceTests
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 dataGuidanceService: dataGuidanceService.Object,
                 footnoteRepository: footnoteRepository.Object,
+                dataBlockService: dataBlockService.Object,
                 dataSetVersionService: dataSetVersionService.Object,
                 releasePublishingValidator: releasePublishingValidator.Object
             );
@@ -361,6 +360,7 @@ public class ReleaseChecklistServiceTests
             var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(
+                dataBlockService,
                 footnoteRepository,
                 dataGuidanceService,
                 methodologyVersionRepository,
@@ -497,7 +497,7 @@ public class ReleaseChecklistServiceTests
             Created = DateTime.UtcNow.AddMonths(-2),
         };
 
-        var dataBlockVersionId = Guid.NewGuid();
+        var dataBlockId = Guid.NewGuid();
 
         var releaseVersion = new ReleaseVersion
         {
@@ -517,10 +517,7 @@ public class ReleaseChecklistServiceTests
                 new ContentSection
                 {
                     Type = ContentSectionType.Generic,
-                    Content =
-                    [
-                        new DataBlockVersionLink { Id = dataBlockVersionId, DataBlockVersionId = dataBlockVersionId },
-                    ],
+                    Content = [new DataBlock { Id = dataBlockId }],
                 },
             ],
             HeadlinesSection = new ContentSection
@@ -552,11 +549,7 @@ public class ReleaseChecklistServiceTests
             ],
         };
 
-        var featuredTable = new FeaturedTable
-        {
-            DataBlockVersionId = dataBlockVersionId,
-            ReleaseVersion = releaseVersion,
-        };
+        var featuredTable = new FeaturedTable { DataBlockId = dataBlockId };
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -567,6 +560,7 @@ public class ReleaseChecklistServiceTests
             await context.SaveChangesAsync();
         }
 
+        var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>();
         var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
@@ -601,6 +595,8 @@ public class ReleaseChecklistServiceTests
 
             footnoteRepository.Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id)).ReturnsAsync([]);
 
+            dataBlockService.Setup(s => s.ListDataBlocks(releaseVersion.Id)).ReturnsAsync([new() { Id = dataBlockId }]);
+
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync([
@@ -619,6 +615,7 @@ public class ReleaseChecklistServiceTests
                 releaseDataFileRepository: releaseDataFileRepository.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object,
                 footnoteRepository: footnoteRepository.Object,
+                dataBlockService: dataBlockService.Object,
                 dataSetVersionService: dataSetVersionService.Object
             );
             var result = await service.GetChecklist(releaseVersion.Id);
@@ -631,6 +628,7 @@ public class ReleaseChecklistServiceTests
         }
 
         MockUtils.VerifyAllMocks(
+            dataBlockService,
             footnoteRepository,
             dataGuidanceService,
             methodologyVersionRepository,

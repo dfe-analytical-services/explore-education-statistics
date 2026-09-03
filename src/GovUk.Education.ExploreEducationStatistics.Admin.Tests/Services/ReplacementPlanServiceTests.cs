@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -336,15 +337,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = [originalFilterItem.Id],
-                Indicators = [originalIndicator.Id],
-                LocationIds = [originalLocation.Id],
+                Filters = new[] { originalFilterItem.Id },
+                Indicators = new[] { originalIndicator.Id },
+                LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -446,7 +447,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.Files.AddRange(originalFile, replacementFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -493,8 +494,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             Assert.Single(dataBlockPlan.IndicatorGroups);
 
@@ -840,15 +841,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = [originalDefaultFilterItem.Id, originalDefaultFilterItem2.Id],
-                Indicators = [originalIndicator.Id],
-                LocationIds = [location.Id],
+                Filters = new[] { originalDefaultFilterItem.Id, originalDefaultFilterItem2.Id },
+                Indicators = new[] { originalIndicator.Id },
+                LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -940,7 +941,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -1167,15 +1168,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters = [originalDefaultFilterItem.Id],
-                Indicators = [originalIndicator.Id],
-                LocationIds = [location.Id],
+                Filters = new[] { originalDefaultFilterItem.Id },
+                Indicators = new[] { originalIndicator.Id },
+                LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -1200,7 +1201,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -1344,9 +1345,9 @@ public class ReplacementPlanServiceTests
             EndYear = 2020,
             EndCode = CalendarYear,
         };
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
@@ -1415,7 +1416,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(mapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -2025,20 +2026,20 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
-                Filters =
-                [
+                Filters = new[]
+                {
                     originalDefaultFilterItem.Id,
                     originalPrimarySchoolsFilterItem.Id,
                     originalPrimaryAndSecondarySchoolsFilterItem.Id,
-                ],
-                Indicators = [originalIndicator.Id],
-                LocationIds = [originalLocation.Id],
+                },
+                Indicators = new[] { originalIndicator.Id },
+                LocationIds = ListOf(originalLocation.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -2204,7 +2205,7 @@ public class ReplacementPlanServiceTests
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
             contentDbContext.Files.AddRange(originalFile, replacementFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.AddRange(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -2256,8 +2257,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             Assert.Single(dataBlockPlan.IndicatorGroups);
 
@@ -2641,15 +2642,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
                 Indicators = [originalIndicatorA.Id],
-                LocationIds = [location.Id],
+                LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -2710,7 +2711,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -2748,8 +2749,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             var dataBlockIndicatorGroupPlan = Assert.Single(dataBlockPlan.IndicatorGroups);
 
@@ -2934,15 +2935,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
                 Indicators = [originalIndicatorA.Id],
-                LocationIds = [location.Id],
+                LocationIds = ListOf(location.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -2993,7 +2994,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -3031,8 +3032,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             Assert.Single(dataBlockPlan.IndicatorGroups);
 
@@ -3221,15 +3222,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
                 Indicators = [originalIndicator.Id],
-                LocationIds = [locationEng.Id, originalLocationDerby.Id, locationLeicester.Id],
+                LocationIds = ListOf(locationEng.Id, originalLocationDerby.Id, locationLeicester.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -3289,7 +3290,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -3358,8 +3359,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             Assert.Equal(2, dataBlockPlan.Locations.Count);
             var countriesPlan = dataBlockPlan.Locations.Single(l => l.Key == nameof(GeographicLevel.Country)).Value;
@@ -3593,15 +3594,15 @@ public class ReplacementPlanServiceTests
             EndCode = CalendarYear,
         };
 
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlock = new DataBlock
         {
-            Name = "Test DataBlockVersion",
+            Name = "Test DataBlock",
             Query = new FullTableQuery
             {
                 SubjectId = originalReleaseSubject.SubjectId,
                 Filters = [],
                 Indicators = [originalIndicator.Id],
-                LocationIds = [originalLocationDerby.Id],
+                LocationIds = ListOf(originalLocationDerby.Id),
                 TimePeriod = timePeriod,
             },
             ReleaseVersion = releaseVersion,
@@ -3652,7 +3653,7 @@ public class ReplacementPlanServiceTests
         {
             contentDbContext.ReleaseVersions.AddRange(releaseVersion);
             contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             contentDbContext.DataSetMappings.Add(dataSetMapping);
             await contentDbContext.SaveChangesAsync();
         }
@@ -3698,8 +3699,8 @@ public class ReplacementPlanServiceTests
 
             Assert.Single(replacementPlan.DataBlocks);
             var dataBlockPlan = replacementPlan.DataBlocks.First();
-            Assert.Equal(dataBlockVersion.Id, dataBlockPlan.Id);
-            Assert.Equal(dataBlockVersion.Name, dataBlockPlan.Name);
+            Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+            Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
 
             var laPlan = Assert.Single(dataBlockPlan.Locations).Value;
             var derbyPlan = laPlan.LocationAttributes.Single();

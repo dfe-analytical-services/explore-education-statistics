@@ -28,8 +28,8 @@ public class DataBlockServiceTests
 
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
-        var dataBlock = _fixture
-            .DefaultDataBlock()
+        var dataBlockParent = _fixture
+            .DefaultDataBlockParent()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -39,17 +39,20 @@ public class DataBlockServiceTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            await contentDbContext.DataBlocks.AddRangeAsync(dataBlock);
+            await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParent);
             await contentDbContext.SaveChangesAsync();
         }
 
-        var tableBuilderResults = new TableBuilderResultViewModel { Results = [new()] };
+        var tableBuilderResults = new TableBuilderResultViewModel
+        {
+            Results = new List<ObservationViewModel> { new() },
+        };
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {

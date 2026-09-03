@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -51,7 +51,7 @@ public class DataBlockService : IDataBlockService
         _cacheKeyService = cacheKeyService;
     }
 
-    public async Task<Either<ActionResult, DataBlockVersionViewModel>> Create(
+    public async Task<Either<ActionResult, DataBlockViewModel>> Create(
         Guid releaseVersionId,
         DataBlockCreateRequest createRequest
     )
@@ -61,27 +61,32 @@ public class DataBlockService : IDataBlockService
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
-                var dataBlockVersion = _mapper.Map<DataBlockVersion>(createRequest);
-                dataBlockVersion.Id = Guid.NewGuid();
-                dataBlockVersion.Created = DateTime.UtcNow;
-                dataBlockVersion.ReleaseVersionId = releaseVersionId;
+                var dataBlock = _mapper.Map<DataBlock>(createRequest);
+                dataBlock.Id = Guid.NewGuid();
+                dataBlock.Created = DateTime.UtcNow;
+                dataBlock.ReleaseVersionId = releaseVersionId;
 
-                // DataBlock and DataBlockVersion reference each other, so the two rows cannot be inserted
-                // in a single SaveChanges - EF rejects the graph as a circular dependency. Insert the parent
-                // without its LatestDraftVersion first, then point it at the newly inserted version.
-                dataBlockVersion.DataBlock = new DataBlock { LatestDraftVersionId = null };
-
-                await _context.RequireTransaction(async () =>
+                var dataBlockVersion = new DataBlockVersion
                 {
-                    await _context.AddAsync(dataBlockVersion);
-                    await _context.SaveChangesAsync();
+                    // EES-4640 - share the same Id with the underlying ContentBlock. This will make the process
+                    // of removing DataBlock information out of the ContentBlocks table and into the
+                    // DataBlockVersions table easier in future stages of extracting pure DataBlocks out of the
+                    // Content model.
+                    Id = dataBlock.Id,
+                    ContentBlock = dataBlock,
+                    ReleaseVersionId = releaseVersionId,
+                    Created = DateTime.UtcNow,
+                    DataBlockParent = new(),
+                };
 
-                    dataBlockVersion.DataBlock.LatestDraftVersion = dataBlockVersion;
-                    dataBlockVersion.DataBlock.LatestDraftVersionId = dataBlockVersion.Id;
-                    await _context.SaveChangesAsync();
-                });
+                await _context.DataBlockVersions.AddAsync(dataBlockVersion);
+                await _context.SaveChangesAsync();
 
-                return await Get(dataBlockVersion.Id);
+                dataBlockVersion.DataBlockParent.LatestDraftVersion = dataBlockVersion;
+                _context.DataBlockParents.Update(dataBlockVersion.DataBlockParent);
+                await _context.SaveChangesAsync();
+
+                return await Get(dataBlock.Id);
             });
     }
 
@@ -93,24 +98,20 @@ public class DataBlockService : IDataBlockService
             .OnSuccess(releaseVersion =>
                 GetDeletePlan(releaseVersionId: releaseVersion.Id, dataBlockVersionId: dataBlockVersionId)
             )
-            .OnSuccessVoid(DeleteDataBlockVersions);
+            .OnSuccessVoid(DeleteDataBlocks);
     }
 
-    public Task<Either<ActionResult, Unit>> DeleteDataBlockVersions(DeleteDataBlockPlanViewModel deletePlan)
+    public Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlanViewModel deletePlan)
     {
         return InvalidateDataBlockCaches(deletePlan)
             .OnSuccessVoid(async () =>
             {
-                var dataBlockVersionIds = deletePlan.DependentDataBlocks.Select(db => db.Id).ToList();
+                var dataBlockIds = deletePlan.DependentDataBlocks.Select(db => db.Id).ToList();
 
-                var keyStats = _context.KeyStatisticsDataBlock.Where(ks =>
-                    dataBlockVersionIds.Contains(ks.DataBlockVersionId)
-                );
+                var keyStats = _context.KeyStatisticsDataBlock.Where(ks => dataBlockIds.Contains(ks.DataBlockId));
                 _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
 
-                var featuredTables = _context.FeaturedTables.Where(ft =>
-                    dataBlockVersionIds.Contains(ft.DataBlockVersionId)
-                );
+                var featuredTables = _context.FeaturedTables.Where(ft => dataBlockIds.Contains(ft.DataBlockId));
                 _context.FeaturedTables.RemoveRange(featuredTables);
 
                 await _context.SaveChangesAsync();
@@ -128,7 +129,7 @@ public class DataBlockService : IDataBlockService
             );
     }
 
-    public async Task<Either<ActionResult, DataBlockVersionViewModel>> Get(Guid dataBlockVersionId)
+    public async Task<Either<ActionResult, DataBlockViewModel>> Get(Guid dataBlockVersionId)
     {
         return await GetDataBlockVersion(dataBlockVersionId)
             .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion))
@@ -136,15 +137,7 @@ public class DataBlockService : IDataBlockService
             {
                 var releaseVersionId = dataBlockVersion.ReleaseVersionId;
 
-                // Only a data block that is placed in a content section has a DataBlockVersionLink. An unattached
-                // one has no positional or locking state, so it is mapped straight from its DataBlockVersion.
-                var link = await _context.DataBlockVersionLinks.SingleOrDefaultAsync(link =>
-                    link.DataBlockVersionId == dataBlockVersionId
-                );
-
-                var viewModel = link is not null
-                    ? _mapper.Map<DataBlockVersionViewModel>(link)
-                    : _mapper.Map<DataBlockVersionViewModel>(dataBlockVersion);
+                var viewModel = _mapper.Map<DataBlockViewModel>(dataBlockVersion);
 
                 var subjectId = dataBlockVersion.Query.SubjectId;
 
@@ -162,7 +155,7 @@ public class DataBlockService : IDataBlockService
                     ?? "";
 
                 var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(ft =>
-                    ft.DataBlockVersionId == dataBlockVersionId
+                    ft.DataBlockId == dataBlockVersion.Id
                 );
 
                 if (featuredTable != null)
@@ -184,30 +177,22 @@ public class DataBlockService : IDataBlockService
             {
                 var dataBlocks = await ListDataBlocks(releaseVersion.Id);
 
-                var dataBlockVersionIdsAttachedToKeyStats = await _context
+                var dataBlockIdsAttachedToKeyStats = await _context
                     .KeyStatisticsDataBlock.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
-                    .Select(ks => ks.DataBlockVersionId)
+                    .Select(ks => ks.DataBlockId)
                     .ToListAsync();
 
                 var featuredTables = await _context
                     .FeaturedTables.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                     .ToListAsync();
 
-                // A DataBlockVersionLink exists only for as long as its DataBlockVersion is placed in a content
-                // section, so the presence of a link is what makes a data block "in content".
-                var dataBlockVersionIdsInContent = await _context
-                    .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == releaseVersion.Id)
-                    .Select(link => link.DataBlockVersionId)
-                    .ToListAsync();
-
                 return dataBlocks
                     .Select(block =>
                     {
-                        var featuredTable = featuredTables.SingleOrDefault(ft => ft.DataBlockVersionId == block.Id);
+                        var featuredTable = featuredTables.SingleOrDefault(ft => ft.DataBlockId == block.Id);
 
                         var inContent =
-                            dataBlockVersionIdsInContent.Contains(block.Id)
-                            || dataBlockVersionIdsAttachedToKeyStats.Contains(block.Id);
+                            block.ContentSectionId != null || dataBlockIdsAttachedToKeyStats.Contains(block.Id);
                         return new DataBlockSummaryViewModel
                         {
                             Id = block.Id,
@@ -226,13 +211,13 @@ public class DataBlockService : IDataBlockService
             });
     }
 
-    public async Task<Either<ActionResult, DataBlockVersionViewModel>> Update(
+    public async Task<Either<ActionResult, DataBlockViewModel>> Update(
         Guid dataBlockVersionId,
         DataBlockUpdateRequest updateRequest
     )
     {
         return await GetDataBlockVersion(dataBlockVersionId)
-            .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateReleaseVersion(dataBlockVersion.ReleaseVersion))
+            .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
             .OnSuccessDo(async dataBlockVersion =>
             {
                 // Remove old infographic file if using a new file
@@ -256,15 +241,13 @@ public class DataBlockService : IDataBlockService
                     );
                 }
 
-                _mapper.Map(updateRequest, dataBlockVersion);
+                _mapper.Map(updateRequest, dataBlockVersion.ContentBlock);
 
-                _context.DataBlockVersions.Update(dataBlockVersion);
+                _context.DataBlocks.Update(dataBlockVersion.ContentBlock);
 
                 await _context.SaveChangesAsync();
             })
-            .OnSuccessDo(dataBlockVersion =>
-                InvalidateCachedDataBlock(dataBlockVersion.ReleaseVersionId, dataBlockVersion.Id)
-            )
+            .OnSuccessDo(dataBlock => InvalidateCachedDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
             .OnSuccess(() => Get(dataBlockVersionId));
     }
 
@@ -278,6 +261,8 @@ public class DataBlockService : IDataBlockService
                 query
                     .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                         .ThenInclude(releaseVersion => releaseVersion.Release)
+                    .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
+                        .ThenInclude(dataBlock => dataBlock.ContentSection)
                     .Where(dataBlockVersion =>
                         dataBlockVersion.ReleaseVersionId == releaseVersionId
                         && dataBlockVersion.Id == dataBlockVersionId
@@ -293,14 +278,15 @@ public class DataBlockService : IDataBlockService
 
     public Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
         Guid releaseVersionId,
-        Guid dataBlockId
+        Guid dataBlockParentId
     )
     {
         return _context
             .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                 .ThenInclude(rv => rv.Release)
             .SingleOrDefaultAsync(dataBlockVersion =>
-                dataBlockVersion.ReleaseVersionId == releaseVersionId && dataBlockVersion.DataBlockId == dataBlockId
+                dataBlockVersion.ReleaseVersionId == releaseVersionId
+                && dataBlockVersion.DataBlockParentId == dataBlockParentId
             )
             .OrNotFound();
     }
@@ -328,21 +314,19 @@ public class DataBlockService : IDataBlockService
         var files = await _context.Files.AsQueryable().Where(f => fileIds.Contains(f.Id)).ToListAsync();
 
         var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(ft =>
-            ft.DataBlockVersionId == dataBlockVersion.Id
+            ft.DataBlockId == dataBlockVersion.Id
         );
-
-        var contentSection = await GetContentSectionForDataBlockVersion(dataBlockVersion.Id);
 
         return new DependentDataBlock
         {
             Id = dataBlockVersion.Id,
             Name = dataBlockVersion.Name,
-            ContentSectionHeading = GetContentSectionHeading(contentSection),
+            ContentSectionHeading = GetContentSectionHeading(dataBlockVersion),
             InfographicFilesInfo = files
                 .Select(f => new InfographicFileInfo { Id = f.Id, Filename = f.Filename })
                 .ToList(),
             IsKeyStatistic = await _context.KeyStatisticsDataBlock.AnyAsync(ks =>
-                ks.DataBlockVersionId == dataBlockVersion.Id
+                ks.DataBlockId == dataBlockVersion.Id
             ),
             FeaturedTable =
                 featuredTable != null
@@ -351,16 +335,9 @@ public class DataBlockService : IDataBlockService
         };
     }
 
-    private Task<ContentSection?> GetContentSectionForDataBlockVersion(Guid dataBlockVersionId)
+    private static string? GetContentSectionHeading(DataBlockVersion dataBlockVersion)
     {
-        return _context
-            .DataBlockVersionLinks.Where(link => link.DataBlockVersionId == dataBlockVersionId)
-            .Select(link => link.ContentSection)
-            .SingleOrDefaultAsync();
-    }
-
-    private static string? GetContentSectionHeading(ContentSection? section)
-    {
+        var section = dataBlockVersion.ContentSection;
         return section?.Type switch
         {
             null => null,
@@ -389,7 +366,7 @@ public class DataBlockService : IDataBlockService
             if (infoGraphicChart != null && infoGraphicChart.FileId == fileId.ToString())
             {
                 dataBlockVersion.Charts.Remove(infoGraphicChart);
-                _context.DataBlockVersions.Update(dataBlockVersion);
+                _context.DataBlocks.Update(dataBlockVersion.ContentBlock);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -412,35 +389,33 @@ public class DataBlockService : IDataBlockService
         var blockIdsToDelete = deletePlan.DependentDataBlocks.Select(block => block.Id);
 
         var dependentDataBlockVersions = await _context
-            .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlock)
+            .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .Where(dataBlockVersion => blockIdsToDelete.Contains(dataBlockVersion.Id))
             .ToListAsync();
 
-        var dataBlocks = dependentDataBlockVersions.Select(dataBlockVersion => dataBlockVersion.DataBlock).ToList();
+        var dataBlockParents = dependentDataBlockVersions
+            .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+            .ToList();
 
-        // Set all of the DataBlocks' "LatestDraftVersion" versions to null, to indicate that these Data
+        // Set all of the DataBlockParents' "LatestDraftVersion" versions to null, to indicate that these Data
         // Blocks are no longer a part of this Release (or amendment).
-        dataBlocks.ForEach(dataBlock => dataBlock.LatestDraftVersionId = null);
+        dataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestDraftVersionId = null);
 
         await _context.SaveChangesAsync();
 
-        // Delete the DataBlockVersion and its associated DataBlockVersionLink (a ContentBlock). As the link -> version
-        // relationship is NoAction (see ContentDbContext.ConfigureDataBlockVersionLink), the link must be removed
-        // explicitly; EF orders the deletes so the dependent link is removed before its principal version.
-        var dependentDataBlockVersionIds = dependentDataBlockVersions
-            .Select(dataBlockVersion => dataBlockVersion.Id)
-            .ToList();
-        var dependentDataBlockVersionLinks = await _context
-            .DataBlockVersionLinks.Where(link => dependentDataBlockVersionIds.Contains(link.DataBlockVersionId))
-            .ToListAsync();
-        _context.ContentBlocks.RemoveRange(dependentDataBlockVersionLinks);
+        // Delete the DataBlockVersion and its associated ContentBlock of type "DataBlock".
         _context.DataBlockVersions.RemoveRange(dependentDataBlockVersions);
+        _context.ContentBlocks.RemoveRange(
+            dependentDataBlockVersions.Select(dataBlockVersion => dataBlockVersion.ContentBlock)
+        );
 
-        // If the DataBlockVersion that has just been deleted is the only version under its DataBlock (i.e.
+        // If the DataBlockVersion that has just been deleted is the only version under its DataBlockParent (i.e.
         // it's the LatestVersion but there isn't another already-published version), also delete its parent.
-        var orphanedDataBlocks = dataBlocks.Where(dataBlock => dataBlock.LatestPublishedVersionId == null).ToList();
+        var orphanedDataBlockParents = dataBlockParents
+            .Where(dataBlockParent => dataBlockParent.LatestPublishedVersionId == null)
+            .ToList();
 
-        _context.DataBlocks.RemoveRange(orphanedDataBlocks);
+        _context.DataBlockParents.RemoveRange(orphanedDataBlockParents);
 
         await _context.SaveChangesAsync();
         return Unit.Instance;
@@ -456,13 +431,13 @@ public class DataBlockService : IDataBlockService
             .ToList();
     }
 
-    private async Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersion(Guid dataBlockVersionId)
+    private async Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersion(Guid dataBlockId)
     {
         return await _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
             query
                 .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
-                .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId)
+                .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockId)
         );
     }
 
@@ -477,76 +452,52 @@ public class DataBlockService : IDataBlockService
 
     public async Task InvalidateCachedDataBlocks(Guid releaseVersionId)
     {
-        var dataBlockVersions = GetDataBlockVersions(releaseVersionId);
-        foreach (var dataBlockVersion in dataBlockVersions)
+        var dataBlocks = GetDataBlockVersions(releaseVersionId);
+        foreach (var dataBlock in dataBlocks)
         {
-            await InvalidateCachedDataBlock(releaseVersionId, dataBlockVersion.Id);
+            await InvalidateCachedDataBlock(releaseVersionId, dataBlock.Id);
         }
     }
 
-    private Task<Either<ActionResult, Unit>> InvalidateCachedDataBlock(Guid releaseVersionId, Guid dataBlockVersionId)
+    private Task<Either<ActionResult, Unit>> InvalidateCachedDataBlock(Guid releaseVersionId, Guid dataBlockId)
     {
         return _cacheKeyService
-            .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId, dataBlockVersionId: dataBlockVersionId)
+            .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
             .OnSuccessVoid(_privateCacheService.DeleteItemAsync);
     }
 
-    public async Task<Either<ActionResult, List<DataBlockVersionViewModel>>> GetUnattachedDataBlocks(
-        Guid releaseVersionId
-    )
+    public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
-                var dataBlockVersionIdsAttachedToKeyStats = await _context
-                    .KeyStatisticsDataBlock.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
-                    .Select(ks => ks.DataBlockVersionId)
-                    .ToListAsync();
-
-                // A DataBlockVersion that is placed in a content section has a DataBlockVersionLink, so the versions
-                // without one are the unattached data blocks.
-                var dataBlockVersionIdsInContent = await _context
-                    .DataBlockVersionLinks.Where(link => link.ReleaseVersionId == releaseVersion.Id)
-                    .Select(link => link.DataBlockVersionId)
-                    .ToListAsync();
-
-                var attachedDataBlockVersionIds = dataBlockVersionIdsAttachedToKeyStats
-                    .Concat(dataBlockVersionIdsInContent)
-                    .ToList();
-
-                var unattachedDataBlockVersions = await _context
-                    .DataBlockVersions.Where(dataBlockVersion =>
-                        dataBlockVersion.ReleaseVersionId == releaseVersion.Id
-                        && !attachedDataBlockVersionIds.Contains(dataBlockVersion.Id)
+                return await _context
+                    .DataBlockVersions.Where(block => block.ReleaseVersionId == releaseVersion.Id)
+                    .ToAsyncEnumerable()
+                    .WhereAwait(async dataBlockVersion =>
+                        await IsUnattachedDataBlock(releaseVersionId, dataBlockVersion)
                     )
-                    .ToListAsync();
-
-                return unattachedDataBlockVersions
                     .OrderBy(dataBlockVersion => dataBlockVersion.Name)
-                    .Select(dataBlockVersion => _mapper.Map<DataBlockVersionViewModel>(dataBlockVersion))
-                    .ToList();
+                    .Select(dataBlockVersion => _mapper.Map<DataBlockViewModel>(dataBlockVersion))
+                    .ToListAsync();
             });
     }
 
     public async Task<bool> IsUnattachedDataBlock(Guid releaseVersionId, DataBlockVersion dataBlockVersion)
     {
-        // A DataBlockVersion only has a DataBlockVersionLink for as long as it is placed in a content section.
-        var isInContent = await _context.DataBlockVersionLinks.AnyAsync(link =>
-            link.DataBlockVersionId == dataBlockVersion.Id
-        );
-
-        return !isInContent
+        return dataBlockVersion.ContentSectionId == null
             && await _context
                 .KeyStatisticsDataBlock.Where(ks => ks.ReleaseVersionId == releaseVersionId)
-                .AllAsync(ks => ks.DataBlockVersionId != dataBlockVersion.Id);
+                .AllAsync(ks => ks.DataBlockId != dataBlockVersion.Id);
     }
 
-    public async Task<List<DataBlockVersion>> ListDataBlocks(Guid releaseVersionId)
+    public async Task<List<DataBlock>> ListDataBlocks(Guid releaseVersionId)
     {
         return await _context
-            .DataBlockVersions.Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
+            .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
+            .OfType<DataBlock>()
             .ToListAsync();
     }
 }

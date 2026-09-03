@@ -82,7 +82,7 @@ describe('KeyStatDataBlock', () => {
     render(
       <KeyStatDataBlock
         releaseVersionId="release-1"
-        dataBlockId="block-1"
+        dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
         guidanceText="Total number of applications received for places at primary and secondary schools."
@@ -120,7 +120,7 @@ describe('KeyStatDataBlock', () => {
     render(
       <KeyStatDataBlock
         releaseVersionId="release-1"
-        dataBlockId="block-1"
+        dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle={undefined}
         guidanceText="Total number of applications received for places at primary and secondary schools."
@@ -160,7 +160,7 @@ describe('KeyStatDataBlock', () => {
     render(
       <KeyStatDataBlock
         releaseVersionId="release-1"
-        dataBlockId="block-1"
+        dataBlockParentId="block-1"
         guidanceTitle="This shouldn't appear"
       />,
     );
@@ -196,7 +196,7 @@ describe('KeyStatDataBlock', () => {
     render(
       <KeyStatDataBlock
         releaseVersionId="release-1"
-        dataBlockId="block-1"
+        dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
         guidanceText="Total number of applications received for places at primary and secondary schools."
@@ -238,7 +238,7 @@ describe('KeyStatDataBlock', () => {
     render(
       <KeyStatDataBlock
         releaseVersionId="release-1"
-        dataBlockId="block-1"
+        dataBlockParentId="block-1"
         trend="Down from 620,330 in 2017"
         guidanceTitle="What is the number of applications received?"
         guidanceText="Total number of applications received for places at primary and secondary schools."

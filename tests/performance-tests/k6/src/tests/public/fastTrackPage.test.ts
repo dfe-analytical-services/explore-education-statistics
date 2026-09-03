@@ -6,7 +6,7 @@ import testPageAndDataUrls from './utils/publicPageTest';
 // slowest fasttrack on dev at the time of writing
 // (after changing max table size to 6 million)
 // created using absence by geographic level data
-const dataBlockId = 'e6fb5d7a-7e21-4256-e59e-08db140dd271';
+const dataBlockParentId = 'e6fb5d7a-7e21-4256-e59e-08db140dd271';
 const fastTrackTableTitle =
   "'1' for Special, State-funded primary and State-funded secondary in Barnsley, Blackburn with Darwen, Blackpool, Bolton, Bradford and 59 other locations between 2006/07 and 2016/17";
 
@@ -19,7 +19,7 @@ export function setup() {
 const performTest = () =>
   testPageAndDataUrls({
     mainPageUrl: {
-      url: `/data-tables/fast-track/${dataBlockId}`,
+      url: `/data-tables/fast-track/${dataBlockParentId}`,
       prefetch: false,
       successCheck: response =>
         check(response, {

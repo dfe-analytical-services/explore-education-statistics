@@ -38,14 +38,14 @@ public class ReleaseAmendmentServiceTests
 
         User amendmentCreator = _fixture.DefaultUser().WithId(_userId);
 
-        var dataBlocks = _fixture
-            .DefaultDataBlock()
+        var dataBlockParents = _fixture
+            .DefaultDataBlockParent()
             .WithLatestPublishedVersion(() => _fixture.DefaultDataBlockVersion().WithVersion(0))
             .GenerateList(3);
 
-        var dataBlock1 = dataBlocks[0];
-        var dataBlock2 = dataBlocks[1];
-        var dataBlock3 = dataBlocks[2];
+        var dataBlock1Parent = dataBlockParents[0];
+        var dataBlock2Parent = dataBlockParents[1];
+        var dataBlock3Parent = dataBlockParents[2];
 
         ReleaseVersion originalReleaseVersion = _fixture
             .DefaultReleaseVersion()
@@ -116,7 +116,7 @@ public class ReleaseAmendmentServiceTests
             .WithKeyStatistics(
                 ListOf<KeyStatistic>(
                     new KeyStatisticText { Title = "key stat text" },
-                    new KeyStatisticDataBlock { DataBlockVersion = dataBlock3.LatestPublishedVersion! }
+                    new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
             .WithGenericContent(
@@ -130,18 +130,14 @@ public class ReleaseAmendmentServiceTests
                                     _fixture
                                         .DefaultHtmlBlock()
                                         .WithBody("<div></div>")
-                                        .WithComments([
-                                            new() { Id = Guid.NewGuid(), Content = "Comment 1 Text" },
-                                            new() { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
-                                        ]),
-                                    new DataBlockVersionLink
-                                    {
-                                        Id = dataBlock1.LatestPublishedVersion!.Id,
-                                        DataBlockVersionId = dataBlock1.LatestPublishedVersion!.Id,
-                                        DataBlockVersion = dataBlock1.LatestPublishedVersion!,
-                                        Order = 2,
-                                        Comments = [new() { Id = Guid.NewGuid(), Content = "Data block comment" }],
-                                    },
+                                        .WithComments(
+                                            new List<Comment>
+                                            {
+                                                new() { Id = Guid.NewGuid(), Content = "Comment 1 Text" },
+                                                new() { Id = Guid.NewGuid(), Content = "Comment 2 Text" },
+                                            }
+                                        ),
+                                    dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
                                     new EmbedBlockLink
                                     {
                                         Id = Guid.NewGuid(),
@@ -151,7 +147,10 @@ public class ReleaseAmendmentServiceTests
                                             Title = "Test EmbedBlockTitle",
                                             Url = "https://www.test.com/embedBlock",
                                         },
-                                        Comments = [new() { Id = Guid.NewGuid(), Content = "Embed block comment" }],
+                                        Comments = new List<Comment>
+                                        {
+                                            new() { Id = Guid.NewGuid(), Content = "Embed block comment" },
+                                        },
                                     }
                                 )
                             )
@@ -171,11 +170,11 @@ public class ReleaseAmendmentServiceTests
                     .WithComments([new Comment { Id = Guid.NewGuid(), Content = "RelatedDashboards comment" }])
                     .Generate(1)
             )
-            .WithDataBlockVersions(dataBlocks.Select(dataBlock => dataBlock.LatestPublishedVersion!))
+            .WithDataBlockVersions(dataBlockParents.Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
             .WithKeyStatistics(
                 ListOf<KeyStatistic>(
                     new KeyStatisticText { Title = "key stat text" },
-                    new KeyStatisticDataBlock { DataBlockVersion = dataBlock3.LatestPublishedVersion! }
+                    new KeyStatisticDataBlock { DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock }
                 )
             )
             .WithReleaseSummaryContent(_fixture.DefaultHtmlBlock().Generate(2))
@@ -190,10 +189,10 @@ public class ReleaseAmendmentServiceTests
                         Name = "Featured table 1",
                         Description = "Featured table 1 description",
                         Order = 1,
-                        DataBlockVersion = dataBlock1.LatestPublishedVersion!,
-                        DataBlockVersionId = dataBlock1.LatestPublishedVersion!.Id,
-                        DataBlock = dataBlock1,
-                        DataBlockId = dataBlock1.Id,
+                        DataBlock = dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
+                        DataBlockId = dataBlock1Parent.LatestPublishedVersion!.Id,
+                        DataBlockParent = dataBlock1Parent,
+                        DataBlockParentId = dataBlock1Parent.Id,
                         Created = new DateTime(2023, 01, 01),
                         Updated = new DateTime(2023, 01, 02),
                     },
@@ -203,10 +202,10 @@ public class ReleaseAmendmentServiceTests
                         Name = "Featured table 2",
                         Description = "Featured table 2 description",
                         Order = 2,
-                        DataBlockVersion = dataBlock2.LatestPublishedVersion!,
-                        DataBlockVersionId = dataBlock2.LatestPublishedVersion!.Id,
-                        DataBlock = dataBlock2,
-                        DataBlockId = dataBlock2.Id,
+                        DataBlock = dataBlock2Parent.LatestPublishedVersion!.ContentBlock,
+                        DataBlockId = dataBlock2Parent.LatestPublishedVersion!.Id,
+                        DataBlockParent = dataBlock2Parent,
+                        DataBlockParentId = dataBlock2Parent.Id,
                         Created = new DateTime(2023, 01, 01),
                         Updated = new DateTime(2023, 01, 02),
                     }
@@ -270,34 +269,11 @@ public class ReleaseAmendmentServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
-        var inContentLinkVersionIds = originalReleaseVersion
-            .Content.SelectMany(section => section.Content)
-            .OfType<DataBlockVersionLink>()
-            .Select(link =>
-            {
-                link.ReleaseVersionId = originalReleaseVersion.Id;
-                return link.DataBlockVersionId;
-            })
-            .ToList();
-
-        var unattachedDataBlockVersionLinks = dataBlocks
-            .Select(dataBlock => dataBlock.LatestPublishedVersion!)
-            .Where(version => !inContentLinkVersionIds.Contains(version.Id))
-            .Select(version => new DataBlockVersionLink
-            {
-                Id = version.Id,
-                DataBlockVersionId = version.Id,
-                DataBlockVersion = version,
-                ReleaseVersionId = originalReleaseVersion.Id,
-            })
-            .ToList();
-
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             contentDbContext.ReleaseVersions.Add(originalReleaseVersion);
             contentDbContext.Users.AddRange(originalCreatedBy, amendmentCreator);
             contentDbContext.ReleaseFiles.AddRange(releaseFiles);
-            contentDbContext.DataBlockVersionLinks.AddRange(unattachedDataBlockVersionLinks);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -419,45 +395,42 @@ public class ReleaseAmendmentServiceTests
             Assert.Equal(3, amendmentDataBlockVersions.Count);
 
             // Assert that each DataBlock has a new version created by the amendment process.
-            // The new DataBlockVersion should now be the LatestDraftVersion of its parent data block but
-            // not the LatestPublishedVersion (which should not have changed).
+            // The new DataBlockVersion should now be the LatestDraftVersion of its parent but not
+            // the LatestPublishedVersion (which should not have changed).
             amendmentDataBlockVersions.ForEach(dataBlockVersion =>
             {
-                var dataBlockVersionsForDataBlock = contentDbContext
-                    .DataBlockVersions.Where(version => version.DataBlockId == dataBlockVersion.DataBlockId)
+                var dataBlockVersionsForParent = contentDbContext
+                    .DataBlockVersions.Where(version => version.DataBlockParentId == dataBlockVersion.DataBlockParentId)
                     .ToList();
 
-                Assert.Equal(2, dataBlockVersionsForDataBlock.Count);
-                Assert.Equal(0, dataBlockVersionsForDataBlock[0].Version);
-                Assert.Equal(1, dataBlockVersionsForDataBlock[1].Version);
+                Assert.Equal(2, dataBlockVersionsForParent.Count);
+                Assert.Equal(0, dataBlockVersionsForParent[0].Version);
+                Assert.Equal(1, dataBlockVersionsForParent[1].Version);
 
-                Assert.Equal(dataBlockVersion, dataBlockVersion.DataBlock.LatestDraftVersion);
-                Assert.NotEqual(dataBlockVersion, dataBlockVersion.DataBlock.LatestPublishedVersion);
+                Assert.Equal(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestDraftVersion);
+                Assert.NotEqual(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestPublishedVersion);
             });
 
-            var amendmentContentBlock1 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock1);
-            var amendmentContentBlock2 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock2);
-            var amendmentContentBlock3 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock3);
+            var amendmentContentBlock1 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock1Parent);
+            var amendmentContentBlock2 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock2Parent);
+            var amendmentContentBlock3 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock3Parent);
 
-            var amendmentContentBlock1InContent = amendment
-                .GenericContent.ToList()[0]
-                .Content.OfType<DataBlockVersionLink>()
-                .Single();
+            var amendmentContentBlock1InContent = amendment.GenericContent.ToList()[0].Content[0];
 
             // Check that the DataBlock that is included in this Release amendment's Content is successfully
             // identified as the exact same DataBlock that is attached to the Release amendment through the
             // additional "Release.ContentBlocks" relationship (which is used to determine which Data Blocks
             // belong to which Release when a Data Block has not yet been - or is removed from - the Release's
             // Content
-            Assert.NotEqual(dataBlock1.LatestDraftVersion!.Id, amendmentContentBlock1.Id);
-            Assert.Equal(dataBlock1.LatestDraftVersion.Name, amendmentContentBlock1.Name);
-            Assert.Equal(amendmentContentBlock1.Id, amendmentContentBlock1InContent.DataBlockVersionId);
+            Assert.NotEqual(dataBlock1Parent.LatestDraftVersion!.Id, amendmentContentBlock1.Id);
+            Assert.Equal(dataBlock1Parent.LatestDraftVersion.Name, amendmentContentBlock1.Name);
+            Assert.Equal(amendmentContentBlock1, amendmentContentBlock1InContent);
 
             // and check that the Data Block that is not yet included in any content is copied across OK still
-            Assert.NotEqual(dataBlock2.LatestDraftVersion!.Id, amendmentContentBlock2.Id);
+            Assert.NotEqual(dataBlock2Parent.LatestDraftVersion!.Id, amendmentContentBlock2.Id);
 
             // and check DataBlock previously associated with key stat is copied correctly
-            Assert.NotEqual(dataBlock3.LatestDraftVersion!.Id, amendmentContentBlock3.Id);
+            Assert.NotEqual(dataBlock3Parent.LatestDraftVersion!.Id, amendmentContentBlock3.Id);
 
             // Check Key Statistics have been copied over.
             Assert.Equal(2, amendment.KeyStatistics.Count);
@@ -469,10 +442,10 @@ public class ReleaseAmendmentServiceTests
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[0].Id, amendmentKeyStatText.Id);
 
             var amendmentKeyStatDataBlock = amendment.KeyStatistics.OfType<KeyStatisticDataBlock>().Single();
-            Assert.Equal(dataBlock3.LatestDraftVersion!.Name, amendmentKeyStatDataBlock.DataBlockVersion.Name);
+            Assert.Equal(dataBlock3Parent.LatestDraftVersion!.Name, amendmentKeyStatDataBlock.DataBlock.Name);
             Assert.NotEqual(originalReleaseVersion.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
-            Assert.NotEqual(dataBlock3.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockVersionId);
-            Assert.Equal(amendmentContentBlock3.Id, amendmentKeyStatDataBlock.DataBlockVersionId);
+            Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
+            Assert.Equal(amendmentContentBlock3.Id, amendmentKeyStatDataBlock.DataBlockId);
 
             // Check generic Release Content has been copied over (both ContentSections and ContentBlocks).
             Assert.Equal(2, amendment.GenericContent.Count());
@@ -522,7 +495,8 @@ public class ReleaseAmendmentServiceTests
 
             // Check EmbedBlocks have been copied over OK.
             var amendmentEmbedBlockLink = await contentDbContext
-                .EmbedBlockLinks.Include(embedBlockLink => embedBlockLink.EmbedBlock)
+                .ContentBlocks.OfType<EmbedBlockLink>()
+                .Include(embedBlockLink => embedBlockLink.EmbedBlock)
                 .SingleAsync(block => block.ReleaseVersionId == amendment.Id);
 
             var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(
@@ -560,15 +534,15 @@ public class ReleaseAmendmentServiceTests
                         ignoreProperties:
                         [
                             ft => ft.Id,
-                            ft => ft.DataBlockVersion,
-                            ft => ft.DataBlockVersionId,
-                            // Note that we're ignoring DataBlock here only, not DataBlockId.
+                            ft => ft.DataBlock,
+                            ft => ft.DataBlockId,
+                            // Note that we're ignoring DataBlockParent here only, not DataBlockParentId.
                             // This is because the LatestPublishedVersion and LatestDraftVersion hanging from
-                            // the representation of DataBlock on the amendment is more up-to-date than
+                            // the representation of DataBlockParent on the amendment is more up-to-date than
                             // that of the original Featured Table's setup state since going through the amendment
                             // process. We expect both versions of the FeaturedTable to have the same
-                            // DataBlockId though.
-                            ft => ft.DataBlock,
+                            // DataBlockParentId though.
+                            ft => ft.DataBlockParent,
                             ft => ft.ReleaseVersion,
                             ft => ft.ReleaseVersionId,
                             ft => ft.Created,
@@ -578,12 +552,12 @@ public class ReleaseAmendmentServiceTests
                     );
 
                     Assert.NotEqual(Guid.Empty, amendedTable.Id);
-                    Assert.NotEqual(Guid.Empty, amendedTable.DataBlockId);
+                    Assert.NotEqual(Guid.Empty, amendedTable.DataBlockParentId);
 
                     // Expect the DataBlock referred to in the amended FeaturedTable to be the
-                    // DataBlock from the LatestDraftVersion of the associated DataBlock rather
+                    // DataBlock from the LatestDraftVersion of the associated DataBlockParent rather
                     // than the LatestPublishedVersion.
-                    Assert.Equal(amendedTable.DataBlock.LatestDraftVersion, amendedTable.DataBlockVersion);
+                    Assert.Equal(amendedTable.DataBlockParent.LatestDraftVersion!.ContentBlock, amendedTable.DataBlock);
 
                     Assert.Equal(amendment, amendedTable.ReleaseVersion);
                     Assert.Equal(amendment.Id, amendedTable.ReleaseVersionId);
@@ -887,20 +861,20 @@ public class ReleaseAmendmentServiceTests
                 .ThenInclude(section => section.Content)
                     .ThenInclude(section => (section as EmbedBlockLink)!.EmbedBlock)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlock)
-                    .ThenInclude(dataBlock => dataBlock.LatestDraftVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
-                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlock)
-                    .ThenInclude(dataBlock => dataBlock.LatestPublishedVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .Include(releaseVersion => releaseVersion.Updates)
             .Include(releaseVersion => releaseVersion.KeyStatistics)
-                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlockVersion)
+                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
             .Include(releaseVersion => releaseVersion.FeaturedTables)
             .First(rv => rv.Id == amendmentId);
     }
 
-    private static void AssertFootnoteDetailsCopiedCorrectly(Footnote originalFootnote, Footnote newFootnote)
+    private void AssertFootnoteDetailsCopiedCorrectly(Footnote originalFootnote, Footnote newFootnote)
     {
         Assert.Equal(originalFootnote.Content, newFootnote.Content);
         Assert.Equal(originalFootnote.Order, newFootnote.Order);
@@ -931,17 +905,18 @@ public class ReleaseAmendmentServiceTests
         );
     }
 
-    private static DataBlockVersion GetMatchingDataBlock(
+    private DataBlock GetMatchingDataBlock(
         List<DataBlockVersion> amendmentDataBlockVersions,
-        DataBlock dataBlockToFind
+        DataBlockParent dataBlockToFind
     )
     {
-        return amendmentDataBlockVersions.Single(dataBlockVersion =>
-            dataBlockVersion.Name == dataBlockToFind.LatestDraftVersion!.Name
-        );
+        return amendmentDataBlockVersions
+            .Where(dataBlockVersion => dataBlockVersion.Name == dataBlockToFind.LatestDraftVersion!.Name)
+            .Select(dataBlockParent => dataBlockParent.ContentBlock)
+            .Single();
     }
 
-    private static void AssertAmendedLinkCorrect(Link amendedLink, Link originalLink)
+    private void AssertAmendedLinkCorrect(Link amendedLink, Link originalLink)
     {
         amendedLink.AssertDeepEqualTo(originalLink, ignoreProperties: [l => l.Id]);
     }
@@ -970,7 +945,7 @@ public class ReleaseAmendmentServiceTests
     }
 
     // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-    private static void AssertAmendedContentSectionCorrect(
+    private void AssertAmendedContentSectionCorrect(
         ReleaseVersion amendment,
         ContentSection amendedSection,
         ContentSection originalSection
@@ -992,7 +967,7 @@ public class ReleaseAmendmentServiceTests
         });
     }
 
-    private static void AssertAmendedContentBlockCorrect(
+    private void AssertAmendedContentBlockCorrect(
         ContentBlock? originalBlock,
         ContentBlock amendedBlock,
         ContentSection amendedSection

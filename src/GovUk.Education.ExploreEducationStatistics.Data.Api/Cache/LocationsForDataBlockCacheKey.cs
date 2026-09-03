@@ -10,32 +10,32 @@ public record LocationsForDataBlockCacheKey : IBlobCacheKey
 {
     private string PublicationSlug { get; }
     private string ReleaseSlug { get; }
-    private Guid DataBlockId { get; }
+    private Guid DataBlockParentId { get; }
     private long BoundaryLevelId { get; }
 
     public LocationsForDataBlockCacheKey(DataBlockVersion dataBlockVersion, long boundaryLevelId)
         : this(
             publicationSlug: dataBlockVersion.ReleaseVersion.Release.Publication.Slug,
             releaseSlug: dataBlockVersion.ReleaseVersion.Release.Slug,
-            dataBlockId: dataBlockVersion.DataBlockId,
+            dataBlockParentId: dataBlockVersion.DataBlockParentId,
             boundaryLevelId: boundaryLevelId
         ) { }
 
     public LocationsForDataBlockCacheKey(
         string publicationSlug,
         string releaseSlug,
-        Guid dataBlockId,
+        Guid dataBlockParentId,
         long boundaryLevelId
     )
     {
         PublicationSlug = publicationSlug;
         ReleaseSlug = releaseSlug;
-        DataBlockId = dataBlockId;
+        DataBlockParentId = dataBlockParentId;
         BoundaryLevelId = boundaryLevelId;
     }
 
     public IBlobContainer Container => BlobContainers.PublicContent;
 
     public string Key =>
-        PublicContentDataBlockLocationsPath(PublicationSlug, ReleaseSlug, DataBlockId, BoundaryLevelId);
+        PublicContentDataBlockLocationsPath(PublicationSlug, ReleaseSlug, DataBlockParentId, BoundaryLevelId);
 }

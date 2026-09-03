@@ -114,13 +114,13 @@ const ReleaseContentAccordionSection = ({
   );
 
   const attachDataBlock = useCallback(
-    async (dataBlockVersionId: string) => {
+    async (contentBlockId: string) => {
       await actions.attachContentSectionBlock({
         releaseVersionId: release.id,
         sectionId,
         sectionKey: 'content',
         block: {
-          dataBlockVersionId,
+          contentBlockId,
           order: sectionContent.length,
         },
       });
@@ -164,9 +164,7 @@ const ReleaseContentAccordionSection = ({
   );
 
   const htmlBlocks = blocks.filter(block => block.type === 'HtmlBlock');
-  const dataBlocks = blocks.filter(
-    block => block.type === 'DataBlockVersionLink',
-  );
+  const dataBlocks = blocks.filter(block => block.type === 'DataBlock');
   const embedBlocks = blocks.filter(block => block.type === 'EmbedBlockLink');
 
   const getBlockButtonLabels = (block: EditableBlock) => {
@@ -193,7 +191,7 @@ const ReleaseContentAccordionSection = ({
         ),
       };
     }
-    if (block.type === 'DataBlockVersionLink') {
+    if (block.type === 'DataBlock') {
       const dataBlockIndex = dataBlocks.findIndex(
         dataBlock => dataBlock.id === block.id,
       );
@@ -327,8 +325,8 @@ const ReleaseContentAccordionSection = ({
                 <DataBlockSelectForm
                   id={`dataBlockSelectForm-${sectionId}`}
                   releaseVersionId={release.id}
-                  onSelect={async selectedDataBlockVersionId => {
-                    await attachDataBlock(selectedDataBlockVersionId);
+                  onSelect={async selectedDataBlockId => {
+                    await attachDataBlock(selectedDataBlockId);
                     toggleDataBlockForm.off();
                   }}
                   onCancel={toggleDataBlockForm.off}

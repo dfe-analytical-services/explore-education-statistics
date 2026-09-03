@@ -9,7 +9,7 @@ import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStat
 
 interface Props {
   releaseVersionId: string;
-  onSelect: (selectedDataBlockVersionId: string) => void;
+  onSelect: (selectedDataBlockId: string) => void;
   onCancel?: () => void;
   hideCancel?: boolean;
   label?: string;
@@ -23,8 +23,7 @@ const KeyStatDataBlockSelectForm = ({
   label = 'Select a key statistic',
 }: Props) => {
   const { unattachedDataBlocks } = useReleaseContentState();
-  const [selectedDataBlockVersionId, setSelectedDataBlockVersionId] =
-    useState('');
+  const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const keyStatDataBlocks = useMemo(() => {
     return unattachedDataBlocks.filter(dataBlock => {
@@ -42,7 +41,7 @@ const KeyStatDataBlockSelectForm = ({
 
   function getKeyStatPreview() {
     const selectedDataBlock = unattachedDataBlocks.find(
-      dataBlock => dataBlock.id === selectedDataBlockVersionId,
+      dataBlock => dataBlock.id === selectedDataBlockId,
     );
     return selectedDataBlock ? (
       <section>
@@ -53,7 +52,7 @@ const KeyStatDataBlockSelectForm = ({
         >
           <KeyStatDataBlock
             releaseVersionId={releaseVersionId}
-            dataBlockId={selectedDataBlock.dataBlockId}
+            dataBlockParentId={selectedDataBlock.dataBlockParentId}
           />
         </Details>
       </section>
@@ -67,8 +66,8 @@ const KeyStatDataBlockSelectForm = ({
         id="keyIndicatorSelect"
         name="selectedDataBlock"
         label={label}
-        value={selectedDataBlockVersionId}
-        onChange={e => setSelectedDataBlockVersionId(e.target.value)}
+        value={selectedDataBlockId}
+        onChange={e => setSelectedDataBlockId(e.target.value)}
         order={[]}
         options={[
           {
@@ -87,10 +86,8 @@ const KeyStatDataBlockSelectForm = ({
       {getKeyStatPreview()}
 
       <ButtonGroup>
-        {selectedDataBlockVersionId !== '' && (
-          <Button onClick={() => onSelect(selectedDataBlockVersionId)}>
-            Embed
-          </Button>
+        {selectedDataBlockId !== '' && (
+          <Button onClick={() => onSelect(selectedDataBlockId)}>Embed</Button>
         )}
         {!hideCancel && (
           <Button className="govuk-button--secondary" onClick={onCancel}>

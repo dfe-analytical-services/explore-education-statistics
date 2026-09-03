@@ -9,7 +9,7 @@ public record FeaturedTableCreateRequest
 
     public string Description { get; set; } = string.Empty;
 
-    public Guid DataBlockVersionId { get; set; }
+    public Guid DataBlockId { get; set; }
 
     public class Validator : AbstractValidator<FeaturedTableCreateRequest>
     {

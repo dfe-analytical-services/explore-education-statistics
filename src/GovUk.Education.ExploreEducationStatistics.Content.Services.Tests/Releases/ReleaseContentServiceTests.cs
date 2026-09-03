@@ -27,9 +27,9 @@ public abstract class ReleaseContentServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            var (keyStatsDataBlock, keyStatsSecondaryDataBlock, contentDataBlock) = _dataFixture
-                .DefaultDataBlock()
-                .WithLatestPublishedVersion(() =>
+            var (keyStatsDataBlockParent, keyStatsSecondaryDataBlockParent, contentDataBlockParent) = _dataFixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(
                     _dataFixture
                         .DefaultDataBlockVersion()
                         .WithReleaseVersion(releaseVersion)
@@ -51,8 +51,8 @@ public abstract class ReleaseContentServiceTests
                 _dataFixture
                     .DefaultKeyStatisticDataBlock()
                     .WithOrder(2)
-                    .WithDataBlock(keyStatsDataBlock)
-                    .WithDataBlockVersion(keyStatsDataBlock.LatestPublishedVersion!),
+                    .WithDataBlockParent(keyStatsDataBlockParent)
+                    .WithDataBlock(keyStatsDataBlockParent.LatestPublishedVersion!.ContentBlock),
                 _dataFixture.DefaultKeyStatisticText().WithOrder(3),
             ];
 
@@ -62,11 +62,7 @@ public abstract class ReleaseContentServiceTests
 
             releaseVersion.KeyStatisticsSecondarySection = _dataFixture
                 .DefaultContentSection(ContentSectionType.KeyStatisticsSecondary)
-                .WithContentBlocks([
-                    _dataFixture
-                        .DefaultDataVersionBlockVersionLink()
-                        .WithDataBlockVersion(keyStatsSecondaryDataBlock.LatestPublishedVersion!),
-                ]);
+                .WithContentBlocks([keyStatsSecondaryDataBlockParent.LatestPublishedVersion!.ContentBlock]);
 
             releaseVersion.SummarySection = _dataFixture
                 .DefaultContentSection(ContentSectionType.ReleaseSummary)
@@ -83,9 +79,7 @@ public abstract class ReleaseContentServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
-                        _dataFixture
-                            .DefaultDataVersionBlockVersionLink()
-                            .WithDataBlockVersion(contentDataBlock.LatestPublishedVersion!),
+                        contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
                     ]),
                 _dataFixture
@@ -438,8 +432,7 @@ public abstract class ReleaseContentServiceTests
                     AssertContentBlockTypeEqual(expectedBlock, actualBlock);
                     switch (expectedBlock)
                     {
-                        case DataBlockVersionLink expectedDataBlock
-                            when actualBlock is DataBlockVersionLinkDto actualDataBlock:
+                        case DataBlock expectedDataBlock when actualBlock is DataBlockDto actualDataBlock:
                             AssertDataBlockEqual(expectedDataBlock, actualDataBlock);
                             break;
                         case EmbedBlockLink expectedEmbedBlockLink
@@ -460,7 +453,7 @@ public abstract class ReleaseContentServiceTests
         {
             var expectedType = expected switch
             {
-                DataBlockVersionLink => typeof(DataBlockVersionLinkDto),
+                DataBlock => typeof(DataBlockDto),
                 EmbedBlockLink => typeof(EmbedBlockLinkDto),
                 HtmlBlock => typeof(HtmlBlockDto),
                 _ => throw new ArgumentOutOfRangeException(nameof(expected), expected, null),
@@ -473,7 +466,7 @@ public abstract class ReleaseContentServiceTests
             }
         }
 
-        private static void AssertDataBlockEqual(DataBlockVersionLink expected, DataBlockVersionLinkDto actual)
+        private static void AssertDataBlockEqual(DataBlock expected, DataBlockDto actual)
         {
             Assert.Equal(expected.Id, actual.Id);
             AssertDataBlockVersionEqual(expected.DataBlockVersion, actual.DataBlockVersion);
@@ -482,7 +475,7 @@ public abstract class ReleaseContentServiceTests
         private static void AssertDataBlockVersionEqual(DataBlockVersion expected, DataBlockVersionDto actual)
         {
             Assert.Equal(expected.Id, actual.DataBlockVersionId);
-            Assert.Equal(expected.DataBlockId, actual.DataBlockId);
+            Assert.Equal(expected.DataBlockParentId, actual.DataBlockParentId);
             expected.Charts.AssertDeepEqualTo(actual.Charts);
             Assert.Equal(expected.Heading, actual.Heading);
             Assert.Equal(expected.Name, actual.Name);
@@ -548,8 +541,8 @@ public abstract class ReleaseContentServiceTests
         )
         {
             Assert.Equal(expected.Id, actual.Id);
-            Assert.Equal(expected.DataBlockVersionId, actual.DataBlockVersionId);
-            Assert.Equal(expected.DataBlockId, actual.DataBlockId);
+            Assert.Equal(expected.DataBlockId, actual.DataBlockVersionId);
+            Assert.Equal(expected.DataBlockParentId, actual.DataBlockParentId);
             Assert.Equal(expected.GuidanceText, actual.GuidanceText);
             Assert.Equal(expected.GuidanceTitle, actual.GuidanceTitle);
             Assert.Equal(expected.Trend, actual.Trend);

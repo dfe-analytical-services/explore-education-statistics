@@ -330,10 +330,10 @@ public class MethodologyAmendmentServiceTests
         amendmentContentBlock.Created.AssertUtcNow();
         Assert.Equal(originalContentBlock.Order, amendmentContentBlock.Order);
 
-        // Check the Content Section is unset. Content Blocks within JSON do not need an owning
+        // Check the Content Section is null. Content Blocks within JSON do not need an owning
         // Content Section back reference.
         Assert.Null(amendmentContentBlock.ContentSection);
-        Assert.Equal(Guid.Empty, amendmentContentBlock.ContentSectionId);
+        Assert.Null(amendmentContentBlock.ContentSectionId);
 
         // Check the amendment's Content Block Comments are empty as we are starting with a clean slate.
         Assert.Empty(amendmentContentBlock.Comments);

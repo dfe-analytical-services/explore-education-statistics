@@ -36,7 +36,7 @@ const ReleaseDataBlockCreatePage = ({
           {
             publicationId,
             releaseVersionId,
-            dataBlockVersionId: dataBlock.id,
+            dataBlockId: dataBlock.id,
           },
         ),
       );

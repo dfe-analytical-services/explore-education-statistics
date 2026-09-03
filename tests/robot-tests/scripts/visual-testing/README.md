@@ -67,7 +67,7 @@ FROM ContentBlock
 JOIN Releases ON ContentBlock.ReleaseId = Releases.Id
 JOIN Publications ON Publications.Id = Releases.PublicationId 
 LEFT JOIN ContentSections ON ContentSections.Id = ContentSectionId
-LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockVersionId
+LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
   AND Releases.SoftDeleted = 0
@@ -75,7 +75,7 @@ WHERE ContentBlock.Type = 'DataBlock'
   -- Include DataBlocks that are linked to Content Sections
   ContentSectionId IS NOT NULL
   -- Include DataBlocks that are used for Featured Tables
-  OR FeaturedTables.DataBlockVersionId IS NOT NULL
+  OR FeaturedTables.DataBlockId IS NOT NULL
   )
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(

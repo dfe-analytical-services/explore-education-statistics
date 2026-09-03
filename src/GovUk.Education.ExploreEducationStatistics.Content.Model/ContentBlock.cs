@@ -1,18 +1,20 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using JsonKnownTypes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 [JsonConverter(typeof(JsonKnownTypesConverter<ContentBlock>))]
 [JsonDiscriminator(Name = "Type")]
-[KnownType(typeof(DataBlockVersionLink))]
+[KnownType(typeof(DataBlock))]
 [KnownType(typeof(HtmlBlock))]
 [KnownType(typeof(EmbedBlockLink))]
 public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
@@ -25,10 +27,10 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
     public Guid Id { get; set; }
 
     [JsonIgnore]
-    public ContentSection ContentSection { get; set; } = null!;
+    public ContentSection? ContentSection { get; set; }
 
     [JsonIgnore]
-    public Guid ContentSectionId { get; set; }
+    public Guid? ContentSectionId { get; set; }
 
     public Guid ReleaseVersionId { get; set; }
 
@@ -40,7 +42,7 @@ public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTi
 
     public DateTime? Updated { get; set; }
 
-    public List<Comment> Comments { get; set; } = [];
+    public List<Comment> Comments { get; set; } = new();
 
     public DateTime? Locked { get; set; }
 
@@ -70,26 +72,50 @@ public class EmbedBlockLink : ContentBlock
     public EmbedBlock EmbedBlock { get; set; }
 }
 
-public class DataBlockVersionLink : ContentBlock
+public class DataBlock : ContentBlock
 {
-    public Guid DataBlockVersionId { get; set; }
+    public DataBlock() { }
+
+    public string Heading { get; set; }
+
+    public string Name { get; set; }
+
+    public string? Source { get; set; }
+
+    public FullTableQuery Query { get; set; }
+
+    [JsonIgnore]
+    public List<IChart> Charts
+    {
+        get
+        {
+            return ChartsInternal
+                .Select(chart =>
+                {
+                    if (chart.Title.IsNullOrEmpty())
+                    {
+                        chart.Title = Heading;
+                    }
+                    return chart;
+                })
+                .ToList();
+        }
+        set => ChartsInternal = value;
+    }
+
+    // NOTE: We serialize ChartsInternal into JSON rather than Charts so that a chart title is set to null in the
+    // database JSON. If we serialized Charts, then the serialization would run through Chart's getter, and so set
+    // a chart title that is identical to the table heading. So to keep the database-stored chart JSON pure, we set
+    // this JsonProperty, preventing the need to migrate existing charts, and Chart's getter will provide the table
+    // heading in request responses when necessary.
+    [JsonProperty("Charts")]
+    [NotMapped]
+    private List<IChart> ChartsInternal { get; set; } = new();
+
+    public TableBuilderConfiguration Table { get; set; }
 
     [JsonIgnore]
     public DataBlockVersion DataBlockVersion { get; set; } = null!;
-
-    internal class Config : IEntityTypeConfiguration<DataBlockVersionLink>
-    {
-        public void Configure(EntityTypeBuilder<DataBlockVersionLink> builder)
-        {
-            // NoAction rather than the convention's Cascade for a required one-to-one. A ReleaseVersion
-            // already cascades to this ContentBlock row via its ContentSection, so cascading from
-            // DataBlockVersions as well would give SQL Server multiple cascade paths to the same row.
-            // Callers deleting a DataBlockVersion must therefore remove its link explicitly.
-            builder.HasOne(block => block.DataBlockVersion).WithOne().OnDelete(DeleteBehavior.NoAction);
-
-            builder.Navigation(block => block.DataBlockVersion).AutoInclude();
-        }
-    }
 }
 
 [AttributeUsage(AttributeTargets.Field)]

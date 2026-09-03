@@ -225,26 +225,26 @@ public class ReplacementPlanService(
     )
     {
         return contentDbContext
-            .DataBlockVersions.AsNoTracking()
-            .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
+            .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
+            .OfType<DataBlock>()
             .ToList()
-            .Where(dataBlockVersion => dataBlockVersion.Query.SubjectId == subjectId)
-            .Select(dataBlockVersion =>
+            .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)
+            .Select(dataBlock =>
             {
                 var existingFilters = ValidateFiltersForDataBlock(
-                    dataBlockVersion.Query.GetFilterItemIds().ToHashSet(),
+                    dataBlock.Query.GetFilterItemIds().ToHashSet(),
                     mapping
                 );
                 var indicatorGroups = CreateIndicatorGroupReplacementViewModel(
-                    dataBlockVersion.Query.Indicators.ToHashSet(),
+                    dataBlock.Query.Indicators.ToHashSet(),
                     mapping
                 );
-                var locations = ValidateLocationsForDataBlock(dataBlockVersion.Query.LocationIds.ToHashSet(), mapping);
-                var timePeriods = ValidateTimePeriodsForDataBlock(dataBlockVersion, replacementTimePeriods);
+                var locations = ValidateLocationsForDataBlock(dataBlock.Query.LocationIds.ToHashSet(), mapping);
+                var timePeriods = ValidateTimePeriodsForDataBlock(dataBlock, replacementTimePeriods);
 
                 return new DataBlockReplacementPlanViewModel(
-                    dataBlockVersion.Id,
-                    dataBlockVersion.Name,
+                    dataBlock.Id,
+                    dataBlock.Name,
                     existingFilters,
                     indicatorGroups,
                     locations,
@@ -472,19 +472,19 @@ public class ReplacementPlanService(
     }
 
     private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
-        DataBlockVersion dataBlockVersion,
+        DataBlock dataBlock,
         IList<(int Year, TimeIdentifier TimeIdentifier)> replacementTimePeriods
     )
     {
         return new TimePeriodRangeReplacementViewModel(
             start: ValidateTimePeriodForReplacement(
-                dataBlockVersion.Query.TimePeriod!.StartYear,
-                dataBlockVersion.Query.TimePeriod.StartCode,
+                dataBlock.Query.TimePeriod!.StartYear,
+                dataBlock.Query.TimePeriod.StartCode,
                 replacementTimePeriods
             ),
             end: ValidateTimePeriodForReplacement(
-                dataBlockVersion.Query.TimePeriod.EndYear,
-                dataBlockVersion.Query.TimePeriod.EndCode,
+                dataBlock.Query.TimePeriod.EndYear,
+                dataBlock.Query.TimePeriod.EndCode,
                 replacementTimePeriods
             )
         );
