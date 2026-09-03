@@ -574,6 +574,12 @@ user checks image has loaded
     ...    return arguments[0].complete && arguments[0].naturalWidth > 0;
     ...    ARGUMENTS    ${element}
     should be true    ${loaded}    Image failed to load. src was "${src}"
+    # also check image isn't corrupt or truncated
+    ${decoded}=    execute async javascript
+    ...    const callback = arguments[arguments.length - 1];
+    ...    arguments[0].decode().then(() => callback(true), () => callback(false));
+    ...    ARGUMENTS    ${element}
+    should be true    ${decoded}    Image data could not be decoded. src was "${src}"
 
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
