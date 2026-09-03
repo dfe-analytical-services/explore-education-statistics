@@ -315,7 +315,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 }
 
 module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
-  name: '${functionApp.name}AzureStorageAccountsConfigModuleDeploy'
+  name: '${functionApp.name}StorageAccountsConfigDeploy'
   params: {
     siteName: functionApp.name
     azureFileShares: azureFileShares
@@ -323,7 +323,7 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.b
 }
 
 module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
+  name: '${functionAppName}KeyVaultSecretsUserRoleAssignment'
   params: {
     principalIds: [functionApp.identity.principalId]
     keyVaultName: keyVault.name
