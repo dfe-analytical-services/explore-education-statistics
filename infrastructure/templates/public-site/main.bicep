@@ -157,6 +157,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       PUBLIC_API_BASE_URL: 'https://${publicApiPublicHostname}'
       PUBLIC_API_DOCS_URL: 'https://${publicApiPublicHostname}/docs'
       DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
+      WEBSITES_DISABLE_CONTENT_COMPRESSION: true
     }
     tagValues: tagValues
   }
