@@ -52,7 +52,7 @@ resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = 
 }
 
 module azureStorageAccountsConfigModule '../../common/components/storage/file-share-mounts-for-site-slot.bicep' = {
-  name: '${appName}${stagingSlotName}AzureStorageAccountsConfigModuleDeploy'
+  name: '${appName}${stagingSlotName}StorageAccountsConfigDeploy'
   params: {
     siteName: appName
     slotName: stagingSlotName
