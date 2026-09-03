@@ -66,7 +66,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 var azureOpenAIApiBaseUrlSecretName = 'nlsearch-azure-openai-api-base-url'
 var azureOpenAIApiKeySecretName = 'nlsearch-azure-openai-api-subscription-key'
 
-module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
