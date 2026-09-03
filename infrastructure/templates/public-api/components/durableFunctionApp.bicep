@@ -352,7 +352,7 @@ var keyVaultPrincipalIds = userAssignedManagedIdentityParams != null
   : [functionApp.identity.principalId, stagingSlot.identity.principalId]
 
 module functionAppKeyVaultRoleAssignments '../../common/components/key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}FunctionAppKeyVaultRoleAssignment'
+  name: '${functionAppName}KeyVaultSecretsUserRoleAssignment'
   params: {
     keyVaultName: keyVaultName
     principalIds: keyVaultPrincipalIds
@@ -361,7 +361,7 @@ module functionAppKeyVaultRoleAssignments '../../common/components/key-vault/key
 }
 
 module azureStorageAccountsConfigModule '../../common/components/storage/file-share-mounts-for-site.bicep' = {
-  name: '${functionApp.name}AzureStorageAccountsConfigModuleDeploy'
+  name: '${functionApp.name}StorageAccountsConfigDeploy'
   params: {
     siteName: functionApp.name
     azureFileShares: azureFileShares
