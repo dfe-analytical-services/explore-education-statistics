@@ -1163,7 +1163,7 @@ user navigates to
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
     IF    '${variable_value}'=='${EMPTY}'
-        Variable "${variable_name}" is empty.
+        Fail    Variable "${variable_name}" is empty.
     END
 
 user waits until table tool wizard step is available

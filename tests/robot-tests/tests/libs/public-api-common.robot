@@ -16,6 +16,10 @@ user creates API data set and opens details
     user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
     user waits until h3 is visible    Draft version details
 
+user checks response status code
+    [Arguments]    ${response}    ${expected_status}
+    should be equal as integers    ${response.status_code}    ${expected_status}
+
 response should be json
     [Arguments]    ${response}
     should be equal as strings    ${response.headers['Content-Type']}    application/json; charset=utf-8
