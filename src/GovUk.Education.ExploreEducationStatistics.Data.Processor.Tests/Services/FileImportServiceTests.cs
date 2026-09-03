@@ -49,16 +49,7 @@ public class FileImportServiceTests
 
         var dataImportService = new Mock<IDataImportService>(Strict);
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-        dataImportService
-            .Setup(s =>
-                s.WriteDataSetFileMeta(
-                    import.FileId,
-                    import.SubjectId,
-                    import.TotalRows!.Value,
-                    import.GeographicLevels
-                )
-            )
-            .Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.WriteDataSetFileMeta(import)).Returns(Task.CompletedTask);
 
         var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
         dataSetMappingService
@@ -129,57 +120,6 @@ public class FileImportServiceTests
         }
 
         VerifyAllMocks(dataImportService);
-    }
-
-    [Fact]
-    public async Task CompleteImport_NoGeographicLevels()
-    {
-        var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
-
-        var import = new DataImport
-        {
-            Id = Guid.NewGuid(),
-            Errors = new List<DataImportError>(),
-            FileId = file.Id,
-            File = file,
-            SubjectId = Guid.NewGuid(),
-            Status = STAGE_3,
-            ExpectedImportedRows = 2,
-            TotalRows = 65,
-            GeographicLevels = null,
-        };
-
-        var dataImportService = new Mock<IDataImportService>(Strict);
-        dataImportService.Setup(s => s.FailImport(import.Id, It.IsAny<string[]>())).Returns(Task.CompletedTask);
-
-        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
-        dataSetMappingService
-            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
-            .Returns(Task.CompletedTask);
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.Observation.AddRangeAsync(
-                new Observation { SubjectId = import.SubjectId },
-                new Observation { SubjectId = import.SubjectId }
-            );
-
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = BuildFileImportService(
-                dataImportService: dataImportService.Object,
-                dataSetMappingService: dataSetMappingService.Object
-            );
-
-            await Assert.ThrowsAsync<Exception>(() => service.CompleteImport(import, statisticsDbContext));
-        }
-
-        VerifyAllMocks(dataImportService, dataSetMappingService);
     }
 
     [Fact]

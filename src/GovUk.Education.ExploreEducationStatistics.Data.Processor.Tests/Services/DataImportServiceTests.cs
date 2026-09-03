@@ -267,18 +267,21 @@ public class DataImportServiceTests
 
         var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
 
-        await service.WriteDataSetFileMeta(
-            file.Id,
-            subject.Id,
-            totalRows,
-            csvGeographicLevels:
+        var import = new DataImport
+        {
+            FileId = file.Id,
+            SubjectId = subject.Id,
+            TotalRows = totalRows,
+            GeographicLevels =
             [
                 GeographicLevel.Country,
                 GeographicLevel.LocalAuthority,
                 GeographicLevel.Region,
                 GeographicLevel.School,
-            ]
-        );
+            ],
+        };
+
+        await service.WriteDataSetFileMeta(import);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
