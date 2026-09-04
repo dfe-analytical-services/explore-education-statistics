@@ -1,6 +1,7 @@
 *** Settings ***
 Library             DateTime
 Library             ../libs/admin_api.py
+Library             ../libs/public_api.py
 Resource            ../libs/admin-common.robot
 Resource            ../libs/admin/manage-content-common.robot
 Resource            ../libs/public-api-common.robot
@@ -71,6 +72,11 @@ Verify the contents inside 'Draft API data sets' table
 Click on 'View Details' link for API data set
     user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
     user waits until h3 is visible    Draft version details
+
+    ${current_url}=    get location
+    ${API_DATA_SET_ID}=    fetch from right    ${current_url}    /
+    check that variable is not empty    API_DATA_SET_ID    ${API_DATA_SET_ID}
+    set suite variable    ${API_DATA_SET_ID}
 
 User verifies the 'Draft API data set' summary list
     user checks summary list contains    Version    v1.0
@@ -317,6 +323,69 @@ User verifies the relevant fields on the active preview token page
     user checks page contains link    View preview token log
     user checks page contains    API data set endpoints quick start
 
+User copies the preview token for use with the API
+    ${PREVIEW_TOKEN}=    get value    id:copy-preview-token
+    check that variable is not empty    PREVIEW_TOKEN    ${PREVIEW_TOKEN}
+    set suite variable    ${PREVIEW_TOKEN}
+
+User cannot access the draft API data set via the API without the preview token
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}
+    user checks response status code    ${response}    403
+
+    &{params}=    create dictionary    dataSetVersion=1.0
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/meta    params=${params}
+    user checks response status code    ${response}    403
+
+User accesses the draft API data set via the API using the preview token
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}
+    ...    preview_token=${PREVIEW_TOKEN}
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    should be equal    ${json['title']}    ${SUBJECT_NAME}
+
+User gets the draft API data set meta via the API using the preview token
+    &{params}=    create dictionary    dataSetVersion=1.0
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/meta
+    ...    params=${params}
+    ...    preview_token=${PREVIEW_TOKEN}
+    user checks response status code    ${response}    200
+    ${meta}=    response should be json    ${response}
+
+    ${MEDIAN_INDICATOR_ID}=    user gets API data set indicator id    ${meta}    Median annualised earnings
+    set suite variable    ${MEDIAN_INDICATOR_ID}
+
+User queries the draft API data set via the API using the preview token
+    &{params}=    create dictionary    dataSetVersion=1.0
+    ${response}=    user makes post request to public api    /data-sets/${API_DATA_SET_ID}/query
+    ...    body={"indicators":["${MEDIAN_INDICATOR_ID}"]}
+    ...    params=${params}
+    ...    preview_token=${PREVIEW_TOKEN}
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    paginated response should contain results    ${json}    3270
+
+User downloads the draft API data set CSV via the API using the preview token
+    &{params}=    create dictionary    dataSetVersion=1.0
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/csv
+    ...    params=${params}
+    ...    preview_token=${PREVIEW_TOKEN}
+    user checks response status code    ${response}    200
+    ${row_count}=    evaluate    len($response.text.strip().splitlines())
+    should be equal as integers    ${row_count}    3271
+
+User revokes the preview token used for API access
+    user clicks button    Revoke preview token
+    ${modal}=    user waits until modal is visible    Revoke preview token
+    user clicks button    Confirm
+    user waits until page finishes loading
+    user waits until modal is not visible    Revoke preview token    %{WAIT_LONG}
+    user waits until page contains    API data set preview token log
+
+User cannot access the draft API data set via the API with a revoked preview token
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}
+    ...    preview_token=${PREVIEW_TOKEN}
+    user checks response status code    ${response}    403
+
 Add headline text block to Content page
     user clicks link    Back to API data set details
     user navigates to content page    ${PUBLICATION_NAME}
@@ -413,3 +482,81 @@ User verifies 'API version history' section
     user checks table cell contains    1    1    1.0 (current)    id:apiVersionHistory
     user checks table cell contains    1    2    ${RELEASE_NAME}    id:apiVersionHistory
     user checks table cell contains    1    3    Published    id:apiVersionHistory
+
+User checks the published API data set via the API
+    ${json}=    wait until keyword succeeds    10x    %{WAIT_SMALL}s
+    ...    user checks API data set is published    ${API_DATA_SET_ID}
+    should be equal    ${json['title']}    ${SUBJECT_NAME}
+    should be equal    ${json['latestVersion']['version']}    1.0
+
+User lists the published API data set versions via the API
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/versions
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    paginated response should contain results    ${json}    1
+    should be equal    ${json['results'][0]['version']}    1.0
+    should be equal    ${json['results'][0]['status']}    Published
+
+User gets the published API data set version via the API
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/versions/1.0
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    should be equal    ${json['version']}    1.0
+    should be equal    ${json['status']}    Published
+
+User queries the published API data set via the API for a known result
+    ${meta}=    user gets api data set meta via api    ${API_DATA_SET_ID}
+    ${median_id}=    user gets API data set indicator id    ${meta}    Median annualised earnings
+    ${gender_id}=    user gets API data set filter option id    ${meta}    Gender    Total
+    ${ethnicity_id}=    user gets API data set filter option id    ${meta}    Ethnicity group    Total
+    ${provision_id}=    user gets API data set filter option id    ${meta}    Provision    Total
+    ${level_id}=    user gets API data set filter option id    ${meta}    Level of learning    Total
+    ${years_id}=    user gets API data set filter option id    ${meta}
+    ...    Number of years after achievement of learning aim    1 year after study
+    ${colour_id}=    user gets API data set filter option id    ${meta}    Colour    Orange
+    ${cheese_id}=    user gets API data set filter option id    ${meta}    Cheese    Feta
+
+    # These filters narrow the data set down to a single row of the source CSV
+    # (the first data row of seven_filters.csv, where Median is 3).
+    ${body}=    catenate    SEPARATOR=
+    ...    {"criteria":{"and":[
+    ...    {"filters":{"eq":"${gender_id}"}},
+    ...    {"filters":{"eq":"${ethnicity_id}"}},
+    ...    {"filters":{"eq":"${provision_id}"}},
+    ...    {"filters":{"eq":"${level_id}"}},
+    ...    {"filters":{"eq":"${years_id}"}},
+    ...    {"filters":{"eq":"${colour_id}"}},
+    ...    {"filters":{"eq":"${cheese_id}"}}
+    ...    ]},"indicators":["${median_id}"]}
+
+    ${response}=    user makes post request to public api    /data-sets/${API_DATA_SET_ID}/query
+    ...    body=${body}
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    paginated response should contain results    ${json}    1
+    should be equal    ${json['results'][0]['values']['${median_id}']}    3
+
+User queries the published API data set via the API using a GET query
+    &{params}=    create dictionary    indicators=${MEDIAN_INDICATOR_ID}
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/query
+    ...    params=${params}
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    paginated response should contain results    ${json}    3270
+
+User downloads the published API data set CSV via the API
+    ${response}=    user makes get request to public api    /data-sets/${API_DATA_SET_ID}/csv
+    user checks response status code    ${response}    200
+    should contain    ${response.headers['Content-Type']}    text/csv
+    ${row_count}=    evaluate    len($response.text.strip().splitlines())
+    should be equal as integers    ${row_count}    3271
+
+
+*** Keywords ***
+user checks API data set is published
+    [Arguments]    ${data_set_id}
+    ${response}=    user makes get request to public api    /data-sets/${data_set_id}
+    user checks response status code    ${response}    200
+    ${json}=    response should be json    ${response}
+    should be equal    ${json['status']}    Published
+    RETURN    ${json}
