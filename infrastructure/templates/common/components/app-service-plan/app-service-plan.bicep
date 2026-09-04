@@ -10,8 +10,11 @@ param location string = resourceGroup().location
 @description('The SKU for the plan')
 param sku AppServicePlanSku
 
-@description('Function App Plan : operating system')
-param operatingSystem 'Windows' | 'Linux' = 'Linux'
+@description('The operating system to use to host App Services.')
+param operatingSystem 'Windows' | 'Linux'
+
+@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
+param kind 'app' | 'app,linux,container'
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
@@ -26,7 +29,7 @@ param tagValues object
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   sku: sku
   name: planName
-  kind: 'app'
+  kind: kind
   location: location
   tags: union(
     tagValues,

@@ -7,7 +7,7 @@ const path = require('path');
  */
 
 const nextConfig = {
-  compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
+  compress: false,
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,

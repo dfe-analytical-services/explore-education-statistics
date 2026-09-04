@@ -62,6 +62,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.contentApi.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -91,9 +92,14 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'contentApiAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.contentApi.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
@@ -124,6 +130,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
         mountPath: analyticsFileShareMountPath
       }
     ] : []
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger

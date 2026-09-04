@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuPublic": {
-      "value": "P1V2 PremiumV2"
-    },
     "skuImporter": {
       "value": "P1V2 PremiumV2"
     },
@@ -13,9 +10,6 @@
     },
     "skuPublisher": {
       "value": "S1 Standard"
-    },
-    "slackAlertsChannel": {
-      "value": "C0681S50SP5"
     },
     "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 5 0 * * *"
@@ -26,29 +20,8 @@
     "useSubnets": {
       "value": true
     },
-    "autoscaleAppServices": {
-      "value": false
-    },
     "domain": {
       "value": "pre-production.explore-education-statistics.service.gov.uk"
-    },
-    "contentApiUrl": {
-      "value": "cont.pre-production.explore-education-statistics.service.gov.uk"
-    },
-    "dataApiUrl": {
-      "value": "data.pre-production.explore-education-statistics.service.gov.uk"
-    },
-    "publicApiUrl": {
-      "value": "pp-api.education.gov.uk/statistics-preprod"
-    },
-    "publicApiDocsUrl": {
-      "value": "pp-api.education.gov.uk/statistics-preprod/docs"
-    },
-    "publicAppGATrackingId": {
-      "value": "G-8FSLWXTV2W"
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "value": 1000000
     },
     "skuContentDb": {
       "value": "Standard"
