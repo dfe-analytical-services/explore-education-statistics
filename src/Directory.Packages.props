@@ -140,7 +140,7 @@
   <ItemGroup Label="Utilities">
     <PackageVersion Include="AngleSharp" Version="1.7.1" />
     <PackageVersion Include="CliFx" Version="2.3.6" />
-    <PackageVersion Include="CliWrap" Version="3.10.1" />
+    <PackageVersion Include="CliWrap" Version="3.10.5" />
     <PackageVersion Include="Cronos" Version="0.13.0" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="Generator.Equals" Version="4.0.1" />
