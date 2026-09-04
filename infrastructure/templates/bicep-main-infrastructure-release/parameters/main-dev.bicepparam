@@ -9,8 +9,6 @@ param environmentConfigParam = {
   enableSwagger: true
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  publicApiUrl: 'pp-api.education.gov.uk/statistics-dev'
-  publicApiDocsUrl: 'pp-api.education.gov.uk/statistics-dev/docs'
   memoryCacheConfig: {
     expirationScanFrequencySeconds: 60
     maxCacheSizeMb: 50
@@ -39,8 +37,8 @@ param publicApiConfigParam = {
 
 param publicSiteConfigParam = {
   appServiceSku: {
-    tier: 'PremiumV2'
-    name: 'P1V2'
+    tier: 'Basic'
+    name: 'B1'
   }
   googleAnalyticsTrackingId: 'G-GRPHH2FN0L'
   defaultCacheMaxAgeSeconds: 10

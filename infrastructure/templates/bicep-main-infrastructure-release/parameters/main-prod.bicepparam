@@ -4,8 +4,6 @@ param environmentConfigParam = {
   environmentIdentifier: 's101p01'
   environmentName: 'Production'
   domain: 'explore-education-statistics.service.gov.uk'
-  publicApiUrl: 'api.education.gov.uk/statistics'
-  publicApiDocsUrl: 'api.education.gov.uk/statistics/docs'
 }
 
 param publicApiConfigParam = {

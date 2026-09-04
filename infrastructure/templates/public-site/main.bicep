@@ -76,8 +76,8 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.publicSite.appServicePlan
     sku: appServiceSku
-    operatingSystem: 'Linux'
     kind: 'app,linux,container'
+    operatingSystem: 'Linux'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
       cpuPercentage: true
@@ -114,8 +114,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'publicSiteAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.publicSite.appService
-    operatingSystem: 'Linux'
     kind: 'app,linux,container'
+    operatingSystem: 'Linux'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
     keyVaultRoles: {
@@ -135,6 +135,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       responseTimeSeconds: 12
       alertsGroupName: resourceNames.alertsGroup
     } : null
+    websitePort: 3000
     applicationAppSettings: {
       APP_ENV: environmentName
       AZURE_SEARCH_ENDPOINT: searchService.properties.endpoint

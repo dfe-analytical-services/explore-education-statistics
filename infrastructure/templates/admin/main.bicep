@@ -99,6 +99,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -128,6 +129,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.admin.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
     keyVaultRoles: {

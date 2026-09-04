@@ -4,8 +4,6 @@ param environmentConfigParam = {
   environmentIdentifier: 's101p02'
   environmentName: 'Pre-Production'
   domain: 'pre-production.explore-education-statistics.service.gov.uk'
-  publicApiUrl: 'pp-api.education.gov.uk/statistics-preprod'
-  publicApiDocsUrl: 'pp-api.education.gov.uk/statistics-preprod/docs'
   basicAuthEnabled: true
 }
 
@@ -19,8 +17,8 @@ param publicApiConfigParam = {
 
 param publicSiteConfigParam = {
   appServiceSku: {
-    tier: 'Basic'
-    name: 'B1'
+    tier: 'PremiumV2'
+    name: 'P1V2'
   }
   googleAnalyticsTrackingId: 'G-8FSLWXTV2W'
 }
