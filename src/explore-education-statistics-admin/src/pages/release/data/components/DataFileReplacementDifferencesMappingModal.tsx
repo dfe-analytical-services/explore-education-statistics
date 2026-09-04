@@ -37,7 +37,7 @@ export type DifferencesItemMappingModalProps<
   allCandidateOptions: Dictionary<SourceItemType>;
   unmappedCandidateOptions: Dictionary<SourceItemType>;
   mapping: ReplacementMapping<SourceItemType>;
-  onSubmit: (payload: UpdateMappingPayload) => void;
+  onSubmit: (payload: UpdateMappingPayload) => Promise<void>;
 } & LabelProps<ItemType>;
 
 export default function DifferencesItemMappingModal<
@@ -69,7 +69,7 @@ export default function DifferencesItemMappingModal<
       };
 
   const handleSubmit = async ({ selectedCandidate }: FormValues) => {
-    onSubmit({
+    await onSubmit({
       sourceKey: mapping.source.id,
       candidateKey:
         selectedCandidate !== noMappingValue ? selectedCandidate : undefined,
@@ -83,11 +83,12 @@ export default function DifferencesItemMappingModal<
     return {
       value: id,
       label: candidate[rowLabel] as string,
-      hint: hintLabelEntries
-        ? `(${hintLabelEntries
-            .map(([key, label]) => `${label} : ${candidate[key]}`)
-            .join(', ')})`
-        : undefined,
+      hint:
+        hintLabelEntries && hintLabelEntries.length > 0
+          ? `(${hintLabelEntries
+              .map(([key, label]) => `${label} : ${candidate[key]}`)
+              .join(', ')})`
+          : undefined,
     };
   };
 

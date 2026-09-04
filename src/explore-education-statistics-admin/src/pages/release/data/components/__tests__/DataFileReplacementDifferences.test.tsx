@@ -1,8 +1,10 @@
 import dataReplacementService, {
   DataReplacementPlan,
+  FilterMappingPlan,
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
+import cloneDeep from 'lodash/cloneDeep';
 import DataFileReplacementDifferencesTable from '../DataFileReplacementDifferencesTable';
 import DataFileReplacementDifferences from '../DataFileReplacementDifferences';
 
@@ -19,6 +21,71 @@ beforeEach(() =>
   ),
 );
 
+const filterMappings: FilterMappingPlan = {
+  mappings: {
+    'filter-one': {
+      source: { id: 'filter-one', label: 'Filter one', name: 'filter_one' },
+      type: 'ManuallySet',
+      candidateKey: 'filter-one-candidate',
+      filterGroups: {
+        mappings: {
+          'group-one': {
+            source: { id: 'group-one', label: 'Group one' },
+            type: 'ManuallySet',
+            candidateKey: 'group-one-candidate',
+            filterItems: {
+              mappings: {
+                'item-one': {
+                  source: { id: 'item-one', label: 'Item one' },
+                  type: 'Unset',
+                },
+              },
+              candidates: {
+                'item-one-candidate': {
+                  id: 'item-one-candidate',
+                  label: 'Item one candidate',
+                },
+              },
+            },
+          },
+          'group-not-mapped': {
+            source: {
+              id: 'group-not-mapped',
+              label: 'Group not mapped',
+            },
+            type: 'ParentNotMapped',
+            filterItems: {
+              mappings: {
+                'item-not-mapped': {
+                  source: {
+                    id: 'item-not-mapped',
+                    label: 'Item not mapped',
+                  },
+                  type: 'ParentNotMapped',
+                },
+              },
+              candidates: {},
+            },
+          },
+        },
+        candidates: {
+          'group-one-candidate': {
+            id: 'group-one-candidate',
+            label: 'Group one candidate',
+          },
+        },
+      },
+    },
+  },
+  candidates: {
+    'filter-one-candidate': {
+      id: 'filter-one-candidate',
+      label: 'Filter one candidate',
+      name: 'filter_one_candidate',
+    },
+  },
+};
+
 const testReplacementPlan: DataReplacementPlan = {
   originalSubjectId: 'subId',
   replacementSubjectId: 'repId',
@@ -26,6 +93,7 @@ const testReplacementPlan: DataReplacementPlan = {
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
+    filters: filterMappings,
     indicators: {
       mappings: {
         enrolments_again: {
@@ -223,6 +291,7 @@ const testReplacementPlanWithLocation: DataReplacementPlan = {
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
+    filters: { mappings: {}, candidates: {} },
     indicators: {
       mappings: {
         enrolments_again: {
@@ -455,13 +524,8 @@ describe('DataFileReplacementDifferences', () => {
       tableId: indicatorsTableId,
       itemType: 'indicator',
       mappingsPlan: testReplacementPlanWithLocation.mapping.indicators,
-      mappingGroups: [
-        {
-          label: 'Enrolment Group',
-          mappings: ['enrolments_again', 'enrolments'],
-        },
-      ],
-      mappingsToShow: new Set(['enrolments_again', 'enrolments']),
+      replacementGroups: expect.any(Array),
+      getGroupMappings: expect.any(Function),
       rowLabel: 'label',
       mappedDataLabels: {
         label: 'Label',
@@ -473,13 +537,8 @@ describe('DataFileReplacementDifferences', () => {
       tableId: locationsTableId,
       itemType: 'location',
       mappingsPlan: testReplacementPlanWithLocation.mapping.locations,
-      mappingGroups: [
-        {
-          label: 'Country',
-          mappings: ['country-england'],
-        },
-      ],
-      mappingsToShow: new Set(['country-england']),
+      replacementGroups: expect.any(Array),
+      getGroupMappings: expect.any(Function),
       rowLabel: 'name',
       mappedDataLabels: {
         name: 'Name',
@@ -640,5 +699,106 @@ describe('DataFileReplacementDifferences', () => {
     );
 
     expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('No Mapping');
+  });
+
+  test('renders the filter, group and item mapping hierarchy', () => {
+    sharedRender();
+
+    const filtersTable = screen.getByText('Filters').closest('table');
+    expect(filtersTable).not.toBeNull();
+
+    const caption = within(filtersTable!)
+      .getByText('Filters')
+      .closest('caption');
+    expect(caption).toHaveTextContent('3 unmapped filters');
+    expect(caption).toHaveTextContent('2 not shown');
+    expect(caption).toHaveTextContent('2 mapped filters');
+
+    const rows = within(filtersTable!).getAllByRole('row');
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toHaveTextContent('Filter one');
+    expect(rows[0]).toHaveTextContent('Filter one candidate');
+    expect(rows[1]).toHaveTextContent('Group one');
+    expect(rows[1]).toHaveTextContent('Group one candidate');
+    expect(rows[2]).toHaveTextContent('Item one');
+    expect(rows[2]).toHaveTextContent('not present');
+    expect(filtersTable).not.toHaveTextContent('Group not mapped');
+    expect(filtersTable).not.toHaveTextContent('Item not mapped');
+  });
+
+  test('maps a filter item to a replacement candidate', async () => {
+    const { user } = sharedRender();
+
+    const filtersTable = screen.getByText('Filters').closest('table');
+    expect(filtersTable).not.toBeNull();
+
+    await user.click(
+      within(filtersTable!).getByRole('button', { name: 'Map item Item one' }),
+    );
+
+    const modal = await screen.findByRole('dialog');
+    await user.click(within(modal).getByLabelText('Item one candidate'));
+    await user.click(within(modal).getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(
+        within(filtersTable!).getByText('Item one candidate'),
+      ).toBeVisible();
+      expect(within(filtersTable!).queryByText('not present')).toBeNull();
+    });
+
+    await waitFor(() => {
+      expect(
+        dataReplacementService.updatePlanFilterMappings,
+      ).toHaveBeenCalledWith(
+        'releaseVersionId',
+        'fileId',
+        'replacementFileId',
+        [],
+        [],
+        [
+          {
+            originalId: 'item-one',
+            newReplacementId: 'item-one-candidate',
+          },
+        ],
+      );
+    });
+  });
+
+  test('refreshes the internal mappings when the plan is reloaded', async () => {
+    const { rerender } = sharedRender();
+    const reloadedFilters = cloneDeep(filterMappings);
+    const reloadedItem =
+      reloadedFilters.mappings['filter-one'].filterGroups.mappings['group-one']
+        .filterItems.mappings['item-one'];
+
+    reloadedItem.type = 'ManuallySet';
+    reloadedItem.candidateKey = 'item-one-candidate';
+
+    rerender(
+      <DataFileReplacementDifferences
+        replacementFileId="replacementFileId"
+        reloadPlan={jest.fn()}
+        fileId="fileId"
+        releaseVersionId="releaseVersionId"
+        plan={{
+          ...testReplacementPlan,
+          mapping: {
+            ...testReplacementPlan.mapping,
+            filters: reloadedFilters,
+          },
+        }}
+      />,
+    );
+
+    const filtersTable = screen.getByText('Filters').closest('table');
+    expect(filtersTable).not.toBeNull();
+
+    await waitFor(() => {
+      expect(
+        within(filtersTable!).getByText('Item one candidate'),
+      ).toBeVisible();
+    });
   });
 });
