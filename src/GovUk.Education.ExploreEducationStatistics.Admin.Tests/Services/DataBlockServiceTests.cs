@@ -385,6 +385,21 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
+        var subjectId1 = Guid.NewGuid();
+        var subjectId2 = Guid.NewGuid();
+
+        ReleaseFile dataReleaseFile1 = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName("Test data set name 1")
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId1));
+
+        ReleaseFile dataReleaseFile2 = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName("Test data set name 2")
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId2));
+
         var dataBlock1 = new DataBlock
         {
             Heading = "Test heading 1",
@@ -395,6 +410,7 @@ public class DataBlockServiceTests
             ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
+                SubjectId = subjectId1,
                 Filters = new List<Guid> { Guid.NewGuid() },
                 Indicators = new List<Guid> { Guid.NewGuid() },
             },
@@ -440,6 +456,7 @@ public class DataBlockServiceTests
             Created = new DateTime(2001, 2, 2),
             Query = new FullTableQuery
             {
+                SubjectId = subjectId2,
                 Filters = new List<Guid> { Guid.NewGuid() },
                 Indicators = new List<Guid> { Guid.NewGuid() },
             },
@@ -474,6 +491,7 @@ public class DataBlockServiceTests
         {
             await context.AddRangeAsync(dataBlock1, dataBlock2);
             await context.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
+            await context.ReleaseFiles.AddRangeAsync(dataReleaseFile1, dataReleaseFile2);
             await context.SaveChangesAsync();
         }
 
@@ -492,6 +510,7 @@ public class DataBlockServiceTests
             Assert.Equal(featuredTable1.Name, listResult[0].HighlightName);
             Assert.Equal(featuredTable1.Description, listResult[0].HighlightDescription);
             Assert.Equal(dataBlock1.Source, listResult[0].Source);
+            Assert.Equal("Test data set name 1", listResult[0].DataSetName);
             Assert.Equal(1, listResult[0].ChartsCount);
             Assert.True(listResult[0].InContent);
 
@@ -501,6 +520,7 @@ public class DataBlockServiceTests
             Assert.Equal(featuredTable2.Name, listResult[1].HighlightName);
             Assert.Equal(featuredTable2.Description, listResult[1].HighlightDescription);
             Assert.Equal(dataBlock2.Source, listResult[1].Source);
+            Assert.Equal("Test data set name 2", listResult[1].DataSetName);
             Assert.Equal(0, listResult[1].ChartsCount);
             Assert.False(listResult[1].InContent);
         }
@@ -511,7 +531,20 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlock = new DataBlock { ContentSectionId = null, ReleaseVersion = releaseVersion };
+        var subjectId = Guid.NewGuid();
+
+        ReleaseFile dataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName("Test data set name")
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId));
+
+        var dataBlock = new DataBlock
+        {
+            ContentSectionId = null,
+            Query = new FullTableQuery { SubjectId = subjectId },
+            ReleaseVersion = releaseVersion,
+        };
 
         var keyStatistic = new KeyStatisticDataBlock { ReleaseVersion = releaseVersion, DataBlock = dataBlock };
 
@@ -521,6 +554,7 @@ public class DataBlockServiceTests
         {
             await context.AddRangeAsync(dataBlock);
             await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
+            await context.ReleaseFiles.AddAsync(dataReleaseFile);
             await context.SaveChangesAsync();
         }
 
@@ -543,6 +577,14 @@ public class DataBlockServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
+        var subjectId = Guid.NewGuid();
+
+        ReleaseFile dataReleaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithName("Test data set name")
+            .WithFile(_fixture.DefaultFile().WithType(FileType.Data).WithSubjectId(subjectId));
+
         var relatedDataBlock = new DataBlock
         {
             Heading = "Test heading 1",
@@ -553,6 +595,7 @@ public class DataBlockServiceTests
             ContentSectionId = Guid.NewGuid(),
             Query = new FullTableQuery
             {
+                SubjectId = subjectId,
                 Filters = new List<Guid> { Guid.NewGuid() },
                 Indicators = new List<Guid> { Guid.NewGuid() },
             },
@@ -601,6 +644,7 @@ public class DataBlockServiceTests
         {
             await context.AddRangeAsync(relatedDataBlock, unrelatedDataBlock);
             await context.FeaturedTables.AddAsync(featuredTable1);
+            await context.ReleaseFiles.AddAsync(dataReleaseFile);
             await context.SaveChangesAsync();
         }
 
@@ -617,6 +661,7 @@ public class DataBlockServiceTests
             Assert.Equal(featuredTable1.Name, viewModel.HighlightName);
             Assert.Equal(featuredTable1.Description, viewModel.HighlightDescription);
             Assert.Equal(relatedDataBlock.Source, viewModel.Source);
+            Assert.Equal("Test data set name", viewModel.DataSetName);
             Assert.Equal(1, viewModel.ChartsCount);
             Assert.True(viewModel.InContent);
         }

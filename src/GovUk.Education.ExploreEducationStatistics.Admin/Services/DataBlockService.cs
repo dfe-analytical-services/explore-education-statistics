@@ -186,6 +186,8 @@ public class DataBlockService : IDataBlockService
                     .FeaturedTables.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                     .ToListAsync();
 
+                var dataSetNamesBySubjectId = await GetDataSetNamesBySubjectId(releaseVersion.Id);
+
                 return dataBlocks
                     .Select(block =>
                     {
@@ -202,6 +204,7 @@ public class DataBlockService : IDataBlockService
                             HighlightName = featuredTable?.Name,
                             HighlightDescription = featuredTable?.Description,
                             Source = block.Source,
+                            DataSetName = dataSetNamesBySubjectId[block.Query.SubjectId],
                             ChartsCount = block.Charts.Count,
                             InContent = inContent,
                         };
@@ -491,6 +494,19 @@ public class DataBlockService : IDataBlockService
             && await _context
                 .KeyStatisticsDataBlock.Where(ks => ks.ReleaseVersionId == releaseVersionId)
                 .AllAsync(ks => ks.DataBlockId != dataBlockVersion.Id);
+    }
+
+    private async Task<Dictionary<Guid, string>> GetDataSetNamesBySubjectId(Guid releaseVersionId)
+    {
+        return await _context
+            .ReleaseFiles.Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.Type == FileType.Data
+                // Replacements should not be linked to any DataBlocks, so no need to include them here
+                && rf.File.ReplacingId == null
+            )
+            .Select(rf => new { SubjectId = rf.File.SubjectId!.Value, rf.Name })
+            .ToDictionaryAsync(rf => rf.SubjectId, rf => rf.Name!);
     }
 
     public async Task<List<DataBlock>> ListDataBlocks(Guid releaseVersionId)

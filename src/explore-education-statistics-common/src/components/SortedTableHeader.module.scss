@@ -1,0 +1,11 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.button {
+  align-items: center;
+  display: inline-flex;
+  gap: govuk-spacing(1);
+}
+
+.icon {
+  flex: none;
+}
