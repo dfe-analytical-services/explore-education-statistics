@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -43,13 +44,12 @@ public class FileImportServiceTests
             Status = STAGE_3,
             ExpectedImportedRows = 2,
             TotalRows = 65,
+            GeographicLevels = [GeographicLevel.Country, GeographicLevel.School],
         };
 
         var dataImportService = new Mock<IDataImportService>(Strict);
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-        dataImportService
-            .Setup(s => s.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value))
-            .Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.WriteDataSetFileMeta(import)).Returns(Task.CompletedTask);
 
         var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
         dataSetMappingService

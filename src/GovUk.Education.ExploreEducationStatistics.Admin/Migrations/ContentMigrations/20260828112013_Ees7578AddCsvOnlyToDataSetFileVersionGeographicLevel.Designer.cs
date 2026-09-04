@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260828112013_Ees7578AddCsvOnlyToDataSetFileVersionGeographicLevel")]
+    partial class Ees7578AddCsvOnlyToDataSetFileVersionGeographicLevel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2585,7 +2588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "User")
-                        .WithMany()
+                        .WithMany("UserPreReleaseRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2612,7 +2615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "User")
-                        .WithMany()
+                        .WithMany("UserPublicationRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2781,6 +2784,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
                     b.Navigation("Publications");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.User", b =>
+                {
+                    b.Navigation("UserPreReleaseRoles");
+
+                    b.Navigation("UserPublicationRoles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", b =>

@@ -94,7 +94,8 @@ public class DataSetFileService(
             .ToDictionaryAsync(
                 file => file.Id,
                 file =>
-                    file.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel.GetEnumLabel())
+                    file.DataSetFileVersionGeographicLevels.Where(gl => gl.CsvOnly != true)
+                        .Select(gl => gl.GeographicLevel.GetEnumLabel())
                         .Order()
                         .ToList(),
                 cancellationToken: cancellationToken
@@ -339,6 +340,7 @@ public class DataSetFileService(
         {
             NumDataFileRows = meta.NumDataFileRows,
             GeographicLevels = dataSetFileVersionGeographicLevels
+                .Where(gl => gl.CsvOnly != true)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
@@ -582,7 +584,9 @@ internal static class ReleaseFileQueryableExtensions
     {
         return geographicLevel.HasValue
             ? query.Where(rf =>
-                rf.File.DataSetFileVersionGeographicLevels.Any(gl => gl.GeographicLevel == geographicLevel)
+                rf.File.DataSetFileVersionGeographicLevels.Any(gl =>
+                    gl.GeographicLevel == geographicLevel && gl.CsvOnly != true
+                )
             )
             : query;
     }

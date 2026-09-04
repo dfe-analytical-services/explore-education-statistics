@@ -55,6 +55,11 @@ public static class FileGeneratorExtensions
         List<GeographicLevel> geographicLevels
     ) => generator.ForInstance(s => s.SetDataSetFileVersionGeographicLevels(geographicLevels));
 
+    public static Generator<File> WithCsvOnlyGeographicLevels(
+        this Generator<File> generator,
+        List<GeographicLevel> geographicLevels
+    ) => generator.ForInstance(s => s.SetCsvOnlyGeographicLevels(geographicLevels));
+
     public static Generator<File> WithCreatedByUser(this Generator<File> generator, User user) =>
         generator.ForInstance(s => s.SetFileCreatedByUser(user));
 
@@ -160,6 +165,25 @@ public static class FileGeneratorExtensions
                         GeographicLevel = gl,
                     })
                     .ToList()
+        );
+
+    public static InstanceSetters<File> SetCsvOnlyGeographicLevels(
+        this InstanceSetters<File> setters,
+        List<GeographicLevel> geographicLevels
+    ) =>
+        setters.Set(
+            file => file.DataSetFileVersionGeographicLevels,
+            (_, file) =>
+                [
+                    .. file.DataSetFileVersionGeographicLevels,
+                    .. geographicLevels.Select(gl => new DataSetFileVersionGeographicLevel
+                    {
+                        DataSetFileVersionId = file.Id,
+                        DataSetFileVersion = file,
+                        GeographicLevel = gl,
+                        CsvOnly = true,
+                    }),
+                ]
         );
 
     public static InstanceSetters<File> SetFileCreatedByUser(this InstanceSetters<File> setters, User? user) =>

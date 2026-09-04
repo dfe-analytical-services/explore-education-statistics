@@ -128,18 +128,16 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows)
+    public async Task WriteDataSetFileMeta(DataImport import)
     {
+        var subjectId = import.SubjectId;
+
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
         await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
         var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
 
-        var geographicLevels = observations
-            .Select(o => o.Location.GeographicLevel)
-            .Distinct()
-            .OrderBy(gl => gl)
-            .ToList();
+        var importedGeographicLevels = observations.Select(o => o.Location.GeographicLevel).Distinct().ToList();
 
         var timePeriods = observations
             .Select(o => new { o.Year, o.TimeIdentifier })
@@ -182,7 +180,7 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
 
         var dataSetFileMeta = new DataSetFileMeta
         {
-            NumDataFileRows = numDataFileRows,
+            NumDataFileRows = import.TotalRows!.Value,
             TimePeriodRange = new TimePeriodRangeMeta { Start = timePeriods.First(), End = timePeriods.Last() },
             Filters = filters,
             Indicators = indicators,
@@ -191,8 +189,15 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         file.DataSetFileMeta = dataSetFileMeta;
 
-        var dataSetFileVersionGeographicLevels = geographicLevels
-            .Select(gl => new DataSetFileVersionGeographicLevel { DataSetFileVersionId = fileId, GeographicLevel = gl })
+        var csvGeographicLevels = import.GeographicLevels!;
+        var dataSetFileVersionGeographicLevels = csvGeographicLevels
+            .OrderBy(gl => gl)
+            .Select(gl => new DataSetFileVersionGeographicLevel
+            {
+                DataSetFileVersionId = import.FileId,
+                GeographicLevel = gl,
+                CsvOnly = !importedGeographicLevels.Contains(gl),
+            })
             .ToList();
         contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 
