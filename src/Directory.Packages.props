@@ -138,7 +138,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Utilities">
-    <PackageVersion Include="AngleSharp" Version="1.7.1" />
+    <PackageVersion Include="AngleSharp" Version="1.7.3" />
     <PackageVersion Include="CliFx" Version="2.3.6" />
     <PackageVersion Include="CliWrap" Version="3.10.1" />
     <PackageVersion Include="Cronos" Version="0.13.0" />
