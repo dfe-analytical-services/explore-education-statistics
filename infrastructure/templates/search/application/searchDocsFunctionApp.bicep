@@ -104,7 +104,6 @@ module functionAppModule '../../common/components/function-app/function-app.bice
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
     appSettings: [
