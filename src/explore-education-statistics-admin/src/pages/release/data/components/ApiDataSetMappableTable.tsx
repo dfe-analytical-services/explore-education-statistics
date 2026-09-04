@@ -15,6 +15,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
+import useIsMappingActionsReadOnly from '@admin/pages/release/data/hooks/useIsMappingActionsReadOnly';
 
 interface Props {
   candidateHint?: (candidate: CandidateWithKey) => ReactNode;
@@ -54,6 +55,8 @@ export default function ApiDataSetMappableTable({
   renderSourceDetails,
   onUpdate,
 }: Props) {
+  const isReadOnly = useIsMappingActionsReadOnly(readOnly);
+
   const totalUnmapped = mappableItems.filter(
     item => item.mapping.type === 'AutoNone',
   ).length;
@@ -93,7 +96,9 @@ export default function ApiDataSetMappableTable({
             <th className="govuk-!-width-one-third">Current data set</th>
             <th className="govuk-!-width-one-third">New data set</th>
             <th>Type</th>
-            {!readOnly && <th className="govuk-!-text-align-right">Actions</th>}
+            {!isReadOnly && (
+              <th className="govuk-!-text-align-right">Actions</th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -134,7 +139,7 @@ export default function ApiDataSetMappableTable({
                     {getUpdateTagText(mapping.type, isMajorMapping)}
                   </Tag>
                 </td>
-                {!readOnly && (
+                {!isReadOnly && (
                   <td className="govuk-!-text-align-right">
                     {isPendingUpdate ? (
                       <LoadingSpinner

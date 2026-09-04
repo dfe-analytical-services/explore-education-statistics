@@ -69,7 +69,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         private record CreatePreviewTokenValidationError(string Message, string Path);
 
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             var expectedExpires = DateTimeOffset.UtcNow.AddDays(7).GetUkEndOfDayUtc();
             var dataSetVersion = await SetUpDataSetVersionTestData();
@@ -317,7 +317,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
 
         [Fact]
-        public async Task NotBauUser_ReturnsForbidden()
+        public async Task NotBauUserAndNotOnPublicationTeam_ReturnsForbidden()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -339,6 +339,104 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             var response = await CreatePreviewToken(dataSetVersion.Id, "Label", user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_ReturnsForbidden()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await CreatePreviewToken(dataSetVersion.Id, "Label", user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanCreatePreviewToken_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await CreatePreviewToken(
+                dataSetVersionId: dataSetVersion.Id,
+                label: "Label",
+                user: identityUser
+            );
+
+            response.AssertCreated<PreviewTokenViewModel>(
+                expectedLocationPrefix: "http://localhost/api/public-data/preview-tokens/"
+            );
         }
 
         private static DateTimeOffset GetUkEndOfDayUtcAfterDays(DateTimeOffset date, int daysToAdd) =>
@@ -393,7 +491,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
     public class GetPreviewTokenTests(PreviewTokenControllerTestsFixture fixture) : PreviewTokenControllerTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -473,7 +571,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
 
         [Fact]
-        public async Task NotBauUser_ReturnsForbidden()
+        public async Task NotBauUserAndNotOnPublicationTeam_ReturnsForbidden()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -501,6 +599,106 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             response.AssertForbidden();
         }
 
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_ReturnsForbidden()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() =>
+                    DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id).Generate(2)
+                )
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var previewToken = dataSetVersion.PreviewTokens[0];
+
+            var response = await GetPreviewToken(previewToken.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanGetPreviewToken_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var previewToken = dataSetVersion.PreviewTokens[0];
+
+            var response = await GetPreviewToken(previewToken.Id, user: identityUser);
+
+            response.AssertOk<PreviewTokenViewModel>();
+        }
+
         private async Task<HttpResponseMessage> GetPreviewToken(Guid previewTokenId, ClaimsPrincipal user)
         {
             var client = fixture.CreateClient(user: user);
@@ -515,7 +713,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         : PreviewTokenControllerTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -669,7 +867,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
 
         [Fact]
-        public async Task NotBauUser_ReturnsForbidden()
+        public async Task NotBauUserAndNotOnPublicationTeam_ReturnsForbidden()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -693,6 +891,99 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             response.AssertForbidden();
         }
 
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_ReturnsForbidden()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanListPreviewTokens_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await ListPreviewTokens(dataSetVersion.Id, user: identityUser);
+
+            response.AssertOk<List<PreviewTokenViewModel>>();
+        }
+
         private async Task<HttpResponseMessage> ListPreviewTokens(Guid dataSetVersionId, ClaimsPrincipal user)
         {
             var client = fixture.CreateClient(user: user);
@@ -709,7 +1000,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         : PreviewTokenControllerTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -805,7 +1096,7 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
         }
 
         [Fact]
-        public async Task NotBauUser_ReturnsForbidden()
+        public async Task NotBauUserAndNotOnPublicationTeam_ReturnsForbidden()
         {
             DataSet dataSet = DataFixture.DefaultDataSet();
 
@@ -831,6 +1122,104 @@ public abstract class PreviewTokenControllerTests(PreviewTokenControllerTestsFix
             );
 
             response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_ReturnsForbidden()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var previewToken = dataSetVersion.PreviewTokens[0];
+
+            var response = await RevokePreviewToken(previewToken.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanRevokePreviewToken_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken().WithCreatedByUserId(fixture.BauUser.Id)])
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var previewToken = dataSetVersion.PreviewTokens[0];
+
+            var response = await RevokePreviewToken(previewToken.Id, user: identityUser);
+
+            response.AssertOk<PreviewTokenViewModel>();
         }
 
         private async Task<HttpResponseMessage> RevokePreviewToken(Guid previewTokenId, ClaimsPrincipal user)

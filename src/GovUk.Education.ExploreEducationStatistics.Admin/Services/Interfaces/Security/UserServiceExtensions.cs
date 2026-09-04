@@ -402,4 +402,25 @@ public static class UserServiceExtensions
     {
         return new DataFilePermissions { CanCancelImport = (await userService.CheckCanCancelFileImport(file)).IsRight };
     }
+
+    public static Task<Either<ActionResult, Unit>> CheckCanManagePublicApiDataSets(this IUserService userService)
+    {
+        return userService.CheckPolicy(SecurityPolicies.CanManagePublicApiDataSets);
+    }
+
+    public static Task<Either<ActionResult, Guid>> CheckCanViewPublicApiDataSets(
+        this IUserService userService,
+        Guid publicationId
+    )
+    {
+        return userService.CheckPolicy(publicationId, SecurityPolicies.CanViewPublicApiDataSets);
+    }
+
+    public static Task<Either<ActionResult, Guid>> CheckCanManagePublicApiDataSetPreviewTokens(
+        this IUserService userService,
+        Guid publicationId
+    )
+    {
+        return userService.CheckPolicy(publicationId, SecurityPolicies.CanManagePublicApiDataSetPreviewTokens);
+    }
 }

@@ -16,6 +16,7 @@ import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import chunk from 'lodash/chunk';
 import React, { ReactNode, useMemo, useState } from 'react';
+import useIsMappingActionsReadOnly from '@admin/pages/release/data/hooks/useIsMappingActionsReadOnly';
 
 const itemsPerPage = 10;
 const formId = 'auto-mapped-search';
@@ -55,6 +56,7 @@ export default function ApiDataSetAutoMappedTable({
 }: Props) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>();
+  const isReadOnly = useIsMappingActionsReadOnly(readOnly);
 
   const filteredItems = useMemo(() => {
     if (searchTerm) {
@@ -134,7 +136,7 @@ export default function ApiDataSetAutoMappedTable({
                 <th className="govuk-!-width-one-third">Current data set</th>
                 <th className="govuk-!-width-one-third">New data set</th>
                 <th>Type</th>
-                {!readOnly && (
+                {!isReadOnly && (
                   <th className="govuk-!-text-align-right">Actions</th>
                 )}
               </tr>
@@ -152,7 +154,7 @@ export default function ApiDataSetAutoMappedTable({
                       <td>
                         <Tag colour="grey">Minor</Tag>
                       </td>
-                      {!readOnly && (
+                      {!isReadOnly && (
                         <td className="govuk-!-text-align-right">
                           {isPendingUpdate ? (
                             <LoadingSpinner

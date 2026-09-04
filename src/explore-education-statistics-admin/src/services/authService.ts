@@ -5,6 +5,7 @@ export interface GlobalPermissions {
   canAccessAnalystPages: boolean;
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
+  canManagePublicApiDataSets: boolean;
   isBauUser: boolean;
   isApprover: boolean;
 }

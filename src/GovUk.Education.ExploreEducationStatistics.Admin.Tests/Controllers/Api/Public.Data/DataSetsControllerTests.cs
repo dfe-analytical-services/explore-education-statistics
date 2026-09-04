@@ -2,7 +2,6 @@
 using System.Net.Http.Json;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -580,6 +580,64 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
         }
 
         [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserHasRoleOnPublication_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var response = await ListPublicationDataSets(publication.Id, user: identityUser);
+
+            response.AssertOk<PaginatedListViewModel<DataSetSummaryViewModel>>();
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            var response = await ListPublicationDataSets(publication.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
         [InlineData(0)]
         [InlineData(-1)]
         public async Task PageBelowMinimumThreshold_ReturnsValidationError(int page)
@@ -647,10 +705,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
             ClaimsPrincipal? user = null
         )
         {
-            var client = fixture.CreateClient(
-                user: user
-                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications))
-            );
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -668,7 +723,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
     public class GetDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             Publication publication = DataFixture
                 .DefaultPublication()
@@ -1030,6 +1085,72 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
             response.AssertForbidden();
         }
 
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserHasRoleOnPublication_Success(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            var response = await GetDataSet(dataSetId: dataSet.Id, user: identityUser);
+
+            response.AssertOk<DataSetSummaryViewModel>();
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            var response = await GetDataSet(dataSetId: dataSet.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
         [Fact]
         public async Task DataSetDoesNotExist_Returns404()
         {
@@ -1086,10 +1207,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
 
         private async Task<HttpResponseMessage> GetDataSet(Guid dataSetId, ClaimsPrincipal? user = null)
         {
-            var client = fixture.CreateClient(
-                user: user
-                    ?? DataFixture.AuthenticatedUser().WithClaim(nameof(SecurityClaimTypes.AccessAllPublications))
-            );
+            var client = fixture.CreateClient(user: user ?? OptimisedTestUsers.Bau);
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}", UriKind.Relative);
 
@@ -1186,14 +1304,99 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
         [Fact]
         public async Task NotBauUser_Returns403()
         {
-            var response = await CreateDataSet(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
+            // The release file must actually exist - otherwise the request is rejected as Not
+            // Found before the authorization check is ever reached.
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            var response = await CreateDataSet(releaseFile.Id, user: OptimisedTestUsers.Authenticated);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the release version's
+            // publication does not (yet) satisfy this policy.
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var response = await CreateDataSet(releaseFile.Id, user: identityUser);
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ReleaseVersionIsApproved_Returns403()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            var response = await CreateDataSet(releaseFile.Id);
+
             response.AssertForbidden();
         }
 
         [Fact]
         public async Task ProcessorReturns400_Returns400_WithProcessorErrors()
         {
-            var releaseFileId = Guid.NewGuid();
+            // The release file must actually exist (and not be Approved) - otherwise the request
+            // is rejected before the processor client is ever called.
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            var releaseFileId = releaseFile.Id;
 
             ErrorViewModel[] processorErrors =
             [

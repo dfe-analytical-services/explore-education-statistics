@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import styles from '@admin/pages/release/data/components/LiveApiDataSetsTable.module.scss';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import { columnWidth } from '@admin/pages/release/data/components/DraftApiDataSetsTable';
@@ -39,6 +40,7 @@ export default function LiveApiDataSetsTable({
   releaseId,
 }: Props) {
   const history = useHistory();
+  const { user } = useAuthContext();
 
   if (!dataSets.length) {
     return <InsetText>No live API data sets for this publication.</InsetText>;
@@ -86,6 +88,7 @@ export default function LiveApiDataSetsTable({
                     <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
                   </Link>
                   {canUpdateRelease &&
+                    user?.permissions.canManagePublicApiDataSets &&
                     !dataSet.previousReleaseIds.includes(releaseId) && (
                       <ApiDataSetCreateModal
                         buttonText={
