@@ -74,6 +74,16 @@ var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 
 
 //
+// Importer-specific config.
+//
+param importerConfigParam ContentApiConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var importerConfig = mergeImporterConfig(importerConfigParam)
+
+
+
+//
 // Public API-specific config.
 //
 param publicApiConfigParam PublicApiConfig = {}
@@ -231,6 +241,19 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: dataApiAzureSqlPassword
+    tagValues: tags
+  }
+}
+
+module importerModuleDeploy '../importer/main.bicep' = {
+  name: 'importerModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: importerConfig.appServiceSku!
+    deployAlerts: true
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: importerAzureSqlPassword
     tagValues: tags
   }
 }
