@@ -1,5 +1,3 @@
-/* eslint-disable import/no-duplicates */
-
 // Life is pain. CKEditor still doesn't have type declarations.
 // See: https://github.com/ckeditor/ckeditor5/issues/504
 

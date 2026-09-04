@@ -25,7 +25,6 @@ export default async function handler(req: NextRequest) {
   }
 
   const endpoint = process.env.AZURE_TABLE_TOOL_SEARCH_ENDPOINT;
-  const functionKey = process.env.AZURE_TABLE_TOOL_SEARCH_FUNCTIONS_KEY;
 
   if (!endpoint) {
     return new Response(
@@ -41,9 +40,6 @@ export default async function handler(req: NextRequest) {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    if (functionKey) {
-      headers['X-Functions-Key'] = functionKey;
-    }
 
     const response = await fetch(endpoint, {
       method: 'POST',

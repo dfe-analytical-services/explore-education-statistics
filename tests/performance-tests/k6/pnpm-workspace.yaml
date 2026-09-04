@@ -1,2 +1,24 @@
 packages:
   - '.'
+
+# This project sits outside the root workspace but used to inherit the
+# repo root .npmrc. From pnpm 11 only auth and registry settings come from
+# .npmrc, so the settings it relied on are repeated here.
+
+# feature parity with npm
+autoInstallPeers: true
+
+# create a flat, non-symlinked node_modules structure
+shamefullyHoist: true
+
+# pnpm does not run dependency build scripts unless they are allowed here.
+# All three compile or download a binary and genuinely need to run.
+allowBuilds:
+  bufferutil: true
+  puppeteer: true
+  utf-8-validate: true
+
+overrides:
+  'picomatch@<2.3.2': 2.3.2
+
+minimumReleaseAge: 720

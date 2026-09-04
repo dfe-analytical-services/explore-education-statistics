@@ -51,17 +51,13 @@ resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = 
   properties: combinedStagingSettings
 }
 
-resource azureStorageAccounts 'Microsoft.Web/sites/slots/config@2023-12-01' = {
-  name: '${appName}/${stagingSlotName}/azurestorageaccounts'
-  properties: reduce(azureFileShares, {}, (cur, next) => union(cur, {
-    '${next.storageName}': {
-      type: 'AzureFiles'
-      shareName: next.fileShareName
-      mountPath: next.mountPath
-      accountName: next.storageAccountName
-      accessKey: next.storageAccountKey
-    }
-  }))
+module azureStorageAccountsConfigModule '../../common/components/storage/file-share-mounts-for-site-slot.bicep' = {
+  name: '${appName}${stagingSlotName}StorageAccountsConfigDeploy'
+  params: {
+    siteName: appName
+    slotName: stagingSlotName
+    azureFileShares: azureFileShares
+  }
 }
 
 @description('Set appsettings on production slot')

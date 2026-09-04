@@ -14,14 +14,16 @@ import {
   ReleaseRouteParams,
   releaseStatusRoute,
 } from '@admin/routes/releaseRoutes';
-import { PublicationRouteParams } from '@admin/routes/routes';
 import {
   ReleaseVersion,
   ReleaseVersionChecklistError,
   ReleaseVersionChecklistWarning,
 } from '@admin/services/releaseVersionService';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
-import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
+import {
+  publicationMethodologiesRoute,
+  PublicationRouteParams,
+} from '@admin/routes/publicationRoutes';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';

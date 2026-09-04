@@ -1,6 +1,9 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
@@ -35,5 +38,38 @@ public class ThemeControllerTests
 
         var result = await controller.GetThemes();
         Assert.Equal(themes, result.Value);
+    }
+
+    [Fact]
+    public async Task DeleteThemes_Success_ReturnsNoContent()
+    {
+        List<Guid> themeIds = [Guid.NewGuid(), Guid.NewGuid()];
+
+        var themeService = new Mock<IThemeService>();
+        themeService.Setup(s => s.DeleteThemes(themeIds, It.IsAny<CancellationToken>())).ReturnsAsync(Unit.Instance);
+
+        var controller = new ThemeController(themeService.Object);
+
+        var result = await controller.DeleteThemes(themeIds, CancellationToken.None);
+
+        Assert.IsType<NoContentResult>(result);
+        themeService.Verify(s => s.DeleteThemes(themeIds, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteThemes_Failure_ReturnsForbidden()
+    {
+        List<Guid> themeIds = [Guid.NewGuid()];
+
+        var themeService = new Mock<IThemeService>();
+        themeService
+            .Setup(s => s.DeleteThemes(themeIds, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ForbidResult());
+
+        var controller = new ThemeController(themeService.Object);
+
+        var result = await controller.DeleteThemes(themeIds, CancellationToken.None);
+
+        result.AssertForbidden();
     }
 }

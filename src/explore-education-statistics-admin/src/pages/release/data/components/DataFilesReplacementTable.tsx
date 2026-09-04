@@ -19,7 +19,6 @@ interface Props {
   onDeleteUpload: (deletedUploadId: string) => void;
   onDataSetImport: (dataSetImportIds: string[]) => void;
   onRefreshUploads: () => void;
-  onReplacementStatusChange: (updatedDataFile: DataFile) => void;
 }
 
 export default function DataFilesReplacementTable({
@@ -34,7 +33,6 @@ export default function DataFilesReplacementTable({
   onRefreshUploads,
   onDeleteUpload,
   onDataSetImport,
-  onReplacementStatusChange,
 }: Props) {
   return (
     <div className="table-container">
@@ -60,7 +58,6 @@ export default function DataFilesReplacementTable({
               publicationId={publicationId}
               releaseVersionId={releaseVersionId}
               onConfirmAction={onConfirmReplacement}
-              onReplacementStatusChange={onReplacementStatusChange}
             />
           ))}
           {dataSetUploads.map((upload, index) => (

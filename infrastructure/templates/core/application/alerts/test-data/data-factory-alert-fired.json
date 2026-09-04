@@ -1,0 +1,51 @@
+{
+  "schemaId": "azureMonitorCommonAlertSchema",
+  "data": {
+    "essentials": {
+      "alertId": "/subscriptions/12340000-0000-0000-0000-000000000000/providers/Microsoft.AlertsManagement/alerts/abcdef12-3456-7890-abcd-ef1234567890",
+      "alertRule": "ADF Critical Pipeline Failure",
+      "severity": "Sev1",
+      "signalType": "Metric",
+      "monitorCondition": "Fired",
+      "monitoringService": "Platform",
+      "alertTargetIDs": [
+        "/subscriptions/12340000-0000-0000-0000-000000000000/resourcegroups/data-platform-rg/providers/microsoft.datafactory/factories/my-production-adf"
+      ],
+      "originAlertId": "00000000-0000-0000-0000-000000000000_88888",
+      "firedDateTime": "2026-08-07T08:50:00.0000000Z",
+      "resolvedDateTime": null,
+      "description": "The nightly Data Warehouse ETL pipeline has failed.",
+      "essentialsVersion": "1.0",
+      "alertContextVersion": "1.0"
+    },
+    "alertContext": {
+      "properties": null,
+      "conditionType": "SingleResourceMultipleMetricCriteria",
+      "condition": {
+        "windowSize": "PT5M",
+        "allOf": [
+          {
+            "metricName": "PipelineFailedRuns",
+            "metricNamespace": "Microsoft.DataFactory/factories",
+            "operator": "GreaterThan",
+            "threshold": "0",
+            "timeAggregation": "Total",
+            "dimensions": [
+              {
+                "name": "Name",
+                "value": "Nightly_DW_ETL_Pipeline"
+              },
+              {
+                "name": "FailureType",
+                "value": "UserError"
+              }
+            ],
+            "metricValue": 1.0
+          }
+        ],
+        "windowStartTime": "2026-08-07T08:45:00.000Z",
+        "windowEndTime": "2026-08-07T08:50:00.000Z"
+      }
+    }
+  }
+}

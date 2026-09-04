@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -25,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReplacementService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
-    IFilterRepository filterRepository,
     IReleaseVersionService releaseVersionService,
     IReleaseFileRepository releaseFileRepository,
     IReplacementPlanService replacementPlanService,
@@ -122,9 +120,16 @@ public class ReplacementService(
 
                 replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
                     originalReleaseFile,
-                    replacementReleaseFile
+                    replacementSubjectId,
+                    mapping,
+                    cancellationToken
                 );
-                replacementReleaseFile.IndicatorSequence = ReplaceIndicatorSequence(originalReleaseFile, mapping);
+                replacementReleaseFile.IndicatorSequence = await ReplaceIndicatorSequence(
+                    originalReleaseFile,
+                    replacementSubjectId,
+                    mapping,
+                    cancellationToken
+                );
                 replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
                 // To remove original, we first unlink the files. If we don't do this,
@@ -160,7 +165,7 @@ public class ReplacementService(
             .Filters.Where(plan => plan.Value.Target != null)
             .ToDictionary(plan => plan.Value.Id, plan => plan.Value.Target!.Value);
         var filterItemTargets = replacementPlan
-            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Filters))
+            .Filters.SelectMany(filter => filter.Value.Groups.SelectMany(group => group.Value.Items))
             .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
         var indicatorTargets = replacementPlan
             .IndicatorGroups.SelectMany(group => group.Value.Indicators)
@@ -644,7 +649,9 @@ public class ReplacementService(
 
     private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(
         ReleaseFile originalReleaseFile,
-        ReleaseFile replacementReleaseFile
+        Guid replacementSubjectId,
+        DataSetMapping mapping,
+        CancellationToken cancellationToken
     )
     {
         // If the sequence is null then leave it so we continue to fallback to ordering by label alphabetically
@@ -653,23 +660,25 @@ public class ReplacementService(
             return null;
         }
 
-        var originalFilters = await filterRepository.GetFiltersIncludingItems(
-            originalReleaseFile.File.SubjectId!.Value
-        );
-        var replacementFilters = await filterRepository.GetFiltersIncludingItems(
-            replacementReleaseFile.File.SubjectId!.Value
-        );
+        var replacementFilters = await statisticsDbContext
+            .Filter.AsNoTracking()
+            .Include(f => f.FilterGroups)
+                .ThenInclude(g => g.FilterItems)
+            .Where(f => f.SubjectId == replacementSubjectId)
+            .ToListAsync(cancellationToken);
 
         return ReplacementServiceHelper.ReplaceFilterSequence(
-            originalFilters: originalFilters,
-            replacementFilters: replacementFilters,
-            originalReleaseFile
+            originalSequence: originalReleaseFile.FilterSequence,
+            mapping: mapping,
+            replacementFilters
         );
     }
 
-    private static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
+    private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
         ReleaseFile originalReleaseFile,
-        DataSetMapping mapping
+        Guid replacementSubjectId,
+        DataSetMapping mapping,
+        CancellationToken cancellationToken
     )
     {
         // If the sequence is null then leave it so we continue to fallback to ordering by label alphabetically
@@ -678,23 +687,25 @@ public class ReplacementService(
             return null;
         }
 
+        var replacementIndicatorGroups = await statisticsDbContext
+            .IndicatorGroup.AsNoTracking()
+            .Include(ig => ig.Indicators)
+            .Where(ig => ig.SubjectId == replacementSubjectId)
+            .ToListAsync(cancellationToken);
+
         var originalGroupIdToLabelMap = mapping
             .IndicatorMappings.Values.Select(i => new { Id = i.OriginalGroupId, Label = i.OriginalGroupLabel })
             .Distinct()
             .ToDictionary(ig => ig.Id, ig => ig.Label);
 
-        var replacementGroupLabelToIdMap = mapping
-            .IndicatorMappings.Values.Where(indMap => indMap.ReplacementId != null)
-            .Select(indMap => new { Id = indMap.ReplacementGroupId!.Value, Label = indMap.ReplacementGroupLabel! })
-            .Concat(mapping.UnmappedReplacementIndicators.Select(i => new { Id = i.GroupId, Label = i.GroupLabel }))
-            .Distinct()
-            .ToDictionary(ig => ig.Label, ig => ig.Id);
+        var replacementGroupLabelToIdMap = replacementIndicatorGroups.ToDictionary(ig => ig.Label, ig => ig.Id);
 
         return ReplacementServiceHelper.ReplaceIndicatorSequence(
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroupIdToLabelMap,
             replacementGroupLabelToIdMap: replacementGroupLabelToIdMap,
-            originalSequence: originalSequence
+            originalSequence: originalSequence,
+            replacementIndicatorGroups
         );
     }
 

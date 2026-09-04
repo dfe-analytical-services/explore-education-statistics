@@ -11,8 +11,6 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: deploySharedPrivateDnsZones
-    type: string
   - name: deployPsqlFlexibleServer
     type: string
   - name: deployContainerApp
@@ -21,8 +19,6 @@ parameters:
   - name: deployDataProcessor
     type: string
   - name: deployDocsSite
-    type: string
-  - name: deployRecoveryVault
     type: string
   - name: deployAlerts
     type: string
@@ -55,12 +51,10 @@ steps:
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               acrResourceGroupName='$(acrResourceGroupName)' \
               dockerImagesTag='$(resources.pipeline.MainBuild.runName)' \
-              deploySharedPrivateDnsZones=${{ parameters.deploySharedPrivateDnsZones }} \
               deployPsqlFlexibleServer=${{ parameters.deployPsqlFlexibleServer }} \
               deployContainerApp=${{ parameters.deployContainerApp }} \
               deployDataProcessor=${{ parameters.deployDataProcessor }} \
               deployDocsSite=${{ parameters.deployDocsSite }} \
-              deployRecoveryVault=${{ parameters.deployRecoveryVault }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \

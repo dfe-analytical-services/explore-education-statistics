@@ -3,3 +3,58 @@ packages:
   - 'src/explore-education-statistics-ckeditor'
   - 'src/explore-education-statistics-common'
   - 'src/explore-education-statistics-frontend'
+
+# From pnpm 11 onwards only auth and registry settings are read from .npmrc.
+# Every other setting has to live here. See https://pnpm.io/settings.
+
+engineStrict: true
+
+# feature parity with npm
+autoInstallPeers: true
+
+# create a flat, non-symlinked node_modules structure
+# (as the project doesn't play nice with symlinks).
+# see https://pnpm.io/feature-comparison for more info
+shamefullyHoist: true
+
+# exclude certain dependencies from hoisting due to
+# various projects needing them present in the relative
+# 'node_modules' directory in order to build properly.
+hoistPattern:
+  - '!react/*'
+  - '!react-dom/*'
+  - '!formik/*'
+  - '!axios/*'
+
+# Required for next-sitemap in Frontend:
+enablePrePostScripts: true
+
+# pnpm does not run dependency build scripts unless they are allowed here.
+# These five compile or fetch a native binary and genuinely need to run.
+# The rest only print donation or licence banners.
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  core-js-pure: false
+  es5-ext: false
+  iframe-resizer: false
+
+overrides:
+  '@opentelemetry/core@2': '>=2.10.0 <3'
+  '@tanstack/query-core': 4.41.1
+  '@tanstack/react-query': 4.42.0
+  'brace-expansion@5': '>=5.0.9 <6'
+  'cookie@<0.7.0': '>=0.7.0'
+  'picomatch@<2.3.2': 2.3.2
+  'picomatch@<4.0.3': 4.0.4
+  'postcss@8': '>=8.5.26 <9'
+  'serialize-javascript@6.0.2': '7.1.0'
+  'svgo@4': '>=4.0.2 <5'
+  'uuid@8': '14.0.2'
+  'ws@7': '>=7.5.13 <8'
+  'yaml@1': '>=1.10.3 <2'
+
+minimumReleaseAge: 720

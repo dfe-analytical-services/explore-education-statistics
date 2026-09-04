@@ -40,14 +40,12 @@ const mockDate = {
     }
 
     // @ts-ignore
-    // eslint-disable-next-line no-global-assign
     global.Date = MockedDate;
 
     now = dateObj;
   },
   reset(): void {
     // @ts-ignore
-    // eslint-disable-next-line no-global-assign
     global.Date = RealDate;
   },
 };

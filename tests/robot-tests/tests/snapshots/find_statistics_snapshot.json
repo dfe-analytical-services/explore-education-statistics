@@ -23,7 +23,7 @@
   {
     "publication_summary": "Appeals submitted by parents against their child not getting an offer to a preferred primary or secondary school for the start of the academic year.",
     "publication_title": "Admission appeals in England",
-    "published": "14 Aug 2025",
+    "published": "6 Aug 2026",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
@@ -233,7 +233,7 @@
   {
     "publication_summary": "Initial outputs from DfE's Childcare Experiences Survey (aka \u201cYour Childcare\u201d), understanding working parents' experiences of the expanded childcare entitlement",
     "publication_title": "Expansion to early childcare entitlements: Childcare Experiences Survey",
-    "published": "25 Sep 2025",
+    "published": "1 Sep 2026",
     "release_type": "Management information",
     "theme": "Early years"
   },
@@ -313,6 +313,13 @@
     "published": "4 Sep 2025",
     "release_type": "Official statistics",
     "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Historic accountability data from 1992 to 2025, covering primary, key stage 4, 16-19, destinations, absence and more.",
+    "publication_title": "Historic accountability data",
+    "published": "6 Aug 2026",
+    "release_type": "Ad hoc statistics",
+    "theme": "School and college outcomes and performance"
   },
   {
     "publication_summary": "Annual numbers of pupils and learners using home to school transport split by school type, eligibility and mode of transport, collected from local authorities.",
@@ -497,23 +504,23 @@
     "theme": "Destination of pupils and students"
   },
   {
-    "publication_summary": "Provisional T Level outcomes for students completing T Levels, as reported to the Department for Education through the manage T Level results service.",
+    "publication_summary": "A summary of outcomes for students in receipt of T Level results, as reported to the Department for Education through the manage T Level results service.",
     "publication_title": "Provisional T Level results",
-    "published": "19 Mar 2026",
+    "published": "13 Aug 2026",
     "release_type": "Official statistics in development",
     "theme": "School and college outcomes and performance"
   },
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "26 Mar 2026",
+    "published": "6 Aug 2026",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
   {
     "publication_summary": "Fortnightly data on pupil attendance, including by reason, phase and geography.",
     "publication_title": "Pupil attendance in schools",
-    "published": "23 Jul 2026",
+    "published": "6 Aug 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -628,6 +635,13 @@
     "published": "30 Apr 2026",
     "release_type": "Official statistics in development",
     "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Ad hoc experimental statistics publication presenting analysis of earnings and lifetime repayments forecasts for England",
+    "publication_title": "Student loan forecasts - earnings",
+    "published": "27 Aug 2026",
+    "release_type": "Ad hoc statistics",
+    "theme": "Finance and funding"
   },
   {
     "publication_summary": "Student loan forecasts for English borrower entrants, outlay and repayments, with average loan amounts, lifetime repayments and cost to government",

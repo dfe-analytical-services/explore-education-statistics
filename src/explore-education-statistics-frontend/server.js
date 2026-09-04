@@ -68,7 +68,6 @@ async function startServer() {
   try {
     await app.prepare();
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error(e);
     process.exit(1);
   }
@@ -205,7 +204,6 @@ async function startServer() {
     if (err) {
       throw err;
     }
-    // eslint-disable-next-line no-console
     console.log(`Server started on http://localhost:${port}`);
   });
 }
@@ -213,7 +211,6 @@ async function startServer() {
 startServer().catch(e => {
   appInsights.defaultClient?.trackException({ exception: e });
 
-  // eslint-disable-next-line no-console
   console.error(e);
   process.exit(1);
 });

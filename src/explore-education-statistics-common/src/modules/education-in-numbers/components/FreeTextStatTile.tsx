@@ -16,23 +16,25 @@ const FreeTextStatTile = ({
   return (
     <div className={styles.tile} data-testid={`${testId}-tile`}>
       <h4 className="govuk-body-l" data-testid={`${testId}-title`}>
-        {title}
+        {title || 'No title available'}
       </h4>
       <p className="govuk-heading-m" data-testid={`${testId}-statistic`}>
-        {statistic}
+        {statistic || 'No statistic available'}
       </p>
       <p className="govuk-body" data-testid={`${testId}-trend`}>
         {trend}
       </p>
 
       {linkText && linkUrl && (
-        <a
-          href={linkUrl}
-          data-testid={`${testId}-link`}
-          className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
-        >
-          {linkText}
-        </a>
+        <div className={styles.linkContainer}>
+          <a
+            href={linkUrl}
+            data-testid={`${testId}-link`}
+            className="govuk-link govuk-!-display-inline-block govuk-!-margin-top-4"
+          >
+            {linkText}
+          </a>
+        </div>
       )}
     </div>
   );

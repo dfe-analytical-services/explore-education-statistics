@@ -25,5 +25,5 @@ public interface IDataImportService
         int? lastProcessedRowIndex = null
     );
 
-    Task WriteDataSetFileMeta(Guid fileId, Guid subjectId, int numDataFileRows);
+    Task WriteDataSetFileMeta(DataImport import);
 }

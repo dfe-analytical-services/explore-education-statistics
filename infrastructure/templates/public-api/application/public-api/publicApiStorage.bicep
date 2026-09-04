@@ -68,6 +68,17 @@ module dataFilesFileShareModule '../../../common/components/storage/fileShare.bi
   }
 }
 
+module publicApiStorageBackupModule '../../../common/components/recovery-services-vault/file-share-registration.bicep' = {
+  name: 'publicApiStorageBackupModuleDeploy'
+  params: {
+    vaultName: resourceNames.sharedResources.recoveryVault
+    backupPolicyName: 'DailyPolicy'
+    storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
+    fileShareName: dataFilesFileShareModule.outputs.fileShareName
+    tagValues: tagValues
+  }
+}
+
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
 output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
 output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName

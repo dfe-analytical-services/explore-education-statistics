@@ -8,6 +8,9 @@
 *.ipr
 *.iws
 
+## AI
+.claude
+
 ## Application
 artifacts
 bin
@@ -17,6 +20,8 @@ obj
 !/data/public-api-db/00-init.sh
 /data/public-api-data
 /data/analytics
+/data/backups/
+/data/dashboard-logs/
 dfe-meta.db
 
 ## CSharp

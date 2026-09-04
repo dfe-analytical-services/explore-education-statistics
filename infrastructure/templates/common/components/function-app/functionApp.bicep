@@ -3,7 +3,7 @@ import { AzureFileShareMount } from '../storage/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
-import { AppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string
@@ -110,7 +110,7 @@ param healthCheckPath string?
 param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
-param sku AppServicePlanSku
+param sku FunctionAppServicePlanSku
 
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from.')
 param keyVaultName string
@@ -178,12 +178,11 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   name: userAssignedIdentityName
 }
 
-module appServicePlanModule '../app-service-plan/appServicePlan.bicep' = {
+module appServicePlanModule '../app-service-plan/function-app-service-plan.bicep' = {
   name: '${appServicePlanName}ModuleDeploy'
   params: {
     planName: appServicePlanName
     location: location
-    kind: 'functionapp'
     sku: sku
     operatingSystem: operatingSystem
     alerts: alerts != null ? {
@@ -315,27 +314,16 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   tags: tagValues
 }
 
-resource azureStorageAccountsConfig 'Microsoft.Web/sites/config@2023-12-01' = if (length(azureFileShares) > 0) {
-  name: 'azurestorageaccounts'
-  parent: functionApp
-  properties: reduce(
-    azureFileShares,
-    {},
-    (cur, next) =>
-      union(cur, {
-        '${next.storageName}': {
-          type: 'AzureFiles'
-          shareName: next.fileShareName
-          mountPath: next.mountPath
-          accountName: next.storageAccountName
-          accessKey: next.storageAccountKey
-        }
-      })
-  )
+module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
+  name: '${functionApp.name}StorageAccountsConfigDeploy'
+  params: {
+    siteName: functionApp.name
+    azureFileShares: azureFileShares
+  }
 }
 
 module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}KeyVaultRoleAssignmentModuleDeploy'
+  name: '${functionAppName}KeyVaultSecretsUserRoleAssignment'
   params: {
     principalIds: [functionApp.identity.principalId]
     keyVaultName: keyVault.name

@@ -423,7 +423,7 @@ function Plan({
                         {Object.values(filter.groups).map(group => (
                           <SummaryListItem key={group.id} term={group.label}>
                             <ul className="govuk-list">
-                              {group.filters.map(filterItem => (
+                              {group.items.map(filterItem => (
                                 <li key={filterItem.id}>
                                   {filterItem.label}
                                   {!filterItem.valid && notPresentTag}

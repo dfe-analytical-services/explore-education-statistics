@@ -3,16 +3,21 @@ import base64
 import json
 import math
 import os
-from typing import Optional
+import sys
+from pathlib import Path
 
-import requests
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.common import NoSuchElementException
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from slack_sdk.webhook import WebhookClient
+ROBOT_TESTS_DIRECTORY = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROBOT_TESTS_DIRECTORY))
+
+import requests  # noqa: E402
+from bs4 import BeautifulSoup  # noqa: E402
+from selenium import webdriver  # noqa: E402
+from selenium.common import NoSuchElementException  # noqa: E402
+from selenium.webdriver.chrome.options import Options  # noqa: E402
+from selenium.webdriver.common.by import By  # noqa: E402
+from selenium.webdriver.support.ui import Select, WebDriverWait  # noqa: E402
+from tests.libs.snapshot_notification import snapshot_process_failed, snapshots_do_not_match  # noqa: E402
+from tests.libs.snapshot_notifier import SnapshotNotifier  # noqa: E402
 
 """
 Script to check find statistics, table tool, methodologies and data catalogue snapshots.
@@ -25,16 +30,17 @@ Optional flags:
   * --validate
   * --ci
   * --slack-webhook-url "slack webhook URL"
+  * --teams-webhook-url "teams webhook URL"
 """
 
 
 class SnapshotService:
     requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
 
-    def __init__(self, public_url: str, slack_webhook_url: str):
+    def __init__(self, public_url: str, notifier: SnapshotNotifier):
         self.session = requests.Session()
         self.public_url = public_url
-        self.slack_webhook_url = slack_webhook_url
+        self.notifier = notifier
         self.timeout = 10
         self.page_size = 10
         self.snapshots = [
@@ -63,13 +69,6 @@ class SnapshotService:
             raise Exception(f"Invalid snapshot name: {name}")
 
         return result
-
-    def _send_slack_notification(self, text: Optional[str] = None, blocks=None) -> None:
-        webhook = WebhookClient(self.slack_webhook_url)
-        response = webhook.send(text=text, blocks=blocks)
-        assert (
-            response.status_code == 200 and response.body == "ok"
-        ), f"Slack notification failed with status code: {response.status_code}"
 
     def _validate_snapshot(self, name: str) -> bool:
         print(f"Validating snapshot: {name}")
@@ -240,23 +239,9 @@ class SnapshotService:
                 failed = True
 
         if failed:
-            # At least one snapshot did not match so send a failure message to slack
-            self._send_slack_notification(
-                blocks=[
-                    {
-                        "type": "header",
-                        "text": {"type": "plain_text", "text": ":warning: Snapshots do not match"},
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "See <https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt|pull request> for more details",
-                        },
-                    },
-                ]
-            ) if self.slack_webhook_url else print("Snapshot script complete. Snapshots do not match")
-
+            # At least one snapshot did not match, so notify the reporting channels
+            print("Snapshot script complete. Snapshots do not match")
+            self.notifier.send(snapshots_do_not_match())
         else:
             print("Snapshot script complete. No differences found.")
 
@@ -266,31 +251,12 @@ class SnapshotService:
 
 
 if __name__ == "__main__":
+    # Replaced once the arguments have been parsed. Until then there is nowhere to
+    # send alerts, so this discards them rather than masking the original failure.
+    notifier = SnapshotNotifier()
 
     def send_alert(message: str) -> None:
-        if args.slack_webhook_url is None or args.slack_webhook_url == "":
-            return
-
-        snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
-        snapshot_service._send_slack_notification(
-            text="fallback",
-            blocks=[
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": ":x: Snapshot process failed",
-                    },
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "plain_text",
-                        "text": f"{message}",
-                    },
-                },
-            ],
-        )
+        notifier.send(snapshot_process_failed(message))
 
     try:
         from get_webdriver import get_webdriver
@@ -352,6 +318,15 @@ if __name__ == "__main__":
         )
 
         ap.add_argument(
+            "--teams-webhook-url",
+            dest="teams_webhook_url",
+            default=None,
+            help="URL for Teams webhook to send notifications when snapshot differences are found during validation",
+            type=str,
+            required=False,
+        )
+
+        ap.add_argument(
             "-v",
             "--visual",
             dest="visual",
@@ -361,6 +336,11 @@ if __name__ == "__main__":
         )
 
         args = ap.parse_args()
+
+        notifier = SnapshotNotifier(
+            slack_webhook_url=args.slack_webhook_url,
+            teams_webhook_url=args.teams_webhook_url,
+        )
 
         assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
@@ -380,7 +360,7 @@ if __name__ == "__main__":
                 "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
             )
 
-        snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
+        snapshot_service = SnapshotService(public_url=args.public_url, notifier=notifier)
 
         if args.ci:
             snapshot_service.validate_snapshots()

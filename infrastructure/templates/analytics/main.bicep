@@ -86,8 +86,8 @@ module analyticsStorageModule 'application/analyticsStorage.bicep' = {
   }
 }
 
-module publicApiStorageBackupModule '../public-api/components/recoveryVaultFileShareRegistration.bicep' = {
-  name: 'publicApiStorageBackupModuleDeploy'
+module analyticsStorageBackupModule '../common/components/recovery-services-vault/file-share-registration.bicep' = {
+  name: 'analyticsStorageBackupModuleDeploy'
   params: {
     vaultName: resourceNames.existingResources.recoveryVault
     backupPolicyName: resourceNames.existingResources.recoveryVaultFileShareBackupPolicy

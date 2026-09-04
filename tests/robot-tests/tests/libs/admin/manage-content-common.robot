@@ -449,6 +449,7 @@ user adds image to accordion section text block with retry
     ...    ${alt_text}=Alt text for ${filename}
     ...    ${parent}=[data-testid="accordion"]
     ...    ${timeout}= %{TIMEOUT}
+    ...    ${autosaving}=${False}
 
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
@@ -478,8 +479,12 @@ user adds image to accordion section text block with retry
     user presses keys    TAB
     user presses keys    SHIFT+TAB
 
-    user clicks button    Save    ${block}
-    user waits until page finishes loading
+    IF    ${autosaving}
+        user saves autosaving text block    ${block}
+    ELSE
+        user clicks button    Save    ${block}
+        user waits until page finishes loading
+    END
 
     user scrolls up    100
 

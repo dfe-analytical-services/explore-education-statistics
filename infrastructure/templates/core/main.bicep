@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('Slack channel to post alerts to.')
+param slackAlertsChannel string = ''
+
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
 
@@ -25,14 +28,35 @@ param publicApiApplicationGatewayFqdn string = ''
 @description('Certificate type for Azure Front Door.')
 param certificateType FrontDoorCertificateType = 'BringYourOwn'
 
+@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
+param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+
+@description('Specify if manual deletion of backups is allowed in Recovery Services Vault.')
+param recoveryServicesVaultImmutable bool = false
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
-@description('Whether or not to deploy Application Gateway and its confirmation.')
+@description('Whether or not to deploy subnets.')
+param deploySubnets bool = false
+
+@description('Whether or not to deploy Private DNS Zones.')
+param deployPrivateDnsZones bool = false
+
+@description('Whether or not to deploy Azure Front Door.')
+param deployAzureFrontDoor bool = false
+
+@description('Whether or not to deploy Application Gateway and its configuration.')
 param deployApplicationGateway bool = false
 
-@description('The minimum average response time from the public site (via Azure Front Door) before latency alerts fire.')
-param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
+@description('Whether or not to deploy Data Factory.')
+param deployDataFactory bool = false
+
+@description('Whether or not to deploy Recovery Services Vault and its policies.')
+param deployRecoveryServicesVault bool = false
+
+@description('Whether or not to deploy the Container Registry.')
+param deployContainerRegistry bool = false
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
@@ -55,7 +79,7 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-var resourcePrefix = '${subscription}-ees'
+var commonResourcePrefix = '${subscription}-ees'
 var publicApiResourcePrefix = '${subscription}-ees-papi'
 
 var resourceNames = {
@@ -65,12 +89,23 @@ var resourceNames = {
     publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     publicSiteApp: '${subscription}-as-ees-public-site'
     publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
-    vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
-    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
-    subnets: {
-      eventGridCustomTopicPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.eventGridTopics}-pep'
-      appGateway: '${resourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
-    }
+  }
+}
+
+module vNetModule 'application/virtual-network/virtual-network.bicep' = {
+  name: 'vNetModuleDeploy'
+  params: {
+    subscription: subscription
+    deploySubnets: deploySubnets
+    tagValues: tagValues
+  }
+}
+
+module privateDnsZonesModule 'application/virtual-network/private-dns-zones.bicep' = if (deployPrivateDnsZones) {
+  name: 'privateDnsZonesApplicationModuleDeploy'
+  params: {
+    vnetName: vNetModule.outputs.vNetName
+    tagValues: tagValues
   }
 }
 
@@ -82,17 +117,33 @@ module keyVaultModule 'application/keyVault/keyVault.bicep' = {
   }
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
-  name: '${resourcePrefix}-log'
-  scope: resourceGroup()
+module logAnalyticsWorkspaceModule 'application/log-analytics-workspace/log-analytics-workspace.bicep' = {
+  name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
+  params: {
+    resourcePrefix: commonResourcePrefix
+    location: location
+    tagValues: tagValues
+  }
+}
+
+module alertsModule 'application/alerts/alerts.bicep' = {
+  name: 'alertsModuleDeploy'
+  params: {
+    subscription: subscription
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+    slackAlertsChannel: slackAlertsChannel
+  }
 }
 
 module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    deployRecoveryServicesVault: deployRecoveryServicesVault
+    recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
     tagValues: tagValues
   }
 }
@@ -101,14 +152,14 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     resourceNames: {
       adminApp: resourceNames.existingResources.adminApp
-      alertsGroup: resourceNames.existingResources.alertsGroup
+      alertsGroup: alertsModule.outputs.actionGroupName
       publisherFunction: resourceNames.existingResources.publisherFunction
-      vNet: resourceNames.existingResources.vNet
+      vNet: vNetModule.outputs.vNetName
       subnets: {
-        eventGridCustomTopicPrivateEndpoints: resourceNames.existingResources.subnets.eventGridCustomTopicPrivateEndpoints
+        eventGridCustomTopicPrivateEndpoints: vNetModule.outputs.eventGridCustomTopicPrivateEndpointsSubnetName
       }
     }
     deployAlerts: deployAlerts
@@ -116,15 +167,15 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   }
 }
 
-module frontDoorModule 'application/frontDoor/frontDoor.bicep' = {
+module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzureFrontDoor) {
   name: 'frontDoorModuleDeploy'
   params: {
     subscription: subscription
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    resourcePrefix: resourcePrefix
+    resourcePrefix: commonResourcePrefix
     publicSiteUrl: publicSiteUrl
     certificateType: certificateType
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
     deployAlerts: deployAlerts
     tagValues: tagValues
@@ -136,17 +187,35 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
   params: {
     location: location
     subscription: subscription
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
     publicApiAppName: resourceNames.existingResources.publicApiApp
     publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
     publicSiteAppServiceName: resourceNames.existingResources.publicSiteApp
-    vnetName: resourceNames.existingResources.vNet
+    vnetName: vNetModule.outputs.vNetName
     publicApiAppGatewayFqdn: publicApiApplicationGatewayFqdn
     publicApiPublicUrl: publicApiPublicUrl
     publicSiteFqdn: replace(publicSiteUrl, 'https://', '')
     publicSiteInternalServiceFqdn: publicSiteInternalServiceFqdn
     deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (deployDataFactory) {
+  name: 'dataFactoryModuleDeploy'
+  params: {
+    subscription: subscription
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
+  name: 'containerRegistryModuleDeploy'
+  params: {
     tagValues: tagValues
   }
 }

@@ -30,28 +30,26 @@ public static class DataSetMappingGeneratorExtensions
         File replacementDataFile
     ) => generator.ForInstance(m => m.SetReplacementDataFile(replacementDataFile));
 
+    public static Generator<DataSetMapping> WithFilterMappings(
+        this Generator<DataSetMapping> generator,
+        Dictionary<Guid, FilterMapping> filterMappings
+    ) => generator.ForInstance(m => m.SetFilterMappings(filterMappings));
+
     public static Generator<DataSetMapping> WithIndicatorMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => generator.ForInstance(m => m.SetIndicatorMappings(indicatorMappings));
-
-    public static Generator<DataSetMapping> WithUnmappedReplacementIndicators(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementIndicators(unmappedIndicators));
 
     public static Generator<DataSetMapping> WithLocationMappings(
         this Generator<DataSetMapping> generator,
         Dictionary<Guid, LocationMapping> locationMappings
     ) => generator.ForInstance(m => m.SetLocationMappings(locationMappings));
 
-    public static Generator<DataSetMapping> WithUnmappedReplacementLocations(
-        this Generator<DataSetMapping> generator,
-        List<UnmappedLocation> unmappedLocations
-    ) => generator.ForInstance(m => m.SetUnmappedReplacementLocations(unmappedLocations));
-
     public static InstanceSetters<DataSetMapping> SetDefaults(this InstanceSetters<DataSetMapping> setters) =>
         setters
+            .SetDefault(m => m.OriginalDataFileId)
+            .SetDefault(m => m.ReplacementDataFileId)
+            .Set(m => m.FilterMappings, new Dictionary<Guid, FilterMapping>())
             .Set(m => m.IndicatorMappings, new Dictionary<Guid, IndicatorMapping>())
             .Set(m => m.LocationMappings, new Dictionary<Guid, LocationMapping>());
 
@@ -75,23 +73,18 @@ public static class DataSetMappingGeneratorExtensions
         Content.Model.File replacementDataFile
     ) => setters.Set(m => m.ReplacementDataFile, replacementDataFile).SetReplacementDataFileId(replacementDataFile.Id);
 
+    public static InstanceSetters<DataSetMapping> SetFilterMappings(
+        this InstanceSetters<DataSetMapping> setters,
+        Dictionary<Guid, FilterMapping> filterMappings
+    ) => setters.Set(m => m.FilterMappings, filterMappings);
+
     public static InstanceSetters<DataSetMapping> SetIndicatorMappings(
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, IndicatorMapping> indicatorMappings
     ) => setters.Set(m => m.IndicatorMappings, indicatorMappings);
 
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementIndicators(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedIndicator> unmappedIndicators
-    ) => setters.Set(m => m.UnmappedReplacementIndicators, unmappedIndicators);
-
     public static InstanceSetters<DataSetMapping> SetLocationMappings(
         this InstanceSetters<DataSetMapping> setters,
         Dictionary<Guid, LocationMapping> locationMappings
     ) => setters.Set(m => m.LocationMappings, locationMappings);
-
-    public static InstanceSetters<DataSetMapping> SetUnmappedReplacementLocations(
-        this InstanceSetters<DataSetMapping> setters,
-        List<UnmappedLocation> unmappedLocations
-    ) => setters.Set(m => m.UnmappedReplacementLocations, unmappedLocations);
 }
