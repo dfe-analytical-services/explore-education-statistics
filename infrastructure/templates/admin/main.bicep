@@ -21,6 +21,7 @@ param appServiceSku AppServicePlanSku
 param logAnalyticsWorkspaceId string
 
 @description('The origins supported for CORS calls to the Admin SignalR service.')
+@minLength(1)
 param signalRAllowedOrigins string[]
 
 @description('SKU of the Admin SignalR service.')
@@ -223,6 +224,5 @@ module adminSignalRService '../common/components/signalr/signalr.bicep' = {
     signalRName: resourceNames.admin.signalRName
     sku: signalRSku
     allowedOrigins: signalRAllowedOrigins
-    hubEventBaseUrl: 'https://${adminHostname}'
   }
 }

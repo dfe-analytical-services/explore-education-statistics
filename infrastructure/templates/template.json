@@ -305,9 +305,6 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-    "adminUri": {
-      "type": "string"
-    },
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
