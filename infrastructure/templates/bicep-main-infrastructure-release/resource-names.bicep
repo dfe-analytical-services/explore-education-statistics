@@ -33,6 +33,12 @@ type ResourceNames = {
       endpointName: string
     }
   }
+  importer: {
+    functionApp: string
+    appServicePlan: string
+    appInsights: string
+    storageAccount: string
+  }
   nlSearch: {
     functionApp: string
   }
@@ -61,6 +67,7 @@ type ResourceNames = {
       admin: string
       contentApi: string
       dataApi: string
+      importer: string
     }
   }
   keyVault: {
@@ -135,17 +142,23 @@ func getResourceNames(
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
   }
-  nlSearch: {
-    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
-  }
-  notifier: {
-    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
-  }
   frontDoor: {
     frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
     defaultEndpoint: {
       endpointName: '${newResourcePrefix}-${abbreviations.frontDoorEndpoints}'
     }
+  }
+  importer: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-importer'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-importer'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-importer'
+    storageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer'
+  }
+  nlSearch: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
+  }
+  notifier: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
   }
   publicApi: {
     processor: {
@@ -169,6 +182,7 @@ func getResourceNames(
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
+      importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
     }
   }
   keyVault: {

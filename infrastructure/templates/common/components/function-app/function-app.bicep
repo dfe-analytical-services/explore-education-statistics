@@ -4,9 +4,10 @@ import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { ConnectionString } from '../../types.bicep'
 
 @description('Specifies the location for all resources.')
-param location string
+param location string = resourceGroup().location
 
 @description('Specifies the Function App name.')
 param functionAppName string
@@ -17,6 +18,9 @@ param appServicePlanName string
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
+@description('Minimum TLS version supported.')
+param minTlsVersion string = '1.3'
+
 @description('The language worker runtime to load in the function app.')
 @allowed([
   'dotnet'
@@ -25,7 +29,7 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
   'java'
   'python'
 ])
-param functionAppRuntime string
+param functionAppRuntime string = 'dotnet-isolated'
 
 @description('.NET Framework version.')
 param netFrameworkVersion string?
@@ -49,6 +53,9 @@ param storageAccountPublicNetworkAccessEnabled bool = false
 
 @description('Specifies firewall rules for the storage account in use by the Function App.')
 param storageFirewallRules IpRange[] = []
+
+@description('Database connection strings.')
+param connectionStrings ConnectionString[]?
 
 @description('Specifies additional setting to add to the Function App.')
 param appSettings {
@@ -85,7 +92,7 @@ param outboundSubnetId string?
 param privateEndpoints {
   functionApp: string?
   storageAccounts: string
-}
+}?
 
 @description('Specifies whether this Function App is accessible from the public internet.')
 param publicNetworkAccessEnabled bool = false
@@ -204,11 +211,11 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVault.name
-    privateEndpointSubnetIds: {
-      blob: privateEndpoints.storageAccounts
-      file: privateEndpoints.storageAccounts
-      queue: privateEndpoints.storageAccounts
-    }
+    privateEndpointSubnetIds: privateEndpoints != null ? {
+      blob: privateEndpoints!.storageAccounts
+      file: privateEndpoints!.storageAccounts
+      queue: privateEndpoints!.storageAccounts
+    } : {}
     publicNetworkAccessEnabled: storageAccountPublicNetworkAccessEnabled
     alerts: storageAlerts
     tagValues: tagValues
@@ -241,6 +248,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: outboundSubnetId
     siteConfig: {
       alwaysOn: alwaysOn
+      connectionStrings: connectionStrings
       appSettings: union([
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -292,7 +300,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       minimumElasticInstanceCount: minimumInstanceCount
       functionAppScaleLimit: maximumInstanceCount
       healthCheckPath: healthCheckPath
-      minTlsVersion: '1.3'
+      minTlsVersion: minTlsVersion
       netFrameworkVersion: netFrameworkVersion
       linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'

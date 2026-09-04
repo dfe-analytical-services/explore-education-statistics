@@ -1,4 +1,4 @@
-import { ConnectionString } from 'types.bicep'
+import { ConnectionString } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 

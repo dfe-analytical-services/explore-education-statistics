@@ -70,7 +70,6 @@ module functionAppModule '../../common/components/function-app/function-app.bice
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
     appSettings: [
