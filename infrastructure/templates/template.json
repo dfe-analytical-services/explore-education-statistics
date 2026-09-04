@@ -95,30 +95,6 @@
         "P3V2 PremiumV2"
       ]
     },
-    "skuAdminSignalR": {
-      "type": "string",
-      "defaultValue": "Free_F1",
-      "allowedValues": [
-        "Free_F1",
-        "Standard_S1"
-      ]
-    },
-    "adminSignalRCapacity": {
-      "type": "int",
-      "metadata": {
-        "description": "The number of SignalR units."
-      },
-      "defaultValue": 1,
-      "allowedValues": [
-        1,
-        2,
-        5,
-        10,
-        20,
-        50,
-        100
-      ]
-    },
     "adminFirewallRules": {
       "type": "array",
       "metadata": {
@@ -328,9 +304,6 @@
       "metadata": {
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
-    },
-    "adminUri": {
-      "type": "string"
     },
     "minTlsVersion": {
       "type": "string",
@@ -606,13 +579,6 @@
         "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
       }
     },
-    "additionalAdminAllowedOrigins": {
-      "type": "array",
-      "defaultValue": [],
-      "metadata": {
-        "description": "Additional CORS allowed origins for admin"
-      }
-    },
     "additionalPublicAllowedOrigins": {
       "type": "array",
       "defaultValue": [],
@@ -637,7 +603,6 @@
     "statisticsDbName": "statistics",
     "statisticsReplicaDbName": "statistics",
     "appInsightsWorkspaceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
-    "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
@@ -1157,10 +1122,6 @@
     "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
     "nlSearchFunctionAppName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fa-nlsearch')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
-    "baseAdminAllowedOrigins": [
-      "[concat('https://', parameters('adminUri'))]"
-    ],
-    "adminAllowedOrigins": "[union(variables('baseAdminAllowedOrigins'), parameters('additionalAdminAllowedOrigins'))]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
       "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
@@ -1176,67 +1137,6 @@
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.SignalRService/signalR",
-      "apiVersion": "2021-10-01",
-      "name": "[variables('adminSignalRName')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "capacity": "[parameters('adminSignalRCapacity')]",
-        "name": "[parameters('skuAdminSignalR')]"
-      },
-      "kind": "SignalR",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "properties": {
-        "tls": {
-          "clientCertEnabled": false
-        },
-        "features": [
-          {
-            "flag": "ServiceMode",
-            "value": "Default"
-          },
-          {
-            "flag": "EnableConnectivityLogs",
-            "value": "true"
-          },
-          {
-            "flag": "EnableMessagingLogs",
-            "value": "true"
-          },
-          {
-            "flag": "EnableLiveTrace",
-            "value": "true"
-          }
-        ],
-        "cors": {
-          "allowedOrigins": "[variables('adminAllowedOrigins')]"
-        },
-        "networkACLs": {
-          "defaultAction": "deny",
-          "publicNetwork": {
-            "allow": [
-              "ClientConnection",
-              "ServerConnection",
-              "RESTAPI",
-              "Trace"
-            ]
-          }
-        },
-        "upstream": {
-          "templates": [
-            {
-              "categoryPattern": "*",
-              "eventPattern": "*",
-              "hubPattern": "*",
-              "urlTemplate": "[concat('https://', parameters('adminUri'), '/hubs/{hub}/{event}')]"
-            }
-          ]
-        }
-      }
-    },
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
