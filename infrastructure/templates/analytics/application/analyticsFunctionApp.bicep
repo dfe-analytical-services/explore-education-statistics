@@ -14,9 +14,6 @@ param resourceNames ResourceNames
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Location for all resources.')
-param location string
-
 @description('Name of the shared analytics storage account.')
 param analyticsStorageAccountName string
 
@@ -67,7 +64,6 @@ module functionAppModule '../../common/components/function-app/function-app.bice
   name: 'analyticsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     diagnosticSettingEnabled: true
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
