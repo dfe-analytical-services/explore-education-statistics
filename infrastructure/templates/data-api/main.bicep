@@ -75,6 +75,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.dataApi.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -104,6 +105,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'dataApiAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.dataApi.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
     keyVaultRoles: {

@@ -179,8 +179,8 @@ module adminModule '../admin/main.bicep' = {
     apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
     publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
     screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
-    publicApiUrl: environmentConfig.publicApiUrl!
-    publicApiDocsUrl: environmentConfig.publicApiDocsUrl!
+    publicApiUrl: publicApiConfig.publicUrl!
+    publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
     prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
     publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
     preReleaseMinutesBeforeStart: adminConfig.preReleaseMinutesBeforeStart!

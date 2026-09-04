@@ -9,10 +9,10 @@ param appServiceName string
 param appInsightsName string
 
 @description('The operating system to use to host App Services.')
-param operatingSystem 'Windows' | 'Linux' = 'Linux'
+param operatingSystem 'Windows' | 'Linux'
 
 @description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
-param kind 'app' | 'app,linux,container' = 'app'
+param kind 'app' | 'app,linux,container'
 
 @description('Details of common Key Vault roles to apply to this App Service.')
 param keyVaultRoles {
@@ -86,7 +86,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true
-    clientAffinityEnabled: true
+    clientAffinityEnabled: false
     reserved: operatingSystem == 'Linux'
     siteConfig: {
       http20Enabled: true

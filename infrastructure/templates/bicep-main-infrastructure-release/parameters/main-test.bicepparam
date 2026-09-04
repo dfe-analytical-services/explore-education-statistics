@@ -4,8 +4,6 @@ param environmentConfigParam = {
   environmentIdentifier: 's101t01'
   environmentName: 'Test'
   domain: 'test.explore-education-statistics.service.gov.uk'
-  publicApiUrl: 'pp-api.education.gov.uk/statistics-test'
-  publicApiDocsUrl: 'pp-api.education.gov.uk/statistics-test/docs'
   detailedErrors: true
   autoscaleAppServices: false
   enableSwagger: true
