@@ -109,6 +109,7 @@ const nextConfig = {
 
     return config;
   },
+  sassOptions: { charset: false }, // prod CSS was breaking due to BOMs being included in the middle of files
   transpilePackages:
     process.env.NEXT_CONFIG_MODE !== 'server'
       ? ['explore-education-statistics-common']
