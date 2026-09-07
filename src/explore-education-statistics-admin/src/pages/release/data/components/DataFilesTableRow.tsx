@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import DataFileSummaryList from '@admin/pages/release/data/components/DataFileSummaryList';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import ImporterStatus, {
@@ -47,6 +48,10 @@ export default function DataFilesTableRow({
   onConfirmDelete,
   onStatusChange,
 }: Props) {
+  const { user } = useAuthContext();
+  const canManagePublicApiDataSets =
+    user?.permissions.canManagePublicApiDataSets;
+
   return (
     <tr key={dataFile.title}>
       <td data-testid={`${dataFile.title}-title`} className={styles.title}>
@@ -112,10 +117,23 @@ export default function DataFilesTableRow({
                       </ButtonText>
                     }
                   >
-                    <p>
-                      This data file has an API data set linked to it. Please
-                      remove the API data set before deleting.
-                    </p>
+                    {canManagePublicApiDataSets ? (
+                      <p>
+                        This data file has an API data set linked to it. Please
+                        remove the API data set before deleting.
+                      </p>
+                    ) : (
+                      <p>
+                        This data file has an API data set linked to it. It will
+                        need removing before the data file can be deleted. You
+                        do not have the required role to resolve the issue, but
+                        you can contact the EES team for support at{' '}
+                        <a href="mailto:explore.statistics@education.gov.uk">
+                          explore.statistics@education.gov.uk
+                        </a>
+                        .
+                      </p>
+                    )}
                     <p>
                       <Link
                         to={generatePath<ReleaseDataSetRouteParams>(

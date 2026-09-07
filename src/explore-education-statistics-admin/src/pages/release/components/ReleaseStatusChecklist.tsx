@@ -57,12 +57,10 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
     [releaseVersion.id, releaseVersion.publicationId],
   );
 
-  const apiDataSetsTabRoute = user?.permissions.isBauUser
-    ? `${generatePath<ReleaseRouteParams>(
-        releaseDataRoute.path,
-        releaseRouteParams,
-      )}#${releaseDataPageTabs.apiDataSets.id}`
-    : undefined;
+  const apiDataSetsTabRoute = `${generatePath<ReleaseRouteParams>(
+    releaseDataRoute.path,
+    releaseRouteParams,
+  )}#${releaseDataPageTabs.apiDataSets.id}`;
 
   const errorDetails = useMemo<ChecklistMessage[]>(() => {
     const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
