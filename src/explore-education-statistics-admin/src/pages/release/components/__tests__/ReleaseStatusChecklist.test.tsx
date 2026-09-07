@@ -195,10 +195,10 @@ describe('ReleaseStatusChecklist', () => {
     );
   });
 
-  test('does not render api data set links for non-BAU users', async () => {
+  test('renders api data set links for non-BAU users too', async () => {
     const nonBauUser: User = {
       id: 'user-id',
-      name: 'BAU',
+      name: 'Standard User',
       permissions: {
         isBauUser: false,
       } as GlobalPermissions,
@@ -224,60 +224,49 @@ describe('ReleaseStatusChecklist', () => {
     expect(await screen.findByText('Errors')).toBeInTheDocument();
 
     expect(
-      screen.getByText('All public API data set processing must be completed'),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
+      screen.getByRole('link', {
         name: 'All public API data set processing must be completed',
       }),
-    ).not.toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
 
     expect(
-      screen.getByText(
-        'All cancelled public API data sets must be removed or completed',
-      ),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
+      screen.getByRole('link', {
         name: 'All cancelled public API data sets must be removed or completed',
       }),
-    ).not.toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
 
     expect(
-      screen.getByText(
-        'All failed public API data sets must be retried or removed',
-      ),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
+      screen.getByRole('link', {
         name: 'All failed public API data sets must be retried or removed',
       }),
-    ).not.toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
 
     expect(
-      screen.getByText('All public API data set mappings must be completed'),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
+      screen.getByRole('link', {
         name: 'All public API data set mappings must be completed',
       }),
-    ).not.toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
 
     expect(
-      screen.getByText(
-        'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
-      ),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('link', {
+      screen.getByRole('link', {
         name: 'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
       }),
-    ).not.toBeInTheDocument();
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#api-data-sets',
+    );
   });
 
   test('renders correctly with warnings', async () => {
