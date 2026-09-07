@@ -20,7 +20,7 @@
     "explore-education-statistics-common": "workspace:*",
     "express": "^4.22.2",
     "express-basic-auth": "^1.2.1",
-    "govuk-frontend": "^6.3.0",
+    "govuk-frontend": "^6.4.0",
     "helmet": "^4.1.1",
     "immer": "^10.2.0",
     "leaflet": "^1.9.4",
