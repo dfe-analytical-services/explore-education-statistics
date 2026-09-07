@@ -149,6 +149,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
   const testDataBlockSummaries: ReleaseDataBlockSummary[] = [
     {
+      dataSetTitle: 'Test data set title 2',
       id: 'block-2',
       name: 'Test name 2',
       heading: 'Test title 2',
@@ -159,6 +160,7 @@ describe('ReleaseDataBlockEditPage', () => {
       inContent: false,
     },
     {
+      dataSetTitle: 'Test data set',
       id: testDataBlock.id,
       name: testDataBlock.name,
       heading: testDataBlock.heading,

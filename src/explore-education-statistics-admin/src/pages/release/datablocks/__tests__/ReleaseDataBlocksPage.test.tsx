@@ -40,7 +40,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: undefined,
       heading: 'Block 1 heading',
       source: 'Block 1 source',
-      dataSetName: 'Data set 1',
+      dataSetTitle: 'Data set 1',
       inContent: true,
       chartsCount: 1,
     },
@@ -50,7 +50,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: '2021-01-01T15:00:00.0000000',
       heading: 'Block 2 heading',
       source: 'Block 2 source',
-      dataSetName: 'Data set 2',
+      dataSetTitle: 'Data set 2',
       inContent: false,
       chartsCount: 0,
     },
@@ -60,6 +60,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: '2021-01-01T15:00:00.0000000',
       heading: 'Block 3 heading',
       source: 'Block 3 source',
+      dataSetTitle: 'Data set 3',
       inContent: false,
       chartsCount: 0,
     },
@@ -69,7 +70,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: '2021-02-01T15:00:00.0000000',
       heading: 'Block 4 heading',
       source: 'Block 4 source',
-      dataSetName: 'A data set 4',
+      dataSetTitle: 'A data set 4',
       inContent: false,
       chartsCount: 0,
     },
@@ -158,7 +159,7 @@ describe('ReleaseDataBlocksPage', () => {
     );
     expect(featuredTablesRow2Cells).toHaveLength(7);
     expect(featuredTablesRow2Cells[0]).toHaveTextContent('Block 3');
-    expect(featuredTablesRow2Cells[1]).toHaveTextContent('Not available');
+    expect(featuredTablesRow2Cells[1]).toHaveTextContent('Data set 3');
     expect(featuredTablesRow2Cells[2]).toHaveTextContent('No');
     expect(featuredTablesRow2Cells[3]).toHaveTextContent('No');
     expect(featuredTablesRow2Cells[4]).toHaveTextContent('Featured 3');
@@ -277,7 +278,7 @@ describe('ReleaseDataBlocksPage', () => {
     );
     expect(featuredTablesRow2Cells).toHaveLength(7);
     expect(featuredTablesRow2Cells[0]).toHaveTextContent('Block 3');
-    expect(featuredTablesRow2Cells[1]).toHaveTextContent('Not available');
+    expect(featuredTablesRow2Cells[1]).toHaveTextContent('Data set 3');
     expect(featuredTablesRow2Cells[2]).toHaveTextContent('No');
     expect(featuredTablesRow2Cells[3]).toHaveTextContent('No');
     expect(featuredTablesRow2Cells[4]).toHaveTextContent('Featured 3');
@@ -352,6 +353,7 @@ describe('ReleaseDataBlocksPage', () => {
     dataBlockService.listDataBlocks.mockResolvedValue([
       ...testDataBlocks,
       {
+        dataSetTitle: 'Data set title 5',
         id: 'block-5',
         name: 'Block 5',
         created: '2021-02-01T15:00:00.0000000',
@@ -361,6 +363,7 @@ describe('ReleaseDataBlocksPage', () => {
         chartsCount: 0,
       },
       {
+        dataSetTitle: 'Data set title 6',
         id: 'block-6',
         name: 'Block 6',
         created: '2021-02-01T15:00:00.0000000',
@@ -502,7 +505,7 @@ describe('ReleaseDataBlocksPage', () => {
       ).getAllByRole('cell');
       expect(featuredTablesRow1Cells).toHaveLength(7);
       expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 3');
-      expect(featuredTablesRow1Cells[1]).toHaveTextContent('Not available');
+      expect(featuredTablesRow1Cells[1]).toHaveTextContent('Data set 3');
       expect(featuredTablesRow1Cells[2]).toHaveTextContent('No');
       expect(featuredTablesRow1Cells[3]).toHaveTextContent('No');
       expect(featuredTablesRow1Cells[4]).toHaveTextContent('Featured 3');
@@ -583,7 +586,7 @@ describe('ReleaseDataBlocksPage', () => {
       ).toHaveAttribute('aria-sort', 'none');
     });
 
-    test('clicking the data file control sorts by data set name', async () => {
+    test('clicking the data file control sorts by data set title', async () => {
       const { user } = renderPage();
 
       await waitFor(() => {
@@ -592,12 +595,11 @@ describe('ReleaseDataBlocksPage', () => {
 
       await user.click(screen.getByRole('button', { name: /Data file/ }));
 
-      // Block 3 has no data set name, so is sorted first
       expect(getDataBlockNames()).toEqual([
-        'Block 3',
         'Block 4',
         'Block 1',
         'Block 2',
+        'Block 3',
       ]);
       expect(
         screen.getByRole('columnheader', { name: /Data file/ }),
@@ -606,10 +608,10 @@ describe('ReleaseDataBlocksPage', () => {
       await user.click(screen.getByRole('button', { name: /Data file/ }));
 
       expect(getDataBlockNames()).toEqual([
+        'Block 3',
         'Block 2',
         'Block 1',
         'Block 4',
-        'Block 3',
       ]);
       expect(
         screen.getByRole('columnheader', { name: /Data file/ }),

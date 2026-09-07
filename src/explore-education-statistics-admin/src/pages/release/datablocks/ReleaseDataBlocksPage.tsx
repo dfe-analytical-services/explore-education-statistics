@@ -30,14 +30,14 @@ import { useCallback, useMemo, useState } from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
 type DataBlockSortColumn =
-  'name' | 'dataSetName' | 'hasChart' | 'inContent' | 'created';
+  'name' | 'dataSetTitle' | 'hasChart' | 'inContent' | 'created';
 
 const dataBlockSortValues: Record<
   DataBlockSortColumn,
   (dataBlock: ReleaseDataBlockSummary) => string | boolean
 > = {
   name: dataBlock => dataBlock.name.toLowerCase(),
-  dataSetName: dataBlock => dataBlock.dataSetName?.toLowerCase() ?? '',
+  dataSetTitle: dataBlock => dataBlock.dataSetTitle.toLowerCase(),
   hasChart: dataBlock => dataBlock.chartsCount > 0,
   inContent: dataBlock => dataBlock.inContent,
   created: dataBlock => dataBlock.created ?? '',
@@ -224,7 +224,7 @@ const ReleaseDataBlocksPage = ({
                 />
                 <SortedTableHeader
                   className="govuk-!-width-one-quarter"
-                  column="dataSetName"
+                  column="dataSetTitle"
                   label="Data file"
                   sort={sort}
                   onClick={handleSortChange}
@@ -256,7 +256,7 @@ const ReleaseDataBlocksPage = ({
               {sortedDataBlocks.map(dataBlock => (
                 <tr key={dataBlock.id}>
                   <td>{dataBlock.name}</td>
-                  <td>{dataBlock.dataSetName ?? 'Not available'}</td>
+                  <td>{dataBlock.dataSetTitle}</td>
                   <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
                   <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
                   <td>

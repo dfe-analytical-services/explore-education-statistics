@@ -13,7 +13,7 @@ export interface ReleaseDataBlockSummary {
   highlightDescription?: string;
   heading: string;
   source?: string;
-  dataSetName?: string;
+  dataSetTitle: string;
   chartsCount: number;
   inContent: boolean;
 }

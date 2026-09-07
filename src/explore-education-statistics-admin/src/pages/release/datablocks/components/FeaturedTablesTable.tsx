@@ -168,7 +168,7 @@ function FeaturedTablesRow({
   return (
     <tr>
       <td>{dataBlock.name}</td>
-      <td>{dataBlock.dataSetName ?? 'Not available'}</td>
+      <td>{dataBlock.dataSetTitle}</td>
       <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
       <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
       <td>{featuredTable.name}</td>
