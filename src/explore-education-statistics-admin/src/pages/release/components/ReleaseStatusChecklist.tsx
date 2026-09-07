@@ -24,7 +24,6 @@ import {
   publicationMethodologiesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useMemo } from 'react';
@@ -41,8 +40,6 @@ interface Props {
 }
 
 const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
-  const { user } = useAuthContext();
-
   const { data: checklist, isLoading } = useQuery(
     releaseVersionQueries.getChecklist(releaseVersion.id),
   );
