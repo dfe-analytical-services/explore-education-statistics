@@ -426,8 +426,8 @@ describe('DataReplacementPlan', () => {
     /Please go to the API data sets tab and complete manual mapping process for indicators\./;
   const bauFinalisationMessage =
     /Please go to the API data sets tab and finalize the data set version mapping process\./;
-  const noAccessApiDetailsMessage =
-    /Please contact the EES team for support at explore.statistics@education.gov.uk. Your user account does not have the role required access to the API details page which can help resolve this issue./;
+  const standardUserInstruction =
+    /You can view the Api data sets tab, but you do not have the required role to resolve the issue\. Please contact the EES team for support at explore\.statistics@education\.gov\.uk\./;
 
   test('renders the API errors section with links to API details page when a BAU user is viewing the page', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
@@ -598,9 +598,17 @@ describe('DataReplacementPlan', () => {
             bauFinalisationMessage,
           );
         } else {
-          expect(filtersParagraph).toHaveTextContent(noAccessApiDetailsMessage);
+          expect(filtersParagraph).toHaveTextContent(standardUserInstruction);
+          expect(
+            within(filtersParagraph as HTMLElement).getByRole('link', {
+              name: 'view the Api data sets tab',
+            }),
+          ).toHaveAttribute(
+            'href',
+            '/publication/publication-1/release/release-1/api-data-sets/data-set-1',
+          );
           expect(finalizationParagraph).toHaveTextContent(
-            noAccessApiDetailsMessage,
+            standardUserInstruction,
           );
         }
       });
@@ -686,11 +694,9 @@ describe('DataReplacementPlan', () => {
             bauFinalisationMessage,
           );
         } else {
-          expect(locationsParagraph).toHaveTextContent(
-            noAccessApiDetailsMessage,
-          );
+          expect(locationsParagraph).toHaveTextContent(standardUserInstruction);
           expect(finalizationParagraph).toHaveTextContent(
-            noAccessApiDetailsMessage,
+            standardUserInstruction,
           );
         }
       });
@@ -777,10 +783,10 @@ describe('DataReplacementPlan', () => {
           );
         } else {
           expect(indicatorsParagraph).toHaveTextContent(
-            noAccessApiDetailsMessage,
+            standardUserInstruction,
           );
           expect(finalizationParagraph).toHaveTextContent(
-            noAccessApiDetailsMessage,
+            standardUserInstruction,
           );
         }
       });
