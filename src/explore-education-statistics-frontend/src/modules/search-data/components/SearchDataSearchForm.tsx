@@ -75,19 +75,28 @@ export default function SearchForm({
     });
 
     function handleEnter(evt: KeyboardEvent) {
-      if (evt.key !== 'Enter' || !onSubmit) {
+      if (evt.key !== 'Enter') {
         return;
       }
 
       const dropdownVisible =
         autocompleteInput.getAttribute('aria-expanded') === 'true';
 
-      if (dropdownVisible) {
+      if (!dropdownVisible) {
+        return;
+      }
+
+      if (onSubmit) {
         const searchTerm = new FormData(wrapper.current!).get(
           'search',
         ) as string;
         onSubmit(searchTerm || '');
+        return;
       }
+
+      // Without an `onSubmit` handler the form should submit natively using its
+      // `action`/`method`, so trigger that submission manually.
+      wrapper.current?.requestSubmit();
     }
 
     // 2) The accessible-autocomplete component has an edge case where when the menu is visible, it
