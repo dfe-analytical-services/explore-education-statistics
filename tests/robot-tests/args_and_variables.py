@@ -213,6 +213,7 @@ def validate_environment_variables():
         "PENDING_INVITE_USER_EMAIL",
         "PENDING_INVITE_USER_PASSWORD",
         "PUBLISHER_FUNCTIONS_URL",
+        "PUBLIC_API_URL",
     ]
 
     for env_var in required_env_vars:
