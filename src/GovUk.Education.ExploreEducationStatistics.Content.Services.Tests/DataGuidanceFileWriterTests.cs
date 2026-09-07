@@ -431,7 +431,7 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = "<p>Test file content</p>",
+                Content = "Test file content",
                 GeographicLevels = new List<string> { "Local authority", "National", "Ward" },
                 GeographicLevelsCsvOnly = new List<string> { "School" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),

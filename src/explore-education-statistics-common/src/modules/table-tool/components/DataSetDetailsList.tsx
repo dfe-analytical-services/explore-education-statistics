@@ -12,7 +12,14 @@ interface Props {
 }
 
 export default function DataSetDetailsList({ subject }: Props) {
-  const { content, filters, geographicLevels, indicators, name } = subject;
+  const {
+    content,
+    filters,
+    geographicLevels,
+    geographicLevelsCsvOnly,
+    indicators,
+    name,
+  } = subject;
   const timePeriod = getTimePeriodString(subject.timePeriods);
 
   return (
@@ -21,6 +28,11 @@ export default function DataSetDetailsList({ subject }: Props) {
       {geographicLevels.length > 0 && (
         <SummaryListItem term="Geographic levels">
           {orderBy(geographicLevels).join('; ')}
+        </SummaryListItem>
+      )}
+      {geographicLevelsCsvOnly && geographicLevelsCsvOnly.length > 0 && (
+        <SummaryListItem term="Geographic levels (only available via download / public API)">
+          {orderBy(geographicLevelsCsvOnly).join('; ')}
         </SummaryListItem>
       )}
       {timePeriod && (

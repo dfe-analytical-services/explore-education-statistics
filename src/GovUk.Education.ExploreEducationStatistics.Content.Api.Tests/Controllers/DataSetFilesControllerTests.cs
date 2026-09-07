@@ -144,7 +144,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             }
 
             [Fact]
-            public async Task FilterByGeographicLevel_CsvOnlyLevelsAreExcluded()
+            public async Task FilterByGeographicLevel_CsvOnlyLevelsAreIncluded()
             {
                 Publication publication = DataFixture
                     .DefaultPublication()
@@ -168,9 +168,15 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 );
                 var csvOnlyResponse = await ListDataSetFiles(csvOnlyQuery);
 
-                csvOnlyResponse
-                    .AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>()
-                    .AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0);
+                var csvOnlyPagedResult = csvOnlyResponse.AssertOk<
+                    PaginatedListViewModel<DataSetFileSummaryViewModel>
+                >();
+
+                csvOnlyPagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+
+                var viewModel = Assert.Single(csvOnlyPagedResult.Results);
+                Assert.Equal([GeographicLevel.Country.GetEnumLabel()], viewModel.Meta.GeographicLevels);
+                Assert.Equal([GeographicLevel.Institution.GetEnumLabel()], viewModel.Meta.GeographicLevelsCsvOnly);
 
                 var importedQuery = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Country.GetEnumValue());
                 var importedResponse = await ListDataSetFiles(importedQuery);

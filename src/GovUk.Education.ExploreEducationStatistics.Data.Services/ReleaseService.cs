@@ -98,6 +98,7 @@ public class ReleaseService : IReleaseService
                     content: releaseFile.Summary ?? string.Empty,
                     timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                     geographicLevels: await GetGeographicLevels(rs.SubjectId),
+                    geographicLevelsCsvOnly: await GetGeographicLevels(rs.SubjectId, csvOnly: true),
                     filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
                     indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
                     file: releaseFile.ToFileInfo(),

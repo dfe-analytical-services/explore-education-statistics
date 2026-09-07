@@ -164,7 +164,12 @@ const ReleasePageTabExploreData = ({
           key={dataset.fileId}
           title={dataset.title}
           description={dataset.summary}
-          metaInfo={dataset.meta.geographicLevels.join(', ')}
+          metaInfo={[
+            ...dataset.meta.geographicLevels,
+            ...dataset.meta.geographicLevelsCsvOnly.map(
+              level => `${level} (CSV only)`,
+            ),
+          ].join(', ')}
           tag={
             dataset.isApiEnabled && (
               <Tag className="govuk-!-margin-bottom-2" colour="grey">
