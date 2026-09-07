@@ -18,6 +18,8 @@ public record DataGuidanceDataSetViewModel
 
     public List<string> GeographicLevels { get; init; } = new();
 
+    public List<string> GeographicLevelsCsvOnly { get; init; } = new();
+
     public List<LabelValue> Variables { get; init; } = new();
 
     public List<FootnoteViewModel> Footnotes { get; init; } = new();

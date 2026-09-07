@@ -51,6 +51,7 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             {
                 var releaseFilesQueryable = _contentDbContext
                     .ReleaseFiles.Include(rf => rf.File)
+                        .ThenInclude(f => f.DataSetFileVersionGeographicLevels)
                     .Where(rf =>
                         rf.ReleaseVersionId == releaseVersionId
                         && rf.File.Type == FileType.Data
@@ -68,33 +69,16 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
                     {
                         var subjectId = releaseFile.File.SubjectId!.Value;
 
-                        var geographicLevels = await ListGeographicLevels(subjectId, cancellationToken);
                         var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
                         var variables = await ListVariables(subjectId, cancellationToken);
                         var footnotes = await ListFootnotes(releaseVersionId: releaseVersionId, subjectId: subjectId);
 
-                        return BuildDataGuidanceDataSetViewModel(
-                            releaseFile,
-                            geographicLevels,
-                            timePeriods,
-                            variables,
-                            footnotes
-                        );
+                        return BuildDataGuidanceDataSetViewModel(releaseFile, timePeriods, variables, footnotes);
                     })
                     .OrderBy(viewModel => viewModel.Order)
                     .ThenBy(viewModel => viewModel.Name) // For data sets existing before ordering was added
                     .ToListAsync(cancellationToken);
             });
-    }
-
-    public async Task<List<string>> ListGeographicLevels(Guid subjectId, CancellationToken cancellationToken = default)
-    {
-        return await _statisticsDbContext
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == subjectId)
-            .Select(observation => observation.Location.GeographicLevel.GetEnumLabel())
-            .Distinct()
-            .ToListAsync(cancellationToken);
     }
 
     private async Task<List<LabelValue>> ListVariables(Guid subjectId, CancellationToken cancellationToken = default)
@@ -125,7 +109,6 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
 
     private static DataGuidanceDataSetViewModel BuildDataGuidanceDataSetViewModel(
         ReleaseFile releaseFile,
-        List<string> geographicLevels,
         TimePeriodLabels timePeriods,
         List<LabelValue> variables,
         List<FootnoteViewModel> footnotes
@@ -138,7 +121,16 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             Filename = releaseFile.File.Filename,
             Order = releaseFile.Order,
             Name = releaseFile.Name ?? "",
-            GeographicLevels = geographicLevels,
+            GeographicLevels = releaseFile
+                .File.DataSetFileVersionGeographicLevels.Where(level => level.CsvOnly != true) // TODO EES-7584 update once CsvOnly isn't nullable
+                .Select(level => level.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList(),
+            GeographicLevelsCsvOnly = releaseFile
+                .File.DataSetFileVersionGeographicLevels.Where(level => level.CsvOnly == true) // TODO EES-7584 update once CsvOnly isn't nullable
+                .Select(level => level.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList(),
             TimePeriods = timePeriods,
             Variables = variables,
             Footnotes = footnotes,

@@ -23,6 +23,7 @@ describe('ReleaseDataGuidanceSection', () => {
         filename: 'data-1.csv',
         content: '<p>Test data set 1 content</p>',
         geographicLevels: ['Local authority', 'National'],
+        geographicLevelsCsvOnly: ['School'],
         timePeriods: {
           from: '2018',
           to: '2019',
@@ -48,6 +49,7 @@ describe('ReleaseDataGuidanceSection', () => {
         filename: 'data-2.csv',
         content: '<p>Test data set 2 content</p>',
         geographicLevels: ['Regional', 'Ward'],
+        geographicLevelsCsvOnly: [],
         timePeriods: {
           from: '2020',
           to: '2021',

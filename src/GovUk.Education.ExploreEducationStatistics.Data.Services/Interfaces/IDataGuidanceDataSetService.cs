@@ -12,6 +12,4 @@ public interface IDataGuidanceDataSetService
         IList<Guid>? dataFileIds = null,
         CancellationToken cancellationToken = default
     );
-
-    Task<List<string>> ListGeographicLevels(Guid subjectId, CancellationToken cancellationToken = default);
 }
