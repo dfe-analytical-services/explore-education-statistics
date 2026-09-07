@@ -7,10 +7,14 @@
   --search-bar-input-size: 53px;
 
   background-color: govuk-colour('blue');
-  color: govuk-functional-colour('inverse-text');
+  color: govuk-colour('white');
 
   *:is(:link, :visited, h1, h2, label) {
-    color: govuk-functional-colour('inverse-text');
+    color: govuk-colour('white');
+  }
+
+  *:is(:link, :visited):focus {
+    color: govuk-functional-colour('focus-text');
   }
 
   :global(.autocomplete__input) {
@@ -39,5 +43,5 @@
 }
 
 .mastheadSubtitle {
-  color: govuk-functional-colour('inverse-text');
+  color: govuk-colour('white');
 }
