@@ -16,7 +16,7 @@ describe('DataSetStep', () => {
     {
       id: 'subject-1',
       name: 'Subject 1',
-      content: '<p>Test content 1</p>',
+      content: 'Test content 1',
       timePeriods: {
         from: '2018/19',
         to: '2020/21',
@@ -37,7 +37,7 @@ describe('DataSetStep', () => {
     {
       id: 'subject-2',
       name: 'Subject 2',
-      content: '<p>Test content 2</p>',
+      content: 'Test content 2',
       timePeriods: {
         from: '2015',
         to: '2020',
@@ -133,11 +133,9 @@ describe('DataSetStep', () => {
     expect(radios[1]).toEqual(screen.getByLabelText('Subject 2'));
 
     const subject1Hint = within(getDescribedBy(radios[0]));
-    expect(
-      within(subject1Hint.getByTestId('Content')).getByText('Test content 1', {
-        selector: 'p',
-      }),
-    ).toBeInTheDocument();
+    expect(subject1Hint.getByTestId('Content')).toHaveTextContent(
+      'Test content 1',
+    );
     expect(subject1Hint.getByTestId('Geographic levels')).toHaveTextContent(
       'Local Authority District; Ward',
     );
@@ -159,11 +157,9 @@ describe('DataSetStep', () => {
     expect(filters1[0]).toHaveTextContent('School type');
 
     const subject2Hint = within(getDescribedBy(radios[1]));
-    expect(
-      within(subject2Hint.getByTestId('Content')).getByText('Test content 2', {
-        selector: 'p',
-      }),
-    ).toBeInTheDocument();
+    expect(subject2Hint.getByTestId('Content')).toHaveTextContent(
+      'Test content 2',
+    );
     expect(subject2Hint.getByTestId('Geographic levels')).toHaveTextContent(
       'Local Authority; National',
     );
@@ -483,11 +479,7 @@ describe('DataSetStep', () => {
       screen.getByRole('heading', { name: 'Data set details' }),
     ).toBeInTheDocument();
 
-    expect(
-      within(screen.getByTestId('Content')).getByText('Test content 1', {
-        selector: 'p',
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('Content')).toHaveTextContent('Test content 1');
     expect(screen.getByTestId('Geographic levels')).toHaveTextContent(
       'Local Authority District; Ward',
     );

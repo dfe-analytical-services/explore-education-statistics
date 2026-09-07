@@ -1,4 +1,4 @@
-import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import CollapsibleList from '@common/components/CollapsibleList';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -60,7 +60,7 @@ export default function DataSetDetailsList({ subject }: Props) {
       )}
       {content && (
         <SummaryListItem term="Content">
-          <ContentHtml html={content} />
+          <PlainTextContent text={content} />
         </SummaryListItem>
       )}
     </SummaryList>
