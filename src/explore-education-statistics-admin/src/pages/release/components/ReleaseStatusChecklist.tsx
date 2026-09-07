@@ -259,7 +259,7 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
         case 'MissingUpdatedApiDataSet':
           return {
             message:
-              'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+              'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
             link: apiDataSetsTabRoute,
           };
         case 'ReleaseSummarySectionContainsHtmlBlock':
