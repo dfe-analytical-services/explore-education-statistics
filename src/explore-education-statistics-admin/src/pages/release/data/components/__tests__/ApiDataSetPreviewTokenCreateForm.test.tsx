@@ -273,6 +273,17 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
         selector: '#apiDataSetTokenCreateForm-selectionMethod-presetDays',
       }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        /If you would like to extend the period that this new token is valid for, please contact/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: 'explore.statistics@education.gov.uk',
+      }),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
   });
 });
 
