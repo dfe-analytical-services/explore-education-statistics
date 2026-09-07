@@ -1,0 +1,8 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.linkWrapper {
+  @include govuk-media-query($until: tablet) {
+    margin-top: govuk-spacing(6);
+    margin-bottom: govuk-spacing(7);
+  }
+}

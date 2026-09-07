@@ -198,8 +198,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.4.0
+        version: 6.4.0
       history:
         specifier: ^4.10.1
         version: 4.10.1
@@ -562,8 +562,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.4.0
+        version: 6.4.0
       html-react-parser:
         specifier: ^5.2.17
         version: 5.2.17(@types/react@19.2.18)(react@19.2.7)
@@ -791,8 +791,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       govuk-frontend:
-        specifier: ^6.3.0
-        version: 6.3.0
+        specifier: ^6.4.0
+        version: 6.4.0
       helmet:
         specifier: ^4.1.1
         version: 4.6.0
@@ -7380,8 +7380,8 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  govuk-frontend@6.3.0:
-    resolution: {integrity: sha512-cXIQxm5PHCsbic47GXZrVBZhAeeshTLRL6ZBKilLsR6rMCjJuWb7Fruq0VUNMBJFlJk/srsRj/q8d5bM9cgKoA==}
+  govuk-frontend@6.4.0:
+    resolution: {integrity: sha512-jU3oaVFXqK1yDVIdZs1YZ6JD7YDB4PFUHF3rFMWJye9ArImp42F9wCsFzzB1+udjuzGCryJGcHHbBQ5HY+8rqQ==}
     engines: {node: '>= 4.2.0'}
 
   graceful-fs@4.2.11:
@@ -20867,7 +20867,7 @@ snapshots:
 
   gopd@1.2.0: {}
 
-  govuk-frontend@6.3.0: {}
+  govuk-frontend@6.4.0: {}
 
   graceful-fs@4.2.11: {}
 

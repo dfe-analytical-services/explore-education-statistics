@@ -2,7 +2,13 @@
 module.exports = {
   siteUrl: process.env.PROD_PUBLIC_URL,
   sitemapSize: 5000,
-  exclude: ['/server-sitemap.xml', '/search-data', '/search-releases'],
+  exclude: [
+    '/server-sitemap.xml',
+    '/search-data',
+    '/search-releases',
+    '/prototype',
+    '/prototype/*',
+  ],
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [
@@ -12,6 +18,7 @@ module.exports = {
         disallow: [
           '/data-tables/fast-track/',
           '/data-tables/permalink/',
+          '/prototype/',
           '/subscriptions/',
         ],
       },
