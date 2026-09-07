@@ -121,14 +121,18 @@ const DataFileReplacementPlan = ({
   );
 };
 
-const mappingLinkNotAvailableToNonBauText = (
+const mappingNotAvailableToStandardUserText = (apiDataSetsTabRoute: string) => (
   <p>
-    Please contact the EES team for support at{' '}
+    You can{' '}
+    <Link to={apiDataSetsTabRoute} unvisited>
+      view the Api data sets tab
+    </Link>
+    , but you do not have the required role to resolve the issue. Please contact
+    the EES team for support at{' '}
     <a href="mailto:explore.statistics@education.gov.uk">
       explore.statistics@education.gov.uk
     </a>
-    . Your user account does not have the role required access to the API
-    details page which can help resolve this issue.
+    .
   </p>
 );
 
@@ -143,14 +147,14 @@ function DataSetMappingProgressTag({
   hasIncompleteMapping,
   hasMajorMapping,
   isPatch,
-  linkToApiDetailsTab,
+  apiDataSetsTabRoute,
   user,
 }: {
   mappableType: string;
   hasIncompleteMapping: boolean;
   hasMajorMapping: boolean | undefined;
   isPatch: boolean;
-  linkToApiDetailsTab: ReactNode | undefined;
+  apiDataSetsTabRoute: string | undefined;
   user?: User;
 }) {
   const mappingRequired = hasIncompleteMapping || (hasMajorMapping && isPatch);
@@ -175,13 +179,16 @@ function DataSetMappingProgressTag({
 
       {mappingRequired && user?.permissions.isBauUser && (
         <p>
-          Please {linkToApiDetailsTab} and complete manual mapping process for{' '}
-          {mappableType}.
+          Please{' '}
+          <Link to={apiDataSetsTabRoute!} unvisited>
+            go to the API data sets tab
+          </Link>{' '}
+          and complete manual mapping process for {mappableType}.
         </p>
       )}
 
       {mappingRequired && !user?.permissions.isBauUser && (
-        <>{mappingLinkNotAvailableToNonBauText}</>
+        <>{mappingNotAvailableToStandardUserText(apiDataSetsTabRoute!)}</>
       )}
 
       {!mappingRequired && (
@@ -264,19 +271,12 @@ function Plan({
     [releaseVersionId, publicationId, dataSetId],
   );
 
-  const apiDataSetsTabRoute =
-    user?.permissions.isBauUser && releaseRouteParams
-      ? `${generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          releaseRouteParams,
-        )}`
-      : undefined;
-
-  const linkToApiDetailsTab = apiDataSetsTabRoute && (
-    <Link to={apiDataSetsTabRoute} unvisited>
-      go to the API data sets tab
-    </Link>
-  );
+  const apiDataSetsTabRoute = releaseRouteParams
+    ? `${generatePath<ReleaseDataSetRouteParams>(
+        releaseApiDataSetDetailsRoute.path,
+        releaseRouteParams,
+      )}`
+    : undefined;
 
   return (
     <>
@@ -293,7 +293,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteLocationMapping}
             hasMajorMapping={hasMajorLocationMapping}
             isPatch={isPatch}
-            linkToApiDetailsTab={linkToApiDetailsTab}
+            apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
           <DataSetMappingProgressTag
@@ -301,7 +301,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteFilterMapping}
             hasMajorMapping={hasMajorFilterMapping}
             isPatch={isPatch}
-            linkToApiDetailsTab={linkToApiDetailsTab}
+            apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
           <DataSetMappingProgressTag
@@ -309,7 +309,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteIndicatorMapping}
             hasMajorMapping={hasMajorIndicatorMapping}
             isPatch={isPatch}
-            linkToApiDetailsTab={linkToApiDetailsTab}
+            apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
           <h3 className="govuk-heading-m govuk-!-padding-top-4">
@@ -321,12 +321,15 @@ function Plan({
           </h3>
           {isNotReadyToPublish && user?.permissions.isBauUser && (
             <p>
-              Please {linkToApiDetailsTab} and finalize the data set version
-              mapping process.
+              Please{' '}
+              <Link to={apiDataSetsTabRoute!} unvisited>
+                go to the API data sets tab
+              </Link>{' '}
+              and finalize the data set version mapping process.
             </p>
           )}
           {isNotReadyToPublish && !user?.permissions.isBauUser && (
-            <>{mappingLinkNotAvailableToNonBauText}</>
+            <>{mappingNotAvailableToStandardUserText(apiDataSetsTabRoute!)}</>
           )}
           {!isNotReadyToPublish && (
             <p>No actions required for API data set version mapping.</p>

@@ -814,13 +814,88 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByTestId('notificationBanner'),
+        screen.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
       ).not.toBeInTheDocument();
+    });
+
+    test('shows a message for a user without permission to manage public API data sets when the data set is ready to be finalised', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            filtersComplete: true,
+            locationsComplete: true,
+            indicatorsComplete: true,
+            isMajorVersionUpdate: null,
+            filtersHaveMajorChange: false,
+            locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      renderPage({ user: testAnalystUser });
+
       expect(
-        screen.queryByText(
-          'Draft API data set version is ready to be finalised',
-        ),
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      const banner = within(screen.getByTestId('notificationBanner'));
+      expect(
+        banner.getByRole('heading', { name: 'Action required' }),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText('Draft API data set version is ready to be finalised'),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText(/you do not have the required role to do this/),
+      ).toBeInTheDocument();
+      expect(
+        banner.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
       ).not.toBeInTheDocument();
+    });
+
+    test('shows a message for a user without permission to manage public API data sets when mapping actions are required', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testDraftVersion,
+          mappingStatus: {
+            filtersComplete: false,
+            locationsComplete: true,
+            indicatorsComplete: true,
+            isMajorVersionUpdate: null,
+            filtersHaveMajorChange: false,
+            locationsHaveMajorChange: false,
+            indicatorsHaveMajorChange: false,
+          },
+        },
+        latestLiveVersion: testLiveVersion,
+      });
+
+      renderPage({ user: testAnalystUser });
+
+      expect(
+        await screen.findByText('Draft version details'),
+      ).toBeInTheDocument();
+
+      const banner = within(screen.getByTestId('notificationBanner'));
+      expect(
+        banner.getByRole('heading', { name: 'Action required' }),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText('Draft API data set version requires action'),
+      ).toBeInTheDocument();
+      expect(
+        banner.getByText(/you do not have the required role to resolve this/),
+      ).toBeInTheDocument();
     });
 
     test('successfully finalised', async () => {
