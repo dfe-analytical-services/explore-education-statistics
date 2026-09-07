@@ -26,7 +26,15 @@
 
 .mastheadTitle {
   @include govuk-media-query($until: tablet) {
-    @include govuk-visually-hidden;
+    // N.b not using govuk-visually-hidden as it seems to break the prod css build
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
   }
 }
 
