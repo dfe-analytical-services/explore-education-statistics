@@ -58,16 +58,16 @@ const HomePageRedesign = () => {
               Latest statistical releases
             </h2>
 
-            <div className="govuk-grid-row">
+            <ol className="govuk-grid-row govuk-list">
               {latestReleases.map(release => (
-                <div
+                <li
                   className="govuk-grid-column-one-third"
                   key={`${release.publicationSlug}-${release.releaseSlug}`}
                 >
                   <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
             <Link
               to="/find-statistics"
               onClick={() => logLinkClick('Find statistics')}
@@ -79,16 +79,16 @@ const HomePageRedesign = () => {
               Most popular statistical releases
             </h2>
 
-            <div className="govuk-grid-row">
+            <ol className="govuk-grid-row govuk-list">
               {popularReleases.map(release => (
-                <div
+                <li
                   className="govuk-grid-column-one-third"
                   key={`${release.publicationSlug}-${release.releaseSlug}`}
                 >
                   <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
             <Link
               to="/find-statistics"
               onClick={() => logLinkClick('Find statistics')}

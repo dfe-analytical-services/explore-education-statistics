@@ -2,6 +2,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { releaseTypes } from '@common/services/types/releaseType';
 import Link from '@frontend/components/Link';
+import styles from '@frontend/modules/home/components/HomeReleaseLink.module.scss';
 import { HomeRelease } from '@frontend/modules/home/data/prototypeHomeReleasesData';
 import React from 'react';
 
@@ -23,7 +24,7 @@ const HomeReleaseLink = ({ release, onClick }: Props) => {
   } = release;
 
   return (
-    <>
+    <div className={styles.linkWrapper}>
       <p className="dfe-colour--dark-grey govuk-!-font-size-16 govuk-!-margin-bottom-0">
         <FormattedDate>{publishedDate}</FormattedDate>, {releaseTypes[type]}
       </p>
@@ -38,7 +39,7 @@ const HomeReleaseLink = ({ release, onClick }: Props) => {
       </h3>
       <p className="govuk-!-margin-bottom-2">{publicationSummary}</p>
       <p className="govuk-caption-m">{theme}</p>
-    </>
+    </div>
   );
 };
 
