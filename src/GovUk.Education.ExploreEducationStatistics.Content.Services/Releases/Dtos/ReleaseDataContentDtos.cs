@@ -1,5 +1,4 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -53,10 +52,8 @@ public record ReleaseDataContentDataSetDto
             FileId = releaseFile.File.Id,
             SubjectId = releaseFile.File.SubjectId ?? throw new ArgumentException("File must have SubjectId"),
             Meta = ReleaseDataContentDataSetMetaDto.FromReleaseFile(releaseFile),
-            // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
-            // TODO: Remove HtmlToText after migrating all summaries to plain text.
             // Default to an empty summary for older data sets that predate the summary requirement.
-            Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : "",
+            Summary = releaseFile.Summary ?? "",
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
             PublicApiDataSetId = releaseFile.PublicApiDataSetId,
         };
