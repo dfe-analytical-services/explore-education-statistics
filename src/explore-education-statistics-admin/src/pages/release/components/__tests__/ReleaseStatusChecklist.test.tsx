@@ -269,13 +269,13 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByText(
-        'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+        'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
       ),
     ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+        name: 'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
       }),
     ).not.toBeInTheDocument();
   });
@@ -413,7 +413,7 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+        name: 'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
       }),
     ).toHaveAttribute(
       'href',
