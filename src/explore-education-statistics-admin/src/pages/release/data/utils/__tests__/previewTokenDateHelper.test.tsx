@@ -1,4 +1,4 @@
-﻿import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
+import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 import mockDate from '@common-test/mockDate';
 import { formatInTimeZone } from 'date-fns-tz';

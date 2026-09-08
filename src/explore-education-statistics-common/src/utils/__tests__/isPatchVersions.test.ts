@@ -1,4 +1,4 @@
-﻿import isPatchVersion from '../isPatchVersion';
+import isPatchVersion from '../isPatchVersion';
 
 describe('isPatchVersion', () => {
   it('returns false for undefined', () => {

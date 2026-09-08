@@ -1,4 +1,4 @@
-﻿import UkTimeHelper from '@common/utils/date/ukTimeHelper';
+import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 
 describe('UkTimeHelper', () => {
   test('should return correct UK start of day in UTC during DST', () => {

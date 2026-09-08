@@ -1,4 +1,4 @@
-﻿import Tag from '@common/components/Tag';
+import Tag from '@common/components/Tag';
 import React from 'react';
 import { TypeMapping } from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 

@@ -1,4 +1,4 @@
-﻿export interface PreviewTokenCreateValues {
+export interface PreviewTokenCreateValues {
   label: string;
   datePresetSpan?: number;
   activates?: Date;

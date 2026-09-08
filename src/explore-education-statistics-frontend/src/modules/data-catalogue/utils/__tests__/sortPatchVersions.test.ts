@@ -1,4 +1,4 @@
-﻿import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import sortVersionChanges from '@frontend/modules/data-catalogue/utils/sortVersionChanges';
 
 describe('change log versions sorting order using sortVersionChanges utiltiy function', () => {

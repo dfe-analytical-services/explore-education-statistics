@@ -8,3 +8,9 @@ indent_size = 4
 
 [*.sql]
 indent_size = 4
+
+# EES-7624: Save without a UTF-8 BOM: it is redundant in UTF-8 and breaks tooling
+# that treats the leading bytes as significant, such as concatenated CSS bundles
+# and JSON.parse.
+[*.{ts,tsx,js,jsx,scss,css}]
+charset = utf-8
