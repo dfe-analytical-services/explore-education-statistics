@@ -1,3 +1,10 @@
+-- Some records exist on each environment with a null heading - setting these values to empty strings prevents the 
+-- migration from failing when it attempts to move the content of each DataBlock into its DataBlockVersion.
+UPDATE ContentBlock
+SET DataBlock_Heading = ''
+WHERE [Type] = 'DataBlock'
+  AND DataBlock_Heading IS NULL;
+
 -- Move the content of each DataBlock out of the ContentBlock table and into its DataBlockVersion. This is done for
 -- every DataBlock, whether or not it is placed in a ContentSection.
 UPDATE dbv
