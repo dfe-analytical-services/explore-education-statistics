@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Moq;
 using Newtonsoft.Json;
@@ -31,6 +32,15 @@ public abstract class DataReplacementControllerTests
             var originalLocationId = Guid.NewGuid();
             var replacementLocationId = Guid.NewGuid();
 
+            var originalFilterId = Guid.NewGuid();
+            var replacementFilterId = Guid.NewGuid();
+
+            var originalFilterGroupId = Guid.NewGuid();
+            var replacementFilterGroupId = Guid.NewGuid();
+
+            var originalFilterItemId = Guid.NewGuid();
+            var replacementFilterItemId = Guid.NewGuid();
+
             var dataReplacementPlan = new DataReplacementPlanViewModel
             {
                 DataBlocks =
@@ -38,28 +48,29 @@ public abstract class DataReplacementControllerTests
                     new DataBlockReplacementPlanViewModel(
                         id: Guid.NewGuid(),
                         name: "my data block",
-                        originalFilters: new Dictionary<Guid, FilterReplacementViewModel>
+                        filters: new Dictionary<Guid, FilterReplacementViewModel>
                         {
                             {
-                                Guid.NewGuid(),
+                                originalFilterId,
                                 new FilterReplacementViewModel(
-                                    id: Guid.NewGuid(), // original filterId
-                                    target: Guid.NewGuid(), // replacement filterId
-                                    label: "filter replacement lebel",
-                                    name: "filter replacement name",
+                                    id: originalFilterId,
+                                    target: replacementFilterId,
+                                    label: "filter original label",
+                                    name: "filter_original_name",
                                     groups: new Dictionary<Guid, FilterGroupReplacementViewModel>
                                     {
                                         {
-                                            Guid.NewGuid(),
+                                            originalFilterGroupId,
                                             new FilterGroupReplacementViewModel(
-                                                id: Guid.NewGuid(),
-                                                label: "filter group replacement label",
-                                                filters:
+                                                id: originalFilterGroupId,
+                                                label: "filter group original label",
+                                                target: replacementFilterGroupId,
+                                                items:
                                                 [
                                                     new FilterItemReplacementViewModel(
-                                                        id: Guid.NewGuid(),
-                                                        label: "filter item replacement label",
-                                                        target: Guid.NewGuid()
+                                                        id: originalFilterItemId,
+                                                        label: "filter item original label",
+                                                        target: replacementFilterItemId
                                                     ),
                                                 ]
                                             )
@@ -83,7 +94,105 @@ public abstract class DataReplacementControllerTests
                 ReplacementSubjectId = Guid.NewGuid(),
                 Mapping = new ReplacementPlanMappingViewModel
                 {
-                    Indicators = new ReplacementPlanIndicatorsMappingViewModel
+                    Filters = new ReplacementPlanFilterMappingsViewModel
+                    {
+                        Mappings = new Dictionary<Guid, ReplacementPlanFilterMappingViewModel>
+                        {
+                            {
+                                originalFilterId,
+                                new ReplacementPlanFilterMappingViewModel
+                                {
+                                    Source = new ReplacementPlanFilterViewModel
+                                    {
+                                        Id = originalFilterId,
+                                        Name = "filter_original_name",
+                                        Label = "filter original label",
+                                    },
+                                    Type = MapStatus.ManuallySet,
+                                    CandidateKey = replacementFilterId,
+                                    FilterGroups = new ReplacementPlanFilterGroupMappingsViewModel
+                                    {
+                                        Mappings = new Dictionary<Guid, ReplacementPlanFilterGroupMappingViewModel>
+                                        {
+                                            {
+                                                originalFilterGroupId,
+                                                new ReplacementPlanFilterGroupMappingViewModel
+                                                {
+                                                    Source = new ReplacementPlanFilterGroupViewModel
+                                                    {
+                                                        Id = originalFilterGroupId,
+                                                        Label = "filter group original label",
+                                                    },
+                                                    Type = MapStatus.AutoSet,
+                                                    CandidateKey = replacementFilterGroupId,
+                                                    FilterItems = new ReplacementPlanFilterItemMappingsViewModel
+                                                    {
+                                                        Mappings = new Dictionary<
+                                                            Guid,
+                                                            ReplacementPlanFilterItemMappingViewModel
+                                                        >
+                                                        {
+                                                            {
+                                                                originalFilterItemId,
+                                                                new ReplacementPlanFilterItemMappingViewModel
+                                                                {
+                                                                    Source = new ReplacementPlanFilterItemViewModel
+                                                                    {
+                                                                        Id = originalFilterItemId,
+                                                                        Label = "filter item original label",
+                                                                    },
+                                                                    Type = MapStatus.AutoSet,
+                                                                    CandidateKey = replacementFilterItemId,
+                                                                }
+                                                            },
+                                                        },
+                                                        Candidates = new Dictionary<
+                                                            Guid,
+                                                            ReplacementPlanFilterItemViewModel
+                                                        >
+                                                        {
+                                                            {
+                                                                replacementFilterItemId,
+                                                                new ReplacementPlanFilterItemViewModel
+                                                                {
+                                                                    Id = replacementFilterItemId,
+                                                                    Label = "filter item replacement label",
+                                                                }
+                                                            },
+                                                        },
+                                                    },
+                                                }
+                                            },
+                                        },
+                                        Candidates = new Dictionary<Guid, ReplacementPlanFilterGroupViewModel>
+                                        {
+                                            {
+                                                replacementFilterGroupId,
+                                                new ReplacementPlanFilterGroupViewModel
+                                                {
+                                                    Id = replacementFilterGroupId,
+                                                    Label = "filter group replacement label",
+                                                }
+                                            },
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                        Candidates = new Dictionary<Guid, ReplacementPlanFilterViewModel>
+                        {
+                            {
+                                replacementFilterId,
+                                new ReplacementPlanFilterViewModel
+                                {
+                                    Id = replacementFilterId,
+                                    Name = "filter_replacement_name",
+                                    Label = "filter replacement label",
+                                }
+                            },
+                        },
+                    },
+                    Indicators = new ReplacementPlanIndicatorMappingsViewModel
                     {
                         Mappings = new Dictionary<Guid, ReplacementPlanIndicatorMappingViewModel>
                         {
@@ -97,7 +206,7 @@ public abstract class DataReplacementControllerTests
                                         Name = "original_indicator",
                                         Label = "Original indicator",
                                     },
-                                    Type = "ManuallySet",
+                                    Type = MapStatus.ManuallySet,
                                     CandidateKey = replacementIndicatorId,
                                 }
                             },
@@ -129,7 +238,7 @@ public abstract class DataReplacementControllerTests
                                         Code = "E9000",
                                         Name = "OriginalLocation",
                                     },
-                                    Type = "ManuallySet",
+                                    Type = MapStatus.ManuallySet,
                                     CandidateKey = replacementLocationId,
                                 }
                             },

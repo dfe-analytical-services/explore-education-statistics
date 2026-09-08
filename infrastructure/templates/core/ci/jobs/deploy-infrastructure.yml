@@ -29,7 +29,13 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySubnets: false
+                deployPrivateDnsZones: false
+                deployAzureFrontDoor: false
                 deployApplicationGateway: false
+                deployDataFactory: false
+                deployContainerRegistry: false
+                deployRecoveryServicesVault: false
                 deployAlerts: false
 
             - template: ../tasks/deploy-bicep.yml
@@ -38,5 +44,11 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
+                deploySubnets: $(deploySubnets)
+                deployPrivateDnsZones: $(deployPrivateDnsZones)
+                deployAzureFrontDoor: $(deployAzureFrontDoor)
                 deployApplicationGateway: $(deployApplicationGateway)
+                deployDataFactory: $(deployDataFactory)
+                deployContainerRegistry: $(deployContainerRegistry)
+                deployRecoveryServicesVault: $(deployRecoveryServicesVault)
                 deployAlerts: $(deployAlerts)

@@ -85,7 +85,6 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 const { adminUrl } = environmentAndUsers.environment;
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
 )!;

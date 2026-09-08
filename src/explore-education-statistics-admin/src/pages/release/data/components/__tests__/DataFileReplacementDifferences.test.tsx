@@ -23,6 +23,7 @@ const testReplacementPlan: DataReplacementPlan = {
   originalSubjectId: 'subId',
   replacementSubjectId: 'repId',
   valid: false,
+  hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
     indicators: {
@@ -146,7 +147,7 @@ const testReplacementPlan: DataReplacementPlan = {
             '7f7dd166-b7bc-4d09-83b5-19756451278b': {
               id: '7f7dd166-b7bc-4d09-83b5-19756451278b',
               label: 'Default',
-              filters: [
+              items: [
                 {
                   id: '6424fca3-f3b7-4d99-b5c4-9711556aaec3',
                   label: 'Not specified',
@@ -219,6 +220,7 @@ const testReplacementPlanWithLocation: DataReplacementPlan = {
   originalSubjectId: 'subId',
   replacementSubjectId: 'repId',
   valid: false,
+  hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
     indicators: {
@@ -342,7 +344,7 @@ const testReplacementPlanWithLocation: DataReplacementPlan = {
             '7f7dd166-b7bc-4d09-83b5-19756451278b': {
               id: '7f7dd166-b7bc-4d09-83b5-19756451278b',
               label: 'Default',
-              filters: [
+              items: [
                 {
                   id: '6424fca3-f3b7-4d99-b5c4-9711556aaec3',
                   label: 'Not specified',

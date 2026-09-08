@@ -1,13 +1,6 @@
-import MethodologyContentPage from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
-import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
-import MethodologySummaryEditPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryEditPage';
-import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
-import { RouteProps } from 'react-router';
+import { NavRouteProps } from '@admin/routes/types';
 
-export interface MethodologyRouteProps extends RouteProps {
-  path: string;
-  title: string;
-}
+export type MethodologyRouteProps = NavRouteProps;
 
 export type MethodologyRouteParams = {
   methodologyId: string;
@@ -16,23 +9,29 @@ export type MethodologyRouteParams = {
 export const methodologySummaryRoute: MethodologyRouteProps = {
   path: '/methodology/:methodologyId/summary',
   title: 'Summary',
-  component: MethodologySummaryPage,
 };
 
 export const methodologySummaryEditRoute: MethodologyRouteProps = {
   path: '/methodology/:methodologyId/summary/edit',
   title: 'Edit summary',
-  component: MethodologySummaryEditPage,
 };
 
 export const methodologyContentRoute: MethodologyRouteProps = {
   path: '/methodology/:methodologyId/content',
   title: 'Manage content',
-  component: MethodologyContentPage,
 };
 
 export const methodologyStatusRoute: MethodologyRouteProps = {
   path: '/methodology/:methodologyId/status',
   title: 'Sign off',
-  component: MethodologyStatusPage,
 };
+
+/**
+ * The routes shown in the methodology nav bar, in the order they are stepped
+ * through by the previous/next links.
+ */
+export const methodologyNavRoutes: MethodologyRouteProps[] = [
+  methodologySummaryRoute,
+  methodologyContentRoute,
+  methodologyStatusRoute,
+];

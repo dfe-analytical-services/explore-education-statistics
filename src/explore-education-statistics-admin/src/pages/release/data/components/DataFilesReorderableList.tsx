@@ -1,7 +1,7 @@
 import { DataFile } from '@admin/services/releaseDataFileService';
 import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 interface Props {
   dataFiles: DataFile[];
@@ -15,10 +15,6 @@ export default function DataFilesReorderableList({
   onConfirmReordering,
 }: Props) {
   const [dataFiles, setDataFiles] = useState<DataFile[]>(initialDataFiles);
-
-  useEffect(() => {
-    setDataFiles(initialDataFiles);
-  }, [initialDataFiles]);
 
   const list = useMemo(
     () =>

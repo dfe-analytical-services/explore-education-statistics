@@ -582,8 +582,8 @@ Edit data block for amendment
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
+    user checks table cell contains    1    4    Yes
 
     user clicks edit data block link    ${DATABLOCK_NAME}
 

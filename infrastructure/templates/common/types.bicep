@@ -13,12 +13,22 @@ type FirewallRule = {
 }
 
 @export()
-type PrivateDnsZone =
-  | 'blobStorage'
-  | 'eventGridTopic'
-  | 'fileService'
-  | 'postgres'
-  | 'queue'
-  | 'sites'
-  | 'tableStorage'
-  | 'custom'
+type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+
+@export()
+type WeekOfMonth = 'First' | 'Second' | 'Third' | 'Fourth' | 'Last'
+
+@export()
+type MonthOfYear =
+  | 'January'
+  | 'February'
+  | 'March'
+  | 'April'
+  | 'May'
+  | 'June'
+  | 'July'
+  | 'August'
+  | 'September'
+  | 'October'
+  | 'November'
+  | 'December'

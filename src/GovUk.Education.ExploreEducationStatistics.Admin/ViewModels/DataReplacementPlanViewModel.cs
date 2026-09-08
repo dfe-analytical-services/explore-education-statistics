@@ -1,9 +1,10 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -13,18 +14,25 @@ public class DataReplacementPlanViewModel
     public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
     public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
     public ReplacementPlanMappingViewModel Mapping { get; init; } = new();
+
+    // If the replacement introduces additional filters, existing data blocks become problematic: the data blocks won't
+    // contain filter items for the new filters, and will appear valid, but will return no results after the
+    // replacement.
+    // If the replacement removes filters, then existing data blocks referencing the removed filters' items will be
+    // considered invalid and prevent the replacement, so we don't need to handle that case.
+    public bool HasDataBlockAndReplacementHasAdditionalFilter =>
+        DataBlocks.Any() && Mapping.Filters.Mappings.Count < Mapping.Filters.Candidates.Count;
     public Guid OriginalSubjectId { get; init; }
     public Guid ReplacementSubjectId { get; init; }
 
     public bool Valid =>
-        DataBlocks.All(info => info.Valid)
+        !HasDataBlockAndReplacementHasAdditionalFilter
+        && DataBlocks.All(info => info.Valid)
         && Footnotes.All(info => info.Valid)
         && (ApiDataSetVersionPlan?.Valid ?? true);
 
-    /**
-     * Trimmed down version of the data replacement plan that
-     * only shows full replacement details for invalid items.
-     */
+    // Trimmed down version of the data replacement plan that
+    // only shows full replacement details for invalid items.
     public DataReplacementPlanViewModel ToSummary()
     {
         return new DataReplacementPlanViewModel
@@ -39,38 +47,27 @@ public class DataReplacementPlanViewModel
     }
 }
 
-public class DataBlockReplacementPlanViewModel
+public class DataBlockReplacementPlanViewModel(
+    Guid id,
+    string name,
+    Dictionary<Guid, FilterReplacementViewModel>? filters = null,
+    Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
+    Dictionary<string, LocationReplacementViewModel>? locations = null,
+    TimePeriodRangeReplacementViewModel? timePeriods = null
+)
 {
-    public Guid Id { get; }
-    public string Name { get; }
-    public Dictionary<Guid, FilterReplacementViewModel> Filters { get; }
-    private List<FilterReplacementViewModel> NewlyIntroducedFilters { get; }
-    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
-    public Dictionary<string, LocationReplacementViewModel> Locations { get; } // Key is GeographicLevel
-    public TimePeriodRangeReplacementViewModel? TimePeriods { get; }
-
-    public DataBlockReplacementPlanViewModel(
-        Guid id,
-        string name,
-        Dictionary<Guid, FilterReplacementViewModel>? originalFilters = null,
-        List<FilterReplacementViewModel>? newlyIntroducedFilters = null,
-        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicators = null,
-        Dictionary<string, LocationReplacementViewModel>? locations = null,
-        TimePeriodRangeReplacementViewModel? timePeriods = null
-    )
-    {
-        Id = id;
-        Name = name;
-        Filters = originalFilters ?? new Dictionary<Guid, FilterReplacementViewModel>();
-        NewlyIntroducedFilters = newlyIntroducedFilters ?? new List<FilterReplacementViewModel>();
-        IndicatorGroups = indicators ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
-        Locations = locations ?? new Dictionary<string, LocationReplacementViewModel>();
-        TimePeriods = timePeriods;
-    }
+    public Guid Id { get; } = id;
+    public string Name { get; } = name;
+    public Dictionary<Guid, FilterReplacementViewModel> Filters { get; } =
+        filters ?? new Dictionary<Guid, FilterReplacementViewModel>();
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } =
+        indicators ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
+    public Dictionary<string, LocationReplacementViewModel> Locations { get; } =
+        locations ?? new Dictionary<string, LocationReplacementViewModel>(); // Key is GeographicLevel
+    public TimePeriodRangeReplacementViewModel? TimePeriods { get; } = timePeriods;
 
     public bool Valid =>
-        NewlyIntroducedFilters.IsNullOrEmpty()
-        && Filters.All(model => model.Value.Valid)
+        Filters.All(model => model.Value.Valid)
         && IndicatorGroups.All(model => model.Value.Valid)
         && Locations.Values.All(model => model.Valid)
         && (TimePeriods?.Valid ?? true);
@@ -81,31 +78,25 @@ public class DataBlockReplacementPlanViewModel
     }
 }
 
-public class FootnoteReplacementPlanViewModel
+public class FootnoteReplacementPlanViewModel(
+    Guid id,
+    string content,
+    IEnumerable<FootnoteFilterReplacementViewModel>? filters = null,
+    IEnumerable<FootnoteFilterGroupReplacementViewModel>? filterGroups = null,
+    IEnumerable<FootnoteFilterItemReplacementViewModel>? filterItems = null,
+    Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null
+)
 {
-    public Guid Id { get; }
-    public string Content { get; }
-    public IEnumerable<FootnoteFilterReplacementViewModel> Filters { get; }
-    public IEnumerable<FootnoteFilterGroupReplacementViewModel> FilterGroups { get; }
-    public IEnumerable<FootnoteFilterItemReplacementViewModel> FilterItems { get; }
-    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; }
-
-    public FootnoteReplacementPlanViewModel(
-        Guid id,
-        string content,
-        IEnumerable<FootnoteFilterReplacementViewModel>? filters = null,
-        IEnumerable<FootnoteFilterGroupReplacementViewModel>? filterGroups = null,
-        IEnumerable<FootnoteFilterItemReplacementViewModel>? filterItems = null,
-        Dictionary<Guid, IndicatorGroupReplacementViewModel>? indicatorGroups = null
-    )
-    {
-        Id = id;
-        Content = content;
-        Filters = filters ?? new List<FootnoteFilterReplacementViewModel>();
-        FilterGroups = filterGroups ?? new List<FootnoteFilterGroupReplacementViewModel>();
-        FilterItems = filterItems ?? new List<FootnoteFilterItemReplacementViewModel>();
-        IndicatorGroups = indicatorGroups ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
-    }
+    public Guid Id { get; } = id;
+    public string Content { get; } = content;
+    public IEnumerable<FootnoteFilterReplacementViewModel> Filters { get; } =
+        filters ?? new List<FootnoteFilterReplacementViewModel>();
+    public IEnumerable<FootnoteFilterGroupReplacementViewModel> FilterGroups { get; } =
+        filterGroups ?? new List<FootnoteFilterGroupReplacementViewModel>();
+    public IEnumerable<FootnoteFilterItemReplacementViewModel> FilterItems { get; } =
+        filterItems ?? new List<FootnoteFilterItemReplacementViewModel>();
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } =
+        indicatorGroups ?? new Dictionary<Guid, IndicatorGroupReplacementViewModel>();
 
     public bool Valid =>
         Filters.All(model => model.Valid)
@@ -119,54 +110,35 @@ public class FootnoteReplacementPlanViewModel
     }
 }
 
-public class FootnoteFilterReplacementViewModel : TargetableReplacementViewModel
+public class FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)
+    : TargetableReplacementViewModel(id, label, target);
+
+public class FootnoteFilterGroupReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    Guid filterId,
+    string filterLabel
+) : TargetableReplacementViewModel(id, label, target)
 {
-    public FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)
-        : base(id, label, target) { }
+    public Guid FilterId { get; } = filterId;
+    public string FilterLabel { get; } = filterLabel;
 }
 
-public class FootnoteFilterGroupReplacementViewModel : TargetableReplacementViewModel
+public class FootnoteFilterItemReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    Guid filterGroupId,
+    string filterGroupLabel,
+    Guid filterId,
+    string filterLabel
+) : TargetableReplacementViewModel(id, label, target)
 {
-    public Guid FilterId { get; }
-    public string FilterLabel { get; }
-
-    public FootnoteFilterGroupReplacementViewModel(
-        Guid id,
-        string label,
-        Guid? target,
-        Guid filterId,
-        string filterLabel
-    )
-        : base(id, label, target)
-    {
-        FilterId = filterId;
-        FilterLabel = filterLabel;
-    }
-}
-
-public class FootnoteFilterItemReplacementViewModel : TargetableReplacementViewModel
-{
-    public Guid FilterGroupId { get; }
-    public string FilterGroupLabel { get; }
-    public Guid FilterId { get; }
-    public string FilterLabel { get; }
-
-    public FootnoteFilterItemReplacementViewModel(
-        Guid id,
-        string label,
-        Guid? target,
-        Guid filterGroupId,
-        string filterGroupLabel,
-        Guid filterId,
-        string filterLabel
-    )
-        : base(id, label, target)
-    {
-        FilterGroupId = filterGroupId;
-        FilterGroupLabel = filterGroupLabel;
-        FilterId = filterId;
-        FilterLabel = filterLabel;
-    }
+    public Guid FilterGroupId { get; } = filterGroupId;
+    public string FilterGroupLabel { get; } = filterGroupLabel;
+    public Guid FilterId { get; } = filterId;
+    public string FilterLabel { get; } = filterLabel;
 }
 
 public class FilterReplacementViewModel(
@@ -183,40 +155,31 @@ public class FilterReplacementViewModel(
     public string Name { get; } = name;
     public Dictionary<Guid, FilterGroupReplacementViewModel> Groups { get; } = groups;
 
-    public bool Valid => Groups.All(group => group.Value.Valid);
+    public bool Valid => Target.HasValue && Groups.All(group => group.Value.Valid);
 }
 
-public class FilterGroupReplacementViewModel
+public class FilterGroupReplacementViewModel(
+    Guid id,
+    string label,
+    Guid? target,
+    IEnumerable<FilterItemReplacementViewModel> items
+)
 {
-    public Guid Id { get; }
-    public string Label { get; }
-    public IEnumerable<FilterItemReplacementViewModel> Filters { get; }
+    public Guid Id { get; } = id;
+    public string Label { get; } = label;
+    public Guid? Target { get; } = target;
+    public IEnumerable<FilterItemReplacementViewModel> Items { get; } = items;
 
-    public bool Valid => Filters.All(filter => filter.Valid);
-
-    public FilterGroupReplacementViewModel(Guid id, string label, IEnumerable<FilterItemReplacementViewModel> filters)
-    {
-        Id = id;
-        Label = label;
-        Filters = filters;
-    }
+    public bool Valid => Target.HasValue && Items.All(item => item.Valid);
 }
 
-public class FilterItemReplacementViewModel : TargetableReplacementViewModel
-{
-    public FilterItemReplacementViewModel(Guid id, string label, Guid? target)
-        : base(id, label, target) { }
-}
+public class FilterItemReplacementViewModel(Guid id, string label, Guid? target)
+    : TargetableReplacementViewModel(id, label, target);
 
-public class IndicatorReplacementViewModel : TargetableReplacementViewModel
+public class IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
+    : TargetableReplacementViewModel(id, label, target)
 {
-    public string Name { get; }
-
-    public IndicatorReplacementViewModel(Guid id, string label, Guid? target, string name)
-        : base(id, label, target)
-    {
-        Name = name; // csv column name
-    }
+    public string Name { get; } = name; // csv column name
 }
 
 public class IndicatorGroupReplacementViewModel
@@ -282,7 +245,7 @@ public class TimePeriodRangeReplacementViewModel
 
 public class TimePeriodReplacementViewModel : ReplacementViewModel
 {
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public TimeIdentifier Code { get; }
 
     public int Year { get; }
@@ -337,33 +300,91 @@ public abstract class ReplacementViewModel
 
 public record ReplacementPlanMappingViewModel
 {
-    public ReplacementPlanIndicatorsMappingViewModel Indicators { get; init; } = null!;
+    public ReplacementPlanIndicatorMappingsViewModel Indicators { get; init; } = null!;
 
     public ReplacementPlanLocationMappingsViewModel Locations { get; init; } = null!;
+
+    public ReplacementPlanFilterMappingsViewModel Filters { get; init; } = null!;
+
+    public static ReplacementPlanMappingViewModel FromModel(
+        DataSetMapping mapping,
+        List<Filter> replacementFilters,
+        List<Indicator> replacementIndicators,
+        List<Location> replacementLocations
+    )
+    {
+        var indicatorMappings = ReplacementPlanIndicatorMappingsViewModel.FromModel(mapping, replacementIndicators);
+        var locationMappings = ReplacementPlanLocationMappingsViewModel.FromModel(mapping, replacementLocations);
+        var filterMappings = ReplacementPlanFilterMappingsViewModel.FromModel(mapping, replacementFilters);
+
+        return new ReplacementPlanMappingViewModel
+        {
+            Indicators = indicatorMappings,
+            Locations = locationMappings,
+            Filters = filterMappings,
+        };
+    }
 }
 
-public record ReplacementPlanIndicatorsMappingViewModel
+public record ReplacementPlanIndicatorMappingsViewModel
 {
     // Key is original indicator id
     public Dictionary<Guid, ReplacementPlanIndicatorMappingViewModel> Mappings { get; init; } = null!;
 
     // Key is replacement indicator id
     public Dictionary<Guid, ReplacementPlanIndicatorViewModel> Candidates { get; init; } = null!;
+
+    public static ReplacementPlanIndicatorMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        List<Indicator> replacementIndicators
+    )
+    {
+        var indicatorMappings = mapping.IndicatorMappings.Values.ToDictionary(
+            indicatorMap => indicatorMap.OriginalId,
+            indicatorMap => new ReplacementPlanIndicatorMappingViewModel
+            {
+                Source = new ReplacementPlanIndicatorViewModel
+                {
+                    Id = indicatorMap.OriginalId,
+                    Name = indicatorMap.OriginalColumnName,
+                    Label = indicatorMap.OriginalLabel,
+                },
+                Type = indicatorMap.Status,
+                CandidateKey = indicatorMap.ReplacementId,
+            }
+        );
+
+        var indicatorCandidates = replacementIndicators.ToDictionary(
+            replacementIndicator => replacementIndicator.Id,
+            replacementIndicator => new ReplacementPlanIndicatorViewModel
+            {
+                Id = replacementIndicator.Id,
+                Name = replacementIndicator.Name,
+                Label = replacementIndicator.Label,
+            }
+        );
+
+        return new ReplacementPlanIndicatorMappingsViewModel
+        {
+            Mappings = indicatorMappings,
+            Candidates = indicatorCandidates,
+        };
+    }
 }
 
 public record ReplacementPlanIndicatorMappingViewModel
 {
     public ReplacementPlanIndicatorViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
     public Guid? CandidateKey { get; init; } // replacement indicator id
 }
 
 public record ReplacementPlanIndicatorViewModel
 {
     public Guid Id { get; init; }
-
     public string Name { get; init; } = ""; // csv column name
-
     public string Label { get; init; } = "";
 }
 
@@ -374,12 +395,51 @@ public record ReplacementPlanLocationMappingsViewModel
 
     // Key is replacement location id
     public Dictionary<Guid, ReplacementPlanLocationViewModel> Candidates { get; init; } = new();
+
+    public static ReplacementPlanLocationMappingsViewModel FromModel(
+        DataSetMapping mapping,
+        List<Location> replacementLocations
+    )
+    {
+        var locationMappings = mapping.LocationMappings.Values.ToDictionary(
+            locationMap => locationMap.OriginalId,
+            locationMap => new ReplacementPlanLocationMappingViewModel
+            {
+                Source = new ReplacementPlanLocationViewModel
+                {
+                    Id = locationMap.OriginalId,
+                    Code = locationMap.OriginalCode,
+                    Name = locationMap.OriginalName,
+                },
+                Type = locationMap.Status,
+                CandidateKey = locationMap.ReplacementId,
+            }
+        );
+        var locationCandidates = replacementLocations.ToDictionary(
+            replacementLocation => replacementLocation.Id,
+            replacementLocation => new ReplacementPlanLocationViewModel
+            {
+                Id = replacementLocation.Id,
+                Code = replacementLocation.ToLocationAttribute().GetCodeOrFallback(),
+                Name = replacementLocation.ToLocationAttribute().Name ?? "",
+            }
+        );
+
+        return new ReplacementPlanLocationMappingsViewModel
+        {
+            Mappings = locationMappings,
+            Candidates = locationCandidates,
+        };
+    }
 }
 
 public record ReplacementPlanLocationMappingViewModel
 {
     public ReplacementPlanLocationViewModel Source { get; init; } = null!;
-    public string Type { get; init; } = "";
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
     public Guid? CandidateKey { get; init; } // replacement location id
 }
 
@@ -388,4 +448,199 @@ public record ReplacementPlanLocationViewModel
     public Guid Id { get; init; }
     public string Code { get; init; } = "";
     public string Name { get; init; } = "";
+}
+
+public record ReplacementPlanFilterMappingsViewModel
+{
+    // Key is original filter id
+    public Dictionary<Guid, ReplacementPlanFilterMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter id
+    public Dictionary<Guid, ReplacementPlanFilterViewModel> Candidates { get; init; } = new();
+
+    public static ReplacementPlanFilterMappingsViewModel FromModel(
+        DataSetMapping dataSetMapping,
+        List<Filter> replacementFilters
+    )
+    {
+        var filterMappings = dataSetMapping.FilterMappings.Values.ToDictionary(
+            filterMap => filterMap.OriginalId,
+            filterMap => new ReplacementPlanFilterMappingViewModel
+            {
+                Source = new ReplacementPlanFilterViewModel
+                {
+                    Id = filterMap.OriginalId,
+                    Name = filterMap.OriginalColumnName,
+                    Label = filterMap.OriginalLabel,
+                },
+                CandidateKey = filterMap.ReplacementId,
+                Type = filterMap.Status,
+                FilterGroups = ReplacementPlanFilterGroupMappingsViewModel.FromModel(
+                    filterMap,
+                    replacementFilters
+                        .Where(f => f.Id == filterMap.ReplacementId)
+                        .Select(f => f.FilterGroups)
+                        .SingleOrDefault()
+                        ?? []
+                ),
+            }
+        );
+
+        var filterCandidates = replacementFilters.ToDictionary(
+            replacementFilter => replacementFilter.Id,
+            replacementFilter => new ReplacementPlanFilterViewModel
+            {
+                Id = replacementFilter.Id,
+                Label = replacementFilter.Label,
+                Name = replacementFilter.Name,
+            }
+        );
+
+        return new ReplacementPlanFilterMappingsViewModel { Mappings = filterMappings, Candidates = filterCandidates };
+    }
+}
+
+public record ReplacementPlanFilterMappingViewModel
+{
+    public ReplacementPlanFilterViewModel Source { get; init; } = null!;
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
+    public Guid? CandidateKey { get; init; } // replacement filter id
+
+    public ReplacementPlanFilterGroupMappingsViewModel FilterGroups { get; init; } = null!;
+}
+
+public record ReplacementPlanFilterViewModel
+{
+    public Guid Id { get; init; }
+    public string Label { get; init; } = "";
+    public string Name { get; init; } = ""; // csv column name
+}
+
+public record ReplacementPlanFilterGroupMappingsViewModel
+{
+    // Key is original filter group id
+    public Dictionary<Guid, ReplacementPlanFilterGroupMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter group id
+    public Dictionary<Guid, ReplacementPlanFilterGroupViewModel> Candidates { get; init; } = new();
+
+    public static ReplacementPlanFilterGroupMappingsViewModel FromModel(
+        FilterMapping filterMapping,
+        List<FilterGroup> replacementFilterGroups
+    )
+    {
+        var filterGroupMappings = filterMapping.FilterGroupMappings.Values.ToDictionary(
+            groupMap => groupMap.OriginalId,
+            groupMap => new ReplacementPlanFilterGroupMappingViewModel
+            {
+                Source = new ReplacementPlanFilterGroupViewModel
+                {
+                    Id = groupMap.OriginalId,
+                    Label = groupMap.OriginalLabel,
+                },
+                CandidateKey = groupMap.ReplacementId,
+                Type = groupMap.Status,
+                FilterItems = ReplacementPlanFilterItemMappingsViewModel.FromModel(
+                    groupMap,
+                    replacementFilterGroups
+                        .Where(group => group.Id == groupMap.ReplacementId)
+                        .Select(g => g.FilterItems)
+                        .SingleOrDefault()
+                        ?? []
+                ),
+            }
+        );
+
+        var filterGroupCandidates = replacementFilterGroups.ToDictionary(
+            replacementGroup => replacementGroup.Id,
+            replacementGroup => new ReplacementPlanFilterGroupViewModel
+            {
+                Id = replacementGroup.Id,
+                Label = replacementGroup.Label,
+            }
+        );
+
+        return new ReplacementPlanFilterGroupMappingsViewModel
+        {
+            Mappings = filterGroupMappings,
+            Candidates = filterGroupCandidates,
+        };
+    }
+}
+
+public record ReplacementPlanFilterGroupMappingViewModel
+{
+    public ReplacementPlanFilterGroupViewModel Source { get; init; } = null!;
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
+    public Guid? CandidateKey { get; init; } // replacement filter group id
+
+    public ReplacementPlanFilterItemMappingsViewModel FilterItems { get; init; } = null!;
+}
+
+public record ReplacementPlanFilterGroupViewModel
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
+}
+
+public record ReplacementPlanFilterItemMappingsViewModel
+{
+    // Key is original filter item id
+    public Dictionary<Guid, ReplacementPlanFilterItemMappingViewModel> Mappings { get; init; } = new();
+
+    // Key is replacement filter item id
+    public Dictionary<Guid, ReplacementPlanFilterItemViewModel> Candidates { get; init; } = new();
+
+    public static ReplacementPlanFilterItemMappingsViewModel FromModel(
+        FilterGroupMapping groupMapping,
+        List<FilterItem> replacementFilterItems
+    )
+    {
+        var itemMappings = groupMapping.FilterItemMappings.Values.ToDictionary(
+            itemMap => itemMap.OriginalId,
+            itemMap => new ReplacementPlanFilterItemMappingViewModel
+            {
+                Source = new ReplacementPlanFilterItemViewModel
+                {
+                    Id = itemMap.OriginalId,
+                    Label = itemMap.OriginalLabel,
+                },
+                CandidateKey = itemMap.ReplacementId,
+                Type = itemMap.Status,
+            }
+        );
+
+        var itemCandidates = replacementFilterItems.ToDictionary(
+            replacementItem => replacementItem.Id,
+            replacementItem => new ReplacementPlanFilterItemViewModel
+            {
+                Id = replacementItem.Id,
+                Label = replacementItem.Label,
+            }
+        );
+
+        return new ReplacementPlanFilterItemMappingsViewModel { Mappings = itemMappings, Candidates = itemCandidates };
+    }
+}
+
+public record ReplacementPlanFilterItemMappingViewModel
+{
+    public ReplacementPlanFilterItemViewModel Source { get; init; } = null!;
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public MapStatus Type { get; init; }
+
+    public Guid? CandidateKey { get; init; } // replacement filter item id
+}
+
+public record ReplacementPlanFilterItemViewModel
+{
+    public Guid Id { get; set; }
+    public string Label { get; set; } = "";
 }

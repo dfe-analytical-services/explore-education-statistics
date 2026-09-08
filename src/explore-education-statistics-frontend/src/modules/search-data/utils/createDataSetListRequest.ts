@@ -128,6 +128,9 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
         : themeAndPubConditions[0];
 
     conditions.push(combinedGroup);
+  } else {
+    // If no publication or theme ids are provided, only include non-superseded data sets.
+    conditions.push(odata`isSuperseded eq false`);
   }
 
   if (filters.releaseTypes?.length) {

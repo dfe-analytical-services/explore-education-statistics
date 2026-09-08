@@ -31,7 +31,7 @@ public static class FiltersMetaViewModelBuilder
             {
                 return new FilterMetaViewModel(input, index)
                 {
-                    Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.ChildSequence),
+                    Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.FilterGroupSequence),
                 };
             },
             sequence: sequence
@@ -60,7 +60,7 @@ public static class FiltersMetaViewModelBuilder
             resultSelector: (input, index) =>
                 new FilterGroupMetaViewModel(input, index)
                 {
-                    Options = BuildFilterItems(input.Value.FilterItems, input.Sequence?.ChildSequence),
+                    Options = BuildFilterItems(input.Value.FilterItems, input.Sequence?.FilterItemSequence),
                 },
             sequence: sequence
         );

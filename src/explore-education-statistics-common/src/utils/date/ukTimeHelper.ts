@@ -1,4 +1,4 @@
-﻿import { fromZonedTime, formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { fromZonedTime, formatInTimeZone, toZonedTime } from 'date-fns-tz';
 import { addDays, format } from 'date-fns';
 
 export type DateRange = { startDate: Date; endDate: Date };

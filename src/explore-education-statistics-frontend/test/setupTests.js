@@ -7,6 +7,12 @@ import 'urlpattern-polyfill';
 
 loadEnvConfig(process.cwd());
 
+// Mirror the normalisation that `src/loadEnv.ts` applies at runtime, so tests
+// see the same PUBLIC_URL as the running app.
+if (process.env.PUBLIC_URL) {
+  process.env.PUBLIC_URL = process.env.PUBLIC_URL.replace(/\/+$/, '');
+}
+
 jest.setTimeout(10000);
 
 if (typeof window !== 'undefined') {

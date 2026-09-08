@@ -41,13 +41,8 @@ public class ReleaseFile
     public DateTime? Published { get; set; }
 }
 
-public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);
+public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> FilterGroupSequence);
 
-public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> ChildSequence)
-    : SequenceEntry<Guid, FilterGroupSequenceEntry>(Id, ChildSequence);
+public record FilterGroupSequenceEntry(Guid Id, List<Guid> FilterItemSequence);
 
-public record FilterGroupSequenceEntry(Guid Id, List<Guid> ChildSequence)
-    : SequenceEntry<Guid, Guid>(Id, ChildSequence);
-
-public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence)
-    : SequenceEntry<Guid, Guid>(Id, ChildSequence);
+public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence);

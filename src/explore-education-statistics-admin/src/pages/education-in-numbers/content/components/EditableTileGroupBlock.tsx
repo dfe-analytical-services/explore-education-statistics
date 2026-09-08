@@ -1,19 +1,20 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
-import EditableFreeTextStatTileForm from '@admin/pages/education-in-numbers/content/components/EditableFreeTextStatTileForm';
+import EditableTile from '@admin/pages/education-in-numbers/content/components/EditableTile';
 import { useEducationInNumbersPageContentState } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import useEducationInNumbersPageContentActions from '@admin/pages/education-in-numbers/content/context/useEducationInNumbersPageContentActions';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
 import { FormTextInput } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
-import ModalConfirm from '@common/components/ModalConfirm';
 import ReorderableList from '@common/components/ReorderableList';
+import TileWrapper from '@common/modules/education-in-numbers/components/TileWrapper';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
-import FreeTextStatTile from '@common/modules/education-in-numbers/components/FreeTextStatTile';
-import FreeTextStatTileWrapper from '@common/modules/education-in-numbers/components/FreeTextStatTileWrapper';
-import { EinTileGroupBlock } from '@common/services/types/einBlocks';
+import {
+  EinTile,
+  EinTileGroupBlock,
+  EinTileType,
+} from '@common/services/types/einBlocks';
 import reorder from '@common/utils/reorder';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
@@ -37,12 +38,7 @@ const EditableTileGroupBlock = ({
   onSave,
 }: Props) => {
   const { pageVersion } = useEducationInNumbersPageContentState();
-  const {
-    addFreeTextStatTile,
-    updateFreeTextStatTile,
-    deleteFreeTextStatTile,
-    reorderFreeTextStatTiles,
-  } = useEducationInNumbersPageContentActions();
+  const { addTile, reorderTiles } = useEducationInNumbersPageContentActions();
 
   const [groupTiles, setGroupTiles] = useState(block.tiles);
 
@@ -69,11 +65,12 @@ const EditableTileGroupBlock = ({
     toggleEditingHeading.off();
   }, [title, isEditingHeading, newHeading, onSave, toggleEditingHeading]);
 
-  const handleAddStatTile = async () => {
-    const newTile = await addFreeTextStatTile({
+  const handleAddTile = async (type: EinTileType) => {
+    const newTile = await addTile({
       educationInNumbersPageId,
       blockId: block.id,
       sectionId,
+      type,
     });
     setIsEditingStatTile(newTile.id);
   };
@@ -140,9 +137,18 @@ const EditableTileGroupBlock = ({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={handleAddStatTile}
+                onClick={() => handleAddTile('FreeTextStatTile')}
               >
-                Add new tile
+                Add new free text stat tile
+                <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
+              </Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => handleAddTile('ApiQueryStatTile')}
+              >
+                Add new API query stat tile
                 <VisuallyHidden> in {groupButtonsLabel}</VisuallyHidden>
               </Button>
 
@@ -163,18 +169,16 @@ const EditableTileGroupBlock = ({
             <ReorderableList
               heading="Reorder tiles"
               id="reorder-stat-tiles"
-              list={groupTiles.map(tile => {
-                return {
-                  id: tile.id,
-                  label: `${tile.title} ${tile.statistic} ${tile.trend}`,
-                };
-              })}
+              list={groupTiles.map(tile => ({
+                id: tile.id,
+                label: getTileReorderLabel(tile),
+              }))}
               onCancel={() => {
                 setGroupTiles(block.tiles);
                 toggleIsReordering.off();
               }}
               onConfirm={async () => {
-                await reorderFreeTextStatTiles({
+                await reorderTiles({
                   educationInNumbersPageId,
                   blockId: block.id,
                   sectionId,
@@ -195,62 +199,22 @@ const EditableTileGroupBlock = ({
               }}
             />
           ) : (
-            <FreeTextStatTileWrapper>
+            <TileWrapper>
               {tiles.map(tile => (
-                <div key={tile.id}>
-                  {isEditingStatTile === tile.id ? (
-                    <EditableFreeTextStatTileForm
-                      statTile={tile}
-                      testId="freeTextStatTile-editForm"
-                      onSubmit={async values => {
-                        await updateFreeTextStatTile({
-                          educationInNumbersPageId,
-                          blockId: block.id,
-                          sectionId,
-                          tileId: tile.id,
-                          values,
-                        });
-                        setIsEditingStatTile(null);
-                      }}
-                      onCancel={() => setIsEditingStatTile(null)}
-                    />
-                  ) : (
-                    <>
-                      <FreeTextStatTile key={tile.id} tile={tile} />
-                      {!isEditingStatTile && (
-                        <ButtonGroup className="govuk-!-margin-top-2">
-                          <Button
-                            onClick={() => setIsEditingStatTile(tile.id)}
-                            variant="secondary"
-                          >
-                            Edit <VisuallyHidden> tile: {title}</VisuallyHidden>
-                          </Button>
-                          <ModalConfirm
-                            title="Remove tile"
-                            triggerButton={
-                              <ButtonText variant="warning">
-                                Delete tile
-                                <VisuallyHidden>- {title}</VisuallyHidden>
-                              </ButtonText>
-                            }
-                            onConfirm={async () => {
-                              await deleteFreeTextStatTile({
-                                educationInNumbersPageId,
-                                blockId: block.id,
-                                sectionId,
-                                tileId: tile.id,
-                              });
-                            }}
-                          >
-                            <p>Are you sure you want to remove this tile?</p>
-                          </ModalConfirm>
-                        </ButtonGroup>
-                      )}
-                    </>
-                  )}
-                </div>
+                <EditableTile
+                  key={tile.id}
+                  blockId={block.id}
+                  educationInNumbersPageId={educationInNumbersPageId}
+                  groupTitle={title}
+                  isEditing={isEditingStatTile === tile.id}
+                  sectionId={sectionId}
+                  showActions={!isEditingStatTile}
+                  tile={tile}
+                  onEdit={() => setIsEditingStatTile(tile.id)}
+                  onEditEnd={() => setIsEditingStatTile(null)}
+                />
               ))}
-            </FreeTextStatTileWrapper>
+            </TileWrapper>
           )}
         </>
       ) : (
@@ -261,5 +225,22 @@ const EditableTileGroupBlock = ({
     </EditableBlockWrapper>
   );
 };
+
+function getTileReorderLabel(tile: EinTile): string {
+  switch (tile.type) {
+    case 'FreeTextStatTile':
+      return (
+        [tile.title, tile.statistic, tile.trend].filter(Boolean).join(' ') ||
+        'Empty free text stat tile'
+      );
+    case 'ApiQueryStatTile':
+      return (
+        [tile.title, tile.statistic].filter(Boolean).join(' ') ||
+        'Empty API query stat tile'
+      );
+    default:
+      return 'Unknown tile';
+  }
+}
 
 export default EditableTileGroupBlock;

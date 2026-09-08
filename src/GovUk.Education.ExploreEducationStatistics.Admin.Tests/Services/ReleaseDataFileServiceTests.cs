@@ -518,6 +518,133 @@ public class ReleaseDataFileServiceTests
     }
 
     [Fact]
+    public async Task Delete_DeleteOriginalFileRemovesDataSetMapping()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var subject = new Subject { Id = Guid.NewGuid() };
+
+        var replacementSubject = new Subject { Id = Guid.NewGuid() };
+
+        var dataFile = new File
+        {
+            RootPath = Guid.NewGuid(),
+            Filename = "data.csv",
+            Type = FileType.Data,
+            SubjectId = subject.Id,
+        };
+
+        var metaFile = new File
+        {
+            RootPath = Guid.NewGuid(),
+            Filename = "data.meta.csv",
+            Type = Metadata,
+            SubjectId = subject.Id,
+        };
+
+        var replacementDataFile = new File
+        {
+            RootPath = Guid.NewGuid(),
+            Filename = "replacement.csv",
+            Type = FileType.Data,
+            SubjectId = replacementSubject.Id,
+            Replacing = dataFile,
+        };
+
+        dataFile.ReplacedBy = replacementDataFile;
+
+        var replacementMetaFile = new File
+        {
+            RootPath = Guid.NewGuid(),
+            Filename = "replacement.meta.csv",
+            Type = Metadata,
+            SubjectId = replacementSubject.Id,
+        };
+
+        var dataReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = dataFile };
+
+        var metaReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = metaFile };
+
+        var replacementDataReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = replacementDataFile,
+        };
+
+        var replacementMetaReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = replacementMetaFile,
+        };
+
+        var mapping = new DataSetMapping
+        {
+            OriginalDataFile = dataFile,
+            ReplacementDataFile = replacementDataFile,
+            IndicatorMappings = [],
+            LocationMappings = [],
+            FilterMappings = [],
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(
+                dataReleaseFile,
+                metaReleaseFile,
+                replacementDataReleaseFile,
+                replacementMetaReleaseFile
+            );
+            contentDbContext.DataSetMappings.Add(mapping);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        var dataImportService = new Mock<IDataImportService>(Strict);
+        var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+        dataImportService.Setup(mock => mock.DeleteImport(dataFile.Id)).Returns(Task.CompletedTask);
+
+        privateBlobStorageService
+            .Setup(mock => mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(dataFile.Path(), metaFile.Path())))
+            .Returns(Task.CompletedTask);
+
+        releaseFileService
+            .Setup(mock => mock.CheckFileExists(releaseVersion.Id, dataFile.Id, FileType.Data))
+            .ReturnsAsync(dataFile);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(
+                contentDbContext: contentDbContext,
+                privateBlobStorageService: privateBlobStorageService.Object,
+                dataImportService: dataImportService.Object,
+                releaseFileService: releaseFileService.Object
+            );
+
+            var result = await service.Delete(releaseVersionId: releaseVersion.Id, fileId: dataFile.Id);
+
+            Assert.True(result.IsRight);
+
+            MockUtils.VerifyAllMocks(privateBlobStorageService, dataImportService, releaseFileService);
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            Assert.Empty(contentDbContext.DataSetMappings);
+
+            Assert.Null(await contentDbContext.Files.FindAsync(dataFile.Id));
+            Assert.Null(await contentDbContext.Files.FindAsync(metaFile.Id));
+
+            // Check that the replacement files remain untouched
+            Assert.NotNull(await contentDbContext.Files.FindAsync(replacementDataFile.Id));
+            Assert.NotNull(await contentDbContext.Files.FindAsync(replacementMetaFile.Id));
+        }
+    }
+
+    [Fact]
     public async Task DeleteAll_FileFromAmendment()
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());

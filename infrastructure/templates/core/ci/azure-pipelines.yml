@@ -12,13 +12,55 @@ trigger:
 pr: none
 
 parameters:
+  - name: deploySubnets
+    displayName: Do subnets need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
+  - name: deployPrivateDnsZones
+    displayName: Do Private DNS Zones need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
+  - name: deployAzureFrontDoor
+    displayName: Does Azure Front Door need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: deployApplicationGateway
     displayName: Does Application Gateway need creating or updating?
     type: string
     values:
       - Yes
       - No
+    default: No
+  - name: deployDataFactory
+    displayName: Does Data Factory need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
     default: No  
+  - name: deployContainerRegistry
+    displayName: Does the Container Registry need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No  
+  - name: deployRecoveryServicesVault
+    displayName: Does Recovery Services Vault or its policies need creating or updating?
+    type: string
+    values:
+      - Yes
+      - No
+    default: No
   - name: deployAlerts
     displayName: Do the Azure Monitor alerts need creating or updating?
     type: string
@@ -50,8 +92,20 @@ variables:
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
     value: ubuntu-latest
+  - name: deploySubnets
+    value: ${{ iif(eq(parameters.deploySubnets, 'Yes'), true, false) }}
+  - name: deployPrivateDnsZones
+    value: ${{ iif(eq(parameters.deployPrivateDnsZones, 'Yes'), true, false) }}
+  - name: deployAzureFrontDoor
+    value: ${{ iif(eq(parameters.deployAzureFrontDoor, 'Yes'), true, false) }}
   - name: deployApplicationGateway
     value: ${{ iif(eq(parameters.deployApplicationGateway, 'Yes'), true, false) }}
+  - name: deployDataFactory
+    value: ${{ iif(eq(parameters.deployDataFactory, 'Yes'), true, false) }}
+  - name: deployContainerRegistry
+    value: ${{ iif(eq(parameters.deployContainerRegistry, 'Yes'), true, false) }}
+  - name: deployRecoveryServicesVault
+    value: ${{ iif(eq(parameters.deployRecoveryServicesVault, 'Yes'), true, false) }}
   - name: deployAlerts
     value: ${{ iif(eq(parameters.deployAlerts, 'Yes'), true, false) }}
 

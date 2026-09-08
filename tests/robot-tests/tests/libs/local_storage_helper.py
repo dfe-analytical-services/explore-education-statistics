@@ -3,8 +3,7 @@ import os.path
 
 
 def get_local_storage_json_from_browser(driver) -> dict:
-    local_storage_string = driver.execute_script(
-        """
+    local_storage_string = driver.execute_script("""
         return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
           try {
             acc[key] = JSON.parse(value);
@@ -13,8 +12,7 @@ def get_local_storage_json_from_browser(driver) -> dict:
           }
           return acc;
         }, {}));
-        """
-    )
+        """)
 
     return json.loads(local_storage_string)
 

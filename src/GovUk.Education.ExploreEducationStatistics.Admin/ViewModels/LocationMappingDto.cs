@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
@@ -16,7 +17,8 @@ public class LocationMappingDto
     public string? ReplacementCode { get; set; }
     public string? ReplacementName { get; set; }
 
-    public string Status { get; set; } = "";
+    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public MapStatus Status { get; set; }
 
     public static LocationMappingDto FromModel(LocationMapping locationMapping)
     {
@@ -30,7 +32,7 @@ public class LocationMappingDto
             ReplacementGeographicLevel = locationMapping.ReplacementGeographicLevel?.GetEnumValue(),
             ReplacementCode = locationMapping.ReplacementCode,
             ReplacementName = locationMapping.ReplacementName,
-            Status = locationMapping.Status.ToString(),
+            Status = locationMapping.Status,
         };
     }
 }

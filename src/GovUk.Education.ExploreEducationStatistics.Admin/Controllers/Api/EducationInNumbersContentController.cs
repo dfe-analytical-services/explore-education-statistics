@@ -157,7 +157,7 @@ public class EducationInNumbersContentController(IEducationInNumbersContentServi
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("education-in-numbers/{pageId:guid}/content/tile/{tileId:guid}/api-stat")]
+    [HttpPut("education-in-numbers/{pageId:guid}/content/tile/{tileId:guid}/api-query-stat")]
     public async Task<ActionResult<EinTileViewModel>> UpdateApiQueryStatTile(
         [FromRoute] Guid pageId,
         [FromRoute] Guid tileId,

@@ -1,7 +1,7 @@
 import { dynamicCountGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 
 @description('Specifies the location for all resources.')
-param location string
+param location string = resourceGroup().location
 
 @description('Specifies the Application Insights name')
 param appInsightsName string
@@ -101,3 +101,4 @@ module failedRequestsAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != 
 output applicationInsightsKey string = applicationInsights.properties.InstrumentationKey
 output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
 output applicationInsightsName string = applicationInsights.name
+output applicationInsightsId string = applicationInsights.id

@@ -9,13 +9,15 @@
 // see https://github.com/alphagov/accessible-autocomplete/blob/main/src/autocomplete.css
 // and https://github.com/alphagov/govuk_publishing_components/blob/main/app/assets/stylesheets/govuk_publishing_components/components/_search-with-autocomplete.scss
 
-// Helps to make the autocomplete menu as wide as the entire search box _including_ the submit
-// button, not just the width of the input field.
-@mixin enhance-autocomplete-menu-width($button-size) {
-  margin-right: -$button-size;
-}
-
 $input-size: 40px;
+
+// The search box is themeable via these custom properties
+:root {
+  --search-bar-button-background: #{govuk-functional-colour(brand)};
+  --search-bar-button-text: #{govuk-colour('white')};
+  --search-bar-input-background: transparent;
+  --search-bar-input-size: #{$input-size};
+}
 
 .autocomplete__item-wrap {
   position: relative;
@@ -32,11 +34,11 @@ $input-size: 40px;
   border-radius: 0;
   box-sizing: border-box;
   margin-bottom: 0;
-  width: calc(100% - #{$input-size});
-  background-color: transparent;
+  width: calc(100% - var(--search-bar-input-size));
+  background-color: var(--search-bar-input-background);
   padding: govuk-spacing(1);
   position: relative;
-  height: $input-size;
+  height: var(--search-bar-input-size);
 }
 
 .autocomplete__input--focused {
@@ -49,8 +51,8 @@ $input-size: 40px;
   position: absolute;
   top: 0;
   right: 0;
-  width: $input-size;
-  height: $input-size;
+  width: var(--search-bar-input-size);
+  height: var(--search-bar-input-size);
 }
 
 .autocomplete__menu {
@@ -66,7 +68,9 @@ $input-size: 40px;
   overflow-x: hidden;
   padding: 0;
   width: 100%;
-  @include enhance-autocomplete-menu-width($input-size);
+  // Make the menu as wide as the entire search box _including_ the submit button,
+  // not just the width of the input field.
+  margin-right: calc(-1 * var(--search-bar-input-size));
 }
 
 .autocomplete__menu--visible {

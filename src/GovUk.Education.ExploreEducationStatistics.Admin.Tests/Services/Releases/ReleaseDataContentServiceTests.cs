@@ -485,6 +485,54 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasCsvOnlyGeographicLevels_ExcludesThemFromGeographicLevels()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country])
+                        .WithCsvOnlyGeographicLevels([GeographicLevel.School])
+                )
+                .WithReleaseVersion(releaseVersion);
+
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.DataImports.Add(dataImport);
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["National"], result.DataSets[0].Meta.GeographicLevels);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetHasNoSummary_ReturnsNullSummary()
         {
             // Arrange

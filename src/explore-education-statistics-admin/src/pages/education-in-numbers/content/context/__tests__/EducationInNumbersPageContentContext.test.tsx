@@ -7,6 +7,7 @@ import {
 } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import { EducationInNumbersPageDispatchAction } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContextActionTypes';
 import {
+  EinApiQueryStatTile,
   EinContentBlock,
   EinFreeTextStatTile,
   EinHtmlBlock,
@@ -220,7 +221,7 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(pageContent.content[0].heading).toEqual('updated heading');
   });
 
-  test('ADD_FREE_TEXT_STAT_TILE_TO_BLOCK adds a tile to a block', () => {
+  test('ADD_TILE_TO_BLOCK adds a free text tile to a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
     const newTile: EinFreeTextStatTile = {
@@ -240,7 +241,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'ADD_FREE_TEXT_STAT_TILE_TO_BLOCK',
+        type: 'ADD_TILE_TO_BLOCK',
         payload: {
           meta: {
             blockId: block.id,
@@ -257,10 +258,10 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(updatedBlock.tiles[originalLength].id).toEqual(newTile.id);
   });
 
-  test('UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK updates a tile in a block', () => {
+  test('UPDATE_TILE_IN_BLOCK updates a free text tile in a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
-    const tileToUpdate = block.tiles[0];
+    const tileToUpdate = block.tiles[0] as EinFreeTextStatTile;
 
     const newStatistic = '9999';
 
@@ -270,7 +271,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'UPDATE_FREE_TEXT_STAT_TILE_IN_BLOCK',
+        type: 'UPDATE_TILE_IN_BLOCK',
         payload: {
           meta: {
             tileId: tileToUpdate.id,
@@ -292,6 +293,87 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(updatedBlock.tiles[0].statistic).toEqual(newStatistic);
   });
 
+  test('ADD_TILE_TO_BLOCK adds an api query tile to a block', () => {
+    const section = testEinPageContent.content[2];
+    const block = section.content[0] as EinTileGroupBlock;
+    const newTile: EinApiQueryStatTile = {
+      id: '456',
+      order: 1,
+      type: 'ApiQueryStatTile',
+      title: 'A new api query tile',
+      dataSetId: 'data-set-1',
+      isLatestVersion: true,
+    };
+
+    const originalLength = block.tiles.length || 0;
+
+    const { pageContent } = einPageReducer(
+      {
+        pageContent: testEinPageContent,
+        pageVersion: testEinPageVersion,
+      },
+      {
+        type: 'ADD_TILE_TO_BLOCK',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId: section.id,
+          },
+          tile: newTile,
+        },
+      },
+    );
+
+    const updatedBlock = pageContent.content[2].content[0] as EinTileGroupBlock;
+    expect(updatedBlock.tiles).toHaveLength(originalLength + 1);
+
+    const addedTile = updatedBlock.tiles[originalLength];
+    expect(addedTile.id).toEqual(newTile.id);
+    expect(addedTile.type).toEqual('ApiQueryStatTile');
+  });
+
+  test('UPDATE_TILE_IN_BLOCK updates an api query tile in a block', () => {
+    const section = testEinPageContent.content[2];
+    const block = section.content[0] as EinTileGroupBlock;
+    const tileToReplace = block.tiles[0];
+
+    const updatedTile: EinApiQueryStatTile = {
+      id: tileToReplace.id,
+      order: tileToReplace.order,
+      type: 'ApiQueryStatTile',
+      title: 'An updated api query tile',
+      dataSetId: 'data-set-1',
+      isLatestVersion: true,
+      statistic: '9999',
+    };
+
+    const { pageContent } = einPageReducer(
+      {
+        pageContent: testEinPageContent,
+        pageVersion: testEinPageVersion,
+      },
+      {
+        type: 'UPDATE_TILE_IN_BLOCK',
+        payload: {
+          meta: {
+            tileId: tileToReplace.id,
+            blockId: block.id,
+            sectionId: section.id,
+          },
+          tile: updatedTile,
+        },
+      },
+    );
+
+    const updatedBlock = pageContent.content[2].content[0] as EinTileGroupBlock;
+    expect(updatedBlock.tiles).toHaveLength(2);
+
+    expect(updatedBlock.tiles[0].id).toEqual(tileToReplace.id);
+    expect(updatedBlock.tiles[0].type).toEqual('ApiQueryStatTile');
+    expect(updatedBlock.tiles[0].title).toEqual('An updated api query tile');
+    expect(updatedBlock.tiles[0].statistic).toEqual('9999');
+  });
+
   test('REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK reorders tiles in a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
@@ -302,7 +384,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'REORDER_FREE_TEXT_STAT_TILES_IN_BLOCK',
+        type: 'REORDER_TILES_IN_BLOCK',
         payload: {
           meta: {
             blockId: block.id,
@@ -332,7 +414,7 @@ describe('EducationInNumbersPageContentContext', () => {
     expect(updatedBlock.tiles[0].order).toEqual(0);
   });
 
-  test('DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK removes a tile from a block', () => {
+  test('DELETE_TILE_FROM_BLOCK removes a tile from a block', () => {
     const section = testEinPageContent.content[2];
     const block = section.content[0] as EinTileGroupBlock;
     const tileToDelete = block.tiles[0];
@@ -343,7 +425,7 @@ describe('EducationInNumbersPageContentContext', () => {
         pageVersion: testEinPageVersion,
       },
       {
-        type: 'DELETE_FREE_TEXT_STAT_TILE_FROM_BLOCK',
+        type: 'DELETE_TILE_FROM_BLOCK',
         payload: {
           meta: {
             tileId: tileToDelete.id,

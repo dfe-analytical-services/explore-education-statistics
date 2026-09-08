@@ -216,9 +216,13 @@ def run():
 
     except Exception as ex:
         if args.enable_slack_notifications:
-            slack_service = SlackService()
-            slack_service.send_exception_details(args.env, args.tests, number_of_test_runs, ex)
-        raise ex
+            try:
+                slack_service = SlackService()
+                slack_service.send_exception_details(args.env, args.tests, test_run_index, ex)
+            except Exception as notification_ex:
+                logger.error("Unable to send UI test exception details to Slack")
+                logger.error(notification_ex)
+        raise
 
 
 current_dir = Path(__file__).absolute().parent

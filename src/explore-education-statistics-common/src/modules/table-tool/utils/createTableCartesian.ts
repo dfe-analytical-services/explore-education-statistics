@@ -95,7 +95,6 @@ export default function createTableCartesian({
         // There is at least one cell in this
         // column that has a text value.
         if (text !== EMPTY_CELL_TEXT) {
-          // eslint-disable-next-line no-param-reassign
           columnsWithText[columnIndex] = true;
         }
 

@@ -1,4 +1,4 @@
-﻿import React, { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import InvalidContentDetails from '@admin/components/editable/InvalidContentDetails';
 import checkMaxLength from '@admin/components/editable/utils/checkMaxLength';
 import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';

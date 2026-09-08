@@ -95,7 +95,7 @@ export interface PluginClass {
   get pluginName(): PluginName;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Plugin {}
 
 export interface CommentsPlugin extends Plugin {

@@ -28,7 +28,7 @@ describe('EditableFreeTextStatTileForm', () => {
   test('renders correctly with initial values', async () => {
     render(
       <EditableFreeTextStatTileForm
-        statTile={testTile}
+        freeTextStatTile={testTile}
         testId="test-id"
         onCancel={noop}
         onSubmit={noop}
@@ -52,7 +52,7 @@ describe('EditableFreeTextStatTileForm', () => {
 
     const { user } = render(
       <EditableFreeTextStatTileForm
-        statTile={testTile}
+        freeTextStatTile={testTile}
         testId="test-id"
         onCancel={noop}
         onSubmit={handleSubmit}

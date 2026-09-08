@@ -246,7 +246,6 @@ public class UserResourceRoleNotificationService(
             ?? throw new KeyNotFoundException(
                 $"A non-expired pre-release role with ID {userPreReleaseRoleId} does not exist."
             );
-        ;
     }
 
     private async Task<User> FindUser(Guid userId, CancellationToken cancellationToken)

@@ -21,6 +21,26 @@ const releaseDataFileQueries = createQueryKeys('releaseDataFile', {
       queryFn: () => releaseDataFileService.getDataSetUploads(releaseId),
     };
   },
+  importStatus(releaseVersionId: string, dataFileId: string) {
+    return {
+      queryKey: [releaseVersionId, dataFileId],
+      queryFn: () =>
+        releaseDataFileService.getDataFileImportStatus(
+          releaseVersionId,
+          dataFileId,
+        ),
+    };
+  },
+  screeningStatus(releaseVersionId: string, dataSetUploadId: string) {
+    return {
+      queryKey: [releaseVersionId, dataSetUploadId],
+      queryFn: () =>
+        releaseDataFileService.getDataFileScreeningStatus(
+          releaseVersionId,
+          dataSetUploadId,
+        ),
+    };
+  },
   getDeleteFilePlan(releaseVersionId: string, dataFileId: string) {
     return {
       queryKey: [releaseVersionId, dataFileId],

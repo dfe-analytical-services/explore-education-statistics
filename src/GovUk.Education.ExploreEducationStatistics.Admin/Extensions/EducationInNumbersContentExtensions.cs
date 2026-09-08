@@ -63,6 +63,7 @@ public static class EducationInNumbersContentExtensions
                 EinParentBlockId = groupBlockId,
                 Title = statTile.Title,
                 DataSetId = statTile.DataSetId,
+                Version = statTile.Version,
                 DataSetVersionId = statTile.DataSetVersionId,
                 LatestDataSetVersionId = statTile.LatestDataSetVersionId,
                 Query = statTile.Query,

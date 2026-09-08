@@ -210,7 +210,7 @@ def set_cookie_from_json(cookie_json):
 
 
 def user_should_be_at_top_of_page():
-    (x, y) = sl().get_window_position()
+    x, y = sl().get_window_position()
     if y != 0:
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 

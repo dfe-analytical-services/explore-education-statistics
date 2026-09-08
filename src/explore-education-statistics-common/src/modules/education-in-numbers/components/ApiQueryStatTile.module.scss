@@ -1,0 +1,40 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.tile {
+  background-color: govuk-colour('black', $variant: 'tint-95');
+  padding: govuk-spacing(4);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .title {
+    margin-top: 0;
+    margin-bottom: govuk-spacing(1);
+  }
+
+  .statistic {
+    margin-top: 0;
+    margin-bottom: govuk-spacing(2);
+  }
+
+  .notLatestTag {
+    align-self: flex-start;
+    margin-top: 2px;
+    margin-bottom: govuk-spacing(3);
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+  }
+
+  .release {
+    @include govuk-font($size: 16);
+  }
+
+  .publication {
+    @include govuk-font($size: 19);
+    line-height: 1.3;
+  }
+}

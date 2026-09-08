@@ -50,7 +50,6 @@ const TableHeadersGroup = ({
         <div
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...draggableProvided.draggableProps}
-          // eslint-disable-next-line react/jsx-props-no-spreading
           className={classNames(styles.group, {
             [styles.isDragging]: draggableSnapshot.isDragging,
             [styles.isDraggingActive]:

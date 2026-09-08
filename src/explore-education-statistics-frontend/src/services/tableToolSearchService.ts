@@ -175,6 +175,7 @@ const tableToolSearchService = {
         },
         body: JSON.stringify(params),
         signal: options.signal,
+        openWhenHidden: true,
 
         async onopen(response) {
           if (

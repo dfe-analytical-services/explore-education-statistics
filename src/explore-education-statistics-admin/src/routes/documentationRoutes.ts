@@ -14,101 +14,136 @@ import AdminDocumentationUsingDashboard from '@admin/pages/documentation/Documen
 
 export const documentationIndexRoute: ProtectedRouteProps = {
   path: '/documentation',
-  component: AdminDocumentationHome,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationContentStandardsRoute: ProtectedRouteProps = {
   path: '/documentation/content-design-standards-guide',
-  component: AdminDocumentationContentDesignStandards,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationGlossaryRoute: ProtectedRouteProps = {
   path: '/documentation/glossary',
-  component: AdminDocumentationGlossary,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationStyleGuideRoute: ProtectedRouteProps = {
   path: '/documentation/style-guide',
-  component: AdminDocumentationStyle,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationUsingDashboardRoute: ProtectedRouteProps = {
   path: '/documentation/using-dashboard',
-  component: AdminDocumentationUsingDashboard,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationCreateReleaseRoute: ProtectedRouteProps = {
   path: '/documentation/create-new-release',
-  component: AdminDocumentationCreateNewRelease,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationCreatePublicationRoute: ProtectedRouteProps = {
   path: '/documentation/create-new-publication',
-  component: AdminDocumentationCreateNewPublication,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationEditReleaseRoute: ProtectedRouteProps = {
   path: '/documentation/edit-release',
-  component: AdminDocumentationEditRelease,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationManageContentRoute: ProtectedRouteProps = {
   path: '/documentation/manage-content',
-  component: AdminDocumentationManageContent,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationManageDataRoute: ProtectedRouteProps = {
   path: '/documentation/manage-data',
-  component: AdminDocumentationManageData,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationManageDataBlockRoute: ProtectedRouteProps = {
   path: '/documentation/manage-data-block',
-  component: AdminDocumentationManageDataBlocks,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 export const documentationConfigureChartsRoute: ProtectedRouteProps = {
   path: '/documentation/configure-charts',
-  component: AdminDocumentationConfigureCharts,
   protectionAction: permissions => permissions.canAccessAnalystPages,
   exact: true,
 };
 
 const documentationRoutes = {
-  documentationIndexRoute,
-  documentationContentStandardsRoute,
-  documentationGlossaryRoute,
-  documentationStyleGuideRoute,
-  documentationUsingDashboardRoute,
-  documentationCreateReleaseRoute,
-  documentationCreatePublicationRoute,
-  documentationEditReleaseRoute,
-  documentationManageContentRoute,
-  documentationManageDataRoute,
-  documentationManageDataBlockRoute,
-  documentationConfigureChartsRoute,
+  documentationIndexRoute: {
+    ...documentationIndexRoute,
+    component: AdminDocumentationHome,
+  },
+
+  documentationContentStandardsRoute: {
+    ...documentationContentStandardsRoute,
+    component: AdminDocumentationContentDesignStandards,
+  },
+
+  documentationGlossaryRoute: {
+    ...documentationGlossaryRoute,
+    component: AdminDocumentationGlossary,
+  },
+
+  documentationStyleGuideRoute: {
+    ...documentationStyleGuideRoute,
+    component: AdminDocumentationStyle,
+  },
+
+  documentationUsingDashboardRoute: {
+    ...documentationUsingDashboardRoute,
+    component: AdminDocumentationUsingDashboard,
+  },
+
+  documentationCreateReleaseRoute: {
+    ...documentationCreateReleaseRoute,
+    component: AdminDocumentationCreateNewRelease,
+  },
+
+  documentationCreatePublicationRoute: {
+    ...documentationCreatePublicationRoute,
+    component: AdminDocumentationCreateNewPublication,
+  },
+
+  documentationEditReleaseRoute: {
+    ...documentationEditReleaseRoute,
+    component: AdminDocumentationEditRelease,
+  },
+
+  documentationManageContentRoute: {
+    ...documentationManageContentRoute,
+    component: AdminDocumentationManageContent,
+  },
+
+  documentationManageDataRoute: {
+    ...documentationManageDataRoute,
+    component: AdminDocumentationManageData,
+  },
+
+  documentationManageDataBlockRoute: {
+    ...documentationManageDataBlockRoute,
+    component: AdminDocumentationManageDataBlocks,
+  },
+
+  documentationConfigureChartsRoute: {
+    ...documentationConfigureChartsRoute,
+    component: AdminDocumentationConfigureCharts,
+  },
 };
 
 export default documentationRoutes;

@@ -1,16 +1,12 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -271,7 +267,21 @@ public class DataImportServiceTests
 
         var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
 
-        await service.WriteDataSetFileMeta(file.Id, subject.Id, totalRows);
+        var import = new DataImport
+        {
+            FileId = file.Id,
+            SubjectId = subject.Id,
+            TotalRows = totalRows,
+            GeographicLevels =
+            [
+                GeographicLevel.Country,
+                GeographicLevel.LocalAuthority,
+                GeographicLevel.Region,
+                GeographicLevel.School,
+            ],
+        };
+
+        await service.WriteDataSetFileMeta(import);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -279,11 +289,15 @@ public class DataImportServiceTests
                 .Files.Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.SubjectId == subject.Id);
 
-            var geogLvls = updatedFile.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel).ToList();
-            Assert.Equal(3, geogLvls.Count);
-            Assert.Contains(GeographicLevel.Country, geogLvls);
-            Assert.Contains(GeographicLevel.LocalAuthority, geogLvls);
-            Assert.Contains(GeographicLevel.Region, geogLvls);
+            var geogLvlToCsvOnlyMap = updatedFile.DataSetFileVersionGeographicLevels.ToDictionary(
+                gl => gl.GeographicLevel,
+                gl => gl.CsvOnly
+            );
+            Assert.Equal(4, geogLvlToCsvOnlyMap.Count);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.Country]);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.LocalAuthority]);
+            Assert.False(geogLvlToCsvOnlyMap[GeographicLevel.Region]);
+            Assert.True(geogLvlToCsvOnlyMap[GeographicLevel.School]);
 
             Assert.NotNull(updatedFile.DataSetFileMeta);
             var meta = updatedFile.DataSetFileMeta;

@@ -32,6 +32,11 @@ public static class DataSetFileVersionGeographicLevelGeneratorExtensions
         GeographicLevel geographicLevel
     ) => generator.ForInstance(s => s.SetGeographicLevel(geographicLevel));
 
+    public static Generator<DataSetFileVersionGeographicLevel> WithCsvOnly(
+        this Generator<DataSetFileVersionGeographicLevel> generator,
+        bool? csvOnly
+    ) => generator.ForInstance(s => s.SetCsvOnly(csvOnly));
+
     public static InstanceSetters<DataSetFileVersionGeographicLevel> SetDataSetFileVersion(
         this InstanceSetters<DataSetFileVersionGeographicLevel> setters,
         File dataSetFileVersion
@@ -49,4 +54,9 @@ public static class DataSetFileVersionGeographicLevelGeneratorExtensions
         this InstanceSetters<DataSetFileVersionGeographicLevel> setters,
         GeographicLevel geographicLevel
     ) => setters.Set(f => f.GeographicLevel, geographicLevel);
+
+    public static InstanceSetters<DataSetFileVersionGeographicLevel> SetCsvOnly(
+        this InstanceSetters<DataSetFileVersionGeographicLevel> setters,
+        bool? csvOnly
+    ) => setters.Set(f => f.CsvOnly, csvOnly);
 }

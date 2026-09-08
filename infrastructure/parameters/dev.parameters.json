@@ -2,21 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuPublic": {
-      "value": "B1 Basic"
-    },
-    "skuData": {
-      "value": "P1V2 PremiumV2"
-    },
-    "skuContent": {
-      "value": "P1V2 PremiumV2"
-    },
-    "skuAdmin": {
-      "value": "P1V2 PremiumV2"
-    },
-    "skuAdminSignalR": {
-      "value": "Standard_S1"
-    },
     "skuImporter": {
       "value": "P2V2 PremiumV2"
     },
@@ -26,22 +11,13 @@
     "skuPublisher": {
       "value": "B1 Basic"
     },
-    "slackAlertsChannel": {
-      "value": "C067Z1K68UD"
-    },
     "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 0 * * * *"
     },
     "publishScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 30 * * * *"
     },
-    "preReleaseMinutesBeforeStart": {
-      "value": 1440
-    },
     "useSubnets": {
-      "value": true
-    },
-    "deploySubnets": {
       "value": true
     },
     "blobDeleteRetentionEnabled": {
@@ -53,44 +29,8 @@
     "domain": {
       "value": "dev.explore-education-statistics.service.gov.uk"
     },
-    "contentApiUrl": {
-      "value": "content.dev.explore-education-statistics.service.gov.uk"
-    },
-    "dataApiUrl": {
-      "value": "data.dev.explore-education-statistics.service.gov.uk"
-    },
-    "publicApiUrl": {
-      "value": "pp-api.education.gov.uk/statistics-dev"
-    },
-    "publicApiDocsUrl": {
-      "value": "pp-api.education.gov.uk/statistics-dev/docs"
-    },
-    "defaultPublicSiteCacheMaxAgeSeconds": {
-      "value": "10"
-    },
-    "detailedErrors": {
-      "value": true
-    },
     "storageAccountPrefix": {
       "value": "sa"
-    },
-    "publicAppGATrackingId": {
-      "value": "G-GRPHH2FN0L"
-    },
-    "enableSwagger": {
-      "value": true
-    },
-    "enableThemeDeletion": {
-      "value": true
-    },
-    "enableEinPublishedPageDeletion": {
-      "value": true
-    },
-    "memoryCacheOverridesDurationInSeconds": {
-      "value": 10
-    },
-    "branch": {
-      "value": "dev"
     },
     "skuContentDb": {
       "value": "Standard"
@@ -116,9 +56,6 @@
     "maxStatsDbSizeBytes": {
       "value": 1099511627776
     },
-    "dataFactoryConcurrency": {
-      "value": 10
-    },
     "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
       "value": true
     },
@@ -128,19 +65,10 @@
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
     },
-    "additionalAdminAllowedOrigins": {
-      "value": [
-        "https://localhost:5021",
-        "http://localhost:5021"
-      ]
-    },
     "additionalPublicAllowedOrigins": {
       "value": [
         "http://localhost:3000"
       ]
-    },
-    "publicAppCompressionDisable": {
-      "value": true
     },
     "sqlServerPublicNetworkAccess": {
       "value": "Disabled"

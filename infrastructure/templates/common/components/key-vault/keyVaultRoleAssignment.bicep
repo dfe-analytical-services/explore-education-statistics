@@ -13,6 +13,9 @@ param principalIds string[]
 @description('Specifies the Key Vault role to assign to the service principals')
 param role KeyVaultRole
 
+@description('The name of the role assignment resource. Auto-calculated by default, so little need to use this unless supporting existing role assignments when switching to Bicep.')
+param roleAssignmentNameOverride string?
+
 var rolesToRoleIds = {
   'Secrets User': '4633458b-17de-408a-b874-0445c86b69e6'
   'Certificate User': 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba'
@@ -27,7 +30,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
 // role.
 resource keyVaultRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: keyVault
-  name: guid(resourceGroup().id, principalId, rolesToRoleIds[role])
+  name: roleAssignmentNameOverride ?? guid(resourceGroup().id, principalId, rolesToRoleIds[role])
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
     principalId: principalId

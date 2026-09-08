@@ -1,0 +1,39 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.masthead {
+  --search-bar-button-background: #{govuk-colour('blue', $variant: 'tint-80')};
+  --search-bar-button-text: #{govuk-colour('blue')};
+  --search-bar-input-background: #{govuk-colour('white')};
+  --search-bar-input-size: 53px;
+
+  background-color: govuk-colour('blue');
+  color: govuk-colour('white');
+
+  *:is(:link, :visited, h1, h2, label) {
+    color: govuk-colour('white');
+  }
+
+  *:is(:link, :visited):focus {
+    color: govuk-functional-colour('focus-text');
+  }
+
+  :global(.autocomplete__input) {
+    border: 0;
+  }
+}
+
+.mastheadMainContent {
+  @include govuk-media-query($from: tablet) {
+    padding-right: govuk-spacing(8);
+  }
+}
+
+.mastheadTitle {
+  @include govuk-media-query($until: tablet) {
+    @include govuk-visually-hidden;
+  }
+}
+
+.mastheadSubtitle {
+  color: govuk-colour('white');
+}

@@ -10,7 +10,13 @@ user waits until table is visible
 user checks table column heading contains
     [Arguments]    ${row}    ${column}    ${expected}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
     user waits until parent contains element    ${parent}
-    ...    xpath://thead/tr[${row}]/th[${column}][text()="${expected}"]
+    ...    xpath:.//thead/tr[${row}]/th[${column}][contains(., "${expected}")]
+    ...    timeout=${wait}
+
+user checks table contains column heading
+    [Arguments]    ${expected}    ${parent}=css:table    ${wait}=%{WAIT_SMALL}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//thead/tr/th[text()="${expected}"]
     ...    timeout=${wait}
 
 user checks row contains heading
@@ -92,6 +98,23 @@ user checks headed table body row cell contains
     [Arguments]    ${row_heading}    ${cell}    ${content}    ${parent}=css:table    ${wait}=${timeout}
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[${cell}][contains(., "${content}")]    timeout=${wait}
+
+user checks table body row cell contains
+    [Arguments]    ${row_cell_text}    ${cell}    ${content}    ${parent}=css:table    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr/td[1][contains(., "${row_cell_text}")]/../td[${cell}][contains(., "${content}")]
+    ...    timeout=${wait}
+
+user checks cell by row and column heading contains
+    [Arguments]    ${row_heading}    ${column_heading}    ${content}    ${parent}=css:table    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//thead/tr/th[normalize-space()="${column_heading}"]
+    ...    timeout=${wait}
+    ${column}=    set variable
+    ...    count(../../../thead/tr/th[normalize-space()="${column_heading}"]/preceding-sibling::th) + 1
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr[th[normalize-space()="${row_heading}"]]/td[${column}][contains(., "${content}")]
+    ...    timeout=${wait}
 
 user clicks link in table cell
     [Arguments]    ${row}    ${column}    ${link_text}    ${parent}=css:table

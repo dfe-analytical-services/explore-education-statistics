@@ -51,7 +51,6 @@ export function ReleaseContentHubContextProvider({
 
   useEffect(() => {
     if (!hub) {
-      // eslint-disable-next-line consistent-return
       return;
     }
 

@@ -1,25 +1,4 @@
 @export()
-type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
-
-@export()
-type WeekOfMonth = 'First' | 'Second' | 'Third' | 'Fourth' | 'Last'
-
-@export()
-type MonthOfYear =
-  | 'January'
-  | 'February'
-  | 'March'
-  | 'April'
-  | 'May'
-  | 'June'
-  | 'July'
-  | 'August'
-  | 'September'
-  | 'October'
-  | 'November'
-  | 'December'
-
-@export()
 type ResourceNames = {
   existingResources: {
     acr: string
@@ -49,10 +28,8 @@ type ResourceNames = {
   }
   sharedResources: {
     containerAppEnvironment: string
-    logAnalyticsWorkspace: string
     postgreSqlFlexibleServer: string
     recoveryVault: string
-    recoveryVaultFileShareBackupPolicy: string
     searchService: string
   }
   publicApi: {

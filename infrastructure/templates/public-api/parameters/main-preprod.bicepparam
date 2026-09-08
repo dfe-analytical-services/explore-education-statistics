@@ -34,8 +34,6 @@ param postgreSqlServerConfig = {
   }
 }
 
-param recoveryVaultImmutable = true
-
 param searchServiceIndexName = 'index-1'
 
 param enableThemeDeletion = false

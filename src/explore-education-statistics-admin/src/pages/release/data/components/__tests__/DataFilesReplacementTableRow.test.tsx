@@ -60,6 +60,7 @@ describe('DataFilesReplacementTableRow', () => {
       readyToPublish: false,
     },
     valid: true,
+    hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { mappings: {}, candidates: {} },
       locations: { mappings: {}, candidates: {} },
@@ -99,7 +100,6 @@ describe('DataFilesReplacementTableRow', () => {
                 dataFile={testDataFile}
                 publicationId="test-publication"
                 releaseVersionId="test-release-version"
-                onReplacementStatusChange={() => {}}
               />
             </tbody>
           </table>
@@ -149,7 +149,6 @@ describe('DataFilesReplacementTableRow', () => {
               dataFile={testDataFile}
               publicationId="test-publication"
               releaseVersionId="test-release-version"
-              onReplacementStatusChange={() => {}}
             />
           </tbody>
         </table>
@@ -195,7 +194,6 @@ describe('DataFilesReplacementTableRow', () => {
               dataFile={testDataFile}
               publicationId="test-publication"
               releaseVersionId="test-release-version"
-              onReplacementStatusChange={() => {}}
             />
           </tbody>
         </table>
@@ -221,6 +219,57 @@ describe('DataFilesReplacementTableRow', () => {
     expect(
       within(cells[3]).queryByRole('button', { name: 'Cancel replacement' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('shows the replacement plan once the replacement import completes', async () => {
+    releaseDataFileService.getDataFile
+      .mockResolvedValueOnce({ ...testReplacementDataFile, status: 'STAGE_3' })
+      .mockResolvedValue(testReplacementDataFile);
+
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue({
+      errors: [],
+      percentageComplete: 100,
+      stagePercentageComplete: 100,
+      status: 'COMPLETE',
+      totalRows: 100,
+    });
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testDataReplacementPlan,
+    );
+
+    render(
+      <MemoryRouter>
+        <table>
+          <tbody>
+            <DataFilesReplacementTableRow
+              dataFile={testDataFile}
+              publicationId="test-publication"
+              releaseVersionId="test-release-version"
+            />
+          </tbody>
+        </table>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Importing')).toBeInTheDocument();
+    expect(screen.queryByText('Ready')).not.toBeInTheDocument();
+
+    // The importer reporting COMPLETE should refresh the replacement file,
+    // which enables the replacement plan query.
+    expect(await screen.findByText('Ready')).toBeInTheDocument();
+
+    const cells = screen.getAllByRole('cell');
+    expect(
+      within(cells[3]).getByRole('button', {
+        name: 'Confirm replacement for Test File',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(cells[3]).getByRole('button', {
+        name: 'Cancel replacement for Test File',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('shows confirm button when user is an analyst and data file is linked to API', async () => {
@@ -253,7 +302,6 @@ describe('DataFilesReplacementTableRow', () => {
                 }}
                 publicationId="test-publication"
                 releaseVersionId="test-release-version"
-                onReplacementStatusChange={() => {}}
               />
             </AuthContext>
           </tbody>
@@ -316,7 +364,6 @@ describe('DataFilesReplacementTableRow', () => {
                 }}
                 publicationId="test-publication"
                 releaseVersionId="test-release-version"
-                onReplacementStatusChange={() => {}}
               />
             </AuthContext>
           </tbody>
@@ -379,7 +426,6 @@ describe('DataFilesReplacementTableRow', () => {
                 }}
                 publicationId="test-publication"
                 releaseVersionId="test-release-version"
-                onReplacementStatusChange={() => {}}
               />
             </tbody>
           </table>

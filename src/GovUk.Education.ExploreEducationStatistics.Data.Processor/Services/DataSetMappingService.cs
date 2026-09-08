@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -27,13 +28,19 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
 
         var originalFile = replacementFile.Replacing!;
 
-        var (initialIndicatorMappingDictionary, unmappedReplacementIndicators) = await GenerateInitialIndicatorMapping(
+        var indicatorMappings = await GenerateInitialIndicatorMapping(
             statisticsDbContext,
             originalFile.SubjectId!.Value,
             replacementFile.SubjectId!.Value
         );
 
-        var (initialLocationMappingDictionary, unmappedReplacementLocations) = await GenerateInitialLocationMapping(
+        var locationMappings = await GenerateInitialLocationMapping(
+            statisticsDbContext,
+            originalFile.SubjectId!.Value,
+            replacementFile.SubjectId!.Value
+        );
+
+        var filterMappings = await GenerateInitialFilterMapping(
             statisticsDbContext,
             originalFile.SubjectId!.Value,
             replacementFile.SubjectId!.Value
@@ -43,17 +50,16 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         {
             OriginalDataFileId = originalFile.Id,
             ReplacementDataFileId = replacementFile.Id,
-            IndicatorMappings = initialIndicatorMappingDictionary,
-            UnmappedReplacementIndicators = unmappedReplacementIndicators,
-            LocationMappings = initialLocationMappingDictionary,
-            UnmappedReplacementLocations = unmappedReplacementLocations,
+            IndicatorMappings = indicatorMappings,
+            LocationMappings = locationMappings,
+            FilterMappings = filterMappings,
         };
 
         contentDbContext.DataSetMappings.Add(newMapping);
         await contentDbContext.SaveChangesAsync();
     }
 
-    private async Task<(Dictionary<Guid, IndicatorMapping>, List<UnmappedIndicator>)> GenerateInitialIndicatorMapping(
+    private async Task<Dictionary<Guid, IndicatorMapping>> GenerateInitialIndicatorMapping(
         StatisticsDbContext statisticsDbContext,
         Guid originalSubjectId,
         Guid replacementSubjectId
@@ -69,7 +75,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
             .ToDictionaryAsync(i => i.Name, i => i);
 
-        var initialMappingDictionary = originalIndicators.ToDictionary(
+        var indicatorMappings = originalIndicators.ToDictionary(
             originalIndicator => originalIndicator.Id,
             originalIndicator =>
             {
@@ -105,26 +111,10 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             }
         );
 
-        var mappedReplacementIds = initialMappingDictionary
-            .Values.Where(m => m.ReplacementId.HasValue)
-            .Select(m => m.ReplacementId!.Value);
-
-        var unmappedReplacements = replacementIndicatorNameToIndicatorMap
-            .Values.ExceptBy(mappedReplacementIds, indicator => indicator.Id)
-            .Select(i => new UnmappedIndicator
-            {
-                Id = i.Id,
-                Label = i.Label,
-                ColumnName = i.Name,
-                GroupId = i.IndicatorGroupId,
-                GroupLabel = i.IndicatorGroup.Label,
-            })
-            .ToList();
-
-        return (initialMappingDictionary, unmappedReplacements);
+        return indicatorMappings;
     }
 
-    private async Task<(Dictionary<Guid, LocationMapping>, List<UnmappedLocation>)> GenerateInitialLocationMapping(
+    private async Task<Dictionary<Guid, LocationMapping>> GenerateInitialLocationMapping(
         StatisticsDbContext statisticsDbContext,
         Guid originalSubjectId,
         Guid replacementSubjectId
@@ -137,31 +127,31 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             .Distinct()
             .ToListAsync();
 
-        var replacementLocationMap = await statisticsDbContext
+        var replacementIdToLocationMap = await statisticsDbContext
             .Observation.AsNoTracking()
             .Where(o => o.SubjectId == replacementSubjectId)
             .Select(observation => observation.Location)
             .Distinct()
             .ToDictionaryAsync(location => location.Id, location => location);
 
-        var initialMappingDictionary = originalLocations.ToDictionary(
+        var locationMappings = originalLocations.ToDictionary(
             originalLocation => originalLocation.Id,
             originalLocation =>
             {
-                replacementLocationMap.TryGetValue(originalLocation.Id, out var replacementLocation);
+                replacementIdToLocationMap.TryGetValue(originalLocation.Id, out var replacementLocation);
                 if (replacementLocation == null)
                 {
                     // If none matching by Id, check if any matching by GeogLvl + Code. We don't check by Name to
                     // preserve behaviour from before location mapping was introduced (which allowed analysts to
                     // change/fix location names with replacements).
-                    var candidateReplacements = replacementLocationMap
+                    var matchingReplacements = replacementIdToLocationMap
                         .Values.Where(location =>
                             location.GeographicLevel == originalLocation.GeographicLevel
                             && location.ToLocationAttribute().GetCodeOrFallback()
                                 == originalLocation.ToLocationAttribute().GetCodeOrFallback()
                         )
                         .ToList();
-                    replacementLocation = candidateReplacements.Count == 1 ? candidateReplacements[0] : null;
+                    replacementLocation = matchingReplacements.Count == 1 ? matchingReplacements[0] : null;
                 }
 
                 return new LocationMapping
@@ -179,21 +169,151 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             }
         );
 
-        var mappedReplacementIds = initialMappingDictionary
-            .Values.Where(map => map.ReplacementId.HasValue)
-            .Select(map => map.ReplacementId!.Value);
+        return locationMappings;
+    }
 
-        var unmappedReplacements = replacementLocationMap
-            .Values.ExceptBy(mappedReplacementIds, location => location.Id)
-            .Select(location => new UnmappedLocation
+    private static async Task<Dictionary<Guid, FilterMapping>> GenerateInitialFilterMapping(
+        StatisticsDbContext statisticsDbContext,
+        Guid originalSubjectId,
+        Guid replacementSubjectId
+    )
+    {
+        var filters = await statisticsDbContext
+            .Filter.AsNoTracking()
+            .Include(f => f.FilterGroups)
+                .ThenInclude(fg => fg.FilterItems)
+            .Where(f => f.SubjectId == originalSubjectId || f.SubjectId == replacementSubjectId)
+            .ToListAsync();
+
+        var originalFilters = filters.Where(f => f.SubjectId == originalSubjectId).ToList();
+
+        var replacementFilters = filters.Where(f => f.SubjectId == replacementSubjectId).ToList();
+
+        // Create dictionaries to speed up performance when matching originals to replacements
+        var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name
+
+        var replacementFilterIdToGroupLabelToGroupMap = replacementFilters
+            .SelectMany(f => f.FilterGroups.Select(g => new { FilterId = f.Id, FilterGroup = g }))
+            .GroupBy(x => x.FilterId)
+            .ToDictionary(x => x.Key, x => x.ToDictionary(g => g.FilterGroup.Label, g => g.FilterGroup)); // automap groups by label
+
+        var replacementGroupIdToItemLabelToItemMap = replacementFilters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(g => g.FilterItems.Select(i => new { FilterGroupId = g.Id, FilterItem = i }))
+            .GroupBy(x => x.FilterGroupId)
+            .ToDictionary(x => x.Key, x => x.ToDictionary(g => g.FilterItem.Label, g => g.FilterItem)); // automap items by label
+
+        // Now we create FilterMappings
+        var filterMappings = new Dictionary<Guid, FilterMapping>();
+        foreach (var originalFilter in originalFilters)
+        {
+            replacementFiltersMap.TryGetValue(originalFilter.Name, out var replacementFilter);
+
+            var replacementGroupLabelToGroupMap =
+                replacementFilter != null
+                    ? replacementFilterIdToGroupLabelToGroupMap.GetValueOrDefault(replacementFilter.Id)
+                    : null;
+
+            var filterGroupMappings = GenerateInitialFilterGroupMapping(
+                originalFilter.FilterGroups,
+                replacementGroupLabelToGroupMap,
+                replacementGroupIdToItemLabelToItemMap
+            );
+
+            var filterMapping = new FilterMapping
             {
-                Id = location.Id,
-                Code = location.ToLocationAttribute().GetCodeOrFallback(),
-                Name = location.ToLocationAttribute().Name ?? "",
-                GeographicLevel = location.GeographicLevel,
-            })
-            .ToList();
+                OriginalId = originalFilter.Id,
+                OriginalColumnName = originalFilter.Name,
+                OriginalLabel = originalFilter.Label,
 
-        return (initialMappingDictionary, unmappedReplacements);
+                ReplacementId = replacementFilter?.Id,
+                ReplacementColumnName = replacementFilter?.Name,
+                ReplacementLabel = replacementFilter?.Label,
+
+                FilterGroupMappings = filterGroupMappings,
+
+                Status = replacementFilter == null ? MapStatus.Unset : MapStatus.AutoSet,
+            };
+
+            filterMappings.Add(filterMapping.OriginalId, filterMapping);
+        }
+
+        return filterMappings;
+    }
+
+    private static Dictionary<Guid, FilterGroupMapping> GenerateInitialFilterGroupMapping(
+        List<FilterGroup> originalFilterGroups,
+        Dictionary<string, FilterGroup>? replacementGroupLabelToGroupMap,
+        Dictionary<Guid, Dictionary<string, FilterItem>> replacementGroupIdToItemLabelToItemMap
+    )
+    {
+        var filterGroupMappings = new Dictionary<Guid, FilterGroupMapping>();
+
+        foreach (var originalFilterGroup in originalFilterGroups)
+        {
+            FilterGroup? replacementFilterGroup = null;
+            replacementGroupLabelToGroupMap?.TryGetValue(originalFilterGroup.Label, out replacementFilterGroup);
+
+            var replacementItemLabelToItemMap =
+                replacementFilterGroup != null
+                    ? replacementGroupIdToItemLabelToItemMap.GetValueOrDefault(replacementFilterGroup.Id)
+                    : null;
+            var filterItemMappings = GenerateInitialFilterItemMapping(
+                originalFilterGroup.FilterItems,
+                replacementItemLabelToItemMap
+            );
+
+            var filterGroupMapping = new FilterGroupMapping
+            {
+                OriginalId = originalFilterGroup.Id,
+                OriginalLabel = originalFilterGroup.Label,
+
+                ReplacementId = replacementFilterGroup?.Id,
+                ReplacementLabel = replacementFilterGroup?.Label,
+
+                FilterItemMappings = filterItemMappings,
+
+                Status =
+                    replacementGroupLabelToGroupMap == null
+                        ? MapStatus.ParentNotMapped
+                        : (replacementFilterGroup == null ? MapStatus.Unset : MapStatus.AutoSet),
+            };
+
+            filterGroupMappings.Add(filterGroupMapping.OriginalId, filterGroupMapping);
+        }
+
+        return filterGroupMappings;
+    }
+
+    private static Dictionary<Guid, FilterItemMapping> GenerateInitialFilterItemMapping(
+        List<FilterItem> originalFilterItems,
+        Dictionary<string, FilterItem>? replacementItemLabelToItemMap
+    )
+    {
+        var filterItemMappings = new Dictionary<Guid, FilterItemMapping>();
+
+        foreach (var originalFilterItem in originalFilterItems)
+        {
+            FilterItem? replacementFilterItem = null;
+            replacementItemLabelToItemMap?.TryGetValue(originalFilterItem.Label, out replacementFilterItem);
+
+            var filterItemMapping = new FilterItemMapping
+            {
+                OriginalId = originalFilterItem.Id,
+                OriginalLabel = originalFilterItem.Label,
+
+                ReplacementId = replacementFilterItem?.Id,
+                ReplacementLabel = replacementFilterItem?.Label,
+
+                Status =
+                    replacementItemLabelToItemMap == null
+                        ? MapStatus.ParentNotMapped
+                        : (replacementFilterItem == null ? MapStatus.Unset : MapStatus.AutoSet),
+            };
+
+            filterItemMappings.Add(filterItemMapping.OriginalId, filterItemMapping);
+        }
+
+        return filterItemMappings;
     }
 }

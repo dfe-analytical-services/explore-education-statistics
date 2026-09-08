@@ -7,7 +7,7 @@ const path = require('path');
  */
 
 const nextConfig = {
-  compress: !process.env.WEBSITES_DISABLE_CONTENT_COMPRESSION,
+  compress: false,
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -109,6 +109,7 @@ const nextConfig = {
 
     return config;
   },
+  sassOptions: { charset: false }, // prod CSS was breaking due to BOMs being included in the middle of files
   transpilePackages:
     process.env.NEXT_CONFIG_MODE !== 'server'
       ? ['explore-education-statistics-common']

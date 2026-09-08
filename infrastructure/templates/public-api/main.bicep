@@ -72,9 +72,6 @@ param acrResourceGroupName string = ''
 @description('Public API docs app : SKU to use.')
 param docsAppSku StaticWebAppSku = 'Free'
 
-@description('Recovery Services Vault : specify if manual deletion of backups is allowed or not.')
-param recoveryVaultImmutable bool = false
-
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
@@ -94,9 +91,6 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Do the shared Private DNS Zones need creating or updating?')
-param deploySharedPrivateDnsZones bool = false
-
 @description('Does the PostgreSQL Flexible Server need creating or updating?')
 param deployPsqlFlexibleServer bool = false
 
@@ -111,9 +105,6 @@ param deployDocsSite bool = true
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
-
-@description('Does the Recovery Services Vault need creating or updating?')
-param deployRecoveryVault bool = false
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -217,10 +208,8 @@ var resourceNames = {
   }
   sharedResources: {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
-    logAnalyticsWorkspace: '${commonResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
     postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
     recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
-    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
     searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
   }
   publicApi: {
@@ -260,14 +249,6 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
   }
 }
 
-module privateDnsZonesModule '../common/application/privateDnsZones.bicep' = if (deploySharedPrivateDnsZones) {
-  name: 'privateDnsZonesApplicationModuleDeploy'
-  params: {
-    vnetName: resourceNames.existingResources.vNet
-    tagValues: tagValues
-  }
-}
-
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
@@ -292,16 +273,9 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
   params: {
     location: location
     resourceNames: resourceNames
-    tagValues: tagValues
-  }
-}
-
-// Create a generic, shared Log Analytics Workspace for any relevant resources to use.
-module logAnalyticsWorkspaceModule 'application/shared/logAnalyticsWorkspace.bicep' = {
-  name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
+    environmentName: environmentName
+    publicApiUrl: publicUrls.publicApi
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
@@ -320,30 +294,6 @@ module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep
     deployAlerts: deployAlerts
     deployBackupVaultRoleAssignment: deployPsqlBackupVaultRoleAssignment
     deployBackupVaultRegistration: deployPsqlBackupVaultRegistration
-    tagValues: tagValues
-  }
-  dependsOn: [
-    privateDnsZonesModule
-  ]
-}
-
-module recoveryVaultModule 'application/shared/recoveryVault.bicep' = if (deployRecoveryVault) {
-  name: 'recoveryVaultApplicationModuleDeploy'
-  params: {
-    location: location
-    resourceNames: resourceNames
-    immutable: recoveryVaultImmutable
-    tagValues: tagValues
-  }
-}
-
-module publicApiStorageBackupModule 'components/recoveryVaultFileShareRegistration.bicep' = if (deployRecoveryVault) {
-  name: 'publicApiStorageBackupModuleDeploy'
-  params: {
-    vaultName: resourceNames.sharedResources.recoveryVault
-    backupPolicyName: resourceNames.sharedResources.recoveryVaultFileShareBackupPolicy
-    storageAccountName: publicApiStorageModule.outputs.publicApiStorageAccountName
-    fileShareName: publicApiStorageModule.outputs.publicApiDataFileShareName
     tagValues: tagValues
   }
 }
@@ -448,7 +398,6 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     tagValues: tagValues
   }
   dependsOn: [
-    privateDnsZonesModule
     publicApiStorageModule
   ]
 }

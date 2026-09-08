@@ -58,3 +58,62 @@ jobs:
     displayName: Seed data suite - Robot UI tests
     testFolder: tests/seed_data
     artifactName: test-results-seed-data
+
+- job: NotifyTeams
+  displayName: Send UI test pipeline summary to Teams
+  dependsOn:
+  - Public
+  - PublishAndAmend
+  - Admin
+  - AdminAndPublic
+  - PublicAPI
+  - SeedData
+  condition: always()
+  pool: ees-ubuntu2204-large
+  variables:
+    publicResult: $[ dependencies.Public.result ]
+    publishAndAmendResult: $[ dependencies.PublishAndAmend.result ]
+    adminResult: $[ dependencies.Admin.result ]
+    adminAndPublicResult: $[ dependencies.AdminAndPublic.result ]
+    publicApiResult: $[ dependencies.PublicAPI.result ]
+    seedDataResult: $[ dependencies.SeedData.result ]
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 1
+    fetchTags: false
+
+  - template: azure-pipelines-install-python.yml
+
+  - task: AzureKeyVault@2
+    displayName: Azure Key Vault - s101d01-kv-ees-01
+    continueOnError: true
+    inputs:
+      azureSubscription: $(SPN_NAME)
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-alerts-teams-uitests-webhookurl
+      RunAsPreJob: true
+
+  - task: DownloadPipelineArtifact@2
+    displayName: Download UI test artifacts
+    continueOnError: true
+    inputs:
+      buildType: current
+      targetPath: $(Pipeline.Workspace)/ui-test-results
+
+  - task: PythonScript@0
+    displayName: Send Teams summary
+    condition: always()
+    continueOnError: true
+    inputs:
+      scriptPath: tests/robot-tests/scripts/send_teams_pipeline_report.py
+      arguments: --artifacts-dir "$(Pipeline.Workspace)/ui-test-results" --environment dev
+      workingDirectory: tests/robot-tests
+    env:
+      TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
+      UI_TEST_PUBLIC_RESULT: $(publicResult)
+      UI_TEST_PUBLISH_AND_AMEND_RESULT: $(publishAndAmendResult)
+      UI_TEST_ADMIN_RESULT: $(adminResult)
+      UI_TEST_ADMIN_AND_PUBLIC_RESULT: $(adminAndPublicResult)
+      UI_TEST_PUBLIC_API_RESULT: $(publicApiResult)
+      UI_TEST_SEED_DATA_RESULT: $(seedDataResult)

@@ -199,8 +199,8 @@ export default function DataFileReplacementDifferences({
         replacementFileId,
         [
           {
-            originalLocationId: sourceKey,
-            newReplacementLocationId: candidateKey,
+            originalId: sourceKey,
+            newReplacementId: candidateKey,
           },
         ],
       );

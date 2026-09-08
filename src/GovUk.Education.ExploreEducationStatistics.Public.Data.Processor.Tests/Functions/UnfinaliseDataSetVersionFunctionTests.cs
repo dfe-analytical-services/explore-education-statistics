@@ -62,6 +62,7 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
             .WithImports(() => [import])
             .WithPreviewTokens(() => [DataFixture.DefaultPreviewToken()])
             .Generate();
+        var expectedMetaSummary = targetVersion.MetaSummary;
         var mapping = DataFixture
             .DefaultDataSetVersionMapping()
             .WithSourceDataSetVersion(sourceVersion)
@@ -109,7 +110,7 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
             .SingleAsync(version => version.Id == targetVersion.Id);
         Assert.Equal(DataSetVersionStatus.Mapping, updatedVersion.Status);
         Assert.Equal(0, updatedVersion.TotalResults);
-        Assert.Null(updatedVersion.MetaSummary);
+        updatedVersion.MetaSummary.AssertDeepEqualTo(expectedMetaSummary);
         Assert.Equal(DataSetVersionImportStage.ManualMapping, updatedVersion.Imports.Single().Stage);
         Assert.Null(updatedVersion.Imports.Single().Completed);
         Assert.Single(updatedVersion.PreviewTokens);
@@ -130,6 +131,47 @@ public class UnfinaliseDataSetVersionFunctionTests(UnfinaliseDataSetVersionFunct
                 .GetPublicDataDbContext()
                 .IndicatorMetas.AnyAsync(meta => meta.DataSetVersionId == targetVersion.Id)
         );
+    }
+
+    [Fact]
+    public async Task InitialVersion_ReturnsValidationProblemAndDoesNotModifyVersion()
+    {
+        var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().Generate();
+        var import = DataFixture
+            .DefaultDataSetVersionImport()
+            .WithStage(DataSetVersionImportStage.Completing)
+            .Generate();
+        import.Completed = new DateTimeOffset(2025, 1, 2, 3, 4, 5, TimeSpan.Zero);
+        var version = DataFixture
+            .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+            .WithDataSet(dataSet)
+            .WithVersionNumber(major: 1, minor: 0)
+            .WithStatusDraft()
+            .WithImports(() => [import])
+            .Generate();
+        var expectedMetaSummary = version.MetaSummary;
+        var expectedTotalResults = version.TotalResults;
+        var expectedImportCompleted = import.Completed;
+
+        await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersions.Add(version));
+
+        var result = await fixture.Function.UnfinaliseDataSetVersion(null!, version.Id, CancellationToken.None);
+
+        var validationProblem = result.AssertBadRequestWithValidationProblem();
+        validationProblem.AssertHasError(
+            expectedPath: "dataSetVersionId",
+            expectedCode: ValidationMessages.InitialDataSetVersionCanNotBeUnfinalised.Code
+        );
+
+        var unchangedVersion = await fixture
+            .GetPublicDataDbContext()
+            .DataSetVersions.Include(dataSetVersion => dataSetVersion.Imports)
+            .SingleAsync(dataSetVersion => dataSetVersion.Id == version.Id);
+        Assert.Equal(DataSetVersionStatus.Draft, unchangedVersion.Status);
+        Assert.Equal(expectedTotalResults, unchangedVersion.TotalResults);
+        unchangedVersion.MetaSummary.AssertDeepEqualTo(expectedMetaSummary);
+        Assert.Equal(DataSetVersionImportStage.Completing, unchangedVersion.Imports.Single().Stage);
+        Assert.Equal(expectedImportCompleted, unchangedVersion.Imports.Single().Completed);
     }
 
     [Theory]

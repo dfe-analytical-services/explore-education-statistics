@@ -146,6 +146,8 @@ public static class EducationInNumbersContentViewModels
         public required int? DecimalPlaces { get; init; }
         public required string? PublicationSlug { get; init; }
         public required string? ReleaseSlug { get; init; }
+        public required string? PublicationLabel { get; init; }
+        public required string? ReleaseLabel { get; init; }
 
         public static EinApiQueryStatTileViewModel FromModel(EinApiQueryStatTile statTile)
         {
@@ -172,6 +174,8 @@ public static class EducationInNumbersContentViewModels
                 DecimalPlaces = statTile.DecimalPlaces,
                 PublicationSlug = statTile.Release?.Publication.Slug,
                 ReleaseSlug = statTile.Release?.Slug,
+                PublicationLabel = statTile.Release?.Publication.Title,
+                ReleaseLabel = statTile.Release?.Title,
             };
         }
     }

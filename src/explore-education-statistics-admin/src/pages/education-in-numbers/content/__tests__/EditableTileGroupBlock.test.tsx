@@ -1,3 +1,4 @@
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import EditableTileGroupBlock from '@admin/pages/education-in-numbers/content/components/EditableTileGroupBlock';
 import { EducationInNumbersPageContentProvider } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
@@ -12,16 +13,18 @@ import testBlock from './__data__/testBlock';
 
 const renderWithContext = (component: React.ReactNode) =>
   render(
-    <EducationInNumbersPageContentProvider
-      value={{
-        pageContent: testEinPageContent,
-        pageVersion: testEinPageVersion,
-      }}
-    >
-      <EditingContextProvider editingMode="edit">
-        {component}
-      </EditingContextProvider>
-    </EducationInNumbersPageContentProvider>,
+    <TestConfigContextProvider>
+      <EducationInNumbersPageContentProvider
+        value={{
+          pageContent: testEinPageContent,
+          pageVersion: testEinPageVersion,
+        }}
+      >
+        <EditingContextProvider editingMode="edit">
+          {component}
+        </EditingContextProvider>
+      </EducationInNumbersPageContentProvider>
+    </TestConfigContextProvider>,
   );
 describe('EditableTileGroupBlock', () => {
   test('renders correct initial heading', async () => {

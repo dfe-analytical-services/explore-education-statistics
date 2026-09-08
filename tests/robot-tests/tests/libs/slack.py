@@ -56,11 +56,11 @@ class SlackService:
         flaky_test_message = (
             "Definitely"
             if failed_tests_in_final_run == 0 and number_of_test_runs > 1
-            else "Definitely not"
-            if failed_tests_in_final_run == 0 and number_of_test_runs == 1
-            else "Likely"
-            if failed_tests_in_merged_report != failed_tests_in_final_run
-            else "Unlikely"
+            else (
+                "Definitely not"
+                if failed_tests_in_final_run == 0 and number_of_test_runs == 1
+                else "Likely" if failed_tests_in_merged_report != failed_tests_in_final_run else "Unlikely"
+            )
         )
 
         blocks = [

@@ -28,6 +28,7 @@ const screenerLocalDir = `${accountRoot}/${screenerRepositoryName}`;
 const screenerRepoUrl =
   'https://github.com/dfe-analytical-services/ees-screener-api';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allowedDockerServices = [
   'db',
   'data-storage',
@@ -71,6 +72,7 @@ type ServiceSchemaDockerServices =
 
 // Annoyingly, need to define these separately from schemas,
 // or we run into various circular reference issues in the types.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const allowedServiceNames = [
   'admin',
   'analytics',
@@ -376,7 +378,7 @@ async function startDockerServices() {
 async function startService(service: ServiceName): Promise<void> {
   const schema = serviceSchemas[service];
 
-  let command = '';
+  let command: string;
   let args: string[] = [];
 
   let lockUntilReady = false;
@@ -400,7 +402,7 @@ async function startService(service: ServiceName): Promise<void> {
       break;
     }
     case 'func': {
-      command = 'func host start';
+      command = 'dotnet run';
       args = ['--port', `${schema.port}`, '--pause-on-error'];
 
       env.ASPNETCORE_ENVIRONMENT ??= 'Development';

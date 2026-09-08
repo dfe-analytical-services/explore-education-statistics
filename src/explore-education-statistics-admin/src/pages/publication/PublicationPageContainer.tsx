@@ -2,48 +2,26 @@ import Link from '@admin/components/Link';
 import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
+import RouteSwitch from '@admin/components/RouteSwitch';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import publicationPageRoutes from '@admin/routes/publicationPageRoutes';
 import {
   publicationContactRoute,
   publicationDetailsRoute,
-  publicationAdoptMethodologyRoute,
-  publicationExternalMethodologyRoute,
-  publicationMethodologiesRoute,
-  publicationTeamAccessRoute,
-  publicationReleasesRoute,
-  publicationReleaseSeriesRoute,
-  publicationCreateReleaseSeriesLegacyLinkRoute,
-  publicationEditReleaseSeriesLegacyLinkRoute,
+  publicationNavRoutes,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import useCurrentRouteTitle from '@admin/utils/useCurrentRouteTitle';
+import useNavRoutes from '@admin/hooks/useNavRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
-
-const navRoutes = [
-  publicationReleasesRoute,
-  publicationMethodologiesRoute,
-  publicationDetailsRoute,
-  publicationContactRoute,
-  publicationTeamAccessRoute,
-  publicationReleaseSeriesRoute,
-];
-
-const routes = [
-  ...navRoutes,
-  publicationAdoptMethodologyRoute,
-  publicationExternalMethodologyRoute,
-  publicationCreateReleaseSeriesLegacyLinkRoute,
-  publicationEditReleaseSeriesLegacyLinkRoute,
-];
+import React, { useMemo } from 'react';
+import { RouteComponentProps } from 'react-router';
 
 const PublicationPageContainer = ({
   match,
@@ -61,8 +39,8 @@ const PublicationPageContainer = ({
     ),
   );
 
-  const getNavRoutes = () => {
-    return navRoutes.filter(route => {
+  const navRoutes = useMemo(() => {
+    return publicationNavRoutes.filter(route => {
       switch (route) {
         case publicationDetailsRoute:
           return (
@@ -75,9 +53,11 @@ const PublicationPageContainer = ({
           return true;
       }
     });
-  };
+  }, [publication?.permissions]);
 
-  const pageTitle = useCurrentRouteTitle(navRoutes);
+  const { navBarRoutes, currentRouteTitle } = useNavRoutes(navRoutes, {
+    publicationId,
+  });
 
   return (
     <LoadingSpinner loading={loadingPublication}>
@@ -87,8 +67,8 @@ const PublicationPageContainer = ({
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
                 metaTitle={
-                  pageTitle
-                    ? `${pageTitle} - ${publication.title}`
+                  currentRouteTitle
+                    ? `${currentRouteTitle} - ${publication.title}`
                     : publication.title
                 }
                 title={publication.title}
@@ -121,15 +101,7 @@ const PublicationPageContainer = ({
             </div>
           </div>
 
-          <NavBar
-            routes={getNavRoutes().map(route => ({
-              title: route.title,
-              to: generatePath<PublicationRouteParams>(route.path, {
-                publicationId,
-              }),
-            }))}
-            label="Publication"
-          />
+          <NavBar routes={navBarRoutes} label="Publication" />
 
           <PublicationContextProvider
             publication={publication}
@@ -138,11 +110,7 @@ const PublicationPageContainer = ({
             }}
             onReload={reloadPublication}
           >
-            <Switch>
-              {routes.map(route => (
-                <Route exact key={route.path} {...route} />
-              ))}
-            </Switch>
+            <RouteSwitch routes={publicationPageRoutes} />
           </PublicationContextProvider>
         </Page>
       ) : (

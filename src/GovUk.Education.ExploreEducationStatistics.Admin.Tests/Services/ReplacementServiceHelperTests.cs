@@ -7,342 +7,309 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class ReplacementServiceHelperTests
 {
     [Fact]
-    public void ReplaceFilterSequence()
+    public void ReplaceFilterSequence_Success()
     {
-        // Define a set of filters, filter groups and filter items belonging to the original subject
-        var originalFilters = new List<Filter>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Filter a",
-                Name = "filter_a",
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group a",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item a" },
-                            new() { Id = Guid.NewGuid(), Label = "Item b" },
-                            new() { Id = Guid.NewGuid(), Label = "Item c" },
-                        },
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group b",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item d" },
-                            new() { Id = Guid.NewGuid(), Label = "Item e" },
-                            new() { Id = Guid.NewGuid(), Label = "Item f" },
-                        },
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group c",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item g" },
-                            new() { Id = Guid.NewGuid(), Label = "Item h" },
-                            new() { Id = Guid.NewGuid(), Label = "Item i" },
-                        },
-                    },
-                },
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Filter b",
-                Name = "filter_b",
-                FilterGroups = new List<FilterGroup>(),
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Filter c",
-                Name = "filter_c",
-                FilterGroups = new List<FilterGroup>(),
-            },
-        };
+        var originalFilterAId = Guid.NewGuid();
+        var originalGroupA1Id = Guid.NewGuid();
+        var originalIndicatorA1AId = Guid.NewGuid(); // mapped to replacement IA1A
+        var originalIndicatorA1BId = Guid.NewGuid(); // mapped to replacement IA1B
 
-        // Define a sequence for the original subject which is expected to be updated after the replacement
-        var originalReleaseFile = new ReleaseFile
+        var originalFilterBId = Guid.NewGuid();
+        var originalGroupB1Id = Guid.NewGuid();
+        var originalIndicatorB1AId = Guid.NewGuid(); // mapped to replacement IB1A
+        var originalIndicatorB1BId = Guid.NewGuid(); // not in replacement
+
+        var originalGroupB2Id = Guid.NewGuid(); // not in replacement
+        var originalIndicatorB2AId = Guid.NewGuid();
+
+        var originalFilterDId = Guid.NewGuid(); // not in replacement
+        var originalGroupD1Id = Guid.NewGuid();
+        var originalIndicatorD1AId = Guid.NewGuid();
+
+        var replacementFilterAId = Guid.NewGuid();
+        var replacementGroupA1Id = Guid.NewGuid();
+        var replacementIndicatorA1AId = Guid.NewGuid();
+        var replacementIndicatorA1BId = Guid.NewGuid();
+        var replacementIndicatorA1CId = Guid.NewGuid(); // new to replacement
+
+        var replacementFilterBId = Guid.NewGuid();
+        var replacementGroupB1Id = Guid.NewGuid();
+        var replacementIndicatorB1AId = Guid.NewGuid();
+
+        var replacementGroupB3Id = Guid.NewGuid(); // new to replacement
+        var replacementIndicatorB3AId = Guid.NewGuid();
+
+        var replacementFilterCId = Guid.NewGuid(); // new to replacement
+        var replacementGroupC1Id = Guid.NewGuid();
+        var replacementIndicatorC1AId = Guid.NewGuid();
+
+        var mapping = new DataSetMapping
         {
-            FilterSequence = new List<FilterSequenceEntry>
+            FilterMappings = new Dictionary<Guid, FilterMapping>()
             {
-                // Filter c
-                new(originalFilters[2].Id, new List<FilterGroupSequenceEntry>()),
-                // Filter a
-                new(
-                    originalFilters[0].Id,
-                    new List<FilterGroupSequenceEntry>
+                {
+                    originalFilterAId,
+                    new FilterMapping
                     {
-                        // Group c
-                        new(
-                            originalFilters[0].FilterGroups[2].Id,
-                            new List<Guid>
+                        OriginalId = originalFilterAId,
+
+                        ReplacementId = replacementFilterAId,
+
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
                             {
-                                // Item i, Item g, Item h
-                                originalFilters[0].FilterGroups[2].FilterItems[2].Id,
-                                originalFilters[0].FilterGroups[2].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[2].FilterItems[1].Id,
-                            }
-                        ),
-                        // Group a
-                        new(
-                            originalFilters[0].FilterGroups[0].Id,
-                            new List<Guid>
-                            {
-                                // Item c, Indicator a, Indicator b
-                                originalFilters[0].FilterGroups[0].FilterItems[2].Id,
-                                originalFilters[0].FilterGroups[0].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[0].FilterItems[1].Id,
-                            }
-                        ),
-                        // Group b
-                        new(
-                            originalFilters[0].FilterGroups[1].Id,
-                            new List<Guid>
-                            {
-                                // Item f, Item d, Item e
-                                originalFilters[0].FilterGroups[1].FilterItems[2].Id,
-                                originalFilters[0].FilterGroups[1].FilterItems[0].Id,
-                                originalFilters[0].FilterGroups[1].FilterItems[1].Id,
-                            }
-                        ),
+                                originalGroupA1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupA1Id,
+
+                                    ReplacementId = replacementGroupA1Id,
+
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalIndicatorA1AId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalIndicatorA1AId,
+                                                ReplacementId = replacementIndicatorA1AId,
+                                            }
+                                        },
+                                        {
+                                            originalIndicatorA1BId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalIndicatorA1BId,
+                                                ReplacementId = replacementIndicatorA1BId,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                        },
                     }
-                ),
-                // Filter b
-                new(originalFilters[1].Id, new List<FilterGroupSequenceEntry>()),
+                },
+                {
+                    originalFilterBId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterBId,
+                        ReplacementId = replacementFilterBId,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalGroupB1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupB1Id,
+                                    ReplacementId = replacementGroupB1Id,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalIndicatorB1AId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalIndicatorB1AId,
+                                                ReplacementId = replacementIndicatorB1AId,
+                                            }
+                                        },
+                                        {
+                                            originalIndicatorB1BId,
+                                            new FilterItemMapping
+                                            {
+                                                OriginalId = originalIndicatorB1BId,
+                                                ReplacementId = null,
+                                            }
+                                        },
+                                    },
+                                }
+                            },
+                            {
+                                originalGroupB2Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupB2Id,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalIndicatorB2AId,
+                                            new FilterItemMapping { OriginalId = originalIndicatorB2AId }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
+                {
+                    originalFilterDId,
+                    new FilterMapping
+                    {
+                        OriginalId = originalFilterDId,
+                        FilterGroupMappings = new Dictionary<Guid, FilterGroupMapping>
+                        {
+                            {
+                                originalGroupD1Id,
+                                new FilterGroupMapping
+                                {
+                                    OriginalId = originalGroupD1Id,
+                                    FilterItemMappings = new Dictionary<Guid, FilterItemMapping>
+                                    {
+                                        {
+                                            originalIndicatorD1AId,
+                                            new FilterItemMapping { OriginalId = originalIndicatorD1AId }
+                                        },
+                                    },
+                                }
+                            },
+                        },
+                    }
+                },
             },
         };
 
-        // Define the set of filters, filter groups and filter items belonging to the replacement subject
-        var replacementFilters = new List<Filter>
-        {
-            // 'Filter a' is updated
-            new()
+        List<Filter> replacementFilters =
+        [
+            new Filter
             {
-                Id = Guid.NewGuid(),
-                Label = "Filter a",
-                Name = "filter_a",
-                FilterGroups = new List<FilterGroup>
-                {
-                    // 'Group a' is removed
-                    // 'Group e' is added
-                    new()
+                Id = replacementFilterAId,
+                FilterGroups =
+                [
+                    new FilterGroup
                     {
-                        Id = Guid.NewGuid(),
-                        Label = "Group e",
-                        FilterItems = new List<FilterItem>(),
+                        Id = replacementGroupA1Id,
+                        FilterId = replacementFilterAId,
+                        FilterItems =
+                        [
+                            new FilterItem { Id = replacementIndicatorA1AId, FilterGroupId = replacementGroupA1Id },
+                            new FilterItem { Id = replacementIndicatorA1BId, FilterGroupId = replacementGroupA1Id },
+                            new FilterItem
+                            {
+                                Id = replacementIndicatorA1CId,
+                                FilterGroupId = replacementGroupA1Id,
+                                Label = "Indicator A1C",
+                            },
+                        ],
                     },
-                    // Group 'Total' is added
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Total",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item m" },
-                            new() { Id = Guid.NewGuid(), Label = "Total" },
-                            new() { Id = Guid.NewGuid(), Label = "Item l" },
-                        },
-                    },
-                    // 'Group d' is added
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group d",
-                        FilterItems = new List<FilterItem>(),
-                    },
-                    // 'Group b' is updated
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group b",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item d" },
-                            // 'Item e' is removed
-                            // 'Item k' is added
-                            new() { Id = Guid.NewGuid(), Label = "Item k" },
-                            // 'Item j' is added
-                            new() { Id = Guid.NewGuid(), Label = "Item j" },
-                            new() { Id = Guid.NewGuid(), Label = "Item f" },
-                        },
-                    },
-                    // 'Group c' remains identical
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group c",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item g" },
-                            new() { Id = Guid.NewGuid(), Label = "Item h" },
-                            new() { Id = Guid.NewGuid(), Label = "Item i" },
-                        },
-                    },
-                },
+                ],
             },
-            // 'Filter b' is removed
-            // 'Filter e' is added
-            new()
+            new Filter
             {
-                Id = Guid.NewGuid(),
-                Label = "Filter e",
-                Name = "filter_e",
-                FilterGroups = new List<FilterGroup>(),
+                Id = replacementFilterBId,
+                FilterGroups =
+                [
+                    new FilterGroup
+                    {
+                        Id = replacementGroupB1Id,
+                        FilterId = replacementFilterBId,
+                        FilterItems =
+                        [
+                            new FilterItem { Id = replacementIndicatorB1AId, FilterGroupId = replacementGroupB1Id },
+                        ],
+                    },
+                    new FilterGroup
+                    {
+                        Id = replacementGroupB3Id,
+                        FilterId = replacementFilterBId,
+                        FilterItems =
+                        [
+                            new FilterItem { Id = replacementIndicatorB3AId, FilterGroupId = replacementGroupB3Id },
+                        ],
+                    },
+                ],
             },
-            // 'Filter d' is added
-            new()
+            new Filter
             {
-                Id = Guid.NewGuid(),
-                Label = "Filter d",
-                Name = "filter_d",
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
+                Id = replacementFilterCId,
+                Label = "Filter C",
+                FilterGroups =
+                [
+                    new FilterGroup
                     {
-                        Id = Guid.NewGuid(),
-                        Label = "Group g",
-                        FilterItems = new List<FilterItem>(),
+                        Id = replacementGroupC1Id,
+                        FilterId = replacementFilterCId,
+                        Label = "Group C1",
+                        FilterItems =
+                        [
+                            new FilterItem
+                            {
+                                Id = replacementIndicatorC1AId,
+                                FilterGroupId = replacementGroupC1Id,
+                                Label = "Indicator C1A",
+                            },
+                        ],
                     },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Total",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new() { Id = Guid.NewGuid(), Label = "Item o" },
-                            new() { Id = Guid.NewGuid(), Label = "Total" },
-                            new() { Id = Guid.NewGuid(), Label = "Item n" },
-                        },
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group f",
-                        FilterItems = new List<FilterItem>(),
-                    },
-                },
+                ],
             },
-            // 'Filter c' remains identical
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Label = "Filter c",
-                Name = "filter_c",
-                FilterGroups = new List<FilterGroup>(),
-            },
-        };
+        ];
+
+        List<FilterSequenceEntry> indicatorSequence =
+        [
+            new(
+                Id: originalFilterAId,
+                FilterGroupSequence:
+                [
+                    new FilterGroupSequenceEntry(
+                        Id: originalGroupA1Id,
+                        FilterItemSequence: [originalIndicatorA1AId, originalIndicatorA1BId]
+                    ),
+                ]
+            ),
+            new(
+                Id: originalFilterBId,
+                FilterGroupSequence:
+                [
+                    new FilterGroupSequenceEntry(
+                        Id: originalGroupB1Id,
+                        FilterItemSequence: [originalIndicatorB1AId, originalIndicatorB1BId]
+                    ),
+                ]
+            ),
+        ];
 
         var updatedSequence = ReplacementServiceHelper.ReplaceFilterSequence(
-            originalFilters: originalFilters,
-            replacementFilters: replacementFilters,
-            originalReleaseFile
+            indicatorSequence,
+            mapping,
+            replacementFilters
         );
 
-        // Verify the updated sequence of filters
         Assert.NotNull(updatedSequence);
+        Assert.Equal(3, updatedSequence.Count);
 
-        Assert.Equal(4, updatedSequence!.Count);
+        var filterA = updatedSequence[0];
+        Assert.Equal(replacementFilterAId, filterA.Id);
 
-        // 'Filter c' was first in the original sequence and is identical in the replacement subject so it should be first
-        var filterC = updatedSequence[0];
-        Assert.Equal(replacementFilters[3].Id, filterC.Id);
-        Assert.Empty(filterC.ChildSequence);
+        var groupA1 = Assert.Single(filterA.FilterGroupSequence);
+        Assert.Equal(replacementGroupA1Id, groupA1.Id);
 
-        // 'Filter a' should be next in the sequence
-        var filterA = updatedSequence[1];
-        Assert.Equal(replacementFilters[0].Id, filterA.Id);
+        Assert.Equal(3, groupA1.FilterItemSequence.Count);
+        Assert.Equal(replacementIndicatorA1AId, groupA1.FilterItemSequence[0]);
+        Assert.Equal(replacementIndicatorA1BId, groupA1.FilterItemSequence[1]);
+        Assert.Equal(replacementIndicatorA1CId, groupA1.FilterItemSequence[2]);
 
-        var filterAGroups = filterA.ChildSequence;
-        Assert.Equal(5, filterAGroups.Count);
+        var filterB = updatedSequence[1];
+        Assert.Equal(replacementFilterBId, filterB.Id);
+        Assert.Equal(2, filterB.FilterGroupSequence.Count);
 
-        // 'Group c' was first in the original sequence and is untouched in the replacement subject so it should be first
-        var filterAGroupC = filterAGroups[0];
-        Assert.Equal(replacementFilters[0].FilterGroups[4].Id, filterAGroupC.Id);
-        Assert.Equal(3, filterAGroupC.ChildSequence.Count);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[2].Id, filterAGroupC.ChildSequence[0]);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[0].Id, filterAGroupC.ChildSequence[1]);
-        Assert.Equal(replacementFilters[0].FilterGroups[4].FilterItems[1].Id, filterAGroupC.ChildSequence[2]);
+        var groupB1 = filterB.FilterGroupSequence[0];
+        Assert.Equal(replacementGroupB1Id, groupB1.Id);
+        var indicatorB1AId = Assert.Single(groupB1.FilterItemSequence);
+        Assert.Equal(replacementIndicatorB1AId, indicatorB1AId);
 
-        // 'Group a' would've been the next group but has been removed
+        // groupB2 is not in the replacement
 
-        // 'Group b' should be second based on the original sequence
-        // Check 'Item e' was removed and both 'Item j' and 'Item k' have been appended in order
-        var filterAGroupB = filterAGroups[1];
-        Assert.Equal(replacementFilters[0].FilterGroups[3].Id, filterAGroupB.Id);
-        Assert.Equal(4, filterAGroupB.ChildSequence.Count);
-        // 'Item f' is first from the original sequence
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[3].Id, filterAGroupB.ChildSequence[0]);
-        // 'Item d' is second from the original sequence
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[0].Id, filterAGroupB.ChildSequence[1]);
-        // 'Item j' is appended first alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[2].Id, filterAGroupB.ChildSequence[2]);
-        // 'Item k' is appended second alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[3].FilterItems[1].Id, filterAGroupB.ChildSequence[3]);
+        var groupB3 = filterB.FilterGroupSequence[1];
+        Assert.Equal(replacementGroupB3Id, groupB3.Id);
+        var indicatorB3AId = Assert.Single(groupB3.FilterItemSequence);
+        Assert.Equal(replacementIndicatorB3AId, indicatorB3AId);
 
-        // Group 'Total' is new so it should be appended first and its filter items should be ordered by label
-        var filterAGroupTotal = filterAGroups[2];
-        Assert.Equal(replacementFilters[0].FilterGroups[1].Id, filterAGroupTotal.Id);
-        // Item 'Total' should be first
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[1].Id, filterAGroupTotal.ChildSequence[0]);
-        // 'Item l' should be second alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[2].Id, filterAGroupTotal.ChildSequence[1]);
-        // 'Item m' should be third alphabetically
-        Assert.Equal(replacementFilters[0].FilterGroups[1].FilterItems[0].Id, filterAGroupTotal.ChildSequence[2]);
+        var filterC = updatedSequence[2];
+        Assert.Equal(replacementFilterCId, filterC.Id);
 
-        // 'Group d' is new so it should be appended in order and its filter items should be ordered by label
-        var filterAGroupD = filterAGroups[3];
-        Assert.Equal(replacementFilters[0].FilterGroups[2].Id, filterAGroupD.Id);
-        Assert.Empty(filterAGroupD.ChildSequence);
-
-        // 'Group e' is new so it should be appended in order
-        var filterAGroupE = filterAGroups[4];
-        Assert.Equal(replacementFilters[0].FilterGroups[0].Id, filterAGroupE.Id);
-        Assert.Empty(filterAGroupE.ChildSequence);
-
-        // 'Filter b' would've been the next filter but has been removed
-
-        // 'Filter d' is new so it should be appended in order and its filter groups and filter items should be ordered by label
-        var filterD = updatedSequence[2];
-        Assert.Equal(replacementFilters[2].Id, filterD.Id);
-
-        var filterDGroups = filterD.ChildSequence;
-        Assert.Equal(3, filterDGroups.Count);
-
-        // Group 'Total' should be first and its filter items should be ordered by label
-        var filterDGroupTotal = filterDGroups[0];
-        Assert.Equal(replacementFilters[2].FilterGroups[1].Id, filterDGroupTotal.Id);
-        Assert.Equal(3, filterDGroupTotal.ChildSequence.Count);
-        // Item 'Total' should be first
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[1].Id, filterDGroupTotal.ChildSequence[0]);
-        // 'Item n' should be second alphabetically
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[2].Id, filterDGroupTotal.ChildSequence[1]);
-        // 'Item o' should be third alphabetically
-        Assert.Equal(replacementFilters[2].FilterGroups[1].FilterItems[0].Id, filterDGroupTotal.ChildSequence[2]);
-
-        // 'Group f' should be second alphabetically
-        var filterDGroupF = filterDGroups[1];
-        Assert.Equal(replacementFilters[2].FilterGroups[2].Id, filterDGroupF.Id);
-        Assert.Empty(filterDGroupF.ChildSequence);
-
-        // 'Group g' should be third alphabetically
-        var filterDGroupG = filterDGroups[2];
-        Assert.Equal(replacementFilters[2].FilterGroups[0].Id, filterDGroupG.Id);
-        Assert.Empty(filterDGroupG.ChildSequence);
-
-        // 'Filter e' is new so it should be appended in order
-        var filterE = updatedSequence[3];
-        Assert.Equal(replacementFilters[1].Id, filterE.Id);
-        Assert.Empty(filterE.ChildSequence);
+        var groupC = Assert.Single(filterC.FilterGroupSequence);
+        Assert.Equal(replacementGroupC1Id, groupC.Id);
+        var indicatorC1A = Assert.Single(groupC.FilterItemSequence);
+        Assert.Equal(replacementIndicatorC1AId, indicatorC1A);
     }
 
     [Fact]
@@ -565,7 +532,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -777,7 +745,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -941,7 +910,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         // Verify the updated sequence of indicators
@@ -1047,7 +1017,8 @@ public class ReplacementServiceHelperTests
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         Assert.NotNull(updatedSequence);
@@ -1181,14 +1152,14 @@ public class ReplacementServiceHelperTests
                     }
                 },
             },
-            UnmappedReplacementIndicators = [],
         };
 
         var updatedSequence = ReplacementServiceHelper.ReplaceIndicatorSequence(
             mapping: mapping,
             originalGroupIdToLabelMap: originalGroups.ToDictionary(g => g.Id, g => g.Label),
             replacementGroupLabelToIdMap: replacementGroups.ToDictionary(g => g.Label, g => g.Id),
-            originalReleaseFile.IndicatorSequence
+            originalReleaseFile.IndicatorSequence,
+            replacementGroups
         );
 
         Assert.NotNull(updatedSequence);
@@ -1214,7 +1185,6 @@ public class ReplacementServiceHelperTests
     )
     {
         Dictionary<Guid, IndicatorMapping> indicatorsMappings = new();
-        List<UnmappedIndicator> unmappedReplacementIndicators = [];
         if (originalIndicatorGroups != null && replacementIndicatorGroups != null)
         {
             // emulates automapping that occurs from indicator groups when a mapping is initially generated
@@ -1244,21 +1214,6 @@ public class ReplacementServiceHelperTests
                         };
                     }
                 );
-            unmappedReplacementIndicators = replacementIndicatorGroups
-                .SelectMany(group => group.Indicators, (group, indicator) => new { group, indicator })
-                .ExceptBy(
-                    indicatorsMappings.Values.Select(mapping => mapping.ReplacementId),
-                    unmappedPair => unmappedPair.indicator.Id
-                )
-                .Select(pair => new UnmappedIndicator
-                {
-                    Id = pair.indicator.Id,
-                    Label = pair.indicator.Label,
-                    ColumnName = pair.indicator.Name,
-                    GroupId = pair.group.Id,
-                    GroupLabel = pair.group.Label,
-                })
-                .ToList();
         }
 
         return new DataSetMapping
@@ -1266,7 +1221,6 @@ public class ReplacementServiceHelperTests
             OriginalDataFileId = originalDataFileId,
             ReplacementDataFileId = replacementDataFileId,
             IndicatorMappings = indicatorsMappings,
-            UnmappedReplacementIndicators = unmappedReplacementIndicators,
         };
     }
 }

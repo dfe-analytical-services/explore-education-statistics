@@ -288,7 +288,7 @@ public static class ReleaseVersionGeneratorExtensions
     public static InstanceSetters<ReleaseVersion> SetReleaseStatuses(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ReleaseStatus> releaseStatuses
-    ) => setters.Set(releaseVersion => releaseVersion.ReleaseStatuses, releaseStatuses.ToList());
+    ) => setters.Set(releaseVersion => releaseVersion.ReleaseStatuses, [.. releaseStatuses]);
 
     public static InstanceSetters<ReleaseVersion> SetDataBlockVersions(
         this InstanceSetters<ReleaseVersion> setters,
@@ -297,7 +297,7 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var dataBlockVersionsList = dataBlockVersions.ToList();
         return setters
-            .Set(releaseVersion => releaseVersion.DataBlockVersions, dataBlockVersionsList.ToList())
+            .Set(releaseVersion => releaseVersion.DataBlockVersions, [.. dataBlockVersionsList])
             .Set(
                 (_, releaseVersion, _) =>
                 {
@@ -417,7 +417,7 @@ public static class ReleaseVersionGeneratorExtensions
     public static InstanceSetters<ReleaseVersion> SetRelatedInformation(
         this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<Link> relatedInformation
-    ) => setters.Set(releaseVersion => releaseVersion.RelatedInformation, relatedInformation.ToList());
+    ) => setters.Set(releaseVersion => releaseVersion.RelatedInformation, [.. relatedInformation]);
 
     public static InstanceSetters<ReleaseVersion> SetUpdates(
         this InstanceSetters<ReleaseVersion> setters,
@@ -426,7 +426,7 @@ public static class ReleaseVersionGeneratorExtensions
     {
         var updatesList = updates.ToList();
         return setters
-            .Set(releaseVersion => releaseVersion.Updates, updatesList.ToList())
+            .Set(releaseVersion => releaseVersion.Updates, [.. updatesList])
             .Set(
                 (_, releaseVersion, _) =>
                     updatesList.ForEach(update =>

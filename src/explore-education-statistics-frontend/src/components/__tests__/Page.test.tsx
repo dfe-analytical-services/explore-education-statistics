@@ -20,6 +20,20 @@ describe('Page', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders the breadcrumbs by default', () => {
+    render(<Page title="Page Title" />);
+    expect(
+      screen.queryByRole('navigation', { name: 'Breadcrumb' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not render the breadcrumbs on the homepage', () => {
+    render(<Page title="Page Title" isHomepage />);
+    expect(
+      screen.queryByRole('navigation', { name: 'Breadcrumb' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders the caption inside h1 if required', () => {
     render(
       <Page

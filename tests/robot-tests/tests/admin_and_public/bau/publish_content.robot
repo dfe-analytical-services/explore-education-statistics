@@ -14,6 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=    Publish content %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Calendar year 2001
+${IMAGE_ALT_TEXT}=      Alt text for the uploaded content image
 
 
 *** Test Cases ***
@@ -63,9 +64,32 @@ Add text block with link to absence glossary entry to accordion section
     user saves autosaving text block    ${block}
     user waits until parent contains button    ${block}    Absence
 
+Add accordion section with an image to release content
+    user clicks button    Add new section
+    user changes accordion section title    2    Test image section
+    user adds text block to editable accordion section    Test image section
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user adds content to autosaving accordion section text block    Test image section    1
+    ...    Test image section text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+Upload image with alt text to the image section text block
+    user scrolls down    100
+    user adds image to accordion section text block with retry    Test image section    1
+    ...    test-infographic.png    ${IMAGE_ALT_TEXT}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ...    autosaving=${True}
+
+    user checks accordion section text block contains image with alt text    Test image section    1
+    ...    ${IMAGE_ALT_TEXT}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks image has loaded    xpath://img[@alt="${IMAGE_ALT_TEXT}"]
+
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
     user waits until page contains button    Absence
+
+Check uploaded image appears on release preview
+    user waits until page contains element
+    ...    xpath://img[@alt="${IMAGE_ALT_TEXT}" and starts-with(@src, "/api/releases/")]
+    user checks image has loaded    xpath://img[@alt="${IMAGE_ALT_TEXT}"]
 
 Click glossary info icon and validate glossary entry
     user closes admin feedback banner if needed
@@ -86,6 +110,16 @@ Get public release link
 
 Verify newly published release is public
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Verify uploaded image is displayed on the public release page
+    user checks section with ID contains elements and back to top link    section-test-image-section
+    ...    Test image section text
+
+    # A mismatched image url placeholder leaves a literal "{releaseId}" in the src, which renders an image
+    # with the correct alt text that never actually loads
+    user waits until parent contains element    id:section-test-image-section
+    ...    xpath:.//img[@alt="${IMAGE_ALT_TEXT}" and contains(@src, "/api/releases/") and contains(@src, "/images/") and not(contains(@src, "{"))]
+    user checks image has loaded    xpath://img[@alt="${IMAGE_ALT_TEXT}"]
 
 Check latest release is correct
     user checks page contains    Latest release
@@ -109,3 +143,17 @@ Click glossary info icon and verify entry is correct
     user clicks button    Close    ${modal}
     user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
+
+Return to Admin and verify the image on the published release content page
+    user navigates to admin dashboard    Bau1
+    user navigates to published release page from dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+    # A published release's content page is read only, so the content sections are rendered with the same
+    # ids as the public release page rather than as editable accordion sections
+    user clicks link    Content
+    user waits until page contains element    id:section-test-image-section    %{WAIT_MEDIUM}
+    user waits until element contains    id:section-test-image-section    Test image section text
+
+    user waits until parent contains element    id:section-test-image-section
+    ...    xpath:.//img[@alt="${IMAGE_ALT_TEXT}" and starts-with(@src, "/api/releases/")]
+    user checks image has loaded    xpath://img[@alt="${IMAGE_ALT_TEXT}"]

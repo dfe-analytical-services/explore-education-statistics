@@ -16,6 +16,10 @@ user creates API data set and opens details
     user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
     user waits until h3 is visible    Draft version details
 
+user checks response status code
+    [Arguments]    ${response}    ${expected_status}
+    should be equal as integers    ${response.status_code}    ${expected_status}
+
 response should be json
     [Arguments]    ${response}
     should be equal as strings    ${response.headers['Content-Type']}    application/json; charset=utf-8
@@ -62,3 +66,26 @@ user waits until draft API data set status contains
     [Arguments]    ${expected_status}    ${retries}=10x    ${interval}=%{WAIT_SMALL}s
     wait until keyword succeeds    ${retries}    ${interval}
     ...    user checks summary list contains    Status    ${expected_status}    testid:draft-version-summary
+
+user gets API data set indicator id
+    [Arguments]    ${meta_json}    ${indicator_label}
+    FOR    ${indicator}    IN    @{meta_json['indicators']}
+        IF    $indicator['label'] == $indicator_label
+            RETURN    ${indicator['id']}
+        END
+    END
+    Fail    No indicator found with label "${indicator_label}"
+
+user gets API data set filter option id
+    [Arguments]    ${meta_json}    ${filter_label}    ${option_label}
+    FOR    ${filter}    IN    @{meta_json['filters']}
+        IF    $filter['label'] == $filter_label
+            FOR    ${option}    IN    @{filter['options']}
+                IF    $option['label'] == $option_label
+                    RETURN    ${option['id']}
+                END
+            END
+            Fail    Filter "${filter_label}" has no option "${option_label}"
+        END
+    END
+    Fail    No filter found with label "${filter_label}"

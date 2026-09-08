@@ -1,0 +1,39 @@
+# Installs the Python version in .python-version and puts it on PATH.
+#
+# The ees-ubuntu2204-large agents only have the Python that ships with Ubuntu
+# 22.04, and UsePythonVersion@0 cannot download newer versions on a self-hosted
+# agent, so we install the one we need with uv instead.
+steps:
+- bash: |
+    set -euo pipefail
+
+    PYTHON_VERSION=$(cat "$BUILD_SOURCESDIRECTORY/.python-version")
+    UV_VERSION=0.12.5
+    UV_SHA256=68a509da24b06b4223a1c0175fb5eb5bc79342b76cbeff0cfe51ac3f5b17b6b2
+    echo "Target Python version: $PYTHON_VERSION (via uv $UV_VERSION)"
+
+    # uv is pinned and checksum-verified rather than piped from an installer
+    # script, because this job has Key Vault secrets in its environment.
+    UV_DIR="$AGENT_TOOLSDIRECTORY/uv/$UV_VERSION"
+    UV="$UV_DIR/uv"
+    if [ ! -x "$UV" ]; then
+      TARBALL=uv-x86_64-unknown-linux-gnu.tar.gz
+      mkdir -p "$UV_DIR"
+      curl -fsSL "https://github.com/astral-sh/uv/releases/download/$UV_VERSION/$TARBALL" -o "$UV_DIR/$TARBALL"
+      echo "$UV_SHA256  $UV_DIR/$TARBALL" | sha256sum -c -
+      tar -xzf "$UV_DIR/$TARBALL" -C "$UV_DIR" --strip-components=1
+      rm -f "$UV_DIR/$TARBALL"
+    fi
+    export PATH="$UV_DIR:$PATH"
+    uv --version
+
+    # --no-bin keeps uv from putting python shims in the agent user's bin dir.
+    uv python install --no-bin "$PYTHON_VERSION"
+
+    # run_tests_pipeline.py runs "pip install pipenv" against the interpreter
+    # on PATH. uv's builds are marked externally managed (PEP 668), so that
+    # fails outside a virtual environment. --seed provides pip.
+    uv venv --seed --python "$PYTHON_VERSION" "$AGENT_TEMPDIRECTORY/venv"
+    echo "##vso[task.prependpath]$AGENT_TEMPDIRECTORY/venv/bin"
+  displayName: Install Python
+  timeoutInMinutes: 5

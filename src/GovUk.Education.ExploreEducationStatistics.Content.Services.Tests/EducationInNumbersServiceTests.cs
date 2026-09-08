@@ -146,6 +146,12 @@ public class EducationInNumbersServiceTests
             Order = 0,
             LatestPublishedVersionId = pageLatestVersionId,
         };
+        var apiTileRelease = _fixture
+            .DefaultRelease()
+            .WithSlug("release-slug")
+            .WithPublication(_fixture.DefaultPublication().WithSlug("publication-slug").WithTitle("Publication title"))
+            .Generate();
+
         var anotherPageLatestVersionId = Guid.NewGuid();
         var anotherPage = new EinPage
         {
@@ -212,12 +218,7 @@ public class EducationInNumbersServiceTests
                                         Query = "some query",
                                         Version = "1.0.0",
                                         QueryResult = "some query result",
-                                        Release = _fixture
-                                            .DefaultRelease()
-                                            .WithSlug("release-slug")
-                                            .WithPublication(
-                                                _fixture.DefaultPublication().WithSlug("publication-slug")
-                                            ),
+                                        Release = apiTileRelease,
                                     },
                                 ],
                             },
@@ -283,8 +284,10 @@ public class EducationInNumbersServiceTests
             Assert.Equal("1.0.0", tile1.Version);
             Assert.Equal(IndicatorUnit.MillionPounds, tile1.IndicatorUnit);
             Assert.False(tile1.IsLatestVersion);
-            Assert.Equal("publication-slug", tile1.PublicationSlug);
-            Assert.Equal("release-slug", tile1.ReleaseSlug);
+            Assert.Equal(apiTileRelease.Publication.Slug, tile1.PublicationSlug);
+            Assert.Equal(apiTileRelease.Slug, tile1.ReleaseSlug);
+            Assert.Equal(apiTileRelease.Publication.Title, tile1.PublicationLabel);
+            Assert.Equal(apiTileRelease.Title, tile1.ReleaseLabel);
 
             var tile2 = Assert.IsType<EinFreeTextStatTileViewModel>(einTileGroupBlock.Tiles[1]);
             Assert.Equal("free text stat tile", tile2.Title);

@@ -313,6 +313,8 @@ public class ReleaseVersionService(
             dataBlockParent.LatestPublishedVersionId = null;
         });
 
+        await RemoveKeyStatsForDataBlocks(dataBlockVersions, cancellationToken);
+
         await context.SaveChangesAsync(cancellationToken);
 
         // Then remove the now-unreferenced DataBlockVersions.
@@ -330,6 +332,35 @@ public class ReleaseVersionService(
 
         context.DataBlockParents.RemoveRange(orphanedDataBlockParents);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Remove any KeyStatistics for the supplied DataBlockVersions.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The foreign key from KeyStatisticsDataBlock to the DataBlock's ContentBlock row is deliberately
+    /// configured with DeleteBehavior.NoAction - see ContentDbContext.ConfigureKeyStatisticsDataBlock -
+    /// so unless they are removed here, removing the DataBlockVersions below fails on
+    /// FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId. Removing them via the derived DbSet also
+    /// removes their base KeyStatistics rows, which must never be orphaned.
+    /// </para>
+    /// <para>
+    /// This method does NOT call DbContext.SaveChangesAsync().
+    /// </para>
+    /// </remarks>
+    private async Task RemoveKeyStatsForDataBlocks(
+        List<DataBlockVersion> dataBlockVersions,
+        CancellationToken cancellationToken
+    )
+    {
+        var dataBlockIds = dataBlockVersions.Select(dataBlockVersion => dataBlockVersion.Id).ToList();
+
+        var keyStatistics = await context
+            .KeyStatisticsDataBlock.Where(keyStatistic => dataBlockIds.Contains(keyStatistic.DataBlockId))
+            .ToListAsync(cancellationToken);
+
+        context.KeyStatisticsDataBlock.RemoveRange(keyStatistics);
     }
 
     private void UpdateMethodologies(Guid releaseVersionId)

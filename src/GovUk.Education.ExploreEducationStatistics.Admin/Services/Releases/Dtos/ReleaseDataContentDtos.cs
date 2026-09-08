@@ -89,7 +89,13 @@ public record ReleaseDataContentDataSetMetaDto
 
     private static string[] GetOrderedGeographicLevels(
         IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels
-    ) => [.. dataSetFileVersionGeographicLevels.Select(level => level.GeographicLevel.GetEnumLabel()).Order()];
+    ) =>
+        [
+            .. dataSetFileVersionGeographicLevels
+                .Where(level => level.CsvOnly != true)
+                .Select(level => level.GeographicLevel.GetEnumLabel())
+                .Order(),
+        ];
 
     private static string[] GetOrderedFilters(
         IEnumerable<FilterMeta> filters,

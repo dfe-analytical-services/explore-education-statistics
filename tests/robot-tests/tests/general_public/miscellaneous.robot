@@ -45,8 +45,7 @@ Validate homepage
     user checks page contains link with text and url    explore.statistics@education.gov.uk
     ...    mailto:explore.statistics@education.gov.uk
 
-    user checks breadcrumb count should be    1
-    user checks nth breadcrumb contains    1    Home
+    user checks page does not contain element    css:[data-testid="breadcrumbs--list"]
 
     user checks page contains link with text and url    Open Government Licence v3.0
     ...    https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/

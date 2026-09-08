@@ -11,7 +11,19 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: deploySubnets
+    type: string
+  - name: deployPrivateDnsZones
+    type: string
+  - name: deployAzureFrontDoor
+    type: string
   - name: deployApplicationGateway
+    type: string
+  - name: deployDataFactory
+    type: string
+  - name: deployContainerRegistry
+    type: string
+  - name: deployRecoveryServicesVault
     type: string
   - name: deployAlerts
     type: string
@@ -35,6 +47,12 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              deploySubnets=${{ parameters.deploySubnets }} \
+              deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
+              deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
               deployApplicationGateway=${{ parameters.deployApplicationGateway }} \
+              deployDataFactory=${{ parameters.deployDataFactory }} \
+              deployContainerRegistry=${{ parameters.deployContainerRegistry }} \
+              deployRecoveryServicesVault=${{ parameters.deployRecoveryServicesVault }} \
               deployAlerts=${{ parameters.deployAlerts }} \
               resourceTags='$(resourceTags)'

@@ -15,7 +15,6 @@ export default function mapValuesWithKeys<
   const mappedObject: Dictionary<TResult> = {};
 
   return Object.entries(object).reduce((acc, entry) => {
-    // eslint-disable-next-line no-param-reassign
     acc[entry[0]] = mappingFunction(entry[0], entry[1]);
     return acc;
   }, mappedObject);

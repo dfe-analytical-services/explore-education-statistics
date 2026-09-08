@@ -123,7 +123,7 @@ public class FileImportService(
         try
         {
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await dataImportService.WriteDataSetFileMeta(import.FileId, import.SubjectId, import.TotalRows!.Value);
+            await dataImportService.WriteDataSetFileMeta(import);
         }
         catch (Exception e)
         {

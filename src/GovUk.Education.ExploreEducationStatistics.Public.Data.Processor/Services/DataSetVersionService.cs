@@ -151,7 +151,6 @@ internal class DataSetVersionService(
                     dataSetVersionImport.Stage = DataSetVersionImportStage.ManualMapping;
                     dataSetVersionImport.Completed = null;
 
-                    dataSetVersion.MetaSummary = null;
                     dataSetVersion.TotalResults = 0;
                     dataSetVersion.Status = DataSetVersionStatus.Mapping;
 
@@ -164,6 +163,19 @@ internal class DataSetVersionService(
 
     private static Either<ActionResult, Unit> CheckCanUnfinaliseDataSetVersion(DataSetVersion dataSetVersion)
     {
+        if (dataSetVersion.IsFirstVersion)
+        {
+            return ValidationUtils.ValidationResult(
+                new ErrorViewModel
+                {
+                    Code = ValidationMessages.InitialDataSetVersionCanNotBeUnfinalised.Code,
+                    Message = ValidationMessages.InitialDataSetVersionCanNotBeUnfinalised.Message,
+                    Detail = new InvalidErrorDetail<Guid>(dataSetVersion.Id),
+                    Path = "dataSetVersionId",
+                }
+            );
+        }
+
         if (dataSetVersion.Status == DataSetVersionStatus.Draft)
         {
             return Unit.Instance;

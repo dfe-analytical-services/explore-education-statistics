@@ -1,0 +1,316 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "$connections": {
+      "type": "Object",
+      "defaultValue": {}
+    },
+    "subscription": {
+      "type": "string"
+    },
+    "resourceGroup": {
+      "type": "string"
+    },
+    "slackAlertsChannel": {
+      "type": "string"
+    },
+    "slackAppToken": {
+      "type": "securestring"
+    },
+    "teamsPowerAutomateWebhookUrl": {
+      "type": "securestring"
+    }
+  },
+  "triggers": {
+    "manual": {
+      "type": "Request",
+      "kind": "Http",
+      "inputs": {
+        "schema": {
+          "properties": {
+            "data": {
+              "properties": {
+                "alertContext": {
+                  "properties": {
+                    "condition": {
+                      "properties": {
+                        "allOf": {
+                          "properties": {
+                            "metricName": {
+                              "type": "string"
+                            },
+                            "timeAggregation": {
+                              "type": "string"
+                            },
+                            "operator": {
+                              "type": "string"
+                            },
+                            "threshold": {
+                              "type": "string"
+                            },
+                            "metricValue": {
+                              "type": "number"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "windowStartTime": "string",
+                        "windowEndTime": "string",
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                },
+                "essentials": {
+                  "properties": {
+                    "alertId": {
+                      "type": "string"
+                    },
+                    "alertRule": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string"
+                    },
+                    "signalType": {
+                      "type": "string"
+                    },
+                    "monitorCondition": {
+                      "type": "string"
+                    },
+                    "monitoringService": {
+                      "type": "string"
+                    },
+                    "alertTargetIDs": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "originAlertId": {
+                      "type": "string"
+                    },
+                    "firedDateTime": {
+                      "type": "string"
+                    },
+                    "resolvedDateTime": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "essentialsVersion": {
+                      "type": "string"
+                    },
+                    "alertContextVersion": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "schemaId": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      }
+    }
+  },
+  "actions": {
+    "variables": {
+      "runAfter": {},
+      "type": "Compose",
+      "description": "Capture low-level variables from the JSON payload.",
+      "inputs": {
+        "alertName": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
+        "severity": "@{triggerBody()?['data']?['essentials']?['severity']}",
+        "operator": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']}",
+        "metricName": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']}",
+        "timeAggregation": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']}",
+        "metricValue": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}",
+        "threshold": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}",
+        "monitorCondition": "@{triggerBody()?['data']?['essentials']?['monitorCondition']}"
+      }
+    },
+    "fragments": {
+      "runAfter": {
+        "variables": [
+          "Succeeded"
+        ]
+      },
+      "type": "Compose",
+      "description": "Construct reusable text fragments based on the low-level variables captured from the JSON payload.",
+      "inputs": {
+        "outsideThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{outputs('variables')?['metricValue']}, which is @{outputs('variables')?['operator']} the threshold of @{outputs('variables')?['threshold']}",
+        "withinThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{if(empty(outputs('variables')?['metricValue']), 'an acceptable value again', concat(outputs('variables')?['metricValue'], ' and is no longer ', outputs('variables')?['operator'], ' the ', outputs('variables')?['threshold'], ' threshold'))}",
+        "severityDisplay": "@{if(equals(outputs('variables')?['severity'], 'Sev0'), 'CRITICAL!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev1'), 'Error!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev2'), 'Warning', '')}@{if(equals(outputs('variables')?['severity'], 'Sev3'), 'Information', '')}@{if(equals(outputs('variables')?['severity'], 'Sev4'), 'Verbose', '')}",
+        "severityColourSlack": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'danger',    if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
+        "severityColourTeams": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'attention', if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
+        "alertRuleUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertId']}",
+        "alertTargetResourceUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}"
+      }
+    },
+    "fields": {
+      "runAfter": {
+        "fragments": [
+          "Succeeded"
+        ]
+      },
+      "type": "Compose",
+      "description": "Create the textual field values for the messages being sent to Slack and Teams.",
+      "inputs": {
+        "alertTime": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), formatDateTime(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'dd/MM/yyyy h:mm:sstt'), formatDateTime(triggerBody()?['data']?['essentials']?['firedDateTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+        "colourSlack": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourSlack'])}",
+        "colourTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourTeams'])}",
+        "severity": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'Resolved', outputs('fragments')?['severityDisplay'])}",
+        "windowStart": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+        "windowEnd": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', formatDateTime(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'dd/MM/yyyy h:mm:sstt'))}",
+        "titleSlack": "*Alert @{outputs('variables')?['monitorCondition']}!*\n@{outputs('variables')?['alertName']}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n<@{outputs('fragments')?['alertRuleUrl']}|Link to alert>\n<@{outputs('fragments')?['alertTargetResourceUrl']}|Link to resource>",
+        "titleTeams": "@{concat('Alert ', outputs('variables')?['alertName'], ' ', toLower(outputs('variables')?['monitorCondition']), if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', '!'))}",
+        "alertLinkTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('fragments')?['alertTargetResourceUrl']})"
+      }
+    },
+    "Post message to Slack": {
+      "runAfter": {
+        "fields": [
+          "Succeeded"
+        ]
+      },
+      "type": "Http",
+      "inputs": {
+        "method": "POST",
+        "uri": "https://slack.com/api/chat.postMessage",
+        "body": {
+          "channel": "@parameters('slackAlertsChannel')",
+          "text": "@outputs('fields')?['titleSlack']",
+          "attachments": [
+            {
+              "color": "@outputs('fields')?['colourSlack']",
+              "fields": [
+                {
+                  "title": "Alert",
+                  "value": "@outputs('variables')?['alertName']",
+                  "short": true
+                },
+                {
+                  "title": "Severity",
+                  "value": "@outputs('fields')?['severity']",
+                  "short": true
+                },
+                {
+                  "title": "@{outputs('variables')?['monitorCondition']} at",
+                  "value": "@outputs('fields')?['alertTime']",
+                  "short": false
+                },
+                {
+                  "title": "Window start",
+                  "value": "@outputs('fields')?['windowStart']",
+                  "short": true
+                },
+                {
+                  "title": "Window end",
+                  "value": "@outputs('fields')?['windowEnd']",
+                  "short": true
+                },
+                {
+                  "title": "Logic App workflow version",
+                  "value": "1.0",
+                  "short": true
+                }
+              ]
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "@{concat('Bearer ', parameters('slackAppToken'))}"
+        }
+      }
+    },
+    "Post message to Teams": {
+      "runAfter": {
+        "fields": [
+          "Succeeded"
+        ]
+      },
+      "type": "Http",
+      "inputs": {
+        "uri": "@parameters('teamsPowerAutomateWebhookUrl')",
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "type": "message",
+          "attachments": [
+            {
+              "contentType": "application/vnd.microsoft.card.adaptive",
+              "contentUrl": null,
+              "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "type": "AdaptiveCard",
+                "version": "1.2",
+                "body": [
+                  {
+                    "type": "TextBlock",
+                    "text": "@outputs('fields')?['titleTeams']",
+                    "weight": "Bolder",
+                    "size": "Medium",
+                    "color": "@outputs('fields')?['colourTeams']"
+                  },
+                  {
+                    "type": "TextBlock",
+                    "text": "@outputs('fields')?['alertLinkTeams']",
+                    "wrap": true
+                  },
+                  {
+                    "type": "FactSet",
+                    "facts": [
+                      {
+                        "title": "Alert",
+                        "value": "@outputs('variables')?['alertName']"
+                      },
+                      {
+                        "title": "Severity",
+                        "value": "@outputs('fields')?['severity']"
+                      },
+                      {
+                        "title": "@{outputs('variables')?['monitorCondition']} at",
+                        "value": "@outputs('fields')?['alertTime']"
+                      },
+                      {
+                        "title": "Window Start",
+                        "value": "@outputs('fields')?['windowStart']"
+                      },
+                      {
+                        "title": "Window End",
+                        "value": "@outputs('fields')?['windowEnd']"
+                      },
+                      {
+                        "title": "Logic App workflow version",
+                        "value": "1.0"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "runtimeConfiguration": {
+        "contentTransfer": {
+          "transferMode": "Chunked"
+        }
+      }
+    }
+  },
+  "outputs": {}
+}
