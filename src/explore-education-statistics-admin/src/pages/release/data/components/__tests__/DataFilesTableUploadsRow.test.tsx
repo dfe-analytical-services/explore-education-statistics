@@ -1,4 +1,4 @@
-﻿import _releaseDataFileService, {
+import _releaseDataFileService, {
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
 import render from '@common-test/render';

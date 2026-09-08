@@ -1,4 +1,4 @@
-﻿import { isToday } from 'date-fns';
+import { isToday } from 'date-fns';
 import UkTimeHelper, { DateRange } from '@common/utils/date/ukTimeHelper';
 
 export default class PreviewTokenDateHelper {

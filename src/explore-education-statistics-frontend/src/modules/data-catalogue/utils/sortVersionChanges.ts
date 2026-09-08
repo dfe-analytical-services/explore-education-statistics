@@ -1,4 +1,4 @@
-﻿import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 
 /**
  * Sorts an array of version changes in descending order (newer versions first).

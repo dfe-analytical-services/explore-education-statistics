@@ -1,4 +1,4 @@
-﻿import { render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import checkMaxLength from '@admin/components/editable/utils/checkMaxLength';
 import getContentErrors from '@admin/components/editable/utils/getContentErrors';
 import getInvalidContent from '@admin/components/editable/utils/getInvalidContent';

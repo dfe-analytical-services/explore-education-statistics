@@ -148,6 +148,14 @@ module.exports = webpackEnv => {
           loader: require.resolve(preProcessor),
           options: {
             sourceMap: true,
+            sassOptions: {
+              // EES-7624 Dart Sass prepends a UTF-8 BOM to any compiled stylesheet that
+              // contains non-ASCII characters Production builds concatenate the
+              // compiled modules into shared stylesheets, so the BOM ends up mid-file
+              // where it's a parse error - making the browser silently drop
+              // the rule that follows it.
+              charset: false,
+            },
           },
         },
       );
