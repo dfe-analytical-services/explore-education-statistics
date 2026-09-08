@@ -559,7 +559,11 @@ public class DataBlockServiceTests
             ReleaseVersion = releaseVersion,
         };
 
-        var keyStatistic = new KeyStatisticDataBlock { ReleaseVersion = releaseVersion, DataBlockVersion = dataBlockVersion };
+        var keyStatistic = new KeyStatisticDataBlock
+        {
+            ReleaseVersion = releaseVersion,
+            DataBlockVersion = dataBlockVersion,
+        };
 
         var contextId = Guid.NewGuid().ToString();
 

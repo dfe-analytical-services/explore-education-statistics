@@ -280,7 +280,7 @@ const ReleaseDataBlocksPage = ({
                         {
                           publicationId,
                           releaseVersionId,
-                          dataBlockId: dataBlock.id,
+                          dataBlockVersionId: dataBlock.id,
                         },
                       )}
                     >
@@ -289,7 +289,7 @@ const ReleaseDataBlocksPage = ({
                     {canUpdateRelease && (
                       <DataBlockDeletePlanModal
                         releaseVersionId={releaseVersionId}
-                        dataBlockId={dataBlock.id}
+                        dataBlockVersionId={dataBlock.id}
                         onConfirm={() => handleDeleteConfirm(dataBlock.id)}
                       />
                     )}
