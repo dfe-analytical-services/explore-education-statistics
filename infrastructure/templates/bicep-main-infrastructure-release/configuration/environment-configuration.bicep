@@ -36,7 +36,10 @@ type EnvironmentConfig = {
   @description('Whether or not to enable Swagger API pages in this environment.')
   enableSwagger: bool?
 
-  @description('Additional CORS allowed origins for the public.')
+  @description('Additional CORS allowed origins for the Admin site.')
+  additionalAdminAllowedOrigins: string[]?
+
+  @description('Additional CORS allowed origins for the public site.')
   additionalPublicAllowedOrigins: string[]?
 
   @description('Whether analytics is enabled.')

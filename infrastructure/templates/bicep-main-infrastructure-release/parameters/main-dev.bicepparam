@@ -16,6 +16,10 @@ param environmentConfigParam = {
     overridesDurationInSeconds: 10
   }
   tableBuilderMaxTableCellsAllowed: 25000
+  additionalAdminAllowedOrigins: [
+    'https://localhost:5021'
+    'http://localhost:5021'
+  ]
   additionalPublicAllowedOrigins: [
     'http://localhost:3000'
   ]
