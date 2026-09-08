@@ -17,7 +17,7 @@ public record DataBlockSummaryViewModel
 
     public string? Source { get; init; }
 
-    public required string DataSetName { get; init; }
+    public required string DataSetTitle { get; init; }
 
     public required bool InContent { get; init; }
 

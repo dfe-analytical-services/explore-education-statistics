@@ -186,7 +186,7 @@ public class DataBlockService : IDataBlockService
                     .FeaturedTables.Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                     .ToListAsync();
 
-                var dataSetNamesBySubjectId = await GetDataSetNamesBySubjectId(releaseVersion.Id);
+                var dataSetTitlesBySubjectId = await GetDataSetTitlesBySubjectId(releaseVersion.Id);
 
                 return dataBlocks
                     .Select(block =>
@@ -204,7 +204,7 @@ public class DataBlockService : IDataBlockService
                             HighlightName = featuredTable?.Name,
                             HighlightDescription = featuredTable?.Description,
                             Source = block.Source,
-                            DataSetName = dataSetNamesBySubjectId[block.Query.SubjectId],
+                            DataSetTitle = dataSetTitlesBySubjectId[block.Query.SubjectId],
                             ChartsCount = block.Charts.Count,
                             InContent = inContent,
                         };
@@ -496,7 +496,7 @@ public class DataBlockService : IDataBlockService
                 .AllAsync(ks => ks.DataBlockId != dataBlockVersion.Id);
     }
 
-    private async Task<Dictionary<Guid, string>> GetDataSetNamesBySubjectId(Guid releaseVersionId)
+    private async Task<Dictionary<Guid, string>> GetDataSetTitlesBySubjectId(Guid releaseVersionId)
     {
         return await _context
             .ReleaseFiles.Where(rf =>
