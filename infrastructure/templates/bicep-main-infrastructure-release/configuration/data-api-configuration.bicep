@@ -9,7 +9,7 @@ type DataApiConfig = {
 
 var defaultConfig = {
   appServiceSku: {
-    tier: 'Premium'
+    tier: 'PremiumV2'
     name: 'P1V2'
   }
 }

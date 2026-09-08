@@ -6,14 +6,11 @@ type EnvironmentConfig = {
   @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
   environmentIdentifier: string?
 
+  @description('Name of this environment e.g. Development, Test.')
+  environmentName: string?
+
   @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
   domain: string?
-
-  @description('Public URL of the public API.')
-  publicApiUrl: string?
-
-  @description('Public URL of the public API documentation site.')
-  publicApiDocsUrl: string?
 
   @description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App.')
   prepareScheduledReleaseVersionsFunctionCronSchedule: string?

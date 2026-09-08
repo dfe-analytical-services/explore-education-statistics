@@ -5,22 +5,6 @@
     "domain": {
       "type": "string"
     },
-    "contentApiUrl": {
-      "type": "string"
-    },
-    "dataApiUrl": {
-      "type": "string"
-    },
-    "publicApiUrl": {
-      "type": "string"
-    },
-    "publicApiDocsUrl": {
-      "type": "string"
-    },
-    "defaultPublicSiteCacheMaxAgeSeconds": {
-      "type": "string",
-      "defaultValue": "30"
-    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -34,21 +18,6 @@
       "metadata": {
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
-    },
-    "skuPublic": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
     },
     "skuImporter": {
       "type": "string",
@@ -172,43 +141,6 @@
       "type": "string",
       "metadata": {
         "description": "Number of days to retain database audit logs for in blob storage"
-      }
-    },
-    "publicAppBasicAuth": {
-      "type": "string",
-      "defaultValue": "true",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
-      "metadata": {
-        "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppBasicAuthUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppBasicAuthPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
-      }
-    },
-    "publicAppGATrackingId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
-      }
-    },
-    "publicAppCompressionDisable": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Disables response compression for the public app. This is required to prevent double compression in conjunction with the CDN. WARN: Also used in next config!"
       }
     },
     "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
@@ -365,55 +297,9 @@
         "description": "Number of days to retain blobs after delete"
       }
     },
-    "autoscaleAppServices": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "storageAccountPrefix": {
       "type": "string",
       "defaultValue": "storage"
-    },
-    "memoryCacheEnabled": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether or not short-lived in-memory caching of specific responses is enabled"
-      }
-    },
-    "memoryCacheMaxCacheSizeMb": {
-      "type": "int",
-      "defaultValue": 50,
-      "metadata": {
-        "description": "Max size of in-memory cache in MBs.  This is an approximation based on the size of the cached objects in JSON notation."
-      }
-    },
-    "memoryCacheExpirationScanFrequencySeconds": {
-      "type": "int",
-      "defaultValue": 50,
-      "metadata": {
-        "description": "The frequency of scans to evict expired entries from the in-memory cache."
-      }
-    },
-    "memoryCacheOverridesDurationInSeconds": {
-      "type": "int",
-      "defaultValue": -1,
-      "metadata": {
-        "description": "Override duration in seconds for all entities cached in memory"
-      }
-    },
-    "memoryCacheOverridesExpirySchedule": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Override cron expression for all entities cached in memory"
-      }
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "type": "int",
-      "defaultValue": 25000,
-      "metadata": {
-        "description": "Maximum number of table cells that a table builder query could potentially render for a request to be valid"
-      }
     },
     "publisherFunctionAppTimeZone": {
       "type": "string",
@@ -421,15 +307,6 @@
       "metadata": {
         "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
       }
-    },
-    "branch": {
-      "type": "string",
-      "defaultValue": "master",
-      "allowedValues": [
-        "master",
-        "dev",
-        "test"
-      ]
     },
     "licenseTypeContentDb": {
       "type": "string",
@@ -510,61 +387,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "slackAlertsChannel": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack channel to post Azure alerts to"
-      }
-    },
-    "containerRegistryName": {
-      "type": "string",
-      "defaultValue": "eesacr",
-      "metadata": {
-        "description": "The name of the Container registry"
-      }
-    },
-    "dockerRegistryServerUrl": {
-      "type": "string",
-      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
-      "metadata": {
-        "description": "The URL of the Container registry"
-      }
-    },
-    "dockerRegistryServerUsername": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The username to log in to the Container registry"
-      }
-    },
-    "dockerRegistryServerPassword": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The password to log in to the Container registry"
-      }
-    },
-    "searchIndexName": {
-      "type": "string",
-      "defaultValue": "index-1",
-      "metadata": {
-        "description": "The name of the Azure AI Search index used by the public frontend application"
-      }
-    },
-    "datasetsSearchIndexName": {
-      "type": "string",
-      "defaultValue": "nl-search-dataset-index",
-      "metadata": {
-        "description": "The name of the Azure AI Search data set index used by the public frontend application"
-      }
-    },
-    "nlSearchFunctionRoute": {
-      "type": "string",
-      "defaultValue": "/api/natural_language_search_function",
-      "metadata": {
-        "description": "The HTTP route of the Natural Language Search function, relative to the Natural Language Search Function app host."
-      }
-    },
     "publicDataDbExists": {
       "type": "bool",
       "defaultValue": true,
@@ -606,8 +428,6 @@
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
     "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
-    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
-    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageVnetRules": [
       {
@@ -688,8 +508,6 @@
     ],
     "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
-    "publicDataProcessorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-fa-processor')]",
-    "dataScreenerName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-fa-screener')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
@@ -756,17 +574,6 @@
         "threshold": 0,
         "operator": "GreaterThan",
         "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
-        "description": "Public App Service - Response Time",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "HttpResponseTime",
-        "threshold": 12,
-        "operator": "GreaterThan",
-        "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
       },
       {
@@ -1073,14 +880,6 @@
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
-    "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
-    "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
-    "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
-    "ees-sql-password-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-importer')]",
-    "ees-sql-password-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-publisher')]",
-    "ees-sql-password-notifier": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-password-notifier')]",
-    "ees-sql-user-importer": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-importer')]",
-    "ees-sql-user-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-user-publisher')]",
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
@@ -1098,11 +897,6 @@
         }
       ]
     },
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
-    "keyVaultCertificateUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba')]",
-    "keyVaultCertificateUserPrincipalRefs": [
-      "[concat('Microsoft.Web/sites/', variables('publicAppName'))]"
-    ],
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
@@ -1113,14 +907,7 @@
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
-    "eventGridTopicNameReleaseChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "eventGridTopicNameThemeChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-theme-changed')]",
-    "screenerStorageAccountConnectionStringSecretKey": "[concat(parameters('subscription'), parameters('environment'), 'sapisafn-connection-string')]",
-    "screenerStorageAccountConnectionStringSecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('screenerStorageAccountConnectionStringSecretKey'))]",
-    "searchServiceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-srch')]",
-    "searchIndexDataReaderRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')]",
-    "nlSearchFunctionAppName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fa-nlsearch')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
     "basePublicAllowedOrigins": [
       "[concat('https://', parameters('domain'))]",
@@ -1128,169 +915,13 @@
     ],
     "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
     "apiVersions": {
-      "afdEndpoint": "2025-06-01",
-      "nlSearchFunctionApp": "2025-03-01",
-      "searchService": "2025-05-01"
+      "afdEndpoint": "2025-06-01"
     },
     "resourceIds": {
       "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('publicAppName')]",
-      "kind": "app,linux,container",
-      "apiVersion": "2021-02-01",
-      "location": "[resourceGroup().location]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service plan",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "httpsOnly": true,
-        "clientAffinityEnabled": false,
-        "reserved": true,
-        "siteConfig": {
-          "acrUseManagedIdentityCreds": false,
-          "http20Enabled": true,
-          "minTlsVersion": "[parameters('minTlsVersion')]",
-          "ftpsState": "FtpsOnly",
-          "preWarmedInstanceCount": 1,
-          "alwaysOn": true,
-          "webSocketsEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": true,
-          "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
-          }
-        }
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]"
-      ]
-    },
-    {
-      "name": "[concat(variables('publicAppName'), '/appsettings')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2021-02-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
-      ],
-      "properties": {
-        "APP_ENV": "[parameters('environmentName')]",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('publicAppInsights')), '2020-02-02').InstrumentationKey]",
-        "AZURE_SEARCH_ENDPOINT": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), variables('apiVersions').searchService).endpoint]",
-        "AZURE_SEARCH_INDEX": "[parameters('searchIndexName')]",
-        "AZURE_DATASETS_SEARCH_INDEX": "[parameters('datasetsSearchIndexName')]",
-        "AZURE_TABLE_TOOL_SEARCH_ENDPOINT": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('nlSearchFunctionAppName')), variables('apiVersions').nlSearchFunctionApp).defaultHostName, parameters('nlSearchFunctionRoute'))]",
-        "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
-        "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
-        "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
-        "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
-        "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
-        "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
-        "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
-        "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
-        "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
-        "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
-        "NEXT_CONFIG_MODE": "server",
-        "NODE_ENV": "production",
-        "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "PUBLIC_API_BASE_URL": "[concat('https://', parameters('publicApiUrl'))]",
-        "PUBLIC_API_DOCS_URL": "[concat('https://', parameters('publicApiDocsUrl'))]",
-        "DEFAULT_CACHE_MAX_AGE_SECONDS": "[parameters('defaultPublicSiteCacheMaxAgeSeconds')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "22.23.1",
-        "WEBSITES_PORT": 3000,
-        "WEBSITES_DISABLE_CONTENT_COMPRESSION": "[parameters('publicAppCompressionDisable')]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('skuPublic'), ' '), 1))]",
-        "Name": "[first(split(parameters('skuPublic'), ' '))]"
-      },
-      "name": "[variables('publicPlanName')]",
-      "kind": "app,linux,container",
-      "apiVersion": "2022-03-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service plan",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "name": "[variables('publicPlanName')]",
-        "workerSizeId": "0",
-        "numberOfWorkers": "1",
-        "hostingEnvironment": "",
-        "reserved": true
-      }
-    },
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('publicAppInsights')]",
-      "apiVersion": "2020-02-02",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Application Insights",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "applicationId": "[variables('publicAppName')]",
-        "Request_Source": "AzureTfsExtensionAzureProject",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "scope": "[resourceId('Microsoft.Search/searchServices', variables('searchServiceName'))]",
-      "name": "[guid(resourceId('Microsoft.Search/searchServices', variables('searchServiceName')), resourceId('Microsoft.Web/sites', variables('publicAppName')), variables('searchIndexDataReaderRoleId'))]",
-      "properties": {
-        "roleDefinitionId": "[variables('searchIndexDataReaderRoleId')]",
-        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('publicAppName')), '2025-03-01', 'Full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]"
-      ]
-    },
     {
       "name": "[variables('coreStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
@@ -3085,21 +2716,6 @@
     },
     {
       "copy": {
-        "name": "keyVaultCertificateUsersCopy",
-        "count": "[length(variables('keyVaultCertificateUserPrincipalRefs'))]"
-      },
-      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultCertificateUserRoleDefinitionId'), variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()]))]",
-      "properties": {
-        "roleDefinitionId": "[variables('keyVaultCertificateUserRoleDefinitionId')]",
-        "principalId": "[reference(variables('keyVaultCertificateUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-        "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "copy": {
         "name": "keyVaultSecretUsersCopy",
         "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
       },
@@ -3111,74 +2727,6 @@
         "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
         "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
         "principalType": "ServicePrincipal"
-      }
-    },
-    {
-      "name": "[concat(variables('publicAppName'), '-autoscale')]",
-      "apiVersion": "2014-04-01",
-      "type": "Microsoft.Insights/autoscaleSettings",
-      "location": "[resourceGroup().location]",
-      "tags": {},
-      "properties": {
-        "name": "[concat(variables('publicAppName'), '-autoscale')]",
-        "enabled": "[parameters('autoscaleAppServices')]",
-        "targetResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-        "profiles": [
-          {
-            "name": "Auto created scale condition",
-            "capacity": {
-              "minimum": 2,
-              "maximum": 10,
-              "default": 2
-            },
-            "rules": [
-              {
-                "scaleAction": {
-                  "direction": "Increase",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-                  "operator": "GreaterThan",
-                  "statistic": "Average",
-                  "threshold": 70,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              },
-              {
-                "scaleAction": {
-                  "direction": "Decrease",
-                  "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT5M"
-                },
-                "metricTrigger": {
-                  "metricName": "CpuPercentage",
-                  "metricNamespace": "microsoft.web/serverfarms",
-                  "metricResourceUri": "[resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Web/serverfarms', variables('publicPlanName'))]",
-                  "operator": "LessThan",
-                  "statistic": "Average",
-                  "threshold": 30,
-                  "timeAggregation": "Average",
-                  "timeGrain": "PT1M",
-                  "timeWindow": "PT10M",
-                  "Dimensions": [],
-                  "dividePerInstance": false
-                }
-              }
-            ]
-          }
-        ],
-        "notifications": [],
-        "targetResourceLocation": ""
       }
     },
     {

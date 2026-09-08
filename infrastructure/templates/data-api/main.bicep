@@ -39,12 +39,12 @@ param publicAppBasicAuth bool
 @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
 param publicAppBasicAuthUsername string
 
-@description('The origins supported for CORS calls to this App Service.')
-param allowedOrigins string[]
-
 @secure()
 @description('Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
 param publicAppBasicAuthPassword string
+
+@description('The origins supported for CORS calls to this App Service.')
+param allowedOrigins string[]
 
 @description('Whether analytics is enabled')
 param analyticsEnabled bool
@@ -75,6 +75,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.dataApi.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -104,9 +105,14 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'dataApiAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.dataApi.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
@@ -137,6 +143,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
         mountPath: analyticsFileShareMountPath
       }
     ] : []
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger

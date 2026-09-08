@@ -1,5 +1,6 @@
 import { ConnectionString } from 'types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
+import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 
 @description('Name of the App Service.')
 param appServiceName string
@@ -7,8 +8,18 @@ param appServiceName string
 @description('Name of the App Insights instance that this App Service is connected to.')
 param appInsightsName string
 
-@description('Name of Key Vault to allow secret access to from this App Service.')
-param keyVaultName string?
+@description('The operating system to use to host App Services.')
+param operatingSystem 'Windows' | 'Linux'
+
+@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
+param kind 'app' | 'app,linux,container'
+
+@description('Details of common Key Vault roles to apply to this App Service.')
+param keyVaultRoles {
+  keyVaultName: string
+  secretsUser: bool?
+  certificateUser: bool?
+}?
 
 @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
 param legacyKeyVaultRoleAssignmentName bool = false
@@ -37,16 +48,23 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling in this environment.')
 param autoscaleEnabled bool
 
+@description('Whether or not to enable slot swapping. Deploys a swap slot if enabled.')
+param swapSlotEnabled bool = true
+
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
 
 @description('File Shares to mount on this App Service and its slots.')
 param azureFileShares AzureFileShareMount[]?
 
+@description('Specific port to serve site traffic from.')
+param websitePort int?
+
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  responseTimeSeconds: int?
   alertsGroupName: string
 }?
 
@@ -57,6 +75,7 @@ var deploySlotName = 'deploy'
 
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
+  kind: kind
   location: resourceGroup().location
   identity: {
     type: 'SystemAssigned'
@@ -67,7 +86,8 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true
-    clientAffinityEnabled: true
+    clientAffinityEnabled: false
+    reserved: operatingSystem == 'Linux'
     siteConfig: {
       http20Enabled: true
       minTlsVersion: minTlsVersion
@@ -88,34 +108,56 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
   }
 }
 
+var baseSettings = union(applicationAppSettings, {
+  APPINSIGHTS_INSTRUMENTATIONKEY: reference(
+    resourceId('Microsoft.Insights/components', appInsightsName),
+    '2020-02-02'
+  ).InstrumentationKey
+  AppInsights__InstrumentationKey: reference(
+    resourceId('Microsoft.Insights/components', appInsightsName),
+    '2020-02-02'
+  ).InstrumentationKey
+  WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
+  ASPNETCORE_DETAILEDERRORS: detailedErrors
+  WEBSITES_PORT: websitePort
+})
+
+var osSpecificSettings = union(baseSettings,
+  kind != 'app,linux,container' ? {
+    WEBSITE_RUN_FROM_PACKAGE: '1'
+  } : {},
+  operatingSystem == 'Windows' ? {
+    WEBSITE_LOAD_CERTIFICATES: '*'
+  } : {}
+)
+
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
   name: 'appsettings'
-  properties: union(applicationAppSettings, {
-    APPINSIGHTS_INSTRUMENTATIONKEY: reference(
-      resourceId('Microsoft.Insights/components', appInsightsName),
-      '2020-02-02'
-    ).InstrumentationKey
-    AppInsights__InstrumentationKey: reference(
-      resourceId('Microsoft.Insights/components', appInsightsName),
-      '2020-02-02'
-    ).InstrumentationKey
-    WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
-    WEBSITE_RUN_FROM_PACKAGE: '1'
-    WEBSITE_LOAD_CERTIFICATES: '*'
-    ASPNETCORE_DETAILEDERRORS: detailedErrors
-  })
+  properties: osSpecificSettings
 }
 
-module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultName != null) {
-  name: '${appServiceName}KeyVaultSecretsUserRoleAssignmentModule'
+module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
+  name: '${appServiceName}KeyVaultSecretsUserRole'
   params: {
-    keyVaultName: keyVaultName!
+    keyVaultName: keyVaultRoles!.keyVaultName!
     roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
-      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6'), 'Microsoft.Web/sites/${appServiceName}')
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
     principalIds: [appService.identity.principalId]
     role: 'Secrets User'
+  }
+}
+
+module appServiceCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?certificateUser ?? false) {
+  name: '${appServiceName}KeyVaultCertificateUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${appServiceName}')
+      : null
+    principalIds: [appService.identity.principalId]
+    role: 'Certificate User'
   }
 }
 
@@ -128,10 +170,12 @@ module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
   }
 }
 
-module stagingSlotModule 'swap-slot.bicep' = {
+module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
   name: '${appServiceName}${deploySlotName}Deploy'
   params: {
     appServiceName: appService.name
+    kind: kind
+    operatingSystem: operatingSystem
     slotName: deploySlotName
     appServicePlanId: appServicePlanId
     minTlsVersion: minTlsVersion
@@ -167,3 +211,4 @@ module alertsModule 'alerts.bicep' = if (alerts != null) {
 }
 
 output appServiceName string = appService.name
+output appServiceSystemIdentityId string = appService.identity.principalId

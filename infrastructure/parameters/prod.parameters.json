@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuPublic": {
-      "value": "P2V2 PremiumV2"
-    },
     "skuImporter": {
       "value": "P2V2 PremiumV2"
     },
@@ -13,12 +10,6 @@
     },
     "skuPublisher": {
       "value": "S1 Standard"
-    },
-    "slackAlertsChannel": {
-      "value": "C01MCTX47E3"
-    },
-    "publicAppBasicAuth": {
-      "value": "false"
     },
     "prepareScheduledReleaseVersionsFunctionCronSchedule": {
       "value": "0 5 0 * * *"
@@ -29,26 +20,8 @@
     "useSubnets": {
       "value": true
     },
-    "autoscaleAppServices": {
-      "value": true
-    },
     "domain": {
       "value": "explore-education-statistics.service.gov.uk"
-    },
-    "contentApiUrl": {
-      "value": "content.explore-education-statistics.service.gov.uk"
-    },
-    "dataApiUrl": {
-      "value": "data.explore-education-statistics.service.gov.uk"
-    },
-    "publicApiUrl": {
-      "value": "api.education.gov.uk/statistics"
-    },
-    "publicApiDocsUrl": {
-      "value": "api.education.gov.uk/statistics/docs"
-    },
-    "publicAppGATrackingId": {
-      "value": "G-9YG8ESXR5Y"
     },
     "storageAccountPrefix": {
       "value": "sa"
@@ -76,9 +49,6 @@
     },
     "capacityStatisticsDb": {
       "value": 12
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "value": 1000000
     },
     "maxContentDbSizeBytes": {
       "value": 4294967296

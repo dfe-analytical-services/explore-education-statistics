@@ -99,6 +99,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -128,9 +129,14 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.admin.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
@@ -156,6 +162,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       App__Url: 'https://${adminHostname}'
       App__EnableSwagger: enableSwagger
