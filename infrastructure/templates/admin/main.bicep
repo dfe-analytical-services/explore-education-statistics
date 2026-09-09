@@ -205,6 +205,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       MemoryCache__Overrides__DurationInSeconds: memoryCacheConfig.?overridesDurationInSeconds
       MemoryCache__Overrides__ExpirySchedule: memoryCacheConfig.?overridesExpirySchedule
       CoreStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
+      ImporterStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       PublisherStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
       PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: preReleaseMinutesBeforeStart

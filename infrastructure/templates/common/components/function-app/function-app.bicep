@@ -186,10 +186,6 @@ var fileServiceAlerts = alerts != null
   }
 : null
 
-resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: keyVaultName
-}
-
 var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
@@ -221,7 +217,7 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: keyVault.name
+    keyVaultName: keyVaultName
     privateEndpointSubnetIds: privateEndpoints != null ? {
       blob: privateEndpoints!.storageAccounts
       file: privateEndpoints!.storageAccounts
