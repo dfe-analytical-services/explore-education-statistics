@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -32,7 +33,8 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    ILogger<ThemeService> logger
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -135,7 +137,10 @@ public class ThemeService(
                     .Themes.Where(t => themeIds.Contains(t.Id))
                     .ToListAsync(cancellationToken);
 
+                var notFoundThemeIds = themeIds.Except(themes.Select(theme => theme.Id)).ToList();
+
                 var failures = new List<ActionResult>();
+                var deletedThemeCount = 0;
 
                 foreach (var theme in themes)
                 {
@@ -146,10 +151,33 @@ public class ThemeService(
                     {
                         failures.AddRange(result.Left);
                     }
+                    else
+                    {
+                        deletedThemeCount++;
+                    }
                 }
 
                 await contentDbContext.SaveChangesAsync(cancellationToken);
                 await publishingService.TaxonomyChanged(cancellationToken);
+
+                if (notFoundThemeIds.Count > 0)
+                {
+                    logger.LogWarning(
+                        "Themes not found during deletion, and therefore not deleted: {NotFoundThemeIds}",
+                        notFoundThemeIds
+                    );
+
+                    // Only fail the request with a 404 if nothing was deleted. Returning one alongside
+                    // successful deletions would misleadingly suggest that no Themes were deleted at all.
+                    if (deletedThemeCount == 0)
+                    {
+                        failures.AddRange(
+                            notFoundThemeIds.Select(themeId =>
+                                ValidationUtils.NotFoundResult<Theme, Guid>(themeId, nameof(themeIds))
+                            )
+                        );
+                    }
+                }
 
                 return failures.Count > 0 ? failures[0] : Unit.Instance;
             });
