@@ -72,20 +72,22 @@ const ReleaseDataBlocksPage = ({
     useQuery(permissionQueries.canUpdateRelease(releaseVersionId));
 
   const handleDeleteConfirm = useCallback(
-    async (deletedDataBlockId?: string) => {
-      if (!deletedDataBlockId) {
+    async (deletedDataBlockVersionId?: string) => {
+      if (!deletedDataBlockVersionId) {
         return;
       }
 
       queryClient.setQueryData(
         listDataBlocksQuery.queryKey,
-        dataBlocks.filter(dataBlock => dataBlock.id !== deletedDataBlockId),
+        dataBlocks.filter(
+          dataBlock => dataBlock.id !== deletedDataBlockVersionId,
+        ),
       );
 
       queryClient.setQueryData(
         listFeaturedTablesQuery.queryKey,
         featuredTables.filter(
-          table => table.dataBlockId !== deletedDataBlockId,
+          table => table.dataBlockVersionId !== deletedDataBlockVersionId,
         ),
       );
       await queryClient.invalidateQueries([
@@ -278,7 +280,7 @@ const ReleaseDataBlocksPage = ({
                         {
                           publicationId,
                           releaseVersionId,
-                          dataBlockId: dataBlock.id,
+                          dataBlockVersionId: dataBlock.id,
                         },
                       )}
                     >
@@ -287,7 +289,7 @@ const ReleaseDataBlocksPage = ({
                     {canUpdateRelease && (
                       <DataBlockDeletePlanModal
                         releaseVersionId={releaseVersionId}
-                        dataBlockId={dataBlock.id}
+                        dataBlockVersionId={dataBlock.id}
                         onConfirm={() => handleDeleteConfirm(dataBlock.id)}
                       />
                     )}

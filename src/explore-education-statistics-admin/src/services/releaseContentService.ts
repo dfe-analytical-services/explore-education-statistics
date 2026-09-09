@@ -35,8 +35,8 @@ export interface ReleaseContent {
   unattachedDataBlocks: DataBlock[];
 }
 
-export interface ContentBlockAttachRequest {
-  contentBlockId: string;
+export interface DataBlockAttachRequest {
+  dataBlockVersionId: string;
   order: number;
 }
 
@@ -167,7 +167,7 @@ const releaseContentService = {
   attachContentSectionBlock(
     releaseId: string,
     sectionId: string,
-    block: ContentBlockAttachRequest,
+    block: DataBlockAttachRequest,
   ): Promise<EditableBlock> {
     return client.post<EditableBlock>(
       `/release/${releaseId}/content/section/${sectionId}/blocks/attach`,

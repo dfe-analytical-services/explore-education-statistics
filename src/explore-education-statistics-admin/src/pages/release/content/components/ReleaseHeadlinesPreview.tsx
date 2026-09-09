@@ -33,7 +33,7 @@ const ReleaseHeadlinesRedesign = ({
               <KeyStatDataBlock
                 key={keyStat.id}
                 releaseVersionId={release.id}
-                dataBlockParentId={keyStat.dataBlockParentId}
+                dataBlockId={keyStat.dataBlockId}
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}

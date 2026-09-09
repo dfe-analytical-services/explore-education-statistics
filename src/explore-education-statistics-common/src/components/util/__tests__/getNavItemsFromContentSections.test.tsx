@@ -36,11 +36,11 @@ describe('getNavItemsFromContentSections', () => {
             id: 'test-section-1-block-1-id',
           },
           {
-            type: 'DataBlock',
+            type: 'DataBlockVersionLink',
             dataBlockVersion: {
               dataBlockVersionId:
                 'test-section-1-block-2-data-block-version-id',
-              dataBlockParentId: 'test-section-1-block-2-data-block-parent-id',
+              dataBlockId: 'test-section-1-block-2-data-block-id',
               charts: [],
               heading: 'Data block heading',
               name: 'Data block name',

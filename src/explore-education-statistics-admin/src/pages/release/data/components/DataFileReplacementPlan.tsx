@@ -470,7 +470,7 @@ function Plan({
                       {
                         publicationId,
                         releaseVersionId,
-                        dataBlockId: dataBlock.id,
+                        dataBlockVersionId: dataBlock.id,
                       },
                     )}?fromFileReplacementId=${fileId}`}
                   >

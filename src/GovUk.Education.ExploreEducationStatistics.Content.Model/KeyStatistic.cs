@@ -39,13 +39,13 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
 public class KeyStatisticDataBlock : KeyStatistic
 {
+    public Guid DataBlockVersionId { get; set; }
+
+    public DataBlockVersion DataBlockVersion { get; set; } = null!;
+
     public Guid DataBlockId { get; set; }
 
-    public DataBlock DataBlock { get; set; } = null!;
-
-    public Guid DataBlockParentId { get; set; }
-
-    public DataBlockParent DataBlockParent { get; set; }
+    public DataBlock DataBlock { get; set; }
 }
 
 public class KeyStatisticText : KeyStatistic

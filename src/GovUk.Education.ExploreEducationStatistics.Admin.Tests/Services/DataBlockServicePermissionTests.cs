@@ -29,6 +29,14 @@ public class DataBlockServicePermissionTests
         ReleaseVersion = ReleaseVersion,
     };
 
+    private static readonly DataBlockVersionLink DataBlockVersionLink = new()
+    {
+        Id = DataBlockVersion.Id,
+        DataBlockVersionId = DataBlockVersion.Id,
+        DataBlockVersion = DataBlockVersion,
+        ReleaseVersion = ReleaseVersion,
+    };
+
     [Fact]
     public async Task Get()
     {
@@ -112,6 +120,7 @@ public class DataBlockServicePermissionTests
         var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
         MockUtils.SetupCall(persistenceHelper, ReleaseVersion.Id, ReleaseVersion);
         MockUtils.SetupCall(persistenceHelper, DataBlockVersion);
+        MockUtils.SetupCall(persistenceHelper, DataBlockVersionLink);
         return persistenceHelper;
     }
 

@@ -99,8 +99,8 @@ export interface FeaturedTable {
   name: string;
   description?: string;
   subjectId: string;
+  dataBlockVersionId: string;
   dataBlockId: string;
-  dataBlockParentId: string;
   order: number;
 }
 
@@ -287,24 +287,24 @@ const tableBuilderService = {
   },
   async getDataBlockTableData(
     releaseVersionId: string,
-    dataBlockParentId: string,
+    dataBlockId: string,
   ): Promise<TableDataResponse> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockParentId}`,
+      `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockId}`,
     );
   },
   getFastTrackTableAndReleaseMeta(
-    dataBlockParentId: string,
+    dataBlockId: string,
   ): Promise<FastTrackTableAndReleaseMeta> {
-    return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
+    return dataApi.get(`/tablebuilder/fast-track/${dataBlockId}`);
   },
   getDataBlockGeoJson(
     releaseVersionId: string,
-    dataBlockParentId: string,
+    dataBlockId: string,
     boundaryLevelId: number,
   ): Promise<Dictionary<LocationGeoJsonOption[]>> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockParentId}/geojson`,
+      `/tablebuilder/release/${releaseVersionId}/data-block/${dataBlockId}/geojson`,
       { params: { boundaryLevelId } },
     );
   },
