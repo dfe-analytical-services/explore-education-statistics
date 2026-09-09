@@ -176,7 +176,20 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
 
-module adminModule '../admin/main.bicep' = {
+module importerModuleDeploy '../importer/main.bicep' = {
+  name: 'importerModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: importerConfig.appServiceSku!
+    deployAlerts: true
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: importerAzureSqlPassword
+    tagValues: tags
+  }
+}
+
+module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -206,6 +219,11 @@ module adminModule '../admin/main.bicep' = {
     databaseUserPassword: adminAzureSqlPassword
     tagValues: tags
   }
+  dependsOn: [
+    // Admin is dependent on Importer's storage account being available
+    // in order to reference its connection string secret in Key Vault.
+    importerModuleDeploy
+  ]
 }
 
 module contentApiModuleDeploy '../content-api/main.bicep' = {
@@ -246,19 +264,6 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: dataApiAzureSqlPassword
-    tagValues: tags
-  }
-}
-
-module importerModuleDeploy '../importer/main.bicep' = {
-  name: 'importerModuleDeploy'
-  params: {
-    resourceNames: resourceNames
-    appServiceSku: importerConfig.appServiceSku!
-    deployAlerts: true
-    minTlsVersion: minTlsVersion
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: importerAzureSqlPassword
     tagValues: tags
   }
 }

@@ -88,6 +88,7 @@ type ResourceNames = {
         screenerStorageAccountConnectionString: string
       }
       coreStorageAccountConnectionString: string
+      importerStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
       publicApiContainerAppPrivateUrl: string
@@ -204,6 +205,7 @@ func getResourceNames(
       }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       coreStorageAccountConnectionString: 'ees-storage-core'
+      importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: 'ees-storage-publisher'
     }
