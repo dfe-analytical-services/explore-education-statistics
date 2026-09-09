@@ -1,10 +1,10 @@
-import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 
 @export()
 type ImporterConfig = {
 
-  @description('App Service SKU')
-  appServiceSku: AppServicePlanSku?
+  @description('Function App Service SKU')
+  appServiceSku: FunctionAppServicePlanSku?
 }
 
 @export()

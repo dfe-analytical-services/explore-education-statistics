@@ -1,12 +1,21 @@
-// Note this is not an exhaustive list of SKUs but ones that are commonly used in the service.
-// If non-ElasticPremium types are added, a @discriminator can be used on "tier" to provide other
-// combinations of valid name-tier-family combinations.
-@export()
-type FunctionAppServicePlanSku = {
+type FunctionAppPlanSkuElastic = {
   name: 'EP1' | 'EP2' | 'EP3'
   tier: 'ElasticPremium'
   family: 'EP'
 }
+
+type FunctionAppPlanSkuPremiumV2 = {
+  tier: 'PremiumV2'
+  name: 'P1V2' | 'P2V2' | 'P3V2'
+}
+
+// Note this is not an exhaustive list of SKUs.
+@export()
+@discriminator('tier')
+type FunctionAppServicePlanSku = 
+  | FunctionAppPlanSkuElastic
+  | FunctionAppPlanSkuPremiumV2
+
 
 type AppServicePlanSkuBasic = {
   tier: 'Basic'
