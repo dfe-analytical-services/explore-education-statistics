@@ -89,6 +89,11 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       tier: 'ElasticPremium'
       family: 'EP'
     }
+    elasticCapacity: {
+      minimumInstanceCount: 1
+      maximumInstanceCount: 1
+      instanceMemoryMB: 2048
+    }
     healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
