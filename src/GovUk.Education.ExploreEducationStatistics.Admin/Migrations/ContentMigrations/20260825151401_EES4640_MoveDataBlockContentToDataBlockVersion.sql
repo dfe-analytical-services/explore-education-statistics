@@ -1,9 +1,9 @@
--- Some records exist on each environment with a null heading or table - setting these values to empty strings
+-- Some records exist on each environment with a null heading or table - setting these values to defaults
 -- prevents the migration from failing when it attempts to move the content of each DataBlock into its
 -- DataBlockVersion.
 UPDATE ContentBlock
 SET DataBlock_Heading = ISNULL(DataBlock_Heading, ''),
-    DataBlock_Table   = ISNULL(DataBlock_Table, '')
+    DataBlock_Table   = ISNULL(DataBlock_Table, '{"TableHeaders":{"ColumnGroups":[],"Columns":[],"RowGroups":[],"Rows":[]}}')
 WHERE [Type] = 'DataBlock'
   AND (DataBlock_Heading IS NULL
     OR DataBlock_Table IS NULL);
