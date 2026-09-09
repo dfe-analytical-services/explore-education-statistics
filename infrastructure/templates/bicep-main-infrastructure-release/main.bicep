@@ -4,7 +4,7 @@ import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
-import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
+import { ImporterConfig, ImporterPipelineVariables, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
@@ -81,6 +81,9 @@ param importerConfigParam ImporterConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var importerConfig = mergeImporterConfig(importerConfigParam)
+
+// These values are all supplied specifically by pipeline variables.
+param importerPipelineVariables ImporterPipelineVariables = {}
 
 
 
@@ -166,6 +169,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
+    storageAccountExists: importerPipelineVariables.storageAccountExists!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
