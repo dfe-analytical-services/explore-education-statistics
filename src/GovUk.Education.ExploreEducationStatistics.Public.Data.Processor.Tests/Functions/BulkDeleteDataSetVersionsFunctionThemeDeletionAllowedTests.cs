@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces
 using LinqToDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -116,6 +117,78 @@ public abstract class BulkDeleteDataSetVersionsFunctionThemeDeletionAllowedTests
             var response = await BulkDeleteDataSetVersions(releaseVersionId: releaseVersion.Id, forceDeleteAll: true);
 
             response.AssertNoContent();
+        }
+
+        [Fact]
+        public async Task DataSetSupersedesDataSetFromAnotherTheme_SupersedingDataSetIdNulled()
+        {
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithPublication(
+                    DataFixture
+                        .DefaultPublication()
+                        .WithTheme(DataFixture.DefaultTheme().WithTitle($"UI test theme {Guid.NewGuid()}"))
+                );
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile);
+                });
+
+            var dataSet = DataFixture
+                .DefaultDataSet()
+                .WithPublicationId(releaseVersion.PublicationId)
+                .WithStatusPublished()
+                .Generate();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.AddRange(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatus(DataSetVersionStatus.Published)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            // A DataSet belonging to a Publication that isn't being deleted, which is superseded by the
+            // DataSet that is being deleted.
+            var supersededDataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithSupersedingDataSet(dataSet)
+                .Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                    context.DataSets.Add(supersededDataSet);
+                });
+
+            var response = await BulkDeleteDataSetVersions(releaseVersionId: releaseVersion.Id, forceDeleteAll: true);
+
+            response.AssertNoContent();
+
+            var remainingDataSets = fixture
+                .GetPublicDataDbContext()
+                .DataSets.AsNoTracking()
+                .Where(ds => ds.Id == dataSet.Id || ds.Id == supersededDataSet.Id)
+                .ToList();
+
+            // The superseded DataSet should remain, with its reference to the deleted DataSet nulled out.
+            var remainingDataSet = Assert.Single(remainingDataSets);
+            Assert.Equal(supersededDataSet.Id, remainingDataSet.Id);
+            Assert.Null(remainingDataSet.SupersedingDataSetId);
         }
 
         [Theory]
