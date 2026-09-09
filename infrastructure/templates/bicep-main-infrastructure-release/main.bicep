@@ -109,22 +109,6 @@ var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 //
 
 @secure()
-@description('''Admin database user's password for Azure SQL databases.''')
-param adminAzureSqlPassword string = ''
-
-@secure()
-@description('''Content API database user's password for Azure SQL databases.''')
-param contentApiAzureSqlPassword string = ''
-
-@secure()
-@description('''Data API database user's password for Azure SQL databases.''')
-param dataApiAzureSqlPassword string = ''
-
-@secure()
-@description('''Importer database user's password for Azure SQL databases.''')
-param importerAzureSqlPassword string = ''
-
-@secure()
 @description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
 param publicAppBasicAuthPassword string = ''
 
@@ -184,7 +168,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     deployAlerts: true
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: importerAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     tagValues: tags
   }
 }
@@ -216,7 +200,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     minTlsVersion: minTlsVersion
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: adminAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
     tagValues: tags
   }
   dependsOn: [
@@ -240,7 +224,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: contentApiAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
     tagValues: tags
   }
 }
@@ -263,7 +247,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: dataApiAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
     tagValues: tags
   }
 }
