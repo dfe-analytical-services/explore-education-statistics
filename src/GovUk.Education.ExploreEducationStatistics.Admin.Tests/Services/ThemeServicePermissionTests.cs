@@ -181,6 +181,7 @@ public class ThemeServicePermissionTests
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            new RedirectsCacheServiceMockBuilder().Build(),
             Mock.Of<ILogger<ThemeService>>()
         );
     }

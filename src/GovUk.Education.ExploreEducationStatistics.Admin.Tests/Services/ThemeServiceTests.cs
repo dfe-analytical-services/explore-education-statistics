@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -950,10 +951,17 @@ public class ThemeServiceTests
             var publishingService = new Mock<IPublishingService>(Strict);
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+            var redirectsCacheService = new RedirectsCacheServiceMockBuilder();
+
+            var service = SetupThemeService(
+                contentDbContext: context,
+                publishingService: publishingService.Object,
+                redirectsCacheService: redirectsCacheService.Build()
+            );
             var result = await service.DeleteThemes([theme1.Id, theme2.Id]);
 
             VerifyAllMocks(publishingService);
+            redirectsCacheService.Assert.UpdateRedirectsCalled();
             result.AssertRight();
         }
 
@@ -1129,6 +1137,7 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IRedirectsCacheService? redirectsCacheService = null,
         ILogger<ThemeService>? logger = null,
         bool enableThemeDeletion = true
     )
@@ -1157,6 +1166,7 @@ public class ThemeServiceTests
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            redirectsCacheService ?? new RedirectsCacheServiceMockBuilder().Build(),
             logger ?? Mock.Of<ILogger<ThemeService>>()
         );
     }
