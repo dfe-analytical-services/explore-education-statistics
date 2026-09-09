@@ -87,14 +87,18 @@ param logAnalyticsWorkspaceId string?
 @description('Specifies whether to grant the Function App role-based access to storage account queue data.')
 param deployQueueRoleAssignment bool = false
 
-@description('Set the amount of memory allocated to each instance of the function app in MB.')
-param instanceMemoryMB int = 2048
+@description('Scaling and capacity configuration for use with Elastic Plans.')
+param elasticCapacity {
+  
+  @description('The minimum number of instances for the function app.')
+  minimumInstanceCount: int
+  
+  @description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+  maximumInstanceCount: int
 
-@description('The minimum number of instances for the function app.')
-param minimumInstanceCount int = 1
-
-@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
-param maximumInstanceCount int = 0
+  @description('The amount of memory allocated to each instance (in MB).')
+  instanceMemoryMB: int
+}?
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
@@ -248,7 +252,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
   properties: {
-    containerSize: instanceMemoryMB
+    containerSize: elasticCapacity.?instanceMemoryMB ?? null
     reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
     vnetContentShareEnabled: true
@@ -304,8 +308,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         supportCredentials: false
       }
       ftpsState: 'FtpsOnly'
-      minimumElasticInstanceCount: minimumInstanceCount
-      functionAppScaleLimit: maximumInstanceCount
+      minimumElasticInstanceCount: elasticCapacity.?minimumInstanceCount ?? 0
+      functionAppScaleLimit: elasticCapacity.?maximumInstanceCount ?? 0
       healthCheckPath: healthCheckPath
       minTlsVersion: minTlsVersion
       netFrameworkVersion: netFrameworkVersion
