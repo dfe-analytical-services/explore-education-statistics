@@ -1,6 +1,6 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { MemoryCacheConfig } from '../bicep-main-infrastructure-release/types.bicep'
-import { keyVaultRef } from '../bicep-main-infrastructure-release/functions.bicep'
+import { keyVaultRef } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { SignalRSku } from '../common/components/signalr/types.bicep'
 
