@@ -86,6 +86,16 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
     outboundSubnetId: outboundVnetSubnet.id
     storageAccountAllowedSubnetIds: [adminSubnet.id]
+    storageAccountPublicNetworkAccessEnabled: true
+    publicNetworkAccessEnabled: true
+    functionAppFirewallRules: [
+      {
+        cidr: 'AzureCloud'
+        tag: 'ServiceTag'
+        priority: 101
+        name: 'AzureCloud'
+      }
+    ]
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
