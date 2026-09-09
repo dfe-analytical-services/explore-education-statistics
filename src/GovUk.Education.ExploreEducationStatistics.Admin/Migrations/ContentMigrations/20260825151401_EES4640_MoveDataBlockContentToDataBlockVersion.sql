@@ -1,9 +1,12 @@
--- Some records exist on each environment with a null heading - setting these values to empty strings prevents the 
--- migration from failing when it attempts to move the content of each DataBlock into its DataBlockVersion.
+-- Some records exist on each environment with a null heading or table - setting these values to defaults
+-- prevents the migration from failing when it attempts to move the content of each DataBlock into its
+-- DataBlockVersion.
 UPDATE ContentBlock
-SET DataBlock_Heading = ''
+SET DataBlock_Heading = ISNULL(DataBlock_Heading, ''),
+    DataBlock_Table   = ISNULL(DataBlock_Table, '{"TableHeaders":{"ColumnGroups":[],"Columns":[],"RowGroups":[],"Rows":[]}}')
 WHERE [Type] = 'DataBlock'
-  AND DataBlock_Heading IS NULL;
+  AND (DataBlock_Heading IS NULL
+    OR DataBlock_Table IS NULL);
 
 -- Move the content of each DataBlock out of the ContentBlock table and into its DataBlockVersion. This is done for
 -- every DataBlock, whether or not it is placed in a ContentSection.
