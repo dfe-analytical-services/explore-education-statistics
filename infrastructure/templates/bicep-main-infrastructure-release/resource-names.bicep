@@ -80,12 +80,22 @@ type ResourceNames = {
       admin: {
         adminSignalrConnectionString: string
         adminGovUkNotifyApiKey: string
+        databaseUserPassword: string
         openIdConnectClientId: string
         openIdConnectAuthority: string
         openIdConnectValidAudience: string
         openIdConnectValidIssuers: string
         openIdConnectFullyQualifiedScopeName: string
         screenerStorageAccountConnectionString: string
+      }
+      contentApi: {
+        databaseUserPassword: string
+      }
+      dataApi: {
+        databaseUserPassword: string
+      }
+      importer: {
+        databaseUserPassword: string
       }
       coreStorageAccountConnectionString: string
       importerStorageAccountConnectionString: string
@@ -196,12 +206,22 @@ func getResourceNames(
       admin: {
         adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'
         adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'
+        databaseUserPassword: 'ees-sql-password-admin'
         openIdConnectClientId: 'ees-openidconnect-clientid'
         openIdConnectAuthority: 'ees-openidconnect-authority'
         openIdConnectValidAudience: 'ees-openidconnect-valid-audience'
         openIdConnectValidIssuers: 'ees-openidconnect-valid-issuers'
         openIdConnectFullyQualifiedScopeName: 'ees-openidconnect-fully-qualified-scope-name'
         screenerStorageAccountConnectionString: '${legacyResourcePrefix}eessapisafn-connection-string'
+      }
+      contentApi: {
+        databaseUserPassword: 'ees-sql-public-password-content'
+      }
+      dataApi: {
+        databaseUserPassword: 'ees-sql-public-password-data'
+      }
+      importer: {
+        databaseUserPassword: 'ees-sql-password-importer'
       }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       coreStorageAccountConnectionString: 'ees-storage-core'
