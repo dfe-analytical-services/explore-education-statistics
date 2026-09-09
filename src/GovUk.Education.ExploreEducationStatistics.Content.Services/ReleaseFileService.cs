@@ -286,6 +286,18 @@ public class ReleaseFileService(
             return null;
         }
 
+        // Publication metadata (including the title in data-guidance.txt) can change
+        // without publishing a new release version. SQL DateTimes represent UTC.
+        var publicationUpdated = releaseVersion.Release.Publication.Updated;
+        if (
+            publicationUpdated.HasValue
+            && allFilesZip.Updated
+                < new DateTimeOffset(DateTime.SpecifyKind(publicationUpdated.Value, DateTimeKind.Utc))
+        )
+        {
+            return null;
+        }
+
         return allFilesZip.Updated >= releaseVersion.Published ? allFilesZip : null;
     }
 

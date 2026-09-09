@@ -1037,6 +1037,56 @@ public class ReleaseFileServiceTests : IDisposable
     }
 
     [Theory]
+    [InlineData(DateTimeKind.Utc)]
+    [InlineData(DateTimeKind.Unspecified)]
+    public async Task PublicationMetadataUpdated_RejectsCachedZipOnBothDownloadPaths(DateTimeKind dateTimeKind)
+    {
+        var now = DateTimeOffset.UtcNow;
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithPublished(now.AddDays(-1))
+            .WithRelease(
+                _dataFixture
+                    .DefaultRelease()
+                    .WithPublication(
+                        _dataFixture
+                            .DefaultPublication()
+                            .WithUpdated(DateTime.SpecifyKind(now.UtcDateTime, dateTimeKind))
+                    )
+            );
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+        var allFilesZipPath = releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion);
+        publicBlobStorageService.SetupFindBlob(
+            PublicReleaseFiles,
+            allFilesZipPath,
+            new BlobInfo(
+                path: allFilesZipPath,
+                contentType: MediaTypeNames.Application.Zip,
+                contentLength: 1000,
+                updated: now.AddHours(-2)
+            )
+        );
+        var analyticsManager = new Mock<IAnalyticsManager>(MockBehavior.Strict);
+        var service = SetupReleaseFileService(
+            contentDbContext,
+            publicBlobStorageService: publicBlobStorageService.Object,
+            analyticsManager: analyticsManager.Object
+        );
+
+        var delivery = await service.GetZipDelivery(releaseVersion, AnalyticsFromPage.ReleaseDownloads, fileIds: null);
+        Assert.IsType<ZipDelivery.Stream>(delivery.AssertRight());
+
+        var cachedDownload = await service.StreamCachedAllFilesZip(releaseVersion.Id, AllFilesZipFormat.CurrentVersion);
+        cachedDownload.AssertNotFound();
+        analyticsManager.VerifyNoOtherCalls();
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public async Task GetZipDelivery_SupersededPublishedReleaseVersion_ReturnsNotFound(bool selectedFiles)
@@ -1296,17 +1346,26 @@ public class ReleaseFileServiceTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task ZipFilesToStream_NoFileIds_ZipCachedBeforePublicationIsRegenerated()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ZipFilesToStream_NoFileIds_ZipCachedBeforePublicationOrMetadataUpdateIsRegenerated(
+        bool publicationMetadataUpdated
+    )
     {
         var published = DateTimeOffset.UtcNow.AddMinutes(-30);
         ReleaseVersion releaseVersion = _dataFixture
             .DefaultReleaseVersion()
-            .WithPublished(published)
+            .WithPublished(publicationMetadataUpdated ? published.AddHours(-1) : published)
             .WithRelease(
                 _dataFixture
                     .DefaultRelease()
-                    .WithPublication(_dataFixture.DefaultPublication().WithSlug("publication-slug"))
+                    .WithPublication(
+                        _dataFixture
+                            .DefaultPublication()
+                            .WithSlug("publication-slug")
+                            .WithUpdated(publicationMetadataUpdated ? published.UtcDateTime : null)
+                    )
             );
 
         var releaseFile1 = new ReleaseFile
@@ -1335,7 +1394,7 @@ public class ReleaseFileServiceTests : IDisposable
 
         var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
-        // The zip was cached while the release was still a draft.
+        // The ZIP predates publication or a subsequent publication metadata update.
         publicBlobStorageService.SetupFindBlob(
             PublicReleaseFiles,
             allFilesZipPath,

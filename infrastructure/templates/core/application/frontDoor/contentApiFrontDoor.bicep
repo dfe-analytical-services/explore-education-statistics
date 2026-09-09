@@ -22,9 +22,10 @@ var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
 var certificateName = '${subscription}-as-ees-content-afd-certificate'
 var publisherFunctionName = '${subscription}-fa-ees-publisher'
-var cdnEndpointContributorRoleDefinitionId = subscriptionResourceId(
+// CDN Endpoint Contributor only covers classic CDN endpoints, not afdEndpoints.
+var cdnProfileContributorRoleDefinitionId = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
-  '426e0c7f-0c7e-4658-b36f-ff54d6c29b45'
+  'ec156ff8-a8d1-4d15-830c-5b80698ca432'
 )
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
@@ -41,10 +42,10 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
 }
 
 resource publisherFrontDoorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(endpoint.id, publisherFunction.id, cdnEndpointContributorRoleDefinitionId)
+  name: guid(endpoint.id, publisherFunction.id, cdnProfileContributorRoleDefinitionId)
   scope: endpoint
   properties: {
-    roleDefinitionId: cdnEndpointContributorRoleDefinitionId
+    roleDefinitionId: cdnProfileContributorRoleDefinitionId
     principalId: publisherFunction.identity.principalId
     principalType: 'ServicePrincipal'
   }

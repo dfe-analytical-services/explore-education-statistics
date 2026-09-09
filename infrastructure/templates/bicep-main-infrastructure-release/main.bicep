@@ -205,6 +205,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
+    restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: contentApiAzureSqlPassword
