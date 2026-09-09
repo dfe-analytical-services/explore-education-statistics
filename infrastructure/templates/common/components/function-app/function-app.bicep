@@ -100,6 +100,9 @@ param elasticCapacity {
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
 
+@description('Whether to route all outbound traffic (including calls to Azure PaaS services like Storage) through the VNet integration subnet, rather than just RFC1918 private traffic. Required for the Function App to reach a network-restricted storage account over its VNet integration on Dedicated (non-Elastic) plans.')
+param vnetRouteAllEnabled bool = true
+
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet.')
 param privateEndpoints {
   functionApp: string?
@@ -262,6 +265,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: outboundSubnetId
     siteConfig: {
       alwaysOn: alwaysOn
+      vnetRouteAllEnabled: vnetRouteAllEnabled
       connectionStrings: connectionStrings
       appSettings: union([
         {
