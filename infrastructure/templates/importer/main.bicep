@@ -50,6 +50,14 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
   }
 }
 
+resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
+  name: resourceNames.vnet.vnet
+}
+resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.vnet.subnets.importer
+  parent: vNet
+}
+
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'importerFunctionAppModuleDeploy'
   params: {
@@ -70,7 +78,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     deployQueueRoleAssignment: true
     healthCheckPath: '/'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
-    outboundSubnetId: resourceNames.vnet.subnets.importer
+    outboundSubnetId: outboundVnetSubnet.id
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
