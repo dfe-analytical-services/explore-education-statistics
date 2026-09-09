@@ -5,6 +5,7 @@ import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alert
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 import { ConnectionString } from '../../types.bicep'
+import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 
 @description('Specifies the location for all resources.')
 param location string = resourceGroup().location
@@ -56,6 +57,15 @@ param storageFirewallRules IpRange[] = []
 
 @description('Database connection strings.')
 param connectionStrings ConnectionString[]?
+
+@description('Details of common Key Vault roles to apply to this Function App.')
+param keyVaultRoles {
+  secretsUser: bool?
+  certificateUser: bool?
+  
+  @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
+  legacyKeyVaultRoleAssignmentName: bool
+}?
 
 @description('Specifies additional setting to add to the Function App.')
 param appSettings {
@@ -330,14 +340,30 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.b
   }
 }
 
-module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}KeyVaultSecretsUserRoleAssignment'
+module secretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
+  name: '${functionApp.name}KeyVaultSecretsUserRole'
   params: {
+    keyVaultName: keyVaultName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${functionApp.name}')
+      : null
     principalIds: [functionApp.identity.principalId]
-    keyVaultName: keyVault.name
     role: 'Secrets User'
   }
 }
+
+module certificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?certificateUser ?? false) {
+  name: '${functionApp.name}KeyVaultCertificateUserRole'
+  params: {
+    keyVaultName: keyVaultName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${functionApp.name}')
+      : null
+    principalIds: [functionApp.identity.principalId]
+    role: 'Certificate User'
+  }
+}
+
 
 module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = {
   name: '${storageAccountName}BlobRoleAssignmentModuleDeploy'

@@ -99,8 +99,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     keyVaultRoles: {
       keyVaultName: resourceNames.keyVault.keyVault
       secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
     }
-    legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
         name: 'StatisticsDb'

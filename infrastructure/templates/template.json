@@ -19,21 +19,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "skuImporter": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
-    },
     "skuNotifier": {
       "type": "string",
       "defaultValue": "S1 Standard",
@@ -86,18 +71,6 @@
       "type": "securestring",
       "metadata": {
         "description": "The password of the publisher user for the private SQL Server"
-      }
-    },
-    "sqlImporterUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the importer for the private SQL Server"
-      }
-    },
-    "sqlImporterUserPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the importer user for the private SQL Server"
       }
     },
     "sqlNotifierUser": {
@@ -454,9 +427,6 @@
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
-    "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
-    "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
-    "importerAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-importer')]",
     "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
     "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
     "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
@@ -511,17 +481,6 @@
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
       {
-        "name": "[concat(parameters('subscription'),'ImporterAppServiceHttpServiceErrors')]",
-        "description": "Importer App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
         "name": "[concat(parameters('subscription'),'NotificationsAppServiceHttpServiceErrors')]",
         "description": "Notifications App Service - Http Service Errors",
         "resourceId": "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
@@ -541,17 +500,6 @@
         "threshold": 0,
         "operator": "GreaterThan",
         "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'ImporterAppInsightsExceptions')]",
-        "description": "Importer AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
       },
       {
@@ -900,8 +848,7 @@
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
-      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]",
-      "[concat('Microsoft.Web/sites/', variables('importerAppName'))]"
+      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]"
     ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
@@ -2266,154 +2213,6 @@
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
-      }
-    },
-    {
-      "apiVersion": "2020-02-02",
-      "name": "[variables('importerAppInsights')]",
-      "type": "Microsoft.Insights/components",
-      "kind": "web",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Application Insights",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "Application_Type": "web",
-        "ApplicationId": "[variables('importerAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "sku": {
-        "Tier": "[first(skip(split(parameters('skuImporter'), ' '), 1))]",
-        "Name": "[first(split(parameters('skuImporter'), ' '))]"
-      },
-      "name": "[variables('importerPlanName')]",
-      "apiVersion": "2022-03-01",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service plan",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "name": "[variables('importerPlanName')]",
-        "workerSize": "0",
-        "workerSizeId": "0",
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "apiVersion": "2019-08-01",
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('importerAppName')]",
-      "location": "[resourceGroup().location]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "kind": "functionapp",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('importerAppInsights'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]"
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "condition": "[parameters('useSubnets')]",
-          "name": "virtualNetwork",
-          "type": "config",
-          "apiVersion": "2018-11-01",
-          "location": "[resourceGroup().location]",
-          "properties": {
-            "subnetResourceId": "[variables('importerSubnetRef')]",
-            "swiftSupported": true
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]"
-          ]
-        }
-      ],
-      "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('importerPlanName'))]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "http20Enabled": true,
-          "minTlsVersion": "[parameters('minTlsVersion')]",
-          "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v10.0",
-          "alwaysOn": true,
-          "webSocketsEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": true,
-          "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          "connectionStrings": [
-            {
-              "name": "StatisticsDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
-            },
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
-            }
-          ],
-          "use32BitWorkerProcess": false
-        }
-      }
-    },
-    {
-      "name": "[concat(variables('importerAppName'), '/appsettings')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('importerAppName'))]",
-        "[variables('ees-storage-core')]"
-      ],
-      "properties": {
-        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
-        "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "FUNCTIONS_EXTENSION_VERSION": "~4",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('importerAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__RowsPerBatch": "3000",
-        "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]"
       }
     },
     {

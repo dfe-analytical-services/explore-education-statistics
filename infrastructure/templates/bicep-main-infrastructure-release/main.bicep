@@ -4,6 +4,7 @@ import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
+import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
@@ -76,7 +77,7 @@ var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 //
 // Importer-specific config.
 //
-param importerConfigParam ContentApiConfig = {}
+param importerConfigParam ImporterConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var importerConfig = mergeImporterConfig(importerConfigParam)
@@ -118,6 +119,10 @@ param contentApiAzureSqlPassword string = ''
 @secure()
 @description('''Data API database user's password for Azure SQL databases.''')
 param dataApiAzureSqlPassword string = ''
+
+@secure()
+@description('''Importer database user's password for Azure SQL databases.''')
+param importerAzureSqlPassword string = ''
 
 @secure()
 @description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')

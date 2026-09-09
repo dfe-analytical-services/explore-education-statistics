@@ -19,10 +19,10 @@ param keyVaultRoles {
   keyVaultName: string
   secretsUser: bool?
   certificateUser: bool?
-}?
 
-@description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
-param legacyKeyVaultRoleAssignmentName bool = false
+  @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
+  legacyKeyVaultRoleAssignmentName: bool
+}?
 
 @description('Minimum TLS version supported.')
 param minTlsVersion string
@@ -73,6 +73,10 @@ param tagValues object
 
 var deploySlotName = 'deploy'
 
+var vnetIntegrationSubnetRef = vnetLink != null 
+  ? resourceId('Microsoft.Network/virtualNetworks/subnets', vnetLink!.vnetName, vnetLink!.subnetName)
+  : null
+
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
   kind: kind
@@ -88,6 +92,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     reserved: operatingSystem == 'Linux'
+    virtualNetworkSubnetId: vnetIntegrationSubnetRef ?? ''
     siteConfig: {
       http20Enabled: true
       minTlsVersion: minTlsVersion
@@ -141,7 +146,7 @@ module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key
   name: '${appServiceName}KeyVaultSecretsUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName 
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
     principalIds: [appService.identity.principalId]
@@ -153,20 +158,11 @@ module appServiceCertificateUserRoleAssignmentModule '../../../common/components
   name: '${appServiceName}KeyVaultCertificateUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: legacyKeyVaultRoleAssignmentName 
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName 
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
     principalIds: [appService.identity.principalId]
     role: 'Certificate User'
-  }
-}
-
-module vNetLink 'virtual-network-link.bicep' = if (vnetLink != null) {
-  name: '${appServiceName}VnetLinkDeploy'
-  params: {
-    appServiceName: appService.name
-    vNetName: vnetLink!.vnetName
-    subnetName: vnetLink!.subnetName
   }
 }
 
