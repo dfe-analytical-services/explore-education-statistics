@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -182,6 +183,7 @@ public class ThemeServicePermissionTests
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             new RedirectsCacheServiceMockBuilder().Build(),
+            Mock.Of<IPublicationCacheService>(),
             Mock.Of<ILogger<ThemeService>>()
         );
     }

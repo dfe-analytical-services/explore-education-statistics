@@ -286,6 +286,11 @@ public class ReleaseVersionService(
 
     private async Task HardDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
+        await publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicReleaseFiles,
+            directoryPath: $"{releaseVersion.Id}/"
+        );
+
         await DeleteReleaseSeriesItem(releaseVersion, cancellationToken);
         await DeleteDataBlocks(releaseVersion.Id, cancellationToken);
 

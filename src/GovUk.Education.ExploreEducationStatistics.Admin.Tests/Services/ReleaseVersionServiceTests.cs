@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
@@ -1680,6 +1680,13 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalink.Id}.csv.zst"))
                 .Returns(Task.CompletedTask);
 
+            if (!releaseVersion.Amendment)
+            {
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                    .Returns(Task.CompletedTask);
+            }
+
             processorClient
                 .Setup(mock =>
                     mock.BulkDeleteDataSetVersions(
@@ -2037,6 +2044,7 @@ public abstract class ReleaseVersionServiceTests
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             var forceDeleteRelatedData = true;
 
@@ -2078,6 +2086,11 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
+            // The files copied into public storage when the ReleaseVersion was published are deleted with it
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
             userPreReleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.All,
                 [userPreReleaseRoles[0], userPreReleaseRoles[1]]
@@ -2099,7 +2112,8 @@ public abstract class ReleaseVersionServiceTests
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object
                 );
 
                 // Act
@@ -2127,7 +2141,8 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService,
                     processorClient,
                     releasePublishingStatusRepository,
-                    userPreReleaseRoleRepository
+                    userPreReleaseRoleRepository,
+                    publicBlobStorageService
                 );
 
                 result.AssertRight();
