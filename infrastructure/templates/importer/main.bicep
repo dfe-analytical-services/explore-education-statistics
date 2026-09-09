@@ -54,6 +54,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     appServicePlanName: resourceNames.importer.appServicePlan
     storageAccountName: resourceNames.importer.storageAccount
     keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
+    }
     sku: appServiceSku
     functionAppExists: true
     functionAppRuntime: 'dotnet-isolated'

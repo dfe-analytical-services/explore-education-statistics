@@ -112,6 +112,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
+    }
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
