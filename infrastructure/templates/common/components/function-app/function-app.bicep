@@ -78,11 +78,8 @@ param appSettings {
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
-@description('Enable diagnostic setting to send logs and metrics to Log Analytics.')
-param diagnosticSettingEnabled bool = false
-
-@description('The id of the Log Analytics workspace to which logs and metrics will be sent.')
-param logAnalyticsWorkspaceId string?
+@description('The id of the Log Analytics workspace to which diagnostics will be sent.')
+param diagnosticSettingsLogAnalyticsWorkspaceId string
 
 @description('Specifies whether to grant the Function App role-based access to storage account queue data.')
 param deployQueueRoleAssignment bool = false
@@ -456,12 +453,12 @@ module expectedHttpStatusCodeAlerts '../alerts/dynamicMetricAlert.bicep' = [
   }
 ]
 
-module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = if (diagnosticSettingEnabled) {
+module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = {
   name: '${functionAppName}DiagnosticSettingModuleDeploy'
   params: {
     functionAppName: functionApp.name
     diagnosticSettingName: 'Send all logs and metrics to Log Analytics'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    logAnalyticsWorkspaceId: diagnosticSettingsLogAnalyticsWorkspaceId
   }
 }
 
