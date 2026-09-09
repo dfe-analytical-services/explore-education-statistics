@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ public class ThemeService(
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
     IUserPublicationRoleRepository userPublicationRoleRepository,
+    IRedirectsCacheService redirectsCacheService,
     ILogger<ThemeService> logger
 ) : IThemeService
 {
@@ -159,6 +161,7 @@ public class ThemeService(
 
                 await contentDbContext.SaveChangesAsync(cancellationToken);
                 await publishingService.TaxonomyChanged(cancellationToken);
+                await redirectsCacheService.UpdateRedirects();
 
                 if (notFoundThemeIds.Count > 0)
                 {
