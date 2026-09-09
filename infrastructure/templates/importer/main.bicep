@@ -104,7 +104,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       fileServiceCapacity: false
       alertsGroupName: resourceNames.alertsGroup
     } : null
-    diagnosticSettingEnabled: true
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     appSettings: [
       {
         name: 'App__RowsPerBatch'

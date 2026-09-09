@@ -130,8 +130,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     operatingSystem: 'Linux'
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
