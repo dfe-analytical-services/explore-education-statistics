@@ -7,6 +7,13 @@ type ImporterConfig = {
   appServiceSku: AppServicePlanSku?
 }
 
+@export()
+type ImporterPipelineVariables = {
+
+  @description('Does the Importer Function App have a dedicated storage account yet?')
+  storageAccountExists: bool?
+}
+
 var defaultConfig = {
   appServiceSku: {
     tier: 'PremiumV2'
