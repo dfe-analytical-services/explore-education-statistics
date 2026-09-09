@@ -65,8 +65,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspace.id
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-analytics'
     appSettings: [
       {

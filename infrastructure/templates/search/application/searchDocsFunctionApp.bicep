@@ -197,8 +197,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     deployQueueRoleAssignment: true
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
