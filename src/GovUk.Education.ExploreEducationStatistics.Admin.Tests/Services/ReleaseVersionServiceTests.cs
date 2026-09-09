@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -1584,6 +1585,11 @@ public abstract class ReleaseVersionServiceTests
                 PublicationId = releaseVersion.Publication.Id,
             };
 
+            var permalink = new Permalink { Id = Guid.NewGuid(), ReleaseVersionId = releaseVersion.Id };
+
+            // This Permalink should not be removed as it is for another ReleaseVersion.
+            var anotherPermalink = new Permalink { Id = Guid.NewGuid(), ReleaseVersionId = anotherReleaseVersion.Id };
+
             // This Methodology is scheduled to go out with the Release being deleted.
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
@@ -1619,6 +1625,7 @@ public abstract class ReleaseVersionServiceTests
                     methodologyScheduledWithRelease,
                     methodologyScheduledWithAnotherRelease
                 );
+                context.Permalinks.AddRange(permalink, anotherPermalink);
                 await context.SaveChangesAsync();
             }
 
@@ -1633,6 +1640,7 @@ public abstract class ReleaseVersionServiceTests
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
@@ -1660,6 +1668,16 @@ public abstract class ReleaseVersionServiceTests
                         ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
                     )
                 )
+                .Returns(Task.CompletedTask);
+
+            // Only the snapshots of the deleted ReleaseVersion's Permalink are expected to be deleted.
+            // As this is a Strict mock, deleting the snapshots of any other Permalink would fail the test.
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalink.Id}.json.zst"))
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalink.Id}.csv.zst"))
                 .Returns(Task.CompletedTask);
 
             processorClient
@@ -1691,6 +1709,7 @@ public abstract class ReleaseVersionServiceTests
                     dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     processorClient: processorClient.Object,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
@@ -1718,6 +1737,7 @@ public abstract class ReleaseVersionServiceTests
 
                 VerifyAllMocks(
                     privateCacheService,
+                    publicBlobStorageService,
                     releaseDataFilesService,
                     releaseFileService,
                     dataSetUploadRepository,
@@ -1775,6 +1795,11 @@ public abstract class ReleaseVersionServiceTests
                     Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
                     Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
                 }
+
+                // Assert that the Permalinks belonging to the deleted ReleaseVersion have been removed, and
+                // that Permalinks belonging to other ReleaseVersions are unaffected
+                var remainingPermalink = Assert.Single(contentDbContext.Permalinks);
+                Assert.Equal(anotherPermalink.Id, remainingPermalink.Id);
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
@@ -2657,6 +2682,7 @@ public abstract class ReleaseVersionServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
@@ -2688,6 +2714,7 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             _organisationsValidator.Build(),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
