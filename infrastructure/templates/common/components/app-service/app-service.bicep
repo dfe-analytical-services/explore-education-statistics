@@ -104,6 +104,10 @@ resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
     WEBSITE_RUN_FROM_PACKAGE: '1'
     WEBSITE_LOAD_CERTIFICATES: '*'
     ASPNETCORE_DETAILEDERRORS: detailedErrors
+    
+    // Enable the App Service to access file shares over the VNet if
+    // file shares are available for this App Service. 
+    WEBSITE_CONTENTOVERVNET: length(azureFileShares ?? []) > 0 ? '1' : null
   })
 }
 
