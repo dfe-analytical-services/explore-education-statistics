@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -55,6 +56,7 @@ public class ReleaseVersionService(
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
+    IPublicBlobStorageService publicBlobStorageService,
     IOrganisationsValidator organisationsValidator,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
@@ -198,6 +200,7 @@ public class ReleaseVersionService(
                 releaseFileService.DeleteAll(releaseVersionId: releaseVersion.Id, forceDelete: forceDeleteRelatedData)
             )
             .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(releaseVersion.Id, cancellationToken))
+            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
             .OnSuccessDo(async _ =>
             {
                 if (hardDeleteContentReleaseVersion)
@@ -242,6 +245,43 @@ public class ReleaseVersionService(
                     }
                 }
             });
+    }
+
+    /// <summary>
+    /// Deletes any Permalinks belonging to a ReleaseVersion, along with their snapshots in blob storage.
+    /// </summary>
+    /// <remarks>
+    /// Permalinks have no foreign key to ReleaseVersions, so they are not removed by any cascade delete.
+    /// </remarks>
+    private async Task DeletePermalinks(Guid releaseVersionId, CancellationToken cancellationToken)
+    {
+        var permalinks = await context
+            .Permalinks.Where(permalink => permalink.ReleaseVersionId == releaseVersionId)
+            .ToListAsync(cancellationToken);
+
+        if (permalinks.Count == 0)
+        {
+            return;
+        }
+
+        // Snapshots are stored as flat blobs named after the Permalink id, so they have to be deleted
+        // individually. The CSV is absent for Permalinks of cropped tables, but deleting a blob that
+        // doesn't exist is a no-op.
+        foreach (var permalink in permalinks)
+        {
+            await publicBlobStorageService.DeleteBlob(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.json.zst"
+            );
+
+            await publicBlobStorageService.DeleteBlob(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.csv.zst"
+            );
+        }
+
+        context.Permalinks.RemoveRange(permalinks);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     private async Task HardDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
