@@ -311,8 +311,8 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         supportCredentials: false
       }
       ftpsState: 'FtpsOnly'
-      minimumElasticInstanceCount: elasticCapacity.?minimumInstanceCount ?? 1
-      functionAppScaleLimit: elasticCapacity.?maximumInstanceCount ?? 1
+      minimumElasticInstanceCount: elasticCapacity.?minimumInstanceCount ?? 0
+      functionAppScaleLimit: elasticCapacity.?maximumInstanceCount ?? 0
       healthCheckPath: healthCheckPath
       minTlsVersion: minTlsVersion
       netFrameworkVersion: netFrameworkVersion
