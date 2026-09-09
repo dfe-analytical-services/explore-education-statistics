@@ -6,6 +6,7 @@ import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
 import { ConnectionString } from '../../types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
+import { keyVaultRef } from '../../functions.bicep'
 
 @description('Specifies the location for all resources.')
 param location string = resourceGroup().location
@@ -271,7 +272,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${storageAccountModule.outputs.connectionStringSecretName})'
+          value: keyVaultRef(keyVaultName, storageAccountModule.outputs.connectionStringSecretName)
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
