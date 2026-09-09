@@ -100,6 +100,9 @@ param elasticCapacity {
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
 
+@description('Other subnets that are allowed to access this Function App storage account. These will be combined with the Function App outboundSubnetId.')
+param storageAccountAllowedSubnetIds string[]?
+
 @description('Whether to route all outbound traffic (including calls to Azure PaaS services like Storage) through the VNet integration subnet, rather than just RFC1918 private traffic. Required for the Function App to reach a network-restricted storage account over its VNet integration on Dedicated (non-Elastic) plans.')
 param vnetRouteAllEnabled bool = true
 
@@ -223,7 +226,10 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
   params: {
     location: location
     storageAccountName: storageAccountName
-    allowedSubnetIds: outboundSubnetId != null ? [outboundSubnetId!] : []
+    allowedSubnetIds: union(
+      storageAccountAllowedSubnetIds ?? [],
+      outboundSubnetId != null ? [outboundSubnetId!] : []
+    )
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
