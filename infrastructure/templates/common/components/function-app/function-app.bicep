@@ -189,6 +189,12 @@ var fileServiceAlerts = alerts != null
 
 var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
+var vaultUri = keyVault.properties.vaultUri
+
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
   name: userAssignedIdentityName
 }
@@ -269,7 +275,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: keyVaultRef(keyVaultName, storageAccountModule.outputs.connectionStringSecretName)
+          value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName)
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
