@@ -24,7 +24,6 @@ public class ReleaseService : IReleaseService
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IUserService _userService;
-    private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
     private readonly ITimePeriodService _timePeriodService;
 
     public ReleaseService(
@@ -32,7 +31,6 @@ public class ReleaseService : IReleaseService
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         StatisticsDbContext statisticsDbContext,
         IUserService userService,
-        IDataGuidanceDataSetService dataGuidanceDataSetService,
         ITimePeriodService timePeriodService
     )
     {
@@ -40,7 +38,6 @@ public class ReleaseService : IReleaseService
         _contentPersistenceHelper = contentPersistenceHelper;
         _statisticsDbContext = statisticsDbContext;
         _userService = userService;
-        _dataGuidanceDataSetService = dataGuidanceDataSetService;
         _timePeriodService = timePeriodService;
     }
 
@@ -100,7 +97,7 @@ public class ReleaseService : IReleaseService
                     order: releaseFile.Order,
                     content: releaseFile.Summary ?? string.Empty,
                     timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                    geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
+                    geographicLevels: await GetGeographicLevels(rs.SubjectId),
                     filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
                     indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
                     file: releaseFile.ToFileInfo(),
@@ -109,6 +106,19 @@ public class ReleaseService : IReleaseService
             })
         ).OrderBy(svm => svm.Order).ThenBy(svm => svm.Name) // For subjects existing before ordering was added
         .ToList();
+    }
+
+    private async Task<List<string>> GetGeographicLevels(Guid subjectId, bool csvOnly = false)
+    {
+        var geographicLevels = await _contentDbContext
+            .Files.AsNoTracking()
+            .Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
+            .SelectMany(file => file.DataSetFileVersionGeographicLevels)
+            .Where(gl => (gl.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
+            .Select(gl => gl.GeographicLevel)
+            .ToListAsync();
+
+        return geographicLevels.Select(gl => gl.GetEnumLabel()).Order().ToList();
     }
 
     private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)

@@ -418,6 +418,61 @@ public class DataGuidanceFileWriterTests : IDisposable
     }
 
     [Fact]
+    public async Task WriteToStream_FileWithCsvOnlyGeographicLevels()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "<p>Test file content</p>",
+                GeographicLevels = new List<string> { "Local authority", "National", "Ward" },
+                GeographicLevelsCsvOnly = new List<string> { "School" },
+                TimePeriods = new TimePeriodLabels("2018", "2018"),
+                Variables = new List<LabelValue> { new("Accommodation type", "accommodation_type") },
+                Footnotes = new List<FootnoteViewModel> { new(Guid.NewGuid(), "Footnote 1") },
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
     public async Task WriteToStream_FileWithEmptyProperties()
     {
         ReleaseVersion releaseVersion = _dataFixture
