@@ -69,6 +69,7 @@ public abstract class DataSetFilesControllerCachingTests
                     {
                         NumDataFileRows = 9393,
                         GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
+                        GeographicLevelsCsvOnly = [],
                         TimePeriodRange = new DataSetFileTimePeriodRangeViewModel { From = "2000", To = "2001" },
                         Filters = ["Filter 1"],
                         Indicators = ["Indicator 1"],

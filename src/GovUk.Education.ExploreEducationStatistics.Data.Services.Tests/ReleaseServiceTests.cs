@@ -183,6 +183,9 @@ public class ReleaseServiceTests
             Assert.Equal("Local authority", subjects[0].GeographicLevels[0]);
             Assert.Equal("Local authority district", subjects[0].GeographicLevels[1]);
 
+            Assert.Single(subjects[0].GeographicLevelsCsvOnly);
+            Assert.Equal("School", subjects[0].GeographicLevelsCsvOnly[0]);
+
             Assert.Equal(2, subjects[0].Filters.Count);
             Assert.Equal("subject 1 filter 1", subjects[0].Filters[0]);
             Assert.Equal("subject 1 filter 2", subjects[0].Filters[1]);
@@ -207,6 +210,8 @@ public class ReleaseServiceTests
 
             Assert.Single(subjects[1].GeographicLevels);
             Assert.Equal("National", subjects[1].GeographicLevels[0]);
+
+            Assert.Empty(subjects[1].GeographicLevelsCsvOnly);
 
             Assert.Single(subjects[1].Filters);
             Assert.Equal("subject 2 filter 1", subjects[1].Filters[0]);

@@ -36,6 +36,11 @@ describe('DataSetFileDetails', () => {
       ),
     ).toBeInTheDocument();
     expect(
+      screen.queryByTestId(
+        'Geographic levels (only available via download / public API)',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
       within(screen.getByTestId('Indicators')).getByText('Indicator 1'),
     ).toBeInTheDocument();
     expect(
@@ -49,6 +54,36 @@ describe('DataSetFileDetails', () => {
     ).toBeInTheDocument();
     expect(
       within(screen.getByTestId('Time period')).getByText('2023 to 2024'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders csv-only geographic levels in a separate row', async () => {
+    render(
+      <DataSetFileDetails
+        dataSetFile={{
+          ...testDataSetFile,
+          file: {
+            ...testDataSetFile.file,
+            meta: {
+              ...testDataSetFile.file.meta,
+              geographicLevelsCsvOnly: ['School', 'Institution'],
+            },
+          },
+        }}
+      />,
+    );
+
+    expect(
+      within(screen.getByTestId('Geographic levels')).getByText(
+        'Local authority, National',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(
+        screen.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).getByText('Institution, School'),
     ).toBeInTheDocument();
   });
 

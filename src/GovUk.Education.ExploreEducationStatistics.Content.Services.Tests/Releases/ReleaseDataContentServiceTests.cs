@@ -462,7 +462,7 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
-        public async Task WhenDataSetHasCsvOnlyGeographicLevels_ExcludesThemFromGeographicLevels()
+        public async Task WhenDataSetHasCsvOnlyGeographicLevels_SplitsThemIntoGeographicLevelsCsvOnly()
         {
             // Arrange
             Publication publication = _dataFixture
@@ -503,6 +503,7 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Equal(["National"], result.DataSets[0].Meta.GeographicLevels);
+                Assert.Equal(["School"], result.DataSets[0].Meta.GeographicLevelsCsvOnly);
             }
         }
 

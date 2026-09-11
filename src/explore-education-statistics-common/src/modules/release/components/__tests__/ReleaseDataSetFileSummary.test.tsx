@@ -17,6 +17,7 @@ const testDataSetItem: DataSetItem = {
       'Local authority district',
       'National',
     ],
+    geographicLevelsCsvOnly: [],
     indicators: ['Authorised absence rate', 'Authorised absence rate exact'],
     numDataFileRows: 1000,
     timePeriodRange: {

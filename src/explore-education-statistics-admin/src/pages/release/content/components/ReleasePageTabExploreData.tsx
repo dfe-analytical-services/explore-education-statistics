@@ -159,51 +159,61 @@ const ReleasePageTabExploreData = ({
         />
       }
     >
-      {dataContent?.dataSets.map(dataset => (
-        <ReleaseDataListItem
-          key={dataset.fileId}
-          title={dataset.title}
-          description={dataset.summary}
-          metaInfo={dataset.meta.geographicLevels.join(', ')}
-          tag={
-            dataset.isApiEnabled && (
-              <Tag className="govuk-!-margin-bottom-2" colour="grey">
-                Available by API
-              </Tag>
-            )
-          }
-          actions={
-            <>
-              <span>
-                Create table{' '}
-                <VisuallyHidden>using {dataset.title}</VisuallyHidden> (public
-                site only)
-              </span>
-              <ButtonText
-                onClick={() => {
-                  releaseFileService.downloadFilesAsZip(release.id, [
-                    dataset.fileId,
-                  ]);
-                }}
-              >
-                Download <VisuallyHidden>{dataset.title}</VisuallyHidden> (ZIP)
-              </ButtonText>
-            </>
-          }
-        >
-          <ReleaseDataSetFileSummary
-            dataSetFile={dataset}
-            expanded={showAllDataSetDetails}
-            renderLink={
-              <span>
-                Data set information page{' '}
-                <VisuallyHidden>for {dataset.title}</VisuallyHidden> (public
-                site only)
-              </span>
+      {dataContent?.dataSets.map(dataset => {
+        const geographicLevels = [
+          ...dataset.meta.geographicLevels,
+          ...dataset.meta.geographicLevelsCsvOnly.map(
+            level => `${level} (CSV only)`,
+          ),
+        ];
+
+        return (
+          <ReleaseDataListItem
+            key={dataset.fileId}
+            title={dataset.title}
+            description={dataset.summary}
+            metaInfo={geographicLevels.join(', ')}
+            tag={
+              dataset.isApiEnabled && (
+                <Tag className="govuk-!-margin-bottom-2" colour="grey">
+                  Available by API
+                </Tag>
+              )
             }
-          />
-        </ReleaseDataListItem>
-      ))}
+            actions={
+              <>
+                <span>
+                  Create table{' '}
+                  <VisuallyHidden>using {dataset.title}</VisuallyHidden> (public
+                  site only)
+                </span>
+                <ButtonText
+                  onClick={() => {
+                    releaseFileService.downloadFilesAsZip(release.id, [
+                      dataset.fileId,
+                    ]);
+                  }}
+                >
+                  Download <VisuallyHidden>{dataset.title}</VisuallyHidden>{' '}
+                  (ZIP)
+                </ButtonText>
+              </>
+            }
+          >
+            <ReleaseDataSetFileSummary
+              dataSetFile={dataset}
+              expanded={showAllDataSetDetails}
+              renderLink={
+                <span>
+                  Data set information page{' '}
+                  <VisuallyHidden>for {dataset.title}</VisuallyHidden> (public
+                  site only)
+                </span>
+              }
+            />
+          </ReleaseDataListItem>
+        );
+      })}
     </ReleaseDataList>
   ) : (
     <InsetText>No data sets added for this release yet.</InsetText>

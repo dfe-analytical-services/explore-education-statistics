@@ -130,9 +130,10 @@ public class PublicationControllerTests
             0,
             "Content",
             new TimePeriodLabels { From = "2020", To = "2022" },
-            ["level1"],
-            ["filter1"],
-            ["indicator1", "indicator2", "indicator3", "indicator4"],
+            new List<string> { "level1" },
+            new List<string> { "csvOnlyLevel1" },
+            new List<string> { "filter1" },
+            new List<string> { "indicator1", "indicator2", "indicator3", "indicator4" },
             new FileInfo
             {
                 Created = DateTime.Now,

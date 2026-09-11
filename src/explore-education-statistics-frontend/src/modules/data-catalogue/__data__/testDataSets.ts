@@ -192,6 +192,7 @@ export const testDataSetFile: DataSetFile = {
       },
       filters: ['Filter 1', 'Filter 2'],
       geographicLevels: ['Local authority', 'National'],
+      geographicLevelsCsvOnly: [],
       indicators: ['Indicator 1', 'Indicator 2'],
     },
     dataCsvPreview: testDataSetCsvPreview,

@@ -92,16 +92,22 @@ public class DataSetFileService(
             .Where(file => results.Select(r => r.FileId).ToList().Contains(file.Id))
             .ToDictionaryAsync(
                 file => file.Id,
-                file =>
-                    file.DataSetFileVersionGeographicLevels.Where(gl => gl.CsvOnly != true)
-                        .Select(gl => gl.GeographicLevel.GetEnumLabel())
-                        .Order()
-                        .ToList(),
+                file => file.DataSetFileVersionGeographicLevels,
                 cancellationToken: cancellationToken
             );
         foreach (var result in results)
         {
-            result.Meta.GeographicLevels = geogLvlsDict[result.FileId];
+            // TODO EES-7584 update once CsvOnly isn't nullable
+            result.Meta.GeographicLevels = geogLvlsDict[result.FileId]
+                .Where(gl => gl.CsvOnly != true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList();
+            result.Meta.GeographicLevelsCsvOnly = geogLvlsDict[result.FileId]
+                .Where(gl => gl.CsvOnly == true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList();
         }
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
@@ -329,9 +335,15 @@ public class DataSetFileService(
         return new DataSetFileMetaViewModel
         {
             NumDataFileRows = meta.NumDataFileRows,
+            // TODO EES-7584 update once CsvOnly isn't nullable
             GeographicLevels = dataSetFileVersionGeographicLevels
                 .Where(gl => gl.CsvOnly != true)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .ToList(),
+            GeographicLevelsCsvOnly = dataSetFileVersionGeographicLevels
+                .Where(gl => gl.CsvOnly == true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
                 .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
@@ -574,9 +586,7 @@ internal static class ReleaseFileQueryableExtensions
     {
         return geographicLevel.HasValue
             ? query.Where(rf =>
-                rf.File.DataSetFileVersionGeographicLevels.Any(gl =>
-                    gl.GeographicLevel == geographicLevel && gl.CsvOnly != true
-                )
+                rf.File.DataSetFileVersionGeographicLevels.Any(gl => gl.GeographicLevel == geographicLevel)
             )
             : query;
     }

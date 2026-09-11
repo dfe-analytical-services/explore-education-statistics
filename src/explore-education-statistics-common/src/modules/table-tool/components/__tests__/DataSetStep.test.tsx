@@ -22,6 +22,7 @@ describe('DataSetStep', () => {
         to: '2020/21',
       },
       geographicLevels: ['Local Authority District', 'Ward'],
+      geographicLevelsCsvOnly: ['School'],
       file: {
         id: 'file-1',
         name: 'Subject 1',
@@ -139,6 +140,11 @@ describe('DataSetStep', () => {
     expect(subject1Hint.getByTestId('Geographic levels')).toHaveTextContent(
       'Local Authority District; Ward',
     );
+    expect(
+      subject1Hint.getByTestId(
+        'Geographic levels (only available via download / public API)',
+      ),
+    ).toHaveTextContent('School');
     expect(subject1Hint.getByTestId('Time period')).toHaveTextContent(
       '2018/19 to 2020/21',
     );
@@ -163,6 +169,11 @@ describe('DataSetStep', () => {
     expect(subject2Hint.getByTestId('Geographic levels')).toHaveTextContent(
       'Local Authority; National',
     );
+    expect(
+      subject2Hint.queryByTestId(
+        'Geographic levels (only available via download / public API)',
+      ),
+    ).not.toBeInTheDocument();
     expect(subject2Hint.getByTestId('Time period')).toHaveTextContent(
       '2015 to 2020',
     );
