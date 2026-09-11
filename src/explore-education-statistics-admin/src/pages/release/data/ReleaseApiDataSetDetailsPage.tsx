@@ -28,6 +28,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import NotificationBanner from '@common/components/NotificationBanner';
 import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import { useQuery } from '@tanstack/react-query';
@@ -39,6 +40,7 @@ import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDr
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
@@ -47,6 +49,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const history = useHistory();
   const { publicAppUrl } = useConfig();
   const { releaseVersion } = useReleaseVersionContext();
+  const { user } = useAuthContext();
 
   const [finalisingStatus, setFinalisingStatus] =
     useState<DataSetFinalisingStatus>(undefined);
@@ -198,32 +201,36 @@ export default function ReleaseApiDataSetDetailsPage() {
                     View preview token log
                   </Link>
                 </li>
-                {unfinaliseAction && <li>{unfinaliseAction}</li>}
               </>
             )}
-            {canUpdateRelease &&
-              !isPatch &&
-              dataSet?.draftVersion?.status !== 'Finalising' && (
-                <li>
-                  <DeleteDraftVersionButton
-                    dataSet={dataSet}
-                    dataSetVersion={dataSet.draftVersion}
-                    onDeleted={() =>
-                      history.push(
-                        generatePath<ReleaseRouteParams>(
-                          releaseApiDataSetsRoute.path,
-                          {
-                            publicationId: releaseVersion.publicationId,
-                            releaseVersionId: releaseVersion.id,
-                          },
-                        ),
-                      )
-                    }
-                  >
-                    Remove draft version
-                  </DeleteDraftVersionButton>
-                </li>
-              )}
+            {user?.permissions.canManagePublicApiDataSets && (
+              <>
+                {unfinaliseAction && <li>{unfinaliseAction}</li>}
+                {canUpdateRelease &&
+                  !isPatch &&
+                  dataSet?.draftVersion?.status !== 'Finalising' && (
+                    <li>
+                      <DeleteDraftVersionButton
+                        dataSet={dataSet}
+                        dataSetVersion={dataSet.draftVersion}
+                        onDeleted={() =>
+                          history.push(
+                            generatePath<ReleaseRouteParams>(
+                              releaseApiDataSetsRoute.path,
+                              {
+                                publicationId: releaseVersion.publicationId,
+                                releaseVersionId: releaseVersion.id,
+                              },
+                            ),
+                          )
+                        }
+                      >
+                        Remove draft version
+                      </DeleteDraftVersionButton>
+                    </li>
+                  )}
+              </>
+            )}
           </ul>
         )
       }
@@ -296,12 +303,16 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet.draftVersion.mappingStatus.indicatorsComplete;
 
   const showDraftVersionTasks =
-    dataSet?.draftVersion?.status !== 'Processing' &&
-    dataSet?.draftVersion?.status !== 'Finalising' &&
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
+
+  const mappingActionsRequired =
+    !!dataSet?.draftVersion?.mappingStatus && !mappingComplete;
+
+  const readyToFinalise =
+    !!mappingComplete && dataSet?.draftVersion?.status === 'Mapping';
 
   const replaceRouteParams = dataSet?.draftVersion?.originalFileId
     ? {
@@ -354,6 +365,74 @@ export default function ReleaseApiDataSetDetailsPage() {
       </div>
     </InsetText>
   );
+
+  const contactEesTeamText = (
+    <>
+      Please contact the EES team for support at{' '}
+      <a href="mailto:explore.statistics@education.gov.uk">
+        explore.statistics@education.gov.uk
+      </a>
+      .
+    </>
+  );
+
+  const standardUserMappingActionsRequiredBanner = (
+    <NotificationBanner
+      fullWidthContent
+      heading="Draft API data set version requires action"
+      title="Action required"
+    >
+      <p>
+        This API data set version has mapping actions that need to be completed
+        before it can be published, but you do not have the required role to
+        resolve this. {contactEesTeamText}
+      </p>
+    </NotificationBanner>
+  );
+
+  const standardUserFinaliseRequiredBanner = (
+    <NotificationBanner
+      fullWidthContent
+      heading="Draft API data set version is ready to be finalised"
+      title="Action required"
+    >
+      <p>
+        This API data set version is ready to be finalised, but you do not have
+        the required role to do this. {contactEesTeamText}
+      </p>
+    </NotificationBanner>
+  );
+
+  const finaliseSection = (() => {
+    if (majorVersionRejected) {
+      return majorVersionErrorSummary;
+    }
+
+    if (user?.permissions.canManagePublicApiDataSets) {
+      return (
+        mappingComplete &&
+        dataSet?.draftVersion && (
+          <ApiDataSetFinaliseBanner
+            dataSetId={dataSetId}
+            dataSetVersionId={dataSet.draftVersion.id}
+            draftVersionStatus={dataSet.draftVersion.status}
+            finalisingStatus={finalisingStatus}
+            publicationId={releaseVersion.publicationId}
+            releaseVersionId={releaseVersion.id}
+            onFinalise={handleFinalise}
+          />
+        )
+      );
+    }
+
+    return (
+      <>
+        {mappingActionsRequired && standardUserMappingActionsRequiredBanner}
+        {readyToFinalise && standardUserFinaliseRequiredBanner}
+      </>
+    );
+  })();
+
   return (
     <>
       <Link
@@ -373,20 +452,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             <span className="govuk-caption-l">API data set details</span>
             <h2>{dataSet.title}</h2>
 
-            {majorVersionRejected
-              ? majorVersionErrorSummary
-              : mappingComplete &&
-                dataSet.draftVersion && (
-                  <ApiDataSetFinaliseBanner
-                    dataSetId={dataSetId}
-                    dataSetVersionId={dataSet.draftVersion.id}
-                    draftVersionStatus={dataSet.draftVersion.status}
-                    finalisingStatus={finalisingStatus}
-                    publicationId={releaseVersion.publicationId}
-                    releaseVersionId={releaseVersion.id}
-                    onFinalise={handleFinalise}
-                  />
-                )}
+            {finaliseSection}
 
             <SummaryList
               className="govuk-!-margin-bottom-8"

@@ -32,9 +32,10 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        return await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(dataSetVersion.DataSet.PublicationId)
+            )
             .OnSuccessDo(ValidateDraftDataSetVersion)
             .OnSuccess(async () =>
             {
@@ -62,12 +63,11 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await publicDataDbContext
-                    .PreviewTokens.AsNoTracking()
-                    .SingleOrNotFoundAsync(pt => pt.Id == previewTokenId, cancellationToken: cancellationToken)
+        return await CheckPreviewTokenExists(previewTokenId, cancellationToken)
+            .OnSuccessDo(previewToken =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(
+                    previewToken.DataSetVersion.DataSet.PublicationId
+                )
             )
             .OnSuccess(MapPreviewToken);
     }
@@ -77,9 +77,10 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () => await CheckDataSetVersionExists(dataSetVersionId, cancellationToken))
+        return await CheckDataSetVersionExists(dataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(dataSetVersion.DataSet.PublicationId)
+            )
             .OnSuccess(async () => await DoList(dataSetVersionId, cancellationToken));
     }
 
@@ -88,12 +89,12 @@ public class PreviewTokenService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await publicDataDbContext.PreviewTokens.SingleOrNotFoundAsync(
-                    pt => pt.Id == previewTokenId,
-                    cancellationToken: cancellationToken
+        // Deliberately requests a tracked entity since the mutation below needs EF to pick up
+        // and persist the change to Expires.
+        return await CheckPreviewTokenExists(previewTokenId, cancellationToken, trackChanges: true)
+            .OnSuccessDo(previewToken =>
+                userService.CheckCanManagePublicApiDataSetPreviewTokens(
+                    previewToken.DataSetVersion.DataSet.PublicationId
                 )
             )
             .OnSuccessDo(ValidatePreviewToken)
@@ -112,6 +113,7 @@ public class PreviewTokenService(
     {
         return await publicDataDbContext
             .DataSetVersions.AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .SingleOrNotFoundAsync(dsv => dsv.Id == dataSetVersionId, cancellationToken);
     }
 
@@ -143,6 +145,26 @@ public class PreviewTokenService(
                 }
             )
             : Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, PreviewToken>> CheckPreviewTokenExists(
+        Guid previewTokenId,
+        CancellationToken cancellationToken,
+        bool trackChanges = false
+    )
+    {
+        IQueryable<PreviewToken> query = publicDataDbContext.PreviewTokens;
+
+        if (!trackChanges)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query
+            .Include(pt => pt.DataSetVersion)
+                .ThenInclude(dsv => dsv.DataSet)
+            .Where(pt => pt.Id == previewTokenId)
+            .SingleOrNotFoundAsync(cancellationToken);
     }
 
     private async Task<Either<ActionResult, IReadOnlyList<PreviewTokenViewModel>>> DoList(

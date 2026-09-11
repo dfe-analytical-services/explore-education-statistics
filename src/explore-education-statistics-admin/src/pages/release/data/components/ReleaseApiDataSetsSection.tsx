@@ -73,8 +73,7 @@ export default function ReleaseApiDataSetsSection() {
       </InsetText>
 
       <LoadingSpinner loading={hasDataSetsLoading}>
-        {/* TODO: Update when non-BAU users can create API data sets  */}
-        {user?.permissions.isBauUser && (
+        {user?.permissions.canManagePublicApiDataSets ? (
           <>
             {canUpdateRelease ? (
               <ApiDataSetCreateModal
@@ -94,6 +93,13 @@ export default function ReleaseApiDataSetsSection() {
               </WarningMessage>
             )}
           </>
+        ) : (
+          <p>
+            To create, replace or remove API data sets, please contact{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </p>
         )}
 
         {dataSets.length > 0 ? (

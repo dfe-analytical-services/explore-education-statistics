@@ -47,6 +47,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessAnalystPages: false,
                 CanAccessAllImports: false,
                 CanManageAllTaxonomy: false,
+                CanManagePublicApiDataSets: false,
                 IsBauUser: false,
                 IsApprover: false
             )
@@ -75,6 +76,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: true,
                 CanManageAllTaxonomy: true,
+                CanManagePublicApiDataSets: true,
                 IsBauUser: true,
                 // Expect "IsApprover" to be false even for BAU as we don't expect BAU users to be assigned
                 // individual Approver roles on Releases or Publications.
@@ -109,6 +111,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
                 CanManageAllTaxonomy: false,
+                CanManagePublicApiDataSets: false,
                 IsBauUser: false,
                 // Expect this to be false if the user isn't an approver
                 IsApprover: false
@@ -141,6 +144,7 @@ public class PermissionsControllerTests(PermissionsControllerTestsFixture fixtur
                 CanAccessAnalystPages: true,
                 CanAccessAllImports: false,
                 CanManageAllTaxonomy: false,
+                CanManagePublicApiDataSets: false,
                 IsBauUser: false,
                 // Expect this to be true if the user is a Publication approver
                 IsApprover: true

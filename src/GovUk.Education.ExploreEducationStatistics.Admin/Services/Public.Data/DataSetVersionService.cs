@@ -36,13 +36,10 @@ public class DataSetVersionService(
         Either<ActionResult, PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>
     > ListLiveVersions(Guid dataSetId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(() =>
-                publicDataDbContext
-                    .DataSets.AsNoTracking()
-                    .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken)
-            )
+        return await publicDataDbContext
+            .DataSets.AsNoTracking()
+            .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken)
+            .OnSuccessDo(dataSet => userService.CheckCanViewPublicApiDataSets(dataSet.PublicationId))
             .OnSuccess(async dataSet =>
             {
                 var dataSetVersionsQueryable = publicDataDbContext
@@ -78,10 +75,9 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanViewPublicApiDataSets(dataSetVersion.DataSet.PublicationId)
             )
             .OnSuccess(mapper.Map<DataSetVersionInfoViewModel>);
     }
@@ -130,13 +126,9 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        var releaseFile = await contentDbContext
-            .ReleaseFiles.Include(rf => rf.ReleaseVersion)
-                .ThenInclude(rv => rv.Release)
-            .SingleAsync(r => r.Id == releaseFileId, cancellationToken);
-
-        return await userService
-            .CheckCanUpdateReleaseVersion(releaseFile.ReleaseVersion)
+        return await GetReleaseVersion(releaseFileId, cancellationToken)
+            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccess(async () =>
                 await processorClient.CreateNextDataSetVersionMappings(
                     dataSetId: dataSetId,
@@ -159,11 +151,18 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessCombineWith(dataSetVersion =>
+                GetReleaseVersion(dataSetVersion.Release.ReleaseFileId, cancellationToken)
             )
+            .OnSuccess(async tuple =>
+            {
+                var (dataSetVersion, releaseVersion) = tuple;
+
+                return await ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken)
+                    .OnSuccess(_ => dataSetVersion);
+            })
+            .OnSuccessDo(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccessDo(CheckCanUpdatePatchVersion)
             .OnSuccess(async _ =>
                 await processorClient.CompleteNextDataSetVersionImport(
@@ -186,28 +185,14 @@ public class DataSetVersionService(
     )
     {
         return await GetVersion(dataSetVersionId, cancellationToken)
-            .OnSuccess(dsv => dsv.Release.ReleaseFileId)
-            .OnSuccess(releaseFileId =>
-                contentDbContext.ReleaseFiles.SingleAsync(
-                    r => r.Id == releaseFileId,
+            .OnSuccess(dataSetVersion => GetReleaseVersion(dataSetVersion.Release.ReleaseFileId, cancellationToken))
+            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccessVoid(async () =>
+                await processorClient.DeleteDataSetVersion(
+                    dataSetVersionId: dataSetVersionId,
                     cancellationToken: cancellationToken
                 )
-            )
-            .OnSuccess(async releaseFile =>
-                await contentDbContext
-                    .ReleaseVersions.Include(rv => rv.Release)
-                    .AsNoTracking()
-                    .SingleAsync(r => r.Id == releaseFile.ReleaseVersionId, cancellationToken)
-            )
-            .OnSuccess(async releaseVersion =>
-                await userService
-                    .CheckCanUpdateReleaseVersion(releaseVersion)
-                    .OnSuccessVoid(async () =>
-                        await processorClient.DeleteDataSetVersion(
-                            dataSetVersionId: dataSetVersionId,
-                            cancellationToken: cancellationToken
-                        )
-                    )
             );
     }
 
@@ -216,17 +201,10 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(() => GetVersion(dataSetVersionId, cancellationToken))
-            .OnSuccess(async dataSetVersion =>
-                await contentDbContext
-                    .ReleaseFiles.AsNoTracking()
-                    .Where(releaseFile => releaseFile.Id == dataSetVersion.Release.ReleaseFileId)
-                    .Select(releaseFile => releaseFile.ReleaseVersion)
-                    .SingleAsync(cancellationToken)
-            )
-            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+        return await GetVersion(dataSetVersionId, cancellationToken)
+            .OnSuccess(dataSetVersion => GetReleaseVersion(dataSetVersion.Release.ReleaseFileId, cancellationToken))
+            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccessVoid(async _ =>
                 await processorClient.UnfinaliseDataSetVersion(dataSetVersionId, cancellationToken)
             );
@@ -237,13 +215,9 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(() =>
-                publicDataDbContext
-                    .DataSetVersions.AsNoTracking()
-                    .Where(dsv => dsv.Id == dataSetVersionId)
-                    .SingleOrNotFoundAsync(cancellationToken: cancellationToken)
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(dataSetVersion =>
+                userService.CheckCanViewPublicApiDataSets(dataSetVersion.DataSet.PublicationId)
             )
             .OnSuccess(dsv =>
                 publicDataApiClient.GetDataSetVersionChanges(
@@ -260,11 +234,8 @@ public class DataSetVersionService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
-            .OnSuccess(async () =>
-                await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
-            )
+        return await GetVersion(dataSetVersionId: dataSetVersionId, cancellationToken: cancellationToken)
+            .OnSuccessDo(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccessDo(dataSetVersion => CheckCanUpdateVersion(dataSetVersion, updateRequest))
             .OnSuccess(async dataSetVersion =>
                 await UpdateVersion(
@@ -361,6 +332,7 @@ public class DataSetVersionService(
     {
         return await publicDataDbContext
             .DataSetVersions.AsNoTracking()
+            .Include(dsv => dsv.DataSet)
             .Where(dsv => dsv.Id == dataSetVersionId)
             .SingleOrNotFoundAsync(cancellationToken);
     }
@@ -486,6 +458,29 @@ public class DataSetVersionService(
     private static IdTitleViewModel MapReleaseVersion(ReleaseVersion releaseVersion)
     {
         return new IdTitleViewModel { Id = releaseVersion.Id, Title = releaseVersion.Release.Title };
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> GetReleaseVersion(
+        Guid releaseFileId,
+        CancellationToken cancellationToken
+    ) =>
+        await contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Where(r => r.Id == releaseFileId)
+            .Select(rf => rf.ReleaseVersion)
+            .SingleOrNotFoundAsync(cancellationToken);
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIsNotApproved(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        {
+            return new ForbidResult();
+        }
+
+        return Unit.Instance;
     }
 }
 

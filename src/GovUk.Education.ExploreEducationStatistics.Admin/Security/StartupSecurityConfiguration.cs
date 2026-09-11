@@ -272,6 +272,24 @@ public static class StartupSecurityConfiguration
                 nameof(SecurityPolicies.CanDeleteSpecificMethodology),
                 policy => policy.Requirements.Add(new DeleteSpecificMethodologyRequirement())
             );
+
+            /*
+             * Public API management
+             */
+            options.AddPolicy(
+                nameof(SecurityPolicies.CanManagePublicApiDataSets),
+                policy => policy.Requirements.Add(new ManagePublicApiDataSetsRequirement())
+            );
+
+            options.AddPolicy(
+                nameof(SecurityPolicies.CanViewPublicApiDataSets),
+                policy => policy.Requirements.Add(new ViewPublicApiDataSetsRequirement())
+            );
+
+            options.AddPolicy(
+                nameof(SecurityPolicies.CanManagePublicApiDataSetPreviewTokens),
+                policy => policy.Requirements.Add(new ManagePublicApiDataSetPreviewTokensRequirement())
+            );
         });
     }
 
@@ -337,5 +355,12 @@ public static class StartupSecurityConfiguration
         services.AddTransient<IAuthorizationHandler, MarkMethodologyAsApprovedAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, DeleteSpecificMethodologyAuthorizationHandler>();
+
+        /*
+         * Public API management
+         */
+        services.AddTransient<IAuthorizationHandler, ManagePublicApiDataSetsAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ViewPublicApiDataSetsAuthorizationHandler>();
+        services.AddTransient<IAuthorizationHandler, ManagePublicApiDataSetPreviewTokensAuthorizationHandler>();
     }
 }

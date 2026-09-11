@@ -18,6 +18,8 @@ import _permissionService, {
 } from '@admin/services/permissionService';
 import render from '@common-test/render';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
+import { GlobalPermissions } from '@admin/services/authService';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 
@@ -33,6 +35,24 @@ describe('ReleaseDataUploadsSection', () => {
   beforeEach(() => {
     document.body.className = 'govuk-frontend-supported';
   });
+
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-2',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
 
   const testDataFiles: DataFile[] = [
     {
@@ -960,6 +980,65 @@ describe('ReleaseDataUploadsSection', () => {
           'This data file has an API data set linked to it. Please remove the API data set before deleting.',
         ),
       ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('link', { name: 'Go to API data set' }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/api-data-sets/test-data-set-id',
+      );
+    });
+
+    test('shows contact EES team message when linked to an API data set and user cannot manage API data sets', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        { ...testDataFiles[0], publicApiDataSetId: 'test-data-set-id' },
+      ]);
+      releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+        testCompleteImportStatus,
+      );
+
+      const { user } = renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+        testAnalystUser,
+      );
+
+      expect(
+        await screen.findByText('Uploaded data files'),
+      ).toBeInTheDocument();
+
+      const fileTableRows = getAllFileTableRows('Data files');
+
+      expect(fileTableRows).toHaveLength(2);
+
+      await user.click(
+        within(fileTableRows[1]).getByRole('button', {
+          name: 'Delete files for Test data 1',
+        }),
+      );
+
+      expect(
+        await screen.findByText('Cannot delete files'),
+      ).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText(
+          /This data file has an API data set linked to it\. It will need removing before the data file can be deleted\./,
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByRole('link', {
+          name: 'explore.statistics@education.gov.uk',
+        }),
+      ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
 
       expect(
         modal.getByRole('link', { name: 'Go to API data set' }),
@@ -2157,7 +2236,10 @@ describe('ReleaseDataUploadsSection', () => {
     return within(table).getAllByRole('row');
   }
 
-  function renderWithTestConfig(children: React.ReactNode) {
+  function renderWithTestConfig(
+    children: React.ReactNode,
+    user: User = testBauUser,
+  ) {
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',
@@ -2181,11 +2263,13 @@ describe('ReleaseDataUploadsSection', () => {
       },
     };
     return render(
-      <ReleaseVersionContextProvider releaseVersion={testRelease}>
-        <TestConfigContextProvider config={defaultTestConfig}>
-          {children}
-        </TestConfigContextProvider>
-      </ReleaseVersionContextProvider>,
+      <AuthContextTestProvider user={user}>
+        <ReleaseVersionContextProvider releaseVersion={testRelease}>
+          <TestConfigContextProvider config={defaultTestConfig}>
+            {children}
+          </TestConfigContextProvider>
+        </ReleaseVersionContextProvider>
+      </AuthContextTestProvider>,
     );
   }
 });

@@ -37,9 +37,7 @@ public class DataSetVersionMappingService(
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
             .OnSuccess(mapping => mapping.LocationMappingPlan);
     }
 
@@ -64,9 +62,7 @@ public class DataSetVersionMappingService(
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
             .OnSuccess(mapping => mapping.FilterMappingPlan);
     }
 
@@ -75,9 +71,7 @@ public class DataSetVersionMappingService(
         CancellationToken cancellationToken = default
     )
     {
-        return userService
-            .CheckIsBauUser()
-            .OnSuccess(() => CheckMappingExists(nextDataSetVersionId, cancellationToken))
+        return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
             .OnSuccess(mapping => mapping.IndicatorMappingPlan);
     }
 
@@ -171,7 +165,7 @@ public class DataSetVersionMappingService(
     {
         return await publicDataDbContext.RequireTransaction(async () =>
             await userService
-                .CheckIsBauUser()
+                .CheckCanManagePublicApiDataSets()
                 .OnSuccess(() =>
                     CheckMappingExists(nextDataSetVersionId, cancellationToken).OnSuccess(CheckInMappingStatus)
                 )
@@ -804,9 +798,23 @@ public class DataSetVersionMappingService(
         return await publicDataDbContext
             .DataSetVersionMappings.AsNoTracking()
             .Include(mapping => mapping.TargetDataSetVersion)
+                .ThenInclude(targetVersion => targetVersion.DataSet)
             .SingleOrNotFoundAsync(
                 mapping => mapping.TargetDataSetVersionId == nextDataSetVersionId,
                 cancellationToken
+            );
+    }
+
+    private async Task<Either<ActionResult, DataSetVersionMapping>> CheckMappingExistsAndCanView(
+        Guid nextDataSetVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await CheckMappingExists(nextDataSetVersionId, cancellationToken)
+            .OnSuccessDo(dataSetVersionMapping =>
+                userService.CheckCanViewPublicApiDataSets(
+                    dataSetVersionMapping.TargetDataSetVersion.DataSet.PublicationId
+                )
             );
     }
 }

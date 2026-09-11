@@ -1,13 +1,33 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import DraftApiDataSetsTable, {
   DraftApiDataSetSummary,
 } from '@admin/pages/release/data/components/DraftApiDataSetsTable';
+import { GlobalPermissions } from '@admin/services/authService';
 import baseRender from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
 describe('DraftApiDataSetsTable', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testDataSets: DraftApiDataSetSummary[] = [
     {
       id: 'data-set-4',
@@ -509,7 +529,65 @@ describe('DraftApiDataSetsTable', () => {
     expect(row1Cells[3]).toHaveTextContent('Remove draft for Data set 8 title');
   });
 
-  function render(element: ReactNode) {
+  test('it doesnt render Remove Draft button for a user who cannot manage public API data sets, even if working with a Ready draft version that is not patch', () => {
+    render(
+      <DraftApiDataSetsTable
+        canUpdateRelease
+        dataSets={draftDataSet}
+        publicationId="publication-1"
+        releaseVersionId="release-1"
+      />,
+      { user: testAnalystUser },
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(rows).toHaveLength(2);
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(row1Cells[0]).toHaveTextContent('v2.0');
+    expect(row1Cells[1]).toHaveTextContent('Data set 8 title');
+    expect(row1Cells[2]).toHaveTextContent('Ready');
+    expect(
+      within(row1Cells[3]).queryByRole('button', {
+        name: /Remove draft/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('it shows "View details" instead of "View details / edit draft" for a user who cannot manage public API data sets, even when they can update the release and the version is not 1.0', () => {
+    render(
+      <DraftApiDataSetsTable
+        canUpdateRelease
+        dataSets={draftDataSet}
+        publicationId="publication-1"
+        releaseVersionId="release-1"
+      />,
+      { user: testAnalystUser },
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(rows).toHaveLength(2);
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(
+      within(row1Cells[3]).getByRole('link', {
+        name: 'View details for Data set 8 title',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(row1Cells[3]).queryByRole('link', {
+        name: 'View details / edit draft for Data set 8 title',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  function render(element: ReactNode, options?: { user?: User }) {
+    const { user = testBauUser } = options ?? {};
+
     const defaultTestConfig = {
       appInsightsKey: '',
       publicAppUrl: 'http://localhost',
@@ -540,7 +618,9 @@ describe('DraftApiDataSetsTable', () => {
             ...defaultTestConfig,
           }}
         >
-          {element}
+          <AuthContextTestProvider user={user}>
+            {element}
+          </AuthContextTestProvider>
         </TestConfigContextProvider>
       </MemoryRouter>,
     );

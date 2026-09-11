@@ -16,12 +16,12 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 {
     [HttpGet("locations")]
     [Produces("application/json")]
-    public Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
+    public async Task<ActionResult<LocationMappingPlan>> GetLocationMappings(
         [FromRoute] Guid nextDataSetVersionId,
         CancellationToken cancellationToken
     )
     {
-        return mappingService.GetLocationMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
+        return await mappingService.GetLocationMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("locations")]
@@ -43,12 +43,12 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpGet("filters")]
     [Produces("application/json")]
-    public Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
+    public async Task<ActionResult<FilterMappingPlan>> GetFilterMappings(
         [FromRoute] Guid nextDataSetVersionId,
         CancellationToken cancellationToken
     )
     {
-        return mappingService.GetFilterMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
+        return await mappingService.GetFilterMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("filters/options")]
@@ -72,12 +72,12 @@ public class DataSetVersionMappingController(IDataSetVersionMappingService mappi
 
     [HttpGet("indicators")]
     [Produces("application/json")]
-    public Task<ActionResult<IndicatorMappingPlan>> GetIndicatorMappings(
+    public async Task<ActionResult<IndicatorMappingPlan>> GetIndicatorMappings(
         [FromRoute] Guid nextDataSetVersionId,
         CancellationToken cancellationToken
     )
     {
-        return mappingService.GetIndicatorMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
+        return await mappingService.GetIndicatorMappings(nextDataSetVersionId, cancellationToken).HandleFailuresOrOk();
     }
 
     [HttpPatch("indicators")]

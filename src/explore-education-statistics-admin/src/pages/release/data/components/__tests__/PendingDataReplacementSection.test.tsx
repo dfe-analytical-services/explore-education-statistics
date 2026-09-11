@@ -69,6 +69,7 @@ const defaultPermissions = {
   canAccessAnalystPages: true,
   canAccessAllImports: true,
   canManageAllTaxonomy: true,
+  canManagePublicApiDataSets: true,
   isApprover: true,
 };
 
