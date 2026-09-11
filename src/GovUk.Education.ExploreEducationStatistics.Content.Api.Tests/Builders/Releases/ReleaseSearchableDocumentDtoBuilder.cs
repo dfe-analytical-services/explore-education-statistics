@@ -17,6 +17,10 @@ public class ReleaseSearchableDocumentDtoBuilder
     private Guid _themeId = Guid.NewGuid();
     private string _themeTitle = "Theme title";
     private ReleaseType _type = ReleaseType.OfficialStatistics;
+    private SearchableDocumentPublishingOrganisationDto[] _publishingOrganisations =
+    [
+        new() { Id = Guid.NewGuid(), Title = "Department for Education" },
+    ];
     private string _htmlContent = "HTML content";
 
     public ReleaseSearchableDocumentDto Build() =>
@@ -34,6 +38,7 @@ public class ReleaseSearchableDocumentDtoBuilder
             ThemeTitle = _themeTitle,
             Type = _type.ToString(),
             TypeBoost = _type.ToSearchDocumentTypeBoost(),
+            PublishingOrganisations = _publishingOrganisations,
             HtmlContent = _htmlContent,
         };
 
@@ -100,6 +105,14 @@ public class ReleaseSearchableDocumentDtoBuilder
     public ReleaseSearchableDocumentDtoBuilder WithType(ReleaseType type)
     {
         _type = type;
+        return this;
+    }
+
+    public ReleaseSearchableDocumentDtoBuilder WithPublishingOrganisations(
+        params SearchableDocumentPublishingOrganisationDto[] publishingOrganisations
+    )
+    {
+        _publishingOrganisations = publishingOrganisations;
         return this;
     }
 
