@@ -1,4 +1,5 @@
 import { allowedServiceNames, ServiceName, serviceSchemas } from './services';
+import { isOlderVersion } from './utils/versions';
 
 /**
  * The oldest Azure Functions Core Tools whose bundled host runs on .NET 10.
@@ -11,8 +12,9 @@ import { allowedServiceNames, ServiceName, serviceSchemas } from './services';
  */
 export const MIN_CORE_TOOLS_VERSION = '4.13.0';
 
-/** Where to go to get a newer one, for the message that says to. */
-const CORE_TOOLS_URL = 'https://github.com/Azure/azure-functions-core-tools';
+/** Where to go to get a newer one, for the messages that say to. */
+export const CORE_TOOLS_URL =
+  'https://github.com/Azure/azure-functions-core-tools';
 
 /**
  * The services this applies to: every one the dashboard starts through a
@@ -203,15 +205,6 @@ export function findCoreToolsVersion(
   return banner?.match(/^Core Tools Version:\s+(\d+\.\d+\.\d+)/)?.[1];
 }
 
-/** Whether `version` is older than {@link MIN_CORE_TOOLS_VERSION}. */
-function isCoreToolsTooOld(version: string): boolean {
-  const parts = version.split('.').map(Number);
-  const minimum = MIN_CORE_TOOLS_VERSION.split('.').map(Number);
-  const differing = parts.findIndex((part, index) => part !== minimum[index]);
-
-  return differing !== -1 && parts[differing] < minimum[differing];
-}
-
 /**
  * What to tell the user to do about it.
  *
@@ -232,7 +225,7 @@ function describeRemedy(
   version: string | undefined,
   versionMismatch: boolean,
 ): string {
-  if (version && isCoreToolsTooOld(version)) {
+  if (version && isOlderVersion(version, MIN_CORE_TOOLS_VERSION)) {
     return (
       `Azure Functions Core Tools ${version} bundles a .NET 9 host, and these ` +
       `services target net10.0 - upgrade it to ${MIN_CORE_TOOLS_VERSION} or ` +

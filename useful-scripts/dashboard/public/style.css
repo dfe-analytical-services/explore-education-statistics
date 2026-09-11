@@ -86,6 +86,22 @@ h1 {
   display: none;
 }
 
+/* Warnings share the issues banner's layout but trade the red for amber -
+   drifted tool versions shouldn't shout as loudly as a broken service. */
+.issues-banner.warnings {
+  background: rgba(217, 164, 65, 0.12);
+  border-color: var(--amber);
+}
+
+.issues-banner.warnings .issue-service-chip {
+  background: rgba(217, 164, 65, 0.2);
+  border-color: var(--amber);
+}
+
+.issues-banner.warnings .issue-service-chip:hover {
+  background: rgba(217, 164, 65, 0.3);
+}
+
 .issues-banner button {
   flex-shrink: 0;
 }

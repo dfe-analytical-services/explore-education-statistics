@@ -8,6 +8,7 @@ const appServicesEl = document.getElementById('app-services');
 const backupPanelEl = document.getElementById('backup-panel');
 const stopAllBtn = document.getElementById('stop-all-btn');
 const issuesBannerEl = document.getElementById('issues-banner');
+const warningsBannerEl = document.getElementById('warnings-banner');
 const projectRootBannerEl = document.getElementById('project-root-banner');
 const operationBannerEl = document.getElementById('operation-banner');
 
@@ -606,15 +607,29 @@ function renderProjectRootBanner(projectRootOverride) {
   projectRootBannerEl.classList.remove('hidden');
 }
 
+// Errors and warnings get separate banners (red and amber) so that a tool
+// that's merely drifted behind the repo's pins doesn't look as urgent as a
+// database that won't start.
 function renderIssues(issues) {
-  issuesBannerEl.replaceChildren();
+  renderIssueBanner(
+    issuesBannerEl,
+    issues.filter(issue => issue.severity !== 'warning'),
+  );
+  renderIssueBanner(
+    warningsBannerEl,
+    issues.filter(issue => issue.severity === 'warning'),
+  );
+}
+
+function renderIssueBanner(bannerEl, issues) {
+  bannerEl.replaceChildren();
 
   if (issues.length === 0) {
-    issuesBannerEl.classList.add('hidden');
+    bannerEl.classList.add('hidden');
     return;
   }
 
-  issuesBannerEl.classList.remove('hidden');
+  bannerEl.classList.remove('hidden');
 
   issues.forEach(issue => {
     const text = document.createElement('span');
@@ -637,10 +652,10 @@ function renderIssues(issues) {
     message.textContent = issue.message;
     text.appendChild(message);
 
-    issuesBannerEl.appendChild(text);
+    bannerEl.appendChild(text);
 
     if (issue.fixLabel) {
-      issuesBannerEl.appendChild(makeIssueFixButton(issue));
+      bannerEl.appendChild(makeIssueFixButton(issue));
     }
   });
 }

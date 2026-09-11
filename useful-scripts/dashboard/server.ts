@@ -53,6 +53,7 @@ import {
   subscribeLogs,
 } from './processManager';
 import importMssqlDataZip from './testData';
+import checkToolVersions, { ToolIssue } from './toolVersions';
 import findWebAppFailure, { webAppServices } from './webAppHealth';
 import findFunctionHostFailure, {
   functionHostServices,
@@ -186,6 +187,14 @@ interface ServiceIssue {
   id: string;
   message: string;
   /**
+   * How loudly the client should report it: 'error' (the default) gets the
+   * red banner, 'warning' an amber one. Warnings exist for things that are
+   * wrong but not yet breaking anything - a tool that's drifted behind the
+   * repo's pins - where the red treatment would just teach people to ignore
+   * the banner.
+   */
+  severity?: 'error' | 'warning';
+  /**
    * Label for the button that fixes the issue, where the dashboard can fix it.
    * Omitted for issues it can only report - the client renders no button at
    * all rather than a dead one.
@@ -206,15 +215,41 @@ interface ServiceIssue {
   serviceName?: string;
 }
 
+/**
+ * Tooling issues, checked at startup and refreshed on a timer rather than per
+ * request - `/api/services` is polled every few seconds, and these checks run
+ * subprocesses (and, for the Core Tools latest-release lookup, an HTTP
+ * request; the module caches that part for longer than this interval).
+ *
+ * The refresh also means fixing a tool clears its warning within a few
+ * minutes, without restarting the dashboard - except for Node, where the
+ * version reported is the one this process is running on, and a restart is
+ * the fix.
+ */
+let toolIssues: ToolIssue[] = [];
+
+async function refreshToolIssues(): Promise<void> {
+  try {
+    toolIssues = await checkToolVersions();
+  } catch (err) {
+    console.error('Failed to check tool versions:', err);
+  }
+}
+
+refreshToolIssues();
+setInterval(refreshToolIssues, 5 * 60 * 1000).unref();
+
 app.get(
   '/api/services',
   asyncHandler(async (_req, res) => {
     const dockerStatuses = await getDockerStatuses();
 
+    // Tooling first: a wrong SDK or Core Tools explains most of what any
+    // other issue would go on to say.
+    const issues: ServiceIssue[] = [...toolIssues];
+
     // The mssql data directory issues are associated with the `db` service,
     // so the dashboard labels the banner with it and can scroll to its card.
-    const issues: ServiceIssue[] = [];
-
     const mssqlHealth = await getMssqlVolumeHealth();
 
     if (mssqlHealth.status === 'error') {
