@@ -21,7 +21,7 @@ public record DataSetMapping
 
     public Dictionary<Guid, LocationMapping> LocationMappings { get; init; } = null!;
 
-    public Dictionary<Guid, FilterMapping> FilterMappings { get; set; } = null!; // EES-7370 Change set -> init
+    public Dictionary<Guid, FilterMapping> FilterMappings { get; init; } = null!;
 
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
