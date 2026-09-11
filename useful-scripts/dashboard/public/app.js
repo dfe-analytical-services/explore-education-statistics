@@ -632,6 +632,9 @@ function renderIssueBanner(bannerEl, issues) {
   bannerEl.classList.remove('hidden');
 
   issues.forEach(issue => {
+    const row = document.createElement('div');
+    row.className = 'issue-row';
+
     const text = document.createElement('span');
     text.className = 'issue-text';
 
@@ -652,11 +655,13 @@ function renderIssueBanner(bannerEl, issues) {
     message.textContent = issue.message;
     text.appendChild(message);
 
-    bannerEl.appendChild(text);
+    row.appendChild(text);
 
     if (issue.fixLabel) {
-      bannerEl.appendChild(makeIssueFixButton(issue));
+      row.appendChild(makeIssueFixButton(issue));
     }
+
+    bannerEl.appendChild(row);
   });
 }
 

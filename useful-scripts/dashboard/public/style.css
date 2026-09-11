@@ -71,9 +71,8 @@ h1 {
 
 .issues-banner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   background: rgba(229, 83, 75, 0.12);
   border: 1px solid var(--red);
   border-radius: 8px;
@@ -104,6 +103,13 @@ h1 {
 
 .issues-banner button {
   flex-shrink: 0;
+}
+
+.issue-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .issue-text {
