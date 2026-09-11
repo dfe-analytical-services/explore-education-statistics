@@ -128,16 +128,17 @@ public abstract class StripReleaseFileSummaryHtmlControllerTests
     public class StripSummaryHtmlTests : StripReleaseFileSummaryHtmlControllerTests
     {
         [Fact]
-        public async Task WhenSummaryIsHtml_ConvertsItToPlainTextAfterBackingItUp()
+        public async Task ReleaseFileSummariesContainHtml_HtmlTagsAreStrippedAfterBackingThemUp()
         {
             // Arrange
             ReleaseFile releaseFile = DefaultReleaseFile().WithSummary(HtmlSummary);
+            ReleaseFile anotherReleaseFile = DefaultReleaseFile().WithSummary("<p>Another summary</p>");
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                context.ReleaseFiles.Add(releaseFile);
+                context.ReleaseFiles.AddRange(releaseFile, anotherReleaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -165,7 +166,8 @@ public abstract class StripReleaseFileSummaryHtmlControllerTests
                 // Assert
                 var report = result.AssertOkResult();
 
-                Assert.Equal(1, report.ChangeCount);
+                Assert.Equal(2, report.CandidateCount);
+                Assert.Equal(2, report.ChangeCount);
 
                 VerifyAllMocks(sqlExecutor);
             }
@@ -175,7 +177,11 @@ public abstract class StripReleaseFileSummaryHtmlControllerTests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                Assert.Equal(HtmlSummaryAsPlainText, context.ReleaseFiles.Single().Summary);
+                var summaries = context.ReleaseFiles.ToDictionary(rf => rf.Id, rf => rf.Summary);
+
+                Assert.Equal(2, summaries.Count);
+                Assert.Equal(HtmlSummaryAsPlainText, summaries[releaseFile.Id]);
+                Assert.Equal("Another summary", summaries[anotherReleaseFile.Id]);
             }
         }
 
