@@ -37,6 +37,7 @@ public class ReleaseSearchableDocumentsService(ContentDbContext contentDbContext
         contentDbContext
             .ReleaseVersions.AsNoTracking()
             .Include(rv => rv.Release.Publication.Theme)
+            .Include(rv => rv.PublishingOrganisations)
             .Include(rv => rv.Content)
                 .ThenInclude(cs => cs.Content)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken);
