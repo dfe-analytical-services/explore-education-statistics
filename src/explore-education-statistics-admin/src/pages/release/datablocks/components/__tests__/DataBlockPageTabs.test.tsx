@@ -29,7 +29,7 @@ describe('DataBlockPageTabs', () => {
     name: 'Test data block',
     heading: 'Test title',
     id: 'block-1',
-    dataBlockParentId: 'block-1-parent',
+    dataBlockId: 'block-1',
     dataSetId: 'subject-1',
     dataSetName: 'Test subject',
     source: 'Test source',

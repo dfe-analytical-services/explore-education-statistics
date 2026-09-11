@@ -25,7 +25,7 @@ export default function ReleaseDataListItem({
         {tag}
         {metaInfo && <p className="govuk-!-margin-bottom-1">{metaInfo}</p>}
         {description && (
-          <p className="dfe-colour--dark-grey govuk-!-margin-bottom-0">
+          <p className="dfe-colour--dark-grey govuk-!-margin-bottom-0 dfe-white-space--pre-wrap">
             {description}
           </p>
         )}

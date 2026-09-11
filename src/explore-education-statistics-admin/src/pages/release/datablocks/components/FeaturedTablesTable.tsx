@@ -22,7 +22,7 @@ interface Props {
   featuredTables: FeaturedTable[];
   publicationId: string;
   releaseVersionId: string;
-  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
+  handleDeleteConfirm: (deletedDataBlockVersionId?: string) => Promise<void>;
   onSaveOrder: (reorderedTables: FeaturedTable[]) => Promise<void>;
 }
 
@@ -51,7 +51,7 @@ export default function FeaturedTablesTable({
         list={currentFeaturedTables.reduce<ReorderableListItem[]>(
           (acc, featuredTable) => {
             const dataBlock = dataBlocks.find(
-              block => block.id === featuredTable.dataBlockId,
+              block => block.id === featuredTable.dataBlockVersionId,
             );
             if (dataBlock) {
               acc.push({
@@ -107,6 +107,7 @@ export default function FeaturedTablesTable({
               <th scope="col" className="govuk-!-width-one-quarter">
                 Data block name
               </th>
+              <th scope="col">Data file</th>
               <th scope="col">Has chart</th>
               <th scope="col">In content</th>
               <th scope="col">Featured table name</th>
@@ -119,7 +120,7 @@ export default function FeaturedTablesTable({
           <tbody>
             {currentFeaturedTables.map(featuredTable => {
               const dataBlock = dataBlocks.find(
-                block => block.id === featuredTable.dataBlockId,
+                block => block.id === featuredTable.dataBlockVersionId,
               );
               return dataBlock ? (
                 <FeaturedTablesRow
@@ -132,7 +133,7 @@ export default function FeaturedTablesTable({
                     {
                       publicationId,
                       releaseVersionId,
-                      dataBlockId: featuredTable.dataBlockId,
+                      dataBlockVersionId: featuredTable.dataBlockVersionId,
                     },
                   )}
                   releaseVersionId={releaseVersionId}
@@ -153,7 +154,7 @@ interface FeaturedTablesRowProps {
   featuredTable: FeaturedTable;
   link: string;
   releaseVersionId: string;
-  handleDeleteConfirm: (deletedDataBlockId?: string) => Promise<void>;
+  handleDeleteConfirm: (deletedDataBlockVersionId?: string) => Promise<void>;
 }
 
 function FeaturedTablesRow({
@@ -167,6 +168,7 @@ function FeaturedTablesRow({
   return (
     <tr>
       <td>{dataBlock.name}</td>
+      <td>{dataBlock.dataSetTitle}</td>
       <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
       <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>
       <td>{featuredTable.name}</td>
@@ -191,7 +193,7 @@ function FeaturedTablesRow({
         {canUpdateRelease && (
           <DataBlockDeletePlanModal
             releaseVersionId={releaseVersionId}
-            dataBlockId={dataBlock.id}
+            dataBlockVersionId={dataBlock.id}
             onConfirm={() => handleDeleteConfirm(dataBlock.id)}
           />
         )}

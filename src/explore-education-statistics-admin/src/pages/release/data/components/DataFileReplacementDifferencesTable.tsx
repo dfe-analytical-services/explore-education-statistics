@@ -1,4 +1,4 @@
-﻿import startCase from 'lodash/startCase';
+import startCase from 'lodash/startCase';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useMemo } from 'react';

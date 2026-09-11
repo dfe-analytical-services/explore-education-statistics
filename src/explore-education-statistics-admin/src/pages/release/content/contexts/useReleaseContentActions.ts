@@ -4,7 +4,7 @@ import releaseContentCommentService, {
   CommentCreate,
 } from '@admin/services/releaseContentCommentService';
 import releaseContentService, {
-  ContentBlockAttachRequest,
+  DataBlockAttachRequest,
 } from '@admin/services/releaseContentService';
 import {
   Comment,
@@ -305,7 +305,7 @@ export default function useReleaseContentActions() {
       releaseVersionId: string;
       sectionId: string;
       sectionKey: ContentSectionKeys;
-      block: ContentBlockAttachRequest;
+      block: DataBlockAttachRequest;
     }) => {
       const newBlock = await releaseContentService.attachContentSectionBlock(
         releaseVersionId,
@@ -419,9 +419,11 @@ export default function useReleaseContentActions() {
         },
       });
 
+      await updateUnattachedDataBlocks({ releaseVersionId });
+
       return content;
     },
-    [dispatch],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateContentSectionHeading = useCallback(
@@ -454,24 +456,26 @@ export default function useReleaseContentActions() {
   const addKeyStatisticDataBlock = useCallback(
     async ({
       releaseVersionId,
-      dataBlockId,
+      dataBlockVersionId,
     }: {
       releaseVersionId: string;
-      dataBlockId: string;
+      dataBlockVersionId: string;
     }) => {
       const keyStatisticDataBlock =
         await keyStatisticService.createKeyStatisticDataBlock(
           releaseVersionId,
           {
-            dataBlockId,
+            dataBlockVersionId,
           },
         );
       dispatch({
         type: 'ADD_KEY_STATISTIC',
         payload: { keyStatistic: keyStatisticDataBlock },
       });
+
+      await updateUnattachedDataBlocks({ releaseVersionId });
     },
-    [dispatch],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const addKeyStatisticText = useCallback(

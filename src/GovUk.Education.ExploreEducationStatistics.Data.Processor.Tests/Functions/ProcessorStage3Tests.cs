@@ -122,6 +122,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -301,10 +302,9 @@ public class ProcessorStage3Tests
                 .Single(f => f.Type == FileType.Data && f.SubjectId == import.File.SubjectId);
 
             Assert.NotNull(file.DataSetFileVersionGeographicLevels);
-            var geographicLevel = Assert.Single(
-                file.DataSetFileVersionGeographicLevels.Select(gl => gl.GeographicLevel).ToList()
-            );
-            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel);
+            var geographicLevel = Assert.Single(file.DataSetFileVersionGeographicLevels);
+            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel.GeographicLevel);
+            Assert.False(geographicLevel.CsvOnly);
 
             Assert.NotNull(file.DataSetFileMeta);
 
@@ -334,6 +334,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         var unexpectedImportedObservation = _fixture.DefaultObservation().WithSubject(_subject).Generate();
@@ -467,6 +468,7 @@ public class ProcessorStage3Tests
             .WithExpectedImportedRows(16)
             .WithImportedRows(4)
             .WithLastProcessedRowIndex(3)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         var alreadyImportedObservations = _fixture.DefaultObservation().WithSubject(_subject).Generate(4);
@@ -616,6 +618,7 @@ public class ProcessorStage3Tests
             .WithExpectedImportedRows(16)
             .WithImportedRows(10)
             .WithLastProcessedRowIndex(9)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         var alreadyImportedObservations = _fixture.DefaultObservation().WithSubject(_subject).Generate(10);
@@ -758,6 +761,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(8)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority, GeographicLevel.School])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -888,6 +892,15 @@ public class ProcessorStage3Tests
             // of 2.  However, only alternate rows are being imported in this scenario,
             // meaning that we expect to see the CsvRows 2, 4, 6, 8 etc up to 18.
             Enumerable.Range(0, 8).ForEach(i => Assert.Equal((i * 2) + 2, observations[i].CsvRow));
+
+            // Verify that the ignored School level is still recorded against the file, flagged as CSV only.
+            var file = contentDbContext
+                .Files.Include(f => f.DataSetFileVersionGeographicLevels)
+                .Single(f => f.Type == FileType.Data && f.SubjectId == import.File.SubjectId);
+
+            file.DataSetFileVersionGeographicLevels.Select(gl => (gl.GeographicLevel, gl.CsvOnly))
+                .ToList()
+                .AssertDeepEqualTo([(GeographicLevel.LocalAuthority, false), (GeographicLevel.School, true)]);
         }
     }
 
@@ -906,6 +919,7 @@ public class ProcessorStage3Tests
             .WithExpectedImportedRows(8)
             .WithImportedRows(4)
             .WithLastProcessedRowIndex(6)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority, GeographicLevel.School])
             .Generate();
 
         // Generate already-imported Observations with alternating CsvRow numbers
@@ -1058,6 +1072,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1196,6 +1211,7 @@ public class ProcessorStage3Tests
             .WithStatus(CANCELLED)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1326,6 +1342,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(16)
             .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -1500,6 +1517,7 @@ public class ProcessorStage3Tests
             .WithStatus(STAGE_3)
             .WithTotalRows(5)
             .WithExpectedImportedRows(5)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
             .Generate();
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))

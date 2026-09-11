@@ -119,8 +119,8 @@ public abstract class ReleaseSearchableDocumentsServiceTests
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
 
-            DataBlockParent contentDataBlockParent = _dataFixture
-                .DefaultDataBlockParent()
+            DataBlock contentDataBlock = _dataFixture
+                .DefaultDataBlock()
                 .WithLatestPublishedVersion(
                     _dataFixture
                         .DefaultDataBlockVersion()
@@ -143,7 +143,9 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     .WithHeading("Section 1")
                     .WithContentBlocks([
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 1 content</p>"),
-                        contentDataBlockParent.LatestPublishedVersion!.ContentBlock,
+                        _dataFixture
+                            .DefaultDataVersionBlockVersionLink()
+                            .WithDataBlockVersion(contentDataBlock.LatestPublishedVersion!),
                         _dataFixture.DefaultHtmlBlock().WithBody("<p>Section 1 block 3 content</p>"),
                     ]),
                 _dataFixture

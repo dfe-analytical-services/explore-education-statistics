@@ -566,6 +566,21 @@ user checks element does not have class
     ${classes}=    get element attribute    ${element}    class
     should not contain    ${classes}    ${class}
 
+user checks image has loaded
+    [Arguments]    ${selector}    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
+    ${src}=    get element attribute    ${element}    src
+    ${loaded}=    execute javascript
+    ...    return arguments[0].complete && arguments[0].naturalWidth > 0;
+    ...    ARGUMENTS    ${element}
+    should be true    ${loaded}    Image failed to load. src was "${src}"
+    # also check image isn't corrupt or truncated
+    ${decoded}=    execute async javascript
+    ...    const callback = arguments[arguments.length - 1];
+    ...    arguments[0].decode().then(() => callback(true), () => callback(false));
+    ...    ARGUMENTS    ${element}
+    should be true    ${decoded}    Image data could not be decoded. src was "${src}"
+
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
     wait until element is enabled    ${element}    ${wait}
@@ -1163,7 +1178,7 @@ user navigates to
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
     IF    '${variable_value}'=='${EMPTY}'
-        Variable "${variable_name}" is empty.
+        Fail    Variable "${variable_name}" is empty.
     END
 
 user waits until table tool wizard step is available

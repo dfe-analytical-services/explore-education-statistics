@@ -11,6 +11,7 @@ import Form from '@common/components/form/Form';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import WarningMessage from '@common/components/WarningMessage';
 import Link from '@admin/components/Link';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -198,8 +199,8 @@ const ReleaseDataGuidanceSection = ({
                                         maxLength={contentMaxLength}
                                       />
                                     ) : (
-                                      <ContentHtml
-                                        html={values.dataSets[index].content}
+                                      <PlainTextContent
+                                        text={values.dataSets[index].content}
                                         testId="fileGuidanceContent"
                                       />
                                     )

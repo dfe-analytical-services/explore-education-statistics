@@ -144,6 +144,47 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             }
 
             [Fact]
+            public async Task FilterByGeographicLevel_CsvOnlyLevelsAreExcluded()
+            {
+                Publication publication = DataFixture
+                    .DefaultPublication()
+                    .WithReleases(_ => [DataFixture.DefaultRelease(publishedVersions: 1)])
+                    .WithTheme(DataFixture.DefaultTheme());
+
+                ReleaseFile releaseFile = DataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(publication.Releases[0].Versions[0])
+                    .WithFile(
+                        DataFixture
+                            .DefaultFile(FileType.Data)
+                            .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country])
+                            .WithCsvOnlyGeographicLevels([GeographicLevel.Institution])
+                    );
+
+                await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+                var csvOnlyQuery = new DataSetFileListRequest(
+                    GeographicLevel: GeographicLevel.Institution.GetEnumValue()
+                );
+                var csvOnlyResponse = await ListDataSetFiles(csvOnlyQuery);
+
+                csvOnlyResponse
+                    .AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>()
+                    .AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0);
+
+                var importedQuery = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Country.GetEnumValue());
+                var importedResponse = await ListDataSetFiles(importedQuery);
+
+                var pagedResult = importedResponse.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+                Assert.Equal(
+                    [GeographicLevel.Country.GetEnumLabel()],
+                    Assert.Single(pagedResult.Results).Meta.GeographicLevels
+                );
+            }
+
+            [Fact]
             public async Task FilterByPublicationId_Success()
             {
                 var (publication1, publication2) = DataFixture
@@ -1565,45 +1606,6 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertEmptyResults();
-            }
-
-            [Fact]
-            // TODO Remove this once we do further work to remove all HTML from summaries at source
-            public async Task ReleaseFileSummariesContainHtml_HtmlTagsAreStripped()
-            {
-                Publication publication = DataFixture
-                    .DefaultPublication()
-                    .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(DataFixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
-
-                release1Version1Files.ForEach(releaseFile =>
-                {
-                    releaseFile.Summary = $"<p>{releaseFile.Summary}</p>";
-                });
-
-                await fixture
-                    .GetContentDbContext()
-                    .AddTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(release1Version1Files);
-                    });
-
-                var query = new DataSetFileListRequest();
-                var response = await ListDataSetFiles(query);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                Assert.All(
-                    pagedResult.Results,
-                    item =>
-                    {
-                        var content = item.Content;
-                        Assert.DoesNotContain("<p>", content);
-                        Assert.DoesNotContain("</p>", content);
-                    }
-                );
             }
         }
 

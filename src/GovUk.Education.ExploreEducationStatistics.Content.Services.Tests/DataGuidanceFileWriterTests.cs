@@ -120,11 +120,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday).
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -145,11 +142,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-2.csv",
                 Name = "Test data 2",
                 Content =
-                    @"
-                        <p>
-                            Number and proportion of population participating in education, training and employment 
-                            by age, gender and labour market status.
-                        </p>",
+                    "Number and proportion of population participating in education, training and employment "
+                    + "by age, gender and labour market status.",
                 GeographicLevels = new List<string> { "National" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue>
@@ -216,11 +210,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday). See <a href=""https://test.com"">reference information</a>.
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday). See reference information (https://test.com).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -286,11 +277,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday).
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -389,7 +377,7 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = "<p>Test file content</p>",
+                Content = "Test file content",
                 GeographicLevels = new List<string> { "Local Authority" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue> { new("Accommodation type", "accommodation_type") },

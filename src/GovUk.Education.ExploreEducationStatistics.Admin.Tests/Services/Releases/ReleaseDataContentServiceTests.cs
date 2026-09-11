@@ -485,6 +485,54 @@ public abstract class ReleaseDataContentServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasCsvOnlyGeographicLevels_ExcludesThemFromGeographicLevels()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+            var releaseVersion = release.Versions[0];
+
+            ReleaseFile dataSet = _dataFixture
+                .DefaultReleaseFile()
+                .WithFile(
+                    _dataFixture
+                        .DefaultFile(FileType.Data)
+                        .WithDataSetFileVersionGeographicLevels([GeographicLevel.Country])
+                        .WithCsvOnlyGeographicLevels([GeographicLevel.School])
+                )
+                .WithReleaseVersion(releaseVersion);
+
+            DataImport dataImport = _dataFixture
+                .DefaultDataImport()
+                .WithFile(dataSet.File)
+                .WithStatus(DataImportStatus.COMPLETE);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.DataImports.Add(dataImport);
+                context.Publications.Add(publication);
+                context.ReleaseFiles.Add(dataSet);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                Assert.Equal(["National"], result.DataSets[0].Meta.GeographicLevels);
+            }
+        }
+
+        [Fact]
         public async Task WhenDataSetHasNoSummary_ReturnsNullSummary()
         {
             // Arrange
@@ -527,52 +575,6 @@ public abstract class ReleaseDataContentServiceTests
                 var result = outcome.AssertRight();
 
                 Assert.Null(result.DataSets[0].Summary);
-            }
-        }
-
-        [Fact]
-        public async Task WhenDataSetSummaryIsHtml_ReturnsPlainTextSummary()
-        {
-            // Arrange
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
-            var release = publication.Releases[0];
-            var releaseVersion = release.Versions[0];
-
-            ReleaseFile dataSet = _dataFixture
-                .DefaultReleaseFile()
-                .WithFile(() => _dataFixture.DefaultFile(FileType.Data))
-                .WithReleaseVersion(releaseVersion)
-                .WithSummary(
-                    "<div><p>Test paragraph with <strong>bold text</strong> and <em>italic text</em></p></div>"
-                );
-
-            DataImport dataImport = _dataFixture
-                .DefaultDataImport()
-                .WithFile(dataSet.File)
-                .WithStatus(DataImportStatus.COMPLETE);
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.DataImports.Add(dataImport);
-                context.Publications.Add(publication);
-                context.ReleaseFiles.Add(dataSet);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var sut = BuildService(context);
-
-                // Act
-                var outcome = await sut.GetReleaseDataContent(releaseVersion.Id);
-
-                // Assert
-                var result = outcome.AssertRight();
-
-                Assert.Equal("Test paragraph with bold text and italic text", result.DataSets[0].Summary);
             }
         }
 
@@ -937,8 +939,8 @@ public abstract class ReleaseDataContentServiceTests
         private static void AssertFeaturedTableEqual(FeaturedTable expected, ReleaseDataContentFeaturedTableDto actual)
         {
             Assert.Equal(expected.Id, actual.FeaturedTableId);
+            Assert.Equal(expected.DataBlockVersionId, actual.DataBlockVersionId);
             Assert.Equal(expected.DataBlockId, actual.DataBlockId);
-            Assert.Equal(expected.DataBlockParentId, actual.DataBlockParentId);
             Assert.Equal(expected.Description, actual.Summary);
             Assert.Equal(expected.Name, actual.Title);
         }

@@ -23,7 +23,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
-import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryCard from '@common/components/SummaryCard';
 import SummaryList from '@common/components/SummaryList';
@@ -398,7 +398,7 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </Tag>
               </SummaryListItem>
               <SummaryListItem term="Summary">
-                <ContentHtml html={dataSet.summary} />
+                <PlainTextContent text={dataSet.summary} />
               </SummaryListItem>
             </SummaryList>
 

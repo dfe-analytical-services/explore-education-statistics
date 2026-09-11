@@ -1,10 +1,14 @@
 import { AppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
+import { SignalRSku } from '../../common/components/signalr/types.bicep'
 
 @export()
 type AdminConfig = {
 
   @description('App Service SKU')
   appServiceSku: AppServicePlanSku?
+
+  @description('SignalR Service SKU')
+  signalRSku: SignalRSku?
 
   @description('Whether or not to enable theme deletion in this environment (for test teardown).')
   enableThemeDeletion: bool?
@@ -31,8 +35,12 @@ type AdminPipelineVariables = {
 
 var defaultConfig = {
   appServiceSku: {
-    tier: 'Premium'
+    tier: 'PremiumV2'
     name: 'P1V2'
+  }
+  signalRSku: {
+    name: 'Standard_S1'
+    capacity: 1
   }
   enableThemeDeletion: false
   enableEinPublishedPageDeletion: false

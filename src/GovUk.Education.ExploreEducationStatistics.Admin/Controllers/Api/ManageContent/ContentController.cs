@@ -98,7 +98,7 @@ public class ContentController(IContentService contentService) : ControllerBase
             .HandleFailuresOrOk();
 
     [HttpPost("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/blocks/attach")]
-    public async Task<ActionResult<DataBlockViewModel>> AttachDataBlock(
+    public async Task<ActionResult<DataBlockVersionViewModel>> AttachDataBlock(
         Guid releaseVersionId,
         Guid contentSectionId,
         DataBlockAttachRequest request

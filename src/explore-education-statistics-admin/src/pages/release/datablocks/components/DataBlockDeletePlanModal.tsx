@@ -11,27 +11,33 @@ import React, { useCallback } from 'react';
 
 interface Props {
   releaseVersionId: string;
-  dataBlockId: string;
+  dataBlockVersionId: string;
   triggerButtonVariant?: 'TEXT' | 'BUTTON';
   onConfirm: () => void;
 }
 
 const DataBlockDeletePlanModal = ({
   releaseVersionId,
-  dataBlockId,
+  dataBlockVersionId,
   triggerButtonVariant = 'TEXT',
   onConfirm,
 }: Props) => {
   const [open, toggleOpen] = useToggle(false);
 
   const { data: deletePlan, isLoading } = useQuery({
-    ...dataBlockQueries.getDeleteBlockPlan(releaseVersionId, dataBlockId),
+    ...dataBlockQueries.getDeleteBlockPlan(
+      releaseVersionId,
+      dataBlockVersionId,
+    ),
     enabled: open,
   });
 
   const handleDeleteConfirm = useCallback(async () => {
     try {
-      await dataBlocksService.deleteDataBlock(releaseVersionId, dataBlockId);
+      await dataBlocksService.deleteDataBlock(
+        releaseVersionId,
+        dataBlockVersionId,
+      );
 
       onConfirm();
 
@@ -40,7 +46,7 @@ const DataBlockDeletePlanModal = ({
       logger.error(err);
       toggleOpen.off();
     }
-  }, [releaseVersionId, dataBlockId, onConfirm, toggleOpen]);
+  }, [releaseVersionId, dataBlockVersionId, onConfirm, toggleOpen]);
 
   return (
     <ModalConfirm

@@ -2,6 +2,7 @@ import { ResourceNames } from '../bicep-main-infrastructure-release/resource-nam
 import { MemoryCacheConfig } from '../bicep-main-infrastructure-release/types.bicep'
 import { keyVaultRef } from '../bicep-main-infrastructure-release/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { SignalRSku } from '../common/components/signalr/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -18,6 +19,13 @@ param appServiceSku AppServicePlanSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
+
+@description('The origins supported for CORS calls to the Admin SignalR service.')
+@minLength(1)
+param signalRAllowedOrigins string[]
+
+@description('SKU of the Admin SignalR service.')
+param signalRSku SignalRSku
 
 @description('Whether to display detailed error messages in this environment or not.')
 param detailedErrors bool
@@ -91,6 +99,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: appServiceSku
+    kind: 'app'
     operatingSystem: 'Windows'
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
@@ -120,9 +129,14 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.admin.appService
+    kind: 'app'
+    operatingSystem: 'Windows'
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
-    keyVaultName: resourceNames.keyVault.keyVault
+    keyVaultRoles: {
+      keyVaultName: resourceNames.keyVault.keyVault
+      secretsUser: true
+    }
     legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
@@ -148,6 +162,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
+    alerts: deployAlerts ? {
+      appServiceHealth: true
+      httpErrors: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
     applicationAppSettings: {
       App__Url: 'https://${adminHostname}'
       App__EnableSwagger: enableSwagger
@@ -210,3 +229,11 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   }
 }
 
+module adminSignalRService '../common/components/signalr/signalr.bicep' = {
+  name: 'adminSignalRServiceDeploy'
+  params: {
+    signalRName: resourceNames.admin.signalRName
+    sku: signalRSku
+    allowedOrigins: signalRAllowedOrigins
+  }
+}

@@ -1,4 +1,4 @@
-import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
+import { staticAverageLessThanHundred, staticMinGreaterThanZero, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 
 @description('Name of the App Service to connect these alerts to.')
@@ -8,6 +8,7 @@ param appServiceName string
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  responseTimeSeconds: int?
   alertsGroupName: string
 }
 
@@ -73,3 +74,22 @@ module expectedHttpStatusCodeAlerts '../alerts/dynamicMetricAlert.bicep' = [
     }
   }
 ]
+
+module responseTimeAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && alerts!.?responseTimeSeconds != null) {
+  name: '${appServiceName}ResponseTimeAlertModuleDeploy'
+  params: {
+    resourceName: appServiceName
+    resourceMetric: {
+      resourceType: 'Microsoft.Web/sites'
+      metric: 'HttpResponseTime'
+    }
+    config: {
+      ...staticAverageGreaterThanZero
+      nameSuffix: 'responseTime'
+      severity: 'Warning'
+      threshold: '${alerts!.responseTimeSeconds!}'
+    }
+    alertsGroupName: alerts!.alertsGroupName
+    tagValues: tagValues
+  }
+}

@@ -43,7 +43,7 @@ describe('ReleaseDataBlockCreatePage', () => {
               {
                 publicationId: 'publication-1',
                 releaseVersionId: 'release-1',
-                dataBlockId: 'block-1',
+                dataBlockVersionId: 'block-1',
               },
             ),
           ]}

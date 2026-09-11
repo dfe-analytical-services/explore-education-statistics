@@ -19,7 +19,7 @@ type AppServicePlanSkuStandard = {
 }
 
 type AppServicePlanSkuPremiumV2 = {
-  tier: 'Premium'
+  tier: 'PremiumV2'
   name: 'P1V2' | 'P2V2' | 'P3V2'
 }
 

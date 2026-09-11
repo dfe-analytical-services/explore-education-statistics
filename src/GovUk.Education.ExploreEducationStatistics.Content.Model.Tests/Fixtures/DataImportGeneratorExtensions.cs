@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -55,6 +56,11 @@ public static class DataImportGeneratorExtensions
         this Generator<DataImport> generator,
         int expectedImportedRows
     ) => generator.ForInstance(s => s.SetExpectedImportedRows(expectedImportedRows));
+
+    public static Generator<DataImport> WithGeographicLevels(
+        this Generator<DataImport> generator,
+        HashSet<GeographicLevel>? geographicLevels
+    ) => generator.ForInstance(s => s.SetGeographicLevels(geographicLevels));
 
     public static Generator<DataImport> WithImportedRows(this Generator<DataImport> generator, int importedRows) =>
         generator.ForInstance(s => s.SetImportedRows(importedRows));
@@ -143,6 +149,11 @@ public static class DataImportGeneratorExtensions
         this InstanceSetters<DataImport> setters,
         int expectedImportedRows
     ) => setters.Set(d => d.ExpectedImportedRows, expectedImportedRows);
+
+    public static InstanceSetters<DataImport> SetGeographicLevels(
+        this InstanceSetters<DataImport> setters,
+        HashSet<GeographicLevel>? geographicLevels
+    ) => setters.Set(d => d.GeographicLevels, geographicLevels);
 
     public static InstanceSetters<DataImport> SetImportedRows(
         this InstanceSetters<DataImport> setters,
