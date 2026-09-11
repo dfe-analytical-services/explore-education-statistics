@@ -163,6 +163,30 @@
       "key": false,
       "synonymMaps": []
     },
+   {
+      "name": "publishingOrganisationIds",
+      "type": "Collection(Edm.String)",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": true,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "publishingOrganisationTitles",
+      "type": "Collection(Edm.String)",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
     {
       "name": "metadata_storage_content_type",
       "type": "Edm.String",
