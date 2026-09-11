@@ -125,21 +125,6 @@ public record LocationMapping
     public MapStatus Status { get; set; }
 }
 
-public record UnmappedFilterGroup
-{
-    public Guid Id { get; set; }
-    public string Label { get; set; } = "";
-
-    // All child items of an unmapped group must also be unmapped
-    public List<UnmappedFilterItem> UnmappedReplacementFilterItems { get; set; } = [];
-}
-
-public record UnmappedFilterItem
-{
-    public Guid Id { get; set; }
-    public string Label { get; set; } = "";
-}
-
 public record FilterMapping
 {
     public Guid OriginalId { get; set; }
@@ -151,9 +136,6 @@ public record FilterMapping
     public string? ReplacementColumnName { get; set; }
 
     public Dictionary<Guid, FilterGroupMapping> FilterGroupMappings { get; set; } = [];
-
-    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
-    public List<UnmappedFilterGroup>? UnmappedReplacementFilterGroups { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }
@@ -167,9 +149,6 @@ public record FilterGroupMapping
     public string? ReplacementLabel { get; set; }
 
     public Dictionary<Guid, FilterItemMapping> FilterItemMappings { get; set; } = [];
-
-    // TODO EES-7559 Remove - We need to keep this until no preexisting DataSetMapping.FilterMappings entries have this - to ensure json still parses
-    public List<UnmappedFilterItem>? UnmappedReplacementFilterItems { get; set; } = [];
 
     public MapStatus Status { get; set; }
 }
