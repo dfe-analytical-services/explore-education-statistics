@@ -48,5 +48,19 @@
         "useHttpServerUtilityUrlTokenDecode": false
       }
     }
+  },
+  {
+    "sourceFieldName": "/document/publishingOrganisationIds",
+    "targetFieldName": "publishingOrganisationIds",
+    "mappingFunction": {
+      "name": "jsonArrayToStringCollection"
+    }
+  },
+  {
+    "sourceFieldName": "/document/publishingOrganisationTitles",
+    "targetFieldName": "publishingOrganisationTitles",
+    "mappingFunction": {
+      "name": "jsonArrayToStringCollection"
+    }
   }
 ]
