@@ -16,6 +16,9 @@ param slackAlertsChannel string = ''
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
 
+@description('The public Content API URL for use with Azure Front Door.')
+param contentApiUrl string
+
 @description('FQDN of the service hosting the public site, rather than the public URL as used by custom domains.')
 param publicSiteInternalServiceFqdn string
 
@@ -174,6 +177,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
     keyVaultName: keyVaultModule.outputs.keyVaultName
     resourcePrefix: commonResourcePrefix
     publicSiteUrl: publicSiteUrl
+    contentApiUrl: contentApiUrl
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis

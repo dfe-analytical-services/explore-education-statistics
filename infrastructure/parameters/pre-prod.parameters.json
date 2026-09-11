@@ -23,6 +23,12 @@
     "domain": {
       "value": "pre-production.explore-education-statistics.service.gov.uk"
     },
+    "contentApiUrl": {
+      "value": "cont.pre-production.explore-education-statistics.service.gov.uk"
+    },
+    "azureFrontDoorCachePurgeEnabled": {
+      "value": false
+    },
     "skuContentDb": {
       "value": "Standard"
     },

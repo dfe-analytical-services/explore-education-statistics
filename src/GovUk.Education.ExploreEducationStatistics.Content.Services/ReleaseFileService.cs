@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -30,13 +31,10 @@ public class ReleaseFileService(
     IDataGuidanceFileWriter dataGuidanceFileWriter,
     IUserService userService,
     IAnalyticsManager analyticsManager,
+    IReleaseVersionRepository releaseVersionRepository,
     ILogger<ReleaseFileService> logger
 ) : IReleaseFileService
 {
-    /// How long the all files zip should be
-    /// cached in blob storage, in seconds.
-    private const int AllFilesZipTtl = 60 * 60;
-
     private static readonly FileType[] AllowedFileTypes = [FileType.Ancillary, FileType.Data];
 
     public async Task<Either<ActionResult, IList<ReleaseFileViewModel>>> ListReleaseFiles(
@@ -113,6 +111,89 @@ public class ReleaseFileService(
             });
     }
 
+    public async Task<Either<ActionResult, ZipDelivery>> GetZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        IEnumerable<Guid>? fileIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await EnsurePublished(releaseVersion)
+            .OnSuccess(publishedReleaseVersion =>
+                EnsureLatestPublishedReleaseVersion(publishedReleaseVersion, cancellationToken)
+            )
+            .OnSuccess(latestPublishedReleaseVersion =>
+                ResolveZipDelivery(latestPublishedReleaseVersion, fromPage, fileIds, cancellationToken)
+            );
+    }
+
+    private async Task<Either<ActionResult, ZipDelivery>> ResolveZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        IEnumerable<Guid>? fileIds,
+        CancellationToken cancellationToken
+    )
+    {
+        if (fileIds is not null)
+        {
+            return new ZipDelivery.Stream(releaseVersion);
+        }
+
+        return await userService
+            .CheckCanViewReleaseVersion(releaseVersion)
+            .OnSuccess(() => GetAllFilesZipDelivery(releaseVersion, fromPage, cancellationToken));
+    }
+
+    private async Task<Either<ActionResult, ZipDelivery>> GetAllFilesZipDelivery(
+        ReleaseVersion releaseVersion,
+        AnalyticsFromPage fromPage,
+        CancellationToken cancellationToken
+    )
+    {
+        if (await FindValidAllFilesZip(releaseVersion, AllFilesZipFormat.CurrentVersion) is null)
+        {
+            return new ZipDelivery.Stream(releaseVersion);
+        }
+
+        await RecordZipDownloadAnalytics(releaseVersion, releaseFiles: null, fromPage, cancellationToken);
+
+        return new ZipDelivery.Redirect($"/api/all-files/{releaseVersion.Id}/v{AllFilesZipFormat.CurrentVersion}");
+    }
+
+    public async Task<Either<ActionResult, FileStreamResult>> StreamCachedAllFilesZip(
+        Guid releaseVersionId,
+        int formatVersion,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (formatVersion != AllFilesZipFormat.CurrentVersion)
+        {
+            return new NotFoundResult();
+        }
+
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+                .ThenInclude(r => r.Publication)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken)
+            .OnSuccess(EnsurePublished)
+            .OnSuccess(releaseVersion => EnsureLatestPublishedReleaseVersion(releaseVersion, cancellationToken))
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccessCombineWith(releaseVersion => FindValidAllFilesZipOrNotFound(releaseVersion, formatVersion))
+            .OnSuccess(releaseVersionAndZip =>
+                publicBlobStorageService
+                    .GetDownloadStream(
+                        PublicReleaseFiles,
+                        releaseVersionAndZip.Item2.Path,
+                        cancellationToken: cancellationToken
+                    )
+                    .OnSuccess(stream => new FileStreamResult(stream, MediaTypeNames.Application.Zip)
+                    {
+                        FileDownloadName = releaseVersionAndZip.Item1.AllFilesZipFileName(),
+                        EnableRangeProcessing = true,
+                    })
+            );
+    }
+
     public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
         Guid releaseVersionId,
         Stream outputStream,
@@ -166,18 +247,12 @@ public class ReleaseFileService(
         CancellationToken cancellationToken
     )
     {
-        var path = releaseVersion.AllFilesZipPath();
-        var allFilesZip = await publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
-
-        // Ideally, we would have some way to do this caching via annotations,
-        // but this a chunk of work to get working properly as piping
-        // the cached file to target stream isn't super trivial.
-        // For now, we'll just do this manually as it's way easier.
-        if (allFilesZip?.Updated is not null && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
+        var allFilesZip = await FindValidAllFilesZip(releaseVersion, AllFilesZipFormat.CurrentVersion);
+        if (allFilesZip is not null)
         {
             var streamResult = await publicBlobStorageService.GetDownloadStream(
                 containerName: PublicReleaseFiles,
-                path: path,
+                path: allFilesZip.Path,
                 cancellationToken: cancellationToken
             );
 
@@ -192,6 +267,53 @@ public class ReleaseFileService(
         }
 
         return false;
+    }
+
+    private async Task<BlobInfo?> FindValidAllFilesZip(ReleaseVersion releaseVersion, int formatVersion)
+    {
+        if (releaseVersion.Published is null || releaseVersion.Published > DateTimeOffset.UtcNow)
+        {
+            return null;
+        }
+
+        var allFilesZip = await publicBlobStorageService.FindBlob(
+            PublicReleaseFiles,
+            releaseVersion.AllFilesZipPath(formatVersion)
+        );
+
+        if (allFilesZip?.Updated is null)
+        {
+            return null;
+        }
+
+        return allFilesZip.Updated >= releaseVersion.Published ? allFilesZip : null;
+    }
+
+    private static Either<ActionResult, ReleaseVersion> EnsurePublished(ReleaseVersion releaseVersion)
+    {
+        return releaseVersion.Published is null || releaseVersion.Published > DateTimeOffset.UtcNow
+            ? new NotFoundResult()
+            : releaseVersion;
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> EnsureLatestPublishedReleaseVersion(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        return await releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id, cancellationToken)
+            ? releaseVersion
+            : new NotFoundResult();
+    }
+
+    private async Task<Either<ActionResult, BlobInfo>> FindValidAllFilesZipOrNotFound(
+        ReleaseVersion releaseVersion,
+        int formatVersion
+    )
+    {
+        return await FindValidAllFilesZip(releaseVersion, formatVersion) is { } allFilesZip
+            ? allFilesZip
+            : new NotFoundResult();
     }
 
     private async Task ZipAllFilesToStream(
@@ -220,7 +342,7 @@ public class ReleaseFileService(
 
         await publicBlobStorageService.UploadStream(
             containerName: PublicReleaseFiles,
-            path: releaseVersion.AllFilesZipPath(),
+            path: releaseVersion.AllFilesZipPath(AllFilesZipFormat.CurrentVersion),
             sourceStream: fileStream,
             contentType: MediaTypeNames.Application.Zip,
             cancellationToken: cancellationToken
