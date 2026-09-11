@@ -66,11 +66,10 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 var azureOpenAIApiBaseUrlSecretName = 'nlsearch-azure-openai-api-base-url'
 var azureOpenAIApiKeySecretName = 'nlsearch-azure-openai-api-subscription-key'
 
-module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
     appSettings: [
@@ -113,17 +112,25 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
+    }
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
       family: 'EP'
     }
+    elasticCapacity: {
+      minimumInstanceCount: 1
+      maximumInstanceCount: 1
+      instanceMemoryMB: 2048
+    }
     healthCheckPath: '/health_check'
     operatingSystem: 'Linux'
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

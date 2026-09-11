@@ -14,9 +14,6 @@ param resourceNames ResourceNames
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Location for all resources.')
-param location string
-
 @description('Name of the shared analytics storage account.')
 param analyticsStorageAccountName string
 
@@ -63,14 +60,12 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
 
 var fileShareMountPath = '/data/analytics'
 
-module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'analyticsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.id
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspace.id
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-analytics'
     appSettings: [
       {
@@ -84,10 +79,19 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
     ]
     functionAppExists: functionAppExists
     keyVaultName: keyVault.name
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
+    }
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
       family: 'EP'
+    }
+    elasticCapacity: {
+      minimumInstanceCount: 1
+      maximumInstanceCount: 1
+      instanceMemoryMB: 2048
     }
     healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'

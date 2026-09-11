@@ -30,6 +30,10 @@ param azureFileShares AzureFileShareMount[]?
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
+var vnetIntegrationSubnetRef = vnetLink != null 
+  ? resourceId('Microsoft.Network/virtualNetworks/subnets', vnetLink!.vnetName, vnetLink!.subnetName)
+  : null
+
 resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
   name: '${appServiceName}/${slotName}'
   kind: kind
@@ -39,6 +43,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
     serverFarmId: appServicePlanId
     httpsOnly: true
     reserved: operatingSystem == 'Linux'
+    virtualNetworkSubnetId: vnetIntegrationSubnetRef ?? ''
     siteConfig: {
       http20Enabled: true
       minTlsVersion: minTlsVersion
@@ -52,16 +57,6 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
     }
-  }
-}
-
-module stagingSlotVNetLink 'slot-virtual-network-link.bicep' = if (vnetLink != null) {
-  name: '${appServiceName}${slotName}VnetLinkDeploy'
-  params: {
-    appServiceName: appServiceName
-    slotName: slotName
-    vNetName: vnetLink!.vnetName
-    subnetName: vnetLink!.subnetName
   }
 }
 

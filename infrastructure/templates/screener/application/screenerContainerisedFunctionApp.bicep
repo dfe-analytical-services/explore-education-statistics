@@ -104,7 +104,7 @@ var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoi
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
   : coreStorageBlobEndpoint
 
-module containerisedFunctionAppModule '../../common/components/function-app/containerisedFunctionApp.bicep' = {
+module containerisedFunctionAppModule '../../common/components/function-app/containerised-function-app.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
     operatingSystem: operatingSystem
