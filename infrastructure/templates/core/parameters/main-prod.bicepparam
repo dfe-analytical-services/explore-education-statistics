@@ -12,8 +12,8 @@ param publicApiPublicUrl = 'https://api.education.gov.uk/statistics'
 
 param slackAlertsChannels = ['C01MCTX47E3']
 
-// Alerts are mirrored to the Hive workspace in production only. The other environments inherit the
-// empty default in main.bicep, which stops the Logic App posting to Hive at all.
-param hiveSlackAlertsChannels = ['C0BSTE3G6KY']
+// Alerts are mirrored to Hive's Slack workspace in production only. The other environments inherit
+// the empty default in main.bicep, which stops the Logic App posting to a second workspace at all.
+param secondarySlackAlertsChannels = ['C0BSTE3G6KY']
 
 param recoveryServicesVaultImmutable = true

@@ -15,13 +15,13 @@
     "slackAlertsChannels": {
       "type": "Array"
     },
-    "hiveSlackAlertsChannels": {
+    "secondarySlackAlertsChannels": {
       "type": "Array"
     },
     "slackAppToken": {
       "type": "securestring"
     },
-    "hiveSlackAppToken": {
+    "secondarySlackAppToken": {
       "type": "securestring"
     },
     "teamsPowerAutomateWebhookUrl": {
@@ -190,8 +190,8 @@
         ]
       },
       "type": "Foreach",
-      "description": "Post the alert to every configured Slack channel. Channels listed in hiveSlackAlertsChannels belong to the Hive workspace and are posted with the Hive app token; all others use the DfE app token.",
-      "foreach": "@union(parameters('slackAlertsChannels'), parameters('hiveSlackAlertsChannels'))",
+      "description": "Post the alert to every configured Slack channel. Channels listed in secondarySlackAlertsChannels are posted with secondarySlackAppToken; all others use slackAppToken.",
+      "foreach": "@union(parameters('slackAlertsChannels'), parameters('secondarySlackAlertsChannels'))",
       "actions": {
         "Post message to Slack": {
           "type": "Http",
@@ -241,7 +241,7 @@
             },
             "headers": {
               "Content-Type": "application/json",
-              "Authorization": "@{concat('Bearer ', if(contains(parameters('hiveSlackAlertsChannels'), items('Post messages to Slack')), parameters('hiveSlackAppToken'), parameters('slackAppToken')))}"
+              "Authorization": "@{concat('Bearer ', if(contains(parameters('secondarySlackAlertsChannels'), items('Post messages to Slack')), parameters('secondarySlackAppToken'), parameters('slackAppToken')))}"
             }
           }
         }
