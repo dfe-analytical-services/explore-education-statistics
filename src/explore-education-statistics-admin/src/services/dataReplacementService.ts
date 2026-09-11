@@ -119,11 +119,15 @@ export interface ApiDataSetVersionPlan {
   valid: boolean;
 }
 
-type MappingType = 'Unset' | 'ManuallySet' | 'AutoSet' | 'ParentNotMapped';
+export type MappingType =
+  'Unset' | 'ManuallySet' | 'AutoSet' | 'ParentNotMapped';
 
-export interface ReplacementMapping<TSource> {
+export interface Replacement<TSource> {
   type: MappingType;
   source: TSource;
+}
+
+export interface ReplacementMapping<TSource> extends Replacement<TSource> {
   candidateKey?: string;
 }
 
@@ -132,43 +136,80 @@ export type UpdateMappingPayload = {
   candidateKey?: string;
 };
 
-export interface MappingsPlan<TSource> {
-  candidates: Dictionary<TSource>;
-  mappings: Dictionary<ReplacementMapping<TSource>>;
-}
-
-export type MappingWithKey<TSource> = {
-  sourceKey: string;
-} & ReplacementMapping<TSource>;
-
-export interface IndicatorSource {
+export interface FilterMappingSource {
   id: string;
-  name: string; // csv column name
   label: string;
 }
 
-export interface LocationSource {
+export type Candidates<TSource = CandidateSource> = Dictionary<TSource>;
+export type Mappings<
+  TSource = CandidateSource,
+  TMapping = ReplacementMapping<TSource>,
+> = Dictionary<TMapping>;
+
+export interface MappingsPlan<
+  TSource = CandidateSource,
+  TMapping = ReplacementMapping<TSource>,
+> {
+  candidates: Candidates<TSource>;
+  mappings: Mappings<TSource, TMapping>;
+}
+
+export type FilterMappingFilterItems<TSource> = MappingsPlan<
+  TSource,
+  ReplacementMapping<FilterMappingSource>
+>;
+
+export interface FilterGroupMappings<
+  TSource,
+> extends ReplacementMapping<TSource> {
+  filterItems: FilterMappingFilterItems<TSource>;
+}
+
+export type FilterMappingFilterGroups = MappingsPlan<
+  FilterMappingSource,
+  FilterGroupMappings<FilterMappingSource>
+>;
+
+export interface FilterMappingReplacementMapping<
+  TSource,
+> extends ReplacementMapping<TSource> {
+  filterGroups: FilterMappingFilterGroups;
+}
+
+export interface CandidateSource {
   id: string;
-  code: string;
   name: string;
+}
+
+export interface FilterSource extends CandidateSource {
+  label: string;
+}
+
+export interface IndicatorSource extends CandidateSource {
+  label: string;
+}
+
+export interface LocationSource extends CandidateSource {
+  code: string;
 }
 
 export type IndicatorCandidate = IndicatorSource;
 
-export type SourceItem = IndicatorSource | LocationSource; /* | FilterSource */
-
 export type IndicatorMapping = ReplacementMapping<IndicatorSource>;
 export type LocationMapping = ReplacementMapping<LocationSource>;
 
-export type IndicatorMappingWithKey = MappingWithKey<IndicatorSource>;
-export type LocationMappingWithKey = MappingWithKey<LocationSource>;
-
 export type IndicatorsMappingsPlan = MappingsPlan<IndicatorSource>;
 export type LocationMappingsPlan = MappingsPlan<LocationSource>;
+export type FilterMappingPlan = MappingsPlan<
+  FilterSource,
+  FilterMappingReplacementMapping<FilterSource>
+>;
 
 export type PlanMappings = {
   indicators: IndicatorsMappingsPlan;
   locations: LocationMappingsPlan;
+  filters: FilterMappingPlan;
 };
 
 export interface IndicatorsMapping {
@@ -214,6 +255,23 @@ type PlanMappingLocationUpdateResponse = {
   replacementName: string;
   status: MappingType;
 }[];
+
+type FilterMappingResponse = {
+  originalId: string;
+  originalLabel: string;
+  originalColumnName: string;
+
+  replacementId?: string;
+  replacementLabel?: string;
+  replacementColumnName?: string;
+
+  status: MappingType;
+};
+type PlanMappingFilterUpdateResponse = {
+  filters: FilterMappingResponse[];
+  filterGroups: FilterMappingResponse[];
+  filterItems: FilterMappingResponse[];
+};
 
 const dataReplacementService = {
   async getReplacementPlan(
@@ -318,6 +376,28 @@ const dataReplacementService = {
       );
 
     return planLocationMappings;
+  },
+  async updatePlanFilterMappings(
+    releaseVersionId: string,
+    originalDataFileId: string,
+    replacementDataFileId: string,
+    filterUpdates: { originalId: string; newReplacementId?: string }[],
+    filterGroupUpdates: { originalId: string; newReplacementId?: string }[],
+    filterItemUpdates: { originalId: string; newReplacementId?: string }[],
+  ): Promise<PlanMappingFilterUpdateResponse> {
+    const filterMappings: PlanMappingFilterUpdateResponse = await client.patch(
+      `releases/${releaseVersionId}/data/replacements/mapping/filters`,
+      {
+        originalDataFileId,
+        replacementDataFileId,
+        filterUpdates,
+        filterGroupUpdates,
+        filterItemUpdates,
+      },
+    );
+
+    // the service can only return what it knows, it's up to the caller to integrate into its own data
+    return filterMappings;
   },
   replaceData(
     releaseVersionId: string,

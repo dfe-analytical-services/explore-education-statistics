@@ -348,6 +348,7 @@ describe('DataReplacementPlan', () => {
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },
+      filters: { candidates: {}, mappings: {} },
     },
   };
 
@@ -415,6 +416,7 @@ describe('DataReplacementPlan', () => {
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },
+      filters: { candidates: {}, mappings: {} },
     },
   };
 

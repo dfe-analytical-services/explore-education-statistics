@@ -3,6 +3,7 @@ import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useMemo } from 'react';
 import {
+  FilterMappingSource,
   IndicatorGroupReplacement,
   IndicatorReplacement,
   IndicatorSource,
@@ -10,6 +11,7 @@ import {
   LocationReplacement,
   LocationSource,
   MappingsPlan,
+  ReplacementMapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
 import DifferencesMappingTableRows from '@admin/pages/release/data/components/DataFileReplacementDifferencesTableRows';
@@ -27,6 +29,9 @@ export interface TypeMapping {
     group: LocationReplacement;
     target: LocationAttributeReplacement;
   };
+  filter: {
+    source: FilterMappingSource;
+  };
 }
 
 export type TableMappingGroup = {
@@ -34,29 +39,58 @@ export type TableMappingGroup = {
   mappings: string[];
 };
 
-type DataFileDifferencesReplacementTableProps<
-  ItemType extends keyof TypeMapping,
-> = {
-  tableId: string;
-  itemType: ItemType;
-  handleMappingUpdate: (payload: UpdateMappingPayload) => Promise<void>;
-  mappingsPlan: MappingsPlan<TypeMapping[ItemType]['source']>;
-  mappingsToShow: Set<string>;
-  mappingGroups: Array<TableMappingGroup>;
-} & LabelProps<ItemType>;
+export function uniqueByLabel<T extends { label: string }>(items: T[]): T[] {
+  return Array.from(new Map(items.map(item => [item.label, item])).values());
+}
+
+type TableItemType = 'indicator' | 'location';
+
+type DataFileDifferencesReplacementTableProps<ItemType extends TableItemType> =
+  {
+    tableId: string;
+    itemType: ItemType;
+    handleMappingUpdate: (payload: UpdateMappingPayload) => Promise<void>;
+    mappingsPlan: MappingsPlan<TypeMapping[ItemType]['source']>;
+    replacementGroups: Array<TypeMapping[ItemType]['group']>;
+    getGroupMappings: (
+      group: TypeMapping[ItemType]['group'],
+    ) => Array<TypeMapping[ItemType]['target']>;
+  } & LabelProps<ItemType>;
 
 export default function DataFileDifferencesReplacementTable<
-  ItemType extends keyof TypeMapping,
+  ItemType extends TableItemType,
 >({
   tableId,
   itemType,
   handleMappingUpdate,
   mappingsPlan,
-  mappingGroups,
+  replacementGroups,
+  getGroupMappings,
   mappedDataLabels,
   rowLabel,
-  mappingsToShow,
 }: DataFileDifferencesReplacementTableProps<ItemType>) {
+  const { mappingGroups, mappingsToShow } = useMemo(() => {
+    const mappings = mappingsPlan.mappings as Record<
+      string,
+      ReplacementMapping<TypeMapping[ItemType]['source']>
+    >;
+    const mappingIds = new Set<string>();
+
+    const groups = uniqueByLabel(replacementGroups).flatMap(group => {
+      const groupMappingIds = getGroupMappings(group)
+        .map(mapping => mapping.id)
+        .filter(id => mappings[id]?.type !== 'AutoSet' && mappings[id]);
+
+      groupMappingIds.forEach(id => mappingIds.add(id));
+
+      return groupMappingIds.length > 0
+        ? [{ label: group.label, mappings: groupMappingIds }]
+        : [];
+    });
+
+    return { mappingGroups: groups, mappingsToShow: mappingIds };
+  }, [getGroupMappings, mappingsPlan.mappings, replacementGroups]);
+
   const mappingCounts: {
     mapped: number;
     unmapped: number;
@@ -74,6 +108,10 @@ export default function DataFileDifferencesReplacementTable<
       unmapped: unmappedCount,
     };
   }, [mappingsPlan.mappings, mappingsToShow]);
+
+  if (mappingsToShow.size === 0) {
+    return null;
+  }
 
   return (
     <div className="table-container">
