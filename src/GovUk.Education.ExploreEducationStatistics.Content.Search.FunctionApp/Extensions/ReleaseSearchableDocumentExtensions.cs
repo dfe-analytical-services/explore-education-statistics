@@ -1,3 +1,4 @@
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
@@ -19,6 +20,8 @@ public static class SearchableDocumentAzureBlobMetadataKeys
     public const string Title = "Title";
     public const string ReleaseType = "ReleaseType";
     public const string TypeBoost = "TypeBoost";
+    public const string PublishingOrganisationIds = "PublishingOrganisationIds";
+    public const string PublishingOrganisationTitles = "PublishingOrganisationTitles";
 }
 
 public static class ReleaseSearchableDocumentExtensions
@@ -27,6 +30,7 @@ public static class ReleaseSearchableDocumentExtensions
     {
         // Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
         // Values are Base64 encoded if non-ASCII characters might be present.
+        // Collection values are serialised as JSON string arrays.
         var metadata = new Dictionary<string, string>
         {
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseId, releaseSearchableDocument.ReleaseId.ToString() },
@@ -65,6 +69,22 @@ public static class ReleaseSearchableDocumentExtensions
             },
             { SearchableDocumentAzureBlobMetadataKeys.ReleaseType, releaseSearchableDocument.ReleaseType },
             { SearchableDocumentAzureBlobMetadataKeys.TypeBoost, releaseSearchableDocument.TypeBoost.ToString() },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.PublishingOrganisationIds,
+                JsonSerializer.Serialize(
+                    releaseSearchableDocument
+                        .PublishingOrganisations.Select(publishingOrganisation => publishingOrganisation.Id)
+                        .ToArray()
+                )
+            },
+            {
+                SearchableDocumentAzureBlobMetadataKeys.PublishingOrganisationTitles,
+                JsonSerializer.Serialize(
+                    releaseSearchableDocument
+                        .PublishingOrganisations.Select(publishingOrganisation => publishingOrganisation.Title)
+                        .ToArray()
+                )
+            },
         };
         return metadata;
     }

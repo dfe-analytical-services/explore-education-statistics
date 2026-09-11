@@ -66,7 +66,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     )
     {
         var apiEndpoint = BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(publicationSlug);
-        var response = await Get<ReleaseSearchViewModelDto>(apiEndpoint, cancellationToken);
+        var response = await Get<ReleaseSearchableDocumentDto>(apiEndpoint, cancellationToken);
 
         return Process(
             response,

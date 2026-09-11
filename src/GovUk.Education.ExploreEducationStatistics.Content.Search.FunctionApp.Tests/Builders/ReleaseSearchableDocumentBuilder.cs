@@ -11,6 +11,7 @@ public class ReleaseSearchableDocumentBuilder
     private Guid? _publicationId;
     private Guid? _themeId;
     private string? _themeTitle;
+    private PublishingOrganisation[]? _publishingOrganisations;
 
     public ReleaseSearchableDocument Build() =>
         new()
@@ -27,6 +28,21 @@ public class ReleaseSearchableDocumentBuilder
             TypeBoost = 10,
             PublicationSlug = "publication-slug",
             ReleaseSlug = "release-slug",
+            PublishingOrganisations =
+                _publishingOrganisations
+                ??
+                [
+                    new PublishingOrganisation
+                    {
+                        Id = new Guid("7cbcfe03-9f7e-478a-8512-a1a5e0ca793b"),
+                        Title = "Department for Education",
+                    },
+                    new PublishingOrganisation
+                    {
+                        Id = new Guid("7c3252c6-6e94-4a34-8762-ff52aae5c0c0"),
+                        Title = "Ofsted",
+                    },
+                ],
             HtmlContent = "<p>This is some Html Content</p>",
         };
 
@@ -69,6 +85,14 @@ public class ReleaseSearchableDocumentBuilder
     public ReleaseSearchableDocumentBuilder WithThemeTitle(string themeTitle)
     {
         _themeTitle = themeTitle;
+        return this;
+    }
+
+    public ReleaseSearchableDocumentBuilder WithPublishingOrganisations(
+        params PublishingOrganisation[] publishingOrganisations
+    )
+    {
+        _publishingOrganisations = publishingOrganisations;
         return this;
     }
 }
