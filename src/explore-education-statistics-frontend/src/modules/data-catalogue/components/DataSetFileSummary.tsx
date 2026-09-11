@@ -1,7 +1,7 @@
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import CollapsibleList from '@common/components/CollapsibleList';
-import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -107,12 +107,12 @@ export default function DataSetFileSummary({
         </Link>,
       )}
 
-      <ContentHtml
+      <PlainTextContent
         className={classNames({
           [styles.content]: truncateContent,
           [styles.expanded]: showMoreContent,
         })}
-        html={content}
+        text={content}
       />
 
       {truncateContent && (

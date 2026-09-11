@@ -123,8 +123,7 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
                     if (!dataSet.Content.IsNullOrWhitespace())
                     {
-                        var content = HtmlToTextUtils.HtmlToText(dataSet.Content);
-                        await file.WriteLineAsync($"Content summary: {content}");
+                        await file.WriteLineAsync($"Content summary: {dataSet.Content}");
                     }
 
                     var variables = dataSet

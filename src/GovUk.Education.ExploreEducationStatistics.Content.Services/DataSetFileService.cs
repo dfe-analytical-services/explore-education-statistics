@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -106,9 +105,7 @@ public class DataSetFileService(
         }
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
-            // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
-            // TODO: Remove ChangeSummaryHtmlToText after migrating all summaries to plain text
-            ChangeSummaryHtmlToText(results),
+            results,
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
             page,
             pageSize
@@ -185,13 +182,6 @@ public class DataSetFileService(
             })
             .ToListAsync(cancellationToken);
     }
-
-    private static List<DataSetFileSummaryViewModel> ChangeSummaryHtmlToText(
-        IList<DataSetFileSummaryViewModel> results
-    ) =>
-        results
-            .Select(viewModel => viewModel with { Content = HtmlToTextUtils.HtmlToText(viewModel.Content) })
-            .ToList();
 
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId,
