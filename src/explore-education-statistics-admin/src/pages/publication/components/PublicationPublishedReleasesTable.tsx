@@ -14,6 +14,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
 import { Publication } from '@admin/services/publicationService';
+import { useConfig } from '@admin/contexts/ConfigContext';
 import { PublishedStatusGuidanceModal } from './PublicationGuidance';
 import ReleaseLabelEditModal, {
   ReleaseLabelFormValues,
@@ -38,6 +39,7 @@ export default function PublicationPublishedReleasesTable({
   onEdit,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
+  const { publicAppUrl } = useConfig();
 
   useEffect(() => {
     rowRef.current?.focus();
@@ -79,7 +81,15 @@ export default function PublicationPublishedReleasesTable({
                   ref={isFocused ? rowRef : undefined}
                   tabIndex={isFocused ? -1 : undefined}
                 >
-                  <td>{release.title}</td>
+                  <td>
+                    <Link
+                      to={`${publicAppUrl}/find-statistics/${publication.slug}/${release.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {release.title} (opens in new tab)
+                    </Link>
+                  </td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
