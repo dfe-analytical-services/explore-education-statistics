@@ -1,9 +1,6 @@
 import PublicationPublishedReleasesTable from '@admin/pages/publication/components/PublicationPublishedReleasesTable';
 import publicationQueries from '@admin/queries/publicationQueries';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import releaseVersionService, {
   ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
@@ -13,8 +10,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import { PaginatedList } from '@common/services/types/pagination';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import last from 'lodash/last';
-import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
+import React, { RefObject, useEffect, useMemo, useState } from 'react';
+import { generatePath, useNavigate } from 'react-router';
 import { Publication } from '@admin/services/publicationService';
 import BackToTopLink from '@common/components/BackToTopLink';
 import { ReleaseLabelFormValues } from './ReleaseLabelEditModal';
@@ -22,7 +19,7 @@ import { ReleaseLabelFormValues } from './ReleaseLabelEditModal';
 interface Props {
   publication: Publication;
   pageSize?: number;
-  refetchRef?: MutableRefObject<() => void>;
+  refetchRef?: RefObject<() => void>;
   onEdit: (
     releaseId: string,
     releaseDetailsFormValues: ReleaseLabelFormValues,
@@ -39,7 +36,7 @@ export default function PublicationPublishedReleases({
   setVisibleCount,
   showBackToTopLink,
 }: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [focusReleaseId, setFocusReleaseId] = useState<string>();
 
@@ -118,8 +115,8 @@ export default function PublicationPublishedReleases({
               onAmend={async id => {
                 const { id: amendmentId } =
                   await releaseVersionService.createReleaseVersionAmendment(id);
-                history.push(
-                  generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+                navigate(
+                  generatePath(releaseSummaryRoute.fullPath, {
                     publicationId: publication.id,
                     releaseVersionId: amendmentId,
                   }),

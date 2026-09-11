@@ -1,4 +1,3 @@
-import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
 import EducationInNumbersCreatePage from '@admin/pages/education-in-numbers/EducationInNumbersCreatePage';
@@ -42,30 +41,30 @@ import {
   publishersGuideRoute,
   releaseCreateRoute,
   releaseRoute,
-  signInRoute,
   signedOutRoute,
+  signInRoute,
   themeCreateRoute,
   themeEditRoute,
   themesRoute,
 } from '@admin/routes/routes';
-import { RouteProps } from 'react-router';
+import { ProtectedRouteProps, PublicRouteProps } from '@admin/routes/types';
 
-export const publicRoutes: Record<string, RouteProps> = {
+export const publicRoutes: Record<string, PublicRouteProps> = {
   signInRoute: {
     ...signInRoute,
-    children: <SignInPage />,
+    element: <SignInPage />,
   },
   signedOutRoute: {
     ...signedOutRoute,
-    children: <SignedOutPage />,
+    element: <SignedOutPage />,
   },
   expiredInviteRoute: {
     ...expiredInviteRoute,
-    children: <ExpiredInvitePage />,
+    element: <ExpiredInvitePage />,
   },
   noInvitationRoute: {
     ...noInvitationRoute,
-    children: <NoInvitationPage />,
+    element: <NoInvitationPage />,
   },
 };
 
@@ -74,75 +73,76 @@ const appRoutes: Record<string, ProtectedRouteProps> = {
   ...documentationRoutes,
   homeRoute: {
     ...homeRoute,
-    children: <AdminDashboardPage />,
+    element: <AdminDashboardPage />,
   },
   publishersGuideRoute: {
     ...publishersGuideRoute,
-    children: <PublishersGuide />,
+    element: <PublishersGuide />,
   },
   dashboardRoute: {
     ...dashboardRoute,
-    children: <AdminDashboardPage />,
+    element: <AdminDashboardPage />,
   },
   contactUsRoute: {
     ...contactUsRoute,
-    children: <ContactUsPage />,
+    element: <ContactUsPage />,
   },
   themesRoute: {
     ...themesRoute,
-    children: <ThemesPage />,
+    element: <ThemesPage />,
   },
   themeCreateRoute: {
     ...themeCreateRoute,
-    children: <ThemeCreatePage />,
+    element: <ThemeCreatePage />,
   },
   themeEditRoute: {
     ...themeEditRoute,
-    children: <ThemeEditPage />,
+    element: <ThemeEditPage />,
   },
   publicationCreateRoute: {
     ...publicationCreateRoute,
-    children: <PublicationCreatePage />,
+    element: <PublicationCreatePage />,
   },
   methodologyRoute: {
     ...methodologyRoute,
-    children: <MethodologyPage />,
+
+    element: <MethodologyPage />,
   },
   preReleaseRoute: {
     ...preReleaseRoute,
-    children: <PreReleasePageContainer />,
+    element: <PreReleasePageContainer />,
   },
   preReleaseContentRoute: {
     ...preReleaseContentRoute,
-    children: <PreReleaseContentPage />,
+    element: <PreReleaseContentPage />,
   },
   preReleaseTableToolRoute: {
     ...preReleaseTableToolRoute,
-    children: <PreReleaseTableToolPage />,
+    element: <PreReleaseTableToolPage />,
   },
   releaseRoute: {
     ...releaseRoute,
-    children: <ReleasePageContainer />,
+    element: <ReleasePageContainer />,
   },
   releaseCreateRoute: {
     ...releaseCreateRoute,
-    children: <ReleaseCreatePage />,
+    element: <ReleaseCreatePage />,
   },
   publicationRoute: {
     ...publicationRoute,
-    children: <PublicationPageContainer />,
+    element: <PublicationPageContainer />,
   },
   educationInNumbersListRoute: {
     ...educationInNumbersListRoute,
-    children: <EducationInNumbersListPage />,
+    element: <EducationInNumbersListPage />,
   },
   educationInNumbersCreateRoute: {
     ...educationInNumbersCreateRoute,
-    children: <EducationInNumbersCreatePage />,
+    element: <EducationInNumbersCreatePage />,
   },
   educationInNumbersRoute: {
     ...educationInNumbersRoute,
-    children: <EducationInNumbersPage />,
+    element: <EducationInNumbersPage />,
   },
 };
 

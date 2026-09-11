@@ -1,10 +1,9 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetPreviewPage from '@admin/pages/release/data/ReleaseApiDataSetPreviewPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import {
   releaseApiDataSetPreviewRoute,
-  ReleaseDataSetRouteParams,
+  releaseApiDataSetPreviewTokenRoute,
 } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
@@ -16,10 +15,11 @@ import _previewTokenService, {
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, Route, Router } from 'react-router-dom';
-import { createMemoryHistory, MemoryHistory } from 'history';
+import { generatePath } from 'react-router-dom';
 import { addHours } from 'date-fns';
 import mockDate from '@common-test/mockDate';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/previewTokenService');
@@ -79,11 +79,10 @@ describe('ReleaseApiDataSetPreviewPage', () => {
 
   test('generating a preview token', async () => {
     mockDate.set('2025-10-08T13:00:00.000Z');
-    const history = createMemoryHistory();
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     previewTokenService.createPreviewToken.mockResolvedValue(testToken);
 
-    const { user } = renderPage({ history });
+    const { user } = renderPage();
 
     expect(
       await screen.findByText('Generate API data set preview token'),
@@ -116,47 +115,37 @@ describe('ReleaseApiDataSetPreviewPage', () => {
       label: 'Test label',
     });
 
-    await waitFor(() => {
-      expect(history.location.pathname).toBe(
+    await waitFor(() =>
+      expectLocation(
         '/publication/publication-1/release/release-1/api-data-sets/data-set-id/preview-tokens/token-id',
-      );
-    });
+      ),
+    );
   });
 
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;
     previewTokenId?: string;
-    history?: MemoryHistory;
   }) {
-    const {
-      releaseVersion = testRelease,
-      dataSetId = 'data-set-id',
-      history = createMemoryHistory(),
-    } = options ?? {};
+    const { releaseVersion = testRelease, dataSetId = 'data-set-id' } =
+      options ?? {};
 
-    history.push(
-      generatePath<ReleaseDataSetRouteParams>(
-        releaseApiDataSetPreviewRoute.path,
-        {
-          publicationId: releaseVersion.publicationId,
-          releaseVersionId: releaseVersion.id,
-          dataSetId,
-        },
-      ),
-    );
+    const path = generatePath(releaseApiDataSetPreviewRoute.fullPath, {
+      publicationId: releaseVersion.publicationId,
+      releaseVersionId: releaseVersion.id,
+      dataSetId,
+    });
 
     return render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer
+        initialUrl={path}
+        route={releaseApiDataSetPreviewRoute.fullPath}
+        routes={[releaseApiDataSetPreviewTokenRoute.fullPath]}
+      >
         <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-          <Router history={history}>
-            <Route
-              component={ReleaseApiDataSetPreviewPage}
-              path={releaseApiDataSetPreviewRoute.path}
-            />
-          </Router>
+          <ReleaseApiDataSetPreviewPage />
         </ReleaseVersionContextProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });

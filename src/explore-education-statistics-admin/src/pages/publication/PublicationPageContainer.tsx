@@ -24,7 +24,8 @@ import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 const PublicationPageContainer = () => {
-  const { publicationId } = useParams<PublicationRouteParams>();
+  const { publicationId } =
+    useParams<PublicationRouteParams>() as PublicationRouteParams;
   const {
     value: publication,
     setState: setPublication,

@@ -5,7 +5,7 @@ import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContex
 import logger from '@common/services/logger';
 import { isAxiosError } from 'axios';
 import React, { Component, ReactNode } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Location, useLocation } from 'react-router';
 
 interface State {
   errorCode?: number;
@@ -13,7 +13,7 @@ interface State {
 
 interface Props {
   children: ReactNode;
-  history: ReturnType<typeof useHistory>;
+  location: Location;
 }
 
 /**
@@ -24,8 +24,6 @@ interface Props {
 class PageErrorBoundary extends Component<Props, State> {
   public state: State = {};
 
-  private unregisterCallback?: () => void;
-
   private errorPages = {
     forbidden: () => {
       this.setState({
@@ -35,15 +33,17 @@ class PageErrorBoundary extends Component<Props, State> {
   };
 
   public componentDidMount() {
-    const { history } = this.props;
+    window.addEventListener('unhandledrejection', this.handlePromiseRejections);
+  }
 
-    this.unregisterCallback = history.listen(() => {
+  public componentDidUpdate(prevProps: Props) {
+    const { location } = this.props;
+
+    if (location.key !== prevProps.location.key) {
       this.setState({
         errorCode: undefined,
       });
-    });
-
-    window.addEventListener('unhandledrejection', this.handlePromiseRejections);
+    }
   }
 
   public componentDidCatch(error: Error) {
@@ -55,10 +55,6 @@ class PageErrorBoundary extends Component<Props, State> {
   }
 
   public componentWillUnmount() {
-    if (this.unregisterCallback) {
-      this.unregisterCallback();
-    }
-
     window.removeEventListener(
       'unhandledrejection',
       this.handlePromiseRejections,
@@ -108,9 +104,9 @@ class PageErrorBoundary extends Component<Props, State> {
 }
 
 function PageErrorBoundaryWithRouter({ children }: { children: ReactNode }) {
-  const history = useHistory();
+  const location = useLocation();
 
-  return <PageErrorBoundary history={history}>{children}</PageErrorBoundary>;
+  return <PageErrorBoundary location={location}>{children}</PageErrorBoundary>;
 }
 
 export default PageErrorBoundaryWithRouter;

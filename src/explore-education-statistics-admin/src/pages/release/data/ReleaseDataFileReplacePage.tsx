@@ -3,7 +3,6 @@ import DataFileDetailsTable from '@admin/pages/release/data/components/DataFileD
 import {
   ReleaseDataFileReplaceRouteParams,
   releaseDataRoute,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseDataFileService, {
@@ -15,15 +14,14 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import PendingDataReplacementSection from '@admin/pages/release/data/components/PendingDataReplacementSection';
+import { useParams } from 'react-router-dom';
 
-const ReleaseDataFileReplacePage = ({
-  history,
-  match: {
-    params: { publicationId, releaseVersionId, fileId },
-  },
-}: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
+const ReleaseDataFileReplacePage = () => {
+  const { publicationId, releaseVersionId, fileId } =
+    useParams<ReleaseDataFileReplaceRouteParams>() as ReleaseDataFileReplaceRouteParams;
+
   const {
     value: dataFile,
     isLoading: dataFileLoading,
@@ -88,7 +86,7 @@ const ReleaseDataFileReplacePage = ({
       <Link
         className="govuk-!-margin-bottom-6"
         back
-        to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+        to={generatePath(releaseDataRoute.fullPath, {
           publicationId,
           releaseVersionId,
         })}
@@ -122,7 +120,6 @@ const ReleaseDataFileReplacePage = ({
               replacementDataFile={replacementDataFile}
               publicationId={publicationId}
               releaseVersionId={releaseVersionId}
-              history={history}
               publicApiDataSetId={dataFile.publicApiDataSetId}
             />
           </>

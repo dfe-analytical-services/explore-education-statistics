@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import PageTitle from '@admin/components/PageTitle';
-import {
-  preReleaseMethodologyRoute,
-  PreReleaseMethodologyRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseMethodologyRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import methodologyService, {
   MethodologyVersionSummary,
@@ -26,7 +23,8 @@ interface Model {
 }
 
 const PreReleaseMethodologiesPage = () => {
-  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, latestMethodologyVersions] = await Promise.all([
@@ -62,21 +60,18 @@ const PreReleaseMethodologiesPage = () => {
                 {model.methodologyVersions.map(methodology => (
                   <li key={methodology.id}>
                     <Link
-                      to={generatePath<PreReleaseMethodologyRouteParams>(
-                        preReleaseMethodologyRoute.path,
-                        {
-                          publicationId,
-                          releaseVersionId,
-                          methodologyId:
-                            // If latest methodology version is unapproved, it will
-                            // be an unpublished amendment. So we link to previous
-                            // version which will be published
-                            methodology.status !== 'Approved' &&
-                            methodology.previousVersionId
-                              ? methodology.previousVersionId
-                              : methodology.id,
-                        },
-                      )}
+                      to={generatePath(preReleaseMethodologyRoute.fullPath, {
+                        publicationId,
+                        releaseVersionId,
+                        methodologyId:
+                          // If latest methodology version is unapproved, it will
+                          // be an unpublished amendment. So we link to previous
+                          // version which will be published
+                          methodology.status !== 'Approved' &&
+                          methodology.previousVersionId
+                            ? methodology.previousVersionId
+                            : methodology.id,
+                      })}
                     >
                       {`${methodology.title} ${
                         methodology.owned ? '(Owned)' : '(Adopted)'

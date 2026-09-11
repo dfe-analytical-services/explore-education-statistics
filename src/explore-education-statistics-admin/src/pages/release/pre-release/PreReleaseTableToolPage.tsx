@@ -25,7 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const PreReleaseTableToolPage = () => {
   const { publicationId, releaseVersionId, dataBlockId } =
-    useParams<PreReleaseTableToolRouteParams>();
+    useParams<PreReleaseTableToolRouteParams>() as PreReleaseTableToolRouteParams;
 
   const { data: publication, isLoading: isPublicationLoading } = useQuery(
     publicationQueries.get(publicationId),
@@ -120,14 +120,11 @@ const PreReleaseTableToolPage = () => {
             initialState={tableToolState}
             renderFeaturedTableLink={featuredTable => (
               <Link
-                to={generatePath<PreReleaseTableToolRouteParams>(
-                  preReleaseTableToolRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataBlockId: featuredTable.dataBlockId,
-                  },
-                )}
+                to={generatePath(preReleaseTableToolRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                  dataBlockId: featuredTable.dataBlockId,
+                })}
               >
                 {featuredTable.name}
               </Link>

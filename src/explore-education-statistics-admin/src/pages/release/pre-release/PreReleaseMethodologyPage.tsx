@@ -5,7 +5,6 @@ import {
   preReleaseMethodologiesRoute,
   PreReleaseMethodologyRouteParams,
 } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
@@ -17,7 +16,7 @@ import { useParams } from 'react-router-dom';
 
 const PreReleaseMethodologyPage = () => {
   const { methodologyId, publicationId, releaseVersionId } =
-    useParams<PreReleaseMethodologyRouteParams>();
+    useParams<PreReleaseMethodologyRouteParams>() as PreReleaseMethodologyRouteParams;
 
   const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
     useQuery(methodologyQueries.get(methodologyId));
@@ -33,13 +32,10 @@ const PreReleaseMethodologyPage = () => {
         <Link
           back
           className="govuk-!-margin-bottom-6"
-          to={generatePath<ReleaseRouteParams>(
-            preReleaseMethodologiesRoute.path,
-            {
-              publicationId,
-              releaseVersionId,
-            },
-          )}
+          to={generatePath(preReleaseMethodologiesRoute.fullPath, {
+            publicationId,
+            releaseVersionId,
+          })}
         >
           Back
         </Link>

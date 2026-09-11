@@ -1,14 +1,10 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import {
-  releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataBlockEditRoute } from '@admin/routes/releaseRoutes';
 import _permissionService from '@admin/services/permissionService';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router';
-import { Route } from 'react-router-dom';
+import { generatePath } from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/permissionService');
 
@@ -35,25 +31,16 @@ describe('ReleaseDataBlockCreatePage', () => {
 
   const renderPage = () => {
     return render(
-      <TestConfigContextProvider>
-        <MemoryRouter
-          initialEntries={[
-            generatePath<ReleaseDataBlockRouteParams>(
-              releaseDataBlockEditRoute.path,
-              {
-                publicationId: 'publication-1',
-                releaseVersionId: 'release-1',
-                dataBlockId: 'block-1',
-              },
-            ),
-          ]}
-        >
-          <Route
-            path={releaseDataBlockEditRoute.path}
-            component={ReleaseDataBlockCreatePage}
-          />
-        </MemoryRouter>
-      </TestConfigContextProvider>,
+      <TestRouterRenderer
+        initialUrl={generatePath(releaseDataBlockEditRoute.fullPath, {
+          publicationId: 'publication-1',
+          releaseVersionId: 'release-1',
+          dataBlockId: 'block-1',
+        })}
+        route={releaseDataBlockEditRoute.fullPath}
+      >
+        <ReleaseDataBlockCreatePage />
+      </TestRouterRenderer>,
     );
   };
 });

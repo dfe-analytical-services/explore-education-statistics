@@ -49,7 +49,8 @@ export const MethodologyContentPageInternal = () => {
 };
 
 const MethodologyContentPage = () => {
-  const { methodologyId } = useParams<MethodologyRouteParams>();
+  const { methodologyId } =
+    useParams<MethodologyRouteParams>() as MethodologyRouteParams;
 
   const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
     useQuery(methodologyQueries.get(methodologyId));

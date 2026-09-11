@@ -1,9 +1,7 @@
 import React from 'react';
 import { screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import EducationInNumbersContentPage from '@admin/pages/education-in-numbers/content/EducationInNumbersContentPage';
-import { EducationInNumbersRouteParams } from '@admin/routes/educationInNumbersRoutes';
 import _einContentService, {
   EinContent,
 } from '@admin/services/educationInNumbersContentService';
@@ -13,7 +11,7 @@ import _einService, {
 import render from '@common-test/render';
 import { educationInNumbersRoute } from '@admin/routes/routes';
 import userEvent from '@testing-library/user-event';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/educationInNumbersService');
 const einService = _einService as jest.Mocked<typeof _einService>;
@@ -277,22 +275,17 @@ describe('EducationInNumbersContentPage', () => {
   });
 
   const renderPage = () => {
-    const path = generatePath<EducationInNumbersRouteParams>(
-      educationInNumbersRoute.path,
-      {
-        educationInNumbersPageId: 'test-page-id',
-      },
-    );
+    const path = generatePath(educationInNumbersRoute.fullPath, {
+      educationInNumbersPageId: 'test-page-id',
+    });
 
     render(
-      <MemoryRouter initialEntries={[path]}>
-        <TestConfigContextProvider>
-          <Route
-            component={EducationInNumbersContentPage}
-            path={educationInNumbersRoute.path}
-          />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={educationInNumbersRoute.fullPath}
+      >
+        <EducationInNumbersContentPage />
+      </TestRouterRenderer>,
     );
   };
 });

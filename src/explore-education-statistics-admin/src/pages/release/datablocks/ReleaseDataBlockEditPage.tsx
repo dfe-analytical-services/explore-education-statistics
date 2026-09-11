@@ -9,8 +9,6 @@ import {
   ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
   releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import dataBlocksService, {
   ReleaseDataBlock,
@@ -23,20 +21,18 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import isGuid from '@common/utils/string/isGuid';
 import React, { useCallback, useRef } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataBlockEditPage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseDataBlockRouteParams>) => {
-  const {
-    params: { publicationId, releaseVersionId, dataBlockId },
-  } = match;
+const ReleaseDataBlockEditPage = () => {
+  const { publicationId, releaseVersionId, dataBlockId } =
+    useParams<ReleaseDataBlockRouteParams>() as ReleaseDataBlockRouteParams;
+  const navigate = useNavigate();
 
   const replacementFileId =
     new URLSearchParams(window.location.search).get('fromFileReplacementId') ??
@@ -85,13 +81,13 @@ const ReleaseDataBlockEditPage = ({
   );
 
   const handleDataBlockDelete = useCallback(() => {
-    history.push(
-      generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+    navigate(
+      generatePath(releaseDataBlocksRoute.fullPath, {
         publicationId,
         releaseVersionId,
       }),
     );
-  }, [history, publicationId, releaseVersionId]);
+  }, [navigate, publicationId, releaseVersionId]);
 
   const { canUpdateRelease, dataBlock } = model ?? {};
 
@@ -104,15 +100,12 @@ const ReleaseDataBlockEditPage = ({
         className="govuk-!-margin-bottom-6"
         to={
           replacementFileId && isGuid(replacementFileId)
-            ? generatePath<ReleaseDataFileReplaceRouteParams>(
-                releaseDataFileReplaceRoute.path,
-                {
-                  publicationId,
-                  releaseVersionId,
-                  fileId: replacementFileId,
-                },
-              )
-            : generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+            ? generatePath(releaseDataFileReplaceRoute.fullPath, {
+                publicationId,
+                releaseVersionId,
+                fileId: replacementFileId,
+              })
+            : generatePath(releaseDataBlocksRoute.fullPath, {
                 publicationId,
                 releaseVersionId,
               })

@@ -12,7 +12,8 @@ import { useQuery } from '@tanstack/react-query';
 import publicationQueries from '@admin/queries/publicationQueries';
 
 const ReleaseTableToolPage = () => {
-  const { releaseVersionId, publicationId } = useParams<ReleaseRouteParams>();
+  const { releaseVersionId, publicationId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
   const { releaseVersion } = useReleaseVersionContext();
 
   const { data: publication, isLoading } = useQuery(
@@ -24,7 +25,7 @@ const ReleaseTableToolPage = () => {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+        to={generatePath(releaseDataBlocksRoute.fullPath, {
           publicationId,
           releaseVersionId,
         })}

@@ -8,7 +8,6 @@ import featuredTableQueries from '@admin/queries/featuredTableQueries';
 import {
   releaseDataBlockCreateRoute,
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
   ReleaseRouteParams,
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
@@ -25,7 +24,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
 const ReleaseDataBlocksPage = () => {
-  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const queryClient = useQueryClient();
 
@@ -87,13 +87,10 @@ const ReleaseDataBlocksPage = () => {
     [listFeaturedTablesQuery, queryClient, releaseVersionId],
   );
 
-  const createPath = generatePath<ReleaseRouteParams>(
-    releaseDataBlockCreateRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-    },
-  );
+  const createPath = generatePath(releaseDataBlockCreateRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+  });
 
   if (isLoadingDataBlocks || isLoadingFeaturedTables || isLoadingPermissions) {
     return <LoadingSpinner />;
@@ -131,7 +128,7 @@ const ReleaseDataBlocksPage = () => {
           </WarningMessage>
 
           <ButtonLink
-            to={generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
+            to={generatePath(releaseTableToolRoute.fullPath, {
               publicationId,
               releaseVersionId,
             })}
@@ -196,14 +193,11 @@ const ReleaseDataBlocksPage = () => {
                         className="govuk-!-margin-bottom-0"
                         unvisited
                         data-testid={`Edit data block ${dataBlock.name}`}
-                        to={generatePath<ReleaseDataBlockRouteParams>(
-                          releaseDataBlockEditRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            dataBlockId: dataBlock.id,
-                          },
-                        )}
+                        to={generatePath(releaseDataBlockEditRoute.fullPath, {
+                          publicationId,
+                          releaseVersionId,
+                          dataBlockId: dataBlock.id,
+                        })}
                       >
                         {canUpdateRelease ? 'Edit block' : 'View block'}
                       </Link>

@@ -1,9 +1,5 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ReleaseContentPage from '@admin/pages/release/content/ReleaseContentPage';
-import {
-  releaseContentRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseContentRoute } from '@admin/routes/releaseRoutes';
 import _releaseContentService, {
   EditableRelease,
   ReleaseContent,
@@ -18,19 +14,19 @@ import _dataBlockService, {
 import _publicationService from '@admin/services/publicationService';
 import _methodologyService from '@admin/services/methodologyService';
 import _tableBuilderService, {
-  SubjectMeta,
-  TableDataResponse,
   FeaturedTable as TableToolFeaturedTable,
   Subject,
+  SubjectMeta,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
 import { HubConnectionState } from '@microsoft/signalr';
 import userEvent from '@testing-library/user-event';
+import { TestRouterWithProvider } from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/featuredTableService');
 jest.mock('@admin/services/releaseContentService');
@@ -814,23 +810,19 @@ describe('ReleaseContentPage', () => {
     });
   });
 
-  const renderPage = (
-    initialEntries: string[] = [
-      generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
-        publicationId: 'publication-1',
-        releaseVersionId: 'release-1',
-      }),
-    ],
-  ) => {
+  const renderPage = () => {
+    const path = generatePath(releaseContentRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+    });
+
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <TestConfigContextProvider>
-          <Route
-            component={ReleaseContentPage}
-            path={releaseContentRoute.path}
-          />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterWithProvider
+        initialUrl={path}
+        route={releaseContentRoute.fullPath}
+      >
+        <ReleaseContentPage />
+      </TestRouterWithProvider>,
     );
   };
 });

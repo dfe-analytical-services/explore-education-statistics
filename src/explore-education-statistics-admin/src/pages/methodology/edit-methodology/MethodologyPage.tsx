@@ -20,7 +20,8 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 const MethodologyPage = () => {
-  const { methodologyId } = useParams<MethodologyRouteParams>();
+  const { methodologyId } =
+    useParams<MethodologyRouteParams>() as MethodologyRouteParams;
 
   const {
     value: methodology,

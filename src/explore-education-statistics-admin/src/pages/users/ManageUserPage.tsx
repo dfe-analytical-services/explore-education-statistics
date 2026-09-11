@@ -14,7 +14,7 @@ import releaseQueries from '@admin/queries/releaseQueries';
 import { useParams } from 'react-router-dom';
 
 export default function ManageUserPage() {
-  const { userId } = useParams<{ userId: string }>();
+  const { userId } = useParams<{ userId: string }>() as { userId: string };
 
   const {
     data: user,

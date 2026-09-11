@@ -1,9 +1,6 @@
 import { GetEducationInNumbersPageStatus } from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
 import styles from '@admin/pages/education-in-numbers/components/EducationInNumbersPagesTable.module.scss';
-import {
-  EducationInNumbersRouteParams,
-  educationInNumbersSummaryRoute,
-} from '@admin/routes/educationInNumbersRoutes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService, {
   EinSummaryWithPrevVersion,
 } from '@admin/services/educationInNumbersService';
@@ -14,7 +11,7 @@ import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
 import { formatInTimeZone } from 'date-fns-tz';
 import React, { useEffect, useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
 interface Props {
@@ -32,7 +29,7 @@ const EducationInNumbersPagesTable = ({
   onConfirmReordering,
   onDelete,
 }: Props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [pages, setPages] = useState(initialPage);
 
   useEffect(() => {
@@ -113,9 +110,9 @@ const EducationInNumbersPagesTable = ({
                           await educationInNumbersService.createEducationInNumbersPageAmendment(
                             page.id,
                           );
-                        history.push(
-                          generatePath<EducationInNumbersRouteParams>(
-                            educationInNumbersSummaryRoute.path,
+                        navigate(
+                          generatePath(
+                            educationInNumbersSummaryRoute.fullPath,
                             {
                               educationInNumbersPageId: newPage.id,
                             },

@@ -1,8 +1,5 @@
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
-import {
-  ReleaseRouteParams,
-  releaseChecklistRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseChecklistRoute } from '@admin/routes/releaseRoutes';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -66,7 +63,7 @@ export default function ReleaseStatusChecklistSummary({
       <LoadingSpinner inline loading={isFetching} size="sm">
         {totalIssues > 0 ? (
           <Link
-            to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+            to={generatePath(releaseChecklistRoute.fullPath, {
               publicationId,
               releaseVersionId,
             })}
@@ -90,7 +87,7 @@ export default function ReleaseStatusChecklistSummary({
         <InsetText variant={getColour()}>
           {totalIssues > 0 ? (
             <Link
-              to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+              to={generatePath(releaseChecklistRoute.fullPath, {
                 publicationId,
                 releaseVersionId,
               })}

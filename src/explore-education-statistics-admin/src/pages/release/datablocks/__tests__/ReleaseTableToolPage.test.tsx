@@ -1,9 +1,6 @@
 import render from '@common-test/render';
 import ReleaseTableToolPage from '@admin/pages/release/datablocks/ReleaseTableToolPage';
-import {
-  ReleaseRouteParams,
-  releaseTableToolRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseTableToolRoute } from '@admin/routes/releaseRoutes';
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
@@ -11,8 +8,9 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');
@@ -128,21 +126,17 @@ describe('ReleaseTableToolPage', () => {
 
   const renderPage = () => {
     return render(
-      <MemoryRouter
-        initialEntries={[
-          generatePath<ReleaseRouteParams>(releaseTableToolRoute.path, {
-            publicationId: 'publication-1',
-            releaseVersionId: 'release-1',
-          }),
-        ]}
+      <TestRouterRenderer
+        initialUrl={generatePath(releaseTableToolRoute.fullPath, {
+          publicationId: 'publication-1',
+          releaseVersionId: 'release-1',
+        })}
+        route={releaseTableToolRoute.fullPath}
       >
         <ReleaseVersionContextProvider releaseVersion={testRelease}>
-          <Route
-            component={ReleaseTableToolPage}
-            path={releaseTableToolRoute.path}
-          />
+          <ReleaseTableToolPage />
         </ReleaseVersionContextProvider>
-      </MemoryRouter>,
+      </TestRouterRenderer>,
     );
   };
 });

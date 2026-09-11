@@ -1,13 +1,9 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import {
   testSubjectMeta,
   testTableData,
 } from '@admin/pages/release/datablocks/__data__/tableToolServiceData';
 import ReleaseDataBlockEditPage from '@admin/pages/release/datablocks/ReleaseDataBlockEditPage';
-import {
-  releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataBlockEditRoute } from '@admin/routes/releaseRoutes';
 import _dataBlockService, {
   ReleaseDataBlock,
   ReleaseDataBlockSummary,
@@ -23,8 +19,8 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 import { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router';
-import { generatePath, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/permissionService');
@@ -591,25 +587,16 @@ describe('ReleaseDataBlockEditPage', () => {
 
   const renderPage = () => {
     return render(
-      <TestConfigContextProvider>
-        <MemoryRouter
-          initialEntries={[
-            generatePath<ReleaseDataBlockRouteParams>(
-              releaseDataBlockEditRoute.path,
-              {
-                publicationId: 'publication-1',
-                releaseVersionId: 'release-1',
-                dataBlockId: 'block-1',
-              },
-            ),
-          ]}
-        >
-          <Route
-            path={releaseDataBlockEditRoute.path}
-            component={ReleaseDataBlockEditPage}
-          />
-        </MemoryRouter>
-      </TestConfigContextProvider>,
+      <TestRouterRenderer
+        initialUrl={generatePath(releaseDataBlockEditRoute.fullPath, {
+          publicationId: 'publication-1',
+          releaseVersionId: 'release-1',
+          dataBlockId: 'block-1',
+        })}
+        route={releaseDataBlockEditRoute.fullPath}
+      >
+        <ReleaseDataBlockEditPage />
+      </TestRouterRenderer>,
     );
   };
 });

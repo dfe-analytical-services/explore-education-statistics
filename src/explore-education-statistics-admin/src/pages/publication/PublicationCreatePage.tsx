@@ -8,11 +8,13 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function PublicationCreatePage() {
-  const { themeId } = useParams<{ themeId: string }>();
-  const history = useHistory();
+  const { themeId } = useParams<{ themeId: string }>() as { themeId: string };
+
+  const navigate = useNavigate();
 
   const { value: theme, isLoading } = useAsyncHandledRetry(
     () => themeService.getTheme(themeId),
@@ -39,7 +41,7 @@ export default function PublicationCreatePage() {
         cancelButton={
           <Link
             unvisited
-            to={appendQuery<ThemeParams>(dashboardRoute.path, {
+            to={appendQuery<ThemeParams>(dashboardRoute.fullPath, {
               themeId: theme.id,
             })}
           >
@@ -47,7 +49,7 @@ export default function PublicationCreatePage() {
           </Link>
         }
         themeId={theme.id}
-        onSubmit={() => history.push(dashboardRoute.path)}
+        onSubmit={() => navigate(dashboardRoute.fullPath)}
       />
     </Page>
   );

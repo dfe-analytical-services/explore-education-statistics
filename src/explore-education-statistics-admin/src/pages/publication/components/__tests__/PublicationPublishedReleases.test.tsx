@@ -9,11 +9,13 @@ import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import { produce } from 'immer';
 import React, { ReactNode } from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<
@@ -470,14 +472,16 @@ describe('PublicationPublishedReleases', () => {
   test('creating an amendment works correctly', async () => {
     publicationService.listReleaseVersions.mockResolvedValue(testReleasesPage1);
 
-    const history = createMemoryHistory();
-
     releaseVersionService.createReleaseVersionAmendment.mockResolvedValue({
       id: 'release-amendment-id',
     });
 
     baseRender(
-      <Router history={history}>
+      <TestRouterRenderer
+        initialUrl="/"
+        route="/"
+        routes={[releaseSummaryRoute.fullPath]}
+      >
         <TestConfigContextProvider>
           <PublicationPublishedReleases
             publication={testPublication}
@@ -485,7 +489,7 @@ describe('PublicationPublishedReleases', () => {
           />
         </TestConfigContextProvider>
         ,
-      </Router>,
+      </TestRouterRenderer>,
     );
 
     await waitFor(() => {
@@ -523,7 +527,7 @@ describe('PublicationPublishedReleases', () => {
       ).toHaveBeenCalledWith(testRelease1.id);
     });
 
-    expect(history.location.pathname).toBe(
+    await expectLocation(
       '/publication/publication-1/release/release-amendment-id/summary',
     );
   });

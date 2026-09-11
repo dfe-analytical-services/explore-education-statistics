@@ -22,7 +22,7 @@ import { useParams } from 'react-router-dom';
 
 const EducationInNumbersPage = () => {
   const { educationInNumbersPageId } =
-    useParams<EducationInNumbersRouteParams>();
+    useParams<EducationInNumbersRouteParams>() as EducationInNumbersRouteParams;
 
   const {
     value: educationInNumbersPage,

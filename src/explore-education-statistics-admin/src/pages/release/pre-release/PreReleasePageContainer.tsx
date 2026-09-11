@@ -46,7 +46,8 @@ export const calculatePraPeriodAdvice = (
 };
 
 const PreReleasePageContainer = () => {
-  const { publicationId, releaseVersionId } = useParams<ReleaseRouteParams>();
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const config = useConfig();
   const { user } = useAuthContext();

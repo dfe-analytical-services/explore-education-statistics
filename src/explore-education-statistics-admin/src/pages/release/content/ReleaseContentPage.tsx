@@ -180,7 +180,8 @@ const ReleaseContentPageLoaded = () => {
 };
 
 const ReleaseContentPage = () => {
-  const { releaseVersionId } = useParams<ReleaseRouteParams>();
+  const { releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const { value, isLoading } =
     useAsyncRetry<ReleaseContentContextState>(async () => {

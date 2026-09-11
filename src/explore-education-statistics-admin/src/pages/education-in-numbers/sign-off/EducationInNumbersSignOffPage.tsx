@@ -1,10 +1,7 @@
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
-import {
-  EducationInNumbersRouteParams,
-  educationInNumbersSummaryRoute,
-} from '@admin/routes/educationInNumbersRoutes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 import WarningMessage from '@common/components/WarningMessage';
 import { formatInTimeZone } from 'date-fns-tz';
 import SummaryList from '@common/components/SummaryList';
@@ -14,7 +11,6 @@ import educationInNumbersService from '@admin/services/educationInNumbersService
 import ModalConfirm from '@common/components/ModalConfirm';
 import UrlContainer from '@common/components/UrlContainer';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { useHistory } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import educationInNumbersContentQueries from '@admin/queries/educationInNumbersContentQueries';
 import educationInNumbersQueries from '@admin/queries/educationInNumbersQueries';
@@ -24,7 +20,7 @@ const EducationInNumbersSignOffPage = () => {
     useEducationInNumbersPageContext();
 
   const queryClient = useQueryClient();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { publicAppUrl } = useConfig();
 
@@ -83,13 +79,10 @@ const EducationInNumbersSignOffPage = () => {
                   ),
                 );
 
-                history.push(
-                  generatePath<EducationInNumbersRouteParams>(
-                    educationInNumbersSummaryRoute.path,
-                    {
-                      educationInNumbersPageId: publishedPage.id,
-                    },
-                  ),
+                navigate(
+                  generatePath(educationInNumbersSummaryRoute.fullPath, {
+                    educationInNumbersPageId: publishedPage.id,
+                  }),
                 );
               }}
             >

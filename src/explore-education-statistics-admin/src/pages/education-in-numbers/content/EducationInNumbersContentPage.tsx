@@ -13,7 +13,7 @@ import { useParams } from 'react-router-dom';
 
 const EducationInNumbersContentPage = () => {
   const { educationInNumbersPageId } =
-    useParams<EducationInNumbersRouteParams>();
+    useParams<EducationInNumbersRouteParams>() as EducationInNumbersRouteParams;
 
   const { data: pageVersion, isLoading: isPageVersionLoading } = useQuery(
     educationInNumbersQueries.getEducationInNumbersPage(

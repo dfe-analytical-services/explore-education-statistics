@@ -3,7 +3,6 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
-import { ErrorControlState } from '@common/contexts/ErrorControlContext';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import publicationQueries from '@admin/queries/publicationQueries';
@@ -15,7 +14,6 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { ObjectSchema } from 'yup';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { RouteComponentProps } from 'react-router';
 import {
   PublicationRole,
   publicationRoles,
@@ -26,6 +24,7 @@ import userInvitesService, {
 } from '@admin/services/user-management/userInvitesService';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import { FormFieldset } from '@common/components/form';
+import { useNavigate } from 'react-router';
 
 export interface InviteUserPreReleaseRole {
   releaseId: string;
@@ -55,10 +54,9 @@ const errorMappings = [
   }),
 ];
 
-export default function UserInvitePage({
-  history,
-}: RouteComponentProps & ErrorControlState) {
+export default function UserInvitePage() {
   const formId = 'inviteUserForm';
+  const navigate = useNavigate();
 
   const { data: releases, isLoading: isLoadingReleases } = useQuery(
     releaseQueries.getReleases,
@@ -70,7 +68,7 @@ export default function UserInvitePage({
 
   const isLoading = isLoadingReleases || isLoadingPublications;
 
-  const cancelHandler = () => history.push('/administration/users/invites');
+  const cancelHandler = () => navigate('/administration/users/invites');
 
   const handleSubmit = async (values: UserInviteFormValues) => {
     const userPreReleaseRoles =
@@ -97,7 +95,7 @@ export default function UserInvitePage({
 
     await userInvitesService.inviteUser(submission);
 
-    history.push(`/administration/users/invites`);
+    navigate(`/administration/users/invites`);
   };
 
   const validationSchema = useMemo<ObjectSchema<UserInviteFormValues>>(() => {

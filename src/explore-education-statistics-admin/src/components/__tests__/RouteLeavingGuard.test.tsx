@@ -1,32 +1,52 @@
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import { Route, Router } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import { Link } from 'react-router-dom';
+import TestLocationContext, {
+  expectLocation,
+} from '@admin/components/testing/TestLocationContext';
 
-describe('RouteLeavingGuard', () => {
-  test('shows modal when route change is blocked on clicking link', async () => {
-    const history = createMemoryHistory();
-
-    render(
-      <Router history={history}>
-        <Route exact path="/">
-          <RouteLeavingGuard blockRouteChange title="Test modal title">
+function renderPage(blockRouteChange = true) {
+  const memoryRouter = createMemoryRouter([
+    {
+      path: '/',
+      element: (
+        <>
+          <RouteLeavingGuard
+            blockRouteChange={blockRouteChange}
+            title="Test modal title"
+          >
             <p>Test modal content</p>
           </RouteLeavingGuard>
 
           <Link to="/other">Change route</Link>
-        </Route>
-        <Route exact path="/other">
+          <TestLocationContext />
+        </>
+      ),
+    },
+    {
+      path: '/other',
+      element: (
+        <>
           <p>Other route</p>
-        </Route>
-      </Router>,
-    );
+          <TestLocationContext />
+        </>
+      ),
+    },
+  ]);
+
+  return render(<RouterProvider router={memoryRouter} />);
+}
+
+describe('RouteLeavingGuard', () => {
+  test('shows modal when route change is blocked on clicking link', async () => {
+    renderPage();
 
     await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
 
-    expect(history.location.pathname).toBe('/');
+    await expectLocation('/');
 
     const modal = within(screen.getByRole('dialog'));
     expect(modal.getByText('Test modal title')).toBeInTheDocument();
@@ -39,20 +59,7 @@ describe('RouteLeavingGuard', () => {
   test('shows modal when route change is blocked on `history.push`', async () => {
     const history = createMemoryHistory();
 
-    render(
-      <Router history={history}>
-        <Route exact path="/">
-          <RouteLeavingGuard blockRouteChange title="Test modal title">
-            <p>Test modal content</p>
-          </RouteLeavingGuard>
-
-          <Link to="/other">Change route</Link>
-        </Route>
-        <Route exact path="/other">
-          <p>Other route</p>
-        </Route>
-      </Router>,
-    );
+    renderPage();
 
     act(() => {
       // We push an entry instead of clicking the link.
@@ -73,78 +80,34 @@ describe('RouteLeavingGuard', () => {
   });
 
   test('clicking confirm goes to the next route', async () => {
-    const history = createMemoryHistory();
-
-    render(
-      <Router history={history}>
-        <Route exact path="/">
-          <RouteLeavingGuard blockRouteChange title="Test modal title">
-            <p>Test modal content</p>
-          </RouteLeavingGuard>
-
-          <Link to="/other">Change route</Link>
-        </Route>
-        <Route exact path="/other">
-          <p>Other route</p>
-        </Route>
-      </Router>,
-    );
+    renderPage();
 
     await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    expect(history.location.pathname).toBe('/other');
+    await waitFor(async () => expectLocation('/other'));
+
     expect(screen.getByText('Other route')).toBeInTheDocument();
   });
 
   test('clicking cancel does not change route', async () => {
-    const history = createMemoryHistory();
-
-    render(
-      <Router history={history}>
-        <Route exact path="/">
-          <RouteLeavingGuard blockRouteChange title="Test modal title">
-            <p>Test modal content</p>
-          </RouteLeavingGuard>
-
-          <Link to="/other">Change route</Link>
-        </Route>
-        <Route exact path="/other">
-          <p>Other route</p>
-        </Route>
-      </Router>,
-    );
+    renderPage();
 
     await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(history.location.pathname).toBe('/');
+    await expectLocation('/');
 
     expect(screen.getByText('Change route')).toBeInTheDocument();
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();
   });
 
   test('does not show the modal when route change is not blocked', async () => {
-    const history = createMemoryHistory();
-
-    render(
-      <Router history={history}>
-        <Route exact path="/">
-          <Link to="/other">Change route</Link>
-
-          <RouteLeavingGuard blockRouteChange={false} title="Test modal title">
-            <p>Test modal content</p>
-          </RouteLeavingGuard>
-        </Route>
-        <Route exact path="/other">
-          <p>Other route</p>
-        </Route>
-      </Router>,
-    );
+    renderPage(false);
 
     await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
 
-    expect(history.location.pathname).toBe('/other');
+    await expectLocation('/other');
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 

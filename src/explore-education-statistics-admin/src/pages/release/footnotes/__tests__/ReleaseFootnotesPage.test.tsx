@@ -1,8 +1,5 @@
 import ReleaseFootnotesPage from '@admin/pages/release/footnotes/ReleaseFootnotesPage';
-import {
-  releaseFootnotesRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseFootnotesRoute } from '@admin/routes/releaseRoutes';
 import _footnoteService, {
   Footnote,
   FootnoteMeta,
@@ -10,9 +7,9 @@ import _footnoteService, {
 import _permissionService from '@admin/services/permissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import React from 'react';
-import { generatePath, Route, Router } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/footnoteService');
 const footnoteService = _footnoteService as jest.Mocked<
@@ -279,20 +276,17 @@ describe('ReleaseFootnotesPage', () => {
 });
 
 function renderPage() {
-  const history = createMemoryHistory();
-  history.push(
-    generatePath<ReleaseRouteParams>(releaseFootnotesRoute.path, {
-      publicationId: 'publication-1',
-      releaseVersionId: 'release-1',
-    }),
-  );
+  const path = generatePath(releaseFootnotesRoute.fullPath, {
+    publicationId: 'publication-1',
+    releaseVersionId: 'release-1',
+  });
 
   render(
-    <Router history={history}>
-      <Route
-        path={releaseFootnotesRoute.path}
-        component={ReleaseFootnotesPage}
-      />
-    </Router>,
+    <TestRouterRenderer
+      initialUrl={path}
+      route={releaseFootnotesRoute.fullPath}
+    >
+      <ReleaseFootnotesPage />
+    </TestRouterRenderer>,
   );
 }

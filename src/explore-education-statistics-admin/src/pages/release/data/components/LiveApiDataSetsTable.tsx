@@ -2,10 +2,7 @@ import Link from '@admin/components/Link';
 import styles from '@admin/pages/release/data/components/LiveApiDataSetsTable.module.scss';
 import ApiDataSetCreateModal from '@admin/pages/release/data/components/ApiDataSetCreateModal';
 import { columnWidth } from '@admin/pages/release/data/components/DraftApiDataSetsTable';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
 import {
   ApiDataSetLiveVersionSummary,
   ApiDataSetSummary,
@@ -17,7 +14,8 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export interface LiveApiDataSetSummary extends ApiDataSetSummary {
   latestLiveVersion: ApiDataSetLiveVersionSummary;
@@ -38,7 +36,7 @@ export default function LiveApiDataSetsTable({
   releaseVersionId,
   releaseId,
 }: Props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   if (!dataSets.length) {
     return <InsetText>No live API data sets for this publication.</InsetText>;
@@ -73,14 +71,11 @@ export default function LiveApiDataSetsTable({
                   horizontalSpacing="l"
                 >
                   <Link
-                    to={generatePath<ReleaseDataSetRouteParams>(
-                      releaseApiDataSetDetailsRoute.path,
-                      {
-                        publicationId,
-                        releaseVersionId,
-                        dataSetId: dataSet.id,
-                      },
-                    )}
+                    to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+                      publicationId,
+                      releaseVersionId,
+                      dataSetId: dataSet.id,
+                    })}
                   >
                     View details
                     <VisuallyHidden> for {dataSet.title}</VisuallyHidden>
@@ -106,9 +101,9 @@ export default function LiveApiDataSetsTable({
                             dataSetId: dataSet.id,
                             releaseFileId,
                           });
-                          history.push(
-                            generatePath<ReleaseDataSetRouteParams>(
-                              releaseApiDataSetDetailsRoute.path,
+                          navigate(
+                            generatePath(
+                              releaseApiDataSetDetailsRoute.fullPath,
                               {
                                 publicationId,
                                 releaseVersionId,

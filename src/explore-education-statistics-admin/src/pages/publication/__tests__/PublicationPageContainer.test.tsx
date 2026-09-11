@@ -1,18 +1,15 @@
 import render from '@common-test/render';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
-import {
-  publicationReleasesRoute,
-  PublicationRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import { publicationRoute } from '@admin/routes/routes';
 import _publicationService from '@admin/services/publicationService';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router';
-import { Route } from 'react-router-dom';
+import { generatePath } from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -109,19 +106,13 @@ describe('PublicationPageContainer', () => {
 });
 
 function renderPage() {
-  const path = generatePath<PublicationRouteParams>(
-    publicationReleasesRoute.path,
-    {
-      publicationId: 'publication-1',
-    },
-  );
+  const path = generatePath(publicationReleasesRoute.fullPath, {
+    publicationId: 'publication-1',
+  });
 
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <Route
-        component={PublicationPageContainer}
-        path={publicationRoute.path}
-      />
-    </MemoryRouter>,
+    <TestRouterRenderer initialUrl={path} route={publicationRoute.fullPath}>
+      <PublicationPageContainer />
+    </TestRouterRenderer>,
   );
 }

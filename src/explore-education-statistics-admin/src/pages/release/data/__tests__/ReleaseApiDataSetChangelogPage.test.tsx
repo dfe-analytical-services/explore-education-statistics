@@ -1,11 +1,7 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  releaseApiDataSetChangelogRoute,
-  ReleaseDataSetChangelogRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetChangelogRoute } from '@admin/routes/releaseRoutes';
 import _apiDataSetService, {
   ApiDataSet,
   ApiDataSetVersionInfo,
@@ -14,8 +10,9 @@ import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService'
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 import { ChangeSet } from '@common/services/types/apiDataSetChanges';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetVersionService');
@@ -400,28 +397,19 @@ describe('ReleaseApiDataSetChangelogPage', () => {
 
   function renderPage(dataSetVersionId: string) {
     return render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer
+        initialUrl={generatePath(releaseApiDataSetChangelogRoute.fullPath, {
+          publicationId: testRelease.publicationId,
+          releaseVersionId: testRelease.id,
+          dataSetId: 'data-set-id',
+          dataSetVersionId,
+        })}
+        route={releaseApiDataSetChangelogRoute.fullPath}
+      >
         <ReleaseVersionContextProvider releaseVersion={testRelease}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetChangelogRouteParams>(
-                releaseApiDataSetChangelogRoute.path,
-                {
-                  publicationId: testRelease.publicationId,
-                  releaseVersionId: testRelease.id,
-                  dataSetId: 'data-set-id',
-                  dataSetVersionId,
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetChangelogPage}
-              path={releaseApiDataSetChangelogRoute.path}
-            />
-          </MemoryRouter>
+          <ReleaseApiDataSetChangelogPage />
         </ReleaseVersionContextProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });

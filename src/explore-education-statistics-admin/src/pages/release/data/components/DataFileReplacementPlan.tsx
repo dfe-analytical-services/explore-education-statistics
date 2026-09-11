@@ -6,9 +6,7 @@ import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQuerie
 import {
   releaseApiDataSetDetailsRoute,
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
   ReleaseDataSetRouteParams,
-  ReleaseFootnoteRouteParams,
   releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
@@ -266,8 +264,8 @@ function Plan({
 
   const apiDataSetsTabRoute =
     user?.permissions.isBauUser && releaseRouteParams
-      ? `${generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
+      ? `${generatePath(
+          releaseApiDataSetDetailsRoute.fullPath,
           releaseRouteParams,
         )}`
       : undefined;
@@ -465,14 +463,11 @@ function Plan({
 
                 <ButtonGroup>
                   <ButtonLink
-                    to={`${generatePath<ReleaseDataBlockRouteParams>(
-                      releaseDataBlockEditRoute.path,
-                      {
-                        publicationId,
-                        releaseVersionId,
-                        dataBlockId: dataBlock.id,
-                      },
-                    )}?fromFileReplacementId=${fileId}`}
+                    to={`${generatePath(releaseDataBlockEditRoute.fullPath, {
+                      publicationId,
+                      releaseVersionId,
+                      dataBlockId: dataBlock.id,
+                    })}?fromFileReplacementId=${fileId}`}
                   >
                     Edit data block{' '}
                     <VisuallyHidden>- {dataBlock.name}</VisuallyHidden>
@@ -609,14 +604,11 @@ function Plan({
 
                   <ButtonGroup>
                     <ButtonLink
-                      to={generatePath<ReleaseFootnoteRouteParams>(
-                        releaseFootnotesEditRoute.path,
-                        {
-                          publicationId,
-                          releaseVersionId,
-                          footnoteId: footnote.id,
-                        },
-                      )}
+                      to={generatePath(releaseFootnotesEditRoute.fullPath, {
+                        publicationId,
+                        releaseVersionId,
+                        footnoteId: footnote.id,
+                      })}
                     >
                       Edit footnote
                     </ButtonLink>

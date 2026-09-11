@@ -5,30 +5,30 @@ import { ThemeParams, themesRoute } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const ThemeCreatePage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return (
     <Page
       title="Create theme"
       breadcrumbs={[
-        { name: 'Manage themes', link: themesRoute.path },
+        { name: 'Manage themes', link: themesRoute.fullPath },
         { name: 'Create theme' },
       ]}
     >
       <ThemeForm
         cancelButton={
-          <Link unvisited to={themesRoute.path}>
+          <Link unvisited to={themesRoute.fullPath}>
             Cancel
           </Link>
         }
         onSubmit={async values => {
           const theme = await themeService.createTheme(values);
 
-          history.push(
-            appendQuery<ThemeParams>(themesRoute.path, {
+          navigate(
+            appendQuery<ThemeParams>(themesRoute.fullPath, {
               themeId: theme.id,
             }),
           );

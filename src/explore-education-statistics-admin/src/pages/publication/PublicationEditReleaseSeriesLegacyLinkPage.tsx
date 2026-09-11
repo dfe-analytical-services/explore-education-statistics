@@ -12,7 +12,7 @@ import publicationService, {
 } from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
@@ -30,9 +30,10 @@ export const mapToReleaseSeriesItemUpdateRequest = (
 
 export default function PublicationEditReleaseSeriesLegacyLinkPage() {
   const { releaseSeriesItemId } =
-    useParams<PublicationEditReleaseSeriesLegacyLinkRouteParams>();
+    useParams<PublicationEditReleaseSeriesLegacyLinkRouteParams>() as PublicationEditReleaseSeriesLegacyLinkRouteParams;
   const { publicationId } = usePublicationContext();
-  const history = useHistory();
+
+  const navigate = useNavigate();
 
   const { data: releaseSeries = [], isLoading } = useQuery(
     publicationQueries.getReleaseSeries(publicationId),
@@ -43,7 +44,7 @@ export default function PublicationEditReleaseSeriesLegacyLinkPage() {
   );
 
   const publicationReleaseSeriesPath = generatePath(
-    publicationReleaseSeriesRoute.path,
+    publicationReleaseSeriesRoute.fullPath,
     {
       publicationId,
     },
@@ -85,7 +86,7 @@ export default function PublicationEditReleaseSeriesLegacyLinkPage() {
               mapToReleaseSeriesItemUpdateRequest(updatedReleaseSeries),
             );
 
-            history.push(publicationReleaseSeriesPath);
+            navigate(publicationReleaseSeriesPath);
           }}
         />
       )}

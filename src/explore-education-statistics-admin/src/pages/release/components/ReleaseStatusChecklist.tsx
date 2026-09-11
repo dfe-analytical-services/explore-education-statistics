@@ -1,10 +1,7 @@
 import Link from '@admin/components/Link';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 import { releasePreReleaseAccessPageTabs } from '@admin/pages/release/pre-release/ReleasePreReleaseAccessPage';
-import {
-  MethodologyRouteParams,
-  methodologyStatusRoute,
-} from '@admin/routes/methodologyRoutes';
+import { methodologyStatusRoute } from '@admin/routes/methodologyRoutes';
 import {
   releaseContentRoute,
   releaseDataBlocksRoute,
@@ -20,10 +17,7 @@ import {
   ReleaseVersionChecklistWarning,
 } from '@admin/services/releaseVersionService';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
-import {
-  publicationMethodologiesRoute,
-  PublicationRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -58,15 +52,15 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
   );
 
   const apiDataSetsTabRoute = user?.permissions.isBauUser
-    ? `${generatePath<ReleaseRouteParams>(
-        releaseDataRoute.path,
+    ? `${generatePath(
+        releaseDataRoute.fullPath,
         releaseRouteParams,
       )}#${releaseDataPageTabs.apiDataSets.id}`
     : undefined;
 
   const errorDetails = useMemo<ChecklistMessage[]>(() => {
-    const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
-      releaseDataRoute.path,
+    const dataUploadsTabRoute = `${generatePath(
+      releaseDataRoute.fullPath,
       releaseRouteParams,
     )}#${releaseDataPageTabs.dataUploads.id}`;
 
@@ -86,8 +80,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'All summary information must be completed on the data guidance page',
-            link: `${generatePath<ReleaseRouteParams>(
-              releaseDataRoute.path,
+            link: `${generatePath(
+              releaseDataRoute.fullPath,
               releaseRouteParams,
             )}#${releaseDataPageTabs.dataGuidance.id}`,
           };
@@ -95,24 +89,24 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'A public release note for this amendment is required, add this near the top of the content page',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
         case 'EmptyContentSectionExists':
           return {
             message: 'Release content should not contain any empty sections',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
         case 'GenericSectionsContainEmptyHtmlBlock':
           return {
             message: 'Release content should not contain empty text blocks',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -120,8 +114,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'Release content should not contain an empty related dashboards section',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -129,8 +123,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'Release must contain a key statistic or a non-empty headline text block',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -138,8 +132,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'Release content should not contain an empty summary section',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -147,8 +141,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'Release content should not contain an empty warning section. Please either add the required warning text or remove the warning block entirely',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -190,18 +184,15 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
         case 'MethodologyNotApproved':
           return {
             message: 'A methodology for this publication is not yet approved',
-            link: generatePath<MethodologyRouteParams>(
-              methodologyStatusRoute.path,
-              {
-                methodologyId: warning.methodologyId,
-              },
-            ),
+            link: generatePath(methodologyStatusRoute.fullPath, {
+              methodologyId: warning.methodologyId,
+            }),
           };
         case 'NoDataFiles':
           return {
             message: 'No data files uploaded',
-            link: `${generatePath<ReleaseRouteParams>(
-              releaseDataRoute.path,
+            link: `${generatePath(
+              releaseDataRoute.fullPath,
               releaseRouteParams,
             )}#${releaseDataPageTabs.dataUploads.id}`,
           };
@@ -212,8 +203,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
                 ? '1 data file does not have any footnotes'
                 : `${warning.totalSubjects} data files don't have any footnotes`
             }`,
-            link: generatePath<ReleaseRouteParams>(
-              releaseFootnotesRoute.path,
+            link: generatePath(
+              releaseFootnotesRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -221,40 +212,36 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'An in-EES methodology page has not been linked to this publication',
-            link: generatePath<PublicationRouteParams>(
-              publicationMethodologiesRoute.path,
-              { publicationId: releaseVersion.publicationId },
-            ),
+            link: generatePath(publicationMethodologiesRoute.fullPath, {
+              publicationId: releaseVersion.publicationId,
+            }),
           };
         case 'NoNextReleaseDate':
           return {
             message: 'No next expected release date has been added',
-            link: generatePath<ReleaseRouteParams>(
-              releaseStatusRoute.path,
-              releaseRouteParams,
-            ),
+            link: generatePath(releaseStatusRoute.fullPath, releaseRouteParams),
           };
         case 'NoFeaturedTables':
           return {
             message: 'No data blocks have been saved as featured tables',
-            link: generatePath<ReleaseRouteParams>(
-              releaseDataBlocksRoute.path,
+            link: generatePath(
+              releaseDataBlocksRoute.fullPath,
               releaseRouteParams,
             ),
           };
         case 'NoPublicPreReleaseAccessList':
           return {
             message: 'A public pre-release access list has not been created',
-            link: `${generatePath<ReleaseRouteParams>(
-              releasePreReleaseAccessRoute.path,
+            link: `${generatePath(
+              releasePreReleaseAccessRoute.fullPath,
               releaseRouteParams,
             )}#${releasePreReleaseAccessPageTabs.publicAccessList.id}`,
           };
         case 'UnresolvedComments':
           return {
             message: 'The content has unresolved comments',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };
@@ -268,8 +255,8 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
           return {
             message:
               'A summary text block has been added, note that this functionality will be removed as part of the release page redesign (although legacy support for published releases will be in place)',
-            link: generatePath<ReleaseRouteParams>(
-              releaseContentRoute.path,
+            link: generatePath(
+              releaseContentRoute.fullPath,
               releaseRouteParams,
             ),
           };

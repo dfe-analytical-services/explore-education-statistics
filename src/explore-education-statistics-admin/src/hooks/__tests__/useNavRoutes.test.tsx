@@ -1,7 +1,6 @@
 import {
   methodologyContentRoute,
   methodologyNavRoutes,
-  MethodologyRouteParams,
   methodologyStatusRoute,
   methodologySummaryEditRoute,
   methodologySummaryRoute,
@@ -15,7 +14,7 @@ describe('useNavRoutes', () => {
   const methodologyId = 'methodology-1';
 
   const renderAtRoute = (path: string) => {
-    const location = generatePath<MethodologyRouteParams>(path, {
+    const location = generatePath(path, {
       methodologyId,
     });
 
@@ -30,17 +29,17 @@ describe('useNavRoutes', () => {
   };
 
   test('resolves the nav route paths for the nav bar', () => {
-    const { result } = renderAtRoute(methodologySummaryRoute.path);
+    const { result } = renderAtRoute(methodologySummaryRoute.fullPath);
 
     expect(result.current.navBarRoutes).toEqual([
-      { title: 'Summary', to: '/methodology/methodology-1/summary' },
-      { title: 'Manage content', to: '/methodology/methodology-1/content' },
-      { title: 'Sign off', to: '/methodology/methodology-1/status' },
+      { title: 'Summary', to: 'summary' },
+      { title: 'Manage content', to: 'content' },
+      { title: 'Sign off', to: 'status' },
     ]);
   });
 
   test('returns no previous section for the first nav route', () => {
-    const { result } = renderAtRoute(methodologySummaryRoute.path);
+    const { result } = renderAtRoute(methodologySummaryRoute.fullPath);
 
     expect(result.current.currentRouteIndex).toBe(0);
     expect(result.current.currentRouteTitle).toBe('Summary');
@@ -52,7 +51,7 @@ describe('useNavRoutes', () => {
   });
 
   test('returns both sections for a middle nav route', () => {
-    const { result } = renderAtRoute(methodologyContentRoute.path);
+    const { result } = renderAtRoute(methodologyContentRoute.fullPath);
 
     expect(result.current.currentRouteIndex).toBe(1);
     expect(result.current.currentRouteTitle).toBe('Manage content');
@@ -67,7 +66,7 @@ describe('useNavRoutes', () => {
   });
 
   test('returns no next section for the last nav route', () => {
-    const { result } = renderAtRoute(methodologyStatusRoute.path);
+    const { result } = renderAtRoute(methodologyStatusRoute.fullPath);
 
     expect(result.current.currentRouteIndex).toBe(2);
     expect(result.current.currentRouteTitle).toBe('Sign off');
@@ -79,7 +78,7 @@ describe('useNavRoutes', () => {
   });
 
   test('returns no sections when the location is not a nav route', () => {
-    const { result } = renderAtRoute(methodologySummaryEditRoute.path);
+    const { result } = renderAtRoute(methodologySummaryEditRoute.fullPath);
 
     expect(result.current.currentRouteIndex).toBe(-1);
     expect(result.current.previousSection).toBeUndefined();
@@ -89,7 +88,7 @@ describe('useNavRoutes', () => {
   test('falls back to the closest matching nav route for the title', () => {
     // The edit page isn't a nav route, but `useCurrentRouteTitle` matches
     // paths as prefixes, so it still resolves to the summary route's title.
-    const { result } = renderAtRoute(methodologySummaryEditRoute.path);
+    const { result } = renderAtRoute(methodologySummaryEditRoute.fullPath);
 
     expect(result.current.currentRouteTitle).toBe('Summary');
   });
