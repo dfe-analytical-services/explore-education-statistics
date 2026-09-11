@@ -121,64 +121,69 @@ const ReleaseExploreDataPage = ({
         />
       }
     >
-      {dataSets.map(dataset => (
-        <ReleaseDataListItem
-          key={dataset.fileId}
-          title={dataset.title}
-          description={dataset.summary}
-          metaInfo={[
-            ...dataset.meta.geographicLevels,
-            ...dataset.meta.geographicLevelsCsvOnly.map(
-              level => `${level} (CSV only)`,
-            ),
-          ].join(', ')}
-          tag={
-            dataset.isApiEnabled && (
-              <Tag className="govuk-!-margin-bottom-2" colour="grey">
-                Available by API
-              </Tag>
-            )
-          }
-          actions={
-            <>
-              <Link
-                to={`/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}?subjectId=${dataset.subjectId}`}
-              >
-                Create table{' '}
-                <VisuallyHidden>using {dataset.title}</VisuallyHidden>
-              </Link>
-              <ButtonText
-                onClick={async () => {
-                  await downloadService.downloadZip(
-                    releaseVersionSummary.id,
-                    'ReleaseDownloads',
-                    dataset.fileId,
-                  );
+      {dataSets.map(dataset => {
+        const geographicLevels = [
+          ...dataset.meta.geographicLevels,
+          ...dataset.meta.geographicLevelsCsvOnly.map(
+            level => `${level} (CSV only)`,
+          ),
+        ];
 
-                  logEvent({
-                    category: 'Downloads',
-                    action: 'Release page data set file download',
-                    label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, Data set: ${dataset.title}`,
-                  });
-                }}
-              >
-                Download <VisuallyHidden>{dataset.title}</VisuallyHidden> (ZIP)
-              </ButtonText>
-            </>
-          }
-        >
-          <ReleaseDataSetFileSummary
-            dataSetFile={dataset}
-            expanded={showAllDataSetDetails}
-            renderLink={
-              <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
-                Data set information page{' '}
-                <VisuallyHidden>for {dataset.title}</VisuallyHidden>
-              </Link>
+        return (
+          <ReleaseDataListItem
+            key={dataset.fileId}
+            title={dataset.title}
+            description={dataset.summary}
+            metaInfo={geographicLevels.join(', ')}
+            tag={
+              dataset.isApiEnabled && (
+                <Tag className="govuk-!-margin-bottom-2" colour="grey">
+                  Available by API
+                </Tag>
+              )
             }
-          />
-        </ReleaseDataListItem>
-      ))}
+            actions={
+              <>
+                <Link
+                  to={`/data-tables/${publicationSummary.slug}/${releaseVersionSummary.slug}?subjectId=${dataset.subjectId}`}
+                >
+                  Create table{' '}
+                  <VisuallyHidden>using {dataset.title}</VisuallyHidden>
+                </Link>
+                <ButtonText
+                  onClick={async () => {
+                    await downloadService.downloadZip(
+                      releaseVersionSummary.id,
+                      'ReleaseDownloads',
+                      dataset.fileId,
+                    );
+
+                    logEvent({
+                      category: 'Downloads',
+                      action: 'Release page data set file download',
+                      label: `Publication: ${publicationSummary.title}, Release: ${releaseVersionSummary.title}, Data set: ${dataset.title}`,
+                    });
+                  }}
+                >
+                  Download <VisuallyHidden>{dataset.title}</VisuallyHidden>{' '}
+                  (ZIP)
+                </ButtonText>
+              </>
+            }
+          >
+            <ReleaseDataSetFileSummary
+              dataSetFile={dataset}
+              expanded={showAllDataSetDetails}
+              renderLink={
+                <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
+                  Data set information page{' '}
+                  <VisuallyHidden>for {dataset.title}</VisuallyHidden>
+                </Link>
+              }
+            />
+          </ReleaseDataListItem>
+        );
+      })}
     </ReleaseDataList>
   );
 
