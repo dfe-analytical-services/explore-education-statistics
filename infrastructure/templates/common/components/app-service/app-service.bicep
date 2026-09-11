@@ -120,6 +120,10 @@ var baseSettings = union(applicationAppSettings, {
   WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
   ASPNETCORE_DETAILEDERRORS: detailedErrors
   WEBSITES_PORT: websitePort
+  
+  // Enable the App Service to access file shares over the VNet if
+  // file shares are available for this App Service. 
+  WEBSITE_CONTENTOVERVNET: length(azureFileShares ?? []) > 0 ? '1' : null
 })
 
 var osSpecificSettings = union(baseSettings,
