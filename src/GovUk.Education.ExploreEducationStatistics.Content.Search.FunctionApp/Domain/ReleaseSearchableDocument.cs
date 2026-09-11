@@ -2,20 +2,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public record ReleaseSearchableDocument
 {
-    public Guid ReleaseId { get; init; }
-    public Guid ReleaseVersionId { get; init; }
-    public DateTimeOffset Published { get; init; } = DateTimeOffset.MinValue;
-    public Guid PublicationId { get; init; }
-    public string PublicationTitle { get; init; } = string.Empty;
-    public string Summary { get; init; } = string.Empty;
-    public Guid ThemeId { get; init; }
-    public string ThemeTitle { get; init; } = string.Empty;
-    public string ReleaseType { get; init; } = string.Empty;
+    public required Guid ReleaseId { get; init; }
+    public required string ReleaseSlug { get; init; }
+    public required Guid ReleaseVersionId { get; init; }
+    public required Guid PublicationId { get; init; }
+    public required string PublicationSlug { get; init; }
+    public required string Summary { get; init; }
+    public required string PublicationTitle { get; init; }
+    public required DateTimeOffset Published { get; init; }
+    public required Guid ThemeId { get; init; }
+    public required string ThemeTitle { get; init; }
+    public required string ReleaseType { get; init; }
+    public required int TypeBoost { get; init; }
+    public required PublishingOrganisation[] PublishingOrganisations { get; init; }
+    public required string HtmlContent { get; init; }
+}
 
-    public int TypeBoost { get; init; }
-
-    public string PublicationSlug { get; init; } = string.Empty;
-    public string ReleaseSlug { get; init; } = string.Empty;
-
-    public string HtmlContent { get; init; } = string.Empty;
+public record PublishingOrganisation
+{
+    public required Guid Id { get; init; }
+    public required string Title { get; init; }
 }
