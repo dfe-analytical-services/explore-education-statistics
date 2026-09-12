@@ -23,7 +23,16 @@ different Slack workspaces, each of which needs its own app token - channels lis
 `secondarySlackAlertsChannels` are posted with the token from the `ees-alerts-secondaryslackapptoken`
 Key Vault secret, and all others with the token from `ees-alerts-slackapptoken`. Both Slack apps need
 the `chat:write` scope and must be invited to their channels, otherwise `chat.postMessage` returns
-HTTP 200 with `"ok": false` and the alert is dropped without the Logic App run failing.
+HTTP 200 with `"ok": false`.
+
+Because that is not an HTTP failure, the `Record rejected Slack post` condition inspects the response
+body and collects any rejected channel into the `slackFailures` variable, and `Fail if any Slack post
+was rejected` then terminates the run as failed - so dropped alerts surface in the `WorkflowRuntime`
+diagnostic logs instead of passing silently. The check runs after the Teams action as well as the
+Slack loop, so terminating cannot cut short an in-flight Teams post. The `Foreach` runs at a
+concurrency of 1 because appending to a variable from parallel iterations is not safe, and `Terminate`
+is not permitted inside a `Foreach`, which is why the failure is raised after the loop rather than
+within it.
 
 `secondarySlackAlertsChannels` is only populated in production, where alerts are mirrored to our
 support partner's workspace; the other environments inherit the empty default in

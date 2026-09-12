@@ -185,7 +185,7 @@
     },
     "Post messages to Slack": {
       "runAfter": {
-        "fields": [
+        "Initialise Slack failures": [
           "Succeeded"
         ]
       },
@@ -244,6 +244,37 @@
               "Authorization": "@{concat('Bearer ', if(contains(parameters('secondarySlackAlertsChannels'), items('Post messages to Slack')), parameters('secondarySlackAppToken'), parameters('slackAppToken')))}"
             }
           }
+        },
+        "Record rejected Slack post": {
+          "runAfter": {
+            "Post message to Slack": [
+              "Succeeded"
+            ]
+          },
+          "type": "If",
+          "description": "chat.postMessage returns HTTP 200 with ok=false when the app lacks chat:write or is not in the channel, so a rejected message must be detected from the body.",
+          "expression": {
+            "not": {
+              "equals": [
+                "@body('Post message to Slack')?['ok']",
+                true
+              ]
+            }
+          },
+          "actions": {
+            "Append rejected channel": {
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "slackFailures",
+                "value": "@{items('Post messages to Slack')} (@{coalesce(body('Post message to Slack')?['error'], 'unknown error')})"
+              }
+            }
+          }
+        }
+      },
+      "runtimeConfiguration": {
+        "concurrency": {
+          "repetitions": 1
         }
       }
     },
@@ -321,6 +352,53 @@
       "runtimeConfiguration": {
         "contentTransfer": {
           "transferMode": "Chunked"
+        }
+      }
+    },
+    "Initialise Slack failures": {
+      "runAfter": {
+        "fields": [
+          "Succeeded"
+        ]
+      },
+      "type": "InitializeVariable",
+      "description": "Collects any channels that Slack accepted over HTTP but refused to post to.",
+      "inputs": {
+        "variables": [
+          {
+            "name": "slackFailures",
+            "type": "Array"
+          }
+        ]
+      }
+    },
+    "Fail if any Slack post was rejected": {
+      "runAfter": {
+        "Post messages to Slack": [
+          "Succeeded"
+        ],
+        "Post message to Teams": [
+          "Succeeded"
+        ]
+      },
+      "type": "If",
+      "description": "Fails the run so that dropped alerts surface in the WorkflowRuntime diagnostic logs instead of passing silently.",
+      "expression": {
+        "greater": [
+          "@length(variables('slackFailures'))",
+          0
+        ]
+      },
+      "actions": {
+        "Terminate as failed": {
+          "type": "Terminate",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "SlackPostRejected",
+              "message": "Slack rejected the alert for: @{join(variables('slackFailures'), '; ')}"
+            }
+          }
         }
       }
     }
