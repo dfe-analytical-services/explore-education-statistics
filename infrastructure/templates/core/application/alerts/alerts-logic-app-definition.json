@@ -12,10 +12,16 @@
     "resourceGroup": {
       "type": "string"
     },
-    "slackAlertsChannel": {
-      "type": "string"
+    "slackAlertsChannels": {
+      "type": "Array"
+    },
+    "secondarySlackAlertsChannels": {
+      "type": "Array"
     },
     "slackAppToken": {
+      "type": "securestring"
+    },
+    "secondarySlackAppToken": {
       "type": "securestring"
     },
     "teamsPowerAutomateWebhookUrl": {
@@ -177,60 +183,98 @@
         "alertLinkTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('fragments')?['alertTargetResourceUrl']})"
       }
     },
-    "Post message to Slack": {
+    "Post messages to Slack": {
       "runAfter": {
-        "fields": [
+        "Initialise Slack failures": [
           "Succeeded"
         ]
       },
-      "type": "Http",
-      "inputs": {
-        "method": "POST",
-        "uri": "https://slack.com/api/chat.postMessage",
-        "body": {
-          "channel": "@parameters('slackAlertsChannel')",
-          "text": "@outputs('fields')?['titleSlack']",
-          "attachments": [
-            {
-              "color": "@outputs('fields')?['colourSlack']",
-              "fields": [
+      "type": "Foreach",
+      "description": "Post the alert to every configured Slack channel. Channels listed in secondarySlackAlertsChannels are posted with secondarySlackAppToken; all others use slackAppToken.",
+      "foreach": "@union(parameters('slackAlertsChannels'), parameters('secondarySlackAlertsChannels'))",
+      "actions": {
+        "Post message to Slack": {
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://slack.com/api/chat.postMessage",
+            "body": {
+              "channel": "@items('Post messages to Slack')",
+              "text": "@outputs('fields')?['titleSlack']",
+              "attachments": [
                 {
-                  "title": "Alert",
-                  "value": "@outputs('variables')?['alertName']",
-                  "short": true
-                },
-                {
-                  "title": "Severity",
-                  "value": "@outputs('fields')?['severity']",
-                  "short": true
-                },
-                {
-                  "title": "@{outputs('variables')?['monitorCondition']} at",
-                  "value": "@outputs('fields')?['alertTime']",
-                  "short": false
-                },
-                {
-                  "title": "Window start",
-                  "value": "@outputs('fields')?['windowStart']",
-                  "short": true
-                },
-                {
-                  "title": "Window end",
-                  "value": "@outputs('fields')?['windowEnd']",
-                  "short": true
-                },
-                {
-                  "title": "Logic App workflow version",
-                  "value": "1.0",
-                  "short": true
+                  "color": "@outputs('fields')?['colourSlack']",
+                  "fields": [
+                    {
+                      "title": "Alert",
+                      "value": "@outputs('variables')?['alertName']",
+                      "short": true
+                    },
+                    {
+                      "title": "Severity",
+                      "value": "@outputs('fields')?['severity']",
+                      "short": true
+                    },
+                    {
+                      "title": "@{outputs('variables')?['monitorCondition']} at",
+                      "value": "@outputs('fields')?['alertTime']",
+                      "short": false
+                    },
+                    {
+                      "title": "Window start",
+                      "value": "@outputs('fields')?['windowStart']",
+                      "short": true
+                    },
+                    {
+                      "title": "Window end",
+                      "value": "@outputs('fields')?['windowEnd']",
+                      "short": true
+                    },
+                    {
+                      "title": "Logic App workflow version",
+                      "value": "1.0",
+                      "short": true
+                    }
+                  ]
                 }
               ]
+            },
+            "headers": {
+              "Content-Type": "application/json",
+              "Authorization": "@{concat('Bearer ', if(contains(parameters('secondarySlackAlertsChannels'), items('Post messages to Slack')), parameters('secondarySlackAppToken'), parameters('slackAppToken')))}"
             }
-          ]
+          }
         },
-        "headers": {
-          "Content-Type": "application/json",
-          "Authorization": "@{concat('Bearer ', parameters('slackAppToken'))}"
+        "Record rejected Slack post": {
+          "runAfter": {
+            "Post message to Slack": [
+              "Succeeded"
+            ]
+          },
+          "type": "If",
+          "description": "chat.postMessage returns HTTP 200 with ok=false when the app lacks chat:write or is not in the channel, so a rejected message must be detected from the body.",
+          "expression": {
+            "not": {
+              "equals": [
+                "@body('Post message to Slack')?['ok']",
+                true
+              ]
+            }
+          },
+          "actions": {
+            "Append rejected channel": {
+              "type": "AppendToArrayVariable",
+              "inputs": {
+                "name": "slackFailures",
+                "value": "@{items('Post messages to Slack')} (@{coalesce(body('Post message to Slack')?['error'], 'unknown error')})"
+              }
+            }
+          }
+        }
+      },
+      "runtimeConfiguration": {
+        "concurrency": {
+          "repetitions": 1
         }
       }
     },
@@ -308,6 +352,53 @@
       "runtimeConfiguration": {
         "contentTransfer": {
           "transferMode": "Chunked"
+        }
+      }
+    },
+    "Initialise Slack failures": {
+      "runAfter": {
+        "fields": [
+          "Succeeded"
+        ]
+      },
+      "type": "InitializeVariable",
+      "description": "Collects any channels that Slack accepted over HTTP but refused to post to.",
+      "inputs": {
+        "variables": [
+          {
+            "name": "slackFailures",
+            "type": "Array"
+          }
+        ]
+      }
+    },
+    "Fail if any Slack post was rejected": {
+      "runAfter": {
+        "Post messages to Slack": [
+          "Succeeded"
+        ],
+        "Post message to Teams": [
+          "Succeeded"
+        ]
+      },
+      "type": "If",
+      "description": "Fails the run so that dropped alerts surface in the WorkflowRuntime diagnostic logs instead of passing silently.",
+      "expression": {
+        "greater": [
+          "@length(variables('slackFailures'))",
+          0
+        ]
+      },
+      "actions": {
+        "Terminate as failed": {
+          "type": "Terminate",
+          "inputs": {
+            "runStatus": "Failed",
+            "runError": {
+              "code": "SlackPostRejected",
+              "message": "Slack rejected the alert for: @{join(variables('slackFailures'), '; ')}"
+            }
+          }
         }
       }
     }

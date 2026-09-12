@@ -17,6 +17,30 @@ The [Logic App](alerts-logic-app.bicep) receives JSON payloads from metric alert
 information using a series of `Compose` actions, and then 2 HTTP actions, one for Teams and one for
 Slack, take those variables and construct POSTs in the correct format for their target platforms.
 
+The Slack action runs inside a `Foreach` over every channel in `slackAlertsChannels` and
+`secondarySlackAlertsChannels`. Two parameters exist so that alerts can be posted to channels in two
+different Slack workspaces, each of which needs its own app token - channels listed in
+`secondarySlackAlertsChannels` are posted with the token from the `ees-alerts-secondaryslackapptoken`
+Key Vault secret, and all others with the token from `ees-alerts-slackapptoken`. Both Slack apps need
+the `chat:write` scope and must be invited to their channels, otherwise `chat.postMessage` returns
+HTTP 200 with `"ok": false`.
+
+Because that is not an HTTP failure, the `Record rejected Slack post` condition inspects the response
+body and collects any rejected channel into the `slackFailures` variable, and `Fail if any Slack post
+was rejected` then terminates the run as failed - so dropped alerts surface in the `WorkflowRuntime`
+diagnostic logs instead of passing silently. The check runs after the Teams action as well as the
+Slack loop, so terminating cannot cut short an in-flight Teams post. The `Foreach` runs at a
+concurrency of 1 because appending to a variable from parallel iterations is not safe, and `Terminate`
+is not permitted inside a `Foreach`, which is why the failure is raised after the loop rather than
+within it.
+
+`secondarySlackAlertsChannels` is only populated in production, where alerts are mirrored to our
+support partner's workspace; the other environments inherit the empty default in
+[main.bicep](../../main.bicep) and post to a single workspace. The
+`ees-alerts-secondaryslackapptoken` secret still has to exist in every environment's Key Vault,
+because Bicep resolves it at deployment time regardless of whether any channel uses it - a
+placeholder value is fine outside production.
+
 The [Logic App definition](alerts-logic-app-definition.json) defines the workflow.
 
 ## Action Group
