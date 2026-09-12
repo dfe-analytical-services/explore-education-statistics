@@ -10,12 +10,6 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
-@description('Slack channels in the DfE workspace to post alerts to.')
-param slackAlertsChannels array = []
-
-@description('Slack channels in the Hive workspace to post alerts to.')
-param hiveSlackAlertsChannels array = []
-
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
 
@@ -135,8 +129,6 @@ module alertsModule 'application/alerts/alerts.bicep' = {
     subscription: subscription
     keyVaultName: keyVaultModule.outputs.keyVaultName
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
-    slackAlertsChannels: slackAlertsChannels
-    hiveSlackAlertsChannels: hiveSlackAlertsChannels
   }
 }
 
