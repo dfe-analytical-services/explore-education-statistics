@@ -10,6 +10,7 @@ import {
 } from '@azure/search-documents';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { initialiseAzurePublicationsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
+import buildPublicationSearchFilter from '@frontend/modules/api/search/buildPublicationSearchFilter';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import {
   AzurePublicationListRequest,
@@ -43,7 +44,6 @@ export default withMethods({
 
     try {
       const {
-        filter,
         orderBy,
         page = 1,
         pageSize = 10,
@@ -51,6 +51,8 @@ export default withMethods({
         search = '',
         themeId,
       } = searchOptions;
+
+      const filter = buildPublicationSearchFilter({ releaseType, themeId });
 
       const searchOptionsBase: SharedSearchOptionsBase = {
         includeTotalCount: true,
