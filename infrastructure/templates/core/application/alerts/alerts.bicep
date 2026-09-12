@@ -7,12 +7,6 @@ param keyVaultName string
 @description('Resource Id of the Log Analytics Workspace to link the logic app to.')
 param logAnalyticsWorkspaceId string
 
-@description('Slack channels in the primary workspace to post Azure alerts to.')
-param slackAlertsChannels array
-
-@description('Slack channels in the secondary workspace to post Azure alerts to.')
-param secondarySlackAlertsChannels array
-
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
@@ -22,10 +16,7 @@ module alertsLogicAppModule 'alerts-logic-app.bicep' = {
   params: {
     subscription: subscription
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    slackAlertsChannels: slackAlertsChannels
-    secondarySlackAlertsChannels: secondarySlackAlertsChannels
-    slackAppToken: keyVault.getSecret('ees-alerts-slackapptoken')
-    secondarySlackAppToken: keyVault.getSecret('ees-alerts-secondaryslackapptoken')
+    slackAlertsConfig: keyVault.getSecret('ees-alerts-slackconfig')
     teamsPowerAutomateWebhookUrl: keyVault.getSecret('ees-alerts-teamswebhookurl')
   }
 }
