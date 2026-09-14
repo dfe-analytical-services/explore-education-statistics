@@ -57,7 +57,7 @@ public static class ReleaseSearchableDocumentExtensions
             },
             {
                 SearchableDocumentAzureBlobMetadataKeys.Published,
-                releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddThh:mm:ssZ")
+                releaseSearchableDocument.Published.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
             },
             {
                 SearchableDocumentAzureBlobMetadataKeys.Summary,
