@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
@@ -389,6 +390,7 @@ public class ThemeServiceTests
         var adminEventRaiser = new AdminEventRaiserMockBuilder();
         var methodologyService = new Mock<IMethodologyService>(Strict);
         var publishingService = new Mock<IPublishingService>(Strict);
+        var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -397,16 +399,24 @@ public class ThemeServiceTests
                 adminEventRaiser: adminEventRaiser.Build(),
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: new TestReleaseVersionService(contentContext)
+                releaseVersionService: new TestReleaseVersionService(contentContext),
+                publicationCacheService: publicationCacheService.Object
             );
 
             methodologyService.Setup(s => s.DeleteMethodology(methodology.Id, true)).ReturnsAsync(Unit.Instance);
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
+            foreach (var publicationToDelete in publications)
+            {
+                publicationCacheService
+                    .Setup(s => s.RemovePublication(publicationToDelete.Slug))
+                    .Returns(Task.CompletedTask);
+            }
+
             var result = await service.DeleteThemes([theme.Id]);
 
-            VerifyAllMocks(methodologyService, publishingService);
+            VerifyAllMocks(methodologyService, publishingService, publicationCacheService);
 
             result.AssertRight();
 
@@ -1138,6 +1148,7 @@ public class ThemeServiceTests
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IRedirectsCacheService? redirectsCacheService = null,
+        IPublicationCacheService? publicationCacheService = null,
         ILogger<ThemeService>? logger = null,
         bool enableThemeDeletion = true
     )
@@ -1167,6 +1178,7 @@ public class ThemeServiceTests
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
             redirectsCacheService ?? new RedirectsCacheServiceMockBuilder().Build(),
+            publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
             logger ?? Mock.Of<ILogger<ThemeService>>()
         );
     }

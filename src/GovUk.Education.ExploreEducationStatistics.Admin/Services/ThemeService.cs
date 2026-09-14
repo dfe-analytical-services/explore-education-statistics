@@ -2,6 +2,7 @@
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -36,6 +37,7 @@ public class ThemeService(
     IAdminEventRaiser eventRaiser,
     IUserPublicationRoleRepository userPublicationRoleRepository,
     IRedirectsCacheService redirectsCacheService,
+    IPublicationCacheService publicationCacheService,
     ILogger<ThemeService> logger
 ) : IThemeService
 {
@@ -276,6 +278,8 @@ public class ThemeService(
             {
                 contentDbContext.Publications.Remove(publication);
                 contentDbContext.Contacts.Remove(publication.Contact);
+
+                await publicationCacheService.RemovePublication(publication.Slug);
 
                 await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
             });
