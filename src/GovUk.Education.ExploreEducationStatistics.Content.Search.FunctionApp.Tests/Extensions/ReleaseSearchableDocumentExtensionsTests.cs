@@ -14,7 +14,7 @@ public class ReleaseSearchableDocumentExtensionsTests
         {
             ReleaseId = new Guid("76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
             ReleaseVersionId = new Guid("5cd3ae70-ff32-409b-aa6b-363b380eb4c8"),
-            Published = new DateTimeOffset(2025, 02, 21, 09, 24, 01, TimeSpan.FromHours(1)),
+            Published = new DateTimeOffset(2025, 02, 21, 19, 24, 01, TimeSpan.FromHours(1)),
             PublicationId = new Guid("caf751b8-5f8c-4526-8b5f-7fd28199866b"),
             PublicationTitle = "Publication Title",
             ThemeId = new Guid("4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
@@ -52,7 +52,7 @@ public class ReleaseSearchableDocumentExtensionsTests
                 "caf751b8-5f8c-4526-8b5f-7fd28199866b"
             ),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeId, "4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Published, "2025-02-21T08:24:01Z"),
+            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Published, "2025-02-21T18:24:01Z"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseType, "Official Statistics"),
             AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
             AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
