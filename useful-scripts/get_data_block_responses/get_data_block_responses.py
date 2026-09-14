@@ -10,35 +10,35 @@ import requests
 """
 To generate datablocks.csv, use this SQL query against the Content DB:
 
-SELECT ContentBlock.Id                              AS ContentBlockId,
-       ReleaseVersions.Id                           AS ReleaseVersionId,
-       JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
-       ContentBlock.DataBlock_Query                 AS Query
-FROM ContentBlock
-LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
-LEFT JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
-LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockVersionId
-LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockVersionId
-WHERE ContentBlock.Type = 'DataBlock'
-  AND ReleaseVersions.Published IS NOT NULL
+SELECT DataBlockVersions.Id                                 AS ContentBlockId,
+       ReleaseVersions.Id                                   AS ReleaseVersionId,
+       JSON_VALUE(DataBlockVersions.[Query], '$.SubjectId') AS SubjectId,
+       DataBlockVersions.[Query]                            AS Query
+FROM DataBlockVersions
+JOIN ReleaseVersions ON ReleaseVersions.Id = DataBlockVersions.ReleaseVersionId
+WHERE ReleaseVersions.Published IS NOT NULL
   AND ReleaseVersions.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
-    ContentSectionId IS NOT NULL
+    EXISTS(SELECT 1
+           FROM ContentBlock
+           WHERE ContentBlock.DataBlockVersionId = DataBlockVersions.Id)
     -- Include DataBlocks that are Key Statistics
-    OR KeyStatisticsDataBlock.DataBlockVersionId IS NOT NULL
+    OR EXISTS(SELECT 1
+              FROM KeyStatisticsDataBlock
+              WHERE KeyStatisticsDataBlock.DataBlockVersionId = DataBlockVersions.Id)
     -- Include DataBlocks that are Featured Tables
-    OR FeaturedTables.DataBlockVersionId IS NOT NULL
+    OR EXISTS(SELECT 1
+              FROM FeaturedTables
+              WHERE FeaturedTables.DataBlockVersionId = DataBlockVersions.Id)
     )
-  -- Include only DataBlocks that are from the latest published Release
+  -- Exclude DataBlocks from Release versions that have been superseded by a published amendment
   AND NOT EXISTS(
     SELECT 1
-    FROM ReleaseVersions PublicationReleaseVersions
-    WHERE PublicationReleaseVersions.PublicationId = ReleaseVersions.PublicationId
-      AND PublicationReleaseVersions.Published IS NOT NULL
-      AND PublicationReleaseVersions.SoftDeleted = 0
-      AND PublicationReleaseVersions.Id <> ReleaseVersions.Id
-      AND PublicationReleaseVersions.PreviousVersionId = ReleaseVersions.Id
+    FROM ReleaseVersions AmendmentReleaseVersions
+    WHERE AmendmentReleaseVersions.PreviousVersionId = ReleaseVersions.Id
+      AND AmendmentReleaseVersions.Published IS NOT NULL
+      AND AmendmentReleaseVersions.SoftDeleted = 0
   );
 
 And then save the results as a CSV in MS SQL Server Management Studio.
