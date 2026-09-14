@@ -28,6 +28,7 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                 .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
             var release = publication.Releases[0];
             var releaseVersion = release.Versions[0];
+            releaseVersion.PublishingOrganisations = _dataFixture.DefaultOrganisation().GenerateList(2);
 
             releaseVersion.HeadlinesSection = _dataFixture
                 .DefaultContentSection(ContentSectionType.Headlines)
@@ -103,8 +104,69 @@ public abstract class ReleaseSearchableDocumentsServiceTests
                     () => Assert.Equal(publication.Theme.Title, actual.ThemeTitle),
                     () => Assert.Equal(releaseVersion.Type.ToString(), actual.Type),
                     () => Assert.Equal(releaseVersion.Type.ToSearchDocumentTypeBoost(), actual.TypeBoost),
+                    () =>
+                        Assert.Equal(
+                            releaseVersion.PublishingOrganisations.Select(organisation => organisation.Id),
+                            actual.PublishingOrganisations.Select(publishingOrganisation => publishingOrganisation.Id)
+                        ),
+                    () =>
+                        Assert.Equal(
+                            releaseVersion.PublishingOrganisations.Select(organisation => organisation.Title),
+                            actual.PublishingOrganisations.Select(publishingOrganisation =>
+                                publishingOrganisation.Title
+                            )
+                        ),
                     .. GetAssertTrimmedLinesEqual(expectedHtmlContent, actual.HtmlContent),
                 ]);
+            }
+        }
+
+        [Fact]
+        public async Task WhenPublishingOrganisationsExist_ReturnsPublishingOrganisationsOrderedByTitle()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            releaseVersion.PublishingOrganisations = _dataFixture
+                .DefaultOrganisation()
+                .ForIndex(0, s => s.SetTitle("Organisation C"))
+                .ForIndex(1, s => s.SetTitle("Organisation A"))
+                .ForIndex(2, s => s.SetTitle("Organisation B"))
+                .GenerateList(3);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                var expectedOrganisations = releaseVersion.PublishingOrganisations.OrderBy(o => o.Title).ToArray();
+
+                Assert.Equal(expectedOrganisations.Length, result.PublishingOrganisations.Length);
+                Assert.All(
+                    expectedOrganisations,
+                    (expectedOrganisation, index) =>
+                    {
+                        var actualOrganisation = result.PublishingOrganisations[index];
+                        Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
+                    }
+                );
             }
         }
 
