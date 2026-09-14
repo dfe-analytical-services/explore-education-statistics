@@ -1,4 +1,6 @@
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
@@ -9,9 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class ContentApiClientTests(ITestOutputHelper output)
 {
-    private IContentApiClient GetSut(Action<HttpClient>? modifyHttpClient = null)
+    private IContentApiClient GetSut(
+        HttpMessageHandler? httpMessageHandler = null,
+        Action<HttpClient>? modifyHttpClient = null
+    )
     {
-        var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        var httpClient = httpMessageHandler is null ? new HttpClient() : new HttpClient(httpMessageHandler);
+        httpClient.Timeout = TimeSpan.FromSeconds(10);
         modifyHttpClient?.Invoke(httpClient);
         return new ContentApiClient(httpClient);
     }
@@ -40,10 +46,97 @@ public class ContentApiClientTests(ITestOutputHelper output)
     private void AssertAll(params IEnumerable<Action>[] assertions) =>
         Assert.All(assertions.SelectMany(a => a), assertion => assertion());
 
+    private class StubHttpMessageHandler(
+        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> sendAsync
+    ) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        ) => sendAsync(request, cancellationToken);
+    }
+
     public class BasicTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         [Fact]
         public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
+
+        [Fact]
+        public async Task InvalidJsonResponse_ThrowsException()
+        {
+            var sut = GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (_, _) =>
+                        Task.FromResult(
+                            new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent("not-valid-json", Encoding.UTF8, "application/json"),
+                            }
+                        )
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+            var exception = await Assert.ThrowsAsync<UnableToGetPublicationInfosException>(() =>
+                sut.GetAllLivePublicationInfos(CancellationToken.None)
+            );
+            Assert.Contains("Error deserialising response content", exception.Message);
+        }
+    }
+
+    public class GetAllLivePublicationInfosTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        [Fact]
+        public async Task ValidJsonResponse_ReturnsPublicationInfos()
+        {
+            var sut = GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (_, _) =>
+                        Task.FromResult(
+                            new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent(
+                                    """
+                                    [
+                                      {
+                                        "publicationSlug": "publication-1",
+                                        "latestPublishedRelease": {
+                                          "releaseSlug": "2024"
+                                        }
+                                      },
+                                      {
+                                        "publicationSlug": "publication-2",
+                                        "latestPublishedRelease": {
+                                          "releaseSlug": "2025"
+                                        }
+                                      }
+                                    ]
+                                    """,
+                                    Encoding.UTF8,
+                                    "application/json"
+                                ),
+                            }
+                        )
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+            var result = await sut.GetAllLivePublicationInfos(CancellationToken.None);
+
+            Assert.Collection(
+                result,
+                publicationInfo =>
+                {
+                    Assert.Equal("publication-1", publicationInfo.PublicationSlug);
+                    Assert.Equal("2024", publicationInfo.LatestReleaseSlug);
+                },
+                publicationInfo =>
+                {
+                    Assert.Equal("publication-2", publicationInfo.PublicationSlug);
+                    Assert.Equal("2025", publicationInfo.LatestReleaseSlug);
+                }
+            );
+        }
     }
 
     public abstract class LocalDevelopmentIntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
@@ -54,7 +147,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
         public class CallLocalService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
         {
             private IContentApiClient GetSut() =>
-                base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"));
+                base.GetSut(modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"));
 
             [Fact(Skip = "This test is only for local development")]
             public async Task GetExampleSeedDocument()
@@ -93,7 +186,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
         public class CallUnknownService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
         {
             private IContentApiClient GetSut() =>
-                base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:8123")); // Cause a 404
+                base.GetSut(modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:8123")); // Cause a 404
 
             [Fact(Skip = "This test is only for local development")]
             public async Task UnknownEndpointShouldThrow()
@@ -121,7 +214,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
         private const string ContentApiBaseAddress = "-- insert Content API base address here --";
 
         private IContentApiClient GetSut() =>
-            base.GetSut(httpClient =>
+            base.GetSut(modifyHttpClient: httpClient =>
             {
                 httpClient.BaseAddress = new Uri(ContentApiBaseAddress);
             });
