@@ -1080,8 +1080,7 @@
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('coreSqlServerName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('coreSqlServerName'), 'Default')]"
           ],
           "properties": {
             "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
@@ -1422,8 +1421,7 @@
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]",
-            "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('publicSqlServerName'), 'Default')]"
           ],
           "properties": {
             "storageContainerPath": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName')), '2018-07-01').primaryEndpoints.blob, 'vulnerability-assessment')]",
@@ -1807,49 +1805,6 @@
         "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
       ]
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('loggingStorageAccountName')]",
-      "apiVersion": "2023-05-01",
-      "location": "[resourceGroup().location]",
-      "kind": "StorageV2",
-      "sku": {
-        "name": "Standard_GZRS"
-      },
-      "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]"
-      },
-      "resources": [
-        {
-          "name": "default",
-          "type": "blobServices",
-          "apiVersion": "2023-05-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('loggingStorageAccountName')]"
-          ]
-        }
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Storage account V2",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      }
     },
     {
       "type": "Microsoft.Insights/metricAlerts",
