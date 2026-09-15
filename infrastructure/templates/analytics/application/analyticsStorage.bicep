@@ -39,7 +39,7 @@ var storageAccountConfig = {
 
 var fileShareName = '${resourcePrefix}-${abbreviations.fileShare}-anlyt'
 
-module analyticsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module analyticsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'analyticsStorageAccountDeploy'
   params: {
     storageAccountName: storageAccountName

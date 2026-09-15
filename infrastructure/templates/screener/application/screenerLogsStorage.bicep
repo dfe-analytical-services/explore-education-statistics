@@ -31,7 +31,7 @@ var storageAccountConfig = {
   }
 }
 
-module screenerLogsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module screenerLogsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'screenerLogsStorageAccountDeploy'
   params: {
     storageAccountName: resourceNames.screener.screenerLogsStorageAccount

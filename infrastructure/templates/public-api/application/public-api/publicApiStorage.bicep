@@ -26,7 +26,7 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
-module publicApiStorageAccountModule '../../../common/components/storage/storageAccount.bicep' = {
+module publicApiStorageAccountModule '../../../common/components/storage/storage-account.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount

@@ -178,7 +178,7 @@ var fileServiceAlerts = alerts != null
 // This is the shared Storage Account for this Durable Function App that is used for key management, timer trigger
 // management etc.  For performance, it is considered good practice for each Function App to have its own dedicated 
 // Storage Account. See https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-module manamementStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module manamementStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: managementStorageAccountName
@@ -198,7 +198,7 @@ module manamementStorageAccountModule '../../common/components/storage/storageAc
 
 // This is a storage account dedicated to slot 1. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-module slot1StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module slot1StorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot1StorageAccountName
@@ -233,7 +233,7 @@ module slot1FileShareModule '../../common/components/storage/fileShare.bicep' = 
 
 // This is a storage account dedicated to slot 2. It uses this for its own reliable execution.
 // It also contains a file share where its slot-specific version of the code lives.
-module slot2StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module slot2StorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot2StorageAccountName

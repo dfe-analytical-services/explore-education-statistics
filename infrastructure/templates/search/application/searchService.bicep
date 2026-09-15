@@ -79,7 +79,7 @@ module searchServiceModule '../components/searchService.bicep' = {
   }
 }
 
-module searchStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module searchStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'searchStorageAccountModuleDeploy'
   params: {
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
