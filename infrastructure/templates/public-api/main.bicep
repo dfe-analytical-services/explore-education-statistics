@@ -254,7 +254,6 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
-    location: location
     resourceNames: resourceNames
     config: publicApiStorageConfig
     storageFirewallRules: maintenanceIpRanges
