@@ -34,6 +34,9 @@ param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
 @description('Specify if manual deletion of backups is allowed in Recovery Services Vault.')
 param recoveryServicesVaultImmutable bool = false
 
+@description('Retention of storage account blobs in days.')
+param blobDeleteRetentionDays int = 90
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -216,6 +219,16 @@ module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (dep
 module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
   name: 'containerRegistryModuleDeploy'
   params: {
+    tagValues: tagValues
+  }
+}
+
+module loggingStorageAccountModule 'application/logging-storage-account/logging-storage-account.bicep' = {
+  name: 'loggingStorageAccountModuleDeploy'
+  params: {
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }
