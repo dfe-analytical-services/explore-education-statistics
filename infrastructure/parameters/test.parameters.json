@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuNotifier": {
-      "value": "B1 Basic"
-    },
     "useSubnets": {
       "value": true
     },
@@ -34,9 +31,6 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 375809638400
-    },
-    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
-      "value": true
     },
     "sqlServerPublicNetworkAccess": {
       "value": "Disabled"
