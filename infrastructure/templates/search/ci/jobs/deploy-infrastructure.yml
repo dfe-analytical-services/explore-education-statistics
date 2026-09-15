@@ -64,25 +64,9 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                naturalLanguageSearchFunctionAppExists: false
-                searchDocsFunctionAppExists: false
                 searchServiceNLSearchFilterIndexName: ${{ variables.searchServiceNLSearchFilterIndexName }}
                 searchServiceNLSearchDatasetIndexName: ${{ variables.searchServiceNLSearchDatasetIndexName }}
                 searchServiceSearchIndexerName: ${{ variables.searchServiceSearchIndexerName }}
-
-            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(searchDocsFunctionAppName)
-                variableName: searchDocsFunctionAppExists
-
-            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(naturalLanguageSearchFunctionAppName)
-                variableName: naturalLanguageSearchFunctionAppExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -90,8 +74,6 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                naturalLanguageSearchFunctionAppExists: $(naturalLanguageSearchFunctionAppExists)
-                searchDocsFunctionAppExists: $(searchDocsFunctionAppExists)
                 searchServiceNLSearchFilterIndexName: ${{ variables.searchServiceNLSearchFilterIndexName }}
                 searchServiceNLSearchDatasetIndexName: ${{ variables.searchServiceNLSearchDatasetIndexName }}
                 searchServiceSearchIndexerName: ${{ variables.searchServiceSearchIndexerName }}
