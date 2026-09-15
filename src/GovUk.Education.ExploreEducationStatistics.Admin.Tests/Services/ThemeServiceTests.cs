@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
@@ -980,6 +980,51 @@ public class ThemeServiceTests
             var remainingThemes = await context.Themes.ToListAsync();
             Assert.Single(remainingThemes);
             Assert.Equal(otherTheme.Id, remainingThemes[0].Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_PublicationSupersededByDeletedPublication_SupersededByCleared()
+    {
+        Theme themeToDelete = _fixture.DefaultTheme();
+        Theme themeToRetain = _fixture.DefaultTheme();
+
+        Publication supersedingPublication = _fixture.DefaultPublication().WithTheme(themeToDelete);
+
+        Publication supersededPublication = _fixture
+            .DefaultPublication()
+            .WithTheme(themeToRetain)
+            .WithSupersededBy(supersedingPublication);
+
+        using var fixture = new SqliteContentDbContextFixture();
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Publications.AddRange(supersedingPublication, supersededPublication);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+
+            var result = await service.DeleteThemes([themeToDelete.Id]);
+
+            VerifyAllMocks(publishingService);
+            result.AssertRight();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            // The superseded Publication belongs to a Theme that was not deleted, so it must survive with its
+            // reference to the deleted Publication cleared. SQL Server cannot do this for us, as it rejects
+            // cascading actions on self-referencing foreign keys.
+            var remainingPublication = Assert.Single(await context.Publications.ToListAsync());
+            Assert.Equal(supersededPublication.Id, remainingPublication.Id);
+            Assert.Null(remainingPublication.SupersededById);
         }
     }
 
