@@ -4,6 +4,8 @@ import dataReplacementService, {
   FilterMappingFilterItems,
   FilterMappingPlan,
   FilterMappingSource,
+  IndicatorGroupReplacement,
+  LocationReplacement,
   PlanMappings,
   ReplacementMapping,
   UpdateMappingPayload,
@@ -36,8 +38,10 @@ const findFilterMapping = (
     return mapping;
   }
 
-  for (let i = 0; i < Object.values(filters.mappings).length; i += 1) {
-    const child = Object.values(filters.mappings)[i];
+  const filtersMappings = Object.values(filters.mappings);
+
+  for (let i = 0; i < filtersMappings.length; i += 1) {
+    const child = filtersMappings[i];
     if ('filterGroups' in child) {
       const result = findFilterMapping(
         child.filterGroups as FilterMappingFilterGroups,
@@ -257,6 +261,12 @@ export default function DataFileReplacementDifferences({
     ],
   );
 
+  const getIndicatorGroupMappings = (group: IndicatorGroupReplacement) =>
+    group.indicators;
+
+  const getLocationGroupMappings = (group: LocationReplacement) =>
+    group.locationAttributes;
+
   return (
     <>
       <h3>Mapping Dependencies</h3>
@@ -274,7 +284,7 @@ export default function DataFileReplacementDifferences({
         itemType="indicator"
         mappingsPlan={planMappings.indicators}
         replacementGroups={indicatorReplacementGroups}
-        getGroupMappings={group => group.indicators}
+        getGroupMappings={getIndicatorGroupMappings}
         handleMappingUpdate={handleIndicatorsMappingUpdate}
         rowLabel="label"
         mappedDataLabels={{
@@ -287,7 +297,7 @@ export default function DataFileReplacementDifferences({
         itemType="location"
         mappingsPlan={planMappings.locations}
         replacementGroups={locationReplacementGroups}
-        getGroupMappings={group => group.locationAttributes}
+        getGroupMappings={getLocationGroupMappings}
         handleMappingUpdate={handleLocationsMappingUpdate}
         rowLabel="name"
         mappedDataLabels={{

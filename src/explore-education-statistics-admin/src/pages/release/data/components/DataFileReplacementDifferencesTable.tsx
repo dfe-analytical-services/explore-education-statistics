@@ -69,7 +69,7 @@ export default function DataFileDifferencesReplacementTable<
   mappedDataLabels,
   rowLabel,
 }: DataFileDifferencesReplacementTableProps<ItemType>) {
-  const { mappingGroups, mappingsToShow } = useMemo(() => {
+  const { mappingGroups, mappingCounts } = useMemo(() => {
     const mappings = mappingsPlan.mappings as Record<
       string,
       ReplacementMapping<TypeMapping[ItemType]['source']>
@@ -88,30 +88,22 @@ export default function DataFileDifferencesReplacementTable<
         : [];
     });
 
-    return { mappingGroups: groups, mappingsToShow: mappingIds };
-  }, [getGroupMappings, mappingsPlan.mappings, replacementGroups]);
+    const totalMappingCount = mappingIds.size;
 
-  const mappingCounts: {
-    mapped: number;
-    unmapped: number;
-  } = useMemo(() => {
-    const totalMappingCount = mappingsToShow.size;
-
-    const manualMappedCount = Array.from(mappingsToShow).filter(
+    const manualMappedCount = Array.from(mappingIds).filter(
       target => mappingsPlan.mappings[target]?.type === 'ManuallySet',
     ).length;
 
     const unmappedCount = totalMappingCount - manualMappedCount;
 
     return {
-      mapped: manualMappedCount,
-      unmapped: unmappedCount,
+      mappingGroups: groups,
+      mappingCounts: {
+        mapped: manualMappedCount,
+        unmapped: unmappedCount,
+      },
     };
-  }, [mappingsPlan.mappings, mappingsToShow]);
-
-  if (mappingsToShow.size === 0) {
-    return null;
-  }
+  }, [getGroupMappings, mappingsPlan.mappings, replacementGroups]);
 
   return (
     <div className="table-container">

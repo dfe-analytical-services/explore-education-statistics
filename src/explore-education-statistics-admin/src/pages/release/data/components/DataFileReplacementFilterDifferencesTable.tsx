@@ -202,7 +202,7 @@ export default function DataFileReplacementFilterDifferencesTable({
           {header.label}
         </td>
       ) : (
-        <th key={header.id} rowSpan={header.rowSpan} style={{ width: '10%' }}>
+        <th key={header.id} rowSpan={header.rowSpan}>
           {header.label}
         </th>
       ),
@@ -237,6 +237,15 @@ export default function DataFileReplacementFilterDifferencesTable({
             />
           </TagGroup>
         </caption>
+        <thead>
+          <VisuallyHidden as="tr">
+            <th>Filters</th>
+            <th>Filter groups</th>
+            <th>Filter items</th>
+            <th className="govuk-!-width-one-quarter">Mapping</th>
+            <th className="govuk-!-width-one-quarter">Actions</th>
+          </VisuallyHidden>
+        </thead>
 
         <tbody>
           {tableData.rows.map(td => {
