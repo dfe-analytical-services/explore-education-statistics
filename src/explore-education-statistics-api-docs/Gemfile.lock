@@ -106,7 +106,7 @@ GEM
       concurrent-ruby (~> 1.0)
     hashery (2.1.2)
     hashie (3.6.0)
-    html-proofer (5.2.1)
+    html-proofer (5.2.2)
       addressable (~> 2.3)
       async (~> 2.1)
       benchmark (~> 0.5)
