@@ -180,7 +180,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     keyVaultName: keyVault.name
     keyVaultRoles: {
       secretsUser: true
-      legacyKeyVaultRoleAssignmentName: true
+      legacyKeyVaultRoleAssignmentName: false
     }
     sku: {
       name: 'EP1'

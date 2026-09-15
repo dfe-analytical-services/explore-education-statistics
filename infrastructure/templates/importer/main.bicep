@@ -1,5 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
-import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
 
 @description('Names of resources in this deploy.')
@@ -9,7 +9,7 @@ param resourceNames ResourceNames
 param minTlsVersion string
 
 @description('App Service Plan SKU.')
-param appServiceSku AppServicePlanSku
+param appServiceSku FunctionAppServicePlanSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -130,6 +130,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       {
         name: 'App__PrivateStorageConnectionString'
         value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
+      }
+      {
+        name: 'App__ImporterStorageConnectionString'
+        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
       }
     ]
     tagValues: tagValues
