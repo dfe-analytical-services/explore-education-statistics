@@ -201,20 +201,6 @@
         "description": "Whether or not to register data sources with Backup Vault."
       }
     },
-    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
-      "type": "string",
-      "defaultValue": "0 5 0 * * *",
-      "metadata": {
-        "description": "Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App"
-      }
-    },
-    "publishScheduledReleaseVersionsFunctionCronSchedule": {
-      "type": "string",
-      "defaultValue": "0 30 9 * * *",
-      "metadata": {
-        "description": "Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App"
-      }
-    },
     "blobDeleteRetentionEnabled": {
       "defaultValue": true,
       "type": "bool",
@@ -311,13 +297,6 @@
     "maxStatsDbSizeBytes": {
       "type": "int",
       "defaultValue": 268435456000
-    },
-    "publicDataDbExists": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
-      }
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "type": "bool",
