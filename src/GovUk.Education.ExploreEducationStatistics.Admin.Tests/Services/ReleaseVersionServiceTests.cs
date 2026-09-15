@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
@@ -2035,6 +2035,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
@@ -2056,6 +2057,10 @@ public abstract class ReleaseVersionServiceTests
 
             releaseSubjectRepository
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            footnoteRepository
+                .Setup(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id))
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2104,6 +2109,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    footnoteRepository: footnoteRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
@@ -2129,10 +2135,13 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once
                 );
 
+                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
+
                 VerifyAllMocks(
                     privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
+                    footnoteRepository,
                     processorClient,
                     releasePublishingStatusRepository,
                     userPreReleaseRoleRepository,
