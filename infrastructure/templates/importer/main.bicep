@@ -18,9 +18,6 @@ param logAnalyticsWorkspaceId string
 @description('''The database user's password.''')
 param databaseUserPassword string
 
-@description('Does the Importer Function App have a dedicated storage account yet?')
-param storageAccountExists bool = true
-
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
@@ -76,7 +73,6 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       legacyKeyVaultRoleAssignmentName: true
     }
     sku: appServiceSku
-    functionAppExists: storageAccountExists
     functionAppRuntime: 'dotnet-isolated'
     operatingSystem: 'Windows'
     netFrameworkVersion: 'v10.0'
