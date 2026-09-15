@@ -117,6 +117,7 @@ export default function DifferencesItemMappingModal<
         ) {
           return;
         }
+
         await handleSubmit(submittedValue);
       }}
       initialValues={initialValue}
