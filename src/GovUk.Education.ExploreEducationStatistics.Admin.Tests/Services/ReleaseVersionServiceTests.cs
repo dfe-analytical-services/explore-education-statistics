@@ -30,6 +30,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -1936,6 +1937,172 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 VerifyAllMocks(processorClient);
+            }
+        }
+
+        /// <summary>
+        /// A Methodology scheduled with the ReleaseVersion being deleted has to be unscheduled before the
+        /// ReleaseVersion row is removed, not after. ScheduledWithReleaseVersionId is an optional foreign
+        /// key with no cascading action, and the Methodology is not tracked at that point, so the database
+        /// rejects the delete while the reference stands.
+        /// </summary>
+        /// <remarks>
+        /// This runs against SQLite with foreign keys enforced. The EF Core in-memory provider enforces
+        /// none, so it would report a pass whichever order the two steps run in.
+        /// </remarks>
+        [Fact]
+        public async Task ScheduledMethodologyIsUnscheduledBeforeReleaseVersionIsDeleted()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            var role = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "BAU User",
+                NormalizedName = "BAU USER",
+            };
+
+            // Users.CreatedById is a required self-referencing foreign key, so the user has to be created
+            // by a user that exists - itself, here.
+            var createdById = Guid.NewGuid();
+
+            User createdBy = _dataFixture
+                .DefaultUser()
+                .WithId(createdById)
+                .WithCreatedById(createdById)
+                .WithRoleId(role.Id);
+
+            // Version 0 is not an Amendment, so this is hard deleted and the DELETE actually reaches the
+            // database. An Amendment is only soft deleted, where the ordering does not matter.
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(0)
+                .WithCreated(createdById: createdBy.Id);
+
+            // A Methodology owned by another Publication, adopted by this one and scheduled to publish
+            // with the ReleaseVersion being deleted. It outlives the ReleaseVersion, so nothing removes
+            // it on our behalf.
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                OwningPublicationTitle = "Adopted methodology",
+                OwningPublicationSlug = "adopted-methodology",
+            };
+
+            var scheduledMethodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                Status = MethodologyApprovalStatus.Approved,
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
+                Methodology = methodology,
+                CreatedById = createdBy.Id,
+            };
+
+            using var sqliteFixture = new SqliteContentDbContextFixture(enforceForeignKeys: true);
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                context.Set<IdentityRole>().Add(role);
+                context.Users.Add(createdBy);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.MethodologyVersions.Add(scheduledMethodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<IList<UserPreReleaseRole>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+            }
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                Assert.Null(
+                    await context
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == releaseVersion.Id)
+                );
+
+                // The Methodology survives the ReleaseVersion it was scheduled with, reverted to a draft
+                // that publishes immediately
+                var updatedMethodologyVersion = await context.MethodologyVersions.SingleAsync(mv =>
+                    mv.Id == scheduledMethodologyVersion.Id
+                );
+
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersionId);
+                Assert.True(updatedMethodologyVersion.ScheduledForPublishingImmediately);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodologyVersion.Status);
             }
         }
     }

@@ -203,6 +203,16 @@ public class ReleaseVersionService(
             .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
             .OnSuccessDo(async _ =>
             {
+                // Methodologies scheduled with this ReleaseVersion have to be unscheduled before it is
+                // deleted. ScheduledWithReleaseVersionId is an optional foreign key with no cascading
+                // action, so the database rejects the delete while any of them still reference it, and
+                // EF's ClientSetNull behaviour cannot save us as they are not being tracked. A
+                // Methodology adopted by this Publication but owned by another one survives the deletion
+                // of this Theme, so this is not only a concern for the Publication being deleted.
+                UpdateMethodologies(releaseVersion.Id);
+
+                await context.SaveChangesAsync(cancellationToken);
+
                 if (hardDeleteContentReleaseVersion)
                 {
                     await HardDeleteReleaseVersion(releaseVersion, cancellationToken);
@@ -211,8 +221,6 @@ public class ReleaseVersionService(
                 {
                     await SoftDeleteReleaseVersion(releaseVersion, cancellationToken);
                 }
-
-                UpdateMethodologies(releaseVersion.Id);
 
                 await context.SaveChangesAsync(cancellationToken);
 
