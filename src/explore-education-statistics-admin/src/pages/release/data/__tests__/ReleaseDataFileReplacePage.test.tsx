@@ -112,6 +112,7 @@ describe('ReleaseDataFileReplacePage', () => {
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },
+      filters: { candidates: {}, mappings: {} },
     },
   };
 
