@@ -221,7 +221,6 @@ module appServicePlanModule '../app-service-plan/function-app-service-plan.bicep
 module storageAccountModule '../storage/storageAccount.bicep' = {
   name: '${storageAccountName}StorageAccountModuleDeploy'
   params: {
-    location: location
     storageAccountName: storageAccountName
     allowedSubnetIds: union(
       storageAccountAllowedSubnetIds ?? [],

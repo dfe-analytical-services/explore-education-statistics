@@ -203,7 +203,6 @@ module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' 
 module deploymentStorageAccountModule '../../components/storage/storageAccount.bicep' = {
   name: '${functionAppName}DeploymentStorageAccountModuleDeploy'
   params: {
-    location: location
     storageAccountName: deploymentStorageAccountName
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'

@@ -82,7 +82,6 @@ module searchServiceModule '../components/searchService.bicep' = {
 module searchStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: 'searchStorageAccountModuleDeploy'
   params: {
-    location: location
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules

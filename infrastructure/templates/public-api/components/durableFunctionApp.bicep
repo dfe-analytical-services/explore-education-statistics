@@ -181,7 +181,6 @@ var fileServiceAlerts = alerts != null
 module manamementStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: managementStorageAccountName
     allowedSubnetIds: [subnetId]
     keyVaultName: keyVaultName
@@ -202,7 +201,6 @@ module manamementStorageAccountModule '../../common/components/storage/storageAc
 module slot1StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: slot1StorageAccountName
     allowedSubnetIds: [subnetId]
     keyVaultName: keyVaultName
@@ -238,7 +236,6 @@ module slot1FileShareModule '../../common/components/storage/fileShare.bicep' = 
 module slot2StorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: slot2StorageAccountName
     allowedSubnetIds: [subnetId]
     keyVaultName: keyVaultName
