@@ -2,7 +2,7 @@
 // https://github.com/Azure-Samples/todo-csharp-sql/blob/main/infra/abbreviations.json and
 // https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations.
 //
-// Non-standard abbreviations are highlighted with comments.
+// Non-standard abbreviations are highlighted with "TODO EES-7502" comments.
 
 @export()
 var abbreviations = {
@@ -37,13 +37,14 @@ var abbreviations = {
   containerRegistryRegistries: 'cr'
   containerServiceManagedClusters: 'aks'
   databricksWorkspaces: 'dbw'
-  // 'df' is non-standard - should be 'adf'
+  // TODO EES-7502 - 'df' is non-standard - should be 'adf'
   dataFactoryFactories: 'df'
   dataLakeAnalyticsAccounts: 'dla'
   dataLakeStoreAccounts: 'dls'
   dataMigrationServices: 'dms'
   dBforMySQLServers: 'mysql'
-  dBforPostgreSQLServers: 'psql'
+  // TODO EES-7502 - remove the "-flexibleserver" suffix and change the suffix of our PSQL instance to "-01"
+  dBforPostgreSQLServers: 'psql-flexibleserver'
   devicesIotHubs: 'iot'
   devicesProvisioningServices: 'provs'
   devicesProvisioningServicesCertificates: 'pcert'
@@ -71,7 +72,7 @@ var abbreviations = {
   hdInsightClustersStorm: 'storm'
   hybridComputeMachines: 'arcs'
   insightsActionGroups: 'ag'
-  // 'ai' is non-standard - it should be 'appi'
+  // TODO EES-7502 - 'ai' is non-standard - it should be 'appi'
   insightsComponents: 'ai'
   keyVaultVaults: 'kv'
   kubernetesConnectedClusters: 'arck'
@@ -79,7 +80,7 @@ var abbreviations = {
   kustoClustersDatabases: 'dedb'
   loadTesting: 'lt'
   logicIntegrationAccounts: 'ia'
-  // 'la' is non-standard - it should be 'logic'
+  // TODO EES-7502 - 'la' is non-standard - it should be 'logic'
   logicWorkflows: 'la'
   machineLearningServicesWorkspaces: 'mlw'
   managedIdentityUserAssignedIdentities: 'id'
@@ -137,7 +138,7 @@ var abbreviations = {
   serviceBusNamespacesTopics: 'sbt'
   serviceEndPointPolicies: 'se'
   serviceFabricClusters: 'sf'
-  // 'sr' is non-standard - it should be 'sigr'
+  // TODO EES-7502 - 'sr' is non-standard - it should be 'sigr'
   signalRServiceSignalR: 'sr'
   sqlManagedInstances: 'sqlmi'
   sqlServers: 'sql'
@@ -145,7 +146,7 @@ var abbreviations = {
   sqlServersDatabases: 'sqldb'
   sqlServersDatabasesStretch: 'sqlstrdb'
   staticWebApps: 'stapp'
-  // 'sa' is non-standard - it should be 'st'
+  // TODO EES-7502 - 'sa' is non-standard - it should be 'st'
   storageStorageAccounts: 'sa'
   storageStorageAccountsVm: 'stvm'
   storSimpleManagers: 'ssimp'
@@ -155,12 +156,12 @@ var abbreviations = {
   synapseWorkspacesSqlPoolsDedicated: 'syndp'
   synapseWorkspacesSqlPoolsSpark: 'synsp'
   timeSeriesInsightsEnvironments: 'tsi'
-  // 'asp' is non-standard - it should be 'plan'
+  // TODO EES-7502 - 'asp' is non-standard - it should be 'plan'
   webServerFarms: 'asp'
-  // 'as' is non-standard - it should be 'app'
+  // TODO EES-7502 - 'as' is non-standard - it should be 'app'
   webSitesAppService: 'as'
   webSitesAppServiceEnvironment: 'ase'
-  // 'fa' is non-standard - it should be 'func'
+  // TODO EES-7502 - 'fa' is non-standard - it should be 'func'
   webSitesFunctions: 'fa'
   webStaticSites: 'stapp'
 }
