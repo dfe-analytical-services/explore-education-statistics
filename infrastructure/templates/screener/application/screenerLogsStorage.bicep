@@ -4,9 +4,6 @@ import { IpRange } from '../../common/types.bicep'
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
-@description('Specifies the location for all resources.')
-param location string
-
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
 
@@ -34,10 +31,9 @@ var storageAccountConfig = {
   }
 }
 
-module screenerLogsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module screenerLogsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'screenerLogsStorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: resourceNames.screener.screenerLogsStorageAccount
     publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules

@@ -99,7 +99,6 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
 module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
   name: 'screenerLogsStorageModuleDeploy'
   params: {
-    location: location
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     tagValues: tagValues

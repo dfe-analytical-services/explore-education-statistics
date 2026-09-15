@@ -75,7 +75,6 @@ module analyticsStorageModule 'application/analyticsStorage.bicep' = {
   name: 'analyticsStorageAccountApplicationModuleDeploy'
   params: {
     resourcePrefix: resourcePrefix
-    location: location
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: true
@@ -97,7 +96,6 @@ module analyticsStorageBackupModule '../common/components/recovery-services-vaul
 module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
   name: 'analyticsFunctionAppModule'
   params: {
-    location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     functionAppFirewallRules: union(
