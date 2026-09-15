@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -233,6 +233,12 @@ public class ThemeService(
             .Publications.Include(p => p.LatestPublishedReleaseVersion)
             .Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
+
+        // Publications superseded by this one may live in a Theme that is not being deleted, so their
+        // references have to be cleared or the delete breaches FK_Publications_Publications_SupersededById.
+        // SQL Server cannot do this for us, as it rejects cascading actions on self-referencing foreign
+        // keys, so load them here and let EF's ClientSetNull behaviour null them when changes are saved.
+        await contentDbContext.Publications.Where(p => p.SupersededById == publicationId).LoadAsync(cancellationToken);
 
         // Capture details of the latest published release before it is deleted
         // so that they can be used to raise an event after the publication is deleted.

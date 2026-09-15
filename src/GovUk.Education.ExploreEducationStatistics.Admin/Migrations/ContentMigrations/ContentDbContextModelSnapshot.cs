@@ -2346,8 +2346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "SupersededBy")
                         .WithMany()
-                        .HasForeignKey("SupersededById")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("SupersededById");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", "Theme")
                         .WithMany("Publications")
