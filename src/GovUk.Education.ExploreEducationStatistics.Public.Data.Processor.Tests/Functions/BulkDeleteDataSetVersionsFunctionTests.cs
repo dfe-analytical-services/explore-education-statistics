@@ -630,6 +630,12 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
             );
         }
 
+        private static List<int> FilterOptionIds(DataSetVersion dataSetVersion) =>
+            dataSetVersion.FilterMetas.SelectMany(meta => meta.Options).Select(option => option.Id).ToList();
+
+        private static List<int> LocationOptionIds(DataSetVersion dataSetVersion) =>
+            dataSetVersion.LocationMetas.SelectMany(meta => meta.Options).Select(option => option.Id).ToList();
+
         private async Task AssertMetadataIsDeleted(DataSetVersion dataSetVersion)
         {
             Assert.False(
@@ -652,6 +658,21 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
                     .GetPublicDataDbContext()
                     .LocationOptionMetaLinks.AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta))
             );
+
+            // Option metas are a pool shared between DataSetVersions, reachable only through the link tables,
+            // so nothing cascades them away with the DataSetVersion. They have to be reaped explicitly once
+            // their last link is gone.
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => FilterOptionIds(dataSetVersion).Contains(option.Id))
+            );
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => LocationOptionIds(dataSetVersion).Contains(option.Id))
+            );
+
             Assert.False(
                 await fixture
                     .GetPublicDataDbContext()
@@ -690,6 +711,16 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
                 await fixture
                     .GetPublicDataDbContext()
                     .LocationOptionMetaLinks.AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta))
+            );
+            Assert.True(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => FilterOptionIds(dataSetVersion).Contains(option.Id))
+            );
+            Assert.True(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => LocationOptionIds(dataSetVersion).Contains(option.Id))
             );
             Assert.True(
                 await fixture

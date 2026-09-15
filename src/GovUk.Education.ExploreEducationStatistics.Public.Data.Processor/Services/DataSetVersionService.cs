@@ -234,43 +234,23 @@ internal class DataSetVersionService(
         );
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
-        var filterOptionIds = await publicDataDbContext
-            .FilterOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
-            .Select(link => link.OptionId)
-            .ToListAsync(cancellationToken);
+        var linkedOptionMetaIds = await GetLinkedOptionMetaIds([dataSetVersionId], cancellationToken);
+
         await publicDataDbContext
             .FilterOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
             .ExecuteDeleteAsync(cancellationToken);
         await publicDataDbContext
             .FilterMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ExecuteDeleteAsync(cancellationToken);
-        var unlinkedFilterOptionIds = await publicDataDbContext
-            .FilterOptionMetas.Where(option => filterOptionIds.Contains(option.Id))
-            .Where(option => !option.MetaLinks.Any())
-            .Select(option => option.Id)
-            .ToListAsync(cancellationToken);
-        await publicDataDbContext
-            .FilterOptionMetas.Where(option => unlinkedFilterOptionIds.Contains(option.Id))
-            .ExecuteDeleteAsync(cancellationToken);
 
-        var locationOptionIds = await publicDataDbContext
-            .LocationOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
-            .Select(link => link.OptionId)
-            .ToListAsync(cancellationToken);
         await publicDataDbContext
             .LocationOptionMetaLinks.Where(link => link.Meta.DataSetVersionId == dataSetVersionId)
             .ExecuteDeleteAsync(cancellationToken);
         await publicDataDbContext
             .LocationMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
             .ExecuteDeleteAsync(cancellationToken);
-        var unlinkedLocationOptionIds = await publicDataDbContext
-            .LocationOptionMetas.Where(option => locationOptionIds.Contains(option.Id))
-            .Where(option => !option.MetaLinks.Any())
-            .Select(option => option.Id)
-            .ToListAsync(cancellationToken);
-        await publicDataDbContext
-            .LocationOptionMetas.Where(option => unlinkedLocationOptionIds.Contains(option.Id))
-            .ExecuteDeleteAsync(cancellationToken);
+
+        await DeleteUnlinkedOptionMetas(linkedOptionMetaIds, cancellationToken);
 
         await publicDataDbContext
             .GeographicLevelMetas.Where(meta => meta.DataSetVersionId == dataSetVersionId)
@@ -418,15 +398,24 @@ internal class DataSetVersionService(
     {
         var dataSetsWithNoOtherVersions = dataSetVersions.Where(dsv => dsv.IsFirstVersion).Select(dsv => dsv.DataSet);
 
+        var linkedOptionMetaIds = await GetLinkedOptionMetaIds(
+            dataSetVersions.Select(dataSetVersion => dataSetVersion.Id).ToList(),
+            cancellationToken
+        );
+
         publicDataDbContext.DataSetVersions.RemoveRange(dataSetVersions);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         publicDataDbContext.DataSets.RemoveRange(dataSetsWithNoOtherVersions);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
+
+        await DeleteUnlinkedOptionMetas(linkedOptionMetaIds, cancellationToken);
     }
 
     private async Task DeleteDataSetVersion(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
     {
+        var linkedOptionMetaIds = await GetLinkedOptionMetaIds([dataSetVersion.Id], cancellationToken);
+
         publicDataDbContext.DataSetVersions.Remove(dataSetVersion);
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
@@ -435,7 +424,69 @@ internal class DataSetVersionService(
             publicDataDbContext.DataSets.Remove(dataSetVersion.DataSet);
             await publicDataDbContext.SaveChangesAsync(cancellationToken);
         }
+
+        await DeleteUnlinkedOptionMetas(linkedOptionMetaIds, cancellationToken);
     }
+
+    /// <summary>
+    /// Captures the ids of the FilterOptionMetas and LocationOptionMetas linked to the given DataSetVersions,
+    /// so that they can still be found once those links have been removed.
+    /// </summary>
+    /// <remarks>
+    /// Option metas are a pool shared between DataSetVersions, reachable only through the link tables. Once the
+    /// links are gone - whether deleted explicitly, or cascaded away with their FilterMeta / LocationMeta when
+    /// the DataSetVersion is deleted - there is nothing left to join through, so the candidates have to be
+    /// captured up front.
+    /// </remarks>
+    private async Task<LinkedOptionMetaIds> GetLinkedOptionMetaIds(
+        IReadOnlyList<Guid> dataSetVersionIds,
+        CancellationToken cancellationToken
+    )
+    {
+        var filterOptionIds = await publicDataDbContext
+            .FilterOptionMetaLinks.Where(link => dataSetVersionIds.Contains(link.Meta.DataSetVersionId))
+            .Select(link => link.OptionId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        var locationOptionIds = await publicDataDbContext
+            .LocationOptionMetaLinks.Where(link => dataSetVersionIds.Contains(link.Meta.DataSetVersionId))
+            .Select(link => link.OptionId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return new LinkedOptionMetaIds(FilterOptionIds: filterOptionIds, LocationOptionIds: locationOptionIds);
+    }
+
+    /// <summary>
+    /// Deletes any of the given option metas that are no longer linked to a DataSetVersion.
+    /// </summary>
+    /// <remarks>
+    /// Must only be called once the links have been removed. Option metas still shared with another
+    /// DataSetVersion keep their remaining links and are left alone.
+    /// </remarks>
+    private async Task DeleteUnlinkedOptionMetas(LinkedOptionMetaIds optionMetaIds, CancellationToken cancellationToken)
+    {
+        var unlinkedFilterOptionIds = await publicDataDbContext
+            .FilterOptionMetas.Where(option => optionMetaIds.FilterOptionIds.Contains(option.Id))
+            .Where(option => !option.MetaLinks.Any())
+            .Select(option => option.Id)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .FilterOptionMetas.Where(option => unlinkedFilterOptionIds.Contains(option.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+
+        var unlinkedLocationOptionIds = await publicDataDbContext
+            .LocationOptionMetas.Where(option => optionMetaIds.LocationOptionIds.Contains(option.Id))
+            .Where(option => !option.MetaLinks.Any())
+            .Select(option => option.Id)
+            .ToListAsync(cancellationToken);
+        await publicDataDbContext
+            .LocationOptionMetas.Where(option => unlinkedLocationOptionIds.Contains(option.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
+    private record LinkedOptionMetaIds(IReadOnlyList<int> FilterOptionIds, IReadOnlyList<int> LocationOptionIds);
 
     private async Task<Either<ActionResult, IReadOnlyList<ReleaseFile>>> GetReleaseFiles(
         Guid releaseVersionId,
