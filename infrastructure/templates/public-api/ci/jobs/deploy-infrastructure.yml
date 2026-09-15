@@ -34,14 +34,25 @@ jobs:
                 deployDataProcessor: false
                 deployDocsSite: false
                 deployAlerts: false
-                dataProcessorExists: false
+                existingProductionAppSettings: '{}'
+                existingStagingAppSettings: '{}'
 
-            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
+            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
               parameters:
+                displayName: Get existing Data Processor production app settings
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 functionAppName: $(dataProcessorFunctionAppName)
-                variableName: dataProcessorExists
+                variableName: existingProductionAppSettings
+
+            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
+              parameters:
+                displayName: Get existing Data Processor staging app settings
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                functionAppName: $(dataProcessorFunctionAppName)
+                variableName: existingStagingAppSettings
+                slotName: staging
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -54,7 +65,8 @@ jobs:
                 deployDataProcessor: $(deployDataProcessor)
                 deployDocsSite: $(deployDocsSite)
                 deployAlerts: $(deployAlerts)
-                dataProcessorExists: $(dataProcessorExists)
+                existingProductionAppSettings: $(existingProductionAppSettings)
+                existingStagingAppSettings: $(existingStagingAppSettings)
 
             # - template: ../tasks/assign-app-role-to-service-principal.yml
             #   parameters:

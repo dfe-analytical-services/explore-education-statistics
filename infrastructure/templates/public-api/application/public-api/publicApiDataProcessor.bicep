@@ -10,8 +10,11 @@ param location string
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-@description('Specifies whether or not the Data Processor Function App already exists.')
-param dataProcessorFunctionAppExists bool
+@description('The existing app settings for the production slot, fetched by the pipeline before deployment.')
+param existingProductionAppSettings object = {}
+
+@description('The existing app settings for the staging slot, fetched by the pipeline before deployment.')
+param existingStagingAppSettings object = {}
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
@@ -99,7 +102,8 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       name: dataProcessorFunctionAppManagedIdentity.name
       principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
     }
-    functionAppExists: dataProcessorFunctionAppExists
+    existingProductionAppSettings: existingProductionAppSettings
+    existingStagingAppSettings: existingStagingAppSettings
     keyVaultName: resourceNames.existingResources.keyVault
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
