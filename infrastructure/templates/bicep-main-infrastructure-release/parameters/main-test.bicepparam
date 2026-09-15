@@ -45,6 +45,14 @@ param importerConfigParam = {
   }
 }
 
+param notifierConfigParam = {
+  appServiceSku: {
+    tier: 'Basic'
+    name: 'B1'
+  }
+  suppressExceptionsForTeamOnlyApiKeyErrors: true
+}
+
 param publisherConfigParam = {
   appServiceSku: {
     tier: 'Basic'
