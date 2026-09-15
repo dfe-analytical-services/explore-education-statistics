@@ -33,7 +33,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   sku: sku
   properties: {
     reserved: operatingSystem == 'Linux'
-    maximumElasticWorkerCount: maximumElasticWorkerCount
+    maximumElasticWorkerCount: sku.tier == 'ElasticPremium' ? maximumElasticWorkerCount : null
   }
   tags: tagValues
 }
