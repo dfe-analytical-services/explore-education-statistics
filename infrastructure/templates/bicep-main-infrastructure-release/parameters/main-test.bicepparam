@@ -45,6 +45,15 @@ param importerConfigParam = {
   }
 }
 
+param publisherConfigParam = {
+  appServiceSku: {
+    tier: 'Basic'
+    name: 'B1'
+  }
+  prepareScheduledReleaseVersionsNowEnabled: true
+  publishScheduledReleaseVersionsNowEnabled: true
+}
+
 param publicApiConfigParam = {
   publicUrl: 'pp-api.education.gov.uk/statistics-test'
 }
