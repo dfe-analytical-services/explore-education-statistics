@@ -42,9 +42,6 @@ param location string
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
-@description('Specifies whether or not the Search Docs Function App already exists.')
-param functionAppExists bool
-
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
   publicationArchived: 'publication-archived-queue'

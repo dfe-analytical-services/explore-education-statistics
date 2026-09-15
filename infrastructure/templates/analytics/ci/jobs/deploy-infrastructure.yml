@@ -29,14 +29,6 @@ jobs:
                 action: validate
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                analyticsFunctionAppExists: false
-
-            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(analyticsFunctionAppName)
-                variableName: analyticsFunctionAppExists
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -44,4 +36,3 @@ jobs:
                 action: create
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
-                analyticsFunctionAppExists: $(analyticsFunctionAppExists)
