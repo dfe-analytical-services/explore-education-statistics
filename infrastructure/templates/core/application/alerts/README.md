@@ -17,6 +17,41 @@ The [Logic App](alerts-logic-app.bicep) receives JSON payloads from metric alert
 information using a series of `Compose` actions, and then 2 HTTP actions, one for Teams and one for
 Slack, take those variables and construct POSTs in the correct format for their target platforms.
 
+All Slack configuration lives in a single `ees-alerts-slackconfig` Key Vault secret, holding a JSON
+array of workspaces:
+
+```json
+[
+  { "channels": ["C067Z1K68UD"], "authToken": "xoxb-..." },
+  { "channels": ["C0C13TPGB53"], "authToken": "xoxb-..." }
+]
+```
+
+Each workspace carries the app token that can post to its own channels, so channels in different
+Slack workspaces can be mixed without the template knowing anything about who owns them. Nothing
+about Slack is configured in the `.bicepparam` files. To add, remove or retarget a channel, or rotate
+an app token, update the Key Vault secret and redeploy the core infrastructure for that environment.
+The secret is read at deployment time, so the Logic App continues using the previously deployed
+channels and tokens until it is redeployed.
+
+`Post to Slack workspaces` loops over that array and `Post to channels` loops over the channels
+within each entry, so the token used for a POST is always the one belonging to the workspace the
+channel came from. Nested loops are supported up to an action nesting depth of 8; iterations of a
+nested loop always run sequentially.
+
+Because the token now flows through `items()` rather than being referenced directly as a
+`securestring` parameter, the HTTP action sets `secureData` on its inputs and outputs so the token is
+not recorded in run history.
+
+Every app needs the `chat:write` scope and must be invited to its channels, otherwise
+`chat.postMessage` returns HTTP 200 with `"ok": false`. Because that is not an HTTP failure, the
+`Record rejected Slack post` condition inspects the response body and collects any rejected channel
+into the `slackFailures` variable, and `Fail if any Slack post was rejected` then terminates the run
+as failed - so dropped alerts surface in the `WorkflowRuntime` diagnostic logs instead of passing
+silently. Both loops run at a concurrency of 1 because appending to a variable from parallel
+iterations is not safe, and `Terminate` is not permitted inside a `Foreach`, which is why the failure
+is raised after the loops rather than within them.
+
 The [Logic App definition](alerts-logic-app-definition.json) defines the workflow.
 
 ## Action Group
