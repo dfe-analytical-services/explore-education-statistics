@@ -1,5 +1,4 @@
 import { abbreviations } from '../common/abbreviations.bicep'
-import { abbreviations as publicApiAbbreviations } from 'abbreviations.bicep'
 import {
   ContainerAppResourceConfig
   PrincipalNameAndId
@@ -191,7 +190,7 @@ var resourceNames = {
       vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
       psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
     }
-    // The Test Resource Group has broken from the naming convention of other environments for Core Storage
+    // TODO EES-7502 - the Test Resource Group has broken from the naming convention of other environments for Core Storage
     coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
       ? '${legacyResourcePrefix}storageeescore'
       : '${legacyResourcePrefix}saeescore'
@@ -205,13 +204,13 @@ var resourceNames = {
       dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
       dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
       storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
-      psqlFlexibleServer: '${commonResourcePrefix}-snet-${publicApiAbbreviations.dBforPostgreSQLServers}'
+      psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
     }
     vNet: '${legacyResourcePrefix}-vnet-ees'
   }
   sharedResources: {
     containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
-    postgreSqlFlexibleServer: '${commonResourcePrefix}-${publicApiAbbreviations.dBforPostgreSQLServers}'
+    postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
     recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
   }

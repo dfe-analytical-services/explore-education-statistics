@@ -19,21 +19,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-    "skuNotifier": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
-    },
     "adminFirewallRules": {
       "type": "array",
       "metadata": {
@@ -44,18 +29,6 @@
       "type": "array",
       "metadata": {
         "description": "Firewall restrictions for storage accounts, string array"
-      }
-    },
-    "sqlNotifierUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the notifier for the private SQL Server"
-      }
-    },
-    "sqlNotifierUserPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the notifier user for the private SQL Server"
       }
     },
     "sqlFirewallRules": {
@@ -298,13 +271,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key."
-      }
-    },
     "additionalPublicAllowedOrigins": {
       "type": "array",
       "defaultValue": [],
@@ -358,21 +324,6 @@
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
-    "notificationsAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-notify')]",
-    "notificationsPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-notify')]",
-    "notificationsAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-notify')]",
-    "notificationsStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eesnotify')]",
-    "notificationsStorageVnetRules": [
-      {
-        "id": "[variables('notifySubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('publisherSubnetRef')]",
-        "action": "Allow"
-      }
-    ],
-    "notificationsStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('notificationsStorageAccountName'))]",
     "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
     "publicStorageVnetRules": [
       {
@@ -396,28 +347,6 @@
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
-      {
-        "name": "[concat(parameters('subscription'),'NotificationsAppServiceHttpServiceErrors')]",
-        "description": "Notifications App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'NotificationsAppInsightsExceptions')]",
-        "description": "Notifications AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBCpuPercent')]",
         "description": "Statistics Replica DB CPU percentage",
@@ -718,11 +647,8 @@
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
-    "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
-    "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
     "ipWhiteList": {
       "copy": [
@@ -737,10 +663,6 @@
         }
       ]
     },
-    "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
-    "keyVaultSecretsUserPrincipalRefs": [
-      "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]"
-    ],
     "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
     "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
     "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
@@ -1773,66 +1695,6 @@
       }
     },
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('notificationsStorageAccountName')]",
-      "apiVersion": "2023-05-01",
-      "location": "[resourceGroup().location]",
-      "kind": "StorageV2",
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('notificationsStorageVnetRules'), createArray())]",
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "defaultAction": "Deny"
-        }
-      },
-      "resources": [
-        {
-          "name": "default",
-          "type": "blobServices",
-          "apiVersion": "2023-05-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('notificationsStorageAccountName')]"
-          ]
-        }
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Storage account",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'), '/ees-storage-notifications')]",
-      "apiVersion": "2016-10-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('notificationsStorageAccountName'))]"
-      ],
-      "properties": {
-        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('notificationsStorageAccountName'), ';AccountKey=', listKeys(variables('notificationsStorageAccountId'),'2015-05-01-preview').key1)]"
-      }
-    },
-    {
       "name": "[variables('publicStorageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-05-01",
@@ -1958,155 +1820,6 @@
       ]
     },
     {
-      "apiVersion": "2020-02-02",
-      "name": "[variables('notificationsAppInsights')]",
-      "type": "Microsoft.Insights/components",
-      "kind": "web",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Application Insights",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "Application_Type": "web",
-        "ApplicationId": "[variables('notificationsAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-03-01",
-      "name": "[variables('notificationsPlanName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service plan",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "sku": {
-        "Tier": "[first(skip(split(parameters('skuNotifier'), ' '), 1))]",
-        "Name": "[first(split(parameters('skuNotifier'), ' '))]"
-      },
-      "properties": {
-        "name": "[variables('notificationsPlanName')]",
-        "workerSize": "0",
-        "workerSizeId": "0",
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "apiVersion": "2019-08-01",
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('notificationsAppName')]",
-      "location": "[resourceGroup().location]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "kind": "functionapp",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]"
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "condition": "[parameters('useSubnets')]",
-          "name": "virtualNetwork",
-          "type": "config",
-          "apiVersion": "2018-11-01",
-          "location": "[resourceGroup().location]",
-          "properties": {
-            "subnetResourceId": "[variables('notifySubnetRef')]",
-            "swiftSupported": true
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]"
-          ]
-        }
-      ],
-      "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "http20Enabled": true,
-          "minTlsVersion": "[parameters('minTlsVersion')]",
-          "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v10.0",
-          "alwaysOn": true,
-          "webSocketsEnabled": false,
-          "requestTracingEnabled": true,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": true,
-          "detailedErrorLoggingEnabled": true,
-          "cors": {
-            "allowedOrigins": "[union(variables('publicAllowedOrigins'), array(format('https://{0}', reference(variables('resourceIds').afdEndpoint, variables('apiVersions').afdEndpoint).hostName)))]"
-          },
-          "connectionStrings": [
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlNotifierUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlNotifierUserPassword'), ';')]"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "[concat(variables('notificationsAppName'), '/appsettings')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('notificationsAppName'))]",
-        "[variables('ees-storage-notifications')]"
-      ],
-      "properties": {
-        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "FUNCTIONS_EXTENSION_VERSION": "~4",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('notificationsAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__EmailEnabled": "true",
-        "App__SuppressExceptionsForTeamOnlyApiKeyErrors": "[parameters('notifierSuppressExceptionsForTeamOnlyApiKeyErrors')]",
-        "App__Url": "[concat(concat('https://', variables('notificationsAppName')), '.azurewebsites.net/api')]",
-        "App__PublicAppUrl": "[variables('publicAppUrl')]",
-        "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
-      }
-    },
-    {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('loggingStorageAccountName')]",
       "apiVersion": "2023-05-01",
@@ -2147,21 +1860,6 @@
         "CreatedBy": "[parameters('createdBy')]",
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "copy": {
-        "name": "keyVaultSecretUsersCopy",
-        "count": "[length(variables('keyVaultSecretsUserPrincipalRefs'))]"
-      },
-      "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[concat(variables('keyVaultName'), '/Microsoft.Authorization/', guid(resourceId('Microsoft.KeyVault/vaults',  variables('keyVaultName')), variables('keyVaultSecretsUserRoleDefinitionId'), variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()]))]",
-      "properties": {
-        "roleDefinitionId": "[variables('keyVaultSecretsUserRoleDefinitionId')]",
-        "principalId": "[reference(variables('keyVaultSecretsUserPrincipalRefs')[copyIndex()], '2022-09-01', 'Full').identity.principalId]",
-        "scope": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
-        "principalType": "ServicePrincipal"
       }
     },
     {
