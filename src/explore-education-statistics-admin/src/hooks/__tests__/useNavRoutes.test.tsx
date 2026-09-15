@@ -22,7 +22,12 @@ describe('useNavRoutes', () => {
       () => useNavRoutes(methodologyNavRoutes, { methodologyId }),
       {
         wrapper: ({ children }: { children?: ReactNode }) => (
-          <MemoryRouter initialEntries={[location]}>{children}</MemoryRouter>
+          <MemoryRouter
+            future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
+            initialEntries={[location]}
+          >
+            {children}
+          </MemoryRouter>
         ),
       },
     );
@@ -32,9 +37,9 @@ describe('useNavRoutes', () => {
     const { result } = renderAtRoute(methodologySummaryRoute.fullPath);
 
     expect(result.current.navBarRoutes).toEqual([
-      { title: 'Summary', to: 'summary' },
-      { title: 'Manage content', to: 'content' },
-      { title: 'Sign off', to: 'status' },
+      { title: 'Summary', to: '/methodology/methodology-1/summary' },
+      { title: 'Manage content', to: '/methodology/methodology-1/content' },
+      { title: 'Sign off', to: '/methodology/methodology-1/status' },
     ]);
   });
 

@@ -1,9 +1,13 @@
 import { GlobalPermissions } from '@admin/services/authService';
-import { NonIndexRouteObject } from 'react-router/dist/lib/context';
+import React from 'react';
 
-export type PublicRouteProps = NonIndexRouteObject & {
+/**
+ * Removed the explicit React Router type and only defining the required properties
+ */
+export type PublicRouteProps = {
   path: string;
   fullPath: string;
+  element?: React.ReactNode;
 };
 
 export type ProtectedRouteProps = PublicRouteProps & {
