@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
@@ -53,7 +54,17 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             return new GetResponse<TResponse>.Error($"Error calling {apiEndpoint}: {e.Message}({e.StatusCode})");
         }
 
-        var responseData = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
+        TResponse? responseData;
+        try
+        {
+            responseData = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken);
+        }
+        catch (JsonException e)
+        {
+            return new GetResponse<TResponse>.Error(
+                $"Error deserialising response content from {apiEndpoint}: {e.Message}"
+            );
+        }
 
         return responseData is null
             ? new GetResponse<TResponse>.Error($"Response content could not be deserialised")
@@ -66,7 +77,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     )
     {
         var apiEndpoint = BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(publicationSlug);
-        var response = await Get<ReleaseSearchViewModelDto>(apiEndpoint, cancellationToken);
+        var response = await Get<ReleaseSearchableDocumentDto>(apiEndpoint, cancellationToken);
 
         return Process(
             response,
