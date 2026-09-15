@@ -82,8 +82,11 @@ param sku FunctionAppServicePlanSku
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
 
-@description('Specifies whether or not the Function App already exists. This is used to determine whether or not to look for existing appsettings')
-param functionAppExists bool
+@description('The existing app settings for the production slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingProductionAppSettings object = {}
+
+@description('The existing app settings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingAppSettings object = {}
 
 @description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
 param preWarmedInstanceCount int?
@@ -368,18 +371,6 @@ module azureStorageAccountsConfigModule '../../common/components/storage/file-sh
   }
 }
 
-// We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
-// deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
-// appsettings back to their original values by allowing existing ones to take precedence.
-//
-// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
-var existingStagingAppSettings = functionAppExists
-  ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties
-  : {}
-var existingProductionAppSettings = functionAppExists
-  ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties
-  : {}
-
 // Create staging and production deploy slots, and set base app settings on both.
 // These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
 // application-specific appsettings so as to be able to control the rollout of new, updated and deleted
@@ -427,10 +418,11 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // This indicates the name of the file share where the Function App code and configuration lives.
       WEBSITE_CONTENTSHARE: functionAppCodeFileShareName
 
-      // It's only possible to UPDATE a Function App using a Key Vault reference for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING setting,
-      // not creating a new Function App, unless we use the below setting to skip validation for the first time we create
-      // this Function App.  See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
-      WEBSITE_SKIP_CONTENTSHARE_VALIDATION: functionAppExists ? 0 : 1
+      // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
+      // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
+      // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
+      // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+      WEBSITE_SKIP_CONTENTSHARE_VALIDATION: 1
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'

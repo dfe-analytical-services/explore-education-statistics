@@ -23,9 +23,6 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-@description('Specifies whether or not the Analytics Function App already exists.')
-param analyticsFunctionAppExists bool = true
-
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -103,7 +100,6 @@ module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
     location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
-    functionAppExists: analyticsFunctionAppExists
     functionAppFirewallRules: union(
       [
         {

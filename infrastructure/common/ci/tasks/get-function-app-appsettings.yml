@@ -1,0 +1,43 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: functionAppName
+    type: string
+  - name: variableName
+    type: string
+  - name: displayName
+    type: string
+  - name: slotName
+    type: string
+    default: ''
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        slotArgs=()
+        if [ -n "${{ parameters.slotName }}" ]; then
+          slotArgs=(--slot "${{ parameters.slotName }}")
+        fi
+
+        # If the Function App (or slot) doesn't exist yet, fall back to an empty set of app settings rather
+        # than failing the pipeline - this lets Bicep skip merging in "existing" settings on a first deploy.
+        rawAppSettings=$(az functionapp config appsettings list \
+          --name ${{ parameters.functionAppName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          "${slotArgs[@]}" \
+          2>/dev/null) || rawAppSettings='[]'
+
+        # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
+        # which is the shape the Bicep template's appsettings params expect.
+        existingAppSettings=$(echo "$rawAppSettings" | jq -c 'from_entries')
+
+        echo "##vso[task.setvariable variable=${{ parameters.variableName }};]$existingAppSettings"
