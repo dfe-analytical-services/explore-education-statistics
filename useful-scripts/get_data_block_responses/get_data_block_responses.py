@@ -10,19 +10,21 @@ import requests
 """
 To generate datablocks.csv, use this SQL query against the Content DB:
 
-SELECT DataBlockVersions.Id                                 AS ContentBlockId,
-       ReleaseVersions.Id                                   AS ReleaseVersionId,
-       JSON_VALUE(DataBlockVersions.[Query], '$.SubjectId') AS SubjectId,
-       DataBlockVersions.[Query]                            AS Query
+SELECT DataBlockVersions.Id                                    AS DataBlockVersionId,
+       ReleaseVersions.Id                                      AS ReleaseVersionId,
+       JSON_VALUE(DataBlockVersions.[Query], '$.SubjectId')    AS SubjectId,
+       DataBlockVersions.[Query]                               AS Query
 FROM DataBlockVersions
-JOIN ReleaseVersions ON ReleaseVersions.Id = DataBlockVersions.ReleaseVersionId
+JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
+LEFT JOIN ContentBlock ON ContentBlock.DataBlockVersionId = DataBlockVersions.Id
+    AND ContentBlock.Type = 'DataBlockVersionLink'
+LEFT JOIN KeyStatisticsDataBlock ON KeyStatisticsDataBlock.DataBlockVersionId = DataBlockVersions.Id
+LEFT JOIN FeaturedTables ON FeaturedTables.DataBlockVersionId = DataBlockVersions.Id
 WHERE ReleaseVersions.Published IS NOT NULL
   AND ReleaseVersions.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
-    EXISTS(SELECT 1
-           FROM ContentBlock
-           WHERE ContentBlock.DataBlockVersionId = DataBlockVersions.Id)
+    ContentBlock.Id IS NOT NULL
     -- Include DataBlocks that are Key Statistics
     OR EXISTS(SELECT 1
               FROM KeyStatisticsDataBlock
@@ -51,8 +53,8 @@ Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
 
 Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
-responses, as they contain unique traceIds):
-diff -I"Run info - .*" -I "Not Found" -r results_dev1/responses results_dev2/responses
+responses, as they contain unique traceIds. Run this from a bash terminal):
+diff -I "Run info - .*" -I "Not Found" -I "time for response.*" -r results_dev1/responses results_dev2/responses
 """
 
 parser = argparse.ArgumentParser(
@@ -153,7 +155,7 @@ datablocks = []
 with open(args.datablocks_csv, "r") as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=",")
     for row in csv_reader:
-        if row[0] == "ContentBlockId":
+        if row[0] == "DataBlockVersionId":
             continue
         datablocks.append(row)
 
