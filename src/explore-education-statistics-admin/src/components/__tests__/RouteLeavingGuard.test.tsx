@@ -1,7 +1,6 @@
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { Link } from 'react-router-dom';
 import TestLocationContext, {
@@ -9,35 +8,44 @@ import TestLocationContext, {
 } from '@admin/components/testing/TestLocationContext';
 
 function renderPage(blockRouteChange = true) {
-  const memoryRouter = createMemoryRouter([
-    {
-      path: '/',
-      element: (
-        <>
-          <RouteLeavingGuard
-            blockRouteChange={blockRouteChange}
-            title="Test modal title"
-          >
-            <p>Test modal content</p>
-          </RouteLeavingGuard>
+  const memoryRouter = createMemoryRouter(
+    [
+      {
+        path: '/',
+        element: (
+          <>
+            <RouteLeavingGuard
+              blockRouteChange={blockRouteChange}
+              title="Test modal title"
+            >
+              <p>Test modal content</p>
+            </RouteLeavingGuard>
 
-          <Link to="/other">Change route</Link>
-          <TestLocationContext />
-        </>
-      ),
-    },
+            <Link to="/other">Change route</Link>
+            <TestLocationContext />
+          </>
+        ),
+      },
+      {
+        path: '/other',
+        element: (
+          <>
+            <p>Other route</p>
+            <TestLocationContext />
+          </>
+        ),
+      },
+    ],
     {
-      path: '/other',
-      element: (
-        <>
-          <p>Other route</p>
-          <TestLocationContext />
-        </>
-      ),
+      initialEntries: ['/'],
     },
-  ]);
+  );
 
-  return render(<RouterProvider router={memoryRouter} />);
+  return {
+    router: memoryRouter,
+
+    ...render(<RouterProvider router={memoryRouter} />),
+  };
 }
 
 describe('RouteLeavingGuard', () => {
@@ -56,18 +64,16 @@ describe('RouteLeavingGuard', () => {
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();
   });
 
-  test('shows modal when route change is blocked on `history.push`', async () => {
-    const history = createMemoryHistory();
-
-    renderPage();
+  test('shows modal when route change is blocked when location is externally changed', async () => {
+    const { router } = renderPage();
 
     act(() => {
-      // We push an entry instead of clicking the link.
-      // The result should still be the same.
-      history.push('/other');
+      // externally change the url
+      // this is as close as we can get to changing history
+      router.navigate('/other');
     });
 
-    expect(history.location.pathname).toBe('/');
+    await expectLocation('/');
 
     expect(await screen.findByText('Test modal title')).toBeInTheDocument();
 

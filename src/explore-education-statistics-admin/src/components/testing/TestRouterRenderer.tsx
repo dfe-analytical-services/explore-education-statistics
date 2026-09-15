@@ -137,27 +137,16 @@ export function TestRouterWithProvider({
       typeof extraRoute === 'string'
         ? {
             path: extraRoute,
-            element: (
-              <Route
-                key={extraRoute}
-                element={<RenderRouteWithChildren />}
-                path={extraRoute}
-              />
-            ),
+            element: <RenderRouteWithChildren />,
           }
         : {
             path: extraRoute.route,
             element: (
-              <Route
-                path={extraRoute.route}
-                element={
-                  <RenderRouteWithChildren
-                    disableTestContext={extraRoute.disableTestContext}
-                  >
-                    {extraRoute.children}
-                  </RenderRouteWithChildren>
-                }
-              />
+              <RenderRouteWithChildren
+                disableTestContext={extraRoute.disableTestContext}
+              >
+                {extraRoute.children}
+              </RenderRouteWithChildren>
             ),
           },
     ) || []),

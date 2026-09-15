@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router';
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 
 /**
  * These are some helpers due to the changes in react router 6 and the inability to access
@@ -19,17 +19,19 @@ export default function TestLocationContext() {
 }
 
 export async function expectLocation(url: string) {
-  expect(await screen.findByTestId('__current_pathname')).toHaveTextContent(
-    url,
-  );
+  await waitFor(() => {
+    expect(screen.getByTestId('__current_pathname')).toHaveTextContent(url);
+  });
 }
 
 export async function expectLocationHash(hash: string) {
-  expect(await screen.findByTestId('__current_hash')).toHaveTextContent(hash);
+  await waitFor(() => {
+    expect(screen.getByTestId('__current_hash')).toHaveTextContent(hash);
+  });
 }
 
 export async function expectLocationSearch(search: string) {
-  expect(await screen.findByTestId('__current_search')).toHaveTextContent(
-    search,
-  );
+  await waitFor(() => {
+    expect(screen.getByTestId('__current_search')).toHaveTextContent(search);
+  });
 }
