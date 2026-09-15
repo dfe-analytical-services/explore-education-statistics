@@ -163,6 +163,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       }
       {
+        name: 'App__PublisherStorageConnectionString'
+        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
+      }
+      {
         name: 'App__BauEmail'
         value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.bauEmail)
       }
