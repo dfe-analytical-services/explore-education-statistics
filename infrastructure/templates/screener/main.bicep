@@ -1,6 +1,6 @@
 import { IpRange } from '../common/types.bicep'
 import { abbreviations } from '../common/abbreviations.bicep'
-import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -59,7 +59,7 @@ param screenerFunctionAppExists bool = true
 param screenerDockerImageTag string = ''
 
 @description('SKU for the Screener API Function App\'s App Service Plan.')
-param screenerFunctionAppSku AppServicePlanSku = {
+param screenerFunctionAppSku FunctionAppServicePlanSku = {
   name: 'EP1'
   tier: 'ElasticPremium'
   family: 'EP'
