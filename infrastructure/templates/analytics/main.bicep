@@ -75,7 +75,6 @@ module analyticsStorageModule 'application/analyticsStorage.bicep' = {
   name: 'analyticsStorageAccountApplicationModuleDeploy'
   params: {
     resourcePrefix: resourcePrefix
-    location: location
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: true
