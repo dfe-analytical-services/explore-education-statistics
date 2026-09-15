@@ -176,7 +176,6 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.themeUpdated
       }
     ]
-    functionAppExists: functionAppExists
     keyVaultName: keyVault.name
     keyVaultRoles: {
       secretsUser: true

@@ -5,15 +5,6 @@
     "skuNotifier": {
       "value": "B1 Basic"
     },
-    "skuPublisher": {
-      "value": "B1 Basic"
-    },
-    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
-      "value": "0 0 * * * *"
-    },
-    "publishScheduledReleaseVersionsFunctionCronSchedule": {
-      "value": "0 30 * * * *"
-    },
     "useSubnets": {
       "value": true
     },
@@ -52,12 +43,6 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 1099511627776
-    },
-    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
-      "value": true
-    },
-    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
-      "value": true
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
