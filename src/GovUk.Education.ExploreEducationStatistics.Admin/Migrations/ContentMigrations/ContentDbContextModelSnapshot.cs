@@ -2794,12 +2794,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("UserPublicationRoles");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", b =>
-                {
-                    b.Navigation("DataBlockVersion")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinTileGroupBlock", b =>
                 {
                     b.Navigation("Tiles");
