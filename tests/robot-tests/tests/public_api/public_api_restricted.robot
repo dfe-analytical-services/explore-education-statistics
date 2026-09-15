@@ -174,7 +174,7 @@ Upload subject to second release
 Validate checklist warning for an API data set which has not been updated
     user clicks link    Publishing checklist
     user checks checklist warnings contains
-    ...    Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate
+    ...    Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate
 
 Add data guidance to second release
     user clicks link    Data and files

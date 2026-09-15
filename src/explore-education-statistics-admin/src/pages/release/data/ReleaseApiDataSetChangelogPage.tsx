@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import ApiDataSetGuidanceNotesForm, {
   ApiDataSetGuidanceNotesFormValues,
 } from '@admin/pages/release/data/components/ApiDataSetGuidanceNotesForm';
@@ -29,6 +30,10 @@ export default function ReleaseApiDataSetChangelogPage() {
   const { dataSetId, dataSetVersionId, releaseVersionId, publicationId } =
     useParams<ReleaseDataSetChangelogRouteParams>();
 
+  const { user } = useAuthContext();
+  const canManagePublicApiDataSets =
+    user?.permissions.canManagePublicApiDataSets ?? false;
+
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
   );
@@ -47,13 +52,21 @@ export default function ReleaseApiDataSetChangelogPage() {
     ? dataSetVersionIsDraft(dataSetVersion.status)
     : false;
 
+  const canEditGuidanceNotes = canManagePublicApiDataSets && isDraft;
+
   const [showForm, toggleShowForm] = useToggle(false);
 
   useEffect(() => {
-    if (isDraft && !dataSetVersion?.notes) {
+    if (canEditGuidanceNotes && !dataSetVersion?.notes) {
       toggleShowForm.on();
     }
-  }, [dataSetVersion?.notes, isDraft, toggleShowForm]);
+  }, [
+    canManagePublicApiDataSets,
+    dataSetVersion?.notes,
+    isDraft,
+    toggleShowForm,
+    canEditGuidanceNotes,
+  ]);
 
   const handleUpdateNotes = useCallback(
     async ({ notes }: ApiDataSetGuidanceNotesFormValues) => {
@@ -105,7 +118,7 @@ export default function ReleaseApiDataSetChangelogPage() {
               >{`${dataSetVersion.type} update`}</Tag>
             </TagGroup>
 
-            {isDraft && showForm ? (
+            {canEditGuidanceNotes && showForm ? (
               <ApiDataSetGuidanceNotesForm
                 notes={dataSetVersion.notes}
                 onSubmit={handleUpdateNotes}
@@ -117,7 +130,7 @@ export default function ReleaseApiDataSetChangelogPage() {
                   {dataSetVersion?.notes ||
                     'No notes have been added for this API data set.'}
                 </p>
-                {isDraft && (
+                {canEditGuidanceNotes && (
                   <Button onClick={toggleShowForm.on}>
                     Edit public guidance notes
                   </Button>

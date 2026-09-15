@@ -24,7 +24,6 @@ import {
   publicationMethodologiesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useMemo } from 'react';
@@ -41,8 +40,6 @@ interface Props {
 }
 
 const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
-  const { user } = useAuthContext();
-
   const { data: checklist, isLoading } = useQuery(
     releaseVersionQueries.getChecklist(releaseVersion.id),
   );
@@ -57,12 +54,10 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
     [releaseVersion.id, releaseVersion.publicationId],
   );
 
-  const apiDataSetsTabRoute = user?.permissions.isBauUser
-    ? `${generatePath<ReleaseRouteParams>(
-        releaseDataRoute.path,
-        releaseRouteParams,
-      )}#${releaseDataPageTabs.apiDataSets.id}`
-    : undefined;
+  const apiDataSetsTabRoute = `${generatePath<ReleaseRouteParams>(
+    releaseDataRoute.path,
+    releaseRouteParams,
+  )}#${releaseDataPageTabs.apiDataSets.id}`;
 
   const errorDetails = useMemo<ChecklistMessage[]>(() => {
     const dataUploadsTabRoute = `${generatePath<ReleaseRouteParams>(
@@ -261,7 +256,7 @@ const ReleaseStatusChecklist = ({ releaseVersion }: Props) => {
         case 'MissingUpdatedApiDataSet':
           return {
             message:
-              'Public API data sets associated with this publication have not been updated as part of this release. This will create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
+              'Public API data sets associated with this publication have not been updated as part of this release. This may create breaking changes and be confusing for end users. Please set up new versions of API data sets where appropriate',
             link: apiDataSetsTabRoute,
           };
         case 'ReleaseSummarySectionContainsHtmlBlock':

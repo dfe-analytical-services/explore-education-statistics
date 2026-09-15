@@ -5,6 +5,7 @@ public record GlobalPermissionsViewModel(
     bool CanAccessAnalystPages,
     bool CanAccessAllImports,
     bool CanManageAllTaxonomy,
+    bool CanManagePublicApiDataSets,
     bool IsBauUser,
     bool IsApprover
 );

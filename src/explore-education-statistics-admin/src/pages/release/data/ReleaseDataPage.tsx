@@ -1,5 +1,4 @@
 import PageMetaTitle from '@admin/components/PageMetaTitle';
-import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
@@ -19,7 +18,6 @@ import { useLocation } from 'react-router';
 
 const ReleaseDataPage = () => {
   const { releaseVersion, releaseVersionId } = useReleaseVersionContext();
-  const { user } = useAuthContext();
   const { hash } = useLocation();
 
   const tabTitleFromHash = hash
@@ -102,15 +100,13 @@ const ReleaseDataPage = () => {
               canUpdateRelease={canUpdateRelease}
             />
           </TabsSection>
-          {user?.permissions.isBauUser && (
-            <TabsSection
-              id={releaseDataPageTabs.apiDataSets.id}
-              title={releaseDataPageTabs.apiDataSets.title}
-              lazy
-            >
-              <ReleaseApiDataSetsSection />
-            </TabsSection>
-          )}
+          <TabsSection
+            id={releaseDataPageTabs.apiDataSets.id}
+            title={releaseDataPageTabs.apiDataSets.title}
+            lazy
+          >
+            <ReleaseApiDataSetsSection />
+          </TabsSection>
         </Tabs>
       </LoadingSpinner>
     </>

@@ -1,12 +1,14 @@
 #nullable enable
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.WebApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -47,7 +49,7 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
         : DataSetVersionMappingControllerIndicatorTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
                 fixture.GetPublicDataDbContext(),
@@ -86,14 +88,128 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
             retrievedMappings.AssertDeepEqualTo(mapping.IndicatorMappingPlan, ignoreCollectionOrders: true);
         }
 
-        [Fact]
-        public async Task NotBauUser_Returns403()
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanGetIndicatorMappings_ReturnsIndicatorMappingPlan(
+            PublicationRole publicationRole
+        )
         {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext(),
+                publicationId: publication.Id
+            );
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersionMappings.Add(mapping);
+                });
+
+            var response = await GetIndicatorMappings(nextDataSetVersionId: nextDataSetVersion.Id, user: identityUser);
+
+            // Test that a non-BAU user who has a role on the publication that owns the data set
+            // version being mapped can still successfully retrieve the mappings. Content
+            // correctness of the returned mapping plan is already covered by BauUser_Success.
+            response.AssertOk<IndicatorMappingPlan>();
+        }
+
+        [Fact]
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
+        {
+            // The mapping must actually exist - otherwise the request is rejected as Not Found
+            // before the authorization check is ever reached.
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
             var response = await GetIndicatorMappings(
-                nextDataSetVersionId: Guid.NewGuid(),
+                nextDataSetVersionId: nextDataSetVersion.Id,
                 user: OptimisedTestUsers.Authenticated
             );
 
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+
+            var releaseVersion = await fixture
+                .GetContentDbContext()
+                .ReleaseFiles.Include(rf => rf.ReleaseVersion)
+                .Where(rf => rf.Id == nextDataSetVersion.Release.ReleaseFileId)
+                .Select(rf => rf.ReleaseVersion)
+                .SingleAsync();
+
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersionMappings.Add(mapping);
+                });
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            var response = await GetIndicatorMappings(nextDataSetVersionId: nextDataSetVersion.Id, user: identityUser);
+
+            // A non-BAU user with only a pre-release role (and no publication role) on the
+            // publication that owns the data set version being mapped must not be able to
+            // retrieve the mappings.
             response.AssertForbidden();
         }
 
@@ -551,6 +667,59 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
             response.AssertForbidden();
         }
 
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext(),
+                publicationId: publication.Id
+            );
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersionMappings.Add(mapping);
+                });
+
+            var response = await ApplyBatchIndicatorMappingUpdates(
+                nextDataSetVersionId: nextDataSetVersion.Id,
+                updates: [],
+                user: identityUser
+            );
+
+            // Test that a non-BAU user who has a role on the publication that owns the data set
+            // version being mapped still cannot batch-update mappings, as CanManagePublicApiDataSets
+            // is BAU-only and has no publication-role path.
+            response.AssertForbidden();
+        }
+
         [Fact]
         public async Task DataSetVersionMappingDoesNotExist_Returns404()
         {
@@ -700,9 +869,17 @@ static class DataSetVersionMappingControllerIndicatorTestsHelpers
     public static async Task<(
         DataSetVersion initialVersion,
         DataSetVersion nextVersion
-    )> CreateInitialAndNextDataSetVersion(PublicDataDbContext publicDataDbContext, ContentDbContext contentDbContext)
+    )> CreateInitialAndNextDataSetVersion(
+        PublicDataDbContext publicDataDbContext,
+        ContentDbContext contentDbContext,
+        Guid? publicationId = null
+    )
     {
-        DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
+        var dataSetGenerator = DataFixture.DefaultDataSet().WithStatusPublished();
+
+        DataSet dataSet = publicationId is null
+            ? dataSetGenerator
+            : dataSetGenerator.WithPublicationId(publicationId.Value);
 
         await publicDataDbContext.AddTestData(context => context.DataSets.Add(dataSet));
 
