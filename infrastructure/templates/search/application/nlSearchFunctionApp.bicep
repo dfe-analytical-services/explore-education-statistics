@@ -35,9 +35,6 @@ param location string
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
-@description('Specifies whether or not the Natural Language Search Function App already exists.')
-param functionAppExists bool
-
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 

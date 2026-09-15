@@ -11,9 +11,6 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: analyticsFunctionAppExists
-    type: string
-    default: true
 
 steps:
   - task: AzureCLI@2
@@ -34,5 +31,4 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
-              maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              analyticsFunctionAppExists=${{ parameters.analyticsFunctionAppExists }}
+              maintenanceIpRanges='$(maintenanceFirewallRules)'
