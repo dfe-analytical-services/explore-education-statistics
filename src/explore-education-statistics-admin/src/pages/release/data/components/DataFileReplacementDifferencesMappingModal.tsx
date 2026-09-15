@@ -117,7 +117,7 @@ export default function DifferencesItemMappingModal<
         ) {
           return;
         }
-        handleSubmit(submittedValue);
+        await handleSubmit(submittedValue);
       }}
       initialValues={initialValue}
       validationSchema={Yup.object({
