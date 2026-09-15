@@ -29,8 +29,10 @@ array of workspaces:
 
 Each workspace carries the app token that can post to its own channels, so channels in different
 Slack workspaces can be mixed without the template knowing anything about who owns them. Nothing
-about Slack is configured in the `.bicepparam` files - adding, removing or retargeting a channel is
-a Key Vault edit, not a deployment.
+about Slack is configured in the `.bicepparam` files. To add, remove or retarget a channel, or rotate
+an app token, update the Key Vault secret and redeploy the core infrastructure for that environment.
+The secret is read at deployment time, so the Logic App continues using the previously deployed
+channels and tokens until it is redeployed.
 
 `Post to Slack workspaces` loops over that array and `Post to channels` loops over the channels
 within each entry, so the token used for a POST is always the one belonging to the workspace the
