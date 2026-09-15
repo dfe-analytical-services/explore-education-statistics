@@ -1,5 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
-import { keyVaultRef } from '../bicep-main-infrastructure-release/functions.bicep'
+import { keyVaultRef } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -99,8 +99,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     keyVaultRoles: {
       keyVaultName: resourceNames.keyVault.keyVault
       secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
     }
-    legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
         name: 'StatisticsDb'

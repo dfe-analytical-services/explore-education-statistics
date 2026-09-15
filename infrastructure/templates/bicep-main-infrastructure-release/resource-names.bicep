@@ -33,6 +33,12 @@ type ResourceNames = {
       endpointName: string
     }
   }
+  importer: {
+    functionApp: string
+    appServicePlan: string
+    appInsights: string
+    storageAccount: string
+  }
   nlSearch: {
     functionApp: string
   }
@@ -61,6 +67,7 @@ type ResourceNames = {
       admin: string
       contentApi: string
       dataApi: string
+      importer: string
     }
   }
   keyVault: {
@@ -73,6 +80,7 @@ type ResourceNames = {
       admin: {
         adminSignalrConnectionString: string
         adminGovUkNotifyApiKey: string
+        databaseUserPassword: string
         openIdConnectClientId: string
         openIdConnectAuthority: string
         openIdConnectValidAudience: string
@@ -80,7 +88,17 @@ type ResourceNames = {
         openIdConnectFullyQualifiedScopeName: string
         screenerStorageAccountConnectionString: string
       }
+      contentApi: {
+        databaseUserPassword: string
+      }
+      dataApi: {
+        databaseUserPassword: string
+      }
+      importer: {
+        databaseUserPassword: string
+      }
       coreStorageAccountConnectionString: string
+      importerStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
       publicApiContainerAppPrivateUrl: string
@@ -135,17 +153,23 @@ func getResourceNames(
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
   }
-  nlSearch: {
-    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
-  }
-  notifier: {
-    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
-  }
   frontDoor: {
     frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
     defaultEndpoint: {
       endpointName: '${newResourcePrefix}-${abbreviations.frontDoorEndpoints}'
     }
+  }
+  importer: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-importer'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-importer'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-importer'
+    storageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer'
+  }
+  nlSearch: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
+  }
+  notifier: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
   }
   publicApi: {
     processor: {
@@ -169,6 +193,7 @@ func getResourceNames(
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
+      importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
     }
   }
   keyVault: {
@@ -181,6 +206,7 @@ func getResourceNames(
       admin: {
         adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'
         adminSignalrConnectionString: 'ees-signalr-admin-connectionstring'
+        databaseUserPassword: 'ees-sql-password-admin'
         openIdConnectClientId: 'ees-openidconnect-clientid'
         openIdConnectAuthority: 'ees-openidconnect-authority'
         openIdConnectValidAudience: 'ees-openidconnect-valid-audience'
@@ -188,8 +214,18 @@ func getResourceNames(
         openIdConnectFullyQualifiedScopeName: 'ees-openidconnect-fully-qualified-scope-name'
         screenerStorageAccountConnectionString: '${legacyResourcePrefix}eessapisafn-connection-string'
       }
+      contentApi: {
+        databaseUserPassword: 'ees-sql-public-password-content'
+      }
+      dataApi: {
+        databaseUserPassword: 'ees-sql-public-password-data'
+      }
+      importer: {
+        databaseUserPassword: 'ees-sql-password-importer'
+      }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       coreStorageAccountConnectionString: 'ees-storage-core'
+      importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: 'ees-storage-publisher'
     }
