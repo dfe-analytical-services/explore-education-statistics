@@ -52,10 +52,12 @@ export default function ReleaseApiDataSetChangelogPage() {
     ? dataSetVersionIsDraft(dataSetVersion.status)
     : false;
 
+  const canEditGuidanceNotes = canManagePublicApiDataSets && isDraft;
+
   const [showForm, toggleShowForm] = useToggle(false);
 
   useEffect(() => {
-    if (canManagePublicApiDataSets && isDraft && !dataSetVersion?.notes) {
+    if (canEditGuidanceNotes && !dataSetVersion?.notes) {
       toggleShowForm.on();
     }
   }, [
@@ -63,6 +65,7 @@ export default function ReleaseApiDataSetChangelogPage() {
     dataSetVersion?.notes,
     isDraft,
     toggleShowForm,
+    canEditGuidanceNotes,
   ]);
 
   const handleUpdateNotes = useCallback(
@@ -115,7 +118,7 @@ export default function ReleaseApiDataSetChangelogPage() {
               >{`${dataSetVersion.type} update`}</Tag>
             </TagGroup>
 
-            {canManagePublicApiDataSets && isDraft && showForm ? (
+            {canEditGuidanceNotes && showForm ? (
               <ApiDataSetGuidanceNotesForm
                 notes={dataSetVersion.notes}
                 onSubmit={handleUpdateNotes}
@@ -127,7 +130,7 @@ export default function ReleaseApiDataSetChangelogPage() {
                   {dataSetVersion?.notes ||
                     'No notes have been added for this API data set.'}
                 </p>
-                {canManagePublicApiDataSets && isDraft && (
+                {canEditGuidanceNotes && (
                   <Button onClick={toggleShowForm.on}>
                     Edit public guidance notes
                   </Button>

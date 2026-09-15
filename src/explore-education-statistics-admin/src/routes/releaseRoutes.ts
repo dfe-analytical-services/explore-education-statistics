@@ -123,7 +123,7 @@ export const releaseApiDataSetPreviewTokenLogRoute: ReleaseRouteProps = {
 export const releaseApiDataSetVersionHistoryRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/versions',
   title: 'API data set version history',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetChangelogRoute: ReleaseRouteProps = {

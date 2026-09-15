@@ -675,6 +675,25 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not render the `Create new version` button for a user without permission to manage public API data sets', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      latestLiveVersion: testLiveVersion,
+    });
+
+    renderPage({ user: testAnalystUser });
+
+    expect(
+      await screen.findByText('Latest live version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Create a new version of this data set',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   test('does not render the `Create new version` button when release cannot be updated', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,

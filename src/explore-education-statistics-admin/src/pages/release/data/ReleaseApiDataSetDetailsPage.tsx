@@ -588,7 +588,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                 </div>
               )}
             </div>
-            {canUpdateRelease &&
+            {user?.permissions.canManagePublicApiDataSets &&
+              canUpdateRelease &&
               !dataSet.draftVersion &&
               !dataSet.previousReleaseIds.includes(
                 releaseVersion.releaseId,
