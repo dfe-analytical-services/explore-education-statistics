@@ -1855,6 +1855,134 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
+        public async Task Success_ReleaseIsRetainedWhileASoftDeletedVersionStillReferencesIt()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            // Version 0 is not an Amendment, so deleting it hard-deletes it.
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release).WithVersion(0);
+
+            // A cancelled amendment of the same Release. It is soft-deleted, so it is invisible to any
+            // query that does not ignore query filters - including the one that decides whether the Release
+            // still has any versions left.
+            ReleaseVersion cancelledAmendment = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(1);
+            cancelledAmendment.SoftDeleted = true;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.AddRange(releaseVersion, cancelledAmendment);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<List<UserPreReleaseRole>>(), default))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: InMemoryStatisticsDbContext(contextId),
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                // The deleted ReleaseVersion is gone
+                Assert.Null(
+                    await contentDbContext
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == releaseVersion.Id)
+                );
+
+                // The Release survives, because removing it would cascade into the soft-deleted amendment
+                // and take it away without any of its own clean-up having been done
+                Assert.NotNull(await contentDbContext.Releases.SingleOrDefaultAsync(r => r.Id == release.Id));
+
+                Assert.NotNull(
+                    await contentDbContext
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == cancelledAmendment.Id)
+                );
+            }
+        }
+
+        [Fact]
         public async Task Success_DeletesPermalinksOfSubjectsOrphanedByTheDeletion()
         {
             Release release = _dataFixture
