@@ -1,0 +1,48 @@
+name: Verify robot-tests Python
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'tests/robot-tests/**.py'
+      - 'Pipfile'
+      - 'Pipfile.lock'
+      - '.github/workflows/verify-robot-tests.yml'
+
+env:
+  PYTHON_VERSION: 3.14.6
+
+jobs:
+  unit-tests:
+    name: Python unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pipenv'
+
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: pipenv install
+        run: pipenv install
+
+      # The test files are named "*_test.py" and there are no __init__.py files, so
+      # "unittest discover" finds nothing. Name the modules explicitly instead.
+      - name: Run unit tests
+        working-directory: tests/robot-tests
+        run: |
+          set -euo pipefail
+          modules=$(find tests scripts -name '*_test.py' | sed 's#\.py$##; s#/#.#g' | sort)
+          if [ -z "$modules" ]; then
+            echo "No unit tests were found" >&2
+            exit 1
+          fi
+          echo "Running:" $modules
+          pipenv run python -m unittest --verbose $modules

@@ -23,10 +23,14 @@ import reports
 import test_runners
 import tests.libs.selenium_elements as selenium_elements
 from scripts.get_webdriver import get_webdriver
+from tests.libs import azure_pipelines, run_results
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 from tests.libs.fail_fast import failing_suites_filename
 from tests.libs.logger import get_logger
-from tests.libs.slack import SlackService
+from tests.libs.ui_test_notification import suite_label, ui_test_exception, ui_test_report
+from tests.libs.ui_test_notifier import UiTestNotifier
+
+UNKNOWN = "unknown"
 
 pabot_suite_names_filename = ".pabotsuitenames"
 main_results_folder = "test-results"
@@ -101,30 +105,64 @@ def _setup_main_results_folder_for_first_run(args: argparse.Namespace):
             os.mkdir(main_results_folder)
 
 
+def _send_test_report(notifier: UiTestNotifier, args: argparse.Namespace, failing_suites: list, test_runs: int):
+    # Reporting must never change the result of the test run, so a report that cannot be
+    # built or sent is logged rather than raised. Raising here would be reported as a
+    # pipeline failure, hiding a test run that may well have passed.
+    try:
+        # Wait for 5 seconds to ensure the merge reports are properly synchronized after rerun attempts.
+        time.sleep(5)
+
+        results = run_results.read_run_results(
+            results_directory=Path(main_results_folder),
+            environment=args.env,
+            suite_label=suite_label(args.tests),
+            run_attempts=test_runs,
+            failed_suites=tuple(failing_suites),
+        )
+        notifier.send(ui_test_report(results, azure_pipelines.current_artifacts_url()))
+        run_results.record_notification_sent(Path(main_results_folder))
+    except Exception as ex:
+        logger.error("Unable to send the UI test report")
+        logger.error(ex)
+
+
 def run():
-    args = args_and_variables.initialise()
-
-    _setup_main_results_folder_for_first_run(args)
-
-    # Unzip any data files that may be used in tests.
-    _unzip_data_files()
-
-    # Upload test data files to storage if running locally.
-    if args.env == "local":
-        files_generator = ReleaseFilesGenerator()
-        files_generator.create_public_release_files()
-        files_generator.create_private_release_files()
-
-    _install_chromedriver(args.chromedriver_version)
-
-    run_identifier_initial_value = _generate_random_id()
-
-    max_run_attempts = args.rerun_attempts + 1
+    args = None
     test_run_index = 0
 
-    logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
+    # Created before the arguments are parsed so that a failure to parse or validate them
+    # is still reported. Slack is enabled by an argument, so it can only join afterwards.
+    notifier = UiTestNotifier.create(enable_slack=False)
 
     try:
+        args = args_and_variables.initialise()
+
+        notifier = UiTestNotifier.create(enable_slack=args.enable_slack_notifications)
+
+        # Setting up the run is inside this boundary so that a failure to install
+        # chromedriver, unzip the data files or generate the local release files is
+        # reported, rather than leaving the run silent.
+        _setup_main_results_folder_for_first_run(args)
+
+        # Unzip any data files that may be used in tests.
+        _unzip_data_files()
+
+        # Upload test data files to storage if running locally.
+        if args.env == "local":
+            files_generator = ReleaseFilesGenerator()
+            files_generator.create_public_release_files()
+            files_generator.create_private_release_files()
+
+        _install_chromedriver(args.chromedriver_version)
+
+        run_identifier_initial_value = _generate_random_id()
+
+        max_run_attempts = args.rerun_attempts + 1
+        rerunning_failed_suites = args.rerun_failed_suites
+
+        logger.info(f"Running Robot tests with {max_run_attempts} maximum run attempts")
+
         # Run tests
         while test_run_index < max_run_attempts:
             try:
@@ -189,8 +227,11 @@ def run():
             try:
                 failing_suites = reports.get_failing_test_suite_sources(f"{test_run_results_folder}{os.sep}output.xml")
             except Exception as ex:
-                logger.error(f"Unable to determine failing suites from {test_run_results_folder}{os.sep}output.xml")
-                logger.error(ex)
+                # Results we cannot read tell us nothing about whether the run passed, so
+                # fail the run rather than treating "no failures found" as a pass.
+                raise Exception(
+                    f"Unable to determine failing suites from {test_run_results_folder}{os.sep}output.xml"
+                ) from ex
 
             # If all tests passed, return early.
             if len(failing_suites) == 0:
@@ -205,23 +246,27 @@ def run():
         # Log the results of the merge test runs.
         reports.log_report_results(number_of_test_runs, rerunning_failed_suites, failing_suites)
 
-        if args.enable_slack_notifications:
-            slack_service = SlackService()
-            # Wait for 5 seconds to ensure the merge reports are properly synchronized after rerun attempts.
-            time.sleep(5)
-            slack_service.send_test_report(args.env, args.tests, failing_suites, number_of_test_runs)
+        _send_test_report(notifier, args, failing_suites, number_of_test_runs)
 
         if len(failing_suites) > 0:
             sys.exit(1)
 
     except Exception as ex:
-        if args.enable_slack_notifications:
-            try:
-                slack_service = SlackService()
-                slack_service.send_exception_details(args.env, args.tests, test_run_index, ex)
-            except Exception as notification_ex:
-                logger.error("Unable to send UI test exception details to Slack")
-                logger.error(notification_ex)
+        try:
+            # The arguments are unavailable when it was parsing them that failed.
+            notifier.send(
+                ui_test_exception(
+                    args.env if args else UNKNOWN,
+                    suite_label(args.tests) if args else UNKNOWN,
+                    test_run_index,
+                    ex,
+                    azure_pipelines.current_artifacts_url(),
+                )
+            )
+            run_results.record_notification_sent(Path(main_results_folder))
+        except Exception as notification_ex:
+            logger.error("Unable to send UI test exception details")
+            logger.error(notification_ex)
         raise
 
 

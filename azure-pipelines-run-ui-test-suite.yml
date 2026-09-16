@@ -30,7 +30,7 @@ jobs:
       inputs:
         azureSubscription: $(SPN_NAME)
         KeyVaultName: s101d01-kv-ees-01
-        SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken
+        SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl
         RunAsPreJob: true
 
     - task: PythonScript@0
@@ -44,6 +44,9 @@ jobs:
         workingDirectory: tests/robot-tests
       env:
         SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
+        # The test runner reports to Teams whenever this is set, so that every environment
+        # reports itself without any further pipeline configuration.
+        TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
 
     - task: PublishTestResults@2
       displayName: Publish test results
