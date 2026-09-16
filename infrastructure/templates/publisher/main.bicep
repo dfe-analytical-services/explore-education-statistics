@@ -95,6 +95,11 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     elasticCapacity: null
     alwaysOn: true
     publicNetworkAccessEnabled: true
+    storageAccountPublicNetworkAccessEnabled: true
+    storageAccountAllowedSubnetIds: [
+      resourceId('Microsoft.Network/virtualNetworks/subnets', vNet.name, resourceNames.vnet.subnets.admin)
+      resourceId('Microsoft.Network/virtualNetworks/subnets', vNet.name, outboundVnetSubnet.name)
+    ]
     functionAppFirewallRules: []
     healthCheckPath: '/'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
