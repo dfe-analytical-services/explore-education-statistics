@@ -39,7 +39,6 @@ class UiTestNotifier:
     @staticmethod
     def _create_slack_service(enable_slack: bool) -> Optional[SlackService]:
         if not enable_slack:
-            logger.info("Slack notifications were not enabled; skipping Slack notifications")
             return None
 
         try:
@@ -54,11 +53,7 @@ class UiTestNotifier:
     def _create_teams_service(teams_webhook_url: Optional[str] = None) -> Optional[TeamsService]:
         webhook_url = teams_webhook_url or os.getenv("TEAMS_UI_TESTS_WEBHOOK_URL")
 
-        if not webhook_url:
-            logger.info("No Teams webhook URL was given; skipping Teams notifications")
-            return None
-
-        return TeamsService(webhook_url)
+        return TeamsService(webhook_url) if webhook_url else None
 
     def send(self, notification: UiTestNotification) -> None:
         """
@@ -70,13 +65,17 @@ class UiTestNotifier:
         self._send_to_slack(notification)
 
     def _send_to_teams(self, notification: UiTestNotification) -> bool:
+        # Logged when sending rather than when building, so that a notifier which is only
+        # ever a stand-in does not report skipping channels it was never asked to use.
         if not self.teams_service:
+            logger.info("No Teams webhook URL was given; skipping Teams notifications")
             return False
 
         return self.teams_service.send_test_report(notification.to_teams_card())
 
     def _send_to_slack(self, notification: UiTestNotification) -> bool:
         if not self.slack_service:
+            logger.info("Slack notifications were not enabled; skipping Slack notifications")
             return False
 
         try:

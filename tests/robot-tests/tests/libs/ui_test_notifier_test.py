@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from tests.libs.ui_test_notification import UiTestNotification
-from tests.libs.ui_test_notifier import UiTestNotifier
+from tests.libs.ui_test_notifier import UiTestNotifier, logger
 
 WEBHOOK_URL = "https://example.com/teams"
 
@@ -62,6 +62,35 @@ class UiTestNotifierTests(unittest.TestCase):
         UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL).send(self.notification)
 
         teams_service_mock.return_value.send_test_report.assert_called_once()
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_building_a_notifier_reports_nothing(self, _teams_service_mock, _slack_service_mock):
+        """
+        The runner builds a stand-in notifier before it can know whether Slack is enabled,
+        so building one must not claim that a channel is being skipped.
+        """
+        with patch.dict("os.environ", {}, clear=True):
+            with self.assertNoLogs("tests.libs.ui_test_notifier", level="INFO"):
+                UiTestNotifier.create(enable_slack=False)
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_reports_the_skipped_channels_when_sending(self, _teams_service_mock, _slack_service_mock):
+        with patch.dict("os.environ", {}, clear=True):
+            with self.assertLogs("tests.libs.ui_test_notifier", level="INFO") as logs:
+                UiTestNotifier.create(enable_slack=False).send(self.notification)
+
+        self.assertEqual(2, len(logs.records))
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_does_not_report_skipping_a_channel_it_used(self, _teams_service_mock, _slack_service_mock):
+        with self.assertLogs("tests.libs.ui_test_notifier", level="INFO") as logs:
+            UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL).send(self.notification)
+            logger.info("nothing was skipped")
+
+        self.assertEqual(["nothing was skipped"], [record.getMessage() for record in logs.records])
 
     @patch("tests.libs.ui_test_notifier.SlackService", side_effect=AssertionError("SLACK_APP_TOKEN is not set"))
     @patch("tests.libs.ui_test_notifier.TeamsService")
