@@ -366,12 +366,22 @@ public class ReleaseVersionService(
         context.ReleaseVersions.Remove(releaseVersion);
         await context.SaveChangesAsync(cancellationToken);
 
-        var release = await context
-            .Releases.Include(release => release.Versions)
-            .SingleAsync(release => release.Id == releaseVersion.ReleaseId, cancellationToken);
+        // Query filters are ignored here so that soft-deleted ReleaseVersions are counted as remaining.
+        // They are invisible by default, so without this the Release would be removed while they still
+        // referenced it, and the cascade from Releases to ReleaseVersions would either take them with it -
+        // bypassing the file, blob, Permalink and statistics clean-up that deleting a ReleaseVersion goes
+        // through - or fail outright against FK_ReleaseFiles_ReleaseVersions, which does not cascade.
+        var releaseHasRemainingVersions = await context
+            .ReleaseVersions.IgnoreQueryFilters()
+            .AnyAsync(version => version.ReleaseId == releaseVersion.ReleaseId, cancellationToken);
 
-        if (release.Versions.Count == 0)
+        if (!releaseHasRemainingVersions)
         {
+            var release = await context.Releases.SingleAsync(
+                release => release.Id == releaseVersion.ReleaseId,
+                cancellationToken
+            );
+
             context.Releases.Remove(release);
             await context.SaveChangesAsync(cancellationToken);
         }
