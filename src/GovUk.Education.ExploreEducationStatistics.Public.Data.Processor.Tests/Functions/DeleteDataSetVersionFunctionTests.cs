@@ -581,6 +581,92 @@ public abstract class DeleteDataSetVersionFunctionTests(DeleteDataSetVersionFunc
             );
         }
 
+        [Fact]
+        public async Task Success_EinTilesQueryingTheDeletedDataSetAreCleared()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture.DefaultReleaseVersion().WithPublication(DataFixture.DefaultPublication())
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft()
+                .WithPublicationId(releaseFile.ReleaseVersion.PublicationId);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            releaseFile.PublicApiDataSetId = dataSet.Id;
+            releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Update(releaseFile));
+
+            // The second tile queries a DataSet that is not being deleted, so must be left alone.
+            var otherDataSetId = Guid.NewGuid();
+
+            var tiles = await EinTestData.AddApiQueryStatTiles(
+                fixture.GetContentDbContext(),
+                releaseId: releaseFile.ReleaseVersion.ReleaseId,
+                dataSetIds: [dataSet.Id, otherDataSetId]
+            );
+
+            var tileForDeletedDataSet = tiles[0];
+            var tileForOtherDataSet = tiles[1];
+
+            await DeleteDataSetVersion(dataSetVersion.Id);
+
+            // The tile survives so that the page keeps its layout, but every reference to the deleted
+            // DataSet - including the cached statistic derived from it - has been cleared.
+            var clearedTile = await GetEinApiQueryStatTile(tileForDeletedDataSet.Id);
+
+            Assert.Equal(tileForDeletedDataSet.Title, clearedTile.Title);
+            Assert.Equal(tileForDeletedDataSet.Order, clearedTile.Order);
+            Assert.Null(clearedTile.DataSetId);
+            Assert.Null(clearedTile.Version);
+            Assert.Null(clearedTile.DataSetVersionId);
+            Assert.Null(clearedTile.LatestDataSetVersionId);
+            Assert.Null(clearedTile.Query);
+            Assert.Null(clearedTile.Statistic);
+            Assert.Null(clearedTile.IndicatorUnit);
+            Assert.Null(clearedTile.DecimalPlaces);
+            Assert.Null(clearedTile.QueryResult);
+            Assert.Null(clearedTile.ReleaseId);
+
+            var untouchedTile = await GetEinApiQueryStatTile(tileForOtherDataSet.Id);
+
+            Assert.Equal(otherDataSetId, untouchedTile.DataSetId);
+            Assert.Equal(tileForOtherDataSet.Version, untouchedTile.Version);
+            Assert.Equal(tileForOtherDataSet.DataSetVersionId, untouchedTile.DataSetVersionId);
+            Assert.Equal(tileForOtherDataSet.Query, untouchedTile.Query);
+            Assert.Equal(tileForOtherDataSet.Statistic, untouchedTile.Statistic);
+            Assert.Equal(tileForOtherDataSet.QueryResult, untouchedTile.QueryResult);
+            Assert.Equal(tileForOtherDataSet.ReleaseId, untouchedTile.ReleaseId);
+        }
+
+        private async Task<EinApiQueryStatTile> GetEinApiQueryStatTile(Guid tileId) =>
+            await fixture.GetContentDbContext().EinTiles.OfType<EinApiQueryStatTile>().SingleAsync(t => t.Id == tileId);
+
         [Theory]
         [MemberData(
             nameof(DataSetVersionStatusTheoryData.NonDeletableStatuses),
