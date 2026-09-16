@@ -1845,6 +1845,182 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
+        public async Task Success_DeletesPermalinksOfSubjectsOrphanedByTheDeletion()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release).WithVersion(0);
+
+            ReleaseVersion survivingReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(release.Publication))
+                .WithVersion(0);
+
+            // Attached to the ReleaseVersion being deleted and to no other, so the deletion orphans it.
+            var orphanedSubjectId = Guid.NewGuid();
+
+            // Attached to the ReleaseVersion being deleted and to one that survives it, so it lives on.
+            var sharedSubjectId = Guid.NewGuid();
+
+            // A Permalink carried over from the legacy storage, which holds no ReleaseVersion at all and so
+            // is only reachable through its Subject.
+            var legacyPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = null,
+                SubjectId = orphanedSubjectId,
+            };
+
+            // A Permalink left behind by an earlier deletion, still pointing at a ReleaseVersion that no
+            // longer exists.
+            var strandedPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
+                SubjectId = orphanedSubjectId,
+            };
+
+            // This Permalink's Subject is still attached to a surviving ReleaseVersion, so it must be kept.
+            var sharedSubjectPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = null,
+                SubjectId = sharedSubjectId,
+            };
+
+            // This Permalink has nothing to do with the ReleaseVersion being deleted.
+            var unrelatedPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = survivingReleaseVersion.Id,
+                SubjectId = Guid.NewGuid(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.AddRange(releaseVersion, survivingReleaseVersion);
+                context.Permalinks.AddRange(
+                    legacyPermalink,
+                    strandedPermalink,
+                    sharedSubjectPermalink,
+                    unrelatedPermalink
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                context.ReleaseSubject.AddRange(
+                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = orphanedSubjectId },
+                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = sharedSubjectId },
+                    new ReleaseSubject { ReleaseVersionId = survivingReleaseVersion.Id, SubjectId = sharedSubjectId }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            // As this is a Strict mock, deleting the snapshots of any other Permalink would fail the test.
+            foreach (var permalinkId in new[] { legacyPermalink.Id, strandedPermalink.Id })
+            {
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalinkId}.json.zst"))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalinkId}.csv.zst"))
+                    .Returns(Task.CompletedTask);
+            }
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<List<UserPreReleaseRole>>(), default))
+                .Returns(Task.CompletedTask);
+
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+
+                VerifyAllMocks(publicBlobStorageService);
+
+                // The Permalinks of the orphaned Subject are gone, however they referenced their
+                // ReleaseVersion, while those still claimed by a surviving ReleaseVersion are untouched.
+                var remainingPermalinkIds = contentDbContext.Permalinks.Select(p => p.Id).ToList();
+
+                Assert.Equal(2, remainingPermalinkIds.Count);
+                Assert.Contains(sharedSubjectPermalink.Id, remainingPermalinkIds);
+                Assert.Contains(unrelatedPermalink.Id, remainingPermalinkIds);
+            }
+        }
+
+        [Fact]
         public async Task ProcessorReturns400_Returns400()
         {
             ReleaseVersion releaseVersion = _dataFixture
@@ -2071,6 +2247,7 @@ public abstract class ReleaseVersionServiceTests
             {
                 var releaseVersionService = BuildService(
                     contentDbContext: context,
+                    statisticsDbContext: InMemoryStatisticsDbContext(),
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,

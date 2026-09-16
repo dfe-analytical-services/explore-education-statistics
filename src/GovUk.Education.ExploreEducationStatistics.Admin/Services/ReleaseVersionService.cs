@@ -265,12 +265,27 @@ public class ReleaseVersionService(
     /// Deletes any Permalinks belonging to a ReleaseVersion, along with their snapshots in blob storage.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Permalinks have no foreign key to ReleaseVersions, so they are not removed by any cascade delete.
+    /// </para>
+    /// <para>
+    /// Matching on ReleaseVersionId alone is not enough to find them all. The column has been optional since
+    /// the Permalinks table was created and was never backfilled, so Permalinks carried over from the legacy
+    /// storage can hold no ReleaseVersion at all; and until this deletion existed, hard-deleting a
+    /// ReleaseVersion left its Permalinks behind still pointing at it. Both kinds are now only reachable
+    /// through their SubjectId, so Permalinks are matched against the Subjects that this deletion orphans as
+    /// well. Those Subjects belong to no other ReleaseVersion, so no surviving ReleaseVersion can lay claim
+    /// to a Permalink of theirs.
+    /// </para>
     /// </remarks>
     private async Task DeletePermalinks(Guid releaseVersionId, CancellationToken cancellationToken)
     {
+        var orphanedSubjectIds = await GetSubjectIdsOrphanedByDeletion(releaseVersionId, cancellationToken);
+
         var permalinks = await context
-            .Permalinks.Where(permalink => permalink.ReleaseVersionId == releaseVersionId)
+            .Permalinks.Where(permalink =>
+                permalink.ReleaseVersionId == releaseVersionId || orphanedSubjectIds.Contains(permalink.SubjectId)
+            )
             .ToListAsync(cancellationToken);
 
         if (permalinks.Count == 0)
@@ -296,6 +311,43 @@ public class ReleaseVersionService(
 
         context.Permalinks.RemoveRange(permalinks);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets the ids of the Subjects that belong to this ReleaseVersion and to no other, and which deleting
+    /// it therefore leaves orphaned.
+    /// </summary>
+    /// <remarks>
+    /// Must be called before the ReleaseSubjects are deleted, as they are what a Subject is reachable by.
+    /// </remarks>
+    private async Task<List<Guid>> GetSubjectIdsOrphanedByDeletion(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        // The Subjects of a cancelled amendment are soft-deleted, so ignore query filters to see them all.
+        var subjectIds = await statisticsDbContext
+            .ReleaseSubject.AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersionId)
+            .Select(releaseSubject => releaseSubject.SubjectId)
+            .ToListAsync(cancellationToken);
+
+        if (subjectIds.Count == 0)
+        {
+            return [];
+        }
+
+        var subjectIdsSharedWithOtherReleaseVersions = await statisticsDbContext
+            .ReleaseSubject.AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(releaseSubject =>
+                subjectIds.Contains(releaseSubject.SubjectId) && releaseSubject.ReleaseVersionId != releaseVersionId
+            )
+            .Select(releaseSubject => releaseSubject.SubjectId)
+            .ToListAsync(cancellationToken);
+
+        return subjectIds.Except(subjectIdsSharedWithOtherReleaseVersions).ToList();
     }
 
     private async Task HardDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
