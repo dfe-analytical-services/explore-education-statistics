@@ -431,7 +431,10 @@ public class ThemeServiceTests
                             LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
                             LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
                         }
-                        : null
+                        : null,
+                    // Every Release id has to travel on the event, as the searchable document for any of
+                    // them is unreachable once the Publication is gone.
+                    publication.Releases.Select(release => release.Id).ToList()
                 );
             }
         }

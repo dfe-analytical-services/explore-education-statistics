@@ -29,7 +29,12 @@ public class AdminEventRaiserMockBuilder
         m.OnPublicationChanged(It.IsAny<Publication>());
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationDeleted = m =>
-        m.OnPublicationDeleted(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<LatestPublishedReleaseInfo?>());
+        m.OnPublicationDeleted(
+            It.IsAny<Guid>(),
+            It.IsAny<string>(),
+            It.IsAny<LatestPublishedReleaseInfo?>(),
+            It.IsAny<IReadOnlyList<Guid>>()
+        );
 
     private static readonly Expression<Func<IAdminEventRaiser, Task>> OnPublicationLatestPublishedReleaseReordered =
         m =>
@@ -163,7 +168,8 @@ public class AdminEventRaiserMockBuilder
         public void OnPublicationDeletedWasRaised(
             Guid? publicationId = null,
             string? publicationSlug = null,
-            LatestPublishedReleaseInfo? latestPublishedRelease = null
+            LatestPublishedReleaseInfo? latestPublishedRelease = null,
+            IReadOnlyList<Guid>? releaseIds = null
         ) =>
             mockBuilder._mock.Verify(
                 m =>
@@ -172,6 +178,9 @@ public class AdminEventRaiserMockBuilder
                         It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
                         It.Is<LatestPublishedReleaseInfo?>(actual =>
                             latestPublishedRelease == null || actual == latestPublishedRelease
+                        ),
+                        It.Is<IReadOnlyList<Guid>>(actual =>
+                            releaseIds == null || actual.OrderBy(id => id).SequenceEqual(releaseIds.OrderBy(id => id))
                         )
                     ),
                 Times.Once

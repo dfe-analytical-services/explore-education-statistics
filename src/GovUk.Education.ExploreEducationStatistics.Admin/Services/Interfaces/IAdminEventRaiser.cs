@@ -23,7 +23,8 @@ public interface IAdminEventRaiser
     Task OnPublicationDeleted(
         Guid publicationId,
         string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease
+        LatestPublishedReleaseInfo? latestPublishedRelease,
+        IReadOnlyList<Guid> releaseIds
     );
 
     Task OnPublicationLatestPublishedReleaseReordered(
