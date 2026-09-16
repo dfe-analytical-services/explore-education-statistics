@@ -7,6 +7,7 @@ import { FunctionAppServicePlanSku } from '../../components/app-service-plan/typ
 import { ConnectionString } from '../../types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 import { keyVaultRef } from '../../functions.bicep'
+import { StorageAccountSku } from '../storage/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string = resourceGroup().location
@@ -49,6 +50,9 @@ param linuxFxVersion string?
 
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
+
+@description('Storage Account SKU.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Specifies whether the storage account in use by the Function App is accessible from the public internet.')
 param storageAccountPublicNetworkAccessEnabled bool = false
@@ -228,7 +232,7 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
       outboundSubnetId != null ? [outboundSubnetId!] : []
     )
     firewallRules: storageFirewallRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: privateEndpoints != null ? {
