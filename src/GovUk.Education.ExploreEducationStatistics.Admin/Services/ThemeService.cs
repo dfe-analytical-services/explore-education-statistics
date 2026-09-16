@@ -287,7 +287,12 @@ public class ThemeService(
 
                 await publicationCacheService.RemovePublication(publication.Slug);
 
-                await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
+                await eventRaiser.OnPublicationDeleted(
+                    publication.Id,
+                    publication.Slug,
+                    latestPublicationRelease,
+                    releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList()
+                );
             });
     }
 
