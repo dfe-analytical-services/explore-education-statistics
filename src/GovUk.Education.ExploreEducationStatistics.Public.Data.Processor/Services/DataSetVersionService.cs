@@ -396,7 +396,10 @@ internal class DataSetVersionService(
         CancellationToken cancellationToken
     )
     {
-        var dataSetsWithNoOtherVersions = dataSetVersions.Where(dsv => dsv.IsFirstVersion).Select(dsv => dsv.DataSet);
+        var dataSetsWithNoOtherVersions = dataSetVersions
+            .Where(dsv => dsv.IsFirstVersion)
+            .Select(dsv => dsv.DataSet)
+            .ToList();
 
         var linkedOptionMetaIds = await GetLinkedOptionMetaIds(
             dataSetVersions.Select(dataSetVersion => dataSetVersion.Id).ToList(),
@@ -410,6 +413,11 @@ internal class DataSetVersionService(
         await publicDataDbContext.SaveChangesAsync(cancellationToken);
 
         await DeleteUnlinkedOptionMetas(linkedOptionMetaIds, cancellationToken);
+
+        await ClearEinTilesReferencingDataSets(
+            [.. dataSetsWithNoOtherVersions.Select(dataSet => dataSet.Id)],
+            cancellationToken
+        );
     }
 
     private async Task DeleteDataSetVersion(DataSetVersion dataSetVersion, CancellationToken cancellationToken)
@@ -426,6 +434,11 @@ internal class DataSetVersionService(
         }
 
         await DeleteUnlinkedOptionMetas(linkedOptionMetaIds, cancellationToken);
+
+        if (dataSetVersion.IsFirstVersion)
+        {
+            await ClearEinTilesReferencingDataSets([dataSetVersion.DataSetId], cancellationToken);
+        }
     }
 
     /// <summary>
@@ -484,6 +497,60 @@ internal class DataSetVersionService(
         await publicDataDbContext
             .LocationOptionMetas.Where(option => unlinkedLocationOptionIds.Contains(option.Id))
             .ExecuteDeleteAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Clears the API query configuration from any Education in Numbers tiles that reference the given
+    /// deleted DataSets.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A tile records the id of the DataSet it queries, the version it is pinned to, the query itself and a
+    /// cached copy of the statistic that query returned. None of this is a foreign key, as the DataSet lives
+    /// in another database, so nothing clears it when the DataSet is deleted - leaving a published EIN page
+    /// showing a figure derived from data that no longer exists, and querying the Public API for a DataSet it
+    /// will no longer serve.
+    /// </para>
+    /// <para>
+    /// The tile itself is kept so that the page keeps its layout, and is reset to the same unconfigured state
+    /// that a newly added tile is in. Its author-supplied Title is left alone.
+    /// </para>
+    /// </remarks>
+    private async Task ClearEinTilesReferencingDataSets(
+        IReadOnlyList<Guid> dataSetIds,
+        CancellationToken cancellationToken
+    )
+    {
+        if (dataSetIds.Count == 0)
+        {
+            return;
+        }
+
+        var tiles = await contentDbContext
+            .EinTiles.OfType<EinApiQueryStatTile>()
+            .Where(tile => tile.DataSetId != null && dataSetIds.Contains(tile.DataSetId.Value))
+            .ToListAsync(cancellationToken);
+
+        if (tiles.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var tile in tiles)
+        {
+            tile.DataSetId = null;
+            tile.Version = null;
+            tile.DataSetVersionId = null;
+            tile.LatestDataSetVersionId = null;
+            tile.Query = null;
+            tile.Statistic = null;
+            tile.IndicatorUnit = null;
+            tile.DecimalPlaces = null;
+            tile.QueryResult = null;
+            tile.ReleaseId = null;
+        }
+
+        await contentDbContext.SaveChangesAsync(cancellationToken);
     }
 
     private record LinkedOptionMetaIds(IReadOnlyList<int> FilterOptionIds, IReadOnlyList<int> LocationOptionIds);
