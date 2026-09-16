@@ -224,14 +224,17 @@ public class ReleaseVersionService(
 
                 await context.SaveChangesAsync(cancellationToken);
 
-                if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
-                {
-                    // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
-                    // deleted releases that were left scheduled
-                    await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
-                        releaseVersionIds: [releaseVersion.Id]
-                    );
-                }
+                // Delete this ReleaseVersion's entries in the Azure Storage ReleaseStatus table, or the
+                // Publisher will attempt to publish a deleted ReleaseVersion that was left scheduled.
+                //
+                // This is deliberately not limited to ReleaseVersions that are currently Approved. Entries
+                // outlive that status: un-approving a scheduled ReleaseVersion only has the Publisher mark
+                // its entry as superseded - see NotifyChangeFunction.MarkScheduledReleaseStatusAsSuperseded -
+                // so entries are left behind under a ReleaseVersion that is now back in Draft. Removing
+                // entries for a ReleaseVersion that has none is a no-op.
+                await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
+                    releaseVersionIds: [releaseVersion.Id]
+                );
 
                 // TODO: This may be redundant (investigate as part of EES-1295)
                 await releaseSubjectRepository.DeleteAllReleaseSubjects(

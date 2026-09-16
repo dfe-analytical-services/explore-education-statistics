@@ -1640,6 +1640,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -1661,6 +1662,10 @@ public abstract class ReleaseVersionServiceTests
 
             releaseSubjectRepository
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
 
             privateCacheService
@@ -1716,6 +1721,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
                     processorClient: processorClient.Object,
@@ -1743,6 +1749,9 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once
                 );
 
+                // This ReleaseVersion is a Draft, so verifying the Strict releasePublishingStatusRepository
+                // asserts that its Azure Storage ReleaseStatus entries are removed regardless of it never
+                // having been Approved - entries outlive that status when a ReleaseVersion is un-approved.
                 VerifyAllMocks(
                     privateCacheService,
                     publicBlobStorageService,
@@ -1750,6 +1759,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService,
                     dataSetUploadRepository,
                     processorClient,
+                    releasePublishingStatusRepository,
                     userPreReleaseRoleRepository
                 );
 
@@ -1926,6 +1936,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -1947,6 +1958,10 @@ public abstract class ReleaseVersionServiceTests
 
             releaseSubjectRepository
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
 
             privateCacheService
@@ -1998,6 +2013,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
                     processorClient: processorClient.Object,
@@ -2193,6 +2209,7 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
@@ -2214,6 +2231,10 @@ public abstract class ReleaseVersionServiceTests
 
             releaseSubjectRepository
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
 
             privateCacheService
@@ -2252,6 +2273,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
                     processorClient: processorClient.Object,
