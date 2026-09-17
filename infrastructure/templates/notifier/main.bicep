@@ -22,6 +22,9 @@ param databaseUserPassword string
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[]
 
+@description('Number of days to retain blobs after delete.')
+param blobDeleteRetentionDays int
+
 @description('Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key.')
 param suppressExceptionsForTeamOnlyApiKeyErrors bool
 
@@ -152,4 +155,15 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     ]
     tagValues: tagValues
   }
+}
+
+module storageAccountBlobServiceModule '../common/components/blobService.bicep' = {
+  name: 'notifierStorageAccountBlobServiceModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.notifier.storageAccount
+    deleteRetentionPolicy: blobDeleteRetentionDays
+  }
+  dependsOn: [
+    functionAppModule
+  ]
 }

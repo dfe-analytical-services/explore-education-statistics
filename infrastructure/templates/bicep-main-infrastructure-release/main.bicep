@@ -209,7 +209,6 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: notifierConfig.appServiceSku!
-    deployAlerts: true
     suppressExceptionsForTeamOnlyApiKeyErrors: notifierConfig.suppressExceptionsForTeamOnlyApiKeyErrors!
     publicAppUrl: 'https://${environmentConfig.domain!}'
     allowedOrigins: publicSiteAllowedOrigins
@@ -217,6 +216,8 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.notifier.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    deployAlerts: true
     tagValues: tags
   }
 }
