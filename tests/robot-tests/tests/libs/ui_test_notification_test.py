@@ -5,6 +5,7 @@ from tests.libs.ui_test_notification import (
     ATTENTION,
     GOOD,
     MAX_LISTED_SUITES,
+    UNKNOWN_SUITE,
     WARNING,
     shorten_suite_sources,
     suite_label,
@@ -70,6 +71,15 @@ class ShortenSuiteSourcesTests(unittest.TestCase):
         sources = (r"C:\repo\tests\robot-tests\tests\admin\bau\publication.robot",)
 
         self.assertEqual(("bau/publication.robot",), shorten_suite_sources(sources))
+
+    def test_labels_a_suite_with_no_source(self):
+        """
+        Robot reports a suite element with no source attribute as None, which must not take
+        out the whole notification.
+        """
+        sources = ("tests/admin/bau/publication.robot", None)
+
+        self.assertEqual(("bau/publication.robot", UNKNOWN_SUITE), shorten_suite_sources(sources))
 
     def test_caps_the_list_and_counts_the_remainder(self):
         sources = tuple(f"tests/admin/suite-{index}.robot" for index in range(MAX_LISTED_SUITES + 3))

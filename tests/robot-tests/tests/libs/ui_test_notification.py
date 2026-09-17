@@ -20,6 +20,7 @@ ATTENTION = "attention"
 # dozens of them. Teams rejects oversized cards, so the list is shortened and capped.
 MAX_LISTED_SUITES = 15
 SUITE_SOURCE_SEGMENTS = 2
+UNKNOWN_SUITE = "unknown suite"
 
 
 def suite_label(tests: str) -> str:
@@ -30,8 +31,13 @@ def suite_label(tests: str) -> str:
     return tests.replace("tests/", "").strip("/") or "all tests"
 
 
-def shorten_suite_sources(sources: tuple[str, ...]) -> tuple[str, ...]:
-    shortened = ["/".join(source.replace("\\", "/").split("/")[-SUITE_SOURCE_SEGMENTS:]) for source in sources]
+def shorten_suite_sources(sources: tuple[Optional[str], ...]) -> tuple[str, ...]:
+    # Robot reports a suite without a source as None, which must not be allowed to take out
+    # the whole notification.
+    shortened = [
+        "/".join(source.replace("\\", "/").split("/")[-SUITE_SOURCE_SEGMENTS:]) if source else UNKNOWN_SUITE
+        for source in sources
+    ]
 
     if len(shortened) <= MAX_LISTED_SUITES:
         return tuple(shortened)

@@ -55,14 +55,18 @@ class UiTestNotifier:
 
         return TeamsService(webhook_url) if webhook_url else None
 
-    def send(self, notification: UiTestNotification) -> None:
+    def send(self, notification: UiTestNotification) -> bool:
         """
         Notifying is best effort. Neither channel raises, so a chat service outage cannot
         turn a passing test run into a failing one. Teams is the primary channel, so it
         goes first.
+
+        Returns whether any channel accepted the message, so that a run which reported to
+        nobody can be told apart from one that reported, and be picked up by the pipeline.
         """
-        self._send_to_teams(notification)
-        self._send_to_slack(notification)
+        teams_sent = self._send_to_teams(notification)
+        slack_sent = self._send_to_slack(notification)
+        return teams_sent or slack_sent
 
     def _send_to_teams(self, notification: UiTestNotification) -> bool:
         # Logged when sending rather than when building, so that a notifier which is only
@@ -71,7 +75,13 @@ class UiTestNotifier:
             logger.info("No Teams webhook URL was given; skipping Teams notifications")
             return False
 
-        return self.teams_service.send_test_report(notification.to_teams_card())
+        try:
+            return self.teams_service.send_test_report(notification.to_teams_card())
+        # Deliberately broad, and matching Slack below. Teams goes first, so anything it
+        # raises would otherwise cost us the Slack message as well.
+        except Exception as ex:
+            logger.warning(f"Unable to send the UI test report to Teams: {ex}")
+            return False
 
     def _send_to_slack(self, notification: UiTestNotification) -> bool:
         if not self.slack_service:

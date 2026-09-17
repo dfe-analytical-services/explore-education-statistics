@@ -49,10 +49,59 @@ class UiTestNotifierTests(unittest.TestCase):
     @patch("tests.libs.ui_test_notifier.TeamsService")
     def test_skips_both_channels_for_a_local_run(self, teams_service_mock, slack_service_mock):
         with patch.dict("os.environ", {}, clear=True):
-            self.assertIsNone(UiTestNotifier.create(enable_slack=False).send(self.notification))
+            self.assertFalse(UiTestNotifier.create(enable_slack=False).send(self.notification))
 
         teams_service_mock.assert_not_called()
         slack_service_mock.assert_not_called()
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_reports_delivery_when_a_channel_accepted(self, teams_service_mock, slack_service_mock):
+        teams_service_mock.return_value.send_test_report.return_value = True
+        slack_service_mock.return_value.send_notification.return_value = False
+
+        notifier = UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL)
+
+        self.assertTrue(notifier.send(self.notification))
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_reports_delivery_when_only_slack_accepted(self, teams_service_mock, slack_service_mock):
+        teams_service_mock.return_value.send_test_report.return_value = False
+        slack_service_mock.return_value.send_notification.return_value = True
+
+        notifier = UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL)
+
+        self.assertTrue(notifier.send(self.notification))
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_reports_no_delivery_when_both_channels_failed(self, teams_service_mock, slack_service_mock):
+        teams_service_mock.return_value.send_test_report.return_value = False
+        slack_service_mock.return_value.send_notification.return_value = False
+
+        notifier = UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL)
+
+        self.assertFalse(notifier.send(self.notification))
+
+    def test_reports_no_delivery_when_there_are_no_channels(self):
+        with patch.dict("os.environ", {}, clear=True):
+            self.assertFalse(UiTestNotifier.create(enable_slack=False).send(self.notification))
+
+    @patch("tests.libs.ui_test_notifier.SlackService")
+    @patch("tests.libs.ui_test_notifier.TeamsService")
+    def test_notifies_slack_even_when_teams_raises(self, teams_service_mock, slack_service_mock):
+        """
+        Teams is sent first, so anything it raises would otherwise cost the Slack message
+        as well.
+        """
+        teams_service_mock.return_value.send_test_report.side_effect = Exception("boom")
+        slack_service_mock.return_value.send_notification.return_value = True
+
+        notifier = UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL)
+
+        self.assertTrue(notifier.send(self.notification))
+        slack_service_mock.return_value.send_notification.assert_called_once()
 
     @patch("tests.libs.ui_test_notifier.SlackService")
     @patch("tests.libs.ui_test_notifier.TeamsService")
@@ -100,9 +149,10 @@ class UiTestNotifierTests(unittest.TestCase):
         failing one, as it did when the runner constructed SlackService directly inside
         the try block that reports pipeline failures.
         """
+        teams_service_mock.return_value.send_test_report.return_value = True
         notifier = UiTestNotifier.create(enable_slack=True, teams_webhook_url=WEBHOOK_URL)
 
-        self.assertIsNone(notifier.send(self.notification))
+        self.assertTrue(notifier.send(self.notification))
         teams_service_mock.return_value.send_test_report.assert_called_once()
 
 

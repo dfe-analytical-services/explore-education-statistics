@@ -107,8 +107,10 @@ def _setup_main_results_folder_for_first_run(args: argparse.Namespace):
 
 def _send_test_report(notifier: UiTestNotifier, args: argparse.Namespace, failing_suites: list, test_runs: int):
     # Reporting must never change the result of the test run, so a report that cannot be
-    # built or sent is logged rather than raised. Raising here would be reported as a
-    # pipeline failure, hiding a test run that may well have passed.
+    # built is reported as a failure to report rather than raised. Raising here would be
+    # reported as a pipeline failure, hiding a test run that may well have passed. The
+    # run's own result is already known from the failing suites, so it does not depend on
+    # anything below.
     try:
         # Wait for 5 seconds to ensure the merge reports are properly synchronized after rerun attempts.
         time.sleep(5)
@@ -120,11 +122,23 @@ def _send_test_report(notifier: UiTestNotifier, args: argparse.Namespace, failin
             run_attempts=test_runs,
             failed_suites=tuple(failing_suites),
         )
-        notifier.send(ui_test_report(results, azure_pipelines.current_artifacts_url()))
-        run_results.record_notification_sent(Path(main_results_folder))
+        notification = ui_test_report(results, azure_pipelines.current_artifacts_url())
     except Exception as ex:
-        logger.error("Unable to send the UI test report")
+        logger.error("Unable to build the UI test report")
         logger.error(ex)
+        notification = ui_test_exception(
+            args.env, suite_label(args.tests), test_runs, ex, azure_pipelines.current_artifacts_url()
+        )
+
+    _send_notification(notifier, notification)
+
+
+def _send_notification(notifier: UiTestNotifier, notification) -> None:
+    # Only a run that actually reached a channel may record that it reported. Recording it
+    # regardless would tell the pipeline that a silent run had reported, and suppress the
+    # job that exists to catch exactly that.
+    if notifier.send(notification):
+        run_results.record_notification_sent(Path(main_results_folder))
 
 
 def run():
@@ -254,16 +268,16 @@ def run():
     except Exception as ex:
         try:
             # The arguments are unavailable when it was parsing them that failed.
-            notifier.send(
+            _send_notification(
+                notifier,
                 ui_test_exception(
                     args.env if args else UNKNOWN,
                     suite_label(args.tests) if args else UNKNOWN,
                     test_run_index,
                     ex,
                     azure_pipelines.current_artifacts_url(),
-                )
+                ),
             )
-            run_results.record_notification_sent(Path(main_results_folder))
         except Exception as notification_ex:
             logger.error("Unable to send UI test exception details")
             logger.error(notification_ex)
@@ -271,9 +285,13 @@ def run():
 
 
 current_dir = Path(__file__).absolute().parent
-os.chdir(current_dir)
 
-_setup_python_path()
+# Guarded so that the reporting helpers above can be imported by their unit tests without
+# changing directory or running the suite.
+if __name__ == "__main__":
+    os.chdir(current_dir)
 
-# Run the tests!
-run()
+    _setup_python_path()
+
+    # Run the tests!
+    run()
