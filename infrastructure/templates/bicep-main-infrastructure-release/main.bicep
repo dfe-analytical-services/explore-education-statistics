@@ -216,6 +216,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.notifier.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     tagValues: tags
   }
 }
