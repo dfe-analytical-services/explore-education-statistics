@@ -1,5 +1,4 @@
-import delay from '@common/utils/delay';
-import { render, RenderResult, screen, waitFor } from '@testing-library/react';
+import { act, render, RenderResult, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React, { ReactNode } from 'react';
 import { FieldValues } from 'react-hook-form';
@@ -7,11 +6,9 @@ import FormModal from '../FormModal';
 
 describe('FormModal', () => {
   test('trigger button opens modal', async () => {
-    const handleSubmit = jest.fn(async () => {
-      await delay(100);
-    });
+    const { handleSubmit } = createDeferredSubmit();
 
-    await renderModal(handleSubmit, false, undefined, false);
+    await renderModal(handleSubmit, { open: false });
 
     await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
@@ -22,36 +19,28 @@ describe('FormModal', () => {
 
   describe('submitting WITHOUT confirmation warning', () => {
     test('clicking submit button disables all buttons and shows loading spinner', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, false);
+      await renderModal(handleSubmit);
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
+      expect(handleSubmit).toHaveBeenCalled();
 
       expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-
-      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
     });
 
     test('clicking submit button prevents closing modal using Esc', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, false);
+      await renderModal(handleSubmit);
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
       await userEvent.keyboard('[Escape]');
 
@@ -59,17 +48,13 @@ describe('FormModal', () => {
     });
 
     test('clicking submit button prevents closing modal by clicking the underlay', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      const { baseElement } = await renderModal(handleSubmit, false);
+      const { baseElement } = await renderModal(handleSubmit);
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
       await userEvent.click(
         baseElement.querySelector('.underlay') as HTMLElement,
@@ -79,81 +64,74 @@ describe('FormModal', () => {
     });
 
     test('closes the modal once `onSubmit` has completed', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit, resolveSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, false);
+      await renderModal(handleSubmit);
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.queryByText('Save')).not.toBeInTheDocument();
-      });
+      await resolveSubmit();
 
+      expect(
+        screen.queryByRole('button', { name: 'Save' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
   describe('cancelling WITHOUT confirmation warning', () => {
     test('clicking Cancel button closes modal', async () => {
-      const handleSubmit = jest.fn();
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, false);
+      await renderModal(handleSubmit);
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      expect(screen.queryByText('Save')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Save' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
   describe('submitting WITH confirmation warning', () => {
     test('clicking FIRST submit button displays confirmation warning', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, true, <p>Warning text.</p>);
+      await renderModal(handleSubmit, {
+        confirmationWarningText: <p>Warning text.</p>,
+      });
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      await waitFor(() => {
-        expect(handleSubmit).not.toHaveBeenCalled();
-      });
-
       expect(
-        screen.getByRole('button', { name: 'Confirm' }),
+        await screen.findByRole('button', { name: 'Confirm' }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
 
       expect(screen.getByText('Warning text.')).toBeInTheDocument();
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     test('clicking SECOND confirmation button prevents closing modal using Esc', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, true, <p>Warning text.</p>);
+      await renderModal(handleSubmit, {
+        confirmationWarningText: <p>Warning text.</p>,
+      });
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      expect(
-        screen.getByRole('button', { name: 'Confirm' }),
-      ).toBeInTheDocument();
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Confirm' }),
+      );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
       await userEvent.keyboard('[Escape]');
 
@@ -161,27 +139,19 @@ describe('FormModal', () => {
     });
 
     test('clicking SECOND confirmation button prevents closing modal by clicking the underlay', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit } = createDeferredSubmit();
 
-      const { baseElement } = await renderModal(
-        handleSubmit,
-        true,
-        <p>Warning text.</p>,
-      );
+      const { baseElement } = await renderModal(handleSubmit, {
+        confirmationWarningText: <p>Warning text.</p>,
+      });
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      expect(
-        screen.getByRole('button', { name: 'Confirm' }),
-      ).toBeInTheDocument();
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Confirm' }),
+      );
 
-      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
       await userEvent.click(
         baseElement.querySelector('.underlay') as HTMLElement,
@@ -191,42 +161,41 @@ describe('FormModal', () => {
     });
 
     test('closes the modal once `onSubmit` has completed after clicking SECOND confirmation button', async () => {
-      const handleSubmit = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handleSubmit, resolveSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, true, <p>Warning text.</p>);
+      await renderModal(handleSubmit, {
+        confirmationWarningText: <p>Warning text.</p>,
+      });
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+      await userEvent.click(
+        await screen.findByRole('button', { name: 'Confirm' }),
+      );
+
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
+      await resolveSubmit();
+
       expect(
-        screen.getByRole('button', { name: 'Confirm' }),
-      ).toBeInTheDocument();
-
-      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalled();
-      });
-
-      await waitFor(() => {
-        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
-      });
-
+        screen.queryByRole('button', { name: 'Confirm' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 
   describe('cancelling WITH confirmation warning', () => {
     test('clicking SECOND Cancel button displays initial modal content and removes the confirmation warning', async () => {
-      const handleSubmit = jest.fn();
+      const { handleSubmit } = createDeferredSubmit();
 
-      await renderModal(handleSubmit, true, <p>Warning text.</p>);
+      await renderModal(handleSubmit, {
+        confirmationWarningText: <p>Warning text.</p>,
+      });
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       expect(
-        screen.getByRole('button', { name: 'Cancel' }),
+        await screen.findByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
 
       expect(screen.getByText('Warning text.')).toBeInTheDocument();
@@ -247,12 +216,41 @@ describe('FormModal', () => {
     });
   });
 
+  /**
+   * Creates an `onSubmit` handler that stays pending until the test decides to
+   * complete it via `resolveSubmit`.
+   */
+  function createDeferredSubmit() {
+    let resolve: () => void = () => {};
+
+    const submitted = new Promise<void>(res => {
+      resolve = res;
+    });
+
+    return {
+      handleSubmit: jest.fn(() => submitted),
+      /**
+       * Wrapped in `act` so that the state updates made by `FormModal` once
+       * `onSubmit` settles are flushed before the test asserts on them.
+       */
+      resolveSubmit: async () => {
+        await act(async () => {
+          resolve();
+          await submitted;
+        });
+      },
+    };
+  }
+
   async function renderModal<TFormValues extends FieldValues>(
     onSubmit: (formValues: TFormValues) => Promise<void>,
-    withConfirmationWarning: boolean,
-    confirmationWarningText?: ReactNode,
-    open: boolean = true,
+    options: {
+      confirmationWarningText?: ReactNode;
+      open?: boolean;
+    } = {},
   ): Promise<RenderResult> {
+    const { confirmationWarningText, open = true } = options;
+
     const renderResult = render(
       <FormModal
         underlayClass=".underlay"
