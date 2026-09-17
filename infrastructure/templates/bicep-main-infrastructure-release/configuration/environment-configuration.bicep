@@ -45,6 +45,9 @@ type EnvironmentConfig = {
 
   @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
   basicAuthEnabled: bool?
+
+  @description('Number of days to retain blobs after delete.')
+  blobDeleteRetentionDays: int?
 }
 
 @export()
@@ -70,6 +73,7 @@ var defaultConfig = {
   tableBuilderMaxTableCellsAllowed: 1000000
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
+  blobDeleteRetentionDays: 30
 }
 
 @export()

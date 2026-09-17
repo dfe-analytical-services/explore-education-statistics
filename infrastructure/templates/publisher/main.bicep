@@ -43,6 +43,9 @@ param publicAppUrl string
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[]
 
+@description('Number of days to retain blobs after delete.')
+param blobDeleteRetentionDays int
+
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
@@ -231,4 +234,15 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     ]
     tagValues: tagValues
   }
+}
+
+module storageAccountBlobServiceModule '../common/components/blobService.bicep' = {
+  name: 'publisherStorageAccountBlobServiceModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.publisher.storageAccount
+    deleteRetentionPolicy: blobDeleteRetentionDays
+  }
+  dependsOn: [
+    functionAppModule
+  ]
 }

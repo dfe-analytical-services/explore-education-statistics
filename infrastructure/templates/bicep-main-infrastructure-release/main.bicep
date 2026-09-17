@@ -201,6 +201,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
     tagValues: tags
   }

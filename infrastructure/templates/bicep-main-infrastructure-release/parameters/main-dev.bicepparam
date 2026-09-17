@@ -23,6 +23,7 @@ param environmentConfigParam = {
     'http://localhost:3000'
   ]
   basicAuthEnabled: true
+  blobDeleteRetentionDays: 3
 }
 
 param adminConfigParam = {
