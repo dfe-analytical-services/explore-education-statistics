@@ -317,6 +317,12 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
           value: '1'
         }
+        // Enable the Function App to access file shares over the VNet if
+        // file shares are available for this Function App. 
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: length(azureFileShares ?? []) > 0 ? '1' : null
+        }
       ], appSettings)
       cors: {
         allowedOrigins: union(['https://portal.azure.com'], allowedOrigins)

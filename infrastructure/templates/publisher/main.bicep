@@ -154,7 +154,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         storageName: publicApiStorageAccount.name
         storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
         storageAccountName: publicApiStorageAccount.name
-        fileShareName: resourceNames.analytics.storage.fileShareName
+        fileShareName: resourceNames.publicApi.storage.fileShare
         mountPath: '\\mounts\\public-api-data'
       }
     ]
