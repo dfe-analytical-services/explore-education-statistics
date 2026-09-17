@@ -722,9 +722,6 @@
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]"
     ],
-    "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
-    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
-    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",

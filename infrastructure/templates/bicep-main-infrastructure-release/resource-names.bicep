@@ -49,6 +49,10 @@ type ResourceNames = {
     processor: {
       functionApp: string
     }
+    storage: {
+      storageAccount: string
+      fileShare: string
+    }
   }
   publicSite: {
     appService: string
@@ -188,6 +192,10 @@ func getResourceNames(
   publicApi: {
     processor: {
       functionApp: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
+    }
+    storage: {
+      storageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
+      fileShare: '${publicApiResourcePrefix}-share-data'
     }
   }
   publicSite: {

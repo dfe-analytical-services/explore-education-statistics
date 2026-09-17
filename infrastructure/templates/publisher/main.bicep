@@ -60,9 +60,14 @@ var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databas
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.vnet.vnet
 }
+
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: resourceNames.vnet.subnets.publisher
   parent: vNet
+}
+    
+resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
+  name: resourceNames.publicApi.storage.storageAccount
 }
 
 module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
@@ -141,6 +146,15 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       alertsGroupName: resourceNames.alertsGroup
     } : null
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    azureFileShares: [
+      {
+        storageName: publicApiStorageAccount.name
+        storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
+        storageAccountName: publicApiStorageAccount.name
+        fileShareName: resourceNames.analytics.storage.fileShareName
+        mountPath: '\\mounts\\public-api-data'
+      }
+    ]
     appSettings: [
       {
         name: 'WEBSITE_TIME_ZONE'
@@ -209,6 +223,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       {
         name: 'EventGrid__EventTopics__1__TopicEndpoint'
         value: reference(resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.releaseChanged), '2025-02-15').endpoint
+      }
+      {
+        name: 'PublicDataDbExists'
+        value: 'true'
       }
     ]
     tagValues: tagValues
