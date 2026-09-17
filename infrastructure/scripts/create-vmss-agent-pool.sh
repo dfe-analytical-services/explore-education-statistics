@@ -22,6 +22,13 @@
 #   bash infrastructure/scripts/create-vmss-agent-pool.sh
 set -euxo pipefail
 
+# On Git Bash/MSYS2 (Windows), arguments starting with "/" - like the
+# subnet resource ID below - get silently mangled into Windows-style paths
+# before az ever sees them, causing a confusing "incorrect usage" error.
+# This disables that auto-conversion. Harmless/unused on real Bash (Cloud
+# Shell, Linux, macOS).
+export MSYS_NO_PATHCONV=1
+
 RESOURCE_GROUP="S101D01-RG-EES"
 SCALE_SET_NAME="ees-ubuntu2604-large-v2"
 LOCATION="westeurope"   # confirmed from the resource group's "West Europe" location in the portal
@@ -54,6 +61,7 @@ az vmss create \
   --os-disk-caching readonly \
   --encryption-at-host true \
   --subnet "$SUBNET_ID" \
+  --admin-username azureuser \
   --authentication-type SSH \
   --generate-ssh-keys \
   --disable-overprovision \
