@@ -1,6 +1,7 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -38,6 +39,9 @@ param adminAppUrl string
 
 @description('The public-facing URL of the public site.')
 param publicAppUrl string
+
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[]
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
@@ -100,6 +104,8 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       resourceId('Microsoft.Network/virtualNetworks/subnets', vNet.name, resourceNames.vnet.subnets.admin)
       resourceId('Microsoft.Network/virtualNetworks/subnets', vNet.name, outboundVnetSubnet.name)
     ]
+    storageFirewallRules: maintenanceIpRanges
+    deployQueueRoleAssignment: true
     functionAppFirewallRules: []
     healthCheckPath: '/'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString

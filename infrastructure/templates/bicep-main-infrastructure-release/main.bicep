@@ -180,6 +180,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     tagValues: tags
   }
 }
@@ -189,7 +190,6 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publisherConfig.appServiceSku!
-    deployAlerts: true
     prepareScheduledReleaseVersionsNowEnabled: publisherConfig.prepareScheduledReleaseVersionsNowEnabled!
     publishScheduledReleaseVersionsNowEnabled: publisherConfig.publishScheduledReleaseVersionsNowEnabled!
     functionAppTimeZone: publisherConfig.functionAppTimeZone!
@@ -200,6 +200,8 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    deployAlerts: true
     tagValues: tags
   }
 }

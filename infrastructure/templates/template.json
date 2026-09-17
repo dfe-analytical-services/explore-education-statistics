@@ -34,12 +34,6 @@
         "P3V2 PremiumV2"
       ]
     },
-    "adminFirewallRules": {
-      "type": "array",
-      "metadata": {
-        "description": "Firewall restrictions for the admin application"
-      }
-    },
     "storageFirewallRules": {
       "type": "array",
       "metadata": {
@@ -724,19 +718,6 @@
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
-    "ipWhiteList": {
-      "copy": [
-        {
-          "name": "addresses",
-          "count": "[length(parameters('adminFirewallRules'))]",
-          "input": {
-            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
-            "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
-            "action": "Allow"
-          }
-        }
-      ]
-    },
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
       "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]"
