@@ -236,7 +236,7 @@ describe('LiveApiDataSetsTable', () => {
         releaseVersionId="release-version-1"
         releaseId="release-1"
       />,
-      testAnalystUser
+      { user: testAnalystUser },
     );
 
     expect(
@@ -354,7 +354,9 @@ describe('LiveApiDataSetsTable', () => {
     );
   });
 
-  function render(ui: ReactNode, user?: User =testBauUser) {
+  function render(ui: ReactNode, options?: { user?: User }) {
+    const { user = testBauUser } = options ?? {};
+
     return baseRender(
       <TestRouterRenderer
         initialUrl="/"
@@ -362,9 +364,7 @@ describe('LiveApiDataSetsTable', () => {
         routes={[releaseApiDataSetDetailsRoute.fullPath]}
         disableTestContext
       >
-        <AuthContextTestProvider user={user}>
-        {ui}
-        </AuthContextTestProvider>
+        <AuthContextTestProvider user={user}>{ui}</AuthContextTestProvider>
       </TestRouterRenderer>,
     );
   }

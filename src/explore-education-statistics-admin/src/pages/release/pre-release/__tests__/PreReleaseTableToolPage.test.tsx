@@ -367,16 +367,13 @@ describe('PreReleaseTableToolPage', () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
 
-    renderPage([
-      generatePath(
-        preReleaseTableToolRoute.fullPath,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-          dataBlockVersionId: 'block-1',
-        },
-      ),
-    ]);
+    renderPage(
+      generatePath(preReleaseTableToolRoute.fullPath, {
+        publicationId: 'publication-1',
+        releaseVersionId: 'release-1',
+        dataBlockVersionId: 'block-1',
+      }),
+    );
 
     expect(await screen.findByText('Step 5')).toBeInTheDocument();
 

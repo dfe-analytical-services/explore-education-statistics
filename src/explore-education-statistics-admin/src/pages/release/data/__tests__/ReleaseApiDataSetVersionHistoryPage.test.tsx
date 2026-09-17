@@ -1,5 +1,4 @@
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetVersionHistoryPage from '@admin/pages/release/data/ReleaseApiDataSetVersionHistoryPage';
@@ -329,7 +328,13 @@ describe('ReleaseApiDataSetVersionHistoryPage', () => {
       >
         <AuthContextTestProvider user={user}>
           <ReleaseVersionContextProvider releaseVersion={testRelease}>
-            <ReleaseApiDataSetVersionHistoryPage />
+            <ProtectedRoute
+              protectionAction={
+                releaseApiDataSetVersionHistoryRoute.protectionAction
+              }
+            >
+              <ReleaseApiDataSetVersionHistoryPage />
+            </ProtectedRoute>
           </ReleaseVersionContextProvider>
         </AuthContextTestProvider>
       </TestRouterRenderer>,

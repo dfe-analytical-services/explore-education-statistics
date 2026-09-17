@@ -15,17 +15,9 @@ const RouteLeavingGuard = ({
 }: Props) => {
   const blockerFunction = useCallback<BlockerFunction>(
     ({ currentLocation, nextLocation }) => {
-      const result =
-        blockRouteChange && currentLocation.pathname !== nextLocation.pathname;
-
-      console.log(`
-      currentLocation: ${currentLocation.pathname}
-      nextLocation: ${nextLocation.pathname}
-      blockRouteChange: ${blockRouteChange}
-      result: ${result}
-      `);
-
-      return result;
+      return (
+        blockRouteChange && currentLocation.pathname !== nextLocation.pathname
+      );
     },
     [blockRouteChange],
   );
