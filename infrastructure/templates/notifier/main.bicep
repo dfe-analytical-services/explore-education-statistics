@@ -1,6 +1,7 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -17,6 +18,9 @@ param logAnalyticsWorkspaceId string
 @secure()
 @description('''The database user's password.''')
 param databaseUserPassword string
+
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[]
 
 @description('Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key.')
 param suppressExceptionsForTeamOnlyApiKeyErrors bool
@@ -94,6 +98,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
     outboundSubnetId: outboundVnetSubnet.id
     storageAccountAllowedSubnetIds: [publisherSubnet.id]
+    storageFirewallRules: maintenanceIpRanges
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
