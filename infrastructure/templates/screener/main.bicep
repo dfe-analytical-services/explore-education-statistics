@@ -52,9 +52,6 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
-@description('Specifies whether or not the Screener Function App already exists.')
-param screenerFunctionAppExists bool = true
-
 @description('The Docker image tag for the data screener. This value should represent a pipeline build number.')
 param screenerDockerImageTag string = ''
 
@@ -123,7 +120,6 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     maximumInstanceCount: maximumInstanceCount
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
-    functionAppExists: screenerFunctionAppExists
     sku: screenerFunctionAppSku
     functionAppFirewallRules: union(
       [

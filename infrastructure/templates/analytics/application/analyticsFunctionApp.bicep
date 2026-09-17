@@ -26,9 +26,6 @@ param applicationInsightsConnectionString string = ''
 @description('The cron schedule for the analytics consumer Function.')
 param analyticsRequestFilesConsumerCron string
 
-@description('Specifies whether or not the Analytics Function App already exists.')
-param functionAppExists bool
-
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 

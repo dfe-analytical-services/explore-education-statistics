@@ -22,9 +22,6 @@ parameters:
     type: string
   - name: deployAlerts
     type: string
-  - name: dataProcessorExists
-    type: string
-    default: true
 
 steps:
   - task: AzureCLI@2
