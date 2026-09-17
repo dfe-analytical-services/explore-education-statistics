@@ -263,7 +263,7 @@ func getResourceNames(
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
       notifierStorageAccountConnectionString: 'ees-storage-notifications'
       publicStorageAccountConnectionString: 'ees-storage-public'
-      publisherStorageAccountConnectionString: 'ees-storage-publisher'
+      publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
