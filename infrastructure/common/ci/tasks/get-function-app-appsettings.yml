@@ -28,13 +28,33 @@ steps:
           slotArgs=(--slot "${{ parameters.slotName }}")
         fi
 
-        # If the Function App (or slot) doesn't exist yet, fall back to an empty set of app settings rather
-        # than failing the pipeline - this lets Bicep skip merging in "existing" settings on a first deploy.
+        # Check whether or not the target Function App or slot exists yet.
+        if [ -n "${{ parameters.slotName }}" ]; then
+          exists=$(az functionapp deployment slot list \
+            --name ${{ parameters.functionAppName }} \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --query "[?name=='${{ parameters.slotName }}']" | jq '. != []')
+        else
+          exists=$(az functionapp list \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --query "[?name=='${{ parameters.functionAppName }}']" | jq '. != []')
+        fi
+
+        # If the Function App or slot doesn't exist yet, return an empty set of appsettings.
+        if [ "$exists" != "true" ]; then
+          echo "${{ parameters.functionAppName }} (slot: '${{ parameters.slotName }}') does not exist yet - defaulting to no existing app settings."
+          echo "##vso[task.setvariable variable=${{ parameters.variableName }};issecret=true]{}"
+          exit 0
+        fi
+
+        # If the Function App exists, we should be able to get its appsettings without issue.
+        # If we run into any errors, they will not be caught and so will fail the job.
+        # This prevents us from risking applying empty appsettings against a running Function
+        # App or slot.
         rawAppSettings=$(az functionapp config appsettings list \
           --name ${{ parameters.functionAppName }} \
           --resource-group ${{ parameters.resourceGroupName }} \
-          "${slotArgs[@]}" \
-          2>/dev/null) || rawAppSettings='[]'
+          "${slotArgs[@]}")
 
         # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
         # which is the shape the Bicep template's appsettings params expect.
