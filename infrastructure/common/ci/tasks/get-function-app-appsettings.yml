@@ -40,4 +40,4 @@ steps:
         # which is the shape the Bicep template's appsettings params expect.
         existingAppSettings=$(echo "$rawAppSettings" | jq -c 'from_entries')
 
-        echo "##vso[task.setvariable variable=${{ parameters.variableName }};]$existingAppSettings"
+        echo "##vso[task.setvariable variable=${{ parameters.variableName }};issecret=true]$existingAppSettings"

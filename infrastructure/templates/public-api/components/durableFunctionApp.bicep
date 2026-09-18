@@ -82,9 +82,11 @@ param sku FunctionAppServicePlanSku
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
 
+@secure()
 @description('The existing app settings for the production slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
 param processorProdAppSettings object = {}
 
+@secure()
 @description('The existing app settings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
 param processorStagingAppSettings object = {}
 

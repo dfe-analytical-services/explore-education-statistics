@@ -113,9 +113,11 @@ param publicUrls {
   publicApi: string
 }
 
+@secure()
 @description('The existing app settings for the Data Processor Function App production slot, fetched by the pipeline before deployment.')
 param processorProdAppSettings object = {}
 
+@secure()
 @description('The existing app settings for the Data Processor Function App staging slot, fetched by the pipeline before deployment.')
 param processorStagingAppSettings object = {}
 

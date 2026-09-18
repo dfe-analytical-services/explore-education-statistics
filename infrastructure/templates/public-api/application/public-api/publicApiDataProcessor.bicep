@@ -10,9 +10,11 @@ param location string
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
+@secure()
 @description('The existing app settings for the production slot, fetched by the pipeline before deployment.')
 param processorProdAppSettings object = {}
 
+@secure()
 @description('The existing app settings for the staging slot, fetched by the pipeline before deployment.')
 param processorStagingAppSettings object = {}
 
