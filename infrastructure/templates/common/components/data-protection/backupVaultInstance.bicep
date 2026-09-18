@@ -16,6 +16,9 @@ param backupPolicyName string
 @description('Name of the backup vault that this policy belongs to.')
 param vaultName string
 
+@description('Name of the backup instance to create, unique within the vault.')
+param instanceName string
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -24,7 +27,7 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01
 }
 
 resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2025-07-01' = {
-  name: '${vaultName}/PostgreSQLBackupInstance'
+  name: '${vaultName}/${instanceName}'
   properties: {
     dataSourceInfo: {
       datasourceType: getFullBackupVaultDataSourceType(dataSourceType)
