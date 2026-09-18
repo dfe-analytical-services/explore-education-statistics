@@ -47,6 +47,7 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
               deploySubnets=${{ parameters.deploySubnets }} \
               deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
               deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \
