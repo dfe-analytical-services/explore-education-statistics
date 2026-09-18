@@ -7,6 +7,7 @@ later one as PASSED, and reports the tests that followed a failure as SKIPPED, s
 the merged report cannot say what was still failing when the run finished.
 """
 
+import os
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -25,14 +26,30 @@ UNLIKELY = "Unlikely"
 # agent, so that only the latter is reported by the pipeline fallback.
 NOTIFICATION_MARKER_FILENAME = "chat-notification-sent"
 
+LOCAL_RUN_ID = "local"
+
+
+def current_run_id() -> str:
+    """
+    Identifies the pipeline run a marker belongs to. The agents are self-hosted, so a
+    marker can outlive the run that wrote it; recording which run wrote it means a stale
+    one cannot be mistaken for this run's.
+    """
+    return os.getenv("BUILD_BUILDID") or os.getenv("RELEASE_RELEASEID") or LOCAL_RUN_ID
+
 
 def record_notification_sent(results_directory: Path) -> None:
     results_directory.mkdir(parents=True, exist_ok=True)
-    (results_directory / NOTIFICATION_MARKER_FILENAME).touch()
+    (results_directory / NOTIFICATION_MARKER_FILENAME).write_text(current_run_id(), encoding="utf-8")
 
 
 def notification_was_sent(results_directory: Path) -> bool:
-    return (results_directory / NOTIFICATION_MARKER_FILENAME).is_file()
+    try:
+        return (results_directory / NOTIFICATION_MARKER_FILENAME).read_text(encoding="utf-8").strip() == (
+            current_run_id()
+        )
+    except OSError:
+        return False
 
 
 @dataclass(frozen=True)

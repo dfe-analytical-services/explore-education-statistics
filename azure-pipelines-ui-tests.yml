@@ -72,6 +72,11 @@ jobs:
   - SeedData
   condition: always()
   pool: ees-ubuntu2204-large
+  # The agents are self-hosted, so without this the downloaded artifacts persist between
+  # runs. A marker left by a previous run would then suppress this run's alert, which is
+  # the one failure this job exists to report.
+  workspace:
+    clean: all
   variables:
     publicResult: $[ dependencies.Public.result ]
     publishAndAmendResult: $[ dependencies.PublishAndAmend.result ]

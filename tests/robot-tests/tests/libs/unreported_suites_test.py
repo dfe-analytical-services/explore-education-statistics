@@ -7,7 +7,13 @@ from scripts.send_teams_unreported_suites import SUITES, UNKNOWN_STATUS, find_un
 from tests.libs.run_results import record_notification_sent
 from tests.libs.ui_test_notification import unreported_suites
 
-ALL_SUCCEEDED = {status_environment_variable: "Succeeded" for _, _, status_environment_variable in SUITES}
+BUILD_ID = "123"
+
+# Markers are scoped to the run that wrote them, so reading and writing must agree on it.
+ALL_SUCCEEDED = {
+    "BUILD_BUILDID": BUILD_ID,
+    **{status_environment_variable: "Succeeded" for _, _, status_environment_variable in SUITES},
+}
 
 
 class FindUnreportedSuitesTests(unittest.TestCase):
@@ -19,8 +25,9 @@ class FindUnreportedSuitesTests(unittest.TestCase):
         self.temporary_directory.cleanup()
 
     def _mark_reported(self, *artifact_names: str):
-        for artifact_name in artifact_names:
-            record_notification_sent(self.artifacts_directory / artifact_name)
+        with patch.dict("os.environ", {"BUILD_BUILDID": BUILD_ID}):
+            for artifact_name in artifact_names:
+                record_notification_sent(self.artifacts_directory / artifact_name)
 
     def test_finds_nothing_when_every_suite_reported(self):
         self._mark_reported(*[artifact_name for _, artifact_name, _ in SUITES])
@@ -62,8 +69,9 @@ class SendUnreportedSuitesTests(unittest.TestCase):
 
     @patch("scripts.send_teams_unreported_suites.TeamsService")
     def test_sends_nothing_when_every_suite_reported(self, teams_service_mock):
-        for _, artifact_name, _ in SUITES:
-            record_notification_sent(self.artifacts_directory / artifact_name)
+        with patch.dict("os.environ", {"BUILD_BUILDID": BUILD_ID}):
+            for _, artifact_name, _ in SUITES:
+                record_notification_sent(self.artifacts_directory / artifact_name)
 
         with patch.dict("os.environ", ALL_SUCCEEDED, clear=True):
             self.assertFalse(send_unreported_suites(self.artifacts_directory, "dev"))

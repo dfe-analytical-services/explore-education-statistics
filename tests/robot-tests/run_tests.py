@@ -137,8 +137,17 @@ def _send_notification(notifier: UiTestNotifier, notification) -> None:
     # Only a run that actually reached a channel may record that it reported. Recording it
     # regardless would tell the pipeline that a silent run had reported, and suppress the
     # job that exists to catch exactly that.
-    if notifier.send(notification):
+    if not notifier.send(notification):
+        return
+
+    try:
         run_results.record_notification_sent(Path(main_results_folder))
+    # Recording that we reported is bookkeeping, and must not change the result of the
+    # run. Letting it raise would fail a passing run and report it as a failure, which is
+    # the opposite of what this whole reporting path is for.
+    except OSError as ex:
+        logger.error("Unable to record that the UI test report was sent")
+        logger.error(ex)
 
 
 def run():

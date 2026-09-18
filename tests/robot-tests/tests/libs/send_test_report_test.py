@@ -77,6 +77,20 @@ class SendTestReportTests(unittest.TestCase):
 
         self.assertTrue(notification_was_sent(self.results_directory))
 
+    @patch("run_tests.run_results.record_notification_sent", side_effect=OSError("no space left on device"))
+    @patch("run_tests.time.sleep")
+    def test_a_failure_to_record_does_not_fail_a_passing_run(self, _sleep_mock, _record_mock):
+        """
+        Recording that we reported is bookkeeping. Letting it raise would put an otherwise
+        passing run into the exception handler, which would then send a second
+        notification claiming the run had failed.
+        """
+        self._write_readable_results()
+
+        self.assertIsNone(run_tests._send_test_report(self.notifier, _args(), [], 1))
+
+        self.notifier.send.assert_called_once()
+
     @patch("run_tests.time.sleep")
     def test_does_not_record_that_it_reported_when_no_channel_accepted(self, _sleep_mock):
         """

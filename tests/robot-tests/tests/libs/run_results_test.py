@@ -1,15 +1,18 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from xml.etree import ElementTree
 
 from tests.libs.run_results import (
     DEFINITELY,
     DEFINITELY_NOT,
     LIKELY,
+    LOCAL_RUN_ID,
     UNLIKELY,
     RunResults,
     RunTotals,
+    current_run_id,
     find_run_directories,
     notification_was_sent,
     read_run_results,
@@ -169,6 +172,32 @@ class NotificationMarkerTests(unittest.TestCase):
         record_notification_sent(self.results_directory)
 
         self.assertTrue(notification_was_sent(self.results_directory))
+
+    def test_ignores_a_marker_left_by_a_previous_run(self):
+        """
+        The agents are self-hosted and the artifacts are downloaded into a workspace that
+        can outlive a run, so a stale marker must not be mistaken for this run's and
+        suppress its alert.
+        """
+        with patch.dict("os.environ", {"BUILD_BUILDID": "100"}, clear=True):
+            record_notification_sent(self.results_directory)
+
+        with patch.dict("os.environ", {"BUILD_BUILDID": "101"}, clear=True):
+            self.assertFalse(notification_was_sent(self.results_directory))
+
+    def test_recognises_a_marker_from_the_same_run(self):
+        with patch.dict("os.environ", {"BUILD_BUILDID": "100"}, clear=True):
+            record_notification_sent(self.results_directory)
+
+            self.assertTrue(notification_was_sent(self.results_directory))
+
+    def test_falls_back_to_the_release_id_when_there_is_no_build_id(self):
+        with patch.dict("os.environ", {"RELEASE_RELEASEID": "6362"}, clear=True):
+            self.assertEqual("6362", current_run_id())
+
+    def test_identifies_a_local_run(self):
+        with patch.dict("os.environ", {}, clear=True):
+            self.assertEqual(LOCAL_RUN_ID, current_run_id())
 
 
 class ReadRunResultsTests(unittest.TestCase):
