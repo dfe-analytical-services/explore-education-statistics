@@ -70,6 +70,7 @@ export default withMethods({
           'publicationId',
           'publicationTitle',
           'publicationSlug',
+          'publishingOrganisationTitles',
           'releaseId',
           'releaseTitle',
           'releaseSlug',

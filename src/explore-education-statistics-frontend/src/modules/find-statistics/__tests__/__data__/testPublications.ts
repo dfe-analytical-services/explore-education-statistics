@@ -9,6 +9,7 @@ export const testPublications: PublicationListSummary[] = [
     type: 'AdHocStatistics',
     slug: 'publication-1-slug',
     latestReleaseSlug: 'latest-release-slug-1',
+    publishingOrganisationTitles: ['Department for Education'],
     summary: 'Publication 1 summary',
     theme: 'Theme 1',
     title: 'Publication 1',
