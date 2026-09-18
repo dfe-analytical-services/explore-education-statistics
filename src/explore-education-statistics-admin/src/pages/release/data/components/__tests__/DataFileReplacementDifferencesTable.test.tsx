@@ -4,9 +4,7 @@ import {
 } from '@admin/services/dataReplacementService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import DataFileReplacementDifferencesTable, {
-  TableMappingGroup,
-} from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
+import DataFileReplacementDifferencesTable from '@admin/pages/release/data/components/DataFileReplacementDifferencesTable';
 
 jest.mock('@admin/services/dataReplacementService');
 
@@ -99,14 +97,27 @@ const mappingsPlan: IndicatorsMappingsPlan = {
     },
   },
 };
-const mappingsGroup: TableMappingGroup[] = [
+const indicatorReplacementGroups = [
   {
+    id: 'enrolment-group',
     label: 'Enrolment Group',
-    mappings: ['enrolments_again', 'enrolments'],
+    valid: false,
+    indicators: [
+      {
+        id: 'enrolments_again',
+        label: 'Enrolments Again',
+        name: 'Enrolments_Again',
+        valid: false,
+      },
+      {
+        id: 'enrolments',
+        label: 'Enrolments',
+        name: 'Enrolments',
+        valid: false,
+      },
+    ],
   },
 ];
-
-const mappingsToShow = new Set(['enrolments_again', 'enrolments']);
 
 const locationsMappingPlan: LocationMappingsPlan = {
   mappings: {
@@ -128,14 +139,21 @@ const locationsMappingPlan: LocationMappingsPlan = {
   },
 };
 
-const locationsMappingGroup: TableMappingGroup[] = [
+const locationReplacementGroups = [
   {
     label: 'Country',
-    mappings: ['country-england'],
+    valid: false,
+    locationAttributes: [
+      {
+        id: 'country-england',
+        name: 'England',
+        label: 'England',
+        code: 'E92000001',
+        valid: false,
+      },
+    ],
   },
 ];
-
-const locationsMappingsToShow = new Set(['country-england']);
 
 describe('DataFileReplacementDifferences', () => {
   const indicatorsTableId = 'replacements-differences-indicators-table';
@@ -148,8 +166,8 @@ describe('DataFileReplacementDifferences', () => {
         tableId={indicatorsTableId}
         itemType="indicator"
         mappingsPlan={mappingsPlan}
-        mappingGroups={mappingsGroup}
-        mappingsToShow={mappingsToShow}
+        replacementGroups={indicatorReplacementGroups}
+        getGroupMappings={group => group.indicators}
         handleMappingUpdate={handler}
         rowLabel="label"
         mappedDataLabels={{
@@ -166,8 +184,8 @@ describe('DataFileReplacementDifferences', () => {
         itemType="location"
         handleMappingUpdate={handler}
         mappingsPlan={locationsMappingPlan}
-        mappingsToShow={locationsMappingsToShow}
-        mappingGroups={locationsMappingGroup}
+        replacementGroups={locationReplacementGroups}
+        getGroupMappings={group => group.locationAttributes}
         rowLabel="name"
         mappedDataLabels={{
           name: 'Name',
