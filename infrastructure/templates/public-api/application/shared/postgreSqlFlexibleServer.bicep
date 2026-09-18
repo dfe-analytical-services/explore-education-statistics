@@ -100,6 +100,7 @@ module backupInstanceModule '../../../common/components/data-protection/backupVa
   name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}BackupInstanceDeploy'
   params: {
     vaultName: resourceNames.existingResources.backupVault.vault
+    instanceName: 'PostgreSQLBackupInstance'
     dataSourceType: 'psqlFlexibleServer'
     resourceId: postgreSqlServerModule.outputs.databaseRef
     resourceLocation: location
