@@ -1,5 +1,6 @@
 import { ConnectionString } from 'types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
+import { FirewallRule } from '../../types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 
 @description('Name of the App Service.')
@@ -54,6 +55,18 @@ param swapSlotEnabled bool = true
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
 
+@description('''
+Inbound firewall rules for this App Service. Applied to the production site only, not to the deploy slot, so
+that deployments and slot swaps are unaffected.
+''')
+param firewallRules FirewallRule[] = []
+
+@description('''
+The action to take for inbound requests matching none of the "firewallRules". Leave unset to use the Azure
+default of allowing unmatched requests.
+''')
+param ipSecurityRestrictionsDefaultAction ('Allow' | 'Deny')?
+
 @description('File Shares to mount on this App Service and its slots.')
 param azureFileShares AzureFileShareMount[]?
 
@@ -72,6 +85,17 @@ param alerts {
 param tagValues object
 
 var deploySlotName = 'deploy'
+
+var ipSecurityRestrictions = [
+  for (firewallRule, index) in firewallRules: {
+    name: firewallRule.name
+    ipAddress: firewallRule.cidr
+    action: 'Allow'
+    tag: firewallRule.tag != null ? firewallRule.tag : 'Default'
+    priority: firewallRule.priority != null ? firewallRule.priority : 100 + index
+    headers: firewallRule.?headers
+  }
+]
 
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
@@ -101,6 +125,8 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
       connectionStrings: connectionStrings
+      ipSecurityRestrictions: length(ipSecurityRestrictions) > 0 ? ipSecurityRestrictions : null
+      ipSecurityRestrictionsDefaultAction: ipSecurityRestrictionsDefaultAction
       cors: {
         allowedOrigins: allowedOrigins
       }
