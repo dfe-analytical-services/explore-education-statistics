@@ -280,7 +280,7 @@ func getResourceNames(
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
-      notifierStorageAccountConnectionString: 'ees-storage-notifications'
+      notifierStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eesnotify-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
     }
