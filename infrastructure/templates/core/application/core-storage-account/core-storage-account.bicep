@@ -23,6 +23,9 @@ param subnets VNetSubnets
 @description('The name of the Backup Vault instance used to back up this storage account.')
 param backupVaultName string
 
+@description('The name of the Backup Vault policy used to back up blobs.')
+param backupBlobsPolicyName string
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
@@ -82,7 +85,8 @@ module backupVaultRegistration '../../../common/components/data-protection/backu
   name: 'coreStorageBackupVaultRegistrationModuleDeploy'
   params: {
     vaultName: backupVault.name
-    backupPolicyName: ''
+    instanceName: storageAccountName
+    backupPolicyName: backupBlobsPolicyName
     dataSourceType: 'blobs'
     resourceId: storageAccountModule.outputs.storageAccountId
     resourceLocation: resourceGroup().location
