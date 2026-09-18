@@ -113,8 +113,13 @@ param publicUrls {
   publicApi: string
 }
 
-@description('Specifies whether or not the Data Processor Function App already exists.')
-param dataProcessorFunctionAppExists bool = false
+@secure()
+@description('The existing app settings for the Data Processor Function App production slot, fetched by the pipeline before deployment.')
+param processorProdAppSettings object = {}
+
+@secure()
+@description('The existing app settings for the Data Processor Function App staging slot, fetched by the pipeline before deployment.')
+param processorStagingAppSettings object = {}
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string = ''
@@ -393,7 +398,8 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
       ],
       maintenanceFirewallRules
     )
-    dataProcessorFunctionAppExists: dataProcessorFunctionAppExists
+    processorProdAppSettings: processorProdAppSettings
+    processorStagingAppSettings: processorStagingAppSettings
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

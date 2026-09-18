@@ -1,0 +1,63 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: functionAppName
+    type: string
+  - name: variableName
+    type: string
+  - name: displayName
+    type: string
+  - name: slotName
+    type: string
+    default: ''
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        slotArgs=()
+        if [ -n "${{ parameters.slotName }}" ]; then
+          slotArgs=(--slot "${{ parameters.slotName }}")
+        fi
+
+        # Check whether or not the target Function App or slot exists yet.
+        if [ -n "${{ parameters.slotName }}" ]; then
+          exists=$(az functionapp deployment slot list \
+            --name ${{ parameters.functionAppName }} \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --query "[?name=='${{ parameters.slotName }}']" | jq '. != []')
+        else
+          exists=$(az functionapp list \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --query "[?name=='${{ parameters.functionAppName }}']" | jq '. != []')
+        fi
+
+        # If the Function App or slot doesn't exist yet, return an empty set of appsettings.
+        if [ "$exists" != "true" ]; then
+          echo "${{ parameters.functionAppName }} (slot: '${{ parameters.slotName }}') does not exist yet - defaulting to no existing app settings."
+          echo "##vso[task.setvariable variable=${{ parameters.variableName }};issecret=true]{}"
+          exit 0
+        fi
+
+        # If the Function App exists, we should be able to get its appsettings without issue.
+        # If we run into any errors, they will not be caught and so will fail the job.
+        # This prevents us from risking applying empty appsettings against a running Function
+        # App or slot.
+        rawAppSettings=$(az functionapp config appsettings list \
+          --name ${{ parameters.functionAppName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          "${slotArgs[@]}")
+
+        # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
+        # which is the shape the Bicep template's appsettings params expect.
+        existingAppSettings=$(echo "$rawAppSettings" | jq -c 'from_entries')
+
+        echo "##vso[task.setvariable variable=${{ parameters.variableName }};issecret=true]$existingAppSettings"
