@@ -18,6 +18,7 @@ export default async function transformDataSetListResults(
     | 'publicationId'
     | 'publicationTitle'
     | 'publicationSlug'
+    | 'publishingOrganisationTitles'
     | 'releaseId'
     | 'releaseTitle'
     | 'releaseSlug'
@@ -51,6 +52,7 @@ export default async function transformDataSetListResults(
       publicationId,
       publicationTitle,
       publicationSlug,
+      publishingOrganisationTitles,
       releaseId,
       releaseTitle,
       releaseSlug,
@@ -83,6 +85,7 @@ export default async function transformDataSetListResults(
         title: publicationTitle,
         slug: publicationSlug,
       },
+      publishingOrganisationTitles,
       release: {
         id: releaseId,
         title: releaseTitle,
