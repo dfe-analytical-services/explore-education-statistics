@@ -701,20 +701,23 @@ describe('DataFileReplacementDifferences', () => {
     expect(enrolmentsAgainRow.childNodes[2]).toHaveTextContent('No Mapping');
   });
 
-  test('renders the filter, group and item mapping hierarchy', () => {
+  test('renders the filter, group and item mapping hierarchy', async () => {
     sharedRender();
 
-    const filtersTable = screen.getByText('Filters').closest('table');
+    const filtersTable = await screen.findByTestId(
+      'replacements-differences-filters-table',
+    );
     expect(filtersTable).not.toBeNull();
 
-    const caption = within(filtersTable!)
-      .getByText('Filters')
-      .closest('caption');
+    const caption = within(filtersTable!).getByRole('caption');
     expect(caption).toHaveTextContent('3 unmapped filters');
     expect(caption).toHaveTextContent('2 not shown');
     expect(caption).toHaveTextContent('2 mapped filters');
 
-    const rows = within(filtersTable!).getAllByRole('row');
+    const tbody = within(filtersTable!).getByTestId(
+      'replacements-differences-filters-table-body',
+    );
+    const rows = within(tbody!).getAllByRole('row');
     expect(rows).toHaveLength(3);
     expect(rows[0]).toHaveTextContent('Filter one');
     expect(rows[0]).toHaveTextContent('Filter one candidate');
@@ -729,7 +732,9 @@ describe('DataFileReplacementDifferences', () => {
   test('maps a filter item to a replacement candidate', async () => {
     const { user } = sharedRender();
 
-    const filtersTable = screen.getByText('Filters').closest('table');
+    const filtersTable = await screen.findByTestId(
+      'replacements-differences-filters-table',
+    );
     expect(filtersTable).not.toBeNull();
 
     await user.click(
@@ -792,7 +797,9 @@ describe('DataFileReplacementDifferences', () => {
       />,
     );
 
-    const filtersTable = screen.getByText('Filters').closest('table');
+    const filtersTable = await screen.findByTestId(
+      'replacements-differences-filters-table',
+    );
     expect(filtersTable).not.toBeNull();
 
     await waitFor(() => {

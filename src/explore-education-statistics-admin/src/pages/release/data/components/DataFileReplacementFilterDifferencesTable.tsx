@@ -213,7 +213,11 @@ export default function DataFileReplacementFilterDifferencesTable({
 
   return (
     <div className="table-container">
-      <table className="dfe-table--vertical-align-middle ">
+      <table
+        className="dfe-table--vertical-align-middle"
+        id="replacements-differences-filters-table"
+        data-testid="replacements-differences-filters-table"
+      >
         <caption className="govuk-!-margin-bottom-3 govuk-!-font-size-24">
           Filters
           <TagGroup className="govuk-!-margin-left-2">
@@ -247,7 +251,7 @@ export default function DataFileReplacementFilterDifferencesTable({
           </VisuallyHidden>
         </thead>
 
-        <tbody>
+        <tbody data-testid="replacements-differences-filters-table-body">
           {tableData.rows.map(td => {
             const mapping = td.mappingToEdit;
             const { source, type, candidateKey } = td.mappingToEdit;

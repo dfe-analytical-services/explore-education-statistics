@@ -105,7 +105,7 @@ export default function DataFileDifferencesReplacementTable<
     };
   }, [getGroupMappings, mappingsPlan.mappings, replacementGroups]);
 
-  return (
+  return mappingGroups.length === 0 ? null : (
     <div className="table-container">
       <table
         className="dfe-table--vertical-align-middle "
