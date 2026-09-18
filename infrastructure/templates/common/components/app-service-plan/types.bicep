@@ -9,12 +9,24 @@ type FunctionAppPlanSkuPremiumV2 = {
   name: 'P1V2' | 'P2V2' | 'P3V2'
 }
 
+type FunctionAppPlanSkuBasic = {
+  tier: 'Basic'
+  name: 'B1' | 'B2' | 'B3'
+}
+
+type FunctionAppPlanSkuStandard = {
+  tier: 'Standard'
+  name: 'S1' | 'S2' | 'S3'
+}
+
 // Note this is not an exhaustive list of SKUs.
 @export()
 @discriminator('tier')
-type FunctionAppServicePlanSku = 
+type FunctionAppServicePlanSku =
   | FunctionAppPlanSkuElastic
   | FunctionAppPlanSkuPremiumV2
+  | FunctionAppPlanSkuBasic
+  | FunctionAppPlanSkuStandard
 
 
 type AppServicePlanSkuBasic = {

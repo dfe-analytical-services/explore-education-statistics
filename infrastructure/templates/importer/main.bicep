@@ -1,6 +1,7 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -18,8 +19,8 @@ param logAnalyticsWorkspaceId string
 @description('''The database user's password.''')
 param databaseUserPassword string
 
-@description('Does the Importer Function App have a dedicated storage account yet?')
-param storageAccountExists bool = true
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[]
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
@@ -76,7 +77,6 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       legacyKeyVaultRoleAssignmentName: true
     }
     sku: appServiceSku
-    functionAppExists: storageAccountExists
     functionAppRuntime: 'dotnet-isolated'
     operatingSystem: 'Windows'
     netFrameworkVersion: 'v10.0'
@@ -96,6 +96,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         name: 'AzureCloud'
       }
     ]
+    storageFirewallRules: maintenanceIpRanges
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {

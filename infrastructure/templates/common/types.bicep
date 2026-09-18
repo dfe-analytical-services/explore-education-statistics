@@ -37,7 +37,8 @@ type MonthOfYear =
 type ConnectionString = {
   name: string
   connectionString: string
-  type: 
+  type:
     | 'SQLAzure'
     | 'Custom'
+    | 'PostgreSQL'
 }

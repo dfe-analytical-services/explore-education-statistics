@@ -29,12 +29,6 @@ param contentApiUrl string
 @description('The URL of the Data API.')
 param dataApiUrl string
 
-@description('Specifies whether or not the Natural Language Search Function App already exists.')
-param naturalLanguageSearchFunctionAppExists bool = true
-
-@description('Specifies whether or not the Search Docs Function App already exists.')
-param searchDocsFunctionAppExists bool = true
-
 @description('Name of the \'Natural language search filter\' index in Azure AI Search.')
 param searchServiceNLSearchFilterIndexName string = ''
 
@@ -103,11 +97,9 @@ module monitoringModule 'application/monitoring.bicep' = {
 module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
-    location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     dataApiUrl: dataApiUrl
-    functionAppExists: naturalLanguageSearchFunctionAppExists
     functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
@@ -122,11 +114,9 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
 module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
-    location: location
     resourceNames: resourceNames
     resourcePrefix: resourcePrefix
     contentApiUrl: contentApiUrl
-    functionAppExists: searchDocsFunctionAppExists
     functionAppFirewallRules: union(
       [
         {

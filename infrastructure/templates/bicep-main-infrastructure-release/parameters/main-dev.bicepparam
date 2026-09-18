@@ -23,12 +23,22 @@ param environmentConfigParam = {
     'http://localhost:3000'
   ]
   basicAuthEnabled: true
+  blobDeleteRetentionDays: 3
 }
 
 param adminConfigParam = {
   preReleaseMinutesBeforeStart: 1440
   enableThemeDeletion: true
   enableEinPublishedPageDeletion: true
+}
+
+param publisherConfigParam = {
+  appServiceSku: {
+    tier: 'Basic'
+    name: 'B1'
+  }
+  prepareScheduledReleaseVersionsNowEnabled: true
+  publishScheduledReleaseVersionsNowEnabled: true
 }
 
 param publicApiConfigParam = {

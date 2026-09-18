@@ -49,11 +49,21 @@ type ResourceNames = {
     processor: {
       functionApp: string
     }
+    storage: {
+      storageAccount: string
+      fileShare: string
+    }
   }
   publicSite: {
     appService: string
     appServicePlan: string
     appInsights: string
+  }
+  publisher: {
+    functionApp: string
+    appServicePlan: string
+    appInsights: string
+    storageAccount: string
   }
   screener: {
     functionApp: string
@@ -68,6 +78,7 @@ type ResourceNames = {
       contentApi: string
       dataApi: string
       importer: string
+      publisher: string
     }
   }
   keyVault: {
@@ -97,8 +108,15 @@ type ResourceNames = {
       importer: {
         databaseUserPassword: string
       }
+      publisher: {
+        databaseUserPassword: string
+        notifyApiKey: string
+        publicDataDbConnectionString: string
+      }
+      bauEmail: string
       coreStorageAccountConnectionString: string
       importerStorageAccountConnectionString: string
+      notifierStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
       publicApiContainerAppPrivateUrl: string
@@ -175,11 +193,21 @@ func getResourceNames(
     processor: {
       functionApp: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
     }
+    storage: {
+      storageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
+      fileShare: '${publicApiResourcePrefix}-share-data'
+    }
   }
   publicSite: {
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-public-site'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-public-site'
+  }
+  publisher: {
+    functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-publisher'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-publisher'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-publisher'
+    storageAccount: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher'
   }
   screener: {
     functionApp: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
@@ -194,6 +222,7 @@ func getResourceNames(
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
       importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
+      publisher: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-publisher'
     }
   }
   keyVault: {
@@ -223,11 +252,18 @@ func getResourceNames(
       importer: {
         databaseUserPassword: 'ees-sql-password-importer'
       }
+      publisher: {
+        databaseUserPassword: 'ees-sql-password-publisher'
+        notifyApiKey: 'ees-publisher-govuknotify-api-key'
+        publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
+      }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
+      bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
+      notifierStorageAccountConnectionString: 'ees-storage-notifications'
       publicStorageAccountConnectionString: 'ees-storage-public'
-      publisherStorageAccountConnectionString: 'ees-storage-publisher'
+      publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'

@@ -4,7 +4,8 @@ import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
-import { ImporterConfig, ImporterPipelineVariables, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
+import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
+import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
@@ -82,8 +83,15 @@ param importerConfigParam ImporterConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var importerConfig = mergeImporterConfig(importerConfigParam)
 
-// These values are all supplied specifically by pipeline variables.
-param importerPipelineVariables ImporterPipelineVariables = {}
+
+
+//
+// Publisher-specific config.
+//
+param publisherConfigParam PublisherConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var publisherConfig = mergePublisherConfig(publisherConfigParam)
 
 
 
@@ -169,10 +177,32 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
-    storageAccountExists: importerPipelineVariables.storageAccountExists!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    tagValues: tags
+  }
+}
+
+module publisherModuleDeploy '../publisher/main.bicep' = {
+  name: 'publisherModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: publisherConfig.appServiceSku!
+    prepareScheduledReleaseVersionsNowEnabled: publisherConfig.prepareScheduledReleaseVersionsNowEnabled!
+    publishScheduledReleaseVersionsNowEnabled: publisherConfig.publishScheduledReleaseVersionsNowEnabled!
+    functionAppTimeZone: publisherConfig.functionAppTimeZone!
+    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
+    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
+    adminAppUrl: 'https://admin.${environmentConfig.domain!}'
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    deployAlerts: true
     tagValues: tags
   }
 }

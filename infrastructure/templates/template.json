@@ -34,43 +34,10 @@
         "P3V2 PremiumV2"
       ]
     },
-    "skuPublisher": {
-      "type": "string",
-      "defaultValue": "S1 Standard",
-      "allowedValues": [
-        "B1 Basic",
-        "B2 Basic",
-        "B3 Basic",
-        "S1 Standard",
-        "S2 Standard",
-        "S3 Standard",
-        "P1V2 PremiumV2",
-        "P2V2 PremiumV2",
-        "P3V2 PremiumV2"
-      ]
-    },
-    "adminFirewallRules": {
-      "type": "array",
-      "metadata": {
-        "description": "Firewall restrictions for the admin application"
-      }
-    },
     "storageFirewallRules": {
       "type": "array",
       "metadata": {
         "description": "Firewall restrictions for storage accounts, string array"
-      }
-    },
-    "sqlPublisherUser": {
-      "type": "string",
-      "metadata": {
-        "description": "The username of the publisher for the private SQL Server"
-      }
-    },
-    "sqlPublisherUserPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "The password of the publisher user for the private SQL Server"
       }
     },
     "sqlNotifierUser": {
@@ -114,20 +81,6 @@
       "type": "string",
       "metadata": {
         "description": "Number of days to retain database audit logs for in blob storage"
-      }
-    },
-    "publisherFunctionPrepareScheduledReleaseVersionsNowEnabled": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether the PrepareScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
-      }
-    },
-    "publisherFunctionPublishScheduledReleaseVersionsNowEnabled": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether the PublishScheduledReleaseVersionsNow HTTP-triggered function is enabled in the Publisher Function App. Should remain disabled in the Production environment."
       }
     },
     "teamEmailAddresses": {
@@ -242,20 +195,6 @@
         "description": "Whether or not to register data sources with Backup Vault."
       }
     },
-    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
-      "type": "string",
-      "defaultValue": "0 5 0 * * *",
-      "metadata": {
-        "description": "Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App"
-      }
-    },
-    "publishScheduledReleaseVersionsFunctionCronSchedule": {
-      "type": "string",
-      "defaultValue": "0 30 9 * * *",
-      "metadata": {
-        "description": "Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App"
-      }
-    },
     "blobDeleteRetentionEnabled": {
       "defaultValue": true,
       "type": "bool",
@@ -273,13 +212,6 @@
     "storageAccountPrefix": {
       "type": "string",
       "defaultValue": "storage"
-    },
-    "publisherFunctionAppTimeZone": {
-      "type": "string",
-      "defaultValue": "GMT Standard Time",
-      "metadata": {
-        "description": "The time zone of the Publisher Function App. This time zone is used for evaluating Cron expressions of the functions running with Cron triggers and altering it will change the time of execution of these functions. The name of this time zone depends on the operating system and plan on which the function app runs."
-      }
     },
     "licenseTypeContentDb": {
       "type": "string",
@@ -359,13 +291,6 @@
     "maxStatsDbSizeBytes": {
       "type": "int",
       "defaultValue": 268435456000
-    },
-    "publicDataDbExists": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
-      }
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "type": "bool",
@@ -462,21 +387,6 @@
       }
     ],
     "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
-    "publisherAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-publisher')]",
-    "publisherPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-publisher')]",
-    "publisherAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-publisher')]",
-    "publisherStorageAccountName": "[concat(parameters('subscription'), 'saeespublisher')]",
-    "publisherStorageVnetRules": [
-      {
-        "id": "[variables('adminSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('publisherSubnetRef')]",
-        "action": "Allow"
-      }
-    ],
-    "publisherStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publisherStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -492,31 +402,9 @@
         "criterionType": "StaticThresholdCriterion"
       },
       {
-        "name": "[concat(parameters('subscription'),'PublisherAppServiceHttpServiceErrors')]",
-        "description": "Publisher App Service - Http Service Errors",
-        "resourceId": "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "resourceType": "Microsoft.Web/sites",
-        "metricName": "Http5xx",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Total",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
         "name": "[concat(parameters('subscription'),'NotificationsAppInsightsExceptions')]",
         "description": "Notifications AppInsights - Exceptions",
         "resourceId": "[resourceId('Microsoft.Insights/components', variables('notificationsAppInsights'))]",
-        "resourceType": "Microsoft.Insights/components",
-        "metricName": "exceptions/count",
-        "threshold": 0,
-        "operator": "GreaterThan",
-        "timeAggregation": "Count",
-        "criterionType": "StaticThresholdCriterion"
-      },
-      {
-        "name": "[concat(parameters('subscription'),'PublisherAppInsightsExceptions')]",
-        "description": "Publisher AppInsights - Exceptions",
-        "resourceId": "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
         "resourceType": "Microsoft.Insights/components",
         "metricName": "exceptions/count",
         "threshold": 0,
@@ -824,35 +712,16 @@
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "ees-publisher-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-govuknotify-api-key')]",
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
     "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
     "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
     "ees-storage-notifications": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-notifications')]",
     "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
-    "ees-storage-publisher": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-publisher')]",
-    "ipWhiteList": {
-      "copy": [
-        {
-          "name": "addresses",
-          "count": "[length(parameters('adminFirewallRules'))]",
-          "input": {
-            "ipAddress": "[parameters('adminFirewallRules')[copyIndex('addresses')].Address]",
-            "name": "[parameters('adminFirewallRules')[copyIndex('addresses')].Name]",
-            "action": "Allow"
-          }
-        }
-      ]
-    },
     "keyVaultSecretsUserRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
     "keyVaultSecretsUserPrincipalRefs": [
-      "[concat('Microsoft.Web/sites/', variables('publisherAppName'))]",
       "[concat('Microsoft.Web/sites/', variables('notificationsAppName'))]"
     ],
-    "publicDataFileShareMountPathWindows": "\\mounts\\public-api-data",
-    "publicDataFileShareName": "[concat(parameters('subscription'), '-ees-papi-share-data')]",
-    "publicDataStorageAccountName": "[concat(parameters('subscription'), 'eespapisa')]",
     "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
     "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
     "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
@@ -2213,261 +2082,6 @@
         "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
         "App__TokenSecretKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-token-secret-key'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]"
-      }
-    },
-    {
-      "apiVersion": "2020-02-02",
-      "name": "[variables('publisherAppInsights')]",
-      "type": "Microsoft.Insights/components",
-      "kind": "web",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Application Insights",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "properties": {
-        "Application_Type": "web",
-        "ApplicationId": "[variables('publisherAppName')]",
-        "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('appInsightsWorkspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-03-01",
-      "name": "[variables('publisherPlanName')]",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service plan",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "sku": {
-        "Tier": "[first(skip(split(parameters('skuPublisher'), ' '), 1))]",
-        "Name": "[first(split(parameters('skuPublisher'), ' '))]"
-      },
-      "properties": {
-        "name": "[variables('publisherPlanName')]",
-        "workerSize": "0",
-        "workerSizeId": "0",
-        "numberOfWorkers": "1",
-        "hostingEnvironment": ""
-      }
-    },
-    {
-      "apiVersion": "2019-08-01",
-      "type": "Microsoft.Web/sites",
-      "name": "[variables('publisherAppName')]",
-      "location": "[resourceGroup().location]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "kind": "functionapp",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
-        "[resourceId('Microsoft.Insights/components', variables('publisherAppInsights'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('coreStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "App Service",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      },
-      "resources": [
-        {
-          "condition": "[parameters('useSubnets')]",
-          "name": "virtualNetwork",
-          "type": "config",
-          "apiVersion": "2018-11-01",
-          "location": "[resourceGroup().location]",
-          "properties": {
-            "subnetResourceId": "[variables('publisherSubnetRef')]",
-            "swiftSupported": true
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
-          ]
-        }
-      ],
-      "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('publisherPlanName'))]",
-        "httpsOnly": true,
-        "siteConfig": {
-          "http20Enabled": true,
-          "minTlsVersion": "[parameters('minTlsVersion')]",
-          "ftpsState": "FtpsOnly",
-          "netFrameworkVersion": "v10.0",
-          "alwaysOn": true,
-          "webSocketsEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": true,
-          "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          "connectionStrings": [
-            {
-              "name": "ContentDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
-            },
-            {
-              "name": "StatisticsDb",
-              "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('statisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
-            },
-            {
-              "name": "PublicDataDb",
-              "type": "PostgreSQL",
-              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-publisher-connectionstring-publicdatadb)')]"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "[concat(variables('publisherAppName'), '/appsettings')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[variables('ees-storage-core')]",
-        "[variables('ees-storage-public')]",
-        "[variables('ees-storage-notifications')]",
-        "[variables('ees-storage-publisher')]"
-      ],
-      "properties": {
-        "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobs.PrepareScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPrepareScheduledReleaseVersionsNowEnabled'))]",
-        "AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled": "[not(parameters('publisherFunctionPublishScheduledReleaseVersionsNowEnabled'))]",
-        "WEBSITE_CONTENTOVERVNET": "1",
-        "WEBSITE_TIME_ZONE": "[parameters('publisherFunctionAppTimeZone')]",
-        "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "FUNCTIONS_EXTENSION_VERSION": "~4",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('publisherAppInsights')), '2020-02-02').InstrumentationKey]",
-        "App__PrepareScheduledReleaseVersionsFunctionCronSchedule": "[parameters('prepareScheduledReleaseVersionsFunctionCronSchedule')]",
-        "App__PublishScheduledReleaseVersionsFunctionCronSchedule": "[parameters('publishScheduledReleaseVersionsFunctionCronSchedule')]",
-        "App__PrivateStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core')).secretUriWithVersion, ')')]",
-        "App__NotifierStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]",
-        "App__PublicStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
-        "App__PublisherStorageConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "App__BauEmail": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-bau-email'), '2018-02-14').secretUriWithVersion, ')')]",
-        "App__AdminAppUrl": "[variables('adminAppUrl')]",
-        "App__PublicAppUrl": "[variables('publicAppUrl')]",
-        "Notify__ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-govuknotify-api-key'), '2018-02-14').secretUriWithVersion, ')')]",
-        "DataFiles__BasePath": "[variables('publicDataFileShareMountPathWindows')]",
-        "EventGrid__EventTopics__0__Key": "PublicationChangedEvent",
-        "EventGrid__EventTopics__0__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNamePublicationChanged')), '2025-02-15').endpoint]",
-        "EventGrid__EventTopics__1__Key": "ReleaseVersionChangedEvent",
-        "EventGrid__EventTopics__1__TopicEndpoint": "[reference(resourceId('Microsoft.EventGrid/topics', variables('eventGridTopicNameReleaseVersionChanged')), '2025-02-15').endpoint]",
-        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
-      }
-    },
-    {
-      "condition": "[parameters('publicDataDbExists')]",
-      "name": "[concat(variables('publisherAppName'), '/azurestorageaccounts')]",
-      "type": "Microsoft.Web/sites/config",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2019-08-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]"
-      ],
-      "properties": {
-        "[variables('publicDataFileShareName')]": {
-          "type": "AzureFiles",
-          "accountName": "[variables('publicDataStorageAccountName')]",
-          "accessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('publicDataStorageAccountName')), '2018-02-01').keys[0].value]",
-          "shareName": "[variables('publicDataFileShareName')]",
-          "mountPath": "[variables('publicDataFileShareMountPathWindows')]",
-          "protocol": "Smb"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('publisherStorageAccountName')]",
-      "apiVersion": "2023-05-01",
-      "location": "[resourceGroup().location]",
-      "kind": "StorageV2",
-      "sku": {
-        "name": "Standard_GZRS"
-      },
-      "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publisherStorageVnetRules'), createArray())]",
-          "defaultAction": "Deny"
-        }
-      },
-      "resources": [
-        {
-          "name": "default",
-          "type": "blobServices",
-          "apiVersion": "2023-05-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('publisherStorageAccountName')]"
-          ]
-        }
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Storage account V2",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'), '/ees-storage-publisher')]",
-      "apiVersion": "2016-10-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publisherStorageAccountName'))]"
-      ],
-      "properties": {
-        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publisherStorageAccountName'), ';AccountKey=', listKeys(variables('publisherStorageAccountId'),'2015-05-01-preview').key1)]"
       }
     },
     {

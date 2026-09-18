@@ -7,6 +7,7 @@ import { FunctionAppServicePlanSku } from '../../components/app-service-plan/typ
 import { ConnectionString } from '../../types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
 import { keyVaultRef } from '../../functions.bicep'
+import { StorageAccountSku } from '../storage/types.bicep'
 
 @description('Specifies the location for all resources.')
 param location string = resourceGroup().location
@@ -49,6 +50,9 @@ param linuxFxVersion string?
 
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
+
+@description('Storage Account SKU.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Specifies whether the storage account in use by the Function App is accessible from the public internet.')
 param storageAccountPublicNetworkAccessEnabled bool = false
@@ -140,9 +144,6 @@ param sku FunctionAppServicePlanSku
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from.')
 param keyVaultName string
 
-@description('Specifies whether or not the Function App already exists.')
-param functionAppExists bool
-
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan.')
 param alwaysOn bool = false
 
@@ -231,7 +232,7 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
       outboundSubnetId != null ? [outboundSubnetId!] : []
     )
     firewallRules: storageFirewallRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
     keyVaultName: keyVaultName
     privateEndpointSubnetIds: privateEndpoints != null ? {
@@ -308,12 +309,19 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
         }
-        // It's only possible to UPDATE a Function App using a Key Vault reference for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING setting,
-        // not creating a new Function App, unless we use the below setting to skip validation for the first time we create
-        // this Function App.  See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+        // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
+        // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
+        // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
+        // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
         {
           name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-          value: !functionAppExists ? '1' : null
+          value: '1'
+        }
+        // Enable the Function App to access file shares over the VNet if
+        // file shares are available for this Function App. 
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: length(azureFileShares ?? []) > 0 ? '1' : null
         }
       ], appSettings)
       cors: {

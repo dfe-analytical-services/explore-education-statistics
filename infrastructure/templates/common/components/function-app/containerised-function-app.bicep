@@ -113,9 +113,6 @@ param redundancyMode string = 'None'
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
 
-@description('Specifies whether or not the Function App already exists.')
-param functionAppExists bool
-
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
@@ -320,7 +317,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           }
           {
             name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-            value: !functionAppExists ? '1' : null
+            value: '1'
           }
           {
             name: 'WEBSITE_CONTENTSHARE'
