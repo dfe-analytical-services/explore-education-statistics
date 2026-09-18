@@ -73,7 +73,7 @@ var defaultConfig = {
   tableBuilderMaxTableCellsAllowed: 1000000
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
-  blobDeleteRetentionDays: 30
+  blobDeleteRetentionDays: 90
 }
 
 @export()
