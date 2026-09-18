@@ -60,6 +60,8 @@ var vaultUri = keyVault.properties.vaultUri
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
+var publicApiFileshareMountPath = '\\mounts\\public-api-data'
+
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.vnet.vnet
 }
@@ -155,7 +157,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
         storageAccountName: publicApiStorageAccount.name
         fileShareName: resourceNames.publicApi.storage.fileShare
-        mountPath: '\\mounts\\public-api-data'
+        mountPath: publicApiFileshareMountPath
       }
     ]
     appSettings: [
@@ -210,6 +212,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       {
         name: 'Notify__ApiKey'
         value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisher.notifyApiKey)
+      }
+      {
+        name: 'DataFiles__BasePath'
+        value: publicApiFileshareMountPath
       }
       {
         name: 'EventGrid__EventTopics__0__Key'
