@@ -134,7 +134,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       }
       {
         name: 'PublicDataDb'
-        type: 'Custom'
+        type: 'PostgreSQL'
         connectionString: '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault};SecretName=${resourceNames.keyVault.secrets.publisher.publicDataDbConnectionString})'
       }
     ]

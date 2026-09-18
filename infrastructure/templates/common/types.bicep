@@ -40,4 +40,5 @@ type ConnectionString = {
   type:
     | 'SQLAzure'
     | 'Custom'
+    | 'PostgreSQL'
 }
