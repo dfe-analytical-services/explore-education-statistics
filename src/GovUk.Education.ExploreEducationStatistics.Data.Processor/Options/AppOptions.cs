@@ -7,5 +7,7 @@ public class AppOptions
 
     public string PrivateStorageConnectionString { get; init; } = null!;
 
+    public string ImporterStorageConnectionString { get; init; } = null!;
+
     public int RowsPerBatch { get; init; }
 }
