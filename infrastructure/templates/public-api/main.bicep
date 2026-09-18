@@ -114,10 +114,10 @@ param publicUrls {
 }
 
 @description('The existing app settings for the Data Processor Function App production slot, fetched by the pipeline before deployment.')
-param existingProductionAppSettings object = {}
+param processorProdAppSettings object = {}
 
 @description('The existing app settings for the Data Processor Function App staging slot, fetched by the pipeline before deployment.')
-param existingStagingAppSettings object = {}
+param processorStagingAppSettings object = {}
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string = ''
@@ -396,8 +396,8 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
       ],
       maintenanceFirewallRules
     )
-    existingProductionAppSettings: existingProductionAppSettings
-    existingStagingAppSettings: existingStagingAppSettings
+    processorProdAppSettings: processorProdAppSettings
+    processorStagingAppSettings: processorStagingAppSettings
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

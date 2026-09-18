@@ -22,10 +22,10 @@ parameters:
     type: string
   - name: deployAlerts
     type: string
-  - name: existingProductionAppSettings
+  - name: processorProdAppSettings
     type: string
     default: '{}'
-  - name: existingStagingAppSettings
+  - name: processorStagingAppSettings
     type: string
     default: '{}'
 
@@ -59,8 +59,8 @@ steps:
               deployDataProcessor=${{ parameters.deployDataProcessor }} \
               deployDocsSite=${{ parameters.deployDocsSite }} \
               deployAlerts=${{ parameters.deployAlerts }} \
-              existingProductionAppSettings='${{ parameters.existingProductionAppSettings }}' \
-              existingStagingAppSettings='${{ parameters.existingStagingAppSettings }}' \
+              processorProdAppSettings='${{ parameters.processorProdAppSettings }}' \
+              processorStagingAppSettings='${{ parameters.processorStagingAppSettings }}' \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
               devopsServicePrincipalId="$servicePrincipalId"

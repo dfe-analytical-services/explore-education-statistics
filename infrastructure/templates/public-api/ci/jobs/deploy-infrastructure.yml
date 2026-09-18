@@ -34,8 +34,8 @@ jobs:
                 deployDataProcessor: false
                 deployDocsSite: false
                 deployAlerts: false
-                existingProductionAppSettings: '{}'
-                existingStagingAppSettings: '{}'
+                processorProdAppSettings: '{}'
+                processorStagingAppSettings: '{}'
 
             - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
               parameters:
@@ -43,7 +43,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 functionAppName: $(dataProcessorFunctionAppName)
-                variableName: existingProductionAppSettings
+                variableName: processorProdAppSettings
 
             - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
               parameters:
@@ -51,7 +51,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 functionAppName: $(dataProcessorFunctionAppName)
-                variableName: existingStagingAppSettings
+                variableName: processorStagingAppSettings
                 slotName: staging
 
             - template: ../tasks/deploy-bicep.yml
@@ -65,8 +65,8 @@ jobs:
                 deployDataProcessor: $(deployDataProcessor)
                 deployDocsSite: $(deployDocsSite)
                 deployAlerts: $(deployAlerts)
-                existingProductionAppSettings: $(existingProductionAppSettings)
-                existingStagingAppSettings: $(existingStagingAppSettings)
+                processorProdAppSettings: $(processorProdAppSettings)
+                processorStagingAppSettings: $(processorStagingAppSettings)
 
             # - template: ../tasks/assign-app-role-to-service-principal.yml
             #   parameters:

@@ -11,10 +11,10 @@ param location string
 param applicationInsightsKey string
 
 @description('The existing app settings for the production slot, fetched by the pipeline before deployment.')
-param existingProductionAppSettings object = {}
+param processorProdAppSettings object = {}
 
 @description('The existing app settings for the staging slot, fetched by the pipeline before deployment.')
-param existingStagingAppSettings object = {}
+param processorStagingAppSettings object = {}
 
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
@@ -102,8 +102,8 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       name: dataProcessorFunctionAppManagedIdentity.name
       principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
     }
-    existingProductionAppSettings: existingProductionAppSettings
-    existingStagingAppSettings: existingStagingAppSettings
+    processorProdAppSettings: processorProdAppSettings
+    processorStagingAppSettings: processorStagingAppSettings
     keyVaultName: resourceNames.existingResources.keyVault
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'

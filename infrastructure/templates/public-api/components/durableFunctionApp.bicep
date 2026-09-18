@@ -83,10 +83,10 @@ param sku FunctionAppServicePlanSku
 param keyVaultName string
 
 @description('The existing app settings for the production slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
-param existingProductionAppSettings object = {}
+param processorProdAppSettings object = {}
 
 @description('The existing app settings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
-param existingStagingAppSettings object = {}
+param processorStagingAppSettings object = {}
 
 @description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
 param preWarmedInstanceCount int?
@@ -379,8 +379,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   name: '${functionAppName}AppServiceSlotConfigDeploy'
   params: {
     appName: functionApp.name
-    existingStagingAppSettings: existingStagingAppSettings
-    existingProductionAppSettings: existingProductionAppSettings
+    processorStagingAppSettings: processorStagingAppSettings
+    processorProdAppSettings: processorProdAppSettings
     slotSpecificSettingKeys: [
       // This value is sticky to its individual slot and will not swap when slot swapping occurs.
       // This "SLOT_NAME" configuration value is merely to help enable debugging and checking which
