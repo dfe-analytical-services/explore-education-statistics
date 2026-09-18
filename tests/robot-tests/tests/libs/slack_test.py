@@ -57,6 +57,33 @@ class SlackServiceTests(unittest.TestCase):
         )
         remove_mock.assert_called_once_with("report.zip")
 
+    @patch("tests.libs.slack.os.remove")
+    @patch("tests.libs.slack.shutil.make_archive")
+    def test_a_failed_archive_upload_still_reports_the_message_as_sent(
+        self, _make_archive_mock, _remove_mock, web_client_mock
+    ):
+        """
+        The archive is supplementary to a report that has already been posted. Reporting
+        the run as unsent would leave the pipeline treating a suite that did report as
+        silent.
+        """
+        web_client_mock.return_value.chat_postMessage.return_value = self._response()
+        web_client_mock.return_value.files_upload_v2.side_effect = Exception("upload refused")
+        notification = UiTestNotification(title="⚠️ UI tests on dev — admin", results_archive_name="report.zip")
+
+        self.assertTrue(SlackService().send_notification(notification))
+
+    @patch("tests.libs.slack.os.remove")
+    @patch("tests.libs.slack.shutil.make_archive", side_effect=OSError("no space left on device"))
+    def test_a_failed_archive_build_still_reports_the_message_as_sent(
+        self, _make_archive_mock, _remove_mock, web_client_mock
+    ):
+        web_client_mock.return_value.chat_postMessage.return_value = self._response()
+        notification = UiTestNotification(title="⚠️ UI tests on dev — admin", results_archive_name="report.zip")
+
+        self.assertTrue(SlackService().send_notification(notification))
+        web_client_mock.return_value.files_upload_v2.assert_not_called()
+
     def test_raises_when_the_token_is_missing(self, _web_client_mock):
         with patch.dict("os.environ", {}, clear=True):
             with self.assertRaises(AssertionError):

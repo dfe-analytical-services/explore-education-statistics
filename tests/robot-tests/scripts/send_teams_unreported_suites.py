@@ -49,7 +49,7 @@ def send_unreported_suites(artifacts_directory: Path, environment: str) -> bool:
         logger.info("Every UI test suite reported its own result; there is nothing to report")
         return False
 
-    notification = unreported_suites(environment, unreported, azure_pipelines.current_artifacts_url())
+    notification = unreported_suites(environment, unreported, azure_pipelines.current_results_url())
     return TeamsService().send_test_report(notification.to_teams_card())
 
 

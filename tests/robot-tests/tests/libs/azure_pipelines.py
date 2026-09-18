@@ -19,12 +19,23 @@ def get_pipeline_artifacts_url(collection_uri: str, project: str, build_id: str)
     )
 
 
-def current_artifacts_url() -> Optional[str]:
+def current_results_url() -> Optional[str]:
     """
-    Built from the variables that Azure DevOps predefines for every task. None outside
-    of a pipeline, so that local test runs report without a link to artifacts that do
-    not exist.
+    Where to send a reader to see the results of this test run.
+
+    Built from the variables that Azure DevOps predefines for every task, and None
+    outside of a pipeline, so that local test runs report without a link to results that
+    do not exist.
+
+    A release deploys a build, so its BUILD_BUILDID is the application build being
+    deployed rather than this test run, and its artifacts are the application's. The
+    release itself is the only thing that knows about the tests, so link to that instead.
     """
+    release_url = os.getenv("RELEASE_RELEASEWEBURL")
+
+    if release_url:
+        return release_url
+
     return get_pipeline_artifacts_url(
         collection_uri=os.getenv("SYSTEM_TEAMFOUNDATIONCOLLECTIONURI", ""),
         project=os.getenv("SYSTEM_TEAMPROJECT", ""),

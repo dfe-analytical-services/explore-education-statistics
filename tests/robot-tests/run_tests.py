@@ -122,12 +122,12 @@ def _send_test_report(notifier: UiTestNotifier, args: argparse.Namespace, failin
             run_attempts=test_runs,
             failed_suites=tuple(failing_suites),
         )
-        notification = ui_test_report(results, azure_pipelines.current_artifacts_url())
+        notification = ui_test_report(results, azure_pipelines.current_results_url())
     except Exception as ex:
         logger.error("Unable to build the UI test report")
         logger.error(ex)
         notification = ui_test_exception(
-            args.env, suite_label(args.tests), test_runs, ex, azure_pipelines.current_artifacts_url()
+            args.env, suite_label(args.tests), test_runs, ex, azure_pipelines.current_results_url()
         )
 
     _send_notification(notifier, notification)
@@ -275,7 +275,7 @@ def run():
                     suite_label(args.tests) if args else UNKNOWN,
                     test_run_index,
                     ex,
-                    azure_pipelines.current_artifacts_url(),
+                    azure_pipelines.current_results_url(),
                 ),
             )
         except Exception as notification_ex:
