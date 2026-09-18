@@ -4,6 +4,7 @@ type StorageAccountRole =
   | 'Storage Blob Data Owner'
   | 'Storage Blob Data Reader'
   | 'Storage Queue Data Contributor'
+  | 'Storage Account Backup Contributor'
 
 @description('Specifies the name of the Storage Account.')
 param storageAccountName string

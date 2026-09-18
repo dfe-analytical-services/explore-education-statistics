@@ -51,3 +51,6 @@ module recoveryServicesVaultModule 'recovery-services-vault.bicep' = if (deployR
     tagValues: tagValues
   }
 }
+
+output backupVaultName string = backupVaultModule.outputs.vaultName
+output backupVaultBlobsPolicyName string = backupBlobsPolicyModule.outputs.policyName
