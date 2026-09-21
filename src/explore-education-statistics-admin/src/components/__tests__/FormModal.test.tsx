@@ -1,4 +1,5 @@
-import { act, render, RenderResult, screen } from '@testing-library/react';
+import createDeferredHandler from '@common-test/createDeferredHandler';
+import { render, RenderResult, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React, { ReactNode } from 'react';
 import { FieldValues } from 'react-hook-form';
@@ -6,7 +7,7 @@ import FormModal from '../FormModal';
 
 describe('FormModal', () => {
   test('trigger button opens modal', async () => {
-    const { handleSubmit } = createDeferredSubmit();
+    const { handler: handleSubmit } = createDeferredHandler();
 
     await renderModal(handleSubmit, { open: false });
 
@@ -19,7 +20,7 @@ describe('FormModal', () => {
 
   describe('submitting WITHOUT confirmation warning', () => {
     test('clicking submit button disables all buttons and shows loading spinner', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit);
 
@@ -34,7 +35,7 @@ describe('FormModal', () => {
     });
 
     test('clicking submit button prevents closing modal using Esc', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit);
 
@@ -48,7 +49,7 @@ describe('FormModal', () => {
     });
 
     test('clicking submit button prevents closing modal by clicking the underlay', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       const { baseElement } = await renderModal(handleSubmit);
 
@@ -64,7 +65,8 @@ describe('FormModal', () => {
     });
 
     test('closes the modal once `onSubmit` has completed', async () => {
-      const { handleSubmit, resolveSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit, resolveHandler: resolveSubmit } =
+        createDeferredHandler();
 
       await renderModal(handleSubmit);
 
@@ -83,7 +85,7 @@ describe('FormModal', () => {
 
   describe('cancelling WITHOUT confirmation warning', () => {
     test('clicking Cancel button closes modal', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit);
 
@@ -98,7 +100,7 @@ describe('FormModal', () => {
 
   describe('submitting WITH confirmation warning', () => {
     test('clicking FIRST submit button displays confirmation warning', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit, {
         confirmationWarningText: <p>Warning text.</p>,
@@ -119,7 +121,7 @@ describe('FormModal', () => {
     });
 
     test('clicking SECOND confirmation button prevents closing modal using Esc', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit, {
         confirmationWarningText: <p>Warning text.</p>,
@@ -139,7 +141,7 @@ describe('FormModal', () => {
     });
 
     test('clicking SECOND confirmation button prevents closing modal by clicking the underlay', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       const { baseElement } = await renderModal(handleSubmit, {
         confirmationWarningText: <p>Warning text.</p>,
@@ -161,7 +163,8 @@ describe('FormModal', () => {
     });
 
     test('closes the modal once `onSubmit` has completed after clicking SECOND confirmation button', async () => {
-      const { handleSubmit, resolveSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit, resolveHandler: resolveSubmit } =
+        createDeferredHandler();
 
       await renderModal(handleSubmit, {
         confirmationWarningText: <p>Warning text.</p>,
@@ -186,7 +189,7 @@ describe('FormModal', () => {
 
   describe('cancelling WITH confirmation warning', () => {
     test('clicking SECOND Cancel button displays initial modal content and removes the confirmation warning', async () => {
-      const { handleSubmit } = createDeferredSubmit();
+      const { handler: handleSubmit } = createDeferredHandler();
 
       await renderModal(handleSubmit, {
         confirmationWarningText: <p>Warning text.</p>,
@@ -215,32 +218,6 @@ describe('FormModal', () => {
       expect(screen.getByText('Child node.')).toBeInTheDocument();
     });
   });
-
-  /**
-   * Creates an `onSubmit` handler that stays pending until the test decides to
-   * complete it via `resolveSubmit`.
-   */
-  function createDeferredSubmit() {
-    let resolve: () => void = () => {};
-
-    const submitted = new Promise<void>(res => {
-      resolve = res;
-    });
-
-    return {
-      handleSubmit: jest.fn(() => submitted),
-      /**
-       * Wrapped in `act` so that the state updates made by `FormModal` once
-       * `onSubmit` settles are flushed before the test asserts on them.
-       */
-      resolveSubmit: async () => {
-        await act(async () => {
-          resolve();
-          await submitted;
-        });
-      },
-    };
-  }
 
   async function renderModal<TFormValues extends FieldValues>(
     onSubmit: (formValues: TFormValues) => Promise<void>,
