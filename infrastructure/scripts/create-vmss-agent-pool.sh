@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-# Creates a new VMSS-based Azure Pipelines agent scale set, booting from a
-# vanilla Canonical Ubuntu marketplace image instead of a custom-built one,
-# with encryption-at-host enabled from creation (this can only be set when a
-# scale set/instance is first created, not added to an existing one).
-#
-# This replaces the manually-created ees-ubuntu2204-large scale set. Values
-# below were read directly from that scale set's current configuration on
-# 2026-09-16, so the new one matches it in every way except the image and
-# encryption-at-host.
+# Creates a VMSS-based Azure Pipelines agent scale set, booting from a
+# vanilla Canonical Ubuntu marketplace image, with encryption-at-host
+# enabled from creation (this can only be set when a scale set/instance is
+# first created, not added to an existing one).
 #
 # Prerequisites (one-time, per subscription):
 #   az feature register --namespace Microsoft.Compute --name EncryptionAtHost
@@ -19,7 +14,9 @@
 #   az vm image list --all --publisher Canonical --offer ubuntu-26_04-lts -o table
 #
 # Usage:
-#   bash infrastructure/scripts/create-vmss-agent-pool.sh
+#   bash infrastructure/scripts/create-vmss-agent-pool.sh                     # creates the "large" scale set
+#   SCALE_SET_NAME=ees-ubuntu2604-xlarge-v2 VM_SKU=Standard_D8ds_v5 \
+#     bash infrastructure/scripts/create-vmss-agent-pool.sh                   # creates the "xlarge" scale set
 set -euxo pipefail
 
 # On Git Bash/MSYS2 (Windows), arguments starting with "/" - like the
@@ -30,22 +27,24 @@ set -euxo pipefail
 export MSYS_NO_PATHCONV=1
 
 RESOURCE_GROUP="S101D01-RG-EES"
-SCALE_SET_NAME="ees-ubuntu2604-large-v2"
+SCALE_SET_NAME="${SCALE_SET_NAME:-ees-ubuntu2604-large-v2}"
 LOCATION="westeurope"   # confirmed from the resource group's "West Europe" location in the portal
 
-# Same VM size and initial capacity as the current ees-ubuntu2204-large.
-VM_SKU="Standard_D4ds_v5"
+# Defaults to "large" sizing. Override both env vars to build the "xlarge"
+# scale set instead (see usage comment above) - it's identical apart from
+# the VM size.
+VM_SKU="${VM_SKU:-Standard_D4ds_v5}"
 INSTANCE_COUNT=2   # Azure Pipelines will take over managing this count once the pool is registered
 
 # Canonical:offer:sku:version - verify the sku before running (see comment above).
 IMAGE_URN="Canonical:ubuntu-26_04-lts:server:latest"
 
-# Same OS disk settings as today: 86GB, Standard_LRS, ephemeral (local/resource
-# disk, read-only caching) - Standard_LRS is required for ephemeral OS disks.
+# 86GB, Standard_LRS, ephemeral (local/resource disk, read-only caching) -
+# Standard_LRS is required for ephemeral OS disks.
 OS_DISK_SIZE_GB=86
 STORAGE_SKU="Standard_LRS"
 
-# Same subnet the current scale set uses.
+# EES runner agents subnet - shared by both the large and xlarge scale sets.
 SUBNET_ID="/subscriptions/48ea0797-73c6-4202-bf90-b01c817058e9/resourceGroups/s101d01-rg-ees/providers/Microsoft.Network/virtualNetworks/s101d01-vnet-ees-runners/subnets/s101d01-snet-ees-runners-ubuntu2204"
 
 az vmss create \
