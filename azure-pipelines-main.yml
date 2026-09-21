@@ -55,7 +55,7 @@ pr:
 
 jobs:
   - job: BackendVerify
-    pool: ees-ubuntu2604-large-v2   # TEMPORARY - testing the new image/pool, EES-6728 - revert before merging
+    pool: ees-ubuntu2204-large
     workspace:
       clean: all
     steps:
