@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public class OrganisationService(ContentDbContext contentDbContext) : IOrganisationService
+public class OrganisationsService(ContentDbContext contentDbContext) : IOrganisationsService
 {
     public async Task<Organisation[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
         await contentDbContext.Organisations.OrderBy(o => o.Title).ToArrayAsync(cancellationToken);

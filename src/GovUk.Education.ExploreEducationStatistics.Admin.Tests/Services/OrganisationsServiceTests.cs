@@ -8,11 +8,11 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public abstract class OrganisationServiceTests
+public abstract class OrganisationsServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetAllOrganisationTests : OrganisationServiceTests
+    public class GetAllOrganisationTests : OrganisationsServiceTests
     {
         [Theory]
         [InlineData(0)]
@@ -43,8 +43,8 @@ public abstract class OrganisationServiceTests
         }
     }
 
-    private static OrganisationService BuildService(ContentDbContext context = null)
+    private static OrganisationsService BuildService(ContentDbContext context = null)
     {
-        return new OrganisationService(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
+        return new OrganisationsService(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
     }
 }

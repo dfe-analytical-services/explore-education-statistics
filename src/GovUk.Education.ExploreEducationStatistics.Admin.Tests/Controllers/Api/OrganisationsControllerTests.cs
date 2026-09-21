@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 public abstract class OrganisationsControllerTests
 {
     private readonly DataFixture _dataFixture = new();
-    private readonly OrganisationServiceMockBuilder _organisationService = new();
+    private readonly OrganisationsServiceMockBuilder _organisationsService = new();
 
     public class GetAllOrganisationsTests : OrganisationsControllerTests
     {
@@ -21,14 +21,14 @@ public abstract class OrganisationsControllerTests
         {
             // Arrange
             var organisations = _dataFixture.DefaultOrganisation().GenerateArray(numOrganisations);
-            _organisationService.WhereHasOrganisations(organisations);
+            _organisationsService.WhereHasOrganisations(organisations);
             var sut = BuildController();
 
             // Act
             var result = await sut.GetAllOrganisations();
 
             // Assert
-            _organisationService.Assert.GetAllOrganisationsWasCalled();
+            _organisationsService.Assert.GetAllOrganisationsWasCalled();
             Assert.Equal(numOrganisations, result.Length);
             Assert.All(
                 result,
@@ -45,6 +45,6 @@ public abstract class OrganisationsControllerTests
 
     private OrganisationsController BuildController()
     {
-        return new OrganisationsController(_organisationService.Build());
+        return new OrganisationsController(_organisationsService.Build());
     }
 }

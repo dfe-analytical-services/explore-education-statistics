@@ -5,20 +5,20 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 
-public class OrganisationServiceMockBuilder
+public class OrganisationsServiceMockBuilder
 {
-    private readonly Mock<IOrganisationService> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IOrganisationsService> _mock = new(MockBehavior.Strict);
 
     private Organisation[]? _organisations;
 
-    public IOrganisationService Build()
+    public IOrganisationsService Build()
     {
         _mock.Setup(m => m.GetAllOrganisations(It.IsAny<CancellationToken>())).ReturnsAsync(_organisations ?? []);
 
         return _mock.Object;
     }
 
-    public OrganisationServiceMockBuilder WhereHasOrganisations(Organisation[] organisations)
+    public OrganisationsServiceMockBuilder WhereHasOrganisations(Organisation[] organisations)
     {
         _organisations = organisations;
         return this;
@@ -26,7 +26,7 @@ public class OrganisationServiceMockBuilder
 
     public Asserter Assert => new(_mock);
 
-    public class Asserter(Mock<IOrganisationService> mock)
+    public class Asserter(Mock<IOrganisationsService> mock)
     {
         public void GetAllOrganisationsWasCalled()
         {

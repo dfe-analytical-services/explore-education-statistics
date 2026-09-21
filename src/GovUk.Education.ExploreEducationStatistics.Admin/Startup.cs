@@ -614,7 +614,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
-        services.AddTransient<IOrganisationService, OrganisationService>();
+        services.AddTransient<IOrganisationsService, OrganisationsService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
         services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
