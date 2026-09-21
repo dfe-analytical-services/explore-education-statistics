@@ -48,7 +48,7 @@ resource backupPolicy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022
     datasourceTypes: [getFullBackupVaultDataSourceType('blobs')]
     policyRules: [
       {
-        name: 'Default'
+        name: 'Default_OperationalStore'
         objectType: 'AzureRetentionRule'
         isDefault: true
         lifecycles: [
