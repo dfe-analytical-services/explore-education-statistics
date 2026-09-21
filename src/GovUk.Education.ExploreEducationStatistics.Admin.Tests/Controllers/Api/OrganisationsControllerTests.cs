@@ -1,27 +1,28 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
 
 public abstract class OrganisationsControllerTests
 {
-    private readonly DataFixture _dataFixture = new();
     private readonly OrganisationsServiceMockBuilder _organisationsService = new();
 
     public class GetAllOrganisationsTests : OrganisationsControllerTests
     {
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(10)]
-        public async Task GetAllOrganisations_ReturnsExpectedOrganisations(int numOrganisations)
+        [Fact]
+        public async Task WhenServiceReturnsOrganisations_ReturnsOk()
         {
             // Arrange
-            var organisations = _dataFixture.DefaultOrganisation().GenerateArray(numOrganisations);
+            OrganisationViewModel[] organisations =
+            [
+                new OrganisationViewModelBuilder().WithTitle("Organisation A").Build(),
+                new OrganisationViewModelBuilder().WithTitle("Organisation B").Build(),
+            ];
             _organisationsService.WhereHasOrganisations(organisations);
+
             var sut = BuildController();
 
             // Act
@@ -29,22 +30,25 @@ public abstract class OrganisationsControllerTests
 
             // Assert
             _organisationsService.Assert.GetAllOrganisationsWasCalled();
-            Assert.Equal(numOrganisations, result.Length);
-            Assert.All(
-                result,
-                (organisation, index) =>
-                {
-                    var expectedOrganisation = organisations[index];
-                    Assert.Equal(expectedOrganisation.Id, organisation.Id);
-                    Assert.Equal(expectedOrganisation.Title, organisation.Title);
-                    Assert.Equal(expectedOrganisation.Url, organisation.Url);
-                }
-            );
+            Assert.Equal(organisations, result);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNoOrganisations_ReturnsEmpty()
+        {
+            // Arrange
+            _organisationsService.WhereHasOrganisations([]);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetAllOrganisations();
+
+            // Assert
+            _organisationsService.Assert.GetAllOrganisationsWasCalled();
+            Assert.Empty(result);
         }
     }
 
-    private OrganisationsController BuildController()
-    {
-        return new OrganisationsController(_organisationsService.Build());
-    }
+    private OrganisationsController BuildController() => new(_organisationsService.Build());
 }

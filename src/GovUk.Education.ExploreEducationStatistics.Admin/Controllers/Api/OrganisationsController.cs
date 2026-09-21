@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +13,5 @@ public class OrganisationsController(IOrganisationsService organisationsService)
 {
     [HttpGet("organisations")]
     public async Task<OrganisationViewModel[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
-        (await organisationsService.GetAllOrganisations(cancellationToken))
-            .Select(OrganisationViewModel.FromOrganisation)
-            .ToArray();
+        await organisationsService.GetAllOrganisations(cancellationToken);
 }

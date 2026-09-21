@@ -18,7 +18,7 @@ public abstract class OrganisationsServiceTests
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(10)]
-        public async Task GetAllOrganisations_ReturnsExpectedOrganisationsInOrderByTitle(int numOrganisations)
+        public async Task WhenOrganisationsExist_ReturnsOrganisationsOrderedByTitle(int numOrganisations)
         {
             // Arrange
             var organisations = _dataFixture.DefaultOrganisation().GenerateArray(numOrganisations).Shuffle();
@@ -38,13 +38,26 @@ public abstract class OrganisationsServiceTests
                 var result = await sut.GetAllOrganisations();
 
                 // Assert
-                Assert.Equal(organisations.OrderBy(o => o.Title), result);
+                var expectedOrganisations = organisations.OrderBy(o => o.Title).ToArray();
+
+                Assert.Equal(expectedOrganisations.Length, result.Length);
+                Assert.All(
+                    expectedOrganisations,
+                    (expectedOrganisation, index) =>
+                    {
+                        var actualOrganisation = result[index];
+                        Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.GISLogoHexCode, actualOrganisation.GISLogoHexCode);
+                        Assert.Equal(expectedOrganisation.LogoFileName, actualOrganisation.LogoFileName);
+                        Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
+                        Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
+                        Assert.Equal(expectedOrganisation.UseGISLogo, actualOrganisation.UseGISLogo);
+                    }
+                );
             }
         }
     }
 
-    private static OrganisationsService BuildService(ContentDbContext context = null)
-    {
-        return new OrganisationsService(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
-    }
+    private static OrganisationsService BuildService(ContentDbContext context = null) =>
+        new(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
 }

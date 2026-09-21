@@ -1,9 +1,9 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IOrganisationsService
 {
-    Task<Organisation[]> GetAllOrganisations(CancellationToken cancellationToken = default);
+    Task<OrganisationViewModel[]> GetAllOrganisations(CancellationToken cancellationToken = default);
 }

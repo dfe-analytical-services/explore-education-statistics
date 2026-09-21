@@ -1,6 +1,6 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
@@ -9,7 +9,7 @@ public class OrganisationsServiceMockBuilder
 {
     private readonly Mock<IOrganisationsService> _mock = new(MockBehavior.Strict);
 
-    private Organisation[]? _organisations;
+    private OrganisationViewModel[]? _organisations;
 
     public IOrganisationsService Build()
     {
@@ -18,7 +18,7 @@ public class OrganisationsServiceMockBuilder
         return _mock.Object;
     }
 
-    public OrganisationsServiceMockBuilder WhereHasOrganisations(Organisation[] organisations)
+    public OrganisationsServiceMockBuilder WhereHasOrganisations(OrganisationViewModel[] organisations)
     {
         _organisations = organisations;
         return this;
