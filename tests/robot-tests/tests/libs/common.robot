@@ -835,6 +835,11 @@ user checks select contains option
     ${options}=    get list items    ${locator}
     list should contain value    ${options}    ${label}
 
+user waits until select contains option
+    [Arguments]    ${locator}    ${label}    ${wait}=${timeout}
+    wait until keyword succeeds    ${wait}    1s
+    ...    user checks select contains option    ${locator}    ${label}
+
 user checks select does not contain option
     [Arguments]    ${locator}    ${label}
     ${options}=    get list items    ${locator}
