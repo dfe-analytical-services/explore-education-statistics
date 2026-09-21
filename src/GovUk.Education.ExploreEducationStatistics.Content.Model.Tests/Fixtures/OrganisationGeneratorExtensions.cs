@@ -23,10 +23,10 @@ public static class OrganisationGeneratorExtensions
     public static Generator<Organisation> WithId(this Generator<Organisation> generator, Guid id) =>
         generator.ForInstance(s => s.SetId(id));
 
-    public static Generator<Organisation> WithGISLogoHexCode(
+    public static Generator<Organisation> WithGisLogoHexCode(
         this Generator<Organisation> generator,
         string? gisLogoHexCode
-    ) => generator.ForInstance(s => s.SetGISLogoHexCode(gisLogoHexCode));
+    ) => generator.ForInstance(s => s.SetGisLogoHexCode(gisLogoHexCode));
 
     public static Generator<Organisation> WithLogoFileName(
         this Generator<Organisation> generator,
@@ -39,8 +39,8 @@ public static class OrganisationGeneratorExtensions
     public static Generator<Organisation> WithUrl(this Generator<Organisation> generator, string url) =>
         generator.ForInstance(s => s.SetUrl(url));
 
-    public static Generator<Organisation> WithUseGISLogo(this Generator<Organisation> generator, bool useGisLogo) =>
-        generator.ForInstance(s => s.SetUseGISLogo(useGisLogo));
+    public static Generator<Organisation> WithUseGisLogo(this Generator<Organisation> generator, bool useGisLogo) =>
+        generator.ForInstance(s => s.SetUseGisLogo(useGisLogo));
 
     public static Generator<Organisation> WithCreated(this Generator<Organisation> generator, DateTimeOffset created) =>
         generator.ForInstance(s => s.SetCreated(created));
@@ -53,7 +53,7 @@ public static class OrganisationGeneratorExtensions
     public static InstanceSetters<Organisation> SetId(this InstanceSetters<Organisation> setters, Guid id) =>
         setters.Set(o => o.Id, id);
 
-    public static InstanceSetters<Organisation> SetGISLogoHexCode(
+    public static InstanceSetters<Organisation> SetGisLogoHexCode(
         this InstanceSetters<Organisation> setters,
         string? gisLogoHexCode
     ) => setters.Set(o => o.GISLogoHexCode, gisLogoHexCode);
@@ -69,7 +69,7 @@ public static class OrganisationGeneratorExtensions
     public static InstanceSetters<Organisation> SetUrl(this InstanceSetters<Organisation> setters, string url) =>
         setters.Set(o => o.Url, url);
 
-    public static InstanceSetters<Organisation> SetUseGISLogo(
+    public static InstanceSetters<Organisation> SetUseGisLogo(
         this InstanceSetters<Organisation> setters,
         bool useGisLogo
     ) => setters.Set(o => o.UseGISLogo, useGisLogo);

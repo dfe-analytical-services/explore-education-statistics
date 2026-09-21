@@ -64,9 +64,9 @@ public abstract class OrganisationsServiceTests
             // Arrange
             Organisation organisation = _dataFixture
                 .DefaultOrganisation()
-                .WithGISLogoHexCode(null)
+                .WithGisLogoHexCode(null)
                 .WithLogoFileName("ofsted-logo.png")
-                .WithUseGISLogo(false);
+                .WithUseGisLogo(false);
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
