@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using Moq;
@@ -11,12 +12,15 @@ public class OrganisationsServiceMockBuilder
 
     private OrganisationViewModel[]? _organisations;
 
-    public IOrganisationsService Build()
-    {
-        _mock.Setup(m => m.GetAllOrganisations(It.IsAny<CancellationToken>())).ReturnsAsync(_organisations ?? []);
+    private static readonly Expression<Func<IOrganisationsService, Task<OrganisationViewModel[]>>> GetAllOrganisations =
+        m => m.GetAllOrganisations(It.IsAny<CancellationToken>());
 
-        return _mock.Object;
+    public OrganisationsServiceMockBuilder()
+    {
+        _mock.Setup(GetAllOrganisations).ReturnsAsync(() => _organisations ?? []);
     }
+
+    public IOrganisationsService Build() => _mock.Object;
 
     public OrganisationsServiceMockBuilder WhereHasOrganisations(OrganisationViewModel[] organisations)
     {
@@ -30,7 +34,7 @@ public class OrganisationsServiceMockBuilder
     {
         public void GetAllOrganisationsWasCalled()
         {
-            mock.Verify(m => m.GetAllOrganisations(It.IsAny<CancellationToken>()), Times.Once);
+            mock.Verify(GetAllOrganisations, Times.Once);
         }
     }
 }

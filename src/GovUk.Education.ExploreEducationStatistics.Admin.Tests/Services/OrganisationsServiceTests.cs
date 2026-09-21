@@ -1,9 +1,10 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -12,7 +13,7 @@ public abstract class OrganisationsServiceTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetAllOrganisationTests : OrganisationsServiceTests
+    public class GetAllOrganisationsTests : OrganisationsServiceTests
     {
         [Theory]
         [InlineData(0)]
@@ -56,8 +57,39 @@ public abstract class OrganisationsServiceTests
                 );
             }
         }
+
+        [Fact]
+        public async Task WhenOrganisationDoesNotUseGISLogo_ReturnsNullHexCode()
+        {
+            // Arrange
+            Organisation organisation = _dataFixture
+                .DefaultOrganisation()
+                .WithGISLogoHexCode(null)
+                .WithLogoFileName("ofsted-logo.png")
+                .WithUseGISLogo(false);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Organisations.Add(organisation);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var result = await sut.GetAllOrganisations();
+
+                // Assert
+                var actualOrganisation = Assert.Single(result);
+                Assert.Null(actualOrganisation.GISLogoHexCode);
+                Assert.Equal("ofsted-logo.png", actualOrganisation.LogoFileName);
+                Assert.False(actualOrganisation.UseGISLogo);
+            }
+        }
     }
 
-    private static OrganisationsService BuildService(ContentDbContext context = null) =>
-        new(context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict));
+    private static OrganisationsService BuildService(ContentDbContext contentDbContext) => new(contentDbContext);
 }
