@@ -1,0 +1,40 @@
+import { getFullBackupVaultDataSourceType } from 'functions.bicep'
+
+@description('Full resource id of the resource instance that owns the data source.')
+param resourceId string
+
+@description('The location of the resource being backed up.')
+param resourceLocation string
+
+@description('Full resource id of the backup policy that is used to backup this resource.')
+param backupPolicyName string
+
+@description('Name of the backup vault that this policy belongs to.')
+param vaultName string
+
+@description('Name of the backup instance to create, unique within the vault.')
+param instanceName string
+
+@description('A set of tags with which to tag the resource in Azure.')
+param tagValues object
+
+resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' existing = {
+  name: '${vaultName}/${backupPolicyName}'
+}
+
+resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2026-06-01' = {
+  name: '${vaultName}/${instanceName}'
+  properties: {
+    dataSourceInfo: {
+      datasourceType: getFullBackupVaultDataSourceType('psqlFlexibleServer')
+      objectType: 'Datasource'
+      resourceID: resourceId
+      resourceLocation: resourceLocation
+    }
+    policyInfo: {
+      policyId: policy.id
+    }
+    objectType: 'BackupInstance'
+  }
+  tags: tagValues
+}

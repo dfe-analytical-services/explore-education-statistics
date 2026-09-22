@@ -102,6 +102,8 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     outboundSubnetId: outboundVnetSubnet.id
     storageAccountAllowedSubnetIds: [publisherSubnet.id]
     storageFirewallRules: maintenanceIpRanges
+    storageAccountPublicNetworkAccessEnabled: true
+    deployQueueRoleAssignment: true
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
@@ -122,6 +124,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       fileServiceCapacity: false
       alertsGroupName: resourceNames.alertsGroup
     } : null
+    healthCheckPath: '/'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     appSettings: [
       {
