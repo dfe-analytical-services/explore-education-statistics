@@ -105,7 +105,7 @@ jobs:
               /scripts/public-api-openapi-diff.sh
 
   - job: BackendTest
-    pool: ees-ubuntu2204-xlarge
+    pool: ees-ubuntu2604-xlarge-v2   # TEMPORARY - testing the new image/pool, EES-6728 - never merge this branch
     workspace:
       clean: all
     steps:
@@ -127,8 +127,8 @@ jobs:
             **/GovUk.*[Tt]ests/*.csproj
             !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
           arguments: --configuration $(BuildConfiguration)
-        env:
-          DOCKER_API_VERSION: 1.43
+        # DOCKER_API_VERSION removed for this test run - deliberately
+        # verifying the new Docker Engine works without the old workaround
 
   - job: BackendPublish
     pool:
