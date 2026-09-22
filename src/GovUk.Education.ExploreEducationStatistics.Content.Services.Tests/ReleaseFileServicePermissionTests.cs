@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -90,6 +91,7 @@ public class ReleaseFileServicePermissionTests
             dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
             userService ?? Mock.Of<IUserService>(),
             analyticsManager ?? Mock.Of<IAnalyticsManager>(),
+            Mock.Of<IReleaseVersionRepository>(),
             logger ?? Mock.Of<ILogger<ReleaseFileService>>()
         );
     }

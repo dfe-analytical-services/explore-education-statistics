@@ -197,6 +197,9 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
     adminAppUrl: 'https://admin.${environmentConfig.domain!}'
     publicAppUrl: 'https://${environmentConfig.domain!}'
+    contentApiHostName: contentApiPublicHostname
+    frontDoorCachePurgeEnabled: publisherConfig.frontDoorCachePurgeEnabled!
+    frontDoorEndpointResourceId: afdEndpointResourceId
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
@@ -256,6 +259,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
+    restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)

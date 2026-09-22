@@ -39,6 +39,13 @@ param analyticsEnabled bool
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
+ @description('''
+Whether to restrict this App Service origin to requests routed through this environment's Azure Front Door
+profile. Enable only after the Content API custom domain has been cut over to Front Door, as enabling it
+beforehand will reject traffic still arriving directly.
+''')
+param restrictOriginToFrontDoor bool = false
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -52,6 +59,24 @@ var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databas
 var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.publicSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
 var analyticsFileShareMountPath string = '\\mounts\\analytics'
+
+var frontDoorProfileResourceId = resourceId('Microsoft.Cdn/profiles', resourceNames.frontDoor.frontDoorName)
+
+// Allow only requests arriving via this environment's Azure Front Door profile. The service tag alone admits
+// any Front Door tenant, so the "x-azure-fdid" header match is what pins traffic to our own profile.
+var frontDoorOriginFirewallRules = restrictOriginToFrontDoor
+  ? [
+      {
+        name: 'Allow Azure Front Door'
+        cidr: 'AzureFrontDoor.Backend'
+        tag: 'ServiceTag'
+        priority: 100
+        headers: {
+          'x-azure-fdid': [reference(frontDoorProfileResourceId, '2025-04-15').frontDoorId]
+        }
+      }
+    ]
+  : []
 
 resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
   name: resourceNames.analytics.storage.storageAccountName
@@ -121,6 +146,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
+    firewallRules: frontDoorOriginFirewallRules
+    ipSecurityRestrictionsDefaultAction: restrictOriginToFrontDoor ? 'Deny' : null
     azureFileShares: analyticsEnabled ? [
       {
         storageName: analyticsStorageAccount.name
