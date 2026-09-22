@@ -708,7 +708,7 @@
       }
     ],
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
-    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
+    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blob-bkpol')]",
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
