@@ -41,6 +41,8 @@ param tagValues object
 
 var endpointSuffix = environment().suffixes.storage
 
+var deployNetworkAccessRestrictions = publicNetworkAccessEnabled && (length(firewallRules) > 0 || length(allowedSubnetIds) > 0)
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
@@ -52,19 +54,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
-    networkAcls: {
+    networkAcls: deployNetworkAccessRestrictions ? {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules: [for firewallRule in firewallRules: {
+      ipRules: map(firewallRules, firewallRule => {
         value: firewallRule.cidr
         action: 'Allow'
-      }]
-      virtualNetworkRules: [for subnetId in allowedSubnetIds: {
+      })
+      virtualNetworkRules: map(allowedSubnetIds, subnetId => {
         #disable-next-line use-resource-id-functions
         id: subnetId
         action: 'Allow'
-      }]
-    }
+      })
+    } : null
   }
   tags: tagValues
 }
