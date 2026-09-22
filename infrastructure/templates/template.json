@@ -185,7 +185,7 @@
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "Whether or not the Azure Blobs are already registered for an environent. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
+        "description": "Whether or not the Azure Blobs are already registered for an environment. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
       }
     },
     "deployBackupVaultRegistrations": {
@@ -708,7 +708,7 @@
       }
     ],
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
-    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
+    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blob-bkpol')]",
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
@@ -847,14 +847,12 @@
           "policyParameters": {
             "backupDatasourceParametersList": [
               {
-                "objectType": "BlobBackupDatasourceParameters",
-                "containersList": [
-                  "cache",
-                  "backups",
-                  "methodologies",
-                  "releases",
-                  "releases-temp"
-                ]
+                "objectType": "BlobBackupDatasourceParametersForAutoProtection",
+                "autoProtectionSettings": {
+                  "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
+                  "enabled": true,
+                  "rules": []
+                }
               }
             ]
           }
@@ -1918,13 +1916,12 @@
           "policyParameters": {
             "backupDatasourceParametersList": [
               {
-                "objectType": "BlobBackupDatasourceParameters",
-                "containersList": [
-                  "cache",
-                  "downloads",
-                  "methodologies",
-                  "permalink-snapshots"
-                ]
+                "objectType": "BlobBackupDatasourceParametersForAutoProtection",
+                "autoProtectionSettings": {
+                  "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
+                  "enabled": true,
+                  "rules": []
+                }
               }
             ]
           }
