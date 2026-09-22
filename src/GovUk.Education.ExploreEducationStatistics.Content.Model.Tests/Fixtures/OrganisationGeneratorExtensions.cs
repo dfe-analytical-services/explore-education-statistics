@@ -12,19 +12,35 @@ public static class OrganisationGeneratorExtensions
 
     public static InstanceSetters<Organisation> SetDefaults(this InstanceSetters<Organisation> setters) =>
         setters
-            .SetDefault(t => t.Id)
-            .SetDefault(t => t.Title)
-            .SetDefault(t => t.Url)
-            .Set(p => p.Created, f => f.Date.Past());
+            .SetDefault(o => o.Id)
+            .Set(o => o.GISLogoHexCode, f => f.Random.Hexadecimal(6, "#"))
+            .SetDefault(o => o.LogoFileName)
+            .SetDefault(o => o.Title)
+            .SetDefault(o => o.Url)
+            .Set(o => o.UseGISLogo, true)
+            .Set(o => o.Created, f => f.Date.Past());
 
     public static Generator<Organisation> WithId(this Generator<Organisation> generator, Guid id) =>
         generator.ForInstance(s => s.SetId(id));
+
+    public static Generator<Organisation> WithGisLogoHexCode(
+        this Generator<Organisation> generator,
+        string? gisLogoHexCode
+    ) => generator.ForInstance(s => s.SetGisLogoHexCode(gisLogoHexCode));
+
+    public static Generator<Organisation> WithLogoFileName(
+        this Generator<Organisation> generator,
+        string logoFileName
+    ) => generator.ForInstance(s => s.SetLogoFileName(logoFileName));
 
     public static Generator<Organisation> WithTitle(this Generator<Organisation> generator, string title) =>
         generator.ForInstance(s => s.SetTitle(title));
 
     public static Generator<Organisation> WithUrl(this Generator<Organisation> generator, string url) =>
         generator.ForInstance(s => s.SetUrl(url));
+
+    public static Generator<Organisation> WithUseGisLogo(this Generator<Organisation> generator, bool useGisLogo) =>
+        generator.ForInstance(s => s.SetUseGisLogo(useGisLogo));
 
     public static Generator<Organisation> WithCreated(this Generator<Organisation> generator, DateTimeOffset created) =>
         generator.ForInstance(s => s.SetCreated(created));
@@ -37,11 +53,26 @@ public static class OrganisationGeneratorExtensions
     public static InstanceSetters<Organisation> SetId(this InstanceSetters<Organisation> setters, Guid id) =>
         setters.Set(o => o.Id, id);
 
+    public static InstanceSetters<Organisation> SetGisLogoHexCode(
+        this InstanceSetters<Organisation> setters,
+        string? gisLogoHexCode
+    ) => setters.Set(o => o.GISLogoHexCode, gisLogoHexCode);
+
+    public static InstanceSetters<Organisation> SetLogoFileName(
+        this InstanceSetters<Organisation> setters,
+        string logoFileName
+    ) => setters.Set(o => o.LogoFileName, logoFileName);
+
     public static InstanceSetters<Organisation> SetTitle(this InstanceSetters<Organisation> setters, string title) =>
         setters.Set(o => o.Title, title);
 
     public static InstanceSetters<Organisation> SetUrl(this InstanceSetters<Organisation> setters, string url) =>
         setters.Set(o => o.Url, url);
+
+    public static InstanceSetters<Organisation> SetUseGisLogo(
+        this InstanceSetters<Organisation> setters,
+        bool useGisLogo
+    ) => setters.Set(o => o.UseGISLogo, useGisLogo);
 
     public static InstanceSetters<Organisation> SetCreated(
         this InstanceSetters<Organisation> setters,

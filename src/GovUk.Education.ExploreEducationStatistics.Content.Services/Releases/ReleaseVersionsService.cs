@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
                     releaseVersion.Id == releaseVersion.Release.Publication.LatestPublishedReleaseVersionId;
 
                 var publishingOrganisations = releaseVersion
-                    .PublishingOrganisations.Select(PublishingOrganisationDto.FromOrganisation)
+                    .PublishingOrganisations.Select(OrganisationDto.FromOrganisation)
                     .OrderBy(o => o.Title)
                     .ToArray();
 

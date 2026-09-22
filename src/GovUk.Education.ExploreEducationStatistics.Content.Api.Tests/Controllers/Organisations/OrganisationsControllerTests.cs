@@ -1,10 +1,10 @@
-#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Builders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.Organisations;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Organisations;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
+using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.Organisations;
 
 public abstract class OrganisationsControllerTests
 {
@@ -16,10 +16,10 @@ public abstract class OrganisationsControllerTests
         public async Task WhenServiceReturnsOrganisations_ReturnsOk()
         {
             // Arrange
-            OrganisationViewModel[] organisations =
+            OrganisationDto[] organisations =
             [
-                new OrganisationViewModelBuilder().WithTitle("Organisation A").Build(),
-                new OrganisationViewModelBuilder().WithTitle("Organisation B").Build(),
+                new OrganisationDtoBuilder().WithTitle("Organisation A").Build(),
+                new OrganisationDtoBuilder().WithTitle("Organisation B").Build(),
             ];
             _organisationsService.WhereHasOrganisations(organisations);
 

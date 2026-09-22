@@ -1,9 +1,8 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 
-public record OrganisationViewModel
+public record OrganisationDto
 {
     public required Guid Id { get; init; }
 
@@ -17,7 +16,7 @@ public record OrganisationViewModel
 
     public required bool UseGISLogo { get; init; }
 
-    public static OrganisationViewModel FromOrganisation(Organisation organisation) =>
+    public static OrganisationDto FromOrganisation(Organisation organisation) =>
         new()
         {
             Id = organisation.Id,

@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -19,7 +20,7 @@ public record ReleaseVersionSummaryDto
 
     public required DateTimeOffset Published { get; init; }
 
-    public required PublishingOrganisationDto[] PublishingOrganisations { get; init; }
+    public required OrganisationDto[] PublishingOrganisations { get; init; }
 
     public required string Slug { get; init; }
 
@@ -41,7 +42,7 @@ public record ReleaseVersionSummaryDto
     public static ReleaseVersionSummaryDto FromReleaseVersion(
         ReleaseVersion releaseVersion,
         bool isLatestRelease,
-        PublishingOrganisationDto[] publishingOrganisations,
+        OrganisationDto[] publishingOrganisations,
         int updateCount
     ) =>
         new()
@@ -62,32 +63,6 @@ public record ReleaseVersionSummaryDto
             PreReleaseAccessList = releaseVersion.PreReleaseAccessList,
             UpdateCount = updateCount,
             Publication = ReleaseVersionSummaryPublicationDto.FromPublication(releaseVersion.Release.Publication),
-        };
-}
-
-public record PublishingOrganisationDto
-{
-    public required Guid Id { get; init; }
-
-    public required string Title { get; init; }
-
-    public required string Url { get; init; }
-
-    public required bool UseGISLogo { get; init; }
-
-    public required string? GISLogoHexCode { get; init; }
-
-    public required string LogoFileName { get; init; }
-
-    public static PublishingOrganisationDto FromOrganisation(Organisation organisation) =>
-        new()
-        {
-            Id = organisation.Id,
-            Title = organisation.Title,
-            Url = organisation.Url,
-            UseGISLogo = organisation.UseGISLogo,
-            GISLogoHexCode = organisation.GISLogoHexCode,
-            LogoFileName = organisation.LogoFileName,
         };
 }
 
