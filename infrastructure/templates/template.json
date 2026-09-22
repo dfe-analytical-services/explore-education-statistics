@@ -183,7 +183,7 @@
     },
     "backupVaultAzureBlobsRegistrationsDeployed": {
       "type": "bool",
-      "defaultValue": true,
+      "defaultValue": false,
       "metadata": {
         "description": "Whether or not the Azure Blobs are already registered for an environent. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
       }
@@ -708,7 +708,7 @@
       }
     ],
     "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
-    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blob-bkpol')]",
+    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
     "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
     "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",

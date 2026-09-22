@@ -6,7 +6,7 @@ param resourcePrefix string
 @description('Name of the backup vault that this policy belongs to.')
 param vaultName string
 
-var policyName = '${resourcePrefix}-blob-${abbreviations.backupVaultPolicies}'
+var policyName = '${resourcePrefix}-blobs-${abbreviations.backupVaultPolicies}'
 
 module backupVaultPolicyModule '../../../common/components/data-protection/blobBackupVaultPolicy.bicep' = {
   name: '${policyName}Deploy'
