@@ -210,7 +210,7 @@ describe('createDataSetListRequest', () => {
       const result = createDataSetListRequest(testQuery);
 
       expect(result.filter).toBe(
-        "(search.in(themeId, 'theme-1|theme-2', '|') or search.in(publicationId, 'pub-1', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics|OfficialStatistics', '|') and geographicLevels/any(g: search.in(g, 'NAT|REG', '|')) and latestData eq true",
+        "(search.in(themeId, 'theme-1|theme-2', '|') or search.in(publicationId, 'pub-1', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics|OfficialStatistics', '|') and geographicLevelDetails/any(g: search.in(g/code, 'NAT|REG', '|')) and latestData eq true",
       );
     });
   });
@@ -237,7 +237,7 @@ describe('createDataSetListRequest', () => {
         search: 'test search',
         orderBy: 'title asc',
         filter:
-          "(search.in(themeId, 'theme-1', '|') or search.in(publicationId, 'pub-3', '|')) and publishingOrganisationIds/any(g: search.in(g, 'organisation-1', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics', '|') and geographicLevels/any(g: search.in(g, 'NAT', '|')) and latestData eq true and api/id ne null and api/id ne ''",
+          "(search.in(themeId, 'theme-1', '|') or search.in(publicationId, 'pub-3', '|')) and publishingOrganisationIds/any(g: search.in(g, 'organisation-1', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics', '|') and geographicLevelDetails/any(g: search.in(g/code, 'NAT', '|')) and latestData eq true and api/id ne null and api/id ne ''",
       });
     });
   });
