@@ -47,6 +47,14 @@ STORAGE_SKU="Standard_LRS"
 # EES runner agents subnet - shared by both the large and xlarge scale sets.
 SUBNET_ID="/subscriptions/48ea0797-73c6-4202-bf90-b01c817058e9/resourceGroups/s101d01-rg-ees/providers/Microsoft.Network/virtualNetworks/s101d01-vnet-ees-runners/subnets/s101d01-snet-ees-runners-ubuntu2204"
 
+# az vmss create requires an admin account, but nothing actually uses this
+# one - the Azure Pipelines agent extension creates its own AzDevOps user
+# and changes its password during agent configuration, independent of this.
+#
+# The --disable-overprovision through --orchestration-mode flags below
+# aren't arbitrary - Azure Pipelines requires (or strongly recommends) each
+# of these for a scale set it's going to manage as an agent pool, per:
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents#create-the-scale-set
 az vmss create \
   --resource-group "$RESOURCE_GROUP" \
   --name "$SCALE_SET_NAME" \

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Bootstraps the ees-ubuntu2204-* pipeline agent scale set VMs from a vanilla
-# Canonical Ubuntu 22.04 marketplace image, replacing the custom-built
-# ees-ubuntu-2204 image.
+# Bootstraps the EES pipeline agent scale set VMs from a vanilla Canonical
+# Ubuntu marketplace image, replacing the previous custom-built image.
 #
 # Deployed to the scale set as a Custom Script Extension (see
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents#customizing-virtual-machine-startup-via-the-custom-script-extension):
@@ -20,8 +19,8 @@
 #
 # Docker and Chrome are installed from their own vendor apt repos (not
 # Ubuntu's docker.io/chromium-browser packages) so that every fresh/reimaged
-# VM picks up current versions, rather than whatever Ubuntu 22.04 happened to
-# ship - the whole point of moving off a frozen custom image.
+# VM picks up current versions, rather than whatever the base OS image
+# happened to ship - the whole point of moving off a frozen custom image.
 #
 # Everything else the pipelines need (.NET, Python, Node) is installed at job
 # time by the pipelines themselves, so keep this script to the bare minimum.
