@@ -909,6 +909,10 @@ user checks url contains
     ${current_url}=    get location
     should contain    ${current_url}    ${text}
 
+user waits until url contains
+    [Arguments]    ${text}    ${wait}=${timeout}
+    wait until location contains    ${text}    timeout=${wait}
+
 user checks url equals
     [Arguments]    ${expected}
     ${current_url}=    get location

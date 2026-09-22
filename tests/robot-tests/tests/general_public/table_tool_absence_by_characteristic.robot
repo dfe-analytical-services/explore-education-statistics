@@ -30,6 +30,7 @@ Validate back takes you to step 1
     # EES-6361 - add a manual pause in here to give the page time to fully re-render before hitting
     # the browser back button.
     # When EES-6361 is fixed, we can remove this pause.
+    user waits until url contains    /data-tables/${PUPIL_ABSENCE_PUBLICATION_SLUG}
     sleep    2s
 
     user goes back
@@ -46,6 +47,7 @@ Validate back takes you to step 2
     # EES-6361 - add a manual pause in here to give the page time to fully re-render before hitting
     # the browser back button.
     # When EES-6361 is fixed, we can remove this pause.
+    user waits until url contains    subjectId=
     sleep    2s
 
     user goes back

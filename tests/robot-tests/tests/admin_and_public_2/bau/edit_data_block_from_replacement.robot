@@ -79,6 +79,7 @@ Create data block table
     user enters text into element    label:Data block name    ${DATABLOCK_NAME}
 
     user clicks button    Save data block
+    user waits until page contains    Delete this data block
 
 Navigate to 'Content' page
     user clicks link    Content
