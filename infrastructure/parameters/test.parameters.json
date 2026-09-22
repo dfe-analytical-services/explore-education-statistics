@@ -37,6 +37,9 @@
     },
     "notifierSuppressExceptionsForTeamOnlyApiKeyErrors": {
       "value": true
+    },
+    "sqlServerPublicNetworkAccess": {
+      "value": "Disabled"
     }
   }
 }
