@@ -42,6 +42,36 @@ because those *do* have a version pinned in the project's own config that
 must be matched exactly, which something baked in at VM-creation time can't
 guarantee stays in sync with.
 
+## What's installed, beyond stock Ubuntu
+
+The base OS is whatever `IMAGE_URN` in `create-vmss-agent-pool.sh` points
+at - currently Ubuntu 26.04 LTS via Canonical's marketplace image, pinned
+to `version: latest`, so it (and its own OS-level security patches) update
+automatically with no action needed here.
+
+On top of that, `vmss-agent-bootstrap.sh` installs:
+
+- **Docker** - Engine, CLI, Buildx plugin, Compose plugin, containerd
+- **Google Chrome** (stable channel)
+- **git, zip, unzip, jq** - small utilities some pipeline tasks assume exist
+- **libicu** - a native dependency .NET needs at runtime, not something
+  UseDotNet@2 installs
+
+Docker and Chrome are deliberately *not* version-pinned anywhere - every
+fresh/reimaged VM installs whatever's currently available from Docker's and
+Google's own repos. That means there's no fixed version number to document
+here that wouldn't be stale within days; the actual apt package names
+installed are the real source of truth, in the script itself. To check
+what's actually running on a live agent right now, either SSH into one, or
+add a temporary pipeline step running `docker --version` /
+`google-chrome-stable --version`.
+
+**Not installed on the image** - deliberately, installed fresh per pipeline
+job instead, so they always match what the project's own config currently
+declares: .NET (`global.json`), Node (`.nvmrc`), Python
+(`.python-version`, via `azure-pipelines-install-python.yml`), Ruby (pinned
+inline in `azure-pipelines-main.yml`).
+
 ## When to change `create-vmss-agent-pool.sh`
 
 - **Different pool size**: just override `SCALE_SET_NAME`/`VM_SKU` when
