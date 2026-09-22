@@ -1152,13 +1152,13 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          'This API data set can not be published until mapping has been completed.',
         ),
       ).toThrow('Unable to find an element');
     });
   });
 
-  test('renders error summary for incomplete when draft version doesnt have major version update but is incomplete', async () => {
+  test('renders incomplete mapping error summary when all mappings are incomplete', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: {
@@ -1181,7 +1181,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          'This API data set can not be published until mapping has been completed.',
           {
             selector: 'h2',
           },
@@ -1194,11 +1194,69 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
       expect(() =>
         screen.getByText(
-          'This API data set can not be published because it has Major changes that are not allowed',
+          'This API data set can not be published because it has major changes that are not allowed.',
         ),
       ).toThrow('Unable to find an element');
     });
   });
+
+  test.each([true, false])(
+    'renders incomplete mapping error summary when only indicators are incomplete and indicatorsHaveMajorChange is %s',
+    async indicatorsHaveMajorChange => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testPatchDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            isMajorVersionUpdate: true,
+            locationsComplete: true,
+            filtersComplete: true,
+            indicatorsComplete: false,
+            locationsHaveMajorChange: false,
+            filtersHaveMajorChange: false,
+            indicatorsHaveMajorChange,
+          },
+        },
+      });
+
+      renderPage();
+
+      expect(
+        await screen.findByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published until mapping has been completed.',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published because it has major changes that are not allowed.',
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location, filter or indicator manual mapping.',
+        ),
+      ).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('map-locations-task')).getByText('Complete'),
+      ).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('map-filters-task')).getByText('Complete'),
+      ).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId('map-indicators-task')).getByText(
+          'Incomplete',
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+    },
+  );
 
   test('renders "Major Change" when user has selected a major change for the filters', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
@@ -1223,7 +1281,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          'This API data set can not be published until mapping has been completed.',
           {
             selector: 'h2',
           },
@@ -1281,7 +1339,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          'This API data set can not be published until mapping has been completed.',
           {
             selector: 'h2',
           },
@@ -1339,7 +1397,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     await waitFor(() => {
       expect(
         screen.queryByText(
-          'This API data set can not be published because location, filter or indicator mappings are not yet complete.',
+          'This API data set can not be published until mapping has been completed.',
           {
             selector: 'h2',
           },
@@ -1374,12 +1432,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
-  test('does not render error summary when draft version does not have a major version update', async () => {
+  test('shows the finalise banner when patch mapping is complete without major changes', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: {
-        ...testDraftVersion,
-        version: '1.0.1',
+        ...testPatchDraftVersion,
+        status: 'Mapping',
         mappingStatus: {
           isMajorVersionUpdate: false,
           locationsComplete: true,
@@ -1394,16 +1452,26 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     renderPage();
 
-    await waitFor(() => {
-      expect(
-        screen.queryByText(
-          'This API data set can not be published because it is either incomplete or has a major version update.',
-          {
-            selector: 'h2',
-          },
-        ),
-      ).not.toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        'Draft API data set version is ready to be finalised',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Finalise this data set version' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        level: 2,
+        name: 'This API data set can not be published until mapping has been completed.',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        level: 2,
+        name: 'This API data set can not be published because it has major changes that are not allowed.',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('does not render error summary when draft version is not a patch version', async () => {
@@ -1426,13 +1494,21 @@ describe('ReleaseApiDataSetDetailsPage', () => {
 
     renderPage();
 
-    await waitFor(() => {
-      expect(() =>
-        screen.getByText(
-          'This API data set can not be published because it has major changes that are not allowed.',
-        ),
-      ).toThrow('Unable to find an element');
-    });
+    expect(
+      await screen.findByTestId('draft-version-summary'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        level: 2,
+        name: 'This API data set can not be published because it has major changes that are not allowed.',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        level: 2,
+        name: 'This API data set can not be published until mapping has been completed.',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders cancel replacement link with correct releaseVersionId in replaceTabRoute when draftVersion.originalFileId is present', async () => {

@@ -139,7 +139,7 @@ Verify the pending data replacement summary
 Validate error summary is displayed on Api Data Set Details page
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
+    ...    This API data set can not be published until mapping has been completed.
 
 Validate the summary contents inside the 'Latest live version details' table
     user waits until h3 is visible    Latest live version details
@@ -285,6 +285,13 @@ Validate the row headings and its contents in the 'filters options' section afte
     user checks table cell contains    1    3    Minor
 
     user clicks link    Back
+
+Validate error summary when only indicator mappings are incomplete
+    user waits until h2 is visible
+    ...    This API data set can not be published until mapping has been completed.
+    user waits until parent contains element    id:map-locations-task-status    text:Complete
+    user waits until parent contains element    id:map-filters-task-status    text:Complete
+    user waits until parent contains element    id:map-indicators-task-status    text:Incomplete
 
 User clicks on Map indicators link
     user clicks link    Map indicators

@@ -95,7 +95,7 @@ Verify the pending data replacement summary
 Validate error summary is displayed on Api Data Set Details page
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
+    ...    This API data set can not be published until mapping has been completed.
 
 User clicks on Map locations link
     user clicks link    Map locations
@@ -246,7 +246,7 @@ Verify the pending data replacement summary for second patch replacement
 Validate error summary is displayed on Api Data Set Details page for second patch replacement
     user clicks link    go to the API data sets tab
     user waits until h2 is visible
-    ...    This API data set can not be published because location, filter or indicator mappings are not yet complete.
+    ...    This API data set can not be published until mapping has been completed.
     user checks element is visible    testid:cancel-replacement-link
 
 Validate the summary contents inside the 'draft version details' table contains version 1.0.2
