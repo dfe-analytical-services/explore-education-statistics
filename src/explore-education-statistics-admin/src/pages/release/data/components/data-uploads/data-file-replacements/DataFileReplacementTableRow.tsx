@@ -6,7 +6,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQueries';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
-import releaseDataFileService, {
+import {
   DataFile,
   DataFileImportStatus,
 } from '@admin/services/releaseDataFileService';
@@ -14,26 +14,28 @@ import dataReplacementService from '@admin/services/dataReplacementService';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 import { generatePath } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import styles from './DataFilesTable.module.scss';
+import styles from '@admin/pages/release/data/components/data-uploads/DataFilesTable.module.scss';
+import DataFileReplacementCancelModal from './DataFileReplacementCancelModal';
 
 interface Props {
   dataFile: DataFile;
   publicationId: string;
   releaseVersionId: string;
-  onConfirmAction?: () => void;
+  onCancelReplacement: () => void;
+  onConfirmReplacement: () => void;
 }
 
-export default function DataFilesReplacementTableRow({
+export default function DataFileReplacementTableRow({
   dataFile,
   publicationId,
   releaseVersionId,
-  onConfirmAction,
+  onCancelReplacement,
+  onConfirmReplacement,
 }: Props) {
   const queryClient = useQueryClient();
 
@@ -134,27 +136,12 @@ export default function DataFilesReplacementTableRow({
           </Link>
           <>
             {replacementDataFile.status === 'COMPLETE' && (
-              <ModalConfirm
-                title="Cancel data replacement"
-                triggerButton={
-                  <ButtonText variant="secondary">
-                    Cancel replacement
-                    <VisuallyHidden>{` for ${dataFile.title}`}</VisuallyHidden>
-                  </ButtonText>
-                }
-                onConfirm={async () => {
-                  await releaseDataFileService.deleteDataFiles(
-                    releaseVersionId,
-                    replacementDataFile.id,
-                  );
-                  onConfirmAction?.();
-                }}
-              >
-                <p>
-                  Are you sure you want to cancel this data replacement? The
-                  pending replacement data file will be deleted.
-                </p>
-              </ModalConfirm>
+              <DataFileReplacementCancelModal
+                dataFileTitle={dataFile.title}
+                releaseVersionId={releaseVersionId}
+                replacementDataFileId={replacementDataFile.id}
+                onCancelReplacement={onCancelReplacement}
+              />
             )}
             {plan?.valid && (
               <ButtonText
@@ -163,7 +150,7 @@ export default function DataFilesReplacementTableRow({
                     dataFile.id,
                   ]);
 
-                  onConfirmAction?.();
+                  onConfirmReplacement();
                 }}
               >
                 Confirm replacement

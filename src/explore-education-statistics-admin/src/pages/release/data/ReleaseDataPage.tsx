@@ -3,7 +3,7 @@ import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseV
 import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
 import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
-import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
+import ReleaseDataUploadsSection from '@admin/pages/release/data/components/data-uploads/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';

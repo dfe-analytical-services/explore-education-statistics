@@ -1,6 +1,5 @@
-import DataFilesReorderableList from '@admin/pages/release/data/components/DataFilesReorderableList';
-import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
-import DataUploadsGuidance from '@admin/pages/release/data/components/DataUploadsGuidance';
+import DataUploadsPermissions from '@admin/pages/release/data/types/dataUploadsPermissions';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import dataReplacementService from '@admin/services/dataReplacementService';
 import permissionService from '@admin/services/permissionService';
@@ -9,8 +8,7 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import DataFilesTable from '@admin/pages/release/data/components/DataFilesTable';
-import DataFilesReplacementTable from '@admin/pages/release/data/components/DataFilesReplacementTable';
+import DataFileReplacementTable from '@admin/pages/release/data/components/data-uploads/data-file-replacements/DataFileReplacementTable';
 import Button from '@common/components/Button';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -18,6 +16,10 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
 import React, { useCallback, useMemo } from 'react';
+import DataFilesTable from './DataFilesTable';
+import DataUploadsGuidance from './DataUploadsGuidance';
+import DataFileUploadForm from './DataFileUploadForm';
+import DataFilesReorderableList from './DataFilesReorderableList';
 
 interface Props {
   publicationId: string;
@@ -32,53 +34,61 @@ export default function ReleaseDataUploadsSection({
 }: Props) {
   const [isReordering, toggleReordering] = useToggle(false);
 
-  // NOTE: When a data set is initially imported, it is first sent to the data screener to check for screener errors and
-  // warnings. At this stage, the data set will be returned from `listUploads`. If the file has no errors from the
-  // screener tests and the user has pressed a button to continue the import, the data set then starts being imported
-  // properly, and will then be returned from `list` instead.
-  //
-  // So "dataSetUploads" are data sets currently being screened via the R docker container, while "dataFiles" are data
-  // sets that have moved beyond the screener and are now being imported by the Data.Processor
+  const { user } = useAuthContext();
+
+  const permissions = useMemo<DataUploadsPermissions>(
+    () => ({
+      canUpdateRelease,
+      canOverrideScreenerResult: user?.permissions.isBauUser ?? false,
+      canManagePublicApiDataSets:
+        user?.permissions.canManagePublicApiDataSets ?? false,
+    }),
+    [canUpdateRelease, user],
+  );
+
+  // Pre-import uploads include screening and awaiting-import states.
+  // Import-stage files include running, completed and unsuccessful imports.
   const queryClient = useQueryClient();
 
   const {
-    data: allDataFiles = [],
+    data: importStageDataFiles = [],
     isError: dataFilesError,
     isLoading,
     refetch: refetchDataFiles,
   } = useQuery(releaseDataFileQueries.list(releaseVersionId));
   const {
-    data: allDataSetUploads = [],
+    data: preImportDataSetUploads = [],
     isError: dataSetUploadsError,
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
 
-  const uploadsWithoutReplacements = useMemo(
-    () => allDataSetUploads.filter(upload => !upload.replacingFileId),
-    [allDataSetUploads],
+  const newDataSetUploads = useMemo(
+    () => preImportDataSetUploads.filter(upload => !upload.replacingFileId),
+    [preImportDataSetUploads],
   );
 
-  const uploadsWithReplacements = useMemo(
-    () => allDataSetUploads.filter(upload => upload.replacingFileId),
-    [allDataSetUploads],
+  const replacementDataSetUploads = useMemo(
+    () => preImportDataSetUploads.filter(upload => upload.replacingFileId),
+    [preImportDataSetUploads],
   );
 
-  const dataFilesExcludingReplacements = useMemo(
-    () => allDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
-    [allDataFiles],
+  const dataFilesWithoutImportedReplacements = useMemo(
+    () => importStageDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
+    [importStageDataFiles],
   );
 
-  const inProgressReplacementDataFiles = useMemo(
-    () => allDataFiles.filter(dataFile => dataFile.replacedByDataFile),
-    [allDataFiles],
+  const dataFilesWithImportedReplacements = useMemo(
+    () => importStageDataFiles.filter(dataFile => dataFile.replacedByDataFile),
+    [importStageDataFiles],
   );
 
-  const validReplacementDataFiles = inProgressReplacementDataFiles.filter(
-    originalFile =>
-      originalFile.replacedByDataFile?.status === 'COMPLETE' &&
-      originalFile.replacedByDataFile?.hasValidReplacementPlan,
-  );
+  const dataFilesWithValidReplacements =
+    dataFilesWithImportedReplacements.filter(
+      originalFile =>
+        originalFile.replacedByDataFile?.status === 'COMPLETE' &&
+        originalFile.replacedByDataFile?.hasValidReplacementPlan,
+    );
 
   const setAllDataFiles = useCallback(
     (updater: Updater<DataFile[] | undefined, DataFile[] | undefined>) =>
@@ -109,10 +119,11 @@ export default function ReleaseDataUploadsSection({
   const handleStatusChange = useCallback(
     async (dataFile: DataFile, importStatus: DataFileImportStatus) => {
       try {
-        const permissions = await permissionService.getDataFilePermissions(
-          releaseVersionId,
-          dataFile.id,
-        );
+        const dataFilePermissions =
+          await permissionService.getDataFilePermissions(
+            releaseVersionId,
+            dataFile.id,
+          );
         setAllDataFiles(currentDataFiles =>
           currentDataFiles?.map(file =>
             file.id !== dataFile.id
@@ -121,7 +132,7 @@ export default function ReleaseDataUploadsSection({
                   ...dataFile,
                   rows: importStatus.totalRows,
                   status: importStatus.status,
-                  permissions,
+                  permissions: dataFilePermissions,
                 },
           ),
         );
@@ -132,7 +143,7 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, setAllDataFiles, refetchDataFiles],
   );
 
-  const handleDataSetImport = useCallback(
+  const handleImportDataSets = useCallback(
     async (dataSetUploadIds: string[]) => {
       await releaseDataFileService.importDataSets(
         releaseVersionId,
@@ -148,7 +159,7 @@ export default function ReleaseDataUploadsSection({
     [releaseVersionId, setAllDataUploads, refreshDataFileLists],
   );
 
-  const handleDeleteConfirm = useCallback(
+  const handleDeleteFile = useCallback(
     async (deletedFileId: string) => {
       setAllDataFiles(files =>
         files?.filter(dataFile => dataFile.id !== deletedFileId),
@@ -156,6 +167,8 @@ export default function ReleaseDataUploadsSection({
     },
     [setAllDataFiles],
   );
+
+  const handleDeleteUpload = refreshDataFileLists;
 
   const handleConfirmReordering = useCallback(
     async (nextDataFiles: DataFile[]) => {
@@ -173,7 +186,7 @@ export default function ReleaseDataUploadsSection({
   const handleConfirmAllReplacements = async () => {
     await dataReplacementService.replaceData(
       releaseVersionId,
-      validReplacementDataFiles.map(file => file.id),
+      dataFilesWithValidReplacements.map(file => file.id),
     );
     await refetchDataFiles();
   };
@@ -188,7 +201,7 @@ export default function ReleaseDataUploadsSection({
 
       {canUpdateRelease ? (
         <DataFileUploadForm
-          dataSetFileTitles={dataFilesExcludingReplacements.map(
+          dataSetFileTitles={dataFilesWithoutImportedReplacements.map(
             file => file.title,
           )}
           releaseVersionId={releaseVersionId}
@@ -203,17 +216,18 @@ export default function ReleaseDataUploadsSection({
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
       <LoadingSpinner loading={isLoading || isLoadingUploads}>
-        {(allDataFiles.length > 0 || allDataSetUploads.length > 0) &&
+        {(importStageDataFiles.length > 0 ||
+          preImportDataSetUploads.length > 0) &&
         !errorFetchingData ? (
           <>
             <h2>Uploaded data files</h2>
 
-            {!isReordering && allDataFiles.length > 1 && (
+            {!isReordering && importStageDataFiles.length > 1 && (
               <div className="dfe-flex dfe-justify-content--space-between">
                 <Button onClick={toggleReordering.on} variant="secondary">
                   Reorder data files
                 </Button>
-                {validReplacementDataFiles.length > 1 && (
+                {dataFilesWithValidReplacements.length > 1 && (
                   <Button onClick={handleConfirmAllReplacements}>
                     Confirm all valid replacements
                   </Button>
@@ -223,42 +237,43 @@ export default function ReleaseDataUploadsSection({
 
             {isReordering ? (
               <DataFilesReorderableList
-                dataFiles={allDataFiles}
+                dataFiles={importStageDataFiles}
                 onCancelReordering={toggleReordering.off}
                 onConfirmReordering={handleConfirmReordering}
               />
             ) : (
               <>
-                {(inProgressReplacementDataFiles.length > 0 ||
-                  uploadsWithReplacements.length > 0) && (
-                  <DataFilesReplacementTable
-                    canUpdateRelease={canUpdateRelease}
+                {(dataFilesWithImportedReplacements.length > 0 ||
+                  replacementDataSetUploads.length > 0) && (
+                  <DataFileReplacementTable
+                    permissions={permissions}
                     caption="Data file replacements"
-                    dataFiles={inProgressReplacementDataFiles}
-                    dataSetUploads={uploadsWithReplacements}
+                    dataFiles={dataFilesWithImportedReplacements}
+                    dataSetUploads={replacementDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data file replacements table"
+                    onCancelReplacement={refetchDataFiles}
                     onConfirmReplacement={refetchDataFiles}
                     onRefreshUploads={refetchDataSetUploads}
-                    onDeleteUpload={refreshDataFileLists}
-                    onDataSetImport={handleDataSetImport}
+                    onDeleteUpload={handleDeleteUpload}
+                    onImportDataSets={handleImportDataSets}
                   />
                 )}
 
-                {(dataFilesExcludingReplacements.length > 0 ||
-                  uploadsWithoutReplacements.length > 0) && (
+                {(dataFilesWithoutImportedReplacements.length > 0 ||
+                  newDataSetUploads.length > 0) && (
                   <DataFilesTable
-                    canUpdateRelease={canUpdateRelease}
+                    permissions={permissions}
                     caption="Data files"
-                    dataFiles={dataFilesExcludingReplacements}
-                    dataSetUploads={uploadsWithoutReplacements}
+                    dataFiles={dataFilesWithoutImportedReplacements}
+                    dataSetUploads={newDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
                     testId="Data files table"
-                    onDeleteFile={handleDeleteConfirm}
-                    onDeleteUpload={refreshDataFileLists}
-                    onDataSetImport={handleDataSetImport}
+                    onDeleteFile={handleDeleteFile}
+                    onDeleteUpload={handleDeleteUpload}
+                    onImportDataSets={handleImportDataSets}
                     onEditFile={refreshDataFileLists}
                     onReplaceFile={refreshDataFileLists}
                     onRefreshUploads={refetchDataSetUploads}

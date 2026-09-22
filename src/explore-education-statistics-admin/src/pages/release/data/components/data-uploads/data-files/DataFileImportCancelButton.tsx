@@ -11,7 +11,7 @@ interface Props {
   fileId: string;
 }
 
-const DataUploadCancelButton = ({ releaseVersionId, fileId }: Props) => {
+const DataFileImportCancelButton = ({ releaseVersionId, fileId }: Props) => {
   const [{ error }, cancelImport] = useAsyncCallback(() =>
     releaseDataFileService.cancelImport(releaseVersionId, fileId),
   );
@@ -34,4 +34,4 @@ const DataUploadCancelButton = ({ releaseVersionId, fileId }: Props) => {
   );
 };
 
-export default DataUploadCancelButton;
+export default DataFileImportCancelButton;

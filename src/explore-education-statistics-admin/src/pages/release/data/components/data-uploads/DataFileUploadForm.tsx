@@ -1,4 +1,5 @@
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import dataFileTitleMaxLength from '@admin/pages/release/data/utils/dataFileTitleMaxLength';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -31,7 +32,6 @@ export interface DataFileUploadFormValues {
 }
 
 const MAX_FILENAME_SIZE = 150;
-const titleMaxLength = 120;
 
 const subjectErrorMappings = [
   mapFieldErrors<DataFileUploadFormValues>({
@@ -229,8 +229,8 @@ export default function DataFileUploadForm({
           s
             .required('Enter a title')
             .max(
-              titleMaxLength,
-              `Title must be ${titleMaxLength} characters or fewer`,
+              dataFileTitleMaxLength,
+              `Title must be ${dataFileTitleMaxLength} characters or fewer`,
             ),
       }),
       uploadType: Yup.string().oneOf(['csv', 'zip', 'bulkZip']).defined(),
@@ -300,7 +300,7 @@ export default function DataFileUploadForm({
                         name="title"
                         label="Data file title"
                         className="govuk-!-width-two-thirds"
-                        maxLength={titleMaxLength}
+                        maxLength={dataFileTitleMaxLength}
                         onBlur={() => {
                           toggleReplacementWarning(
                             dataSetFileTitles.includes(title),

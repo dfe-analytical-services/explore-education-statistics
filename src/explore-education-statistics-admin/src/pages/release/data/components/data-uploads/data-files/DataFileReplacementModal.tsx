@@ -1,6 +1,6 @@
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
+import DataFileUploadForm from '@admin/pages/release/data/components/data-uploads/DataFileUploadForm';
 import Modal from '@common/components/Modal';
 import React from 'react';
 import useToggle from '@common/hooks/useToggle';
@@ -15,7 +15,7 @@ interface Props {
   onReplaceFile: () => void;
 }
 
-export default function DataFilesTableRowReplaceModal({
+export default function DataFileReplacementModal({
   releaseVersionId,
   dataFileId,
   dataFileTitle,

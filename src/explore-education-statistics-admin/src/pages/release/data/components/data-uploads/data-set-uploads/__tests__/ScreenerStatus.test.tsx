@@ -1,4 +1,4 @@
-import ScreenerStatus from '@admin/pages/release/data/components/ScreenerStatus';
+import ScreenerStatus from '@admin/pages/release/data/components/data-uploads/data-set-uploads/ScreenerStatus';
 import { render, screen } from '@testing-library/react';
 
 describe('ScreenerStatus', () => {

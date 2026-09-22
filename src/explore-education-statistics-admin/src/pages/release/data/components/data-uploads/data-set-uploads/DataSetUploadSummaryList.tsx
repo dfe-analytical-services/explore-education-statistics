@@ -6,11 +6,11 @@ import Tag from '@common/components/Tag';
 import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import downloadTemporaryReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadTemporaryReleaseFileSecurely';
+import ApiCompatibilityTag from '@admin/pages/release/data/components/ApiCompatibilityTag';
 import {
   getDataSetUploadScreeningStatusColour,
   getDataSetUploadScreeningStatusLabel,
 } from './ScreenerStatus';
-import ApiCompatibilityTag from './ApiCompatibilityTag';
 
 interface Props {
   releaseVersionId: string;

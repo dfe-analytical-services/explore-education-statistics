@@ -8,7 +8,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
-import ApiCompatibilityTag from './ApiCompatibilityTag';
+import ApiCompatibilityTag from '@admin/pages/release/data/components/ApiCompatibilityTag';
 
 interface Props {
   dataFile: DataFile;

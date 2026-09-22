@@ -13,14 +13,14 @@ interface Props {
   dataFileId: string;
   dataFileTitle: string;
   releaseVersionId: string;
-  onConfirm: () => void;
+  onDeleteFile: (deletedFileId: string) => void;
 }
 
-export default function DataFilesTableRowDeleteModal({
+export default function DataFileDeleteModal({
   dataFileId,
   dataFileTitle,
   releaseVersionId,
-  onConfirm,
+  onDeleteFile,
 }: Props) {
   const [open, toggleOpen] = useToggle(false);
   const [
@@ -53,14 +53,14 @@ export default function DataFilesTableRowDeleteModal({
         dataFile.id,
       );
 
-      onConfirm();
+      onDeleteFile(dataFile.id);
 
       toggleOpen.off();
     } catch (err) {
       logger.error(err);
       toggleOpen.off();
     }
-  }, [releaseVersionId, dataFile, onConfirm, toggleOpen]);
+  }, [releaseVersionId, dataFile, onDeleteFile, toggleOpen]);
 
   return (
     <ModalConfirm
