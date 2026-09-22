@@ -33,8 +33,10 @@ export interface AzureDataSetIndexItem {
   lastUpdated: string;
   api: DataSetFileApi;
   numDataFileRows: number;
+  // TODO EES-7629 Remove `geographicLevels` and `geographicLevelsLabels` now?
   geographicLevels: GeographicLevelCode[];
   geographicLevelsLabels: string[];
+  geographicLevelDetails: AzureGeographicLevel[];
   indicators: string[];
   filters: string[];
   releaseType: string;
@@ -42,6 +44,12 @@ export interface AzureDataSetIndexItem {
     from: string;
     to: string;
   };
+}
+
+export interface AzureGeographicLevel {
+  code: GeographicLevelCode;
+  label: string;
+  csvOnly: boolean;
 }
 
 export interface AzureDataSetListRequest {
