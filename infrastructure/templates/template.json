@@ -182,10 +182,6 @@
         "description": "Number of days to retain blobs after delete"
       }
     },
-    "storageAccountPrefix": {
-      "type": "string",
-      "defaultValue": "storage"
-    },
     "licenseTypeContentDb": {
       "type": "string",
       "defaultValue": "LicenseIncluded",
@@ -294,26 +290,6 @@
     "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
-    "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
-    "publicStorageVnetRules": [
-      {
-        "id": "[variables('adminSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('contentSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('dataSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('publisherSubnetRef')]",
-        "action": "Allow"
-      }
-    ],
-    "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -1518,137 +1494,6 @@
           }
         ]
       }
-    },
-    {
-      "name": "[variables('publicStorageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2023-05-01",
-      "location": "[resourceGroup().location]",
-      "kind": "StorageV2",
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "defaultAction": "Deny"
-        }
-      },
-      "resources": [
-        {
-          "name": "default",
-          "type": "blobServices",
-          "condition": "[not(parameters('deployBackupVaultRegistrations'))]",
-          "apiVersion": "2019-04-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Storage account",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'), '/ees-storage-public')]",
-      "apiVersion": "2016-10-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ],
-      "properties": {
-        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
-      }
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
-      "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-      "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')))]",
-      "properties": {
-        "roleDefinitionId": "[variables('storageAccountBackupContributorRoleId')]",
-        "principalId": "[reference(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), '2021-01-01', 'Full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "apiVersion": "2026-06-01",
-      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
-      "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
-      "properties": {
-        "objectType": "BackupInstance",
-        "friendlyName": "[variables('publicStorageAccountName')]",
-        "dataSourceInfo": {
-          "objectType": "Datasource",
-          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceName": "[variables('publicStorageAccountName')]",
-          "resourceType": "Microsoft.Storage/storageAccounts",
-          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceLocation": "[resourceGroup().location]",
-          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
-        },
-        "dataSourceSetInfo": {
-          "objectType": "DatasourceSet",
-          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceName": "[variables('publicStorageAccountName')]",
-          "resourceType": "Microsoft.Storage/storageAccounts",
-          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceLocation": "[resourceGroup().location]",
-          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
-        },
-        "policyInfo": {
-          "policyId": "[resourceId('Microsoft.DataProtection/backupVaults/backupPolicies', variables('backupVaultName'), variables('backupVaultBlobPolicyName'))]",
-          "name": "[variables('backupVaultBlobPolicyName')]",
-          "policyParameters": {
-            "backupDatasourceParametersList": [
-              {
-                "objectType": "BlobBackupDatasourceParametersForAutoProtection",
-                "autoProtectionSettings": {
-                  "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
-                  "enabled": true,
-                  "rules": [
-                    {
-                      "objectType": "BlobBackupAutoProtectionRule",
-                      "mode": "Exclude",
-                      "type": "Prefix",
-                      "pattern": "cache"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ]
     },
     {
       "type": "Microsoft.Insights/metricAlerts",

@@ -8,9 +8,6 @@
     "domain": {
       "value": "explore-education-statistics.service.gov.uk"
     },
-    "storageAccountPrefix": {
-      "value": "sa"
-    },
     "skuContentDb": {
       "value": "GP_S_Gen5"
     },
