@@ -16,7 +16,7 @@ jobs:
     variables:
       docsPath: $(Pipeline.Workspace)/MainBuild/public-api-docs
       nodeVersion: '22.23.1'
-      rubyVersion: '4.0.6'
+      rubyVersion: '4.0.7'
     strategy:
       runOnce:
         deploy:
