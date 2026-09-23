@@ -250,3 +250,19 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
     tagValues: tagValues
   }
 }
+
+module publicStorageAccountModule 'application/public-storage-account/public-storage-account.bicep' = {
+  name: 'publicStorageAccountModuleDeploy'
+  params: {
+    subscription: subscription
+    subnets: vNetModule.outputs.subnets
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    backupVaultName: backupsModule.outputs.backupVaultName
+    backupBlobsPolicyName: backupsModule.outputs.backupVaultBlobsPolicyName
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    firewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}

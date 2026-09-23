@@ -14,9 +14,6 @@
     "domain": {
       "value": "dev.explore-education-statistics.service.gov.uk"
     },
-    "storageAccountPrefix": {
-      "value": "sa"
-    },
     "skuContentDb": {
       "value": "Standard"
     },
