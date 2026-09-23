@@ -18,7 +18,7 @@ param instanceName string
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' existing = {
+resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2026-06-01' existing = {
   name: '${vaultName}/${backupPolicyName}'
 }
 

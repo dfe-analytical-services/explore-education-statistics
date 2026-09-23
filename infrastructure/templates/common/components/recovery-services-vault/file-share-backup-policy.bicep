@@ -66,7 +66,7 @@ param yearlySnapshotRetention {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-resource policy 'Microsoft.RecoveryServices/vaults/backupPolicies@2024-04-30-preview' = {
+resource policy 'Microsoft.RecoveryServices/vaults/backupPolicies@2026-07-01' = {
   name: '${vaultName}/${policyName}'
   location: location
   properties: {

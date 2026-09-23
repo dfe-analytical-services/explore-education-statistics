@@ -5,6 +5,9 @@ import { VNetSubnets } from '../virtual-network/types.bicep'
 @description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string
 
+@description('Environment name e.g. Development.')
+param environmentName string
+
 @description('Retention of blobs in days.')
 param blobDeleteRetentionDays int
 
@@ -36,7 +39,13 @@ resource backupVault 'Microsoft.DataProtection/backupVaults@2026-06-01' existing
   name: backupVaultName
 }
 
-var storageAccountName = '${subscription}${abbreviations.storageStorageAccounts}eescore'
+// TODO EES-7502 - use standardised naming convention for Core Storage.
+var storageAccountName = environmentName == 'Test' || environmentName == 'Pre-Production' 
+  ? '${subscription}${abbreviations.storageStorageAccounts}eescore'
+  : '${subscription}storageeescore'
+
+// TODO EES-7502 - remove when standardising role assignment GUID generation.
+var backupContributorRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1') 
 
 module storageAccountModule '../../../common/components/storage/storage-account.bicep' = {
   name: 'coreStorageAccountDeploy'
@@ -78,18 +87,19 @@ module backupVaultRoleAssignmentModule '../../../common/components/storageAccoun
     storageAccountName: storageAccountModule.outputs.storageAccountName
     principalIds: [backupVault.identity.principalId]
     role: 'Storage Account Backup Contributor'
+    roleAssignmentNameOverride: guid(backupVault.id, backupContributorRoleDefinitionId, storageAccountModule.outputs.storageAccountId)
   }
 }
 
-module backupVaultRegistration '../../../common/components/data-protection/backupVaultInstance.bicep' = {
+module backupVaultRegistration '../../../common/components/data-protection/blobs-backup-vault-instance.bicep' = {
   name: 'coreStorageBackupVaultRegistrationModuleDeploy'
   params: {
     vaultName: backupVault.name
     instanceName: storageAccountName
     backupPolicyName: backupBlobsPolicyName
-    dataSourceType: 'blobs'
     resourceId: storageAccountModule.outputs.storageAccountId
     resourceLocation: resourceGroup().location
+    excludedContainerPrefixes: ['cache']
     tagValues: tagValues
   }
 }
