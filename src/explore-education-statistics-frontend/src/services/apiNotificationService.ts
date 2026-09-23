@@ -25,6 +25,7 @@ const apiNotificationService = {
   ): Promise<ApiSubscription> {
     return notificationApi.post<ApiSubscription>(
       `public-api/${dataSetId}/verify-subscription`,
+      undefined,
       { params: { token } },
     );
   },
