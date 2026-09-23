@@ -5,15 +5,6 @@
     "useSubnets": {
       "value": true
     },
-    "blobDeleteRetentionEnabled": {
-      "value": true
-    },
-    "blobDeleteRetentionDays": {
-      "value": 3
-    },
-    "domain": {
-      "value": "dev.explore-education-statistics.service.gov.uk"
-    },
     "skuContentDb": {
       "value": "Standard"
     },
@@ -37,11 +28,6 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 1099511627776
-    },
-    "additionalPublicAllowedOrigins": {
-      "value": [
-        "http://localhost:3000"
-      ]
     },
     "sqlServerPublicNetworkAccess": {
       "value": "Disabled"
