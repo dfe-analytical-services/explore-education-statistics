@@ -52,6 +52,7 @@ param publisherConfigParam = {
   }
   prepareScheduledReleaseVersionsNowEnabled: true
   publishScheduledReleaseVersionsNowEnabled: true
+  frontDoorCachePurgeEnabled: true
 }
 
 param publicApiConfigParam = {
@@ -65,4 +66,3 @@ param publicSiteConfigParam = {
   }
   googleAnalyticsTrackingId: 'G-ZQ5V7CBWMJ'
 }
-
