@@ -817,7 +817,7 @@
     },
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "apiVersion": "2022-05-01",
+      "apiVersion": "2026-06-01",
       "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('coreStorageAccountName'))]",
       "properties": {
@@ -851,7 +851,14 @@
                 "autoProtectionSettings": {
                   "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
                   "enabled": true,
-                  "rules": []
+                  "rules": [
+                    {
+                      "objectType": "BlobBackupAutoProtectionRule",
+                      "mode": "Exclude",
+                      "type": "Prefix",
+                      "pattern": "cache"
+                    }
+                  ]
                 }
               }
             ]
@@ -1886,7 +1893,7 @@
     },
     {
       "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "apiVersion": "2022-05-01",
+      "apiVersion": "2026-06-01",
       "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
       "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
       "properties": {
@@ -1920,7 +1927,14 @@
                 "autoProtectionSettings": {
                   "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
                   "enabled": true,
-                  "rules": []
+                  "rules": [
+                    {
+                      "objectType": "BlobBackupAutoProtectionRule",
+                      "mode": "Exclude",
+                      "type": "Prefix",
+                      "pattern": "cache"
+                    }
+                  ]
                 }
               }
             ]
