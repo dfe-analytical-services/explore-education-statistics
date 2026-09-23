@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "domain": {
-      "type": "string"
-    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -17,12 +14,6 @@
       "defaultValue": "ees",
       "metadata": {
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
-      }
-    },
-    "storageFirewallRules": {
-      "type": "array",
-      "metadata": {
-        "description": "Firewall restrictions for storage accounts, string array"
       }
     },
     "sqlFirewallRules": {
@@ -143,44 +134,9 @@
         "1.2"
       ]
     },
-    "minTlsVersionStorageAccounts": {
-      "type": "string",
-      "defaultValue": "TLS1_2",
-      "allowedValues": [
-        "TLS1_2"
-      ]
-    },
     "useSubnets": {
       "type": "bool",
       "defaultValue": true
-    },
-    "backupVaultAzureBlobsRegistrationsDeployed": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether or not the Azure Blobs are already registered for an environment. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
-      }
-    },
-    "deployBackupVaultRegistrations": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether or not to register data sources with Backup Vault."
-      }
-    },
-    "blobDeleteRetentionEnabled": {
-      "defaultValue": true,
-      "type": "bool",
-      "metadata": {
-        "description": "Retain blobs after delete"
-      }
-    },
-    "blobDeleteRetentionDays": {
-      "defaultValue": 90,
-      "type": "int",
-      "metadata": {
-        "description": "Number of days to retain blobs after delete"
-      }
     },
     "licenseTypeContentDb": {
       "type": "string",
@@ -261,13 +217,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "additionalPublicAllowedOrigins": {
-      "type": "array",
-      "defaultValue": [],
-      "metadata": {
-        "description": "Additional CORS allowed origins for the public"
-      }
-    },
     "sqlServerPublicNetworkAccess": {
       "type": "string",
       "defaultValue": "Enabled",
@@ -285,9 +234,6 @@
     "statisticsDbName": "statistics",
     "statisticsReplicaDbName": "statistics",
     "appInsightsWorkspaceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
-    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
-    "publicAppUrl": "[concat('https://', parameters('domain'))]",
-    "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
@@ -542,8 +488,6 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "sqlServerPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sqlsvr-pep')]",
     "sqlServerPrivateEndpointsSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('sqlServerPrivateEndpointsSubnetName'))]",
-    "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
-    "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -587,29 +531,7 @@
         "name": "publisher",
         "id": "[variables('publisherSubnetRef')]"
       }
-    ],
-    "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
-    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
-    "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
-    "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
-    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
-    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
-    "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
-    "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
-    "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
-    "basePublicAllowedOrigins": [
-      "[concat('https://', parameters('domain'))]",
-      "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-    ],
-    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
-    "apiVersions": {
-      "afdEndpoint": "2025-06-01"
-    },
-    "resourceIds": {
-      "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
-    }
+    ]
   },
   "resources": [
     {
