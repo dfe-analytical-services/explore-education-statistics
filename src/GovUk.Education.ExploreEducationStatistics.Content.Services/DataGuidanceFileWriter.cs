@@ -109,9 +109,14 @@ public class DataGuidanceFileWriter : IDataGuidanceFileWriter
 
                     await file.WriteLineAsync("Filename: " + dataSet.Filename);
 
-                    if (dataSet.GeographicLevels.Any())
+                    var geographicLevels = dataSet
+                        .GeographicLevels.Concat(dataSet.GeographicLevelsCsvOnly)
+                        .Order()
+                        .ToList();
+
+                    if (geographicLevels.Any())
                     {
-                        await file.WriteLineAsync("Geographic levels: " + string.Join("; ", dataSet.GeographicLevels));
+                        await file.WriteLineAsync("Geographic levels: " + string.Join("; ", geographicLevels));
                     }
 
                     var timePeriodsLabel = dataSet.TimePeriods.ToLabel();

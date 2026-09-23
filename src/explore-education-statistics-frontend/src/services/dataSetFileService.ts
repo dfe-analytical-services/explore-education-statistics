@@ -30,6 +30,7 @@ export interface DataSetFile {
     meta: {
       numDataFileRows: number;
       geographicLevels: string[];
+      geographicLevelsCsvOnly: string[];
       timePeriodRange: {
         from: string;
         to: string;
@@ -91,6 +92,8 @@ export interface DataSetFileSummary {
   meta: {
     numDataFileRows: number;
     geographicLevels: string[];
+    // Optional as not currently provided by the azure search index used by the search-data page
+    geographicLevelsCsvOnly?: string[];
     timePeriodRange: {
       from: string;
       to: string;

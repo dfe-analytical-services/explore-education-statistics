@@ -14,9 +14,6 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
-@description('Specifies whether or not the Screener Function App already exists.')
-param functionAppExists bool
-
 param sku FunctionAppServicePlanSku
 
 @description('The IP address ranges that can access the Screener storage accounts.')
@@ -104,7 +101,7 @@ var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoi
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
   : coreStorageBlobEndpoint
 
-module containerisedFunctionAppModule '../../common/components/function-app/containerisedFunctionApp.bicep' = {
+module containerisedFunctionAppModule '../../common/components/function-app/containerised-function-app.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
     operatingSystem: operatingSystem
@@ -153,7 +150,6 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
         value: 'managedidentity'
       }
     ]
-    functionAppExists: functionAppExists
     keyVaultName: keyVault.name
     entraIdAuthentication: {
       appRegistrationClientId: screenerAppRegistrationClientId

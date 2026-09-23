@@ -20,8 +20,9 @@ internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserS
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewReleaseVersion)
+        return await userService
+            .CheckCanManagePublicApiDataSets()
+            .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId, cancellationToken))
             .OnSuccess(async () => await DoListCandidates(releaseVersionId, cancellationToken));
     }
 

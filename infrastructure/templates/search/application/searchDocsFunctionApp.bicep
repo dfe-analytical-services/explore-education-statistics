@@ -36,14 +36,8 @@ param resourceNames ResourceNames
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Location for all resources.')
-param location string
-
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
-
-@description('Specifies whether or not the Search Docs Function App already exists.')
-param functionAppExists bool
 
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
@@ -100,11 +94,10 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
 
-module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
     appSettings: [
@@ -177,20 +170,27 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
         value: storageQueueNames.themeUpdated
       }
     ]
-    functionAppExists: functionAppExists
     keyVaultName: keyVault.name
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: false
+    }
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
       family: 'EP'
+    }
+    elasticCapacity: {
+      minimumInstanceCount: 1
+      maximumInstanceCount: 1
+      instanceMemoryMB: 2048
     }
     healthCheckPath: '/api/HealthCheck'
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     deployQueueRoleAssignment: true
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

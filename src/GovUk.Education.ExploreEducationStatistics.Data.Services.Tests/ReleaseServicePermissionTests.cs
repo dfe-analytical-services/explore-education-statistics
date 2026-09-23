@@ -34,7 +34,6 @@ public class ReleaseServicePermissionTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         StatisticsDbContext? statisticsDbContext = null,
         IUserService? userService = null,
-        IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
         ITimePeriodService? timePeriodService = null
     )
     {
@@ -43,7 +42,6 @@ public class ReleaseServicePermissionTests
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
             userService ?? Mock.Of<IUserService>(),
-            dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(),
             timePeriodService ?? Mock.Of<ITimePeriodService>()
         );
     }

@@ -317,6 +317,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
           'Local authority district',
           'National',
         ],
+        geographicLevelsCsvOnly: ['School'],
         indicators: [
           'Authorised absence rate',
           'Authorised absence rate exact',
@@ -338,6 +339,7 @@ export const testReleaseDataContent: ReleaseVersionDataContent = {
       meta: {
         filters: ['Characteristic', 'School type'],
         geographicLevels: ['Local authority', 'National', 'Regional'],
+        geographicLevelsCsvOnly: [],
         indicators: [
           'Authorised absence rate',
           'Number of authorised absence sessions',

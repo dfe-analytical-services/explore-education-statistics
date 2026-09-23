@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.RelatedInformation;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases;
@@ -177,6 +178,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IThemeService, ThemeService>();
+        services.AddTransient<IOrganisationsService, OrganisationsService>();
         services.AddTransient<IPublicationMethodologiesService, PublicationMethodologiesService>();
         services.AddTransient<IPublicationReleasesService, PublicationReleasesService>();
         services.AddTransient<IPublicationsSitemapService, PublicationsSitemapService>();

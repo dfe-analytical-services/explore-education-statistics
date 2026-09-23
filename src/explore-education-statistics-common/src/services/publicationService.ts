@@ -236,6 +236,7 @@ export interface DataSetItem {
   meta: {
     filters: string[];
     geographicLevels: string[];
+    geographicLevelsCsvOnly: string[];
     indicators: string[];
     numDataFileRows: number;
     timePeriodRange: {

@@ -4,9 +4,13 @@ import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FunctionAppServicePlanSku } from '../../components/app-service-plan/types.bicep'
+import { ConnectionString } from '../../types.bicep'
+import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
+import { keyVaultRef } from '../../functions.bicep'
+import { StorageAccountSku } from '../storage/types.bicep'
 
 @description('Specifies the location for all resources.')
-param location string
+param location string = resourceGroup().location
 
 @description('Specifies the Function App name.')
 param functionAppName string
@@ -17,6 +21,9 @@ param appServicePlanName string
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
+@description('Minimum TLS version supported.')
+param minTlsVersion string = '1.3'
+
 @description('The language worker runtime to load in the function app.')
 @allowed([
   'dotnet'
@@ -25,7 +32,7 @@ param operatingSystem 'Windows' | 'Linux' = 'Linux'
   'java'
   'python'
 ])
-param functionAppRuntime string
+param functionAppRuntime string = 'dotnet-isolated'
 
 @description('.NET Framework version.')
 param netFrameworkVersion string?
@@ -44,11 +51,26 @@ param linuxFxVersion string?
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
 
+@description('Storage Account SKU.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
+
 @description('Specifies whether the storage account in use by the Function App is accessible from the public internet.')
 param storageAccountPublicNetworkAccessEnabled bool = false
 
 @description('Specifies firewall rules for the storage account in use by the Function App.')
 param storageFirewallRules IpRange[] = []
+
+@description('Database connection strings.')
+param connectionStrings ConnectionString[]?
+
+@description('Details of common Key Vault roles to apply to this Function App.')
+param keyVaultRoles {
+  secretsUser: bool?
+  certificateUser: bool?
+  
+  @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
+  legacyKeyVaultRoleAssignmentName: bool
+}?
 
 @description('Specifies additional setting to add to the Function App.')
 param appSettings {
@@ -60,32 +82,39 @@ param appSettings {
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
-@description('Enable diagnostic setting to send logs and metrics to Log Analytics.')
-param diagnosticSettingEnabled bool = false
-
-@description('The id of the Log Analytics workspace to which logs and metrics will be sent.')
-param logAnalyticsWorkspaceId string?
+@description('The id of the Log Analytics workspace to which diagnostics will be sent.')
+param diagnosticSettingsLogAnalyticsWorkspaceId string
 
 @description('Specifies whether to grant the Function App role-based access to storage account queue data.')
 param deployQueueRoleAssignment bool = false
 
-@description('Set the amount of memory allocated to each instance of the function app in MB.')
-param instanceMemoryMB int = 2048
+@description('Scaling and capacity configuration for use with Elastic Plans.')
+param elasticCapacity {
+  
+  @description('The minimum number of instances for the function app.')
+  minimumInstanceCount: int
+  
+  @description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
+  maximumInstanceCount: int
 
-@description('The minimum number of instances for the function app.')
-param minimumInstanceCount int = 1
-
-@description('The maximum number of instances for the function app - setting to 0 disables the checks on upper scaling limits.')
-param maximumInstanceCount int = 0
+  @description('The amount of memory allocated to each instance (in MB).')
+  instanceMemoryMB: int
+}?
 
 @description('Specifies the subnet id for the function app outbound traffic across the VNet.')
 param outboundSubnetId string?
+
+@description('Other subnets that are allowed to access this Function App storage account. These will be combined with the Function App outboundSubnetId.')
+param storageAccountAllowedSubnetIds string[]?
+
+@description('Whether to route all outbound traffic (including calls to Azure PaaS services like Storage) through the VNet integration subnet, rather than just RFC1918 private traffic. Required for the Function App to reach a network-restricted storage account over its VNet integration on Dedicated (non-Elastic) plans.')
+param vnetRouteAllEnabled bool = true
 
 @description('Specifies the optional subnet id for function app inbound traffic from the VNet.')
 param privateEndpoints {
   functionApp: string?
   storageAccounts: string
-}
+}?
 
 @description('Specifies whether this Function App is accessible from the public internet.')
 param publicNetworkAccessEnabled bool = false
@@ -114,9 +143,6 @@ param sku FunctionAppServicePlanSku
 
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from.')
 param keyVaultName string
-
-@description('Specifies whether or not the Function App already exists.')
-param functionAppExists bool
 
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan.')
 param alwaysOn bool = false
@@ -168,11 +194,13 @@ var fileServiceAlerts = alerts != null
   }
 : null
 
-resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
+var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
+
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
 
-var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
+var vaultUri = keyVault.properties.vaultUri
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
   name: userAssignedIdentityName
@@ -199,16 +227,19 @@ module storageAccountModule '../storage/storageAccount.bicep' = {
   params: {
     location: location
     storageAccountName: storageAccountName
-    allowedSubnetIds: outboundSubnetId != null ? [outboundSubnetId!] : []
+    allowedSubnetIds: union(
+      storageAccountAllowedSubnetIds ?? [],
+      outboundSubnetId != null ? [outboundSubnetId!] : []
+    )
     firewallRules: storageFirewallRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
-    keyVaultName: keyVault.name
-    privateEndpointSubnetIds: {
-      blob: privateEndpoints.storageAccounts
-      file: privateEndpoints.storageAccounts
-      queue: privateEndpoints.storageAccounts
-    }
+    keyVaultName: keyVaultName
+    privateEndpointSubnetIds: privateEndpoints != null ? {
+      blob: privateEndpoints!.storageAccounts
+      file: privateEndpoints!.storageAccounts
+      queue: privateEndpoints!.storageAccounts
+    } : {}
     publicNetworkAccessEnabled: storageAccountPublicNetworkAccessEnabled
     alerts: storageAlerts
     tagValues: tagValues
@@ -234,13 +265,15 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
   properties: {
-    containerSize: instanceMemoryMB
+    containerSize: elasticCapacity.?instanceMemoryMB ?? null
     reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
     vnetContentShareEnabled: true
     virtualNetworkSubnetId: outboundSubnetId
     siteConfig: {
       alwaysOn: alwaysOn
+      vnetRouteAllEnabled: vnetRouteAllEnabled
+      connectionStrings: connectionStrings
       appSettings: union([
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
@@ -253,7 +286,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${storageAccountModule.outputs.connectionStringSecretName})'
+          value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName)
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
@@ -276,12 +309,19 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'false'
         }
-        // It's only possible to UPDATE a Function App using a Key Vault reference for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING setting,
-        // not creating a new Function App, unless we use the below setting to skip validation for the first time we create
-        // this Function App.  See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+        // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
+        // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
+        // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
+        // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
         {
           name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-          value: !functionAppExists ? '1' : null
+          value: '1'
+        }
+        // Enable the Function App to access file shares over the VNet if
+        // file shares are available for this Function App. 
+        {
+          name: 'WEBSITE_CONTENTOVERVNET'
+          value: length(azureFileShares ?? []) > 0 ? '1' : null
         }
       ], appSettings)
       cors: {
@@ -289,10 +329,10 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         supportCredentials: false
       }
       ftpsState: 'FtpsOnly'
-      minimumElasticInstanceCount: minimumInstanceCount
-      functionAppScaleLimit: maximumInstanceCount
+      minimumElasticInstanceCount: elasticCapacity.?minimumInstanceCount ?? 0
+      functionAppScaleLimit: elasticCapacity.?maximumInstanceCount ?? 0
       healthCheckPath: healthCheckPath
-      minTlsVersion: '1.3'
+      minTlsVersion: minTlsVersion
       netFrameworkVersion: netFrameworkVersion
       linuxFxVersion: operatingSystem == 'Linux' ? linuxFxVersion : null
       publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
@@ -322,14 +362,30 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.b
   }
 }
 
-module keyVaultRoleAssignmentModule '../key-vault/keyVaultRoleAssignment.bicep' = {
-  name: '${functionAppName}KeyVaultSecretsUserRoleAssignment'
+module secretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
+  name: '${functionApp.name}KeyVaultSecretsUserRole'
   params: {
+    keyVaultName: keyVaultName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${functionApp.name}')
+      : null
     principalIds: [functionApp.identity.principalId]
-    keyVaultName: keyVault.name
     role: 'Secrets User'
   }
 }
+
+module certificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?certificateUser ?? false) {
+  name: '${functionApp.name}KeyVaultCertificateUserRole'
+  params: {
+    keyVaultName: keyVaultName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${functionApp.name}')
+      : null
+    principalIds: [functionApp.identity.principalId]
+    role: 'Certificate User'
+  }
+}
+
 
 module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = {
   name: '${storageAccountName}BlobRoleAssignmentModuleDeploy'
@@ -421,12 +477,12 @@ module expectedHttpStatusCodeAlerts '../alerts/dynamicMetricAlert.bicep' = [
   }
 ]
 
-module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = if (diagnosticSettingEnabled) {
+module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = {
   name: '${functionAppName}DiagnosticSettingModuleDeploy'
   params: {
     functionAppName: functionApp.name
     diagnosticSettingName: 'Send all logs and metrics to Log Analytics'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    logAnalyticsWorkspaceId: diagnosticSettingsLogAnalyticsWorkspaceId
   }
 }
 

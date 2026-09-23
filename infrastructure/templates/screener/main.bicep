@@ -1,6 +1,6 @@
 import { IpRange } from '../common/types.bicep'
 import { abbreviations } from '../common/abbreviations.bicep'
-import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
+import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -52,14 +52,11 @@ param dateProvisioned string = utcNow('u')
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
-@description('Specifies whether or not the Screener Function App already exists.')
-param screenerFunctionAppExists bool = true
-
 @description('The Docker image tag for the data screener. This value should represent a pipeline build number.')
 param screenerDockerImageTag string = ''
 
 @description('SKU for the Screener API Function App\'s App Service Plan.')
-param screenerFunctionAppSku AppServicePlanSku = {
+param screenerFunctionAppSku FunctionAppServicePlanSku = {
   name: 'EP1'
   tier: 'ElasticPremium'
   family: 'EP'
@@ -123,7 +120,6 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     maximumInstanceCount: maximumInstanceCount
     screenerDockerImageTag: screenerDockerImageTag
     resourceNames: resourceNames
-    functionAppExists: screenerFunctionAppExists
     sku: screenerFunctionAppSku
     functionAppFirewallRules: union(
       [

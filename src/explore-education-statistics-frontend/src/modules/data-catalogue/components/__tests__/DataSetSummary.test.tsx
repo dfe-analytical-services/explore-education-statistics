@@ -75,6 +75,11 @@ describe('DataSetFileSummary', () => {
       ),
     ).toBeInTheDocument();
     expect(
+      screen.queryByTestId(
+        'Geographic levels (only available via download / public API)',
+      ),
+    ).not.toBeInTheDocument();
+    expect(
       within(screen.getByTestId('Indicators')).getByText('Indicator 2'),
     ).toBeInTheDocument();
     expect(
@@ -130,6 +135,34 @@ describe('DataSetFileSummary', () => {
       screen.getByRole('button', {
         name: 'Hide details about Data set 1',
       }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders csv-only geographic levels in a separate row in the expanded view', () => {
+    render(
+      <DataSetFileSummary
+        dataSetFile={{
+          ...testDataSetFileSummaries[0],
+          meta: {
+            ...testDataSetFileSummaries[0].meta,
+            geographicLevelsCsvOnly: ['School', 'Institution'],
+          },
+        }}
+        expanded
+      />,
+    );
+
+    expect(
+      within(screen.getByTestId('Geographic levels')).getByText(
+        'Local authority, National, Regional',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(
+        screen.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).getByText('Institution, School'),
     ).toBeInTheDocument();
   });
 

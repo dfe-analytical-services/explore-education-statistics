@@ -299,8 +299,11 @@ public abstract class ReleaseVersionsServiceTests
                     {
                         var actualOrganisation = result.PublishingOrganisations[index];
                         Assert.Equal(expectedOrganisation.Id, actualOrganisation.Id);
+                        Assert.Equal(expectedOrganisation.GISLogoHexCode, actualOrganisation.GISLogoHexCode);
+                        Assert.Equal(expectedOrganisation.LogoFileName, actualOrganisation.LogoFileName);
                         Assert.Equal(expectedOrganisation.Title, actualOrganisation.Title);
                         Assert.Equal(expectedOrganisation.Url, actualOrganisation.Url);
+                        Assert.Equal(expectedOrganisation.UseGISLogo, actualOrganisation.UseGISLogo);
                     }
                 );
             }

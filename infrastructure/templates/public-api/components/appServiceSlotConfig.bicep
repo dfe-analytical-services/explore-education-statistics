@@ -19,10 +19,10 @@ param stagingOnlySettings object
 param stagingSlotName string = 'staging'
 
 @description('Specifies any existing appsettings from the staging slot')
-param existingStagingAppSettings object
+param processorStagingAppSettings object
 
 @description('Specifies any existing appsettings from the production slot')
-param existingProductionAppSettings object
+param processorProdAppSettings object
 
 @description('Specifies additional Azure Storage Accounts to make available to the staging slot')
 param azureFileShares AzureFileShareMount[] = []
@@ -42,8 +42,8 @@ resource functionSlotConfig 'Microsoft.Web/sites/config@2023-12-01' = {
 // ready to run.
 //
 // See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
-var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existingStagingAppSettings)
-var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
+var combinedStagingSettings = union(commonSettings, stagingOnlySettings, processorStagingAppSettings)
+var combinedProductionSettings = union(commonSettings, prodOnlySettings, processorProdAppSettings)
 
 @description('Set appsettings on the staging slot')
 resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-12-01' = {

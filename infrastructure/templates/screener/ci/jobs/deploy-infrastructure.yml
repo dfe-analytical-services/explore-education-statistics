@@ -33,13 +33,6 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
 
-            - template: ../../../../common/ci/tasks/check-function-app-exists.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(screenerFunctionAppName)
-                variableName: screenerFunctionAppExists
-
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Deploy Bicep template

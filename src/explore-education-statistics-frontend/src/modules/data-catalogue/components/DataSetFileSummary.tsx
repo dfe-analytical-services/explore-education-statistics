@@ -51,6 +51,7 @@ export default function DataSetFileSummary({
       },
       filters = [],
       geographicLevels = [],
+      geographicLevelsCsvOnly = [],
       indicators = [],
     },
     api,
@@ -173,6 +174,16 @@ export default function DataSetFileSummary({
             term="Geographic levels"
           >
             {orderBy(geographicLevels).join(', ')}
+          </SummaryListItem>
+        )}
+        {geographicLevelsCsvOnly && geographicLevelsCsvOnly.length > 0 && (
+          <SummaryListItem
+            className={classNames({
+              'dfe-js-hidden': !showDetails,
+            })}
+            term="Geographic levels (only available via download / public API)"
+          >
+            {orderBy(geographicLevelsCsvOnly).join(', ')}
           </SummaryListItem>
         )}
         {indicators && indicators.length > 0 && (

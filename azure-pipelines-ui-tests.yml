@@ -59,8 +59,10 @@ jobs:
     testFolder: tests/seed_data
     artifactName: test-results-seed-data
 
-- job: NotifyTeams
-  displayName: Send UI test pipeline summary to Teams
+# Every suite that runs reports itself from inside the test runner. This covers only the
+# suites that never got that far, which would otherwise fail silently.
+- job: NotifyTeamsOfUnreportedSuites
+  displayName: Report UI test suites that did not report
   dependsOn:
   - Public
   - PublishAndAmend
@@ -70,6 +72,11 @@ jobs:
   - SeedData
   condition: always()
   pool: ees-ubuntu2204-large
+  # The agents are self-hosted, so without this the downloaded artifacts persist between
+  # runs. A marker left by a previous run would then suppress this run's alert, which is
+  # the one failure this job exists to report.
+  workspace:
+    clean: all
   variables:
     publicResult: $[ dependencies.Public.result ]
     publishAndAmendResult: $[ dependencies.PublishAndAmend.result ]
@@ -102,11 +109,11 @@ jobs:
       targetPath: $(Pipeline.Workspace)/ui-test-results
 
   - task: PythonScript@0
-    displayName: Send Teams summary
+    displayName: Report suites that did not report
     condition: always()
     continueOnError: true
     inputs:
-      scriptPath: tests/robot-tests/scripts/send_teams_pipeline_report.py
+      scriptPath: tests/robot-tests/scripts/send_teams_unreported_suites.py
       arguments: --artifacts-dir "$(Pipeline.Workspace)/ui-test-results" --environment dev
       workingDirectory: tests/robot-tests
     env:

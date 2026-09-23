@@ -31,7 +31,7 @@ internal class DataSetService(
     )
     {
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSetsQueryable = publicDataDbContext
@@ -67,7 +67,7 @@ internal class DataSetService(
     )
     {
         return await CheckPublicationExists(publicationId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewPublication)
+            .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             .OnSuccess(async () =>
             {
                 var dataSets = await publicDataDbContext
@@ -105,7 +105,7 @@ internal class DataSetService(
             .SingleOrNotFoundAsync(cancellationToken)
             .OnSuccessDo(dataSet =>
                 CheckPublicationExists(dataSet.PublicationId, cancellationToken)
-                    .OnSuccess(userService.CheckCanViewPublication)
+                    .OnSuccess(publication => userService.CheckCanViewPublicApiDataSets(publication.Id))
             )
             .OnSuccess(async dataSet => await MapDataSet(dataSet, cancellationToken));
     }
@@ -129,8 +129,9 @@ internal class DataSetService(
         CancellationToken cancellationToken = default
     )
     {
-        return await userService
-            .CheckIsBauUser()
+        return await GetReleaseVersion(releaseFileId, cancellationToken)
+            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
+            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
             .OnSuccess(async _ =>
                 await processorClient.CreateDataSet(releaseFileId: releaseFileId, cancellationToken: cancellationToken)
             )
@@ -371,6 +372,29 @@ internal class DataSetService(
             .Include(ds => ds.Versions)
             .Include(ds => ds.LatestDraftVersion)
             .Include(ds => ds.LatestLiveVersion);
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> GetReleaseVersion(
+        Guid releaseFileId,
+        CancellationToken cancellationToken
+    ) =>
+        await contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Where(r => r.Id == releaseFileId)
+            .Select(rf => rf.ReleaseVersion)
+            .SingleOrNotFoundAsync(cancellationToken);
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIsNotApproved(
+        ReleaseVersion releaseVersion,
+        CancellationToken cancellationToken
+    )
+    {
+        if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
+        {
+            return new ForbidResult();
+        }
+
+        return Unit.Instance;
     }
 
     private record DataSetReleaseVersions

@@ -63,6 +63,7 @@ public record ReleaseDataContentDataSetMetaDto
 {
     public required string[] Filters { get; init; }
     public required string[] GeographicLevels { get; init; }
+    public required string[] GeographicLevelsCsvOnly { get; init; }
     public required string[] Indicators { get; init; }
     public required int NumDataFileRows { get; init; }
     public required ReleaseDataContentDataSetMetaTimePeriodRangeDto TimePeriodRange { get; init; }
@@ -74,7 +75,11 @@ public record ReleaseDataContentDataSetMetaDto
         return new ReleaseDataContentDataSetMetaDto
         {
             Filters = GetOrderedFilters(meta.Filters, releaseFile.FilterSequence),
-            GeographicLevels = GetOrderedGeographicLevels(file.DataSetFileVersionGeographicLevels),
+            GeographicLevels = GetOrderedGeographicLevels(file.DataSetFileVersionGeographicLevels, csvOnly: false),
+            GeographicLevelsCsvOnly = GetOrderedGeographicLevels(
+                file.DataSetFileVersionGeographicLevels,
+                csvOnly: true
+            ),
             Indicators = GetOrderedIndicators(meta.Indicators, releaseFile.IndicatorSequence),
             NumDataFileRows = meta.NumDataFileRows,
             TimePeriodRange = ReleaseDataContentDataSetMetaTimePeriodRangeDto.FromTimePeriodRangeMeta(
@@ -84,11 +89,12 @@ public record ReleaseDataContentDataSetMetaDto
     }
 
     private static string[] GetOrderedGeographicLevels(
-        IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels
+        IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
+        bool csvOnly
     ) =>
         [
             .. dataSetFileVersionGeographicLevels
-                .Where(level => level.CsvOnly != true)
+                .Where(level => (level.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
                 .Select(level => level.GeographicLevel.GetEnumLabel())
                 .Order(),
         ];

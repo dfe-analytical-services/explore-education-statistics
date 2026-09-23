@@ -142,6 +142,7 @@ public class ReleaseDataContentDataSetMetaDtoBuilder
 {
     private string[] _filters = ["Filter 1"];
     private string[] _geographicLevels = ["Geographic level 1"];
+    private string[] _geographicLevelsCsvOnly = [];
     private string[] _indicators = ["Indicator 1"];
     private int _numDataFileRows = 100;
     private ReleaseDataContentDataSetMetaTimePeriodRangeDto _timePeriodRange =
@@ -152,6 +153,7 @@ public class ReleaseDataContentDataSetMetaDtoBuilder
         {
             Filters = _filters,
             GeographicLevels = _geographicLevels,
+            GeographicLevelsCsvOnly = _geographicLevelsCsvOnly,
             Indicators = _indicators,
             NumDataFileRows = _numDataFileRows,
             TimePeriodRange = _timePeriodRange,
@@ -166,6 +168,12 @@ public class ReleaseDataContentDataSetMetaDtoBuilder
     public ReleaseDataContentDataSetMetaDtoBuilder WithGeographicLevels(string[] geographicLevels)
     {
         _geographicLevels = geographicLevels;
+        return this;
+    }
+
+    public ReleaseDataContentDataSetMetaDtoBuilder WithGeographicLevelsCsvOnly(string[] geographicLevelsCsvOnly)
+    {
+        _geographicLevelsCsvOnly = geographicLevelsCsvOnly;
         return this;
     }
 

@@ -141,7 +141,7 @@ describe('ReleaseExploreDataPage', () => {
     ).toBeInTheDocument();
     expect(
       within(dataSetItems[0]).getByText(
-        'Local authority, Local authority district, National',
+        'Local authority, Local authority district, National, School (CSV only)',
       ),
     ).toBeInTheDocument();
     expect(

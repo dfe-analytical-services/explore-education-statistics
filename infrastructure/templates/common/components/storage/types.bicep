@@ -16,9 +16,29 @@ type StorageAccountPrivateEndpoints = {
 }
 
 @export()
+type StorageAccountSku = 
+  | 'Standard_LRS'
+  | 'StandardV2_LRS'
+  | 'Standard_GRS'
+  | 'StandardV2_GRS'
+  | 'Standard_RAGRS'
+  | 'Standard_ZRS'
+  | 'StandardV2_ZRS'
+  | 'Premium_LRS'
+  | 'Premium_ZRS'
+  | 'Standard_GZRS'
+  | 'StandardV2_GZRS'
+  | 'Standard_RAGZRS'
+
+@export()
+type StorageAccountKind = 
+  | 'StorageV2'
+  | 'FileStorage'
+
+@export()
 type StorageAccountConfig = {
-  sku: 'Standard_LRS' | 'Premium_LRS' | 'Premium_ZRS'
-  kind: 'StorageV2' | 'FileStorage'
+  sku: StorageAccountSku
+  kind: StorageAccountKind
   fileShare: {
     quotaGbs: int
     accessTier: 'Cool' | 'Hot' | 'TransactionOptimized' | 'Premium'

@@ -23,6 +23,7 @@ describe('ReleaseDataGuidanceSection', () => {
         filename: 'data-1.csv',
         content: 'Test data set 1 content',
         geographicLevels: ['Local authority', 'National'],
+        geographicLevelsCsvOnly: ['School'],
         timePeriods: {
           from: '2018',
           to: '2019',
@@ -48,6 +49,7 @@ describe('ReleaseDataGuidanceSection', () => {
         filename: 'data-2.csv',
         content: 'Test data set 2 content',
         geographicLevels: ['Regional', 'Ward'],
+        geographicLevelsCsvOnly: [],
         timePeriods: {
           from: '2020',
           to: '2021',
@@ -149,6 +151,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
@@ -197,6 +204,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
@@ -283,6 +295,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
@@ -335,6 +352,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
@@ -746,6 +768,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
@@ -794,6 +821,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );

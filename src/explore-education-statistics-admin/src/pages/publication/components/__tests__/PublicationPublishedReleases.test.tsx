@@ -197,7 +197,14 @@ describe('PublicationPublishedReleases', () => {
     expect(rows).toHaveLength(6);
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
-    expect(within(row1Cells[0]).getByText('Release 1')).toBeInTheDocument();
+    expect(
+      within(row1Cells[0]).getByRole('link', {
+        name: 'Release 1 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-1-slug',
+    );
     expect(within(row1Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row1Cells[2]).getByText('1 January 2022'),
@@ -219,7 +226,14 @@ describe('PublicationPublishedReleases', () => {
     ).toBeInTheDocument();
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
-    expect(within(row2Cells[0]).getByText('Release 2')).toBeInTheDocument();
+    expect(
+      within(row2Cells[0]).getByRole('link', {
+        name: 'Release 2 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-2-slug',
+    );
     expect(within(row2Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row2Cells[2]).getByText('2 January 2022'),
@@ -241,7 +255,14 @@ describe('PublicationPublishedReleases', () => {
     ).toBeInTheDocument();
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
-    expect(within(row3Cells[0]).getByText('Release 3')).toBeInTheDocument();
+    expect(
+      within(row3Cells[0]).getByRole('link', {
+        name: 'Release 3 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-3-slug',
+    );
     expect(within(row3Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row3Cells[2]).getByText('3 January 2022'),
@@ -263,7 +284,14 @@ describe('PublicationPublishedReleases', () => {
     ).toBeInTheDocument();
 
     const row4Cells = within(rows[4]).getAllByRole('cell');
-    expect(within(row4Cells[0]).getByText('Release 4')).toBeInTheDocument();
+    expect(
+      within(row4Cells[0]).getByRole('link', {
+        name: 'Release 4 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-4-slug',
+    );
     expect(within(row4Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row4Cells[2]).getByText('4 January 2022'),
@@ -285,7 +313,14 @@ describe('PublicationPublishedReleases', () => {
     ).toBeInTheDocument();
 
     const row5Cells = within(rows[5]).getAllByRole('cell');
-    expect(within(row5Cells[0]).getByText('Release 5')).toBeInTheDocument();
+    expect(
+      within(row5Cells[0]).getByRole('link', {
+        name: 'Release 5 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-5-slug',
+    );
     expect(within(row5Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row5Cells[2]).getByText('5 January 2022'),
@@ -429,7 +464,14 @@ describe('PublicationPublishedReleases', () => {
     expect(rows).toHaveLength(8);
 
     const row6Cells = within(rows[6]).getAllByRole('cell');
-    expect(within(row6Cells[0]).getByText('Release 6')).toBeInTheDocument();
+    expect(
+      within(row6Cells[0]).getByRole('link', {
+        name: 'Release 6 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-6-slug',
+    );
     expect(within(row6Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row6Cells[2]).getByText('6 January 2022'),
@@ -446,7 +488,14 @@ describe('PublicationPublishedReleases', () => {
     );
 
     const row7Cells = within(rows[7]).getAllByRole('cell');
-    expect(within(row7Cells[0]).getByText('Release 7')).toBeInTheDocument();
+    expect(
+      within(row7Cells[0]).getByRole('link', {
+        name: 'Release 7 (opens in new tab)',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/publication-1-slug/release-7-slug',
+    );
     expect(within(row7Cells[1]).getByText('Published')).toBeInTheDocument();
     expect(
       within(row7Cells[2]).getByText('7 January 2022'),

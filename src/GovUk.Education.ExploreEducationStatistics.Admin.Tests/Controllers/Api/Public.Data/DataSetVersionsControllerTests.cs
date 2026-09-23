@@ -57,7 +57,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             nameof(DataSetVersionStatusTheoryData.AvailableStatuses),
             MemberType = typeof(DataSetVersionStatusTheoryData)
         )]
-        public async Task OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
+        public async Task BauUser_OnlyPreviouslyPublishedVersionsReturned(DataSetVersionStatus dataSetVersionStatus)
         {
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -331,14 +331,116 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
         {
+            // The data set must actually exist - otherwise the request is rejected as Not Found
+            // before the authorization check is ever reached.
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
             var response = await ListLiveVersions(
-                dataSetId: Guid.NewGuid(),
+                dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1,
                 user: OptimisedTestUsers.Authenticated
             );
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanListLiveVersions(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatusPublished()
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            // The DataSet <-> DataSetVersion relationship is circular once LatestLiveVersion is set, so
+            // this must remain a two-step Add-then-Update rather than a single combined AddTestData call.
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await ListLiveVersions(dataSetId: dataSet.Id, page: 1, pageSize: 10, user: identityUser);
+
+            var viewModel = response.AssertOk<PaginatedListViewModel<DataSetLiveVersionSummaryViewModel>>();
+
+            Assert.Equal(dataSetVersion.Id, Assert.Single(viewModel.Results).Id);
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease().WithPublication(publication));
+
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseVersions.Add(releaseVersion);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            var response = await ListLiveVersions(dataSetId: dataSet.Id, page: 1, pageSize: 10, user: identityUser);
 
             response.AssertForbidden();
         }
@@ -393,7 +495,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
 
         [Theory]
         [MemberData(nameof(AllDataSetVersionStatuses))]
-        public async Task Success(DataSetVersionStatus dataSetVersionStatus)
+        public async Task BauUser_Success(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
 
@@ -428,10 +530,24 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
         {
+            // The data set version must actually exist - otherwise the request is rejected as
+            // Not Found before the authorization check is ever reached.
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
             var response = await GetDataSetVersion(
-                dataSetVersionId: Guid.NewGuid(),
+                dataSetVersionId: dataSetVersion.Id,
                 user: OptimisedTestUsers.Authenticated
             );
 
@@ -444,6 +560,91 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             var response = await GetDataSetVersion(dataSetVersionId: Guid.NewGuid());
 
             response.AssertNotFound();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanGetDataSetVersion(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var response = await GetDataSetVersion(dataSetVersionId: dataSetVersion.Id, user: identityUser);
+
+            var viewModel = response.AssertOk<DataSetVersionInfoViewModel>();
+
+            Assert.Equal(dataSetVersion.Id, viewModel.Id);
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true).Generate(1));
+
+            var releaseVersion = publication.ReleaseVersions.Single();
+
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished().WithPublicationId(publication.Id);
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var response = await GetDataSetVersion(dataSetVersionId: dataSetVersion.Id, user: identityUser);
+
+            response.AssertForbidden();
         }
 
         private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetVersionId, ClaimsPrincipal? user = null)
@@ -576,8 +777,12 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             response.AssertForbidden();
         }
 
+        // This behaviour is intentional for now - a publication role does not yet satisfy
+        // CanManagePublicApiDataSets, which is currently BAU-only. Revisit this test once
+        // ManagePublicApiDataSetsAuthorizationHandler gains publication-role support (see the
+        // TODO comment in that handler).
         [Fact]
-        public async Task UserOnPublicationTeam_CanCreateNextVersion_ReturnsDataSetVersionSummary()
+        public async Task UserOnPublicationTeam_Returns403()
         {
             ClaimsPrincipal identityUser = DataFixture.StandardUser();
             User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
@@ -605,51 +810,42 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                     context.UserPublicationRoles.Add(userPublicationRole);
                 });
 
-            var dataSetId = Guid.NewGuid();
-            var nextDataSetVersionId = Guid.NewGuid();
-            var dataSet = DataFixture.DefaultDataSet().WithId(dataSetId).Generate();
-            var nextDataSetVersion = DataFixture
-                .DefaultDataSetVersion()
-                .WithId(nextDataSetVersionId)
-                .WithDataSet(dataSet)
-                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
-                .Generate();
-
-            await fixture
-                .GetPublicDataDbContext()
-                .AddTestData(context =>
-                {
-                    context.DataSetVersions.Add(nextDataSetVersion);
-                });
-            var processorClientMock = fixture.GetProcessorClientMock();
-
-            processorClientMock
-                .Setup(c =>
-                    c.CreateNextDataSetVersionMappings(dataSetId, releaseFile.Id, null, It.IsAny<CancellationToken>())
-                )
-                .ReturnsAsync(() =>
-                    new ProcessDataSetVersionResponseViewModel
-                    {
-                        DataSetId = dataSetId,
-                        DataSetVersionId = nextDataSetVersionId,
-                        InstanceId = Guid.NewGuid(),
-                    }
-                );
-
             var response = await CreateNextVersion(
-                dataSetId: dataSetId,
+                dataSetId: Guid.NewGuid(),
                 releaseFileId: releaseFile.Id,
                 user: identityUser
             );
 
-            MockUtils.VerifyAllMocks(processorClientMock);
+            response.AssertForbidden();
+        }
 
-            var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
+        [Fact]
+        public async Task ReleaseVersionApproved_Returns403()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
 
-            Assert.Equal(viewModel.Id, nextDataSetVersionId);
-            Assert.Equal(viewModel.Version, nextDataSetVersion.PublicVersion);
-            Assert.Equal(viewModel.Status, nextDataSetVersion.Status);
-            Assert.Equal(viewModel.Type, nextDataSetVersion.VersionType);
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+
+            var response = await CreateNextVersion(
+                dataSetId: Guid.NewGuid(),
+                releaseFileId: releaseFile.Id,
+                user: OptimisedTestUsers.Bau
+            );
+
+            response.AssertForbidden();
         }
 
         [Fact]
@@ -759,10 +955,140 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task NotBauUser_Returns403()
         {
+            // The data set version must actually exist - otherwise the request is rejected as
+            // Not Found before the authorization check is ever reached.
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(nextDataSetVersion);
+                });
+
             var response = await CompleteNextVersionImport(
-                dataSetVersionId: Guid.NewGuid(),
+                dataSetVersionId: nextDataSetVersion.Id,
                 user: OptimisedTestUsers.Authenticated
             );
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the publication does
+            // not (yet) satisfy this policy.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(nextDataSetVersion);
+                });
+
+            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ReleaseVersionApproved_Returns403()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id);
 
             response.AssertForbidden();
         }
@@ -822,6 +1148,115 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
             var response = await DeleteVersion(dataSetVersion.Id, user: OptimisedTestUsers.Authenticated);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the publication does
+            // not (yet) satisfy this policy.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft().WithPublicationId(publication.Id);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            // The DataSet <-> DataSetVersion relationship is circular once LatestDraftVersion is set, so
+            // this must remain a two-step Add-then-Update rather than a single combined AddTestData call.
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await DeleteVersion(dataSetVersion.Id, user: identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ReleaseVersionApproved_Returns403()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(1, 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            var response = await DeleteVersion(dataSetVersion.Id);
 
             response.AssertForbidden();
         }
@@ -971,6 +1406,94 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             response.AssertForbidden();
         }
 
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the publication does
+            // not (yet) satisfy this policy.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            var releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .Generate();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().WithPublicationId(publication.Id).Generate();
+            var dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(major: 1, minor: 0, patch: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var response = await UnfinaliseVersion(dataSetVersion.Id, identityUser);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ReleaseVersionApproved_Returns403()
+        {
+            var releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .Generate();
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            var dataSet = DataFixture.DefaultDataSet().WithStatusDraft().Generate();
+            var dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(major: 1, minor: 0, patch: 1)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .Generate();
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await UnfinaliseVersion(dataSetVersion.Id);
+
+            response.AssertForbidden();
+        }
+
         [Fact]
         public async Task ProcessorValidationFailure_IsPropagated()
         {
@@ -1032,7 +1555,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
-        public async Task Success_Returns200()
+        public async Task BauUser_Success_Returns200()
         {
             DataSet dataSet = DataFixture.DefaultDataSet().WithStatusDraft();
 
@@ -1077,9 +1600,23 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
         {
-            var response = await GetVersionChanges(Guid.NewGuid(), user: OptimisedTestUsers.Authenticated);
+            // The data set version must actually exist - otherwise the request is rejected as
+            // Not Found before the authorization check is ever reached.
+            DataSet dataSet = DataFixture.DefaultDataSet();
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var response = await GetVersionChanges(dataSetVersion.Id, user: OptimisedTestUsers.Authenticated);
 
             response.AssertForbidden();
         }
@@ -1090,6 +1627,109 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             var response = await GetVersionChanges(Guid.NewGuid());
 
             response.AssertNotFound();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_CanGetVersionChanges(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var mockedChanges = new MockedChanges { Changes = ["test"] };
+
+            var publicDataApiClientMock = fixture.GetPublicDataApiClientMock();
+
+            // Setting up the mock only for this exact data set version's id/public version confirms the
+            // right resource was resolved and passed through to the downstream API call.
+            publicDataApiClientMock
+                .Setup(c =>
+                    c.GetDataSetVersionChanges(
+                        dataSetVersion.DataSetId,
+                        dataSetVersion.PublicVersion,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(mockedChanges) }
+                );
+
+            var response = await GetVersionChanges(dataSetVersion.Id, user: identityUser);
+
+            MockUtils.VerifyAllMocks(publicDataApiClientMock);
+
+            response.AssertOk<MockedChanges>(useSystemJson: true);
+        }
+
+        [Fact]
+        public async Task UserWithOnlyPreReleaseRole_Returns403()
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(DataFixture.DefaultRelease().WithPublication(publication));
+
+            UserPreReleaseRole userPreReleaseRole = DataFixture
+                .DefaultUserPreReleaseRole()
+                .WithUser(user)
+                .WithReleaseVersion(releaseVersion);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseVersions.Add(releaseVersion);
+                    context.UserPreReleaseRoles.Add(userPreReleaseRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var response = await GetVersionChanges(dataSetVersion.Id, user: identityUser);
+
+            response.AssertForbidden();
         }
 
         [Fact]
@@ -1274,9 +1914,70 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Fact]
         public async Task NotBauUser_Returns403()
         {
+            // The data set version must actually exist - otherwise the request is rejected as
+            // Not Found before the authorization check is ever reached.
+            DataSet dataSet = DataFixture.DefaultDataSet();
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
             var updateRequest = new DataSetVersionUpdateRequest();
 
-            var response = await UpdateVersion(Guid.NewGuid(), updateRequest, user: OptimisedTestUsers.Authenticated);
+            var response = await UpdateVersion(
+                dataSetVersion.Id,
+                updateRequest,
+                user: OptimisedTestUsers.Authenticated
+            );
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        {
+            // CanManagePublicApiDataSets is currently BAU-only - having a role on the publication does
+            // not (yet) satisfy this policy.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithPublicationId(publication.Id);
+            DataSetVersion dataSetVersion = DataFixture.DefaultDataSetVersion().WithDataSet(dataSet).Generate();
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSets.Add(dataSet);
+                    context.DataSetVersions.Add(dataSetVersion);
+                });
+
+            var updateRequest = new DataSetVersionUpdateRequest();
+
+            var response = await UpdateVersion(dataSetVersion.Id, updateRequest, user: identityUser);
 
             response.AssertForbidden();
         }

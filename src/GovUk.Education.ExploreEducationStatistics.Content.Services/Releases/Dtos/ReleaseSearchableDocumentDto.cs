@@ -20,6 +20,7 @@ public record ReleaseSearchableDocumentDto
     public required string ThemeTitle { get; init; }
     public required string Type { get; init; }
     public required int TypeBoost { get; init; }
+    public required SearchableDocumentPublishingOrganisationDto[] PublishingOrganisations { get; init; }
     public required string HtmlContent { get; init; }
 
     public static ReleaseSearchableDocumentDto FromReleaseVersion(ReleaseVersion releaseVersion) =>
@@ -39,6 +40,12 @@ public record ReleaseSearchableDocumentDto
             ThemeTitle = releaseVersion.Release.Publication.Theme.Title,
             Type = releaseVersion.Type.ToString(),
             TypeBoost = releaseVersion.Type.ToSearchDocumentTypeBoost(),
+            PublishingOrganisations =
+            [
+                .. releaseVersion
+                    .PublishingOrganisations.OrderBy(organisation => organisation.Title)
+                    .Select(SearchableDocumentPublishingOrganisationDto.FromOrganisation),
+            ],
             HtmlContent = RenderSearchableHtmlContent(releaseVersion),
         };
 
@@ -124,4 +131,13 @@ public record ReleaseSearchableDocumentDto
 
     private static string? RemoveComments(string? input) =>
         string.IsNullOrEmpty(input) ? input : ContentFilterUtils.CommentsRegex().Replace(input, string.Empty);
+}
+
+public record SearchableDocumentPublishingOrganisationDto
+{
+    public required Guid Id { get; init; }
+    public required string Title { get; init; }
+
+    public static SearchableDocumentPublishingOrganisationDto FromOrganisation(Organisation organisation) =>
+        new() { Id = organisation.Id, Title = organisation.Title };
 }

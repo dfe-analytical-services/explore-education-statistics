@@ -21,6 +21,11 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
     [dataSet.geographicLevels],
   );
 
+  const geographicLevelsCsvOnly = useMemo(
+    () => dataSet.geographicLevelsCsvOnly.sort().join('; '),
+    [dataSet.geographicLevelsCsvOnly],
+  );
+
   const timePeriod = useMemo(() => {
     const { from, to } = dataSet.timePeriods;
 
@@ -58,6 +63,11 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
         {geographicLevels && (
           <SummaryListItem term="Geographic levels">
             {geographicLevels}
+          </SummaryListItem>
+        )}
+        {geographicLevelsCsvOnly && (
+          <SummaryListItem term="Geographic levels (only available via download / public API)">
+            {geographicLevelsCsvOnly}
           </SummaryListItem>
         )}
         {timePeriod && (

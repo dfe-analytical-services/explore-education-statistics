@@ -1,10 +1,30 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
+import { GlobalPermissions } from '@admin/services/authService';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { MappableFilterOption } from '../../utils/getApiDataSetFilterMappings';
 
 describe('ApiDataSetMappableTable', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testFilterOptions: MappableFilterOption[] = [
     {
       mapping: {
@@ -59,19 +79,7 @@ describe('ApiDataSetMappableTable', () => {
   ];
 
   test('renders correctly', () => {
-    render(
-      <ApiDataSetMappableTable
-        groupKey="Filter1Key"
-        tableCaptionText="Filter 1"
-        itemLabel="filter option"
-        itemPluralLabel="filter options"
-        mappableItems={testFilterOptions}
-        newItems={[]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    renderTable();
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(5);
@@ -142,19 +150,7 @@ describe('ApiDataSetMappableTable', () => {
   });
 
   test('shows the number of mapped and unmapped items in the table caption', () => {
-    render(
-      <ApiDataSetMappableTable
-        groupKey="Filter1Key"
-        tableCaptionText="Filter 1"
-        itemLabel="filter option"
-        itemPluralLabel="filter options"
-        mappableItems={testFilterOptions}
-        newItems={[]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    renderTable();
 
     expect(
       screen.getByRole('table', {
@@ -164,27 +160,16 @@ describe('ApiDataSetMappableTable', () => {
   });
 
   test('hides the buttons if there is a pending update for the mapping', () => {
-    render(
-      <ApiDataSetMappableTable
-        groupKey="Filter1Key"
-        tableCaptionText="Filter 1"
-        itemLabel="filter option"
-        itemPluralLabel="filter options"
-        mappableItems={testFilterOptions}
-        newItems={[]}
-        pendingUpdates={[
-          {
-            previousMapping: testFilterOptions[1].mapping,
-            groupKey: 'Filter1Key',
-            sourceKey: 'FilterOption2SourceKey',
-            type: 'ManualMapped',
-          },
-        ]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    renderTable({
+      pendingUpdates: [
+        {
+          previousMapping: testFilterOptions[1].mapping,
+          groupKey: 'Filter1Key',
+          sourceKey: 'FilterOption2SourceKey',
+          type: 'ManualMapped',
+        },
+      ],
+    });
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
 
@@ -201,4 +186,72 @@ describe('ApiDataSetMappableTable', () => {
       }),
     ).not.toBeInTheDocument();
   });
+
+  test('does not show the actions column or controls when the user cannot manage public API data sets, even when `readOnly` is false', () => {
+    renderTable(
+      { readOnly: false },
+      {
+        user: testAnalystUser,
+      },
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(5);
+
+    expect(
+      within(rows[0]).queryByRole('columnheader', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+
+    // Row 1 - AutoNone
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells).toHaveLength(3);
+    expect(
+      screen.queryByRole('button', {
+        name: 'No mapping for Filter Option 1',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Map filter option for Filter Option 1',
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 2 - ManualMapped - Minor
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells).toHaveLength(3);
+    expect(
+      screen.queryByRole('button', {
+        name: 'No mapping for Filter Option 2',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Map filter option for Filter Option 2',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  function renderTable(
+    props: Partial<ComponentProps<typeof ApiDataSetMappableTable>> = {},
+    options?: { user?: User },
+  ) {
+    const { user = testBauUser } = options ?? {};
+
+    return render(
+      <AuthContextTestProvider user={user}>
+        <ApiDataSetMappableTable
+          groupKey="Filter1Key"
+          tableCaptionText="Filter 1"
+          itemLabel="filter option"
+          itemPluralLabel="filter options"
+          mappableItems={testFilterOptions}
+          newItems={[]}
+          renderCandidate={candidate => candidate.label}
+          renderSource={source => source.label}
+          onUpdate={Promise.resolve}
+          {...props}
+        />
+      </AuthContextTestProvider>,
+    );
+  }
 });

@@ -44,6 +44,7 @@ describe('ReleaseDataFileReplacePage', () => {
     canAccessAnalystPages: true,
     canAccessAllImports: true,
     canManageAllTaxonomy: true,
+    canManagePublicApiDataSets: true,
     isApprover: true,
   };
 
@@ -112,6 +113,7 @@ describe('ReleaseDataFileReplacePage', () => {
     mapping: {
       indicators: { candidates: {}, mappings: {} },
       locations: { candidates: {}, mappings: {} },
+      filters: { candidates: {}, mappings: {} },
     },
   };
 

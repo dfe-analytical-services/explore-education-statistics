@@ -73,6 +73,7 @@ describe('ReleasePageTabExploreData', () => {
             'Local authority district',
             'National',
           ],
+          geographicLevelsCsvOnly: ['School'],
           indicators: [
             'Authorised absence rate',
             'Authorised absence rate exact',
@@ -94,6 +95,7 @@ describe('ReleasePageTabExploreData', () => {
         meta: {
           filters: ['Characteristic', 'School type'],
           geographicLevels: ['Local authority', 'National', 'Regional'],
+          geographicLevelsCsvOnly: [],
           indicators: [
             'Authorised absence rate',
             'Number of authorised absence sessions',
@@ -253,6 +255,11 @@ describe('ReleasePageTabExploreData', () => {
       within(dataSetItems[0]).getByRole('heading', {
         name: 'Test dataset 1',
       }),
+    ).toBeInTheDocument();
+    expect(
+      within(dataSetItems[0]).getByText(
+        'Local authority, Local authority district, National, School (CSV only)',
+      ),
     ).toBeInTheDocument();
     expect(
       within(dataSetItems[0]).getByRole('button', {

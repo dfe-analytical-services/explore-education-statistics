@@ -122,8 +122,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       keyVaultName: resourceNames.keyVault.keyVault
       secretsUser: true
       certificateUser: true
+      legacyKeyVaultRoleAssignmentName: true
     }
-    legacyKeyVaultRoleAssignmentName: true
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices

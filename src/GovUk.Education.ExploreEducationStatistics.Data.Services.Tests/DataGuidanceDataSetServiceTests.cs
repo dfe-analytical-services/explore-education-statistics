@@ -210,6 +210,13 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = subject1.Id,
                 Filename = "file1.csv",
                 Type = FileType.Data,
+                DataSetFileVersionGeographicLevels =
+                [
+                    new() { GeographicLevel = GeographicLevel.Country },
+                    new() { GeographicLevel = GeographicLevel.LocalAuthority },
+                    new() { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
+                    new() { GeographicLevel = GeographicLevel.School, CsvOnly = true },
+                ],
             },
             Summary = "Data set 1 guidance",
         };
@@ -223,6 +230,11 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = subject2.Id,
                 Filename = "file2.csv",
                 Type = FileType.Data,
+                DataSetFileVersionGeographicLevels =
+                [
+                    new() { GeographicLevel = GeographicLevel.Country },
+                    new() { GeographicLevel = GeographicLevel.Region },
+                ],
             },
             Summary = "Data set 2 guidance",
         };
@@ -254,9 +266,10 @@ public class DataGuidanceDataSetServiceTests
             Assert.Equal("2020/21 Q3", result[0].TimePeriods.From);
             Assert.Equal("2021/22 Q1", result[0].TimePeriods.To);
             Assert.Equal(
-                new List<string> { "National", "Local authority", "Local authority district" },
+                new List<string> { "Local authority", "Local authority district", "National" },
                 result[0].GeographicLevels
             );
+            Assert.Equal(new List<string> { "School" }, result[0].GeographicLevelsCsvOnly);
 
             Assert.Equal(2, result[0].Variables.Count);
             Assert.Equal("Subject 1 Filter - Hint", result[0].Variables[0].Label);
@@ -280,6 +293,7 @@ public class DataGuidanceDataSetServiceTests
             Assert.Equal("2020/21 Summer term", result[1].TimePeriods.From);
             Assert.Equal("2021/22 Spring term", result[1].TimePeriods.To);
             Assert.Equal(new List<string> { "National", "Regional" }, result[1].GeographicLevels);
+            Assert.Empty(result[1].GeographicLevelsCsvOnly);
 
             Assert.Equal(2, result[1].Variables.Count);
             Assert.Equal("Subject 2 Filter", result[1].Variables[0].Label);
@@ -697,92 +711,6 @@ public class DataGuidanceDataSetServiceTests
             Assert.Empty(version2ViewModels[1].TimePeriods.To);
             Assert.Empty(version2ViewModels[1].GeographicLevels);
             Assert.Empty(version2ViewModels[1].Variables);
-        }
-    }
-
-    [Fact]
-    public async Task ListGeographicLevels()
-    {
-        var releaseVersion = new ReleaseVersion();
-
-        var subject = new Subject();
-
-        var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
-
-        var subjectObservation1 = new Observation
-        {
-            Location = new Location { GeographicLevel = GeographicLevel.Country },
-            Subject = subject,
-            Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ3,
-        };
-
-        var subjectObservation2 = new Observation
-        {
-            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthority },
-            Subject = subject,
-            Year = 2020,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ4,
-        };
-
-        var subjectObservation3 = new Observation
-        {
-            Location = new Location { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
-            Subject = subject,
-            Year = 2021,
-            TimeIdentifier = TimeIdentifier.AcademicYearQ1,
-        };
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.Subject.AddRange(subject);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
-            statisticsDbContext.Observation.AddRange(subjectObservation1, subjectObservation2, subjectObservation3);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-            var result = await service.ListGeographicLevels(subject.Id);
-
-            Assert.Equal(3, result.Count);
-            Assert.Equal("National", result[0]);
-            Assert.Equal("Local authority", result[1]);
-            Assert.Equal("Local authority district", result[2]);
-        }
-    }
-
-    [Fact]
-    public async Task ListGeographicLevels_NoObservations()
-    {
-        var releaseVersion = new ReleaseVersion();
-
-        var subject = new Subject();
-
-        var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.Subject.AddRange(subject);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-            var result = await service.ListGeographicLevels(subject.Id);
-
-            Assert.Empty(result);
         }
     }
 

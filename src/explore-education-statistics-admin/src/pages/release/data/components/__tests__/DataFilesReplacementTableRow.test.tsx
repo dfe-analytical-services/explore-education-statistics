@@ -64,6 +64,7 @@ describe('DataFilesReplacementTableRow', () => {
     mapping: {
       indicators: { mappings: {}, candidates: {} },
       locations: { mappings: {}, candidates: {} },
+      filters: { mappings: {}, candidates: {} },
     },
   };
 
@@ -73,6 +74,7 @@ describe('DataFilesReplacementTableRow', () => {
     canAccessAnalystPages: true,
     canAccessAllImports: true,
     canManageAllTaxonomy: true,
+    canManagePublicApiDataSets: true,
     isApprover: true,
   };
 

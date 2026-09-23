@@ -1,4 +1,5 @@
 import { MemoryCacheConfig } from '../types.bicep'
+import { IpRange } from '../../common/types.bicep'
 
 @export()
 type EnvironmentConfig = {
@@ -44,6 +45,9 @@ type EnvironmentConfig = {
 
   @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
   basicAuthEnabled: bool?
+
+  @description('Number of days to retain blobs after delete.')
+  blobDeleteRetentionDays: int?
 }
 
 @export()
@@ -51,6 +55,9 @@ type EnvironmentPipelineVariables = {
 
   @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
   publicAppBasicAuthUsername: string?
+
+  @description('Provides access to resources for specific IP address ranges used for service maintenance.')
+  maintenanceIpRanges: IpRange[]?
 }
 
 var defaultConfig = {
@@ -66,6 +73,7 @@ var defaultConfig = {
   tableBuilderMaxTableCellsAllowed: 1000000
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
+  blobDeleteRetentionDays: 90
 }
 
 @export()

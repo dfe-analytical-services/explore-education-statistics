@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -103,6 +104,12 @@ public class ReleaseServiceTests
                 ContentLength = 10240,
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataSetFileVersionGeographicLevels =
+                [
+                    new() { GeographicLevel = GeographicLevel.LocalAuthority },
+                    new() { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
+                    new() { GeographicLevel = GeographicLevel.School, CsvOnly = true },
+                ],
             },
             Summary = "Data set 1 guidance",
         };
@@ -117,6 +124,7 @@ public class ReleaseServiceTests
                 ContentLength = 20480,
                 Type = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
+                DataSetFileVersionGeographicLevels = [new() { GeographicLevel = GeographicLevel.Country }],
             },
             Summary = "Data set 2 guidance",
         };
@@ -136,7 +144,6 @@ public class ReleaseServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
             var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
             timePeriodService
@@ -147,24 +154,15 @@ public class ReleaseServiceTests
                 .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
                 .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
 
-            dataGuidanceDataSetService
-                .Setup(s => s.ListGeographicLevels(releaseSubject1.SubjectId, default))
-                .ReturnsAsync(ListOf("Local Authority", "Local Authority District"));
-
-            dataGuidanceDataSetService
-                .Setup(s => s.ListGeographicLevels(releaseSubject2.SubjectId, default))
-                .ReturnsAsync(ListOf("National"));
-
             var service = BuildReleaseService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                 timePeriodService: timePeriodService.Object
             );
 
             var result = await service.ListSubjects(contentReleaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(dataGuidanceDataSetService, timePeriodService);
+            MockUtils.VerifyAllMocks(timePeriodService);
 
             var subjects = result.AssertRight();
 
@@ -182,8 +180,11 @@ public class ReleaseServiceTests
             Assert.Equal("2021/22", subjects[0].TimePeriods.To);
 
             Assert.Equal(2, subjects[0].GeographicLevels.Count);
-            Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
-            Assert.Equal("Local Authority District", subjects[0].GeographicLevels[1]);
+            Assert.Equal("Local authority", subjects[0].GeographicLevels[0]);
+            Assert.Equal("Local authority district", subjects[0].GeographicLevels[1]);
+
+            Assert.Single(subjects[0].GeographicLevelsCsvOnly);
+            Assert.Equal("School", subjects[0].GeographicLevelsCsvOnly[0]);
 
             Assert.Equal(2, subjects[0].Filters.Count);
             Assert.Equal("subject 1 filter 1", subjects[0].Filters[0]);
@@ -209,6 +210,8 @@ public class ReleaseServiceTests
 
             Assert.Single(subjects[1].GeographicLevels);
             Assert.Equal("National", subjects[1].GeographicLevels[0]);
+
+            Assert.Empty(subjects[1].GeographicLevelsCsvOnly);
 
             Assert.Single(subjects[1].Filters);
             Assert.Equal("subject 2 filter 1", subjects[1].Filters[0]);
@@ -392,12 +395,7 @@ public class ReleaseServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
-
-        dataGuidanceDataSetService
-            .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
-            .ReturnsAsync(new List<string>());
 
         timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
 
@@ -407,7 +405,6 @@ public class ReleaseServiceTests
             var service = BuildReleaseService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                 timePeriodService: timePeriodService.Object
             );
 
@@ -489,12 +486,7 @@ public class ReleaseServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
-
-        dataGuidanceDataSetService
-            .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
-            .ReturnsAsync(new List<string>());
 
         timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
 
@@ -504,7 +496,6 @@ public class ReleaseServiceTests
             var service = BuildReleaseService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                 timePeriodService: timePeriodService.Object
             );
 
@@ -689,12 +680,7 @@ public class ReleaseServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
-
-        dataGuidanceDataSetService
-            .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
-            .ReturnsAsync(new List<string>());
 
         timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
 
@@ -704,7 +690,6 @@ public class ReleaseServiceTests
             var service = BuildReleaseService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                 timePeriodService: timePeriodService.Object
             );
 
@@ -788,12 +773,7 @@ public class ReleaseServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
-
-        dataGuidanceDataSetService
-            .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
-            .ReturnsAsync(new List<string>());
 
         timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
 
@@ -803,7 +783,6 @@ public class ReleaseServiceTests
             var service = BuildReleaseService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                 timePeriodService: timePeriodService.Object
             );
 
@@ -1145,7 +1124,6 @@ public class ReleaseServiceTests
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         StatisticsDbContext? statisticsDbContext = null,
         IUserService? userService = null,
-        IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
         ITimePeriodService? timePeriodService = null
     )
     {
@@ -1154,7 +1132,6 @@ public class ReleaseServiceTests
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
-            dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict)
         );
     }

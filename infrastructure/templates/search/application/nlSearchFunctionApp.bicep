@@ -29,14 +29,8 @@ param resourceNames ResourceNames
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Location for all resources.')
-param location string
-
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
-
-@description('Specifies whether or not the Natural Language Search Function App already exists.')
-param functionAppExists bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -66,11 +60,10 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 var azureOpenAIApiBaseUrlSecretName = 'nlsearch-azure-openai-api-base-url'
 var azureOpenAIApiKeySecretName = 'nlsearch-azure-openai-api-subscription-key'
 
-module functionAppModule '../../common/components/function-app/functionApp.bicep' = {
+module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
     functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
-    location: location
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
     appSettings: [
@@ -111,19 +104,26 @@ module functionAppModule '../../common/components/function-app/functionApp.bicep
         value: dataApiUrl
       }
     ]
-    functionAppExists: functionAppExists
     keyVaultName: keyVault.name
+    keyVaultRoles: {
+      secretsUser: true
+      legacyKeyVaultRoleAssignmentName: false
+    }
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
       family: 'EP'
     }
+    elasticCapacity: {
+      minimumInstanceCount: 1
+      maximumInstanceCount: 1
+      instanceMemoryMB: 2048
+    }
     healthCheckPath: '/health_check'
     operatingSystem: 'Linux'
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'
-    diagnosticSettingEnabled: true
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
