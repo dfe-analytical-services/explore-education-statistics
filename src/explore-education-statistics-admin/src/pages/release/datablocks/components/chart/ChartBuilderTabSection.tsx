@@ -106,7 +106,7 @@ const ChartBuilderTabSection = ({
         updatedBoundaryLevel
           ? tableBuilderService.getDataBlockGeoJson(
               releaseVersionId,
-              dataBlock.dataBlockParentId,
+              dataBlock.dataBlockId,
               updatedBoundaryLevel,
             )
           : undefined,

@@ -1,6 +1,6 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { MemoryCacheConfig } from '../bicep-main-infrastructure-release/types.bicep'
-import { keyVaultRef } from '../bicep-main-infrastructure-release/functions.bicep'
+import { keyVaultRef } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { SignalRSku } from '../common/components/signalr/types.bicep'
 
@@ -136,8 +136,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     keyVaultRoles: {
       keyVaultName: resourceNames.keyVault.keyVault
       secretsUser: true
+      legacyKeyVaultRoleAssignmentName: true
     }
-    legacyKeyVaultRoleAssignmentName: true
     connectionStrings: [
       {
         name: 'StatisticsDb'
@@ -205,6 +205,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       MemoryCache__Overrides__DurationInSeconds: memoryCacheConfig.?overridesDurationInSeconds
       MemoryCache__Overrides__ExpirySchedule: memoryCacheConfig.?overridesExpirySchedule
       CoreStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
+      ImporterStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       PublisherStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
       PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: preReleaseMinutesBeforeStart

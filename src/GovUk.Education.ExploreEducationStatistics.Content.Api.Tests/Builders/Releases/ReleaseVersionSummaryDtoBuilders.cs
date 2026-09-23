@@ -1,4 +1,6 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Organisations;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;
@@ -11,7 +13,7 @@ public class ReleaseVersionSummaryDtoBuilder
     private string? _label = "Label";
     private DateTimeOffset _lastUpdated = new(2025, 9, 1, 8, 30, 0, TimeSpan.Zero);
     private DateTimeOffset _published = new(2025, 8, 1, 8, 30, 0, TimeSpan.Zero);
-    private PublishingOrganisationDto[] _publishingOrganisations = [new PublishingOrganisationDtoBuilder().Build()];
+    private OrganisationDto[] _publishingOrganisations = [new OrganisationDtoBuilder().Build()];
     private string _slug = "Slug";
     private string _title = "Title";
     private string _coverageTitle = "Calendar year";
@@ -77,9 +79,7 @@ public class ReleaseVersionSummaryDtoBuilder
         return this;
     }
 
-    public ReleaseVersionSummaryDtoBuilder WithPublishingOrganisations(
-        PublishingOrganisationDto[] publishingOrganisations
-    )
+    public ReleaseVersionSummaryDtoBuilder WithPublishingOrganisations(OrganisationDto[] publishingOrganisations)
     {
         _publishingOrganisations = publishingOrganisations;
         return this;
@@ -130,63 +130,6 @@ public class ReleaseVersionSummaryDtoBuilder
     public ReleaseVersionSummaryDtoBuilder WithPublication(ReleaseVersionSummaryPublicationDto publication)
     {
         _publication = publication;
-        return this;
-    }
-}
-
-public class PublishingOrganisationDtoBuilder
-{
-    private Guid _id = Guid.NewGuid();
-    private string _title = "Title";
-    private string _url = "Url";
-    private bool _useGisLogo = true;
-    private string _gisLogoHexCode = "GIS logo hex code";
-    private string _logoFileName = "Logo file name";
-
-    public PublishingOrganisationDto Build() =>
-        new()
-        {
-            Id = _id,
-            Title = _title,
-            Url = _url,
-            UseGISLogo = _useGisLogo,
-            GISLogoHexCode = _gisLogoHexCode,
-            LogoFileName = _logoFileName,
-        };
-
-    public PublishingOrganisationDtoBuilder WithId(Guid id)
-    {
-        _id = id;
-        return this;
-    }
-
-    public PublishingOrganisationDtoBuilder WithTitle(string title)
-    {
-        _title = title;
-        return this;
-    }
-
-    public PublishingOrganisationDtoBuilder WithUrl(string url)
-    {
-        _url = url;
-        return this;
-    }
-
-    public PublishingOrganisationDtoBuilder WithUseGisLogo(bool useGisLogo)
-    {
-        _useGisLogo = useGisLogo;
-        return this;
-    }
-
-    public PublishingOrganisationDtoBuilder WithGisLogoHexCode(string gisLogoHexCode)
-    {
-        _gisLogoHexCode = gisLogoHexCode;
-        return this;
-    }
-
-    public PublishingOrganisationDtoBuilder WithLogoFileName(string logoFileName)
-    {
-        _logoFileName = logoFileName;
         return this;
     }
 }

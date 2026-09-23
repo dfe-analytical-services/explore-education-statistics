@@ -6,12 +6,13 @@ param subscription string
 @description('Resource Id of the Log Analytics Workspace to link the logic app to.')
 param logAnalyticsWorkspaceId string
 
-@description('Slack channel to post Azure alerts to.')
-param slackAlertsChannel string
-
 @secure()
-@description('Token to securely post to the Slack channel.')
-param slackAppToken string
+@description('''
+JSON array of the Slack workspaces to post alerts to, each entry taking the form
+`{ "channels": ["<channel id>"], "authToken": "<app token>" }`. Held in the `ees-alerts-slackconfig`
+Key Vault secret so that each workspace's channels travel with the token that can post to them.
+''')
+param slackAlertsConfig string
 
 @secure()
 @description('The Power Automate Webhook URL used to post messages to Teams.')
@@ -33,13 +34,9 @@ resource alertsLogicApp 'Microsoft.Logic/workflows@2019-05-01' = {
         type: 'string'
         value: resourceGroup().name
       }
-      slackAlertsChannel: {
-        type: 'string'
-        value: slackAlertsChannel
-      }
-      slackAppToken: {
+      slackAlertsConfig: {
         type: 'securestring'
-        value: slackAppToken
+        value: slackAlertsConfig
       }
       teamsPowerAutomateWebhookUrl: {
         type: 'securestring'

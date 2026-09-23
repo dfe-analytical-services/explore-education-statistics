@@ -1,4 +1,6 @@
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
@@ -9,9 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class ContentApiClientTests(ITestOutputHelper output)
 {
-    private IContentApiClient GetSut(Action<HttpClient>? modifyHttpClient = null)
+    private IContentApiClient GetSut(
+        HttpMessageHandler? httpMessageHandler = null,
+        Action<HttpClient>? modifyHttpClient = null
+    )
     {
-        var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        var httpClient = httpMessageHandler is null ? new HttpClient() : new HttpClient(httpMessageHandler);
+        httpClient.Timeout = TimeSpan.FromSeconds(10);
         modifyHttpClient?.Invoke(httpClient);
         return new ContentApiClient(httpClient);
     }
@@ -40,10 +46,97 @@ public class ContentApiClientTests(ITestOutputHelper output)
     private void AssertAll(params IEnumerable<Action>[] assertions) =>
         Assert.All(assertions.SelectMany(a => a), assertion => assertion());
 
+    private class StubHttpMessageHandler(
+        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> sendAsync
+    ) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        ) => sendAsync(request, cancellationToken);
+    }
+
     public class BasicTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         [Fact]
         public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
+
+        [Fact]
+        public async Task InvalidJsonResponse_ThrowsException()
+        {
+            var sut = GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (_, _) =>
+                        Task.FromResult(
+                            new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent("not-valid-json", Encoding.UTF8, "application/json"),
+                            }
+                        )
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+            var exception = await Assert.ThrowsAsync<UnableToGetPublicationInfosException>(() =>
+                sut.GetAllLivePublicationInfos(CancellationToken.None)
+            );
+            Assert.Contains("Error deserialising response content", exception.Message);
+        }
+    }
+
+    public class GetAllLivePublicationInfosTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        [Fact]
+        public async Task ValidJsonResponse_ReturnsPublicationInfos()
+        {
+            var sut = GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (_, _) =>
+                        Task.FromResult(
+                            new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent(
+                                    """
+                                    [
+                                      {
+                                        "publicationSlug": "publication-1",
+                                        "latestPublishedRelease": {
+                                          "releaseSlug": "2024"
+                                        }
+                                      },
+                                      {
+                                        "publicationSlug": "publication-2",
+                                        "latestPublishedRelease": {
+                                          "releaseSlug": "2025"
+                                        }
+                                      }
+                                    ]
+                                    """,
+                                    Encoding.UTF8,
+                                    "application/json"
+                                ),
+                            }
+                        )
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+            var result = await sut.GetAllLivePublicationInfos(CancellationToken.None);
+
+            Assert.Collection(
+                result,
+                publicationInfo =>
+                {
+                    Assert.Equal("publication-1", publicationInfo.PublicationSlug);
+                    Assert.Equal("2024", publicationInfo.LatestReleaseSlug);
+                },
+                publicationInfo =>
+                {
+                    Assert.Equal("publication-2", publicationInfo.PublicationSlug);
+                    Assert.Equal("2025", publicationInfo.LatestReleaseSlug);
+                }
+            );
+        }
     }
 
     public abstract class LocalDevelopmentIntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
@@ -54,14 +147,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
         public class CallLocalService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
         {
             private IContentApiClient GetSut() =>
-                base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"));
+                base.GetSut(modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"));
 
             [Fact(Skip = "This test is only for local development")]
             public async Task GetExampleSeedDocument()
             {
                 // ARRANGE
                 var sut = GetSut();
-                var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
+                const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
                 // ACT
                 var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
@@ -70,20 +163,21 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 Assert.NotNull(actual);
                 var expected = new ReleaseSearchableDocument
                 {
-                    ReleaseId = new Guid("4fcb18ba-2adb-49ff-9414-f91f9f5d2e57"),
-                    ReleaseVersionId = new Guid("46c5d916-ee40-49bd-cfdc-08dc1c5c621e"),
-                    PublicationId = new Guid("346fd6f2-3938-4006-9867-08dc1c5c66c3"),
-                    ThemeId = new Guid("0396c130-4d59-4099-9050-08dc1c5c669e"),
+                    ReleaseId = new Guid("2ae1f7b1-0088-4fd1-c78a-08dec542c3bb"),
+                    ReleaseVersionId = new Guid("90f5ae5d-0eec-4029-f805-08dec542c394"),
+                    PublicationId = new Guid("a5dd5b19-db74-4fa3-8eed-08dec542afe3"),
+                    ThemeId = new Guid("04cadfe8-acac-4203-a6d6-08dec542a06f"),
                     ThemeTitle = "Seed theme - Pupils and schools",
-                    Published = DateTimeOffset.Parse("2018-07-18T23:00:00Z"),
-                    PublicationTitle = "Seed publication - Permanent and fixed-period exclusions in England",
-                    Summary = "Seed publication - Permanent and fixed-period exclusions in England summary",
+                    Published = DateTimeOffset.Parse("2020-03-26T09:30:00Z"),
+                    PublicationTitle = "Seed publication - Permanent & fixed-period exclusions in England",
+                    Summary = "Seed publication - Permanent & fixed-period exclusions in England summary",
                     ReleaseType = "OfficialStatistics",
                     TypeBoost = 5,
-                    PublicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england",
+                    PublicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england",
                     ReleaseSlug = "2016-17",
+                    PublishingOrganisations = [],
                     HtmlContent =
-                        "<html>\n    <head>\n        <title>Seed publication - Permanent and fixed-period exclusions in England</title>\n    </head>\n    <body>\n<h1>Seed publication - Permanent and fixed-period exclusions in England</h1>\n<h2>Academic year 2016/17</h2>\n<h3>Summary</h3>\n<p>Read national statistical summaries, view charts and tables and download data files.</p>\n<h3>Headlines</h3>\n<p>The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17.</p>\n<h3>About this release</h3>\n<p>The statistics and data cover permanent and fixed period exclusions and school-level exclusions during the 2016/17 academic year in the following state-funded school types as reported in the school census.</p>\n<h3>Permanent exclusions</h3>\n<p>The number of permanent exclusions has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.</p>\n<h3>Fixed-period exclusions</h3>\n<p>The number of fixed-period exclusions has increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.</p>\n<h3>Number and length of fixed-period exclusions</h3>\n<p>The number of pupils with one or more fixed-period exclusion has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.</p>\n<h3>Reasons for exclusions</h3>\n<p>All reasons (except bullying and theft) saw an increase in permanent exclusions since 2015/16.</p>\n<h3>Exclusions by pupil characteristics</h3>\n<p>There was a similar pattern to previous years where the following groups (where higher exclusion rates are expected) showed an increase in exclusions since 2015/16.</p>\n<h3>Independent exclusion reviews</h3>\n<p>There were 560 reviews lodged with independent review panels in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement.</p>\n<h3>Pupil referral units exclusions</h3>\n<p>The permanent exclusion rate in pupil referral units decreased to 0.13 - down from 0.14% in 2015/16.</p>\n<h3>Regional and local authority (LA) breakdown</h3>\n<p>There's considerable variation in the permanent exclusion and fixed-period exclusion rate at the LA level.</p>\n    </body>\n</html>\n",
+                        "<html>\n    <head>\n        <title>Seed publication - Permanent & fixed-period exclusions in England</title>\n    </head>\n    <body>\n<h1>Seed publication - Permanent & fixed-period exclusions in England</h1>\n<h2>Academic year 2016/17</h2>\n<h3>Summary</h3>\nRead national statistical summaries, view charts and tables and download data files.\n<h3>Headlines</h3>\n<p>The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17.</p>\n<h3>About this release</h3>\n<p>The statistics and data cover permanent and fixed period exclusions and school-level exclusions during the 2016/17 academic year in the following state-funded school types as reported in the school census.</p>\n<h3>Permanent exclusions</h3>\n<p>The number of permanent exclusions has increased across all state-funded primary, secondary and special schools to 7,720 - up from 6,685 in 2015/16.</p>\n<h3>Fixed-period exclusions</h3>\n<p>The number of fixed-period exclusions has increased across all state-funded primary, secondary and special schools to 381,865 - up from 339,360 in 2015/16.</p>\n<h3>Number and length of fixed-period exclusions</h3>\n<p>The number of pupils with one or more fixed-period exclusion has increased across state-funded primary, secondary and special schools to 183,475 (2.29% of pupils) up from 167,125 (2.11% of pupils) in 2015/16.</p>\n<h3>Reasons for exclusions</h3>\n<p>All reasons (except bullying and theft) saw an increase in permanent exclusions since 2015/16.</p>\n<h3>Exclusions by pupil characteristics</h3>\n<p>There was a similar pattern to previous years where the following groups (where higher exclusion rates are expected) showed an increase in exclusions since 2015/16.</p>\n<h3>Independent exclusion reviews</h3>\n<p>There were 560 reviews lodged with independent review panels in maintained primary, secondary and special schools and academies of which 525 (93.4%) were determined and 45 (8.0%) resulted in an offer of reinstatement.</p>\n<h3>Pupil referral units exclusions</h3>\n<p>The permanent exclusion rate in pupil referral units decreased to 0.13 - down from 0.14% in 2015/16.</p>\n<h3>Regional and local authority (LA) breakdown</h3>\n<p>There's considerable variation in the permanent exclusion and fixed-period exclusion rate at the LA level.</p>\n    </body>\n</html>\n",
                 };
                 AssertAllPropertiesMatch(expected, actual);
             }
@@ -92,14 +186,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
         public class CallUnknownService(ITestOutputHelper output) : LocalDevelopmentIntegrationTests(output)
         {
             private IContentApiClient GetSut() =>
-                base.GetSut(httpClient => httpClient.BaseAddress = new Uri("http://localhost:8123")); // Cause a 404
+                base.GetSut(modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:8123")); // Cause a 404
 
             [Fact(Skip = "This test is only for local development")]
             public async Task UnknownEndpointShouldThrow()
             {
                 // ARRANGE
                 var sut = GetSut();
-                var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
+                const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
                 // ACT
                 var exception = await Record.ExceptionAsync(() =>
@@ -120,7 +214,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
         private const string ContentApiBaseAddress = "-- insert Content API base address here --";
 
         private IContentApiClient GetSut() =>
-            base.GetSut(httpClient =>
+            base.GetSut(modifyHttpClient: httpClient =>
             {
                 httpClient.BaseAddress = new Uri(ContentApiBaseAddress);
             });
@@ -188,7 +282,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
         {
             // ARRANGE
             var sut = GetSut();
-            var publicationSlug = "seed-publication-permanent-and-fixed-period-exclusions-in-england";
+            const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
             // ACT
             var result = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);

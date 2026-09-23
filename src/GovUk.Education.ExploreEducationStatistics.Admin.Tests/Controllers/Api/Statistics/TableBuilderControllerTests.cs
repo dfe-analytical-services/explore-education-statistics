@@ -49,8 +49,8 @@ public class TableBuilderControllerTests
     {
         var cancellationToken = new CancellationToken();
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
+        var dataBlock = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(
                 _fixture
                     .DefaultDataBlockVersion()
@@ -59,7 +59,7 @@ public class TableBuilderControllerTests
             )
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         var dataBlockService = new Mock<IDataBlockService>(Strict);
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -69,7 +69,7 @@ public class TableBuilderControllerTests
         privateBlobCacheService
             .Setup(s =>
                 s.GetItemAsync(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
+                    ItIs.DeepEqualTo(new DataBlockVersionTableResultCacheKey(dataBlockVersion)),
                     typeof(TableBuilderResultViewModel)
                 )
             )
@@ -92,7 +92,7 @@ public class TableBuilderControllerTests
         privateBlobCacheService
             .Setup(s =>
                 s.SetItemAsync<object>(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
+                    ItIs.DeepEqualTo(new DataBlockVersionTableResultCacheKey(dataBlockVersion)),
                     TableBuilderResults
                 )
             )
@@ -125,10 +125,7 @@ public class TableBuilderControllerTests
 
         var controller = BuildController(dataBlockService: dataBlockService.Object);
 
-        var result = await controller.QueryForDataBlock(
-            releaseVersionId: ReleaseVersionId,
-            dataBlockParentId: DataBlockId
-        );
+        var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId, dataBlockId: DataBlockId);
         VerifyAllMocks(dataBlockService);
 
         result.AssertNotFoundResult();

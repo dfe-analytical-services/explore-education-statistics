@@ -21,8 +21,9 @@ describe('ReleaseDataGuidanceSection', () => {
         fileId: 'file-1',
         name: 'Data set 1',
         filename: 'data-1.csv',
-        content: '<p>Test data set 1 content</p>',
+        content: 'Test data set 1 content',
         geographicLevels: ['Local authority', 'National'],
+        geographicLevelsCsvOnly: ['School'],
         timePeriods: {
           from: '2018',
           to: '2019',
@@ -46,8 +47,9 @@ describe('ReleaseDataGuidanceSection', () => {
         fileId: 'file-2',
         name: 'Data set 2',
         filename: 'data-2.csv',
-        content: '<p>Test data set 2 content</p>',
+        content: 'Test data set 2 content',
         geographicLevels: ['Regional', 'Ward'],
+        geographicLevelsCsvOnly: [],
         timePeriods: {
           from: '2020',
           to: '2021',
@@ -149,12 +151,17 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
 
       expect(dataSet1.getByLabelText('File guidance content')).toHaveValue(
-        '<p>Test data set 1 content</p>',
+        'Test data set 1 content',
       );
 
       await user.click(
@@ -197,12 +204,17 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
 
       expect(dataSet2.getByLabelText('File guidance content')).toHaveValue(
-        '<p>Test data set 2 content</p>',
+        'Test data set 2 content',
       );
 
       await user.click(
@@ -283,6 +295,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
@@ -291,14 +308,8 @@ describe('ReleaseDataGuidanceSection', () => {
         dataSet1.queryByLabelText('File guidance content'),
       ).not.toBeInTheDocument();
 
-      expect(
-        dataSet1.getByTestId('fileGuidanceContent').innerHTML,
-      ).toMatchInlineSnapshot(
-        `
-        <p>
-          Test data set 1 content
-        </p>
-      `,
+      expect(dataSet1.getByTestId('fileGuidanceContent')).toHaveTextContent(
+        'Test data set 1 content',
       );
 
       await user.click(
@@ -341,6 +352,11 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
@@ -349,14 +365,8 @@ describe('ReleaseDataGuidanceSection', () => {
         dataSet2.queryByLabelText('File guidance content'),
       ).not.toBeInTheDocument();
 
-      expect(
-        dataSet2.getByTestId('fileGuidanceContent').innerHTML,
-      ).toMatchInlineSnapshot(
-        `
-        <p>
-          Test data set 2 content
-        </p>
-      `,
+      expect(dataSet2.getByTestId('fileGuidanceContent')).toHaveTextContent(
+        'Test data set 2 content',
       );
 
       await user.click(
@@ -758,16 +768,18 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
+      expect(
+        dataSet1.getByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).toHaveTextContent('School');
       expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
 
-      expect(dataSet1.getByTestId('fileGuidanceContent').innerHTML)
-        .toMatchInlineSnapshot(`
-              <p>
-                Test data set 1 content
-              </p>
-          `);
+      expect(dataSet1.getByTestId('fileGuidanceContent')).toHaveTextContent(
+        'Test data set 1 content',
+      );
 
       await user.click(
         dataSet1.getByText(/Variable names and descriptions/, {
@@ -809,16 +821,18 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
+      expect(
+        dataSet2.queryByTestId(
+          'Geographic levels (only available via download / public API)',
+        ),
+      ).not.toBeInTheDocument();
       expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
 
-      expect(dataSet2.getByTestId('fileGuidanceContent').innerHTML)
-        .toMatchInlineSnapshot(`
-              <p>
-                Test data set 2 content
-              </p>
-          `);
+      expect(dataSet2.getByTestId('fileGuidanceContent')).toHaveTextContent(
+        'Test data set 2 content',
+      );
 
       await user.click(
         dataSet2.getByRole('button', {

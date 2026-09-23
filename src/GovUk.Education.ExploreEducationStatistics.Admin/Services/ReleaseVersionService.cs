@@ -297,23 +297,24 @@ public class ReleaseVersionService(
     private async Task DeleteDataBlocks(Guid releaseVersionId, CancellationToken cancellationToken = default)
     {
         var dataBlockVersions = await context
-            .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
+            .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlock)
             .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
             .ToListAsync(cancellationToken);
 
-        var dataBlockParents = dataBlockVersions
-            .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
-            .Distinct()
-            .ToList();
+        var dataBlocks = dataBlockVersions.Select(dataBlockVersion => dataBlockVersion.DataBlock).Distinct().ToList();
 
-        // Unset the DataBlockVersion references from the DataBlockParent.
-        dataBlockParents.ForEach(dataBlockParent =>
+        // Unset the DataBlockVersion references from the DataBlock.
+        dataBlocks.ForEach(dataBlock =>
         {
-            dataBlockParent.LatestDraftVersionId = null;
-            dataBlockParent.LatestPublishedVersionId = null;
+            dataBlock.LatestDraftVersionId = null;
+            dataBlock.LatestPublishedVersionId = null;
         });
 
         await RemoveKeyStatsForDataBlocks(dataBlockVersions, cancellationToken);
+
+        await RemoveFeaturedTablesForDataBlocks(dataBlockVersions, cancellationToken);
+
+        await RemoveContentLinksForDataBlocks(dataBlockVersions, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -321,16 +322,14 @@ public class ReleaseVersionService(
         context.DataBlockVersions.RemoveRange(dataBlockVersions);
         await context.SaveChangesAsync(cancellationToken);
 
-        // And finally, delete the DataBlockParents if they are now orphaned.
-        var orphanedDataBlockParents = dataBlockParents
-            .Where(dataBlockParent =>
-                !context.DataBlockVersions.Any(dataBlockVersion =>
-                    dataBlockVersion.DataBlockParentId == dataBlockParent.Id
-                )
+        // And finally, delete the DataBlockss if they are now orphaned.
+        var orphanedDataBlock = dataBlocks
+            .Where(dataBlock =>
+                !context.DataBlockVersions.Any(dataBlockVersion => dataBlockVersion.DataBlockId == dataBlock.Id)
             )
             .ToList();
 
-        context.DataBlockParents.RemoveRange(orphanedDataBlockParents);
+        context.DataBlocks.RemoveRange(orphanedDataBlock);
         await context.SaveChangesAsync(cancellationToken);
     }
 
@@ -339,11 +338,11 @@ public class ReleaseVersionService(
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The foreign key from KeyStatisticsDataBlock to the DataBlock's ContentBlock row is deliberately
-    /// configured with DeleteBehavior.NoAction - see ContentDbContext.ConfigureKeyStatisticsDataBlock -
-    /// so unless they are removed here, removing the DataBlockVersions below fails on
-    /// FK_KeyStatisticsDataBlock_ContentBlock_DataBlockId. Removing them via the derived DbSet also
-    /// removes their base KeyStatistics rows, which must never be orphaned.
+    /// The foreign key from KeyStatisticsDataBlock to DataBlockVersions is deliberately configured with
+    /// DeleteBehavior.NoAction - see ContentDbContext.ConfigureKeyStatisticsDataBlock - so unless they
+    /// are removed here, removing the DataBlockVersions below fails on
+    /// FK_KeyStatisticsDataBlock_DataBlockVersions_DataBlockVersionId. Removing them via the derived
+    /// DbSet also removes their base KeyStatistics rows, which must never be orphaned.
     /// </para>
     /// <para>
     /// This method does NOT call DbContext.SaveChangesAsync().
@@ -357,10 +356,68 @@ public class ReleaseVersionService(
         var dataBlockIds = dataBlockVersions.Select(dataBlockVersion => dataBlockVersion.Id).ToList();
 
         var keyStatistics = await context
-            .KeyStatisticsDataBlock.Where(keyStatistic => dataBlockIds.Contains(keyStatistic.DataBlockId))
+            .KeyStatisticsDataBlock.Where(keyStatistic => dataBlockIds.Contains(keyStatistic.DataBlockVersionId))
             .ToListAsync(cancellationToken);
 
         context.KeyStatisticsDataBlock.RemoveRange(keyStatistics);
+    }
+
+    /// <summary>
+    /// Remove any FeaturedTables for the supplied DataBlockVersions.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The foreign key from FeaturedTables to DataBlockVersions is deliberately configured with
+    /// DeleteBehavior.NoAction - see ContentDbContext.ConfigureFeaturedTable - so unless they are
+    /// removed here, removing the DataBlockVersions below fails on
+    /// FK_FeaturedTables_DataBlockVersions_DataBlockVersionId. The cascade from the FeaturedTable's
+    /// ReleaseVersion cannot be relied upon, as the DataBlockVersions are removed first.
+    /// </para>
+    /// <para>
+    /// This method does NOT call DbContext.SaveChangesAsync().
+    /// </para>
+    /// </remarks>
+    private async Task RemoveFeaturedTablesForDataBlocks(
+        List<DataBlockVersion> dataBlockVersions,
+        CancellationToken cancellationToken
+    )
+    {
+        var dataBlockVersionIds = dataBlockVersions.Select(dataBlockVersion => dataBlockVersion.Id).ToList();
+
+        var featuredTables = await context
+            .FeaturedTables.Where(featuredTable => dataBlockVersionIds.Contains(featuredTable.DataBlockVersionId))
+            .ToListAsync(cancellationToken);
+
+        context.FeaturedTables.RemoveRange(featuredTables);
+    }
+
+    /// <summary>
+    /// Remove any DataBlockVersionLinks for the supplied DataBlockVersions.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The foreign key from a DataBlockVersionLink's ContentBlock row to DataBlockVersions is deliberately
+    /// configured with DeleteBehavior.NoAction - see DataBlockVersionLink.Config - so unless they are
+    /// removed here, removing the DataBlockVersions below fails on
+    /// FK_ContentBlock_DataBlockVersions_DataBlockVersionId. The cascade from the link's ContentSection
+    /// cannot be relied upon, as the DataBlockVersions are removed first.
+    /// </para>
+    /// <para>
+    /// This method does NOT call DbContext.SaveChangesAsync().
+    /// </para>
+    /// </remarks>
+    private async Task RemoveContentLinksForDataBlocks(
+        List<DataBlockVersion> dataBlockVersions,
+        CancellationToken cancellationToken
+    )
+    {
+        var dataBlockVersionIds = dataBlockVersions.Select(dataBlockVersion => dataBlockVersion.Id).ToList();
+
+        var dataBlockVersionLinks = await context
+            .DataBlockVersionLinks.Where(link => dataBlockVersionIds.Contains(link.DataBlockVersionId))
+            .ToListAsync(cancellationToken);
+
+        context.ContentBlocks.RemoveRange(dataBlockVersionLinks);
     }
 
     private void UpdateMethodologies(Guid releaseVersionId)
@@ -724,7 +781,7 @@ public class ReleaseVersionService(
                 return Unit.Instance;
             })
             .OnSuccess(_ => GetDeleteDataFilePlan(releaseVersionId, fileId))
-            .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
+            .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlockVersions(deletePlan.DeleteDataBlockPlan))
             .OnSuccessDo(async deletePlan =>
             {
                 await releaseSubjectRepository.DeleteReleaseSubject(

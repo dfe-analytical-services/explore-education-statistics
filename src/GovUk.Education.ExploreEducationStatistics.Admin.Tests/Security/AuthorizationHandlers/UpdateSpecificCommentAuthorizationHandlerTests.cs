@@ -38,7 +38,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentCreatedBySameUser] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
@@ -48,7 +48,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentCreatedByDifferentUser] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
@@ -58,7 +58,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedBySameUser] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentCreatedBySameUser] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
@@ -68,7 +68,7 @@ public abstract class UpdateSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentCreatedByDifferentUser] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentCreatedByDifferentUser] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
     }

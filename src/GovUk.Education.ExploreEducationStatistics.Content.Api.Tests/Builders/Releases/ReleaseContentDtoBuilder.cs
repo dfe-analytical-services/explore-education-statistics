@@ -129,7 +129,7 @@ public class DataBlockDtoBuilder
     private Guid _id = Guid.NewGuid();
     private DataBlockVersionDto _dataBlockVersion = new DataBlockVersionDtoBuilder().Build();
 
-    public DataBlockDto Build() => new() { Id = _id, DataBlockVersion = _dataBlockVersion };
+    public DataBlockVersionLinkDto Build() => new() { Id = _id, DataBlockVersion = _dataBlockVersion };
 
     public DataBlockDtoBuilder WithId(Guid id)
     {
@@ -147,7 +147,7 @@ public class DataBlockDtoBuilder
 public class DataBlockVersionDtoBuilder
 {
     private Guid _dataBlockVersionId = Guid.NewGuid();
-    private Guid _dataBlockParentId = Guid.NewGuid();
+    private Guid _dataBlockId = Guid.NewGuid();
     private List<IChart> _charts = [];
     private string _heading = "Heading";
     private string _name = "Name";
@@ -159,7 +159,7 @@ public class DataBlockVersionDtoBuilder
         new()
         {
             DataBlockVersionId = _dataBlockVersionId,
-            DataBlockParentId = _dataBlockParentId,
+            DataBlockId = _dataBlockId,
             Charts = _charts,
             Heading = _heading,
             Name = _name,
@@ -174,9 +174,9 @@ public class DataBlockVersionDtoBuilder
         return this;
     }
 
-    public DataBlockVersionDtoBuilder WithDataBlockParentId(Guid dataBlockParentId)
+    public DataBlockVersionDtoBuilder WithDataBlockId(Guid dataBlockId)
     {
-        _dataBlockParentId = dataBlockParentId;
+        _dataBlockId = dataBlockId;
         return this;
     }
 
@@ -294,7 +294,7 @@ public class KeyStatisticDataBlockDtoBuilder
 {
     private Guid _id = Guid.NewGuid();
     private Guid _dataBlockVersionId = Guid.NewGuid();
-    private Guid _dataBlockParentId = Guid.NewGuid();
+    private Guid _dataBlockId = Guid.NewGuid();
     private string? _guidanceText = "Guidance Text";
     private string? _guidanceTitle = "Guidance Title";
     private string? _trend = "Trend";
@@ -304,7 +304,7 @@ public class KeyStatisticDataBlockDtoBuilder
         {
             Id = _id,
             DataBlockVersionId = _dataBlockVersionId,
-            DataBlockParentId = _dataBlockParentId,
+            DataBlockId = _dataBlockId,
             GuidanceText = _guidanceText,
             GuidanceTitle = _guidanceTitle,
             Trend = _trend,
@@ -322,9 +322,9 @@ public class KeyStatisticDataBlockDtoBuilder
         return this;
     }
 
-    public KeyStatisticDataBlockDtoBuilder WithDataBlockParentId(Guid dataBlockParentId)
+    public KeyStatisticDataBlockDtoBuilder WithDataBlockId(Guid dataBlockId)
     {
-        _dataBlockParentId = dataBlockParentId;
+        _dataBlockId = dataBlockId;
         return this;
     }
 

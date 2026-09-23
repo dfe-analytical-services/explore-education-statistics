@@ -305,12 +305,8 @@ public class ReleaseChecklistService : IReleaseChecklistService
             .ToList();
     }
 
-    private async Task<bool> HasFeaturedTable(Guid releaseVersionId)
-    {
-        var dataBlocks = await _dataBlockService.ListDataBlocks(releaseVersionId);
-        var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
-        return await _contentDbContext.FeaturedTables.AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
-    }
+    private async Task<bool> HasFeaturedTable(Guid releaseVersionId) =>
+        await _contentDbContext.FeaturedTables.AnyAsync(ft => ft.ReleaseVersionId == releaseVersionId);
 }
 
 public static class ReleaseChecklistQueryableExtensions

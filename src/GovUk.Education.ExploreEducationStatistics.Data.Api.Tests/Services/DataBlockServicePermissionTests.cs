@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
 public class DataBlockServicePermissionTests
 {
-    private readonly DataBlock _dataBlock = new() { Id = Guid.NewGuid() };
+    private readonly DataBlockVersion _dataBlockVersion = new() { Id = Guid.NewGuid() };
 
     private readonly ReleaseVersion _releaseVersion = new() { Id = Guid.NewGuid() };
 
@@ -28,7 +28,7 @@ public class DataBlockServicePermissionTests
             .AssertForbidden(userService =>
             {
                 var service = BuildService(userService: userService.Object);
-                return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
+                return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlockVersion.Id);
             });
     }
 

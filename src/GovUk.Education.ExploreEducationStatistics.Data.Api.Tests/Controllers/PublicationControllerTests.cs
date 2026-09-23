@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -88,8 +88,8 @@ public class PublicationControllerTests
                 Name: "name",
                 Description: "description",
                 SubjectId: Guid.NewGuid(),
+                DataBlockVersionId: Guid.NewGuid(),
                 DataBlockId: Guid.NewGuid(),
-                DataBlockParentId: Guid.NewGuid(),
                 Order: 0
             ),
         };
@@ -131,6 +131,7 @@ public class PublicationControllerTests
             "Content",
             new TimePeriodLabels { From = "2020", To = "2022" },
             new List<string> { "level1" },
+            new List<string> { "csvOnlyLevel1" },
             new List<string> { "filter1" },
             new List<string> { "indicator1", "indicator2", "indicator3", "indicator4" },
             new FileInfo

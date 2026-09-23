@@ -10,35 +10,37 @@ import requests
 """
 To generate datablocks.csv, use this SQL query against the Content DB:
 
-SELECT ContentBlock.Id                              AS ContentBlockId,
-       ReleaseVersions.Id                           AS ReleaseVersionId,
-       JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
-       ContentBlock.DataBlock_Query                 AS Query
-FROM ContentBlock
-LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
-LEFT JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
-LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
-LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
-WHERE ContentBlock.Type = 'DataBlock'
-  AND ReleaseVersions.Published IS NOT NULL
+SELECT DataBlockVersions.Id                                    AS DataBlockVersionId,
+       ReleaseVersions.Id                                      AS ReleaseVersionId,
+       JSON_VALUE(DataBlockVersions.[Query], '$.SubjectId')    AS SubjectId,
+       DataBlockVersions.[Query]                               AS Query
+FROM DataBlockVersions
+JOIN ReleaseVersions ON DataBlockVersions.ReleaseVersionId = ReleaseVersions.Id
+LEFT JOIN ContentBlock ON ContentBlock.DataBlockVersionId = DataBlockVersions.Id
+    AND ContentBlock.Type = 'DataBlockVersionLink'
+LEFT JOIN KeyStatisticsDataBlock ON KeyStatisticsDataBlock.DataBlockVersionId = DataBlockVersions.Id
+LEFT JOIN FeaturedTables ON FeaturedTables.DataBlockVersionId = DataBlockVersions.Id
+WHERE ReleaseVersions.Published IS NOT NULL
   AND ReleaseVersions.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
-    ContentSectionId IS NOT NULL
+    ContentBlock.Id IS NOT NULL
     -- Include DataBlocks that are Key Statistics
-    OR KeyStatisticsDataBlock.DataBlockId IS NOT NULL
+    OR EXISTS(SELECT 1
+              FROM KeyStatisticsDataBlock
+              WHERE KeyStatisticsDataBlock.DataBlockVersionId = DataBlockVersions.Id)
     -- Include DataBlocks that are Featured Tables
-    OR FeaturedTables.DataBlockId IS NOT NULL
+    OR EXISTS(SELECT 1
+              FROM FeaturedTables
+              WHERE FeaturedTables.DataBlockVersionId = DataBlockVersions.Id)
     )
-  -- Include only DataBlocks that are from the latest published Release
+  -- Exclude DataBlocks from Release versions that have been superseded by a published amendment
   AND NOT EXISTS(
     SELECT 1
-    FROM ReleaseVersions PublicationReleaseVersions
-    WHERE PublicationReleaseVersions.PublicationId = ReleaseVersions.PublicationId
-      AND PublicationReleaseVersions.Published IS NOT NULL
-      AND PublicationReleaseVersions.SoftDeleted = 0
-      AND PublicationReleaseVersions.Id <> ReleaseVersions.Id
-      AND PublicationReleaseVersions.PreviousVersionId = ReleaseVersions.Id
+    FROM ReleaseVersions AmendmentReleaseVersions
+    WHERE AmendmentReleaseVersions.PreviousVersionId = ReleaseVersions.Id
+      AND AmendmentReleaseVersions.Published IS NOT NULL
+      AND AmendmentReleaseVersions.SoftDeleted = 0
   );
 
 And then save the results as a CSV in MS SQL Server Management Studio.
@@ -51,8 +53,8 @@ Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
 
 Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
-responses, as they contain unique traceIds):
-diff -I"Run info - .*" -I "Not Found" -r results_dev1/responses results_dev2/responses
+responses, as they contain unique traceIds. Run this from a bash terminal):
+diff -I "Run info - .*" -I "Not Found" -I "time for response.*" -r results_dev1/responses results_dev2/responses
 """
 
 parser = argparse.ArgumentParser(
@@ -153,7 +155,7 @@ datablocks = []
 with open(args.datablocks_csv, "r") as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=",")
     for row in csv_reader:
-        if row[0] == "ContentBlockId":
+        if row[0] == "DataBlockVersionId":
             continue
         datablocks.append(row)
 

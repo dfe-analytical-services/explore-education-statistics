@@ -222,7 +222,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         loadingFastTrack={loadingFastTrack}
         renderFeaturedTableLink={featuredTable => (
           <Link
-            to={`/data-tables/fast-track/${featuredTable.dataBlockParentId}`}
+            to={`/data-tables/fast-track/${featuredTable.dataBlockId}`}
             onClick={() => {
               setLoadingFastTrack(true);
               setCurrentStep(undefined);

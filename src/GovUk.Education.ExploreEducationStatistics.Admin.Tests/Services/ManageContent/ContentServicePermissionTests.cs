@@ -29,7 +29,10 @@ public class ContentServicePermissionTests
     private readonly ReleaseVersion _releaseVersion = new()
     {
         Id = Guid.NewGuid(),
-        Content = [new ContentSection { Id = ContentSectionId, Content = [new DataBlock { Id = ContentBlockId }] }],
+        Content =
+        [
+            new ContentSection { Id = ContentSectionId, Content = [new DataBlockVersionLink { Id = ContentBlockId }] },
+        ],
     };
 
     [Fact]

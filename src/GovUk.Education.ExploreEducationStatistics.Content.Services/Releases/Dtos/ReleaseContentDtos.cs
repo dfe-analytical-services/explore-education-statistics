@@ -75,30 +75,32 @@ public abstract record ContentBlockBaseDto
     public static ContentBlockBaseDto FromContentBlock(ContentBlock contentBlock) =>
         contentBlock switch
         {
-            DataBlock dataBlock => DataBlockDto.FromDataBlock(dataBlock),
+            DataBlockVersionLink dataBlockVersionLink => DataBlockVersionLinkDto.FromDataBlockVersionLink(
+                dataBlockVersionLink
+            ),
             EmbedBlockLink embedBlockLink => EmbedBlockLinkDto.FromEmbedBlockLink(embedBlockLink),
             HtmlBlock htmlBlock => HtmlBlockDto.FromHtmlBlock(htmlBlock),
             _ => throw new ArgumentOutOfRangeException(nameof(contentBlock)),
         };
 }
 
-[JsonKnownThisType("DataBlock")]
-public record DataBlockDto : ContentBlockBaseDto
+[JsonKnownThisType("DataBlockVersionLink")]
+public record DataBlockVersionLinkDto : ContentBlockBaseDto
 {
     public required DataBlockVersionDto DataBlockVersion { get; init; }
 
-    public static DataBlockDto FromDataBlock(DataBlock dataBlock) =>
+    public static DataBlockVersionLinkDto FromDataBlockVersionLink(DataBlockVersionLink dataBlockVersionLink) =>
         new()
         {
-            Id = dataBlock.Id,
-            DataBlockVersion = DataBlockVersionDto.FromDataBlockVersion(dataBlock.DataBlockVersion),
+            Id = dataBlockVersionLink.Id,
+            DataBlockVersion = DataBlockVersionDto.FromDataBlockVersion(dataBlockVersionLink.DataBlockVersion),
         };
 }
 
 public record DataBlockVersionDto
 {
     public required Guid DataBlockVersionId { get; init; }
-    public required Guid DataBlockParentId { get; init; }
+    public required Guid DataBlockId { get; init; }
     public required List<IChart> Charts { get; init; }
     public required string Heading { get; init; }
     public required string Name { get; init; }
@@ -110,7 +112,7 @@ public record DataBlockVersionDto
         new()
         {
             DataBlockVersionId = dataBlockVersion.Id,
-            DataBlockParentId = dataBlockVersion.DataBlockParentId,
+            DataBlockId = dataBlockVersion.DataBlockId,
             Charts = dataBlockVersion.Charts,
             Heading = dataBlockVersion.Heading,
             Name = dataBlockVersion.Name,
@@ -175,14 +177,14 @@ public abstract record KeyStatisticBaseDto
 public record KeyStatisticDataBlockDto : KeyStatisticBaseDto
 {
     public required Guid DataBlockVersionId { get; init; }
-    public required Guid DataBlockParentId { get; init; }
+    public required Guid DataBlockId { get; init; }
 
     public static KeyStatisticDataBlockDto FromKeyStatisticDataBlock(KeyStatisticDataBlock keyStatisticDataBlock) =>
         new()
         {
             Id = keyStatisticDataBlock.Id,
-            DataBlockVersionId = keyStatisticDataBlock.DataBlockId,
-            DataBlockParentId = keyStatisticDataBlock.DataBlockParentId,
+            DataBlockVersionId = keyStatisticDataBlock.DataBlockVersionId,
+            DataBlockId = keyStatisticDataBlock.DataBlockId,
             GuidanceText = keyStatisticDataBlock.GuidanceText,
             GuidanceTitle = keyStatisticDataBlock.GuidanceTitle,
             Trend = keyStatisticDataBlock.Trend,

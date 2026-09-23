@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -93,22 +92,26 @@ public class DataSetFileService(
             .Where(file => results.Select(r => r.FileId).ToList().Contains(file.Id))
             .ToDictionaryAsync(
                 file => file.Id,
-                file =>
-                    file.DataSetFileVersionGeographicLevels.Where(gl => gl.CsvOnly != true)
-                        .Select(gl => gl.GeographicLevel.GetEnumLabel())
-                        .Order()
-                        .ToList(),
+                file => file.DataSetFileVersionGeographicLevels,
                 cancellationToken: cancellationToken
             );
         foreach (var result in results)
         {
-            result.Meta.GeographicLevels = geogLvlsDict[result.FileId];
+            // TODO EES-7584 update once CsvOnly isn't nullable
+            result.Meta.GeographicLevels = geogLvlsDict[result.FileId]
+                .Where(gl => gl.CsvOnly != true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList();
+            result.Meta.GeographicLevelsCsvOnly = geogLvlsDict[result.FileId]
+                .Where(gl => gl.CsvOnly == true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
+                .ToList();
         }
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
-            // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
-            // TODO: Remove ChangeSummaryHtmlToText after migrating all summaries to plain text
-            ChangeSummaryHtmlToText(results),
+            results,
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
             page,
             pageSize
@@ -185,13 +188,6 @@ public class DataSetFileService(
             })
             .ToListAsync(cancellationToken);
     }
-
-    private static List<DataSetFileSummaryViewModel> ChangeSummaryHtmlToText(
-        IList<DataSetFileSummaryViewModel> results
-    ) =>
-        results
-            .Select(viewModel => viewModel with { Content = HtmlToTextUtils.HtmlToText(viewModel.Content) })
-            .ToList();
 
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetFileId,
@@ -339,9 +335,15 @@ public class DataSetFileService(
         return new DataSetFileMetaViewModel
         {
             NumDataFileRows = meta.NumDataFileRows,
+            // TODO EES-7584 update once CsvOnly isn't nullable
             GeographicLevels = dataSetFileVersionGeographicLevels
                 .Where(gl => gl.CsvOnly != true)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .ToList(),
+            GeographicLevelsCsvOnly = dataSetFileVersionGeographicLevels
+                .Where(gl => gl.CsvOnly == true)
+                .Select(gl => gl.GeographicLevel.GetEnumLabel())
+                .Order()
                 .ToList(),
             TimePeriodRange = new DataSetFileTimePeriodRangeViewModel
             {
@@ -584,9 +586,7 @@ internal static class ReleaseFileQueryableExtensions
     {
         return geographicLevel.HasValue
             ? query.Where(rf =>
-                rf.File.DataSetFileVersionGeographicLevels.Any(gl =>
-                    gl.GeographicLevel == geographicLevel && gl.CsvOnly != true
-                )
+                rf.File.DataSetFileVersionGeographicLevels.Any(gl => gl.GeographicLevel == geographicLevel)
             )
             : query;
     }

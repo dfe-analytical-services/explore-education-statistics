@@ -33,7 +33,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentForDraftReleaseVersion] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentForDraftReleaseVersion] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
 
@@ -43,7 +43,7 @@ public abstract class DeleteSpecificCommentAuthorizationHandlerTests
             .WithGenericContent([
                 _dataFixture
                     .DefaultContentSection()
-                    .WithContentBlocks([new DataBlock { Comments = [_commentForApprovedReleaseVersion] }]),
+                    .WithContentBlocks([new DataBlockVersionLink { Comments = [_commentForApprovedReleaseVersion] }]),
             ])
             .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
     }

@@ -25,10 +25,10 @@ export default function AddKeyStatistics({ release }: Props) {
   } = useReleaseContentActions();
 
   const addKeyStatDataBlock = useCallback(
-    async (dataBlockId: string) => {
+    async (dataBlockVersionId: string) => {
       await addKeyStatisticDataBlock({
         releaseVersionId: release.id,
-        dataBlockId,
+        dataBlockVersionId,
       });
       await updateUnattachedDataBlocks({ releaseVersionId: release.id });
       setFormType(undefined);

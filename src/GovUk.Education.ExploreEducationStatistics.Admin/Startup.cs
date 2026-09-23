@@ -614,7 +614,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
-        services.AddTransient<IOrganisationService, OrganisationService>();
+        services.AddTransient<IOrganisationsService, OrganisationsService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
         services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
@@ -696,7 +696,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IPrivateBlobCacheService, PrivateBlobCacheService>();
         services.AddTransient<ICacheKeyService, CacheKeyService>();
         services.AddSingleton<IDataProcessorClient, DataProcessorClient>(_ => new DataProcessorClient(
-            configuration.GetRequiredValue("CoreStorage")
+            configuration.GetRequiredValue("ImporterStorage")
         ));
         services.AddSingleton<IPublisherClient, PublisherClient>(_ => new PublisherClient(
             configuration.GetRequiredValue("PublisherStorage")

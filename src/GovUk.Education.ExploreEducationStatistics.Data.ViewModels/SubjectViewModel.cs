@@ -16,6 +16,8 @@ public record SubjectViewModel
 
     public List<string> GeographicLevels { get; }
 
+    public List<string> GeographicLevelsCsvOnly { get; }
+
     public List<string> Filters { get; }
 
     public List<string> Indicators { get; }
@@ -31,6 +33,7 @@ public record SubjectViewModel
         string content,
         TimePeriodLabels timePeriods,
         List<string> geographicLevels,
+        List<string> geographicLevelsCsvOnly,
         List<string> filters,
         List<string> indicators,
         FileInfo file,
@@ -43,6 +46,7 @@ public record SubjectViewModel
         Content = content;
         TimePeriods = timePeriods;
         GeographicLevels = geographicLevels;
+        GeographicLevelsCsvOnly = geographicLevelsCsvOnly;
         Filters = filters;
         Indicators = indicators;
         File = file;

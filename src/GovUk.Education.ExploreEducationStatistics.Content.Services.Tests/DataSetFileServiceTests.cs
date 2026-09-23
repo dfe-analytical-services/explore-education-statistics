@@ -106,7 +106,7 @@ public class DataSetFileServiceTests
         }
 
         [Fact]
-        public async Task CsvOnlyGeographicLevels_ExcludedFromViewModel()
+        public async Task CsvOnlyGeographicLevels_SplitIntoGeographicLevelsCsvOnly()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -141,11 +141,12 @@ public class DataSetFileServiceTests
 
                 var viewModel = Assert.Single(pagedResult.Results);
                 Assert.Equal([GeographicLevel.Country.GetEnumLabel()], viewModel.Meta.GeographicLevels);
+                Assert.Equal([GeographicLevel.Institution.GetEnumLabel()], viewModel.Meta.GeographicLevelsCsvOnly);
             }
         }
 
         [Fact]
-        public async Task FilterByGeographicLevel_CsvOnlyLevelsDoNotMatchWhenMultipleGeogLvls()
+        public async Task FilterByGeographicLevel_CsvOnlyLevelsMatchWhenMultipleGeogLvls()
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
@@ -182,8 +183,9 @@ public class DataSetFileServiceTests
 
                 var pagedResult = result.AssertRight();
 
-                var viewModel = Assert.Single(pagedResult.Results);
-                Assert.Equal(releaseFiles[0].FileId, viewModel.FileId);
+                Assert.Equal(2, pagedResult.Results.Count);
+                Assert.Contains(pagedResult.Results, viewModel => viewModel.FileId == releaseFiles[0].FileId);
+                Assert.Contains(pagedResult.Results, viewModel => viewModel.FileId == releaseFiles[1].FileId);
             }
         }
 
@@ -522,8 +524,8 @@ public class DataSetFileServiceTests
                 var meta = releaseFile.File.DataSetFileMeta!;
 
                 Assert.Equal(meta.NumDataFileRows, viewModel.File.Meta.NumDataFileRows);
-                // Csv-only geographic levels should be excluded
                 Assert.Equal([GeographicLevel.Country.GetEnumLabel()], viewModel.File.Meta.GeographicLevels);
+                Assert.Equal([GeographicLevel.Institution.GetEnumLabel()], viewModel.File.Meta.GeographicLevelsCsvOnly);
                 Assert.Equal(
                     TimePeriodLabelFormatter.Format(
                         meta.TimePeriodRange.Start.Period,

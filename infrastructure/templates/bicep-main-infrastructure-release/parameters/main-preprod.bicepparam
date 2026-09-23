@@ -11,6 +11,18 @@ param adminConfigParam = {
   enableThemeDeletion: true
 }
 
+param importerConfigParam = {
+  appServiceSku: {
+    tier: 'PremiumV2'
+    name: 'P1V2'
+  }
+}
+
+param publisherConfigParam = {
+  prepareScheduledReleaseVersionsNowEnabled: true
+  publishScheduledReleaseVersionsNowEnabled: true
+}
+
 param publicApiConfigParam = {
   publicUrl: 'pp-api.education.gov.uk/statistics-preprod'
 }

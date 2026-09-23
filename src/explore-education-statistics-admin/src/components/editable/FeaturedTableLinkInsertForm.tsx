@@ -15,7 +15,7 @@ import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 
 interface FormValues {
-  dataBlockParentId: string;
+  dataBlockId: string;
   text: string;
 }
 
@@ -49,12 +49,12 @@ export default function FeaturedTableLinkInsertForm({
   const handleFormSubmit = (values: FormValues) =>
     onSubmit({
       text: values.text,
-      url: `${config.publicAppUrl}/data-tables/fast-track/${values.dataBlockParentId}?featuredTable=true`,
+      url: `${config.publicAppUrl}/data-tables/fast-track/${values.dataBlockId}?featuredTable=true`,
     });
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
-      dataBlockParentId: Yup.string().required('Select a featured table'),
+      dataBlockId: Yup.string().required('Select a featured table'),
       text: Yup.string().required('Enter link text'),
     });
   }, []);
@@ -77,7 +77,7 @@ export default function FeaturedTableLinkInsertForm({
             {featuredTables.length > 0 ? (
               <>
                 <FormComboBox
-                  error={getError('dataBlockParentId')}
+                  error={getError('dataBlockId')}
                   hideSearchIcon={!!selectedEntry}
                   id="featuredTablesSearch"
                   inputLabel="Featured table"
@@ -94,16 +94,16 @@ export default function FeaturedTableLinkInsertForm({
                       { shouldTouch: true },
                     );
                     setValue(
-                      'dataBlockParentId' as const,
-                      searchResults[selectedIndex].dataBlockParentId,
+                      'dataBlockId' as const,
+                      searchResults[selectedIndex].dataBlockId,
                       { shouldTouch: true },
                     );
-                    trigger('dataBlockParentId');
+                    trigger('dataBlockId');
                     setSelectedEntry(searchResults[selectedIndex]);
                   }}
                 />
 
-                {getValues('dataBlockParentId') && (
+                {getValues('dataBlockId') && (
                   <FormFieldTextInput<FormValues>
                     formGroupClass="govuk-!-margin-top-5 govuk-!-margin-bottom-2"
                     id="text"

@@ -357,7 +357,7 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             annexHtmlBlock1,
-                            new DataBlock { Id = Guid.NewGuid() },
+                            new DataBlockVersionLink { Id = Guid.NewGuid() },
                         },
                     },
                     new()
@@ -368,7 +368,7 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             annexHtmlBlock2,
-                            new DataBlock { Id = Guid.NewGuid() },
+                            new DataBlockVersionLink { Id = Guid.NewGuid() },
                         },
                     },
                 },
@@ -382,7 +382,7 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             contentHtmlBlock1,
-                            new DataBlock { Id = Guid.NewGuid() },
+                            new DataBlockVersionLink { Id = Guid.NewGuid() },
                         },
                     },
                     new()
@@ -393,7 +393,7 @@ public class MethodologyContentServiceTests
                         Content = new List<ContentBlock>
                         {
                             contentHtmlBlock2,
-                            new DataBlock { Id = Guid.NewGuid() },
+                            new DataBlockVersionLink { Id = Guid.NewGuid() },
                         },
                     },
                 },

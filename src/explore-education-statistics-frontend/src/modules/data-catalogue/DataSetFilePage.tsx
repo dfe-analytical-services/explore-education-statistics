@@ -1,5 +1,5 @@
 import Button from '@common/components/Button';
-import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import FormattedDate from '@common/components/FormattedDate';
 import PageNav, { NavItem } from '@common/components/PageNav';
 import SectionBreak from '@common/components/SectionBreak';
@@ -230,7 +230,7 @@ export default function DataSetFilePage({
           </div>
 
           <div className={styles.subscribeContainer}>
-            <ContentHtml className="dfe-flex-grow--1" html={summary} />
+            <PlainTextContent className="dfe-flex-grow--1" text={summary} />
             {apiDataSet && (
               <SubscribeLink
                 url={`/api-subscriptions/new-subscription/${dataSetFile.id}`}

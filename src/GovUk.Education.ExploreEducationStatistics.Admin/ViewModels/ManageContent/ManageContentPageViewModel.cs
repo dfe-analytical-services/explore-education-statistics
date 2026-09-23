@@ -12,7 +12,7 @@ public record ManageContentPageViewModel
 {
     public required ReleaseViewModel Release { get; init; }
 
-    public required List<DataBlockViewModel> UnattachedDataBlocks { get; init; }
+    public required List<DataBlockVersionViewModel> UnattachedDataBlocks { get; init; }
 
     public record ReleaseViewModel
     {

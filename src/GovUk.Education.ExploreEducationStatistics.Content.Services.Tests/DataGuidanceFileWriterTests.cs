@@ -120,11 +120,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday).
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -145,11 +142,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-2.csv",
                 Name = "Test data 2",
                 Content =
-                    @"
-                        <p>
-                            Number and proportion of population participating in education, training and employment 
-                            by age, gender and labour market status.
-                        </p>",
+                    "Number and proportion of population participating in education, training and employment "
+                    + "by age, gender and labour market status.",
                 GeographicLevels = new List<string> { "National" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue>
@@ -216,11 +210,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday). See <a href=""https://test.com"">reference information</a>.
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday). See reference information (https://test.com).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -286,11 +277,8 @@ public class DataGuidanceFileWriterTests : IDisposable
                 Filename = "test-1.csv",
                 Name = "Test data 1",
                 Content =
-                    @"
-                        <p>
-                            Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday).
-                        </p>",
+                    "Local authority level data on care leavers aged 17 to 21, by accommodation type "
+                    + "(as measured on or around their birthday).",
                 GeographicLevels = new List<string> { "Local Authority", "National", "Regional" },
                 TimePeriods = new TimePeriodLabels("2018", "2020"),
                 Variables = new List<LabelValue>
@@ -389,8 +377,63 @@ public class DataGuidanceFileWriterTests : IDisposable
             {
                 Filename = "test-1.csv",
                 Name = "Test data 1",
-                Content = "<p>Test file content</p>",
+                Content = "Test file content",
                 GeographicLevels = new List<string> { "Local Authority" },
+                TimePeriods = new TimePeriodLabels("2018", "2018"),
+                Variables = new List<LabelValue> { new("Accommodation type", "accommodation_type") },
+                Footnotes = new List<FootnoteViewModel> { new(Guid.NewGuid(), "Footnote 1") },
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+
+        dataGuidanceDataSetService
+            .Setup(s => s.ListDataSets(releaseVersion.Id, null, CancellationToken.None))
+            .ReturnsAsync(dataSets);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        {
+            await contentDbContext.Entry(releaseVersion).ReloadAsync();
+
+            var writer = BuildDataGuidanceFileWriter(
+                contentDbContext: contentDbContext,
+                dataGuidanceDataSetService: dataGuidanceDataSetService.Object
+            );
+
+            await using var stream = new MemoryStream();
+            await writer.WriteToStream(stream, releaseVersion);
+
+            Snapshot.Match(stream.ReadToEnd());
+        }
+
+        VerifyAllMocks(dataGuidanceDataSetService);
+    }
+
+    [Fact]
+    public async Task WriteToStream_FileWithCsvOnlyGeographicLevels()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()))
+            .WithDataGuidance(TestBasicDataGuidance);
+
+        var dataSets = new List<DataGuidanceDataSetViewModel>
+        {
+            new()
+            {
+                Filename = "test-1.csv",
+                Name = "Test data 1",
+                Content = "Test file content",
+                GeographicLevels = new List<string> { "Local authority", "National", "Ward" },
+                GeographicLevelsCsvOnly = new List<string> { "School" },
                 TimePeriods = new TimePeriodLabels("2018", "2018"),
                 Variables = new List<LabelValue> { new("Accommodation type", "accommodation_type") },
                 Footnotes = new List<FootnoteViewModel> { new(Guid.NewGuid(), "Footnote 1") },

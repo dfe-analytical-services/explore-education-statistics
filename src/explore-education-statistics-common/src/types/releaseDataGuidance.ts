@@ -8,6 +8,7 @@ export interface DataSetDataGuidance {
     to: string;
   };
   geographicLevels: string[];
+  geographicLevelsCsvOnly: string[];
   variables: {
     label: string;
     value: string;

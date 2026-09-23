@@ -98,7 +98,7 @@ public class ContentServiceTests
                     [
                         new HtmlBlock { Body = "Test html block 1", ReleaseVersionId = releaseVersionId },
                         new HtmlBlock { Body = "Test html block 2", ReleaseVersionId = releaseVersionId },
-                        new DataBlock { Name = "Test data block 1", ReleaseVersionId = releaseVersionId },
+                        new DataBlockVersionLink { ReleaseVersionId = releaseVersionId },
                     ],
                     ReleaseVersionId = releaseVersionId,
                 },
@@ -110,7 +110,7 @@ public class ContentServiceTests
                     [
                         new HtmlBlock { Body = "Test html block 3", ReleaseVersionId = releaseVersionId },
                         new HtmlBlock { Body = "Test html block 4", ReleaseVersionId = releaseVersionId },
-                        new DataBlock { Name = "Test data block 2", ReleaseVersionId = releaseVersionId },
+                        new DataBlockVersionLink { ReleaseVersionId = releaseVersionId },
                     ],
                     ReleaseVersionId = releaseVersionId,
                 },
@@ -151,13 +151,22 @@ public class ContentServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
+        var contentBlockId = Guid.NewGuid();
+
         var contentSectionToRemove = new ContentSection
         {
             Order = 1,
             Content =
             [
                 new HtmlBlock { ReleaseVersion = releaseVersion },
-                new DataBlock { ReleaseVersion = releaseVersion },
+                new DataBlockVersionLink
+                {
+                    Id = contentBlockId,
+                    Order = 3,
+                    DataBlockVersionId = contentBlockId,
+                    DataBlockVersion = new DataBlockVersion { Id = contentBlockId },
+                    ReleaseVersion = releaseVersion,
+                },
                 new EmbedBlockLink
                 {
                     EmbedBlock = new EmbedBlock { Title = "title", Url = "url" },
@@ -213,16 +222,9 @@ public class ContentServiceTests
             Assert.Equal(contentSection3.Id, genericContentSections[1].Id);
             Assert.Equal(contentSection3.ReleaseVersionId, genericContentSections[1].ReleaseVersionId);
             Assert.Equal(2, genericContentSections[1].Order);
-
-            var contentBlocks = contentDbContext.ContentBlocks.ToList();
-
-            var dataBlock = Assert.Single(contentBlocks); // data blocks are detached, not deleted
-            Assert.IsType<DataBlock>(dataBlock);
-            Assert.Equal(0, dataBlock.Order);
-            Assert.Null(dataBlock.ContentSectionId);
-
-            var embedBlocks = contentDbContext.EmbedBlocks.ToList();
-            Assert.Empty(embedBlocks);
+            Assert.Empty(contentDbContext.ContentBlocks);
+            Assert.Empty(contentDbContext.EmbedBlocks);
+            Assert.Single(contentDbContext.DataBlockVersions); // Data blocks are detached, not deleted - verify that the content block's associated data block version still exists
         }
     }
 
@@ -328,22 +330,20 @@ public class ContentServiceTests
         };
 
         var dataBlockVersionId = Guid.NewGuid();
-        var dataBlockVersion = new DataBlockVersion
+        var dataBlockVersion = new DataBlockVersion { Id = dataBlockVersionId, DataBlockId = Guid.NewGuid() };
+        var dataBlockVersionLink = new DataBlockVersionLink
         {
             Id = dataBlockVersionId,
-            ContentBlock = new DataBlock
-            {
-                Id = dataBlockVersionId,
-                Order = 1,
-                Comments = [new Comment { Content = "Comment 1" }, new Comment { Content = "Comment 2" }],
-            },
-            DataBlockParentId = Guid.NewGuid(),
+            DataBlockVersionId = dataBlockVersionId,
+            DataBlockVersion = dataBlockVersion,
+            Order = 1,
+            Comments = [new Comment { Content = "Comment 1" }, new Comment { Content = "Comment 2" }],
         };
 
         var contentSection = new ContentSection
         {
             Id = contentSectionId,
-            Content = [blockToRemove, dataBlockVersion.ContentBlock, new HtmlBlock { Order = 2 }],
+            Content = [blockToRemove, dataBlockVersionLink, new HtmlBlock { Order = 2 }],
             ReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()),
         };
 
@@ -377,14 +377,12 @@ public class ContentServiceTests
             Assert.Equal(2, contentBlocks.Count);
 
             Assert.Equal(0, contentBlocks[0].Order);
-            Assert.IsType<DataBlock>(contentBlocks[0]);
+            Assert.IsType<DataBlockVersionLink>(contentBlocks[0]);
             Assert.Equal(1, contentBlocks[1].Order);
             Assert.IsType<HtmlBlock>(contentBlocks[1]);
 
             var comments = contentDbContext
-                .Comment.Where(c =>
-                    c.ContentBlockId == dataBlockVersion.ContentBlockId || c.ContentBlockId == blockToRemove.Id
-                )
+                .Comment.Where(c => c.ContentBlockId == dataBlockVersionLink.Id || c.ContentBlockId == blockToRemove.Id)
                 .ToList();
             Assert.Equal(2, comments.Count);
             Assert.Equal("Comment 1", comments[0].Content);
@@ -398,7 +396,7 @@ public class ContentServiceTests
         var contentBlockId = Guid.NewGuid();
         var contentSection = new ContentSection
         {
-            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlock(), new HtmlBlock()],
+            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlockVersionLink(), new HtmlBlock()],
             ReleaseVersion = new ReleaseVersion(),
         };
 
@@ -428,7 +426,7 @@ public class ContentServiceTests
             Content =
             [
                 new HtmlBlock { Id = contentBlockId, ReleaseVersion = releaseVersion },
-                new DataBlock { ReleaseVersion = releaseVersion },
+                new DataBlockVersionLink { ReleaseVersion = releaseVersion },
                 new HtmlBlock { ReleaseVersion = releaseVersion },
             ],
         };
@@ -459,7 +457,7 @@ public class ContentServiceTests
         var contentBlockId = Guid.NewGuid();
         var contentSection = new ContentSection
         {
-            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlock(), new HtmlBlock()],
+            Content = [new HtmlBlock { Id = contentBlockId }, new DataBlockVersionLink(), new HtmlBlock()],
             ReleaseVersion = new ReleaseVersion(),
         };
 
@@ -522,14 +520,12 @@ public class ContentServiceTests
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var dataBlockParent = _fixture
-            .DefaultDataBlockParent()
-            .WithLatestPublishedVersion(
-                _fixture.DefaultDataBlockVersion().WithOrder(1).WithReleaseVersion(releaseVersion)
-            )
+        var dataBlock = _fixture
+            .DefaultDataBlock()
+            .WithLatestPublishedVersion(_fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion))
             .Generate();
 
-        var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
 
         releaseVersion.Content = _fixture
             .DefaultContentSection()
@@ -546,7 +542,7 @@ public class ContentServiceTests
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            contentDbContext.DataBlockParents.AddRange(dataBlockParent);
+            contentDbContext.DataBlocks.AddRange(dataBlock);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -556,19 +552,29 @@ public class ContentServiceTests
             var result = await service.AttachDataBlock(
                 releaseVersionId: releaseVersion.Id,
                 contentSectionId: releaseVersion.Content[0].Id,
-                new DataBlockAttachRequest { ContentBlockId = dataBlockVersion.Id, Order = 3 }
+                new DataBlockAttachRequest { DataBlockVersionId = dataBlockVersion.Id, Order = 3 }
             );
 
             var dataBlockViewModel = result.AssertRight();
             Assert.Equal(dataBlockVersion.Id, dataBlockViewModel.Id);
-            Assert.Equal(dataBlockParent.Id, dataBlockViewModel.DataBlockParentId);
+
+            // The view model's DataBlockVersion-derived fields are mapped through the new link's
+            // DataBlockVersion navigation, so assert on several of them rather than just one.
+            Assert.Equal(dataBlock.Id, dataBlockViewModel.DataBlockId);
+            Assert.Equal(dataBlockVersion.Heading, dataBlockViewModel.Heading);
+            Assert.Equal(dataBlockVersion.Name, dataBlockViewModel.Name);
+            Assert.Equal(dataBlockVersion.Source, dataBlockViewModel.Source);
+
+            // Query and Table are mapped as deep copies, so compare a field rather than the instances.
+            Assert.Equal(dataBlockVersion.Query.SubjectId, dataBlockViewModel.Query.SubjectId);
+            Assert.NotNull(dataBlockViewModel.Table.TableHeaders);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
             // Assert that the DataBlock's requested attachment Order has been updated to reflect its new position.
-            var dataBlock = Assert.Single(contentDbContext.DataBlocks);
-            Assert.Equal(3, dataBlock.Order);
+            var dataBlockVersionLink = Assert.Single(contentDbContext.DataBlockVersionLinks);
+            Assert.Equal(3, dataBlockVersionLink.Order);
 
             // Assert that the existing HtmlBlocks' Orders are updated where appropriate.
             var htmlBlocks = contentDbContext.HtmlBlocks.ToList();

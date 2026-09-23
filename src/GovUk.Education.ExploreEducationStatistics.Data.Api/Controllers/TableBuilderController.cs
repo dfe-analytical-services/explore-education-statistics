@@ -91,10 +91,10 @@ public class TableBuilderController(
     // both in order to support legacy URLs in bookmarks and in content, but also to remain consistent with the equivalent
     // endpoint in the Admin API, which does require the Release Id in order to differentiate between different
     // DataBlockVersions rather than simply picking the latest published one.
-    [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
-    public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(Guid dataBlockParentId)
+    [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockId:guid}")]
+    public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(Guid dataBlockId)
     {
-        var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+        var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockId)
             .OnSuccessDo(dataBlockVersion =>
                 this.CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion)
             )
@@ -109,12 +109,12 @@ public class TableBuilderController(
         return actionResult;
     }
 
-    [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}/geojson")]
+    [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockId:guid}/geojson")]
     public async Task<
         ActionResult<Dictionary<string, List<LocationAttributeViewModel>>>
-    > QueryForDataBlockWithGeoJsonResult(Guid dataBlockParentId, [FromQuery] long boundaryLevelId)
+    > QueryForDataBlockWithGeoJsonResult(Guid dataBlockId, [FromQuery] long boundaryLevelId)
     {
-        var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+        var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockId)
             .OnSuccessDo(dataBlockVersion =>
                 this.CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion)
             )
@@ -129,10 +129,10 @@ public class TableBuilderController(
         return actionResult;
     }
 
-    [HttpGet("tablebuilder/fast-track/{dataBlockParentId:guid}")]
-    public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
+    [HttpGet("tablebuilder/fast-track/{dataBlockId:guid}")]
+    public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockId)
     {
-        return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+        return await GetLatestPublishedDataBlockVersion(dataBlockId)
             .OnSuccessCombineWith(GetDataBlockTableResult)
             .OnSuccessCombineWith(async tuple =>
             {
@@ -189,14 +189,13 @@ public class TableBuilderController(
     )
     {
         var releaseVersion = dataBlockVersion.ReleaseVersion;
-        var dataBlock = dataBlockVersion.ContentBlock;
 
         return new FastTrackViewModel
         {
-            DataBlockParentId = dataBlockVersion.DataBlockParentId,
-            Configuration = dataBlock.Table,
+            DataBlockId = dataBlockVersion.DataBlockId,
+            Configuration = dataBlockVersion.Table,
             FullTable = tableResult,
-            Query = new TableBuilderQueryViewModel(releaseVersion.Release.PublicationId, dataBlock.Query),
+            Query = new TableBuilderQueryViewModel(releaseVersion.Release.PublicationId, dataBlockVersion.Query),
             ReleaseId = releaseVersion.Id,
             ReleaseSlug = releaseVersion.Release.Slug,
             ReleaseType = releaseVersion.Type,
@@ -206,18 +205,16 @@ public class TableBuilderController(
         };
     }
 
-    // Get the latest published DataBlockVersion for the given parent id, also including its ReleaseVersion and
+    // Get the latest published DataBlockVersion for the given data block id, also including its ReleaseVersion and
     // Publication for the purposes of generating a cache key for Data Block table results.
-    private async Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(
-        Guid dataBlockParentId
-    )
+    private async Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(Guid dataBlockId)
     {
         return await contextDbContext
-            .DataBlockParents.Include(dbp => dbp.LatestPublishedVersion)
+            .DataBlocks.Include(dbp => dbp.LatestPublishedVersion)
                 .ThenInclude(dbv => dbv.ReleaseVersion)
                     .ThenInclude(rv => rv.Release)
                         .ThenInclude(r => r.Publication)
-            .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockParentId)
+            .SingleOrNotFoundAsync(dbp => dbp.Id == dataBlockId)
             .OnSuccess(dbp => dbp.LatestPublishedVersion)
             .OrNotFound();
     }

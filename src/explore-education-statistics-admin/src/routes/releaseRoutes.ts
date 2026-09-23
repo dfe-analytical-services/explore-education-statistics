@@ -7,7 +7,7 @@ export type ReleaseRouteParams = {
 };
 
 export type ReleaseDataBlockRouteParams = ReleaseRouteParams & {
-  dataBlockId: string;
+  dataBlockVersionId: string;
 };
 
 export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
@@ -81,55 +81,55 @@ export const releaseApiDataSetsRoute: ReleaseRouteProps = {
 export const releaseApiDataSetDetailsRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId',
   title: 'API data set details',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetFiltersMappingRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/filters-mapping',
   title: 'API data set filters mapping',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetIndicatorsMappingRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/indicators-mapping',
   title: 'API data set indicators mapping',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetLocationsMappingRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/locations-mapping',
   title: 'API data set locations mapping',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview',
   title: 'Preview API data set',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewTokenRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens/:previewTokenId',
   title: 'API data set preview token',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetPreviewTokenLogRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/preview-tokens',
   title: 'View API data set token log',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetVersionHistoryRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/versions',
   title: 'API data set version history',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseApiDataSetChangelogRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseVersionId/api-data-sets/:dataSetId/changelog/:dataSetVersionId',
   title: 'View API data set token log',
-  protectionAction: permissions => permissions.isBauUser,
+  protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
 export const releaseFootnotesRoute: ReleaseRouteProps = {
@@ -163,7 +163,7 @@ export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataBlockEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockId',
+  path: '/publication/:publicationId/release/:releaseVersionId/data-blocks/:dataBlockVersionId',
   title: 'Edit data block',
 };
 

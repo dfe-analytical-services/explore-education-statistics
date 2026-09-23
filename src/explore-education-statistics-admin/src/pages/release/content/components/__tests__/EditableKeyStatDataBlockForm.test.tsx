@@ -17,7 +17,7 @@ describe('EditableKeyStatDataBlockForm', () => {
     trend: 'Key stat 1 trend',
     guidanceTitle: 'Key stat 1 guidance title',
     guidanceText: 'Key stat 1 guidance text',
-    dataBlockParentId: 'block-1',
+    dataBlockId: 'block-1',
   };
 
   const testOtherKeyStats: KeyStatistic[] = [
@@ -25,7 +25,7 @@ describe('EditableKeyStatDataBlockForm', () => {
       id: 'keyStat-2',
       type: 'KeyStatisticDataBlock',
       guidanceTitle: 'Key stat 2 guidance title',
-      dataBlockParentId: 'block-2',
+      dataBlockId: 'block-2',
     },
     {
       id: 'keyStat-3',

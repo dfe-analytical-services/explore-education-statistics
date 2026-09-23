@@ -44,7 +44,7 @@ const PublicationSectionBlocks = ({
           );
         }
 
-        if (block.type === 'DataBlock') {
+        if (block.type === 'DataBlockVersionLink') {
           const dataBlock = {
             id: block.id,
             type: block.type,

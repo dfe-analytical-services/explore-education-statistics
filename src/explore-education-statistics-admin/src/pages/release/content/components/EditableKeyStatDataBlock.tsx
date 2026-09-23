@@ -41,7 +41,7 @@ export default function EditableKeyStatDataBlock({
     isLoading,
     error,
   } = useQuery(
-    tableBuilderQueries.getKeyStat(releaseVersionId, keyStat.dataBlockParentId),
+    tableBuilderQueries.getKeyStat(releaseVersionId, keyStat.dataBlockId),
   );
 
   const handleSubmit = useCallback(

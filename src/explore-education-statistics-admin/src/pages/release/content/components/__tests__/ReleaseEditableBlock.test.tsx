@@ -1111,9 +1111,14 @@ describe('ReleaseEditableBlock', () => {
         ).toHaveBeenCalledTimes(1);
         expect(
           releaseContentCommentService.addContentSectionComment,
-        ).toHaveBeenCalledWith('release-1', 'section-1', 'data-block-id', {
-          content: 'I am a comment',
-        });
+        ).toHaveBeenCalledWith(
+          'release-1',
+          'section-1',
+          'data-block-version-id',
+          {
+            content: 'I am a comment',
+          },
+        );
       });
     });
   });

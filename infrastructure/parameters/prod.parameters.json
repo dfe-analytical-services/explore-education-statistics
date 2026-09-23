@@ -2,20 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "skuImporter": {
-      "value": "P2V2 PremiumV2"
-    },
     "skuNotifier": {
       "value": "S1 Standard"
-    },
-    "skuPublisher": {
-      "value": "S1 Standard"
-    },
-    "prepareScheduledReleaseVersionsFunctionCronSchedule": {
-      "value": "0 5 0 * * *"
-    },
-    "publishScheduledReleaseVersionsFunctionCronSchedule": {
-      "value": "0 30 9 * * *"
     },
     "useSubnets": {
       "value": true
@@ -51,7 +39,7 @@
       "value": 12
     },
     "maxContentDbSizeBytes": {
-      "value": 4294967296
+      "value": 6442450944
     },
     "maxStatsDbSizeBytes": {
       "value": 3298534883328

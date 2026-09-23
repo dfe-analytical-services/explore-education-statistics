@@ -1,7 +1,7 @@
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonText from '@common/components/ButtonText';
 import CollapsibleList from '@common/components/CollapsibleList';
-import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -51,6 +51,7 @@ export default function DataSetFileSummary({
       },
       filters = [],
       geographicLevels = [],
+      geographicLevelsCsvOnly = [],
       indicators = [],
     },
     api,
@@ -107,12 +108,12 @@ export default function DataSetFileSummary({
         </Link>,
       )}
 
-      <ContentHtml
+      <PlainTextContent
         className={classNames({
           [styles.content]: truncateContent,
           [styles.expanded]: showMoreContent,
         })}
-        html={content}
+        text={content}
       />
 
       {truncateContent && (
@@ -173,6 +174,16 @@ export default function DataSetFileSummary({
             term="Geographic levels"
           >
             {orderBy(geographicLevels).join(', ')}
+          </SummaryListItem>
+        )}
+        {geographicLevelsCsvOnly && geographicLevelsCsvOnly.length > 0 && (
+          <SummaryListItem
+            className={classNames({
+              'dfe-js-hidden': !showDetails,
+            })}
+            term="Geographic levels (only available via download / public API)"
+          >
+            {orderBy(geographicLevelsCsvOnly).join(', ')}
           </SummaryListItem>
         )}
         {indicators && indicators.length > 0 && (

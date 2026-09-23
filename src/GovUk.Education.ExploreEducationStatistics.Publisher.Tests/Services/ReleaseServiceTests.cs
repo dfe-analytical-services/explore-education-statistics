@@ -159,8 +159,8 @@ public class ReleaseServiceTests
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
-        var originalDataBlockParents = _fixture
-            .DefaultDataBlockParent()
+        var originalDataBlocks = _fixture
+            .DefaultDataBlock()
             .WithLatestDraftVersion(() =>
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(releaseVersion).Generate()
             )
@@ -200,30 +200,30 @@ public class ReleaseServiceTests
             // Expect the published display date to be the actual published date for the first published release version
             Assert.Equal(actualPublishedDate, actualReleaseVersion.PublishedDisplayDate);
 
-            var actualDataBlockParents = await contentDbContext
-                .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
-                .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+            var actualDataBlocks = await contentDbContext
+                .DataBlocks.Include(dataBlock => dataBlock.LatestDraftVersion)
+                .Include(dataBlock => dataBlock.LatestPublishedVersion)
                 .ToListAsync();
 
-            Assert.Equal(2, actualDataBlockParents.Count);
+            Assert.Equal(2, actualDataBlocks.Count);
 
-            // Assert that the original DataBlockParents did not point to a LatestPublishedVersion.
-            originalDataBlockParents.ForEach(parent => Assert.Null(parent.LatestPublishedVersionId));
+            // Assert that the original DataBlocks did not point to a LatestPublishedVersion.
+            originalDataBlocks.ForEach(dataBlock => Assert.Null(dataBlock.LatestPublishedVersionId));
 
-            // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+            // Assert that all DataBlocks have had their LatestPublishedVersion pointers updated to
             // reference the newly published DataBlockVersion.
-            actualDataBlockParents.ForEach(parent =>
+            actualDataBlocks.ForEach(dataBlock =>
             {
-                var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
+                var originalDataBlock = originalDataBlocks.Single(db => db.Id == dataBlock.Id);
 
                 // The LatestPublishedVersion version is now the one that was previously the LatestDraftVersion.
                 // Its "Published" date should have just been set as well.
-                Assert.Equal(originalParent.LatestDraftVersionId, parent.LatestPublishedVersionId);
-                Assert.Null(originalParent.LatestDraftVersion!.Published);
-                parent.LatestPublishedVersion!.Published.AssertUtcNow();
+                Assert.Equal(originalDataBlock.LatestDraftVersionId, dataBlock.LatestPublishedVersionId);
+                Assert.Null(originalDataBlock.LatestDraftVersion!.Published);
+                dataBlock.LatestPublishedVersion!.Published.AssertUtcNow();
 
                 // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
-                Assert.Null(parent.LatestDraftVersionId);
+                Assert.Null(dataBlock.LatestDraftVersionId);
             });
 
             Assert.Equal(actualPublishedDate.UtcDateTime, contentDbContext.ReleaseFiles.First().Published);
@@ -252,8 +252,8 @@ public class ReleaseServiceTests
         var unamendedFileId = Guid.NewGuid();
 
         // Generate Data Blocks for both the previous Release version and for the new Amendment.
-        var originalDataBlockParents = _fixture
-            .DefaultDataBlockParent()
+        var originalDataBlocks = _fixture
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(() =>
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(previousReleaseVersion).Generate()
             )
@@ -311,33 +311,33 @@ public class ReleaseServiceTests
             // Expect the published display date to have been copied from the previous version when 'UpdatePublishedDisplayDate' is false
             Assert.Equal(previousReleaseVersion.PublishedDisplayDate, actualReleaseVersion.PublishedDisplayDate);
 
-            var actualDataBlockParents = await contentDbContext
-                .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
-                .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+            var actualDataBlocks = await contentDbContext
+                .DataBlocks.Include(dataBlock => dataBlock.LatestDraftVersion)
+                .Include(dataBlock => dataBlock.LatestPublishedVersion)
                 .ToListAsync();
 
-            Assert.Equal(2, actualDataBlockParents.Count);
+            Assert.Equal(2, actualDataBlocks.Count);
 
-            // Assert that the original DataBlockParents pointed to a LatestPublishedVersion and LatestDraftVersion.
-            originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestDraftVersionId));
-            originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestPublishedVersionId));
+            // Assert that the original DataBlocks pointed to a LatestPublishedVersion and LatestDraftVersion.
+            originalDataBlocks.ForEach(dataBlock => Assert.NotNull(dataBlock.LatestDraftVersionId));
+            originalDataBlocks.ForEach(dataBlock => Assert.NotNull(dataBlock.LatestPublishedVersionId));
 
-            // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+            // Assert that all DataBlocks have had their LatestPublishedVersion pointers updated to
             // reference the newly published DataBlockVersion.
-            actualDataBlockParents.ForEach(parent =>
+            actualDataBlocks.ForEach(dataBlock =>
             {
-                var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
+                var originalDataBlock = originalDataBlocks.Single(p => p.Id == dataBlock.Id);
 
                 // The LatestPublishedVersion is now the one that was previously the LatestDraftVersion.
                 // Its "Published" date should have just been set as well, and we'll double-check that it didn't
                 // just inherit that date from the original LatestDraftVersion DataBlockVersion, as it should not
                 // have been set until it was published.
-                Assert.Equal(originalParent.LatestDraftVersionId, parent.LatestPublishedVersionId);
-                Assert.Null(originalParent.LatestDraftVersion!.Published);
-                parent.LatestPublishedVersion!.Published.AssertUtcNow();
+                Assert.Equal(originalDataBlock.LatestDraftVersionId, dataBlock.LatestPublishedVersionId);
+                Assert.Null(originalDataBlock.LatestDraftVersion!.Published);
+                dataBlock.LatestPublishedVersion!.Published.AssertUtcNow();
 
                 // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
-                Assert.Null(parent.LatestDraftVersionId);
+                Assert.Null(dataBlock.LatestDraftVersionId);
             });
 
             var actualAmendedReleaseFile = await contentDbContext.ReleaseFiles.SingleAsync(rf =>
@@ -370,7 +370,7 @@ public class ReleaseServiceTests
 
         // Generate Data Blocks for both the previous Release version and for the new Amendment.
         _fixture
-            .DefaultDataBlockParent()
+            .DefaultDataBlock()
             .WithLatestPublishedVersion(() =>
                 _fixture.DefaultDataBlockVersion().WithReleaseVersion(previousReleaseVersion).Generate()
             )
@@ -395,19 +395,19 @@ public class ReleaseServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var actualDataBlockParents = await contentDbContext
-                .DataBlockParents.Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
-                .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+            var actualDataBlocks = await contentDbContext
+                .DataBlocks.Include(dataBlock => dataBlock.LatestDraftVersion)
+                .Include(dataBlock => dataBlock.LatestPublishedVersion)
                 .ToListAsync();
 
-            // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+            // Assert that all DataBlocks have had their LatestPublishedVersion pointers updated to
             // be null so that this Data Block is effectively no longer publicly visible. Their LatestDraftVersions
-            // are also null for this DataBlockParent as this Data Block no longer has a Draft version being worked
+            // are also null for this DataBlock as this Data Block no longer has a Draft version being worked
             // on as a part of this Release / amendment.
-            actualDataBlockParents.ForEach(parent =>
+            actualDataBlocks.ForEach(dataBlock =>
             {
-                Assert.Null(parent.LatestPublishedVersionId);
-                Assert.Null(parent.LatestDraftVersionId);
+                Assert.Null(dataBlock.LatestPublishedVersionId);
+                Assert.Null(dataBlock.LatestDraftVersionId);
             });
         }
     }
@@ -457,13 +457,14 @@ public class ReleaseServiceTests
 
     private List<ReleaseSeriesItem> GenerateReleaseSeries(IReadOnlyList<Release> releases, params int[] years)
     {
-        return years
-            .Select(year =>
+        return
+        [
+            .. years.Select(year =>
             {
                 var release = releases.Single(r => r.Year == year);
                 return _fixture.DefaultReleaseSeriesItem().WithReleaseId(release.Id).Generate();
-            })
-            .ToList();
+            }),
+        ];
     }
 
     private static ReleaseService BuildReleaseService(ContentDbContext? contentDbContext = null)

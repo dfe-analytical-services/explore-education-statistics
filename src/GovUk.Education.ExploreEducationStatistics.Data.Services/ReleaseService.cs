@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -24,7 +24,6 @@ public class ReleaseService : IReleaseService
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IUserService _userService;
-    private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
     private readonly ITimePeriodService _timePeriodService;
 
     public ReleaseService(
@@ -32,7 +31,6 @@ public class ReleaseService : IReleaseService
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         StatisticsDbContext statisticsDbContext,
         IUserService userService,
-        IDataGuidanceDataSetService dataGuidanceDataSetService,
         ITimePeriodService timePeriodService
     )
     {
@@ -40,7 +38,6 @@ public class ReleaseService : IReleaseService
         _contentPersistenceHelper = contentPersistenceHelper;
         _statisticsDbContext = statisticsDbContext;
         _userService = userService;
-        _dataGuidanceDataSetService = dataGuidanceDataSetService;
         _timePeriodService = timePeriodService;
     }
 
@@ -100,7 +97,8 @@ public class ReleaseService : IReleaseService
                     order: releaseFile.Order,
                     content: releaseFile.Summary ?? string.Empty,
                     timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                    geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
+                    geographicLevels: await GetGeographicLevels(rs.SubjectId),
+                    geographicLevelsCsvOnly: await GetGeographicLevels(rs.SubjectId, csvOnly: true),
                     filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
                     indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
                     file: releaseFile.ToFileInfo(),
@@ -109,6 +107,19 @@ public class ReleaseService : IReleaseService
             })
         ).OrderBy(svm => svm.Order).ThenBy(svm => svm.Name) // For subjects existing before ordering was added
         .ToList();
+    }
+
+    private async Task<List<string>> GetGeographicLevels(Guid subjectId, bool csvOnly = false)
+    {
+        var geographicLevels = await _contentDbContext
+            .Files.AsNoTracking()
+            .Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
+            .SelectMany(file => file.DataSetFileVersionGeographicLevels)
+            .Where(gl => (gl.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
+            .Select(gl => gl.GeographicLevel)
+            .ToListAsync();
+
+        return geographicLevels.Select(gl => gl.GetEnumLabel()).Order().ToList();
     }
 
     private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
@@ -159,19 +170,18 @@ public class ReleaseService : IReleaseService
 
         var releaseDataBlockList = (
             await _contentDbContext
-                .ContentBlocks.Where(block => block.ReleaseVersionId == releaseVersionId)
-                .OfType<DataBlock>()
+                .DataBlockVersions.Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
                 .Select(db => new { db.Id, db.Query })
                 .ToListAsync()
-        ) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
-            .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
+        ) // we need to materialise the list access `dataBlockVersion.Query.SubjectId` as `Query` is json
+            .Where(dataBlockVersion => publishedSubjectIds.Contains(dataBlockVersion.Query.SubjectId))
             .ToList();
 
-        var releaseDataBlockIdList = releaseDataBlockList.Select(db => db.Id).ToList();
+        var releaseDataBlockVersionIdList = releaseDataBlockList.Select(db => db.Id).ToList();
 
         var featuredTables = await _contentDbContext
-            .FeaturedTables.Include(ft => ft.DataBlock)
-            .Where(ft => releaseDataBlockIdList.Contains(ft.DataBlockId))
+            .FeaturedTables.Include(ft => ft.DataBlockVersion)
+            .Where(ft => releaseDataBlockVersionIdList.Contains(ft.DataBlockVersionId))
             .OrderBy(ft => ft.Order)
             .ThenBy(ft => ft.Name)
             .ToListAsync();
@@ -181,9 +191,9 @@ public class ReleaseService : IReleaseService
                 ft.Id,
                 ft.Name,
                 ft.Description,
-                ft.DataBlock.Query.SubjectId,
+                ft.DataBlockVersion.Query.SubjectId,
+                ft.DataBlockVersionId,
                 ft.DataBlockId,
-                ft.DataBlockParentId,
                 ft.Order
             ))
             .ToList();

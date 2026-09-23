@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -54,10 +53,8 @@ public record ReleaseDataContentDataSetDto
             FileId = releaseFile.File.Id,
             SubjectId = releaseFile.File.SubjectId ?? throw new ArgumentException("File must have SubjectId"),
             Meta = ReleaseDataContentDataSetMetaDto.FromReleaseFile(releaseFile),
-            // Summaries created before EES-4353 may contain HTML. Convert them to plain text here.
-            // TODO: Remove HtmlToText after migrating all summaries to plain text.
             // Summary is only set when data guidance has been added, so a data set can initially have no summary.
-            Summary = releaseFile.Summary != null ? HtmlToTextUtils.HtmlToText(releaseFile.Summary) : null,
+            Summary = releaseFile.Summary,
             Title = releaseFile.Name ?? throw new ArgumentException("ReleaseFile must have Name"),
             PublicApiDataSetId = releaseFile.PublicApiDataSetId,
         };
@@ -67,6 +64,7 @@ public record ReleaseDataContentDataSetMetaDto
 {
     public required string[] Filters { get; init; }
     public required string[] GeographicLevels { get; init; }
+    public required string[] GeographicLevelsCsvOnly { get; init; }
     public required string[] Indicators { get; init; }
     public required int NumDataFileRows { get; init; }
     public required ReleaseDataContentDataSetMetaTimePeriodRangeDto TimePeriodRange { get; init; }
@@ -78,7 +76,11 @@ public record ReleaseDataContentDataSetMetaDto
         return new ReleaseDataContentDataSetMetaDto
         {
             Filters = GetOrderedFilters(meta.Filters, releaseFile.FilterSequence),
-            GeographicLevels = GetOrderedGeographicLevels(file.DataSetFileVersionGeographicLevels),
+            GeographicLevels = GetOrderedGeographicLevels(file.DataSetFileVersionGeographicLevels, csvOnly: false),
+            GeographicLevelsCsvOnly = GetOrderedGeographicLevels(
+                file.DataSetFileVersionGeographicLevels,
+                csvOnly: true
+            ),
             Indicators = GetOrderedIndicators(meta.Indicators, releaseFile.IndicatorSequence),
             NumDataFileRows = meta.NumDataFileRows,
             TimePeriodRange = ReleaseDataContentDataSetMetaTimePeriodRangeDto.FromTimePeriodRangeMeta(
@@ -88,11 +90,12 @@ public record ReleaseDataContentDataSetMetaDto
     }
 
     private static string[] GetOrderedGeographicLevels(
-        IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels
+        IEnumerable<DataSetFileVersionGeographicLevel> dataSetFileVersionGeographicLevels,
+        bool csvOnly
     ) =>
         [
             .. dataSetFileVersionGeographicLevels
-                .Where(level => level.CsvOnly != true)
+                .Where(level => (level.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
                 .Select(level => level.GeographicLevel.GetEnumLabel())
                 .Order(),
         ];
@@ -148,8 +151,8 @@ public record ReleaseDataContentDataSetMetaTimePeriodRangeDto
 public record ReleaseDataContentFeaturedTableDto
 {
     public required Guid FeaturedTableId { get; init; }
+    public required Guid DataBlockVersionId { get; init; }
     public required Guid DataBlockId { get; init; }
-    public required Guid DataBlockParentId { get; init; }
     public required string Title { get; init; }
     public required string Summary { get; init; }
 
@@ -157,8 +160,8 @@ public record ReleaseDataContentFeaturedTableDto
         new()
         {
             FeaturedTableId = featuredTable.Id,
+            DataBlockVersionId = featuredTable.DataBlockVersionId,
             DataBlockId = featuredTable.DataBlockId,
-            DataBlockParentId = featuredTable.DataBlockParentId,
             Summary = featuredTable.Description ?? "",
             Title = featuredTable.Name,
         };

@@ -71,7 +71,7 @@ describe('EditableKeyStatDataBlock', () => {
     trend: 'DataBlock trend',
     guidanceTitle: 'DataBlock guidance title',
     guidanceText: 'DataBlock guidance text',
-    dataBlockParentId: 'block-1',
+    dataBlockId: 'block-1',
   };
 
   test('renders correctly when `isEditing` is false', async () => {

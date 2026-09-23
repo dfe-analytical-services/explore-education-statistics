@@ -327,6 +327,48 @@
       "synonymMaps": []
     },
     {
+      "name": "geographicLevelDetails",
+      "type": "Collection(Edm.ComplexType)",
+      "fields": [
+        {
+          "name": "code",
+          "type": "Edm.String",
+          "searchable": false,
+          "filterable": true,
+          "retrievable": true,
+          "stored": true,
+          "sortable": false,
+          "facetable": true,
+          "key": false,
+          "synonymMaps": []
+        },
+        {
+          "name": "label",
+          "type": "Edm.String",
+          "searchable": false,
+          "filterable": false,
+          "retrievable": true,
+          "stored": true,
+          "sortable": false,
+          "facetable": false,
+          "key": false,
+          "synonymMaps": []
+        },
+        {
+          "name": "csvOnly",
+          "type": "Edm.Boolean",
+          "searchable": false,
+          "filterable": true,
+          "retrievable": true,
+          "stored": true,
+          "sortable": false,
+          "facetable": true,
+          "key": false,
+          "synonymMaps": []
+        }
+      ]
+    },
+    {
       "name": "timePeriodRange",
       "type": "Edm.ComplexType",
       "fields": [
@@ -391,6 +433,30 @@
       "facetable": false,
       "key": false,
       "analyzer": "standard.lucene",
+      "synonymMaps": []
+    },
+    {
+      "name": "publishingOrganisationIds",
+      "type": "Collection(Edm.String)",
+      "searchable": false,
+      "filterable": true,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": true,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "publishingOrganisationTitles",
+      "type": "Collection(Edm.String)",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
       "synonymMaps": []
     },
     {

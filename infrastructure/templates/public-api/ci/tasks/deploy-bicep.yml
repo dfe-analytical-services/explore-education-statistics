@@ -22,9 +22,12 @@ parameters:
     type: string
   - name: deployAlerts
     type: string
-  - name: dataProcessorExists
+  - name: processorProdAppSettings
     type: string
-    default: true
+    default: '{}'
+  - name: processorStagingAppSettings
+    type: string
+    default: '{}'
 
 steps:
   - task: AzureCLI@2
@@ -56,7 +59,8 @@ steps:
               deployDataProcessor=${{ parameters.deployDataProcessor }} \
               deployDocsSite=${{ parameters.deployDocsSite }} \
               deployAlerts=${{ parameters.deployAlerts }} \
-              dataProcessorFunctionAppExists=${{ parameters.dataProcessorExists }} \
+              processorProdAppSettings='${{ parameters.processorProdAppSettings }}' \
+              processorStagingAppSettings='${{ parameters.processorStagingAppSettings }}' \
               dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
               apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
               devopsServicePrincipalId="$servicePrincipalId"

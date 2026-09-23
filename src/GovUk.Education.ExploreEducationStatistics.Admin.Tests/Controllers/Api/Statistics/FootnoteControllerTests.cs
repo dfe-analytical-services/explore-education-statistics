@@ -100,6 +100,7 @@ public class FootnoteControllerTests
                         content: "Test content",
                         timePeriods: new TimePeriodLabels(),
                         geographicLevels: new List<string>(),
+                        geographicLevelsCsvOnly: new List<string>(),
                         filters: new List<string>(),
                         indicators: new List<string>(),
                         file: new FileInfo

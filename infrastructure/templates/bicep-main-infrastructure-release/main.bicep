@@ -4,6 +4,8 @@ import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig
 import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
+import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
+import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
@@ -74,6 +76,26 @@ var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
 
 
 //
+// Importer-specific config.
+//
+param importerConfigParam ImporterConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var importerConfig = mergeImporterConfig(importerConfigParam)
+
+
+
+//
+// Publisher-specific config.
+//
+param publisherConfigParam PublisherConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var publisherConfig = mergePublisherConfig(publisherConfigParam)
+
+
+
+//
 // Public API-specific config.
 //
 param publicApiConfigParam PublicApiConfig = {}
@@ -96,18 +118,6 @@ var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 //
 // Secret pipeline variables (required to be top-level params).
 //
-
-@secure()
-@description('''Admin database user's password for Azure SQL databases.''')
-param adminAzureSqlPassword string = ''
-
-@secure()
-@description('''Content API database user's password for Azure SQL databases.''')
-param contentApiAzureSqlPassword string = ''
-
-@secure()
-@description('''Data API database user's password for Azure SQL databases.''')
-param dataApiAzureSqlPassword string = ''
 
 @secure()
 @description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
@@ -161,7 +171,43 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
 
-module adminModule '../admin/main.bicep' = {
+module importerModuleDeploy '../importer/main.bicep' = {
+  name: 'importerModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: importerConfig.appServiceSku!
+    deployAlerts: true
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    tagValues: tags
+  }
+}
+
+module publisherModuleDeploy '../publisher/main.bicep' = {
+  name: 'publisherModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: publisherConfig.appServiceSku!
+    prepareScheduledReleaseVersionsNowEnabled: publisherConfig.prepareScheduledReleaseVersionsNowEnabled!
+    publishScheduledReleaseVersionsNowEnabled: publisherConfig.publishScheduledReleaseVersionsNowEnabled!
+    functionAppTimeZone: publisherConfig.functionAppTimeZone!
+    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
+    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
+    adminAppUrl: 'https://admin.${environmentConfig.domain!}'
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    deployAlerts: true
+    tagValues: tags
+  }
+}
+
+module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
@@ -188,9 +234,14 @@ module adminModule '../admin/main.bicep' = {
     minTlsVersion: minTlsVersion
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: adminAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
     tagValues: tags
   }
+  dependsOn: [
+    // Admin is dependent on Importer's storage account being available
+    // in order to reference its connection string secret in Key Vault.
+    importerModuleDeploy
+  ]
 }
 
 module contentApiModuleDeploy '../content-api/main.bicep' = {
@@ -207,7 +258,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: contentApiAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
     tagValues: tags
   }
 }
@@ -230,7 +281,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    databaseUserPassword: dataApiAzureSqlPassword
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
     tagValues: tags
   }
 }

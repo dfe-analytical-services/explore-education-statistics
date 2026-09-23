@@ -32,6 +32,7 @@ export default function DataSetFileDetails({
         timePeriodRange,
         filters,
         geographicLevels,
+        geographicLevelsCsvOnly,
         indicators,
       },
     },
@@ -88,6 +89,11 @@ export default function DataSetFileDetails({
         {geographicLevels && geographicLevels.length > 0 && (
           <SummaryListItem term="Geographic levels">
             {orderBy(geographicLevels).join(', ')}
+          </SummaryListItem>
+        )}
+        {geographicLevelsCsvOnly && geographicLevelsCsvOnly.length > 0 && (
+          <SummaryListItem term="Geographic levels (only available via download / public API)">
+            {orderBy(geographicLevelsCsvOnly).join(', ')}
           </SummaryListItem>
         )}
         {indicators && indicators.length > 0 && (

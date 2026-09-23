@@ -1,10 +1,30 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import { AutoMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import { GlobalPermissions } from '@admin/services/authService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 
 describe('ApiDataSetAutoMappedTable', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const testLocations: AutoMappedLocation[] = [
     {
       candidate: {
@@ -196,20 +216,7 @@ describe('ApiDataSetAutoMappedTable', () => {
   ];
 
   test('renders correctly', () => {
-    render(
-      <ApiDataSetAutoMappedTable
-        autoMappedItems={testLocations}
-        groupKey="localAuthority"
-        groupLabel="Local Authorities"
-        itemLabel="location"
-        itemPluralLabel="locations"
-        newItems={[]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        searchFilter={() => []}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    renderTable();
 
     // Search
     expect(
@@ -347,38 +354,27 @@ describe('ApiDataSetAutoMappedTable', () => {
   });
 
   test('searching', async () => {
-    const { user } = render(
-      <ApiDataSetAutoMappedTable
-        autoMappedItems={testLocations}
-        groupKey="localAuthority"
-        groupLabel="Local Authorities"
-        itemLabel="location"
-        itemPluralLabel="locations"
-        newItems={[]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        searchFilter={() => [
-          {
-            candidate: {
+    const { user } = renderTable({
+      searchFilter: () => [
+        {
+          candidate: {
+            label: 'Location 3',
+            code: 'location-3-code',
+            key: 'Location3Key',
+          },
+          mapping: {
+            candidateKey: 'Location3Key',
+            publicId: 'location-3-public-id',
+            source: {
               label: 'Location 3',
               code: 'location-3-code',
-              key: 'Location3Key',
             },
-            mapping: {
-              candidateKey: 'Location3Key',
-              publicId: 'location-3-public-id',
-              source: {
-                label: 'Location 3',
-                code: 'location-3-code',
-              },
-              sourceKey: 'Location3Key',
-              type: 'AutoMapped',
-            },
+            sourceKey: 'Location3Key',
+            type: 'AutoMapped',
           },
-        ]}
-        onUpdate={Promise.resolve}
-      />,
-    );
+        },
+      ],
+    });
 
     expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
       11,
@@ -415,20 +411,7 @@ describe('ApiDataSetAutoMappedTable', () => {
   });
 
   test('pagination', async () => {
-    const { user } = render(
-      <ApiDataSetAutoMappedTable
-        autoMappedItems={testLocations}
-        groupKey="localAuthority"
-        groupLabel="Local Authorities"
-        itemLabel="location"
-        itemPluralLabel="locations"
-        newItems={[]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        searchFilter={() => []}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    const { user } = renderTable();
 
     expect(within(screen.getByRole('table')).getAllByRole('row')).toHaveLength(
       11,
@@ -465,28 +448,16 @@ describe('ApiDataSetAutoMappedTable', () => {
   });
 
   test('hides the edit button if there is a pending update for the mapping', () => {
-    render(
-      <ApiDataSetAutoMappedTable
-        autoMappedItems={testLocations}
-        groupKey="localAuthority"
-        groupLabel="Local Authorities"
-        itemLabel="location"
-        itemPluralLabel="locations"
-        newItems={[]}
-        pendingUpdates={[
-          {
-            previousMapping: testLocations[1].mapping,
-            groupKey: 'localAuthority',
-            sourceKey: 'Location2Key',
-            type: 'ManualMapped',
-          },
-        ]}
-        renderCandidate={candidate => candidate.label}
-        renderSource={source => source.label}
-        searchFilter={() => []}
-        onUpdate={Promise.resolve}
-      />,
-    );
+    renderTable({
+      pendingUpdates: [
+        {
+          previousMapping: testLocations[1].mapping,
+          groupKey: 'localAuthority',
+          sourceKey: 'Location2Key',
+          type: 'ManualMapped',
+        },
+      ],
+    });
     const rows = within(screen.getByRole('table')).getAllByRole('row');
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
@@ -496,4 +467,63 @@ describe('ApiDataSetAutoMappedTable', () => {
       }),
     ).not.toBeInTheDocument();
   });
+
+  test('does not show the actions column or controls when the user cannot manage public API data sets, even when `readOnly` is false', () => {
+    renderTable(
+      { readOnly: false },
+      {
+        user: testAnalystUser,
+      },
+    );
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows).toHaveLength(11);
+
+    expect(
+      within(rows[0]).queryByRole('columnheader', { name: 'Actions' }),
+    ).not.toBeInTheDocument();
+
+    // Row 1
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells).toHaveLength(3);
+    expect(
+      screen.queryByRole('button', {
+        name: 'Map location for Location 1',
+      }),
+    ).not.toBeInTheDocument();
+
+    // Row 2
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells).toHaveLength(3);
+    expect(
+      screen.queryByRole('button', {
+        name: 'Map location for Location 2',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  function renderTable(
+    props: Partial<ComponentProps<typeof ApiDataSetAutoMappedTable>> = {},
+    options?: { user?: User },
+  ) {
+    const { user = testBauUser } = options ?? {};
+
+    return render(
+      <AuthContextTestProvider user={user}>
+        <ApiDataSetAutoMappedTable
+          autoMappedItems={testLocations}
+          groupKey="localAuthority"
+          groupLabel="Local Authorities"
+          itemLabel="location"
+          itemPluralLabel="locations"
+          newItems={[]}
+          renderCandidate={candidate => candidate.label}
+          renderSource={source => source.label}
+          searchFilter={() => []}
+          onUpdate={Promise.resolve}
+          {...props}
+        />
+      </AuthContextTestProvider>,
+    );
+  }
 });

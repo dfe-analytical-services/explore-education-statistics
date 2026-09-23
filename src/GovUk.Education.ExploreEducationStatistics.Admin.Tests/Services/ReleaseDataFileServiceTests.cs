@@ -1004,13 +1004,13 @@ public class ReleaseDataFileServiceTests
         dataBlockService
             .Setup(mock => mock.ListDataBlocks(releaseVersion.Id))
             .ReturnsAsync([
-                new DataBlock
+                new DataBlockVersion
                 {
                     Id = Guid.NewGuid(),
                     Name = "DataBlock name!",
                     Query = new FullTableQuery { SubjectId = releaseFile.File.SubjectId.Value },
                 },
-                new DataBlock
+                new DataBlockVersion
                 {
                     Id = Guid.NewGuid(),
                     Name = "DataBlock for different data set, so shouldn't appear in results!",

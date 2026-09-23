@@ -8,7 +8,7 @@ public record FullTableQueryRequest
 {
     public Guid SubjectId { get; set; }
 
-    public List<Guid> LocationIds { get; set; } = new();
+    public List<Guid> LocationIds { get; set; } = [];
 
     public TimePeriodQuery? TimePeriod { get; set; }
 
@@ -22,12 +22,12 @@ public record FullTableQueryRequest
     {
         return new FullTableQuery
         {
-            SubjectId = this.SubjectId,
-            LocationIds = this.LocationIds,
-            TimePeriod = this.TimePeriod,
-            Filters = this.Filters,
-            Indicators = this.Indicators,
-            FilterHierarchiesOptions = CreateFilterHierarchiesOptionsFromDictionary(this.FilterHierarchiesOptions),
+            SubjectId = SubjectId,
+            LocationIds = LocationIds,
+            TimePeriod = TimePeriod,
+            Filters = Filters,
+            Indicators = Indicators,
+            FilterHierarchiesOptions = CreateFilterHierarchiesOptionsFromDictionary(FilterHierarchiesOptions),
             AllowCropping = allowCropping,
             IgnoreMaxTableSize = ignoreMaxTableSize,
         };
@@ -55,7 +55,7 @@ public class LocationsOrTimePeriodsQueryRequest
 {
     public Guid SubjectId { get; set; }
 
-    public List<Guid> LocationIds { get; set; } = new();
+    public List<Guid> LocationIds { get; set; } = [];
 
     public TimePeriodQuery? TimePeriod { get; set; }
 
@@ -63,9 +63,9 @@ public class LocationsOrTimePeriodsQueryRequest
     {
         return new FullTableQuery
         {
-            SubjectId = this.SubjectId,
-            LocationIds = this.LocationIds,
-            TimePeriod = this.TimePeriod,
+            SubjectId = SubjectId,
+            LocationIds = LocationIds,
+            TimePeriod = TimePeriod,
             Filters = [],
             Indicators = [],
             FilterHierarchiesOptions = null,

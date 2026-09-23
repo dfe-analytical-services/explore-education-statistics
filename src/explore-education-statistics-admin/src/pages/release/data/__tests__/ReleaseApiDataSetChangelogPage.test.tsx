@@ -1,3 +1,4 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import ReleaseApiDataSetChangelogPage from '@admin/pages/release/data/ReleaseApiDataSetChangelogPage';
@@ -11,6 +12,7 @@ import _apiDataSetService, {
   ApiDataSetVersionInfo,
 } from '@admin/services/apiDataSetService';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import { GlobalPermissions } from '@admin/services/authService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -24,12 +26,38 @@ const apiDataSetService = jest.mocked(_apiDataSetService);
 const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseApiDataSetChangelogPage', () => {
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+      canManagePublicApiDataSets: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-1',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+      canManagePublicApiDataSets: false,
+    } as GlobalPermissions,
+  };
+
   const draftDataSetVersion: ApiDataSetVersionInfo = {
     id: 'data-set-version-4-0',
     version: '4.0',
     status: 'Draft',
     type: 'Major',
     notes: '',
+  };
+
+  const draftDataSetVersionWithNotes: ApiDataSetVersionInfo = {
+    id: 'data-set-version-4-0',
+    version: '4.0',
+    status: 'Draft',
+    type: 'Major',
+    notes: 'Existing draft notes',
   };
 
   const latestLiveDataSetVersion: ApiDataSetVersionInfo = {
@@ -398,30 +426,122 @@ describe('ReleaseApiDataSetChangelogPage', () => {
     expect(screen.getByText('Could not load changelog')).toBeInTheDocument();
   });
 
-  function renderPage(dataSetVersionId: string) {
+  test('shows the edit public guidance notes button for a BAU user viewing a draft version with existing notes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(
+      draftDataSetVersionWithNotes,
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
+    });
+
+    renderPage('data-set-version-4-0', { user: testBauUser });
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByTestId('public-guidance-notes')).toHaveTextContent(
+      'Existing draft notes',
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Edit public guidance notes' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText('Public guidance notes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not show the edit public guidance notes button for a user who cannot manage public API data sets, even when viewing a draft version with existing notes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(
+      draftDataSetVersionWithNotes,
+    );
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
+    });
+
+    renderPage('data-set-version-4-0', { user: testAnalystUser });
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(screen.getByTestId('public-guidance-notes')).toHaveTextContent(
+      'Existing draft notes',
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit public guidance notes' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText('Public guidance notes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows the read-only fallback text (not the editing form) for a user who cannot manage public API data sets, when the draft version has no notes', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getVersion.mockResolvedValue(draftDataSetVersion);
+    apiDataSetVersionService.getChanges.mockResolvedValue({
+      majorChanges: majorChangeSet,
+      minorChanges: minorChangeSet,
+      versionNumber: '1.0.0',
+      notes: '',
+      patchHistory: [],
+    });
+
+    renderPage('data-set-version-4-0', { user: testAnalystUser });
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText('Public guidance notes'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit public guidance notes' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByTestId('public-guidance-notes')).toHaveTextContent(
+      'No notes have been added for this API data set.',
+    );
+  });
+
+  function renderPage(dataSetVersionId: string, options?: { user?: User }) {
+    const { user = testBauUser } = options ?? {};
+
     return render(
-      <TestConfigContextProvider>
-        <ReleaseVersionContextProvider releaseVersion={testRelease}>
-          <MemoryRouter
-            initialEntries={[
-              generatePath<ReleaseDataSetChangelogRouteParams>(
-                releaseApiDataSetChangelogRoute.path,
-                {
-                  publicationId: testRelease.publicationId,
-                  releaseVersionId: testRelease.id,
-                  dataSetId: 'data-set-id',
-                  dataSetVersionId,
-                },
-              ),
-            ]}
-          >
-            <Route
-              component={ReleaseApiDataSetChangelogPage}
-              path={releaseApiDataSetChangelogRoute.path}
-            />
-          </MemoryRouter>
-        </ReleaseVersionContextProvider>
-      </TestConfigContextProvider>,
+      <AuthContextTestProvider user={user}>
+        <TestConfigContextProvider>
+          <ReleaseVersionContextProvider releaseVersion={testRelease}>
+            <MemoryRouter
+              initialEntries={[
+                generatePath<ReleaseDataSetChangelogRouteParams>(
+                  releaseApiDataSetChangelogRoute.path,
+                  {
+                    publicationId: testRelease.publicationId,
+                    releaseVersionId: testRelease.id,
+                    dataSetId: 'data-set-id',
+                    dataSetVersionId,
+                  },
+                ),
+              ]}
+            >
+              <Route
+                component={ReleaseApiDataSetChangelogPage}
+                path={releaseApiDataSetChangelogRoute.path}
+              />
+            </MemoryRouter>
+          </ReleaseVersionContextProvider>
+        </TestConfigContextProvider>
+      </AuthContextTestProvider>,
     );
   }
 });

@@ -144,7 +144,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             }
 
             [Fact]
-            public async Task FilterByGeographicLevel_CsvOnlyLevelsAreExcluded()
+            public async Task FilterByGeographicLevel_CsvOnlyLevelsAreIncluded()
             {
                 Publication publication = DataFixture
                     .DefaultPublication()
@@ -168,9 +168,15 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 );
                 var csvOnlyResponse = await ListDataSetFiles(csvOnlyQuery);
 
-                csvOnlyResponse
-                    .AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>()
-                    .AssertHasExpectedPagingAndResultCount(expectedTotalResults: 0);
+                var csvOnlyPagedResult = csvOnlyResponse.AssertOk<
+                    PaginatedListViewModel<DataSetFileSummaryViewModel>
+                >();
+
+                csvOnlyPagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+
+                var viewModel = Assert.Single(csvOnlyPagedResult.Results);
+                Assert.Equal([GeographicLevel.Country.GetEnumLabel()], viewModel.Meta.GeographicLevels);
+                Assert.Equal([GeographicLevel.Institution.GetEnumLabel()], viewModel.Meta.GeographicLevelsCsvOnly);
 
                 var importedQuery = new DataSetFileListRequest(GeographicLevel: GeographicLevel.Country.GetEnumValue());
                 var importedResponse = await ListDataSetFiles(importedQuery);
@@ -1606,45 +1612,6 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertEmptyResults();
-            }
-
-            [Fact]
-            // TODO Remove this once we do further work to remove all HTML from summaries at source
-            public async Task ReleaseFileSummariesContainHtml_HtmlTagsAreStripped()
-            {
-                Publication publication = DataFixture
-                    .DefaultPublication()
-                    .WithReleases([DataFixture.DefaultRelease(publishedVersions: 1)])
-                    .WithTheme(DataFixture.DefaultTheme());
-
-                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.Releases[0].Versions[0]);
-
-                release1Version1Files.ForEach(releaseFile =>
-                {
-                    releaseFile.Summary = $"<p>{releaseFile.Summary}</p>";
-                });
-
-                await fixture
-                    .GetContentDbContext()
-                    .AddTestData(context =>
-                    {
-                        context.ReleaseFiles.AddRange(release1Version1Files);
-                    });
-
-                var query = new DataSetFileListRequest();
-                var response = await ListDataSetFiles(query);
-
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
-
-                Assert.All(
-                    pagedResult.Results,
-                    item =>
-                    {
-                        var content = item.Content;
-                        Assert.DoesNotContain("<p>", content);
-                        Assert.DoesNotContain("</p>", content);
-                    }
-                );
             }
         }
 

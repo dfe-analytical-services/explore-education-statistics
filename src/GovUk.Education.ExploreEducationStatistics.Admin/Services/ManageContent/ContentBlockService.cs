@@ -58,12 +58,8 @@ public class ContentBlockService : IContentBlockService
     {
         switch (blockToRemove)
         {
-            case DataBlock dataBlock:
-                // TODO: EES-1306 Refactor data blocks out of content block model
-                dataBlock.Order = 0;
-                dataBlock.ContentSectionId = null;
-                dataBlock.ContentSection = null;
-                _context.ContentBlocks.Update(dataBlock);
+            case DataBlockVersionLink dataBlockVersionLink:
+                _context.DataBlockVersionLinks.Remove(dataBlockVersionLink);
                 break;
             case EmbedBlockLink embedBlockLink:
                 await _context.Entry(embedBlockLink).Reference(ebl => ebl.EmbedBlock).LoadAsync();

@@ -1,5 +1,6 @@
 import Details from '@common/components/Details';
 import ContentHtml from '@common/components/ContentHtml';
+import PlainTextContent from '@common/components/PlainTextContent';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { DataSetDataGuidance } from '@common/types/releaseDataGuidance';
@@ -18,6 +19,11 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
   const geographicLevels = useMemo(
     () => dataSet.geographicLevels.sort().join('; '),
     [dataSet.geographicLevels],
+  );
+
+  const geographicLevelsCsvOnly = useMemo(
+    () => dataSet.geographicLevelsCsvOnly.sort().join('; '),
+    [dataSet.geographicLevelsCsvOnly],
   );
 
   const timePeriod = useMemo(() => {
@@ -45,7 +51,7 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
 
     return (
       <SummaryListItem term="Content">
-        <ContentHtml html={dataSet.content} testId="fileGuidanceContent" />
+        <PlainTextContent text={dataSet.content} testId="fileGuidanceContent" />
       </SummaryListItem>
     );
   }, [renderContent, dataSet]);
@@ -57,6 +63,11 @@ const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
         {geographicLevels && (
           <SummaryListItem term="Geographic levels">
             {geographicLevels}
+          </SummaryListItem>
+        )}
+        {geographicLevelsCsvOnly && (
+          <SummaryListItem term="Geographic levels (only available via download / public API)">
+            {geographicLevelsCsvOnly}
           </SummaryListItem>
         )}
         {timePeriod && (

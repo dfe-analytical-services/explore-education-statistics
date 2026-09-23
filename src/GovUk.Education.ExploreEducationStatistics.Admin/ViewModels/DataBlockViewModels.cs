@@ -2,21 +2,16 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using JsonKnownTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-// EES-4640 - ideally this should be renamed to "DataBlockVersionViewModel". This will however produce a lot of
-// code changes and can be deferred until DataBlockVersion has completely replaced DataBlock.
-[JsonKnownThisType(nameof(DataBlock))]
-public record DataBlockViewModel : IContentBlockViewModel
+[JsonKnownThisType("DataBlockVersionLink")]
+public record DataBlockVersionViewModel : IContentBlockViewModel
 {
     public Guid Id { get; init; }
 
-    // EES-4640 - this "set" can get replaced with "init" when we no longer need to manually add DataBlockParentId
-    // to this ViewModel when mapped from a plain DataBlock, rather than a DataBlockVersion.
-    public Guid DataBlockParentId { get; set; }
+    public Guid DataBlockId { get; init; }
 
     public List<CommentViewModel> Comments { get; init; } = new();
 
