@@ -238,6 +238,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     subscription: subscription
+    environmentName: environmentName
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName

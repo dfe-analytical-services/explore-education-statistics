@@ -21,7 +21,7 @@ param sku StorageAccountSku = 'Standard_LRS'
 param kind StorageAccountKind = 'StorageV2'
 
 @description('The access tier for Blob access.')
-param accessTier 'Hot' | 'Cool' | 'Cold' | 'Smart' = 'Hot'
+param accessTier 'Hot' | 'Cool' | 'Cold' | 'Premium' = 'Hot'
 
 @description('Key Vault Name.  If specified, a Key Vault secret will be added for this storage account connection string.')
 param keyVaultName string?
@@ -57,6 +57,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     name: sku
   }
   properties: {
+    accessTier: accessTier
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
