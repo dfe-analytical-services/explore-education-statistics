@@ -48,7 +48,7 @@ public class ReleaseFileController(
     }
 
     [HttpGet("releases/{releaseVersionId:guid}/files")]
-    [Produces(MediaTypeNames.Application.Octet)]
+    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
     public async Task<ActionResult> StreamFilesToZip(
         Guid releaseVersionId,
         // TODO EES-6034
@@ -114,7 +114,7 @@ public class ReleaseFileController(
     }
 
     [HttpGet("all-files/{releaseVersionId:guid}/v{formatVersion:int}")]
-    [Produces(MediaTypeNames.Application.Zip)]
+    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK, MediaTypeNames.Application.Zip)]
     public async Task<ActionResult> StreamCachedAllFilesZip(Guid releaseVersionId, int formatVersion)
     {
         var result = await releaseFileService.StreamCachedAllFilesZip(
