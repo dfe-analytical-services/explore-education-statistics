@@ -1283,6 +1283,71 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
+        public async Task WhenPublishingOrganisationsExist_ReturnsDepartmentForEducationFirstThenOthersOrderedByTitle()
+        {
+            var publishingOrganisations = _dataFixture
+                .DefaultOrganisation()
+                .ForIndex(0, s => s.SetTitle("Organisation C"))
+                .ForIndex(1, s => s.SetTitle(Organisation.DepartmentForEducationTitle))
+                .ForIndex(2, s => s.SetTitle("Organisation A"))
+                .ForIndex(3, s => s.SetTitle("Organisation B"))
+                .Generate(4);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithPublishingOrganisations(publishingOrganisations),
+                                ]
+                            ),
+                    ]
+                );
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    context,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.GetRelease(releaseVersion.Id);
+
+                var viewModel = result.AssertRight();
+
+                string[] expectedTitles =
+                [
+                    Organisation.DepartmentForEducationTitle,
+                    "Organisation A",
+                    "Organisation B",
+                    "Organisation C",
+                ];
+
+                Assert.Equal(expectedTitles, viewModel.PublishingOrganisations.Select(o => o.Title));
+            }
+
+            VerifyAllMocks(userPreReleaseRoleRepository);
+        }
+
+        [Fact]
         public async Task WithPreReleaseInviteForPendingUserInvite()
         {
             UserPreReleaseRole preReleaseUserRole = _dataFixture
