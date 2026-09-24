@@ -98,6 +98,13 @@
     "theme": "Children's social care"
   },
   {
+    "publication_summary": "Analysis of the characteristics and journeys of children in need with a disability, including children looked after and care leavers",
+    "publication_title": "Children in need: A focus on disability",
+    "published": "24 Sep 2026",
+    "release_type": "Ad hoc statistics",
+    "theme": "Children's social care"
+  },
+  {
     "publication_summary": "Ad-hoc statistics on re-referrals to children\u2019s social care services in England by child characteristics and journeys through the social care system.",
     "publication_title": "Children in need: A focus on re-referrals",
     "published": "26 Feb 2026",
@@ -520,7 +527,7 @@
   {
     "publication_summary": "Fortnightly data on pupil attendance, including by reason, phase and geography.",
     "publication_title": "Pupil attendance in schools",
-    "published": "6 Aug 2026",
+    "published": "24 Sep 2026",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -704,6 +711,13 @@
     "publication_title": "Widening participation in higher education",
     "published": "9 Jul 2026",
     "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Estimates of full-time and part-time employees working patterns from the Labour Force Survey",
+    "publication_title": "Working patterns of full-time and part-time employees",
+    "published": "24 Sep 2026",
+    "release_type": "Ad hoc statistics",
     "theme": "Higher education"
   }
 ]

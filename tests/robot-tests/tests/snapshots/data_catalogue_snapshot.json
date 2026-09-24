@@ -1,5 +1,5 @@
 {
-  "num_datasets": "1077 data sets",
+  "num_datasets": "1104 data sets",
   "themes": [
     {
       "publications": [
@@ -12,6 +12,7 @@
         "All publications",
         "Children accommodated in secure children's homes",
         "Children in need",
+        "Children in need: A focus on disability",
         "Children in need: A focus on re-referrals",
         "Children in need: A focus on sexual abuse and exploitation",
         "Children looked after in England including adoptions",
@@ -112,7 +113,8 @@
         "LEO Graduate outcomes provider level data",
         "Participation measures in higher education",
         "UK revenue from education related exports and transnational education activity",
-        "Widening participation in higher education"
+        "Widening participation in higher education",
+        "Working patterns of full-time and part-time employees"
       ],
       "theme_heading": "Higher education"
     },
