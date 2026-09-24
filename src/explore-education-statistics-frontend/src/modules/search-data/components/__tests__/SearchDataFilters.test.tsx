@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Filters from '@frontend/modules/search-data/components/SearchDataFilters';
@@ -6,6 +6,7 @@ import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/p
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { SortOption } from '@frontend/components/SortControls';
 import { testPublicationTree } from '@frontend/modules/search-data/__tests__/__data__/testPublicationTree';
+import { testOrganisations } from '@frontend/modules/search-data/__tests__/__data__/testOrganisations';
 
 describe('SearchDataFilters', () => {
   const defaultProps = {
@@ -14,6 +15,10 @@ describe('SearchDataFilters', () => {
       { label: 'National', value: 'NAT' },
       { label: 'Local Authority', value: 'LA' },
     ],
+    organisationOptions: testOrganisations.map(organisation => ({
+      label: organisation.title,
+      value: organisation.id,
+    })),
     publicationTree: testPublicationTree,
     releaseTypeOptions: [
       {
@@ -65,6 +70,9 @@ describe('SearchDataFilters', () => {
 
       // Universal filters should be visible
       expect(
+        screen.getByRole('group', { name: 'Filter by Organisation' }),
+      ).toBeInTheDocument();
+      expect(
         screen.getByRole('group', { name: 'Filter by Release type' }),
       ).toBeInTheDocument();
       expect(
@@ -96,15 +104,58 @@ describe('SearchDataFilters', () => {
 
       // Universal filters should still be visible
       expect(
+        screen.getByRole('group', { name: 'Filter by Organisation' }),
+      ).toBeInTheDocument();
+      expect(
         screen.getByRole('group', { name: 'Filter by Release type' }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole('group', { name: 'Sort by' }),
       ).toBeInTheDocument();
     });
+
+    test('renders a checkbox for each organisation option', () => {
+      render(<Filters {...defaultProps} />);
+
+      expect(screen.getByText('Published by')).toBeInTheDocument();
+
+      const checkboxes = within(
+        screen.getByRole('group', { name: 'Filter by Organisation' }),
+      ).getAllByRole('checkbox');
+
+      expect(checkboxes).toHaveLength(2);
+      expect(checkboxes[0]).toEqual(
+        screen.getByLabelText('Department for Education'),
+      );
+      expect(checkboxes[0]).not.toBeChecked();
+      expect(checkboxes[1]).toEqual(screen.getByLabelText('Ofsted'));
+      expect(checkboxes[1]).not.toBeChecked();
+    });
+
+    test('checks the organisations matching the selected organisationIds', () => {
+      render(
+        <Filters {...defaultProps} organisationIds={['organisation-id-2']} />,
+      );
+
+      expect(
+        screen.getByLabelText('Department for Education'),
+      ).not.toBeChecked();
+      expect(screen.getByLabelText('Ofsted')).toBeChecked();
+    });
   });
 
   describe('interactions', () => {
+    test('calls onChange when an Organisation checkbox is selected', async () => {
+      render(<Filters {...defaultProps} />);
+
+      await userEvent.click(screen.getByLabelText('Ofsted'));
+
+      expect(defaultProps.onChange).toHaveBeenCalledWith({
+        filterType: 'organisationId',
+        nextValue: 'organisation-id-2',
+      });
+    });
+
     test('calls onChangeBatch from ThemesAndReleasesFilterGroup when includeDataFilters is true', async () => {
       render(<Filters {...defaultProps} />);
 
