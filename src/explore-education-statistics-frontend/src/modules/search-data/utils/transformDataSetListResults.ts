@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { SearchIterator } from '@azure/search-documents';
+import sortPublishingOrganisationTitles from '@frontend/modules/search-data/utils/sortPublishingOrganisationTitles';
 import { AzureDataSetIndexItem } from '@frontend/services/azureDataSetService';
 import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
 
@@ -85,7 +86,9 @@ export default async function transformDataSetListResults(
         title: publicationTitle,
         slug: publicationSlug,
       },
-      publishingOrganisationTitles,
+      publishingOrganisationTitles: sortPublishingOrganisationTitles(
+        publishingOrganisationTitles,
+      ),
       release: {
         id: releaseId,
         title: releaseTitle,
