@@ -106,6 +106,7 @@ const ReleaseContent = ({
           releaseDate={release.publishedDisplayDate}
           releaseType={release.type}
           renderProducerLink={
+            /* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */
             publishingOrganisations?.length ? (
               <span>
                 {publishingOrganisations.map((org, index) => (

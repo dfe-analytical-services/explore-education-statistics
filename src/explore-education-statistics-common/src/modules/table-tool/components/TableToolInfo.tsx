@@ -10,7 +10,7 @@ import { Organisation } from '@common/services/types/organisation';
 interface Props {
   contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
   releaseLink?: ReactNode;
   releaseType?: ReleaseType;
 }

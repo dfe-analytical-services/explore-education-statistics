@@ -22,7 +22,7 @@ const ReleaseContactUsSection = ({
   includeSectionBreak?: boolean;
   publicationContact: Contact;
   publicationTitle: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
   sectionTitle?: string;
 }) => {
   const isSkillsEngland = !!publishingOrganisations?.find(
