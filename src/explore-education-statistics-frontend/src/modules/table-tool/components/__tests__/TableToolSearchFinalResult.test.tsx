@@ -29,10 +29,6 @@ describe('TableToolSearchFinalResult', () => {
     ).toHaveAttribute('href', '/data-catalogue/data-set/test-data-set-file-id');
 
     expect(
-      screen.getByRole('heading', { name: 'Relevance' }),
-    ).toBeInTheDocument();
-
-    expect(
       screen.getByText('Test AI relevance summary explanation.'),
     ).toBeInTheDocument();
   });

@@ -75,8 +75,9 @@ const TableToolSearchFinalResult = ({
       <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
         View this data set <VisuallyHidden> - {dataset.title}</VisuallyHidden>
       </Link>
-      <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
-      <p className="govuk-body">{dataset.relevanceReason}</p>
+      <p className="govuk-body govuk-!-margin-top-4">
+        {dataset.relevanceReason}
+      </p>
 
       <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
         {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
