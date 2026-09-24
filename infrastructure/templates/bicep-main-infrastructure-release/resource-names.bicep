@@ -131,8 +131,9 @@ type ResourceNames = {
   }
   eventGrid: {
     topics: {
-      releaseChanged: string
       publicationChanged: string
+      releaseChanged: string
+      releaseVersionChanged: string
       themeChanged: string
     }
   }
@@ -275,8 +276,9 @@ func getResourceNames(
   }
   eventGrid: {
     topics: {
-      releaseChanged: '${newResourcePrefix}-evgt-release-changed'
       publicationChanged: '${newResourcePrefix}-evgt-publication-changed'
+      releaseChanged: '${newResourcePrefix}-evgt-release-changed'
+      releaseVersionChanged: '${newResourcePrefix}-evgt-release-version-changed'
       themeChanged: '${newResourcePrefix}-evgt-theme-changed'
     }
   }

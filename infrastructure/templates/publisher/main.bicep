@@ -231,7 +231,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       }
       {
         name: 'EventGrid__EventTopics__1__TopicEndpoint'
-        value: reference(resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.releaseChanged), '2025-02-15').endpoint
+        value: reference(resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.releaseVersionChanged), '2025-02-15').endpoint
       }
       {
         name: 'PublicDataDbExists'
