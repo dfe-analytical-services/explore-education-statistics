@@ -16,7 +16,7 @@ The project is primarily composed of two areas:
     - Notifier
 
 - **Content API** - `src/GovUk.Education.ExploreEducationStatistics.Content.Api`
-  - Private API providing content for UI app 
+  - Private API providing content for UI app
   - Depends on:
     - Publisher - to generate its cache
 
@@ -55,12 +55,12 @@ The project is primarily composed of two areas:
   - Depends on:
     - SQLServer `content` database
     - SQLServer `statistics` database
-  
+
 - **Notifier** - `src/GovUk.Education.ExploreEducationStatistics.Notifier`
   - Azure function for sending notifications
 
 - **Data Processor** - `src/GovUk.Education.ExploreEducationStatistics.Data.Processor`
-  - Azure function for handling data set imports into the admin. 
+  - Azure function for handling data set imports into the admin.
   - Also referred to as the 'importer' or just 'processor'.
   - Depends on:
     - SQLServer `content` database
@@ -96,21 +96,22 @@ To emulate Azure storage services (blobs, tables and queues) you will require on
 
 ### Install PNPM via corepack
 
-We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement 
-for [NPM](https://www.npmjs.com/) which has several advantages over its predecessor. You can read more about the benefits 
+We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement
+for [NPM](https://www.npmjs.com/) which has several advantages over its predecessor. You can read more about the benefits
 of PNPM [here](https://pnpm.io/motivation). This is installed & managed via [corepack](https://github.com/nodejs/corepack).
 
-Corepack is a tool installed as part of your Node.js installation that allows you to install and 
-manage multiple package manager versions in your environment based on per-project configuration 
-(via the `packageManager` field in `package.json`). 
+Corepack is a tool installed as part of your Node.js installation that allows you to install and
+manage multiple package manager versions in your environment based on per-project configuration
+(via the `packageManager` field in `package.json`).
 
-We use Corepack to ensure that everyone is using the same version of PNPM to avoid any issues when 
-people are using different versions of PNPM. 
+We use Corepack to ensure that everyone is using the same version of PNPM to avoid any issues when
+people are using different versions of PNPM.
 
 In order to install Corepack and the right version of PNPM, run the following command:
 
 ```bash
 corepack install
+corepack enable
 ```
 
 This will install the package manager version specified in the `package.json` file. You can check
@@ -136,22 +137,31 @@ corepack install
 pnpm i
 ```
 
+If you get a `SELF_SIGNED_CERT_IN_CHAIN` error, fix this by setting the `NODE_USE_SYSTEM_CA=1`
+environment variable, which makes Node trust your operating system's certificate store. On Windows:
+
+```bash
+setx NODE_USE_SYSTEM_CA 1
+```
+
+Then re-run `pnpm i` in a new terminal.
+
 ### Set up GitHub Packages source
 
-In additional to the common .NET dependencies sourced from [nuget.org](nuget.org), some dependencies 
-are hosted on GitHub Packages. In order to restore these during a build, you will need to create a 
+In additional to the common .NET dependencies sourced from [nuget.org](nuget.org), some dependencies
+are hosted on GitHub Packages. In order to restore these during a build, you will need to create a
 personal access token (PAT), and add the source to your local NuGet configuration.
 
 #### Create a personal access token (PAT)
 
-You can create a PAT by following the instructions in the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) - 
-note that it must be a "classic" PAT. Create a token and select the `read:packages` scope. If you 
-intend to contribute to a package project, and have the required repository contributor permissions 
+You can create a PAT by following the instructions in the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) -
+note that it must be a "classic" PAT. Create a token and select the `read:packages` scope. If you
+intend to contribute to a package project, and have the required repository contributor permissions
 to push new versions to GitHub Packages, this PAT will also need the `write:packages` scope.
 
 #### Add the source to your local NuGet configuration
 
-If you're working on the project in an IDE like Visual Studio or Rider, you may be automatically prompted 
+If you're working on the project in an IDE like Visual Studio or Rider, you may be automatically prompted
 to add the source to your local NuGet configuration either when opening the solution, or when you attempt
 to restore dependencies. If so, simply enter your GitHub account name for the username field, and the PAT
 generated above for the password.
@@ -179,27 +189,30 @@ dotnet nuget add source https://nuget.pkg.github.com/<OWNER>/index.json -n <NAME
 > above command, as encryption is only supported on Windows.
 
 
+### Trust the .NET HTTPS development certificate
+
+The services run over HTTPS locally (e.g. the admin frontend at `https://localhost:5021`) using the
+ASP.NET Core HTTPS development certificate. If this certificate isn't trusted by your machine, the
+browser will show a `NET::ERR_CERT_AUTHORITY_INVALID` warning - and on managed devices, enterprise
+policy may remove the option to proceed past it.
+
+To trust the certificate, run:
+
+```bash
+dotnet dev-certs https --clean
+dotnet dev-certs https --trust
+```
+
+Accept the security prompt that appears, then fully reload the page in your browser.
+
 ### Set up the database and storage emulator hosts
 
-Add the following to your `hosts` file:
+Add the following to your `/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts` file:
 
 ```
 127.0.0.1    db
 127.0.0.1    data-storage
-```
-
-- On Unix this is located in `/etc/hosts`. 
-- On Windows this is located in `C:\Windows\System32\drivers\etc\hosts`.
-
-### Add the local site domain to hosts file
-
-> This step is only required if you are using Keycloak as the identity provider, or if you are using
-> a custom identity provider and prefer to use a 'nicer' URL instead of http://localhost.
-
-Add the following to your `hosts` file:
-
-```
-127.0.0.1    ees.local
+127.0.0.1    ees.local  # for keycloak
 ```
 
 ### Set up your database
@@ -208,22 +221,22 @@ There are two options for setting up your database:
 
 #### Option 1 - Use a pre-built development database
 
-We regularly create new development databases that are uploaded to Google Drive. Ask a team member if 
+We regularly create new development databases that are uploaded to Google Drive. Ask a team member if
 you need access.
 
-These are already bootstrapped with seed data to run tests and start the project. This is the 
+These are already bootstrapped with seed data to run tests and start the project. This is the
 **recommended** way of running the project.
 
 The seed data file names are suffixed with a number to identify the latest. Download the most recent
-`ees-mssql-data-<number>.zip` and extract the `ees-mssql` directory into the project's `data` directory. 
+`ees-mssql-data-<number>.zip` and extract the `ees-mssql` directory into the project's `data` directory.
 You **must** give all OS users appropriate access to this directory.
 
 In Linux:
-  - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
+  - The ees-mssql folder needs to be present in an unencrypted folder / partition. The
     `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
     using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
   - The Docker container user needs ownership of the ees-mssql folder. Run
-  `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
+  `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate
    permissions.
 
 
@@ -231,7 +244,7 @@ All the data in the `data/ees-mssql` directory will be mounted and loaded automa
 
 #### Option 2 - Use a bare database
 
-The service can be started against a set of non-existent database. If no pre-existing `content` or 
+The service can be started against a set of non-existent database. If no pre-existing `content` or
 `statistics` databases yet exist on the target SQL Server instance:
 
 1. Start the SQL Server Docker container:
@@ -242,12 +255,12 @@ The service can be started against a set of non-existent database. If no pre-exi
 
 2. Create empty `content` and `statistics` databases.
 
-3. Perform a one-off creation of database logins and users. Using Azure Data Studio or similar, 
+3. Perform a one-off creation of database logins and users. Using Azure Data Studio or similar,
    connect to these new databases and run:
    1. Against the "master" database
 
       Create logins for different components of the service, substituting appropriate passwords as required:
-        
+
       ```sql
       CREATE LOGIN [adminapp] WITH PASSWORD = 'Your_Password123';
       CREATE LOGIN [importer] WITH PASSWORD = 'Your_Password123';
@@ -258,23 +271,23 @@ The service can be started against a set of non-existent database. If no pre-exi
       CREATE LOGIN [public_data_processor] WITH PASSWORD = 'Your_Password123';
       CREATE LOGIN [datafactory] WITH PASSWORD = 'Your_Password123';
       ```
-        
+
       Give the "datafactory" user the ability to read DMV tables and to kill reindexing initiated by other sessions.
       This only needs to be applied to non-Azure SQL database servers. Azure SQL equivalent permissions are
       conditionally applied by automatic database migrations.
 
       This is necessary to perform here rather than in migrations as it affects the master database rather than an
       application database:
-        
+
       ```sql
       GRANT VIEW SERVER STATE TO [datafactory];
       GRANT ALTER ANY CONNECTION TO [datafactory];
       ```
-    
+
    2. Against the "content" database
-    
+
       Create the contained "adminapp" user and give it permissions required to run migrations and control user roles and permissions:
-    
+
       ```sql
       CREATE USER [adminapp] FROM LOGIN [adminapp];
       ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
@@ -284,9 +297,9 @@ The service can be started against a set of non-existent database. If no pre-exi
       ALTER ROLE [db_accessadmin] add member [adminapp];
       GRANT ALTER ANY USER TO [adminapp];
       ```
-    
+
    3. Against the "statistics" database
-    
+
       Create the contained "adminapp" user and give it permissions required to run migrations and control user roles and
       permissions:
 
@@ -306,8 +319,8 @@ The service can be started against a set of non-existent database. If no pre-exi
       CREATE USER [datafactory] FROM LOGIN [datafactory];
       ```
 
-4. Start the Admin project and this will configure the contained users' permissions via database migrations. 
-   The other projects will then be able to be started, using their own contained users to connect to the databases. 
+4. Start the Admin project and this will configure the contained users' permissions via database migrations.
+   The other projects will then be able to be started, using their own contained users to connect to the databases.
 
 ### Setting up the storage emulator
 
@@ -320,7 +333,7 @@ The Azurite Docker container can be started by one of the following methods:
     ```
 
 2. Directly via the start script using:
-    
+
     ```bash
     pnpm start dataStorage
     ```
@@ -346,10 +359,10 @@ The Keycloak Docker container can be started by one of the following methods:
    ```bash
    pnpm start admin
    ```
-   
+
    This will start the Keycloak container before the admin starts if you haven't created a
    custom `appsettings.Idp.json` file (see earlier).
-   
+
 2. Directly via the `start` script:
 
    ```bash
@@ -376,6 +389,28 @@ The standard accounts used day to day are:
 The [Keycloak Admin login](https://ees.local:5031/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
 
+##### Certificate warnings when logging in via Keycloak
+
+Keycloak's HTTPS endpoint (`https://ees.local:5031`) uses a self-signed certificate that is generated
+when the Docker image is built, so browsers will show a `NET::ERR_CERT_AUTHORITY_INVALID` warning
+when redirected there to log in. Normally you can click through this warning, but on managed devices,
+enterprise policy may remove that option entirely.
+
+If so, you can export the certificate from the running container and trust it. With the IdP container
+running, simply run:
+
+```bash
+pnpm trust-idp-cert
+```
+
+This exports the certificate and installs it into your user's trusted certificate store (on Windows
+and macOS - on Linux it prints manual installation instructions). Accept the security prompt that
+appears, then fully reload the admin in your browser. The script is safe to re-run - it does nothing
+if the certificate is already trusted.
+
+Note that the certificate is regenerated whenever the Keycloak image is rebuilt (e.g. after adding
+users with `--rebuild-docker`), so you will need to re-run the script after a rebuild.
+
 ##### Adding additional users to Keycloak manually
 
 Additional seed data users can be added to Keycloak by manually adding new entries to the "users" array in
@@ -383,7 +418,7 @@ Additional seed data users can be added to Keycloak by manually adding new entri
 `credentials` Ids. If copying and pasting from an existing user record in the array, the new user password will be
 "password" also.
 
-After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list. 
+After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list.
 
 To do this, you can run one of the following:
 
@@ -397,11 +432,11 @@ docker compose up --build --force-recreate idp
 
 #### Using a custom Identity Provider
 
-If you have your own custom OpenID Connect identity provider (IdP), you can provide its configuration by creating 
-an `appsettings.Idp.json` file in the `src/GovUk.Education.ExploreEducationStatistics.Admin` project directory, which is 
-excluded from Git. 
+If you have your own custom OpenID Connect identity provider (IdP), you can provide its configuration by creating
+an `appsettings.Idp.json` file in the `src/GovUk.Education.ExploreEducationStatistics.Admin` project directory, which is
+excluded from Git.
 
-You can use [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) 
+You can use [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json)
 as a template for how the configuration should be structured.
 
 > Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue
@@ -414,7 +449,7 @@ IdpConfig=Keycloak # To use default Keycloak
 IdpConfig=Idp      # To use custom IdP
 ```
 
-This might be useful if you want to toggle between Keycloak and your custom IdP config, but otherwise, 
+This might be useful if you want to toggle between Keycloak and your custom IdP config, but otherwise,
 just remove the `appsettings.Idp.json` to default back to Keycloak.
 
 #### Bootstrapping Keycloak users into a blank database
@@ -425,7 +460,7 @@ If you are wanting to use Keycloak but with a fresh database, set the following 
 BootstrapUsers=Keycloak
 ```
 
-This environment variable tells the Admin application to generate a set of BAU users on startup that 
+This environment variable tells the Admin application to generate a set of BAU users on startup that
 are specified in the [appsettings.KeycloakBootstrapUsers.json](
 src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.KeycloakBootstrapUsers.json) file.
 
@@ -440,7 +475,7 @@ now be in both Keycloak and in the SQL Server database.
 If you are using your own IdP config (via `appsettings.Idp.json`), you can bootstrap users who you want to
 have access to the system straight away by creating a `appsettings.IdpBootstrapUsers.json`, which is excluded from Git.
 This should contain a set of user emails in a format similar to [appsettings.KeycloakBootstrapUsers.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.KeycloakBootstrapUsers.json). 
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.KeycloakBootstrapUsers.json).
 
 Then set the following environment variable before starting the Admin:
 
@@ -452,8 +487,8 @@ BootstrapUsers=Idp
 
 A good way of running applications/functions is directly through an IDE like [Rider](https://www.jetbrains.com/rider/).
 
-Alternatively, you can use our `start` script. This is a simple wrapper around the various CLI 
-commands you need to start the applications. 
+Alternatively, you can use our `start` script. This is a simple wrapper around the various CLI
+commands you need to start the applications.
 
 This can be most easily accessed via from the root package.json as `pnpm start`.
 
@@ -509,7 +544,7 @@ The frontend applications can be accessed via:
 
 ### Aliasing the start script
 
-A nice and convenient way to access the start script from anywhere on your machine is to create a 
+A nice and convenient way to access the start script from anywhere on your machine is to create a
 custom function in your `.bashrc`, `.zshrc` or similar.
 
 This function would look like the following (change to your liking):
@@ -615,21 +650,21 @@ minimumReleaseAgeExclude:
 #### Adding dependencies
 
 When adding new NPM dependencies, be aware that we need to be careful about where we add them in the
-`package.json` file. We very deliberately add our dependencies to either `devDependencies` or 
+`package.json` file. We very deliberately add our dependencies to either `devDependencies` or
 `dependencies` depending on the subproject.
 
-- `explore-education-statistics-frontend` dependencies are in either `dependencies` or 
+- `explore-education-statistics-frontend` dependencies are in either `dependencies` or
   `devDependencies` to avoid including build dependencies in the `node_modules` that are deployed to
   environments.
-  
-  This is beneficial for cutting down build times, but in the past, we've also experienced weird 
-  issues with being unable to deploy to the Azure App Service when there are too many `node_modules` 
+
+  This is beneficial for cutting down build times, but in the past, we've also experienced weird
+  issues with being unable to deploy to the Azure App Service when there are too many `node_modules`
   (related to Windows).
 
-- `explore-education-statistics-commmon` dependencies are in `dependencies` as these must all be 
+- `explore-education-statistics-commmon` dependencies are in `dependencies` as these must all be
   included in the final build (admin or public).
-  
-- `explore-education-statistics-admin` dependencies are in either `dependencies` or 
+
+- `explore-education-statistics-admin` dependencies are in either `dependencies` or
   `devDependencies`.
 
 To install new dependencies, you will need to use PNPM to do this, with the following steps:
@@ -690,7 +725,7 @@ rule sets:
 - [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin) recommended rules for TypeScript.
 - [stylelint-config-sass-guidelines](https://github.com/bjankord/stylelint-config-sass-guidelines) for SCSS.
 
-We also combine this with [Prettier](https://prettier.io/) to format our code to avoid disagreements 
+We also combine this with [Prettier](https://prettier.io/) to format our code to avoid disagreements
 on formatting.
 
 To enforce these code styles, we run linting and formatting tasks upon save, commit and build.
@@ -774,7 +809,7 @@ dotnet csharpier format .
 
 ### Migrations
 
-The backend c# projects use code first migrations to generate the application's database schema. 
+The backend c# projects use code first migrations to generate the application's database schema.
 The migration tool is installed by running:
 
 ```sh
@@ -822,7 +857,7 @@ dotnet ef migrations add Ees1234MigrationNameHere --context PublicDataDbContext 
 ### Troubleshoot: `Unable to retrieve project metadata` error
 when creating a new migration for Admin or public API databases, to workaround the following error:
 ```
-Unable to retrieve project metadata. Ensure it's an SDK-style project. 
+Unable to retrieve project metadata. Ensure it's an SDK-style project.
 If you're using a custom BaseIntermediateOutputPath or MSBuildProjectExtensionsPath values,
 Use the --msbuildprojectextensionspath option
 ```
@@ -860,7 +895,7 @@ sudo sysctl -p
 
 ### Resetting Azurite
 
-During development you might want to reset your Azurite instance to clear out all data from 
+During development you might want to reset your Azurite instance to clear out all data from
 blobs, queues and tables. This is typically done at the same time as resetting the databases.
 
 To delete all data in Azurite simply delete the Azurite docker container, remove the Azurite volume and recreate it:
@@ -875,15 +910,15 @@ docker compose up data-storage
 If wanting to add more users to the standard set of users we use and are using Keycloak as the Identity Provider, the users will firstly need to be
 added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
 
-```
-docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
--Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.realmName=ees-realm -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.file=/tmp/new-ees-realm.json
+```bash
+docker exec -it ees-idp /opt/keycloak/bin/kc.sh export --file /tmp/new-ees-realm.json --realm ees-realm --users realm_file
 ```
 
-Wait for the above process to complete by waiting for the console output `Admin console listening on http://127.0.0.1:10090`, then shut it down. 
+The export runs to completion and exits. Keycloak recommends that the server is stopped whilst exporting; if the command fails with a
+database lock error, stop the Admin (so that nothing is using the IdP), re-run the export, and then start the Admin again.
 
-Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts 
-of the IdP to use this new realm configuration. From the project root, run:
+Then copy `/tmp/new-ees-realm.json` out of the `ees-idp` container, overwriting the existing `docker/keycloak/keycloak-ees-realm.json` in the repo, so that
+future rebuilds of the IdP image use the new realm configuration. From the project root, run:
 
 ```bash
 docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.json
@@ -899,7 +934,7 @@ See the [Publisher Functions README](src/GovUk.Education.ExploreEducationStatist
 
 ### Customise `magic.mgc` version for file validation
 
-In some cases, it may be useful to change the version of the `magic.mgc` file that is used for 
+In some cases, it may be useful to change the version of the `magic.mgc` file that is used for
 file validation in a project.
 
 You can create an `appsettings.Local.json` file in the relevant project e.g.
@@ -916,7 +951,7 @@ Then ensure it has the following:
 }
 ```
 
-The above example uses the default `magic.mgc` used by Ubuntu, but you can change this path to 
+The above example uses the default `magic.mgc` used by Ubuntu, but you can change this path to
 whatever you want on your filesystem.
 
 ### Robot Tests
@@ -927,7 +962,7 @@ See the [Robot Framework tests README](tests/robot-tests/README.md) for more inf
 
 ### Checking for bad links
 
-If you want to check the site for broken links \(including broken anchor links\) then you can use linkchecker. 
+If you want to check the site for broken links \(including broken anchor links\) then you can use linkchecker.
 
 ```
 $ pipenv install --dev
