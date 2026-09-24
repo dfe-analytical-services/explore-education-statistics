@@ -910,15 +910,15 @@ docker compose up data-storage
 If wanting to add more users to the standard set of users we use and are using Keycloak as the Identity Provider, the users will firstly need to be
 added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
 
-```
-docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
--Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.realmName=ees-realm -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.file=/tmp/new-ees-realm.json
+```bash
+docker exec -it ees-idp /opt/keycloak/bin/kc.sh export --file /tmp/new-ees-realm.json --realm ees-realm --users realm_file
 ```
 
-Wait for the above process to complete by waiting for the console output `Admin console listening on http://127.0.0.1:10090`, then shut it down.
+The export runs to completion and exits. Keycloak recommends that the server is stopped whilst exporting; if the command fails with a
+database lock error, stop the Admin (so that nothing is using the IdP), re-run the export, and then start the Admin again.
 
-Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts
-of the IdP to use this new realm configuration. From the project root, run:
+Then copy `/tmp/new-ees-realm.json` out of the `ees-idp` container, overwriting the existing `docker/keycloak/keycloak-ees-realm.json` in the repo, so that
+future rebuilds of the IdP image use the new realm configuration. From the project root, run:
 
 ```bash
 docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.json
