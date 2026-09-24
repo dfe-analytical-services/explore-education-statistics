@@ -1,4 +1,4 @@
-import delay from '@common/utils/delay';
+import createDeferredHandler from '@common-test/createDeferredHandler';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -48,7 +48,7 @@ describe('Button', () => {
   });
 
   test('calls `onClick` handler once when clicking twice, if `preventDoubleClick` is true', async () => {
-    const handleClick = jest.fn(async () => delay(100));
+    const { handler: handleClick } = createDeferredHandler();
 
     render(<Button onClick={handleClick}>Test button</Button>);
 
@@ -61,7 +61,7 @@ describe('Button', () => {
   });
 
   test('calls `onClick` handler twice when clicking twice, if `preventDoubleClick` is false', async () => {
-    const handleClick = jest.fn(async () => delay(100));
+    const { handler: handleClick } = createDeferredHandler();
 
     render(
       <Button preventDoubleClick={false} onClick={handleClick}>
