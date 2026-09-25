@@ -16,9 +16,7 @@ cp src/GovUk.Education.ExploreEducationStatistics.Notifier/appsettings.Local.jso
 
 `appsettings.Local.json` is already in the `.gitignore` file, so it should remain as untracked.
 
-Update the `GovUkNotify` section of the `appsettings.Local.json` file by substituting values `change-me` with values for the `ApiKey` and each of the email templates ids.
-
-A member of the EES team will need to invite you to be a team member of the GOV.UK Notify service and generate you an API key.
+Update the `GovUkNotify` section of the `appsettings.Local.json` file by substituting the placeholder value under `ApiKey` with your API key - a member of the EES team will need to invite you to be a team member of the GOV.UK Notify service and generate a key for you.
 
 As part of the GOV.UK Notify team you will be able to see the dashboard where you can create and edit templates.
 
@@ -30,7 +28,14 @@ API keys that have been generated for testing locally are usually limited to sen
 
 To alter an existing template, first copy its Subject and Message into a new template.
 
-Reference the new template id in `appsettings.Local.json` to test it locally.
+Reference the new template id in `appsettings.Local.json` to test it locally, e.g.:
+```json
+"GovUkNotify": {
+    "EmailTemplates": {
+      "SubscriptionVerificationId": "<new-template-id>"
+    }
+  }
+```
 
 When the changes are approved this new template id can be set in the Azure Function app configuration as it is promoted through the different Azure environments.
 
