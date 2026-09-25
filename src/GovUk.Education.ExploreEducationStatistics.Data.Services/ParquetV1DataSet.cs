@@ -8,22 +8,26 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
-public class ParquetV1QueryService(
-    StatisticsDbContext statisticsDbContext,
-    IFilterRepository filterRepository,
-    IIndicatorRepository indicatorRepository,
+/// <summary>
+/// Answers table tool queries from the Parquet copy of a data set's CSV file rather than from the Observation
+/// tables in the statistics database. The Parquet file holds the raw CSV values, so results are mapped back onto
+/// the Location, Filter Item and Indicator rows of the statistics database that the table tool refers to by ID.
+/// Everything other than the observations, filter items and time periods matching a query is read from
+/// <paramref name="statisticsDbDataSet" />.
+/// </summary>
+public class ParquetV1DataSet(
+    File dataFile,
+    IStorageDataSet statisticsDbDataSet,
     IDataFilesPathResolver dataFilesPathResolver,
-    ILogger<ParquetV1QueryService> logger
-) : IParquetV1QueryService
+    ILogger<ParquetV1DataSet> logger
+) : IStorageDataSet
 {
     private const string TimePeriodColumn = "time_period";
     private const string TimeIdentifierColumn = "time_identifier";
@@ -32,122 +36,15 @@ public class ParquetV1QueryService(
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
 
-    // The CSV columns that the importer reads Location attributes from (see FixedInformationDataFileReader).
-    private static readonly string[] LocationColumns =
-    [
-        "country_code",
-        "country_name",
-        "english_devolved_area_code",
-        "english_devolved_area_name",
-        "institution_id",
-        "institution_name",
-        "new_la_code",
-        "old_la_code",
-        "la_name",
-        "lad_code",
-        "lad_name",
-        "local_enterprise_partnership_code",
-        "local_enterprise_partnership_name",
-        "lsip_code",
-        "lsip_name",
-        "mayoral_combined_authority_code",
-        "mayoral_combined_authority_name",
-        "trust_id",
-        "trust_name",
-        "opportunity_area_code",
-        "opportunity_area_name",
-        "pcon_code",
-        "pcon_name",
-        "provider_ukprn",
-        "provider_name",
-        "region_code",
-        "region_name",
-        "rsc_region_lead_name",
-        "school_urn",
-        "school_name",
-        "sponsor_id",
-        "sponsor_name",
-        "ward_code",
-        "ward_name",
-        "planning_area_code",
-        "planning_area_name",
-        "pfa_code",
-        "pfa_name",
-    ];
+    public Guid SubjectId => statisticsDbDataSet.SubjectId;
 
-    public async Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
-        File dataFile,
-        IEnumerable<Guid> locationIds,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var locations = await ListLocations(locationIds, cancellationToken);
-
-        if (locations.Count == 0)
-        {
-            return [];
-        }
-
-        await using var parquet = await OpenParquetFile(dataFile, cancellationToken);
-
-        var yearColumn = $"substr({Quote(TimePeriodColumn)}, 1, 4) AS {Quote(TimePeriodColumn)}";
-
-        var rows = await parquet.Query(
-            $"""
-            SELECT DISTINCT {yearColumn}, {Quote(TimeIdentifierColumn)}
-            FROM {parquet.Source}
-            WHERE {LocationsPredicate(parquet, locations)}
-            """,
-            cancellationToken
-        );
-
-        return rows.Select(GetTimePeriod)
-            .Distinct()
-            .OrderBy(tuple => tuple.Year)
-            .ThenBy(tuple => tuple.TimeIdentifier)
-            .ToList();
-    }
-
-    public async Task<IList<FilterItem>> ListFilterItems(
-        File dataFile,
+    public async Task<List<Observation>> ListObservations(
         FullTableQuery query,
         CancellationToken cancellationToken = default
     )
     {
-        var locations = await ListLocations(query.LocationIds, cancellationToken);
-        var filters = await filterRepository.GetFiltersIncludingItems(query.SubjectId);
+        ValidateQuery(query);
 
-        if (locations.Count == 0 || filters.Count == 0)
-        {
-            return [];
-        }
-
-        var filterItemLookup = BuildFilterItemLookup(filters);
-
-        await using var parquet = await OpenParquetFile(dataFile, cancellationToken);
-
-        var columns = filters.SelectMany(FilterColumns).Where(parquet.Columns.Contains).Distinct().ToList();
-
-        var rows = await parquet.Query(
-            $"""
-            SELECT DISTINCT {(columns.Count > 0 ? columns.Select(Quote).JoinToString(", ") : "1")}
-            FROM {parquet.Source}
-            WHERE {LocationsPredicate(parquet, locations)}{TimePeriodPredicate(query.TimePeriod)}
-            """,
-            cancellationToken
-        );
-
-        return rows.SelectMany(row => filters.Select(filter => GetFilterItem(row, filter, filterItemLookup)))
-            .Distinct()
-            .ToList();
-    }
-
-    public async Task<IList<Observation>> ListObservations(
-        File dataFile,
-        FullTableQuery query,
-        CancellationToken cancellationToken = default
-    )
-    {
         var stopwatch = Stopwatch.StartNew();
 
         var locations = await ListLocations(query.LocationIds, cancellationToken);
@@ -157,12 +54,12 @@ public class ParquetV1QueryService(
             return [];
         }
 
-        var filters = await filterRepository.GetFiltersIncludingItems(query.SubjectId);
+        var filters = await ListFilters(cancellationToken);
         var filterItemLookup = BuildFilterItemLookup(filters);
         var requestedFilterItems = await ListFilterItems(query.GetFilterItemIds(), cancellationToken);
-        var indicators = indicatorRepository.GetIndicators(query.SubjectId, query.Indicators).ToList();
+        var indicators = await ListIndicators(query.Indicators, cancellationToken);
 
-        await using var parquet = await OpenParquetFile(dataFile, cancellationToken);
+        await using var parquet = await OpenParquetFile(cancellationToken);
 
         var locationsByKey = new Dictionary<string, Location>();
         foreach (var location in locations)
@@ -215,7 +112,7 @@ public class ParquetV1QueryService(
                 return new Observation
                 {
                     Id = observationId,
-                    SubjectId = query.SubjectId,
+                    SubjectId = SubjectId,
                     Location = location,
                     LocationId = location.Id,
                     Year = year,
@@ -245,28 +142,153 @@ public class ParquetV1QueryService(
         return observations;
     }
 
-    private async Task<List<FilterItem>> ListFilterItems(
-        IEnumerable<Guid> filterItemIds,
-        CancellationToken cancellationToken
+    public IAsyncEnumerable<IReadOnlyList<Observation>> ListObservationBatches(
+        FullTableQuery query,
+        int batchSize,
+        CancellationToken cancellationToken = default
     )
     {
-        return await statisticsDbContext
-            .FilterItem.AsNoTracking()
-            .Include(filterItem => filterItem.FilterGroup)
-                .ThenInclude(filterGroup => filterGroup.Filter)
-            .Where(filterItem => filterItemIds.Contains(filterItem.Id))
-            .ToListAsync(cancellationToken);
+        return statisticsDbDataSet.ListObservationBatches(query, batchSize, cancellationToken);
     }
 
-    private async Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken)
+    public async Task<List<FilterItem>> ListFilterItemsForQuery(
+        FullTableQuery query,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await statisticsDbContext
-            .Location.AsNoTracking()
-            .Where(location => locationIds.Contains(location.Id))
-            .ToListAsync(cancellationToken);
+        ValidateQuery(query);
+
+        var locations = await ListLocations(query.LocationIds, cancellationToken);
+        var filters = await ListFilters(cancellationToken);
+
+        if (locations.Count == 0 || filters.Count == 0)
+        {
+            return [];
+        }
+
+        var filterItemLookup = BuildFilterItemLookup(filters);
+
+        await using var parquet = await OpenParquetFile(cancellationToken);
+
+        var columns = filters.SelectMany(FilterColumns).Where(parquet.Columns.Contains).Distinct().ToList();
+
+        var rows = await parquet.Query(
+            $"""
+            SELECT DISTINCT {(columns.Count > 0 ? columns.Select(Quote).JoinToString(", ") : "1")}
+            FROM {parquet.Source}
+            WHERE {LocationsPredicate(parquet, locations)}{TimePeriodPredicate(query.TimePeriod)}
+            """,
+            cancellationToken
+        );
+
+        return rows.SelectMany(row => filters.Select(filter => GetFilterItem(row, filter, filterItemLookup)))
+            .Distinct()
+            .ToList();
     }
 
-    private async Task<ParquetFile> OpenParquetFile(File dataFile, CancellationToken cancellationToken)
+    public Task<List<FilterItem>> ListFilterItems(
+        IEnumerable<Guid> filterItemIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return statisticsDbDataSet.ListFilterItems(filterItemIds, cancellationToken);
+    }
+
+    public Task<Dictionary<Guid, int>> CountFilterItemsByFilter(
+        IEnumerable<Guid> filterItemIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return statisticsDbDataSet.CountFilterItemsByFilter(filterItemIds, cancellationToken);
+    }
+
+    public Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default)
+    {
+        return statisticsDbDataSet.ListFilters(cancellationToken);
+    }
+
+    public Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
+    {
+        return statisticsDbDataSet.ListIndicators(cancellationToken);
+    }
+
+    public Task<List<Indicator>> ListIndicators(
+        IEnumerable<Guid> indicatorIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return statisticsDbDataSet.ListIndicators(indicatorIds, cancellationToken);
+    }
+
+    public Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
+    {
+        return statisticsDbDataSet.ListIndicatorGroups(cancellationToken);
+    }
+
+    public Task<List<Location>> ListLocations(CancellationToken cancellationToken = default)
+    {
+        return statisticsDbDataSet.ListLocations(cancellationToken);
+    }
+
+    public Task<List<Location>> ListLocations(
+        IEnumerable<Guid> locationIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return statisticsDbDataSet.ListLocations(locationIds, cancellationToken);
+    }
+
+    public Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+        CancellationToken cancellationToken = default
+    )
+    {
+        return statisticsDbDataSet.ListTimePeriods(cancellationToken);
+    }
+
+    public async Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+        IEnumerable<Guid> locationIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var locations = await ListLocations(locationIds, cancellationToken);
+
+        if (locations.Count == 0)
+        {
+            return [];
+        }
+
+        await using var parquet = await OpenParquetFile(cancellationToken);
+
+        var yearColumn = $"substr({Quote(TimePeriodColumn)}, 1, 4) AS {Quote(TimePeriodColumn)}";
+
+        var rows = await parquet.Query(
+            $"""
+            SELECT DISTINCT {yearColumn}, {Quote(TimeIdentifierColumn)}
+            FROM {parquet.Source}
+            WHERE {LocationsPredicate(parquet, locations)}
+            """,
+            cancellationToken
+        );
+
+        return rows.Select(GetTimePeriod)
+            .Distinct()
+            .OrderBy(tuple => tuple.Year)
+            .ThenBy(tuple => tuple.TimeIdentifier)
+            .ToList();
+    }
+
+    private void ValidateQuery(FullTableQuery query)
+    {
+        if (query.SubjectId != SubjectId)
+        {
+            throw new ArgumentException(
+                $"Query SubjectId {query.SubjectId} does not match data set SubjectId {SubjectId}",
+                nameof(query)
+            );
+        }
+    }
+
+    private async Task<ParquetFile> OpenParquetFile(CancellationToken cancellationToken)
     {
         var path = dataFilesPathResolver.ParquetV1Path(dataFile);
 
@@ -431,10 +453,7 @@ public class ParquetV1QueryService(
 
     private static List<string> LocationKeyValues(ParquetFile parquet, Location location)
     {
-        var csvValues = location
-            .GetAttributes()
-            .SelectMany(attribute => attribute.CsvValues)
-            .ToDictionary(pair => pair.Key, pair => pair.Value);
+        var csvValues = location.GetCsvValues();
 
         return
         [
@@ -466,7 +485,7 @@ public class ParquetV1QueryService(
         public HashSet<string> Columns { get; } = columns;
 
         public List<string> LocationColumns { get; } =
-            ParquetV1QueryService.LocationColumns.Where(columns.Contains).ToList();
+            LocationCsvUtils.AllCsvColumns().Where(columns.Contains).ToList();
 
         public async Task<List<IDictionary<string, object?>>> Query(string sql, CancellationToken cancellationToken)
         {

@@ -594,7 +594,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
+        services.AddTransient<StatisticsDbDataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, ParquetV1DataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy
@@ -652,7 +653,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<IDataFilesPathResolver>(provider => new DataFilesPathResolver(
             basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
         ));
-        services.AddTransient<IParquetV1QueryService, ParquetV1QueryService>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(
             provider => new PrivateBlobStorageService(

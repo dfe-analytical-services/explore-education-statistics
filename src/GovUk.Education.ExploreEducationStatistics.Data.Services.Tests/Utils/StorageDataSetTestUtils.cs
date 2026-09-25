@@ -16,7 +16,7 @@ public static class StorageDataSetTestUtils
     /// The raw SQL temp table plumbing cannot run against the in-memory provider, so those collaborators default
     /// to Strict mocks and tests seed <c>MatchedObservations</c> directly instead.
     /// </summary>
-    public static IStorageDataSetResolver BuildStatisticsDbDataSetResolver(
+    public static StatisticsDbDataSetResolver BuildStatisticsDbDataSetResolver(
         StatisticsDbContext statisticsDbContext,
         IObservationService? observationService = null,
         IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,

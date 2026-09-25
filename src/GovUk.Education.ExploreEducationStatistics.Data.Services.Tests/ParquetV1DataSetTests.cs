@@ -6,18 +6,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
-public class ParquetV1QueryServiceTests : IAsyncLifetime
+public class ParquetV1DataSetTests : IAsyncLifetime
 {
     // Mirrors what the importer reads from a data CSV: labels are matched after trimming and ignoring case,
     // blank filter values become the "Not specified" filter item and blank indicator values are kept as empty.
@@ -74,7 +74,7 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     private readonly Indicator _enrolments;
     private readonly Indicator _attendanceRate;
 
-    public ParquetV1QueryServiceTests()
+    public ParquetV1DataSetTests()
     {
         _schoolType = new Filter(
             hint: null,
@@ -166,35 +166,31 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     public async Task ListTimePeriods()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
-        Assert.Equal(
-            [(2019, AcademicYear), (2020, AcademicYear)],
-            await service.ListTimePeriods(_dataFile, [_england.Id])
-        );
+        Assert.Equal([(2019, AcademicYear), (2020, AcademicYear)], await dataSet.ListTimePeriods([_england.Id]));
 
         Assert.Equal(
             [(2020, AcademicYear), (2021, AcademicYear)],
-            await service.ListTimePeriods(_dataFile, [_northEast.Id, _london.Id])
+            await dataSet.ListTimePeriods([_northEast.Id, _london.Id])
         );
 
         Assert.Equal(
             [(2019, AcademicYear), (2020, AcademicYear), (2021, AcademicYear)],
-            await service.ListTimePeriods(_dataFile, [_england.Id, _northEast.Id])
+            await dataSet.ListTimePeriods([_england.Id, _northEast.Id])
         );
 
-        Assert.Empty(await service.ListTimePeriods(_dataFile, [_london.Id]));
-        Assert.Empty(await service.ListTimePeriods(_dataFile, [Guid.NewGuid()]));
+        Assert.Empty(await dataSet.ListTimePeriods([_london.Id]));
+        Assert.Empty(await dataSet.ListTimePeriods([Guid.NewGuid()]));
     }
 
     [Fact]
     public async Task ListFilterItems()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
-        var result = await service.ListFilterItems(
-            _dataFile,
+        var result = await dataSet.ListFilterItemsForQuery(
             new FullTableQuery
             {
                 SubjectId = _subjectId,
@@ -206,8 +202,7 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
         AssertFilterItems([_primary, _male, _female], result);
         Assert.All(result, filterItem => Assert.NotNull(filterItem.FilterGroup.Filter));
 
-        result = await service.ListFilterItems(
-            _dataFile,
+        result = await dataSet.ListFilterItemsForQuery(
             new FullTableQuery
             {
                 SubjectId = _subjectId,
@@ -218,16 +213,14 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
 
         AssertFilterItems([_primary, _male, _notSpecified], result);
 
-        result = await service.ListFilterItems(
-            _dataFile,
+        result = await dataSet.ListFilterItemsForQuery(
             new FullTableQuery { SubjectId = _subjectId, LocationIds = [_england.Id] }
         );
 
         AssertFilterItems([_primary, _secondary, _male, _female], result);
 
         Assert.Empty(
-            await service.ListFilterItems(
-                _dataFile,
+            await dataSet.ListFilterItemsForQuery(
                 new FullTableQuery { SubjectId = _subjectId, LocationIds = [_london.Id] }
             )
         );
@@ -237,10 +230,9 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     public async Task ListObservations()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
-        var result = await service.ListObservations(
-            _dataFile,
+        var result = await dataSet.ListObservations(
             new FullTableQuery
             {
                 SubjectId = _subjectId,
@@ -267,10 +259,9 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     public async Task ListObservations_NoFilters()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
-        var result = await service.ListObservations(
-            _dataFile,
+        var result = await dataSet.ListObservations(
             new FullTableQuery
             {
                 SubjectId = _subjectId,
@@ -305,10 +296,9 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     public async Task ListObservations_NotSpecifiedFilterItem()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
-        var result = await service.ListObservations(
-            _dataFile,
+        var result = await dataSet.ListObservations(
             new FullTableQuery
             {
                 SubjectId = _subjectId,
@@ -330,11 +320,10 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
     public async Task ListObservations_NoMatchingLocations()
     {
         await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-        var service = BuildService(statisticsDbContext);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
 
         Assert.Empty(
-            await service.ListObservations(
-                _dataFile,
+            await dataSet.ListObservations(
                 new FullTableQuery
                 {
                     SubjectId = _subjectId,
@@ -345,8 +334,7 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
         );
 
         Assert.Empty(
-            await service.ListObservations(
-                _dataFile,
+            await dataSet.ListObservations(
                 new FullTableQuery
                 {
                     SubjectId = _subjectId,
@@ -357,17 +345,45 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
         );
     }
 
-    private ParquetV1QueryService BuildService(StatisticsDbContext statisticsDbContext)
+    [Fact]
+    public async Task ListObservations_QueryForDifferentSubject()
+    {
+        await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            dataSet.ListObservations(
+                new FullTableQuery
+                {
+                    SubjectId = Guid.NewGuid(),
+                    LocationIds = [_england.Id],
+                    Indicators = [_enrolments.Id],
+                }
+            )
+        );
+    }
+
+    [Fact]
+    public async Task ListFilters_ReadFromStatisticsDb()
+    {
+        await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
+        var dataSet = await BuildParquetV1DataSet(statisticsDbContext);
+
+        var result = await dataSet.ListFilters();
+
+        Assert.Equal(new[] { _schoolType.Id, _sex.Id }.Order(), result.Select(filter => filter.Id).Order());
+    }
+
+    private async Task<ParquetV1DataSet> BuildParquetV1DataSet(StatisticsDbContext statisticsDbContext)
     {
         var dataFilesPathResolver = new Mock<IDataFilesPathResolver>(Strict);
         dataFilesPathResolver.Setup(s => s.ParquetV1Path(_dataFile)).Returns(ParquetPath);
 
-        return new ParquetV1QueryService(
-            statisticsDbContext,
-            new FilterRepository(statisticsDbContext),
-            new IndicatorRepository(statisticsDbContext),
-            dataFilesPathResolver.Object,
-            Mock.Of<ILogger<ParquetV1QueryService>>()
+        return new ParquetV1DataSet(
+            dataFile: _dataFile,
+            statisticsDbDataSet: await BuildStatisticsDbDataSetResolver(statisticsDbContext).Resolve(_subjectId),
+            dataFilesPathResolver: dataFilesPathResolver.Object,
+            logger: Mock.Of<ILogger<ParquetV1DataSet>>()
         );
     }
 
