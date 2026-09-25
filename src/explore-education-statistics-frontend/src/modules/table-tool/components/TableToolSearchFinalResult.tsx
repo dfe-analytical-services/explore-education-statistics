@@ -89,48 +89,45 @@ const TableToolSearchFinalResult = ({
       </p>
 
       {isValidForTableGeneration ? (
-        <>
+        <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
           {validationWarnings.map(warning => (
             <WarningMessage key={`${warning.code}-${warning.message}`}>
               {warning.message}
             </WarningMessage>
           ))}
 
-          <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
-            {isError && (
-              <ErrorMessage>Error loading table preview.</ErrorMessage>
-            )}
-            {table && tableHeaders && (
-              <>
-                <div className={styles.previewNotice}>
-                  <p className="govuk-body govuk-!-margin-bottom-0">
-                    Table showing a preview from:
-                    <br />
-                    {dataset.title}
-                  </p>
-                  <Link
-                    to={`/data-tables/${releaseVersionSummary.publication.slug}/${
-                      releaseVersionSummary.slug
-                    }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
-                  >
-                    View and edit this table{' '}
-                    <VisuallyHidden> - {dataset.title}</VisuallyHidden>
-                  </Link>
-                </div>
-                <TimePeriodDataTable
-                  capMaxHeight
-                  captionTitle={generatedCaption}
-                  defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
-                  defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
-                  fullTable={table}
-                  query={fullTableQuery}
-                  releaseVersionId={releaseVersionSummary.id}
-                  tableHeadersConfig={tableHeaders}
-                />
-              </>
-            )}
-          </LoadingSpinner>
-        </>
+          {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
+
+          {table && tableHeaders && (
+            <>
+              <div className={styles.previewNotice}>
+                <p className="govuk-body govuk-!-margin-bottom-0">
+                  Table showing a preview from:
+                  <br />
+                  {dataset.title}
+                </p>
+                <Link
+                  to={`/data-tables/${releaseVersionSummary.publication.slug}/${
+                    releaseVersionSummary.slug
+                  }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
+                >
+                  View and edit this table{' '}
+                  <VisuallyHidden> - {dataset.title}</VisuallyHidden>
+                </Link>
+              </div>
+              <TimePeriodDataTable
+                capMaxHeight
+                captionTitle={generatedCaption}
+                defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
+                defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
+                fullTable={table}
+                query={fullTableQuery}
+                releaseVersionId={releaseVersionSummary.id}
+                tableHeadersConfig={tableHeaders}
+              />
+            </>
+          )}
+        </LoadingSpinner>
       ) : (
         <>
           {validationErrors.length > 0 ? (
