@@ -593,7 +593,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy
@@ -631,17 +631,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITimePeriodService, TimePeriodService>();
         services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => new SubjectMetaService(
-            statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
             contentDbContext: provider.GetRequiredService<ContentDbContext>(),
             cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
             releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
-            filterRepository: provider.GetRequiredService<IFilterRepository>(),
-            filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
-            indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
-            locationRepository: provider.GetRequiredService<ILocationRepository>(),
+            storageDataSetResolver: provider.GetRequiredService<IStorageDataSetResolver>(),
             logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
-            observationService: provider.GetRequiredService<IObservationService>(),
-            timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
             userService: provider.GetRequiredService<IUserService>(),
             locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
         ));

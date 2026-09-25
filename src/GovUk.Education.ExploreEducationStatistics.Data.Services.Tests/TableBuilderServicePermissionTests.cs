@@ -102,9 +102,8 @@ public class TableBuilderServicePermissionTests
 
     private TableBuilderService BuildTableBuilderService(
         ContentDbContext contentDbContext,
-        IFilterItemRepository? filterItemRepository = null,
         ILocationService? locationService = null,
-        IObservationService? observationService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         ISubjectResultMetaService? subjectResultMetaService = null,
         ISubjectCsvMetaService? subjectCsvMetaService = null,
@@ -116,10 +115,9 @@ public class TableBuilderServicePermissionTests
     )
     {
         return new(
-            Mock.Of<StatisticsDbContext>(),
             contentDbContext,
             locationService ?? Mock.Of<ILocationService>(Strict),
-            observationService ?? Mock.Of<IObservationService>(Strict),
+            storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(Strict),
             statisticsPersistenceHelper ?? MockUtils.MockPersistenceHelper<StatisticsDbContext>().Object,
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),

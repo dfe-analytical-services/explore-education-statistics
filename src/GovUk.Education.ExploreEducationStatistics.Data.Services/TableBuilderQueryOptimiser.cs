@@ -1,36 +1,50 @@
-﻿#nullable enable
+#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class TableBuilderQueryOptimiser(
-    StatisticsDbContext statisticsDbContext,
-    IFilterItemRepository filterItemRepository,
+    IStorageDataSetResolver storageDataSetResolver,
     IOptions<TableBuilderOptions> options
 ) : ITableBuilderQueryOptimiser
 {
-    private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
+    private const int MaxSelections = 5;
+
+    private async Task<Either<ActionResult, int>> GetMaximumTableCellCount(FullTableQuery query)
     {
         var filterItemIds = query.GetFilterItemIds();
 
-        var countsOfFilterItemsByFilter =
-            filterItemIds.Count == 0
-                ? []
-                : (await filterItemRepository.CountFilterItemsByFilter(filterItemIds))
-                    .Select(pair =>
-                    {
-                        var (_, count) = pair;
-                        return count;
-                    })
-                    .ToList();
+        List<int> countsOfFilterItemsByFilter;
+
+        if (filterItemIds.Count == 0)
+        {
+            countsOfFilterItemsByFilter = [];
+        }
+        else
+        {
+            var dataSet = await storageDataSetResolver.Resolve(query.SubjectId);
+            var filterItems = await dataSet.ListFilterItems(filterItemIds);
+
+            // The ids are distinct, so fewer filter items than ids means some ids don't exist in the data set
+            if (filterItems.Count != filterItemIds.Count)
+            {
+                return ValidationUtils.ValidationResult(FilterItemsNotFound);
+            }
+
+            countsOfFilterItemsByFilter = filterItems
+                .GroupBy(filterItem => filterItem.FilterGroup.FilterId)
+                .Select(grouping => grouping.Count())
+                .ToList();
+        }
 
         return TableBuilderUtils.MaximumTableCellCount(
             countOfIndicators: query.Indicators.Count(),
@@ -40,35 +54,41 @@ public class TableBuilderQueryOptimiser(
         );
     }
 
-    public async Task<bool> IsCroppingRequired(FullTableQuery query)
+    public async Task<Either<ActionResult, bool>> IsCroppingRequired(FullTableQuery query)
     {
-        var maxCells = await GetMaximumTableCellCount(query);
-        return maxCells > options.Value.MaxTableCellsAllowed;
+        return await GetMaximumTableCellCount(query)
+            .OnSuccess(maxCells => maxCells > options.Value.MaxTableCellsAllowed);
     }
 
-    public async Task<FullTableQuery> CropQuery(FullTableQuery query, CancellationToken cancellationToken)
+    public async Task<Either<ActionResult, FullTableQuery>> CropQuery(
+        FullTableQuery query,
+        CancellationToken cancellationToken
+    )
     {
-        var maxSelections = 5;
-
         if (query.TimePeriod is not null)
         {
             var timePeriods = TimePeriodUtil.Range(query.TimePeriod);
 
-            if (timePeriods.Count > maxSelections)
+            if (timePeriods.Count > MaxSelections)
             {
-                var croppedTimePeriods = timePeriods.TakeLast(maxSelections);
+                var croppedTimePeriods = timePeriods.TakeLast(MaxSelections);
                 query.TimePeriod.StartYear = croppedTimePeriods.First().Year;
                 query.TimePeriod.StartCode = croppedTimePeriods.First().TimeIdentifier;
                 query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;
                 query.TimePeriod.EndCode = croppedTimePeriods.Last().TimeIdentifier;
 
-                if (!await IsCroppingRequired(query))
-                {
-                    return query;
-                }
+                return await IsCroppingRequired(query)
+                    .OnSuccess(async croppingRequired =>
+                        croppingRequired ? await CropLocations(query, cancellationToken) : query
+                    );
             }
         }
 
+        return await CropLocations(query, cancellationToken);
+    }
+
+    private async Task<FullTableQuery> CropLocations(FullTableQuery query, CancellationToken cancellationToken)
+    {
         var maxLocationsPerGeographicLevel = new Dictionary<GeographicLevel, int>
         {
             { GeographicLevel.Country, 1 },
@@ -92,14 +112,13 @@ public class TableBuilderQueryOptimiser(
             { GeographicLevel.Ward, 2 },
         };
 
-        var locations = await statisticsDbContext
-            .Location.Where(l => query.LocationIds.Contains(l.Id))
-            .ToListAsync(cancellationToken);
+        var dataSet = await storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
+        var locations = await dataSet.ListLocations(query.LocationIds, cancellationToken);
 
         var croppedLocationIds = locations
             .GroupBy(l => l.GeographicLevel)
             .SelectMany(g => g.OrderBy(l => l.Id).Take(maxLocationsPerGeographicLevel[g.Key]).Select(l => l.Id))
-            .Take(maxSelections)
+            .Take(MaxSelections)
             .ToList();
 
         query.LocationIds = croppedLocationIds;

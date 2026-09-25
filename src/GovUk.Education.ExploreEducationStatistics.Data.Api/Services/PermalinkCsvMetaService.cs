@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -22,21 +21,21 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 {
     private readonly ILogger<PermalinkCsvMetaService> _logger;
     private readonly ContentDbContext _contentDbContext;
-    private readonly StatisticsDbContext _statisticsDbContext;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseSubjectService _releaseSubjectService;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public PermalinkCsvMetaService(
         ILogger<PermalinkCsvMetaService> logger,
         ContentDbContext contentDbContext,
-        StatisticsDbContext statisticsDbContext,
+        IStorageDataSetResolver storageDataSetResolver,
         IReleaseSubjectService releaseSubjectService,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
         _contentDbContext = contentDbContext;
-        _statisticsDbContext = statisticsDbContext;
+        _storageDataSetResolver = storageDataSetResolver;
         _releaseSubjectService = releaseSubjectService;
         _releaseFileBlobService = releaseFileBlobService;
     }
@@ -51,7 +50,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
-        var locations = await GetLocations(tableResultMeta.Locations);
+        var locations = await GetLocations(subjectId, tableResultMeta.Locations, cancellationToken);
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
             filter => filter.Name,
@@ -161,7 +160,9 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     }
 
     private async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy
+        Guid subjectId,
+        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy,
+        CancellationToken cancellationToken
     )
     {
         var locationAttributePaths = locationsHierarchy
@@ -179,9 +180,10 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         // all the attributes from when it was originally created.
         // Locations in the database are immutable, but they may have been deleted
         // if they have been orphaned from any subject for too long.
-        var locations = await _statisticsDbContext
-            .Location.Where(location => locationIds.Contains(location.Id))
-            .ToDictionaryAsync(location => location.Id);
+        var dataSet = await _storageDataSetResolver.Resolve(subjectId, cancellationToken);
+        var locations = (await dataSet.ListLocations(locationIds, cancellationToken)).ToDictionary(location =>
+            location.Id
+        );
 
         // For any locations that no longer exist in the database, fallback to using the
         // permalink's location hierarchy metadata. It should be noted that this meta
