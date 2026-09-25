@@ -33,9 +33,6 @@ export interface AzureDataSetIndexItem {
   lastUpdated: string;
   api: DataSetFileApi;
   numDataFileRows: number;
-  // TODO EES-7629 Remove `geographicLevels` and `geographicLevelsLabels` now?
-  geographicLevels: GeographicLevelCode[];
-  geographicLevelsLabels: string[];
   geographicLevelDetails: AzureGeographicLevel[];
   indicators: string[];
   filters: string[];
