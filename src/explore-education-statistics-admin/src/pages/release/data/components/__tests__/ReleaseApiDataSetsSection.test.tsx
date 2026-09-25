@@ -11,11 +11,9 @@ import _apiDataSetService, {
 import { GlobalPermissions } from '@admin/services/authService';
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render, { CustomRenderResult } from '@common-test/render';
-import { createMemoryHistory, History } from 'history';
 import { screen, waitFor, within } from '@testing-library/react';
-import { Router } from 'react-router-dom';
 import React from 'react';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
 jest.mock('@admin/services/apiDataSetCandidateService');
@@ -314,72 +312,34 @@ describe('ReleaseApiDataSetsSection', () => {
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     user?: User;
-    history?: History;
   }): CustomRenderResult {
-    const {
-      releaseVersion = testRelease,
-      user = testBauUser,
-      history = createMemoryHistory(),
-    } = options ?? {};
+    const { releaseVersion = testRelease, user = testBauUser } = options ?? {};
 
     return render(
-      <AuthContextTestProvider user={user}>
-        <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-          <Router history={history}>
+      <TestRouterRenderer initialUrl="/" route="/" disableTestContext>
+        <AuthContextTestProvider user={user}>
+          <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
             <ReleaseApiDataSetsSection />
-          </Router>
-        </ReleaseVersionContextProvider>
-      </AuthContextTestProvider>,
+          </ReleaseVersionContextProvider>
+        </AuthContextTestProvider>
+      </TestRouterRenderer>,
     );
   }
 
   function renderWithTestConfig(options?: {
     releaseVersion?: ReleaseVersion;
     user?: User;
-    history?: History;
   }): CustomRenderResult {
-    const defaultTestConfig = {
-      appInsightsKey: '',
-      publicAppUrl: 'http://localhost',
-      publicApiUrl: 'http://public-api',
-      publicApiDocsUrl: 'http://public-api-docs',
-      permittedEmbedUrlDomains: [
-        'https://department-for-education.shinyapps.io',
-      ],
-      oidc: {
-        clientId: '',
-        authority: '',
-        knownAuthorities: [''],
-        adminApiScope: '',
-        authorityMetadata: {
-          authorizationEndpoint: '',
-          tokenEndpoint: '',
-          issuer: '',
-          userInfoEndpoint: '',
-          endSessionEndpoint: '',
-        },
-      },
-    };
-    const {
-      releaseVersion = testRelease,
-      user = testBauUser,
-      history = createMemoryHistory(),
-    } = options ?? {};
+    const { releaseVersion = testRelease, user = testBauUser } = options ?? {};
 
     return render(
-      <TestConfigContextProvider
-        config={{
-          ...defaultTestConfig,
-        }}
-      >
+      <TestRouterRenderer initialUrl="/" route="/">
         <AuthContextTestProvider user={user}>
           <ReleaseVersionContextProvider releaseVersion={releaseVersion}>
-            <Router history={history}>
-              <ReleaseApiDataSetsSection />
-            </Router>
+            <ReleaseApiDataSetsSection />
           </ReleaseVersionContextProvider>
         </AuthContextTestProvider>
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
   }
 });

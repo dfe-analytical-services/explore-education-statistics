@@ -3,7 +3,6 @@ import PageMetaTitle from '@admin/components/PageMetaTitle';
 import DataBlockPageTabs from '@admin/pages/release/datablocks/components/DataBlockPageTabs';
 import {
   releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
@@ -13,15 +12,13 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useCallback } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseDataBlockCreatePage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const {
-    params: { publicationId, releaseVersionId },
-  } = match;
+const ReleaseDataBlockCreatePage = () => {
+  const navigate = useNavigate();
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const { value: canUpdateRelease, isLoading } = useAsyncHandledRetry(
     () => permissionService.canUpdateRelease(releaseVersionId),
@@ -30,18 +27,15 @@ const ReleaseDataBlockCreatePage = ({
 
   const handleDataBlockSave = useCallback(
     async (dataBlock: ReleaseDataBlock) => {
-      history.push(
-        generatePath<ReleaseDataBlockRouteParams>(
-          releaseDataBlockEditRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataBlockVersionId: dataBlock.id,
-          },
-        ),
+      navigate(
+        generatePath(releaseDataBlockEditRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataBlockVersionId: dataBlock.id,
+        }),
       );
     },
-    [history, publicationId, releaseVersionId],
+    [navigate, publicationId, releaseVersionId],
   );
 
   return (
@@ -50,7 +44,7 @@ const ReleaseDataBlockCreatePage = ({
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseDataBlocksRoute.path, {
+        to={generatePath(releaseDataBlocksRoute.fullPath, {
           publicationId,
           releaseVersionId,
         })}

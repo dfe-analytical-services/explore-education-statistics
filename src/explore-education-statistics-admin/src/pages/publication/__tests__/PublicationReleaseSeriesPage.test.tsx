@@ -10,10 +10,12 @@ import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/Pu
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
+import { publicationCreateReleaseSeriesLegacyLinkRoute } from '@admin/routes/publicationRoutes';
 
 jest.mock('@admin/services/publicationService');
 
@@ -229,23 +231,24 @@ describe('PublicationReleaseSeriesPage', () => {
     });
 
     test('goes to the create page when OK is clicked', async () => {
-      const history = createMemoryHistory();
       const user = userEvent.setup();
       publicationService.getReleaseSeries.mockResolvedValueOnce(
         testReleaseSeries,
       );
       render(
-        <Router history={history}>
-          <TestConfigContextProvider>
-            <PublicationContextProvider
-              publication={testPublication}
-              onPublicationChange={noop}
-              onReload={noop}
-            >
-              <PublicationReleaseSeriesPage />
-            </PublicationContextProvider>
-          </TestConfigContextProvider>
-        </Router>,
+        <TestRouterRenderer
+          route="/"
+          initialUrl="/"
+          routes={[publicationCreateReleaseSeriesLegacyLinkRoute.fullPath]}
+        >
+          <PublicationContextProvider
+            publication={testPublication}
+            onPublicationChange={noop}
+            onReload={noop}
+          >
+            <PublicationReleaseSeriesPage />
+          </PublicationContextProvider>
+        </TestRouterRenderer>,
       );
 
       expect(await screen.findByText('Release order')).toBeInTheDocument();
@@ -259,11 +262,10 @@ describe('PublicationReleaseSeriesPage', () => {
       await user.click(
         within(screen.getByRole('dialog')).getByRole('button', { name: 'OK' }),
       );
-      await waitFor(() => {
-        expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/releases/legacy/create`,
-        );
-      });
+
+      await expectLocation(
+        `/publication/${testPublication.id}/releases/legacy/create`,
+      );
     });
 
     test('does not show button to create when user does not have permission to manage the release series', async () => {

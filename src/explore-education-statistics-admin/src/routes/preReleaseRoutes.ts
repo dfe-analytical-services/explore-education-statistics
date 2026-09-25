@@ -12,27 +12,31 @@ export type PreReleaseMethodologyRouteParams = ReleaseRouteParams & {
 };
 
 export const preReleaseContentRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/content',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/prerelease/content',
+  path: 'content',
   title: 'Content',
-  exact: true,
 };
 
 export const preReleaseMethodologiesRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/methodologies',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/prerelease/methodologies',
+  path: 'methodologies',
   title: 'Methodologies',
-  exact: true,
 };
 
 export const preReleaseMethodologyRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/methodologies/:methodologyId',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/prerelease/methodologies/:methodologyId',
+  path: 'methodologies/:methodologyId',
   title: 'Methodology',
-  exact: true,
 };
 
 export const preReleaseTableToolRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseVersionId/prerelease/table-tool/:dataBlockVersionId?',
+  fullPath:
+    '/publication/:publicationId/release/:releaseVersionId/prerelease/table-tool/:dataBlockVersionId?',
+  path: 'table-tool/:dataBlockVersionId?',
   title: 'Table tool',
-  exact: true,
 };
 
 export const preReleaseNavRoutes = [

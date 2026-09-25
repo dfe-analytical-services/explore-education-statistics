@@ -9,8 +9,8 @@ import {
   useMethodologyContentState,
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import methodologyContentQueries from '@admin/queries/methodologyContentQueries';
 import permissionQueries from '@admin/queries/permissionQueries';
@@ -48,10 +48,9 @@ export const MethodologyContentPageInternal = () => {
   );
 };
 
-const MethodologyContentPage = ({
-  match,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+const MethodologyContentPage = () => {
+  const { methodologyId } =
+    useParams<MethodologyRouteParams>() as MethodologyRouteParams;
 
   const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
     useQuery(methodologyQueries.get(methodologyId));

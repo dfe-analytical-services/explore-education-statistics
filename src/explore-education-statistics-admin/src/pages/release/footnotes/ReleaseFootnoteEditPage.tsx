@@ -4,19 +4,18 @@ import FootnoteForm from '@admin/pages/release/footnotes/components/FootnoteForm
 import {
   ReleaseFootnoteRouteParams,
   releaseFootnotesRoute,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import footnoteService from '@admin/services/footnoteService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseFootnoteEditPage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseFootnoteRouteParams>) => {
-  const { publicationId, releaseVersionId, footnoteId } = match.params;
+const ReleaseFootnoteEditPage = () => {
+  const navigate = useNavigate();
+  const { publicationId, releaseVersionId, footnoteId } =
+    useParams<ReleaseFootnoteRouteParams>() as ReleaseFootnoteRouteParams;
 
   const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
     useAsyncHandledRetry(
@@ -30,13 +29,10 @@ const ReleaseFootnoteEditPage = ({
       [releaseVersionId, footnoteId],
     );
 
-  const footnotesPath = generatePath<ReleaseRouteParams>(
-    releaseFootnotesRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-    },
-  );
+  const footnotesPath = generatePath(releaseFootnotesRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+  });
 
   return (
     <>
@@ -59,7 +55,7 @@ const ReleaseFootnoteEditPage = ({
                 values,
               );
 
-              history.push(footnotesPath);
+              navigate(footnotesPath);
             }}
             cancelButton={
               <Link unvisited to={footnotesPath}>

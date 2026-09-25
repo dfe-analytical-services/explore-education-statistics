@@ -2,9 +2,7 @@ import DataFileReplacementPlan from '@admin/pages/release/data/components/DataFi
 import WarningMessage from '@common/components/WarningMessage';
 import {
   releaseDataFileReplacementCompleteRoute,
-  ReleaseDataFileReplaceRouteParams,
   releaseDataRoute,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import releaseDataFileService, {
   DataFile,
@@ -12,7 +10,7 @@ import releaseDataFileService, {
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
 const PendingDataReplacementSection: React.FC<{
   dataFileId: string;
@@ -21,7 +19,6 @@ const PendingDataReplacementSection: React.FC<{
   replacementDataFile?: DataFile;
   publicationId: string;
   releaseVersionId: string;
-  history: RouteComponentProps<ReleaseDataFileReplaceRouteParams>['history'];
 }> = ({
   dataFileId,
   replacementDataFileError,
@@ -29,8 +26,9 @@ const PendingDataReplacementSection: React.FC<{
   replacementDataFile,
   publicationId,
   releaseVersionId,
-  history,
 }) => {
+  const navigate = useNavigate();
+
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;
@@ -84,8 +82,8 @@ const PendingDataReplacementSection: React.FC<{
             releaseVersionId,
             replacementDataFile.id,
           );
-          history.push(
-            generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+          navigate(
+            generatePath(releaseDataRoute.fullPath, {
               publicationId,
               releaseVersionId,
             }),
@@ -111,15 +109,12 @@ const PendingDataReplacementSection: React.FC<{
           fileId={dataFileId}
           replacementFileId={replacementDataFile.id}
           onReplacement={() => {
-            history.push(
-              generatePath<ReleaseDataFileReplaceRouteParams>(
-                releaseDataFileReplacementCompleteRoute.path,
-                {
-                  publicationId,
-                  releaseVersionId,
-                  fileId: replacementDataFile.id,
-                },
-              ),
+            navigate(
+              generatePath(releaseDataFileReplacementCompleteRoute.fullPath, {
+                publicationId,
+                releaseVersionId,
+                fileId: replacementDataFile.id,
+              }),
             );
           }}
         />

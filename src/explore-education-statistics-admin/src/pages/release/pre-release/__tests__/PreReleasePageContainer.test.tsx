@@ -1,8 +1,6 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import PreReleasePageContainer, {
   calculatePraPeriodAdvice,
 } from '@admin/pages/release/pre-release/PreReleasePageContainer';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import { preReleaseRoute } from '@admin/routes/routes';
 import _permissionService from '@admin/services/permissionService';
 import _preReleaseService, {
@@ -11,8 +9,8 @@ import _preReleaseService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { subHours } from 'date-fns';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router';
-import { Route } from 'react-router-dom';
+import { generatePath } from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/permissionService');
 jest.mock('@admin/services/preReleaseService');
@@ -193,21 +191,15 @@ describe('PreReleasePageContainer', () => {
 
   const renderPageAndAwaitForText = async (textToWaitFor: string) => {
     render(
-      <TestConfigContextProvider>
-        <MemoryRouter
-          initialEntries={[
-            generatePath<ReleaseRouteParams>(preReleaseRoute.path, {
-              publicationId: 'publication-1',
-              releaseVersionId: 'release-1',
-            }),
-          ]}
-        >
-          <Route
-            path={preReleaseRoute.path}
-            component={PreReleasePageContainer}
-          />
-        </MemoryRouter>
-      </TestConfigContextProvider>,
+      <TestRouterRenderer
+        initialUrl={generatePath(preReleaseRoute.fullPath, {
+          publicationId: 'publication-1',
+          releaseVersionId: 'release-1',
+        })}
+        route={preReleaseRoute.fullPath}
+      >
+        <PreReleasePageContainer />
+      </TestRouterRenderer>,
     );
 
     await waitFor(() => {

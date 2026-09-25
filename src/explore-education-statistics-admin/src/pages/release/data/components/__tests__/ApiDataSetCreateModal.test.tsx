@@ -4,9 +4,8 @@ import _apiDataSetCandidateService, {
 } from '@admin/services/apiDataSetCandidateService';
 import baseRender from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
-import { createMemoryHistory, History } from 'history';
 import { ReactNode } from 'react';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/apiDataSetCandidateService');
 
@@ -156,14 +155,7 @@ describe('ApiDataSetCreateModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  function render(
-    ui: ReactNode,
-    options?: {
-      history: History;
-    },
-  ) {
-    const { history = createMemoryHistory() } = options ?? {};
-
-    return baseRender(<Router history={history}>{ui}</Router>);
+  function render(ui: ReactNode) {
+    return baseRender(<MemoryRouter>{ui}</MemoryRouter>);
   }
 });

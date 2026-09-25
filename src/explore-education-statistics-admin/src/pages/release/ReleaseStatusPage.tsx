@@ -5,16 +5,13 @@ import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
-import {
-  releasePreReleaseAccessRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releasePreReleaseAccessRoute } from '@admin/routes/releaseRoutes';
 import permissionService, {
   ReleaseStatusPermissions,
 } from '@admin/services/permissionService';
 import releaseVersionService, {
-  ReleaseVersionStageStatus,
   ReleaseStatus,
+  ReleaseVersionStageStatus,
 } from '@admin/services/releaseVersionService';
 import Button from '@common/components/Button';
 import FormattedDate from '@common/components/FormattedDate';
@@ -30,7 +27,7 @@ import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
-import { parseISO, isAfter, isBefore } from 'date-fns';
+import { isAfter, isBefore, parseISO } from 'date-fns';
 import React from 'react';
 import { generatePath, useLocation } from 'react-router';
 
@@ -237,13 +234,10 @@ export default function ReleaseStatusPage() {
           If you are wanting to add additional emails to pre-release access, you
           can do this without changing the release status on the{' '}
           <Link
-            to={generatePath<ReleaseRouteParams>(
-              releasePreReleaseAccessRoute.path,
-              {
-                publicationId: releaseVersion.publicationId,
-                releaseVersionId,
-              },
-            )}
+            to={generatePath(releasePreReleaseAccessRoute.fullPath, {
+              publicationId: releaseVersion.publicationId,
+              releaseVersionId,
+            })}
           >
             pre-release tab
           </Link>

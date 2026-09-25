@@ -8,9 +8,11 @@ import _publicationService, {
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/publicationService');
 
@@ -158,12 +160,15 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 
   test('handles successful form submission', async () => {
-    const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
     );
     const { user } = render(
-      <Router history={history}>
+      <TestRouterRenderer
+        initialUrl="/"
+        route="/"
+        routes={[publicationMethodologiesRoute.fullPath]}
+      >
         <PublicationContextProvider
           publication={testPublication}
           onPublicationChange={noop}
@@ -171,7 +176,7 @@ describe('PublicationAdoptMethodologyPage', () => {
         >
           <PublicationAdoptMethodologyPage />
         </PublicationContextProvider>
-      </Router>,
+      </TestRouterRenderer>,
     );
 
     await screen.findByLabelText('Search for a published methodology');
@@ -187,18 +192,19 @@ describe('PublicationAdoptMethodologyPage', () => {
       );
     });
 
-    expect(history.location.pathname).toBe(
-      `/publication/publication-1/methodologies`,
-    );
+    await expectLocation(`/publication/publication-1/methodologies`);
   });
 
   test('handles clicking the cancel button', async () => {
-    const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
     );
     const { user } = render(
-      <Router history={history}>
+      <TestRouterRenderer
+        initialUrl="/"
+        route="/"
+        routes={[publicationMethodologiesRoute.fullPath]}
+      >
         <PublicationContextProvider
           publication={testPublication}
           onPublicationChange={noop}
@@ -206,7 +212,7 @@ describe('PublicationAdoptMethodologyPage', () => {
         >
           <PublicationAdoptMethodologyPage />
         </PublicationContextProvider>
-      </Router>,
+      </TestRouterRenderer>,
     );
 
     await waitFor(() =>
@@ -219,9 +225,7 @@ describe('PublicationAdoptMethodologyPage', () => {
 
     expect(publicationService.adoptMethodology).not.toHaveBeenCalled();
 
-    expect(history.location.pathname).toBe(
-      `/publication/publication-1/methodologies`,
-    );
+    await expectLocation(`/publication/publication-1/methodologies`);
   });
 });
 

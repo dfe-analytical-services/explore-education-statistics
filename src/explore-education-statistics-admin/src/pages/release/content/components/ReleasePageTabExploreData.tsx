@@ -4,10 +4,7 @@ import ReleasePageTabPanel from '@admin/pages/release/content/components/Release
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 import releaseContentQueries from '@admin/queries/releaseContentQueries';
-import {
-  preReleaseTableToolRoute,
-  PreReleaseTableToolRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseTableToolRoute } from '@admin/routes/preReleaseRoutes';
 import releaseFileService from '@admin/services/releaseFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
@@ -112,14 +109,11 @@ const ReleasePageTabExploreData = ({
               <Link
                 to={
                   isPra
-                    ? generatePath<PreReleaseTableToolRouteParams>(
-                        preReleaseTableToolRoute.path,
-                        {
-                          publicationId: publication.id,
-                          releaseVersionId: release.id,
-                          dataBlockVersionId: featuredTable.dataBlockVersionId,
-                        },
-                      )
+                    ? generatePath(preReleaseTableToolRoute.fullPath, {
+                        publicationId: publication.id,
+                        releaseVersionId: release.id,
+                        dataBlockVersionId: featuredTable.dataBlockVersionId,
+                      })
                     : `${publicAppUrl}/data-tables/fast-track/${featuredTable.dataBlockId}`
                 }
               >

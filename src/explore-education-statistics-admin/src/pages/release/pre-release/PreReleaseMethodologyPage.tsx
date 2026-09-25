@@ -2,22 +2,21 @@ import Link from '@admin/components/Link';
 import { MethodologyContentPageInternal } from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
 import { MethodologyContentProvider } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import {
-  PreReleaseMethodologyRouteParams,
   preReleaseMethodologiesRoute,
+  PreReleaseMethodologyRouteParams,
 } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import methodologyContentQueries from '@admin/queries/methodologyContentQueries';
+import { useParams } from 'react-router-dom';
 
-const PreReleaseMethodologyPage = ({
-  match,
-}: RouteComponentProps<PreReleaseMethodologyRouteParams>) => {
-  const { methodologyId, publicationId, releaseVersionId } = match.params;
+const PreReleaseMethodologyPage = () => {
+  const { methodologyId, publicationId, releaseVersionId } =
+    useParams<PreReleaseMethodologyRouteParams>() as PreReleaseMethodologyRouteParams;
 
   const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
     useQuery(methodologyQueries.get(methodologyId));
@@ -33,13 +32,10 @@ const PreReleaseMethodologyPage = ({
         <Link
           back
           className="govuk-!-margin-bottom-6"
-          to={generatePath<ReleaseRouteParams>(
-            preReleaseMethodologiesRoute.path,
-            {
-              publicationId,
-              releaseVersionId,
-            },
-          )}
+          to={generatePath(preReleaseMethodologiesRoute.fullPath, {
+            publicationId,
+            releaseVersionId,
+          })}
         >
           Back
         </Link>

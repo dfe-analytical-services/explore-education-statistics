@@ -1,5 +1,4 @@
 import React from 'react';
-import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 import StepNav from './components/StepByStep';
@@ -16,7 +15,7 @@ import imageCreateReleaseDatablockSaved from './images/guidance/guidance-datablo
 import imageCreateReleaseManageContent from './images/guidance/guidance-content-edit.png';
 import imageSelectTheme from './images/guidance/guidance-publication-select-theme.png';
 
-const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
+const DocumentationCreateNewRelease = () => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 
