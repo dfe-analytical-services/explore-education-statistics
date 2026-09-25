@@ -14,6 +14,13 @@ type PublisherConfig = {
 
   @description('The time zone used for evaluating Cron expressions of the functions running with Cron triggers.')
   functionAppTimeZone: string?
+
+  @description('''
+  Whether the Publisher is allowed to purge superseded all-files ZIPs from Azure Front Door. Enable per
+  environment only after the Front Door role assignment granting the Publisher purge permissions has been
+  deployed.
+  ''')
+  frontDoorCachePurgeEnabled: bool?
 }
 
 var defaultConfig = {
@@ -24,6 +31,7 @@ var defaultConfig = {
   prepareScheduledReleaseVersionsNowEnabled: false
   publishScheduledReleaseVersionsNowEnabled: false
   functionAppTimeZone: 'GMT Standard Time'
+  frontDoorCachePurgeEnabled: false
 }
 
 @export()

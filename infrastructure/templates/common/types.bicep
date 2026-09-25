@@ -10,6 +10,9 @@ type FirewallRule = {
   cidr: string
   priority: int
   tag: string
+
+  @description('Optional header matches that must also be satisfied for this rule to allow a request.')
+  headers: object?
 }
 
 @export()

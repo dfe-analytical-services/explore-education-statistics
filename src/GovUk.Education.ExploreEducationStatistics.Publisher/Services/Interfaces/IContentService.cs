@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IContentService
 {
-    Task DeletePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds);
+    Task InvalidatePreviousVersionsDownloadFiles(IReadOnlyList<Guid> releaseVersionIds);
 
     Task DeletePreviousVersionsContent(IReadOnlyList<Guid> releaseVersionIds);
 
