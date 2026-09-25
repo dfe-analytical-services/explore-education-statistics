@@ -328,23 +328,18 @@ export default function ReleaseApiDataSetDetailsPage() {
       )}`
     : '';
 
-  const incompletesFound =
-    dataSet?.draftVersion?.mappingStatus &&
-    (!dataSet.draftVersion.mappingStatus.filtersComplete ||
-      !dataSet.draftVersion.mappingStatus.locationsComplete);
-
   const majorVersionErrorSummary = (
     <InsetText variant="error">
       <h2 className="govuk-error-summary__title" id="error-summary-title">
-        {incompletesFound
-          ? 'This API data set can not be published because location, filter or indicator mappings are not yet complete.'
+        {mappingActionsRequired
+          ? 'This API data set can not be published until mapping has been completed.'
           : 'This API data set can not be published because it has major changes that are not allowed.'}
       </h2>
       <div className="govuk-error-summary__body">
         <ul className="govuk-list govuk-error-summary__list">
           <li>
-            {incompletesFound
-              ? 'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location or filter manual mapping.'
+            {mappingActionsRequired
+              ? 'The data file uploaded has not been able to be fully auto mapped and as a result has incomplete location, filter or indicator manual mapping.'
               : 'The data file uploaded has resulted in a major version update which is not allowed in release amendments. Major version type changes can only be made as part of new releases.'}
           </li>
           <li>
