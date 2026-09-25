@@ -40,6 +40,7 @@ public class SubjectMetaService(
     ILocationRepository locationRepository,
     ILogger<SubjectMetaService> logger,
     IObservationService observationService,
+    IParquetV1QueryService parquetV1QueryService,
     ITimePeriodService timePeriodService,
     IUserService userService,
     IOptions<LocationsOptions> locationOptions
@@ -180,6 +181,28 @@ public class SubjectMetaService(
             {
                 var stopwatch = Stopwatch.StartNew();
 
+                var dataFile = await contentDbContext
+                    .ReleaseFiles.Where(rf =>
+                        rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
+                        && rf.File.SubjectId == releaseSubject.SubjectId
+                        && rf.File.Type == FileType.Data
+                    )
+                    .Select(rf => rf.File)
+                    .SingleOrDefaultAsync(cancellationToken);
+
+                if (dataFile?.HasParquet == true)
+                {
+                    var parquetTimePeriods = await parquetV1QueryService.ListTimePeriods(
+                        dataFile,
+                        request.LocationIds,
+                        cancellationToken
+                    );
+
+                    logger.LogTrace("Got Time Periods from Parquet in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+
+                    return new SubjectMetaViewModel { TimePeriod = BuildTimePeriodsViewModels(parquetTimePeriods) };
+                }
+
                 var observations = statisticsDbContext
                     .Observation.AsNoTracking()
                     .Where(o =>
@@ -206,18 +229,34 @@ public class SubjectMetaService(
                     )
                     .SingleAsync(cancellationToken: cancellationToken);
 
-                var matchingObservationsTable = await observationService.GetMatchedObservations(
-                    request.AsFullTableQuery(),
-                    cancellationToken
-                );
-                logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
+                IEnumerable<FilterItem> filterItems;
 
-                var filterItems = await filterItemRepository.GetFilterItemsFromMatchedObservationIds(
-                    request.SubjectId,
-                    matchingObservationsTable,
-                    cancellationToken
-                );
+                if (releaseFile.File.HasParquet)
+                {
+                    filterItems = await parquetV1QueryService.ListFilterItems(
+                        releaseFile.File,
+                        request.AsFullTableQuery(),
+                        cancellationToken
+                    );
+                    logger.LogTrace("Got Filter Items from Parquet in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+                }
+                else
+                {
+                    var matchingObservationsTable = await observationService.GetMatchedObservations(
+                        request.AsFullTableQuery(),
+                        cancellationToken
+                    );
+                    logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    filterItems = await filterItemRepository.GetFilterItemsFromMatchedObservationIds(
+                        request.SubjectId,
+                        matchingObservationsTable,
+                        cancellationToken
+                    );
+                }
+
                 var filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,
                     releaseFile.FilterSequence

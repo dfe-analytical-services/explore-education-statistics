@@ -380,6 +380,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Section));
         services.Configure<ReleaseApprovalOptions>(configuration.GetRequiredSection(ReleaseApprovalOptions.Section));
         services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.Section));
+        services.Configure<DataFilesOptions>(configuration.GetSection(DataFilesOptions.Section));
         services.Configure<OpenIdConnectSpaClientOptions>(
             configuration.GetSection(OpenIdConnectSpaClientOptions.Section)
         );
@@ -641,6 +642,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             locationRepository: provider.GetRequiredService<ILocationRepository>(),
             logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
             observationService: provider.GetRequiredService<IObservationService>(),
+            parquetV1QueryService: provider.GetRequiredService<IParquetV1QueryService>(),
             timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
             userService: provider.GetRequiredService<IUserService>(),
             locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
@@ -654,6 +656,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IDataSetValidator, DataSetValidator>();
         services.AddTransient<IFileValidatorService, FileValidatorService>();
         services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+        services.AddSingleton<IDataFilesPathResolver>(provider => new DataFilesPathResolver(
+            basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
+        ));
+        services.AddTransient<IParquetV1QueryService, ParquetV1QueryService>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddTransient<IPrivateBlobStorageService, PrivateBlobStorageService>(
             provider => new PrivateBlobStorageService(

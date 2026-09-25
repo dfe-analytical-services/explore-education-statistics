@@ -1,12 +1,12 @@
 using System.Reflection;
 using Dapper;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -56,65 +56,56 @@ public class DataSetParquetServiceTests
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(PrivateReleaseFiles, file.Path(), csvPath);
 
-        var uploadedParquet = new MemoryStream();
-        privateBlobStorageService
-            .Setup(s =>
-                s.UploadStream(
-                    PrivateReleaseFiles,
-                    file.ParquetV1Path(),
-                    It.IsAny<Stream>(),
-                    ContentTypes.Parquet,
-                    null,
-                    default
-                )
-            )
-            .Callback<IBlobContainer, string, Stream, string, string?, CancellationToken>(
-                (_, _, stream, _, _, _) => stream.CopyTo(uploadedParquet)
-            )
-            .Returns(Task.CompletedTask);
+        var dataFilesDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var parquetPath = Path.Combine(dataFilesDirectory, "data", $"{file.Id}.parquet");
+
+        var dataFilesPathResolver = new Mock<IDataFilesPathResolver>(Strict);
+        dataFilesPathResolver.Setup(s => s.ParquetV1Path(file)).Returns(parquetPath);
 
         var service = new DataSetParquetService(
             Mock.Of<ILogger<DataSetParquetService>>(),
             privateBlobStorageService.Object,
+            dataFilesPathResolver.Object,
             new InMemoryDbContextSupplier(contentDbContextId: contentDbContextId)
         );
 
-        await service.WriteParquetV1File(import);
-
-        VerifyAllMocks(privateBlobStorageService);
-
-        var csvLines = await System.IO.File.ReadAllLinesAsync(csvPath);
-        var expectedColumns = csvLines[0].Split(',');
-        var expectedRows = csvLines.Skip(1).Select(line => line.Split(',')).ToList();
-
-        var parquetPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.parquet");
-        await System.IO.File.WriteAllBytesAsync(parquetPath, uploadedParquet.ToArray());
-
         try
         {
-            await using var duckDbConnection = new DuckDbConnection();
-            var parquetRows = (await duckDbConnection.QueryAsync($"SELECT * FROM read_parquet('{parquetPath}')"))
-                .Cast<IDictionary<string, object>>()
-                .ToList();
+            await service.WriteParquetV1File(import);
 
-            Assert.Equal(expectedRows.Count, parquetRows.Count);
+            VerifyAllMocks(privateBlobStorageService, dataFilesPathResolver);
 
-            foreach (var (expectedRow, parquetRow) in expectedRows.Zip(parquetRows))
+            Assert.True(System.IO.File.Exists(parquetPath));
+
+            var csvLines = await System.IO.File.ReadAllLinesAsync(csvPath);
+            var expectedColumns = csvLines[0].Split(',');
+            var expectedRows = csvLines.Skip(1).Select(line => line.Split(',')).ToList();
+
+            await using (var duckDbConnection = new DuckDbConnection())
             {
-                Assert.Equal(expectedColumns, parquetRow.Keys);
-                Assert.Equal(expectedRow, parquetRow.Values.Select(value => (string)value));
+                var parquetRows = (await duckDbConnection.QueryAsync($"SELECT * FROM read_parquet('{parquetPath}')"))
+                    .Cast<IDictionary<string, object>>()
+                    .ToList();
+
+                Assert.Equal(expectedRows.Count, parquetRows.Count);
+
+                foreach (var (expectedRow, parquetRow) in expectedRows.Zip(parquetRows))
+                {
+                    Assert.Equal(expectedColumns, parquetRow.Keys);
+                    Assert.Equal(expectedRow, parquetRow.Values.Select(value => (string)value));
+                }
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var updatedFile = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
+                Assert.True(updatedFile.HasParquet);
+                Assert.Equal(DataStorageVersion.StatsDB, updatedFile.DataStorageVersion);
             }
         }
         finally
         {
-            System.IO.File.Delete(parquetPath);
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var updatedFile = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
-            Assert.True(updatedFile.HasParquet);
-            Assert.Equal(DataStorageVersion.StatsDB, updatedFile.DataStorageVersion);
+            Directory.Delete(dataFilesDirectory, recursive: true);
         }
     }
 }

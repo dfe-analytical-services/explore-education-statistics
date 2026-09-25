@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
@@ -69,8 +71,12 @@ var host = new HostBuilder()
                 .AddSingleton<IDatabaseHelper, DatabaseHelper>()
                 .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
                 .AddSingleton<IDbContextSupplier, DbContextSupplier>()
+                .AddSingleton<IDataFilesPathResolver>(provider => new DataFilesPathResolver(
+                    basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
+                ))
                 .AddSingleton<DateTimeProvider>()
-                .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section));
+                .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section))
+                .Configure<DataFilesOptions>(hostContext.Configuration.GetSection(DataFilesOptions.Section));
         }
     )
     .Build();

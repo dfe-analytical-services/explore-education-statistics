@@ -3,6 +3,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public class FilterItem : IEquatable<FilterItem>
 {
+    public const string NotSpecifiedFilterItemLabel = "Not specified";
+
     public Guid Id { get; set; }
     public string Label { get; set; } = string.Empty;
     public FilterGroup FilterGroup { get; set; } = null!;

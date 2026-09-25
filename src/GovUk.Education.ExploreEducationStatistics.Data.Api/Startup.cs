@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -40,6 +41,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
 using Newtonsoft.Json;
@@ -133,6 +135,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
+        services.Configure<DataFilesOptions>(Configuration.GetSection(DataFilesOptions.Section));
 
         services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
         services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
@@ -160,6 +163,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
+        services.AddSingleton<IDataFilesPathResolver>(provider => new DataFilesPathResolver(
+            basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
+        ));
+        services.AddTransient<IParquetV1QueryService, ParquetV1QueryService>();
         services.AddTransient<IFilterItemRepository, FilterItemRepository>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,

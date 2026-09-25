@@ -36,6 +36,7 @@ public class TableBuilderService : ITableBuilderService
     private readonly ContentDbContext _contentDbContext;
     private readonly ILocationService _locationService;
     private readonly IObservationService _observationService;
+    private readonly IParquetV1QueryService _parquetV1QueryService;
     private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly ISubjectResultMetaService _subjectResultMetaService;
     private readonly ISubjectCsvMetaService _subjectCsvMetaService;
@@ -50,6 +51,7 @@ public class TableBuilderService : ITableBuilderService
         ContentDbContext contentDbContext,
         ILocationService locationService,
         IObservationService observationService,
+        IParquetV1QueryService parquetV1QueryService,
         IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
         ISubjectResultMetaService subjectResultMetaService,
         ISubjectCsvMetaService subjectCsvMetaService,
@@ -64,6 +66,7 @@ public class TableBuilderService : ITableBuilderService
         _contentDbContext = contentDbContext;
         _locationService = locationService;
         _observationService = observationService;
+        _parquetV1QueryService = parquetV1QueryService;
         _statisticsPersistenceHelper = statisticsPersistenceHelper;
         _subjectResultMetaService = subjectResultMetaService;
         _subjectCsvMetaService = subjectCsvMetaService;
@@ -91,7 +94,7 @@ public class TableBuilderService : ITableBuilderService
     {
         return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccess(() => ListQueryObservations(query, cancellationToken))
+            .OnSuccess(() => ListQueryObservations(releaseVersionId, query, cancellationToken))
             .OnSuccess(async queryObservations =>
             {
                 var (observations, isCroppedTable) = queryObservations;
@@ -125,7 +128,7 @@ public class TableBuilderService : ITableBuilderService
     {
         return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccess(() => ListQueryObservations(query, cancellationToken))
+            .OnSuccess(() => ListQueryObservations(releaseVersionId, query, cancellationToken))
             .OnSuccess(async queryObservations =>
             {
                 var (observations, _) = queryObservations;
@@ -183,6 +186,7 @@ public class TableBuilderService : ITableBuilderService
     }
 
     private async Task<Either<ActionResult, (List<Observation>, bool)>> ListQueryObservations(
+        Guid releaseVersionId,
         FullTableQuery query,
         CancellationToken cancellationToken = default
     )
@@ -190,11 +194,38 @@ public class TableBuilderService : ITableBuilderService
         return await PrepareObservationQuery(query, cancellationToken)
             .OnSuccess(async preparedQuery =>
             {
-                var observationsQuery = await BuildMatchedObservationsQuery(preparedQuery.Query, cancellationToken);
-                var observations = await observationsQuery.ToListAsync(cancellationToken);
+                var observations = await ListObservations(releaseVersionId, preparedQuery.Query, cancellationToken);
 
                 return (observations, preparedQuery.RequiresCropping);
             });
+    }
+
+    /// <summary>
+    /// Lists the observations matching the query, reading them from the data file's Parquet copy where one exists
+    /// and otherwise from the statistics database.
+    /// </summary>
+    private async Task<List<Observation>> ListObservations(
+        Guid releaseVersionId,
+        FullTableQuery query,
+        CancellationToken cancellationToken
+    )
+    {
+        var dataFile = await _contentDbContext
+            .ReleaseFiles.Where(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.SubjectId == query.SubjectId
+                && rf.File.Type == FileType.Data
+            )
+            .Select(rf => rf.File)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (dataFile?.HasParquet == true)
+        {
+            return (await _parquetV1QueryService.ListObservations(dataFile, query, cancellationToken)).ToList();
+        }
+
+        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
+        return await observationsQuery.ToListAsync(cancellationToken);
     }
 
     /// <summary>

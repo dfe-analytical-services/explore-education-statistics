@@ -170,6 +170,7 @@ public class SubjectMetaServicePermissionTests
         IIndicatorGroupRepository? indicatorGroupRepository = null,
         ILocationRepository? locationRepository = null,
         IObservationService? observationService = null,
+        IParquetV1QueryService? parquetV1QueryService = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
         IOptions<LocationsOptions>? options = null
@@ -186,6 +187,7 @@ public class SubjectMetaServicePermissionTests
             locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             Mock.Of<ILogger<SubjectMetaService>>(),
             observationService ?? Mock.Of<IObservationService>(Strict),
+            parquetV1QueryService ?? Mock.Of<IParquetV1QueryService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService ?? Mock.Of<IUserService>(),
             options ?? DefaultLocationOptions()

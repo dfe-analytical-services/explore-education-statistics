@@ -15,8 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 /// </summary>
 public class FilterAndIndicatorValuesReader
 {
-    private const string NotSpecifiedFilterItemLabel = "Not specified";
-
     private readonly Dictionary<Guid, int> _indicatorColumnIndexes;
     private readonly Dictionary<Guid, int> _filterColumnIndexes;
     private readonly Dictionary<Guid, int> _filterGroupColumnIndexes;
@@ -60,10 +58,10 @@ public class FilterAndIndicatorValuesReader
 
         if (columnIndex == -1)
         {
-            return NotSpecifiedFilterItemLabel;
+            return FilterItem.NotSpecifiedFilterItemLabel;
         }
 
-        return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? NotSpecifiedFilterItemLabel;
+        return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? FilterItem.NotSpecifiedFilterItemLabel;
     }
 
     public string GetFilterGroupLabel(IReadOnlyList<string> rowValues, Guid filterId)

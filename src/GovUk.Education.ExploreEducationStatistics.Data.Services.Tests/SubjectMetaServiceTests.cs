@@ -991,6 +991,229 @@ public class SubjectMetaServiceTests
     }
 
     [Fact]
+    public async Task FilterSubjectMeta_TimePeriods_Parquet()
+    {
+        var subject = new Subject { Id = Guid.NewGuid() };
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            SubjectId = subject.Id,
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new Content.Model.ReleaseVersion
+            {
+                Id = releaseSubject.ReleaseVersion.Id,
+                Published = DateTimeOffset.UtcNow,
+            },
+            File = new File
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Type = FileType.Data,
+                HasParquet = true,
+            },
+        };
+
+        var request = new LocationsOrTimePeriodsQueryRequest
+        {
+            SubjectId = releaseSubject.SubjectId,
+            LocationIds = ListOf(Guid.NewGuid(), Guid.NewGuid()),
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var cancellationToken = new CancellationTokenSource().Token;
+
+            var parquetV1QueryService = new Mock<IParquetV1QueryService>(MockBehavior.Strict);
+
+            parquetV1QueryService
+                .Setup(s =>
+                    s.ListTimePeriods(
+                        It.Is<File>(file => file.Id == releaseFile.FileId),
+                        request.LocationIds,
+                        cancellationToken
+                    )
+                )
+                .ReturnsAsync(
+                    new List<(int Year, TimeIdentifier TimeIdentifier)>
+                    {
+                        (2012, TimeIdentifier.April),
+                        (2012, TimeIdentifier.May),
+                    }
+                );
+
+            var service = BuildSubjectMetaService(
+                statisticsDbContext,
+                contentDbContext: contentDbContext,
+                parquetV1QueryService: parquetV1QueryService.Object
+            );
+
+            var result = (
+                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
+            ).AssertRight();
+
+            VerifyAllMocks(parquetV1QueryService);
+
+            Assert.Empty(result.Locations);
+            Assert.Empty(result.Filters);
+            Assert.Empty(result.Indicators);
+
+            var periods = result.TimePeriod.Options.ToList();
+            Assert.Equal(2, periods.Count);
+            Assert.Equal(2012, periods[0].Year);
+            Assert.Equal(TimeIdentifier.April, periods[0].Code);
+            Assert.Equal(2012, periods[1].Year);
+            Assert.Equal(TimeIdentifier.May, periods[1].Code);
+        }
+    }
+
+    [Fact]
+    public async Task FilterSubjectMeta_FiltersAndIndicators_Parquet()
+    {
+        var subject = new Subject { Id = Guid.NewGuid() };
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            SubjectId = subject.Id,
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new Content.Model.ReleaseVersion
+            {
+                Id = releaseSubject.ReleaseVersion.Id,
+                Published = DateTimeOffset.UtcNow,
+            },
+            File = new File
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Type = FileType.Data,
+                HasParquet = true,
+                FilterHierarchies = null,
+            },
+        };
+
+        var request = new LocationsOrTimePeriodsQueryRequest
+        {
+            SubjectId = releaseSubject.SubjectId,
+            LocationIds = ListOf(Guid.NewGuid()),
+            TimePeriod = new TimePeriodQuery
+            {
+                StartYear = 2012,
+                StartCode = TimeIdentifier.AcademicYear,
+                EndYear = 2012,
+                EndCode = TimeIdentifier.AcademicYear,
+            },
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var cancellationToken = new CancellationTokenSource().Token;
+
+            var filter = new Filter
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = releaseSubject.SubjectId,
+                Label = "Filter 1",
+            };
+            filter.FilterGroups = CreateFilterGroups(filter, 2);
+
+            var filterItems = filter.FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+
+            var parquetV1QueryService = new Mock<IParquetV1QueryService>(MockBehavior.Strict);
+
+            parquetV1QueryService
+                .Setup(s =>
+                    s.ListFilterItems(
+                        It.Is<File>(file => file.Id == releaseFile.FileId),
+                        It.Is<FullTableQuery>(query => query.Equals(request.AsFullTableQuery())),
+                        cancellationToken
+                    )
+                )
+                .ReturnsAsync(filterItems);
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            var indicatorGroup = new IndicatorGroup
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator Group 1",
+                Indicators = ListOf(
+                    new Indicator
+                    {
+                        Id = Guid.NewGuid(),
+                        Unit = IndicatorUnit.Percent,
+                        Label = "Indicator 1",
+                    }
+                ),
+            };
+
+            indicatorGroupRepository
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(ListOf(indicatorGroup));
+
+            var service = BuildSubjectMetaService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                parquetV1QueryService: parquetV1QueryService.Object,
+                indicatorGroupRepository: indicatorGroupRepository.Object
+            );
+
+            var result = (
+                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
+            ).AssertRight();
+
+            VerifyAllMocks(indicatorGroupRepository, parquetV1QueryService);
+
+            result.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
+            Assert.Empty(result.Locations);
+
+            var filterViewModel = Assert.Single(result.Filters).Value;
+            Assert.Equal(filter.Id, filterViewModel.Id);
+            var filterGroupViewModel = Assert.Single(filterViewModel.Options).Value;
+            Assert.Equal(filter.FilterGroups[0].Id, filterGroupViewModel.Id);
+            Assert.Equal(filterItems.Select(fi => fi.Id), filterGroupViewModel.Options.Select(option => option.Value));
+
+            var indicatorGroupViewModel = Assert.Single(result.Indicators).Value;
+            Assert.Equal(indicatorGroup.Id, indicatorGroupViewModel.Id);
+            Assert.Equal(indicatorGroup.Indicators[0].Id, Assert.Single(indicatorGroupViewModel.Options).Value);
+
+            Assert.Null(result.FilterHierarchies);
+        }
+    }
+
+    [Fact]
     public async Task UpdateSubjectFilters()
     {
         var subject = new Subject { Id = Guid.NewGuid() };
@@ -2525,6 +2748,7 @@ public class SubjectMetaServiceTests
         IIndicatorGroupRepository? indicatorGroupRepository = null,
         ILocationRepository? locationRepository = null,
         IObservationService? observationService = null,
+        IParquetV1QueryService? parquetV1QueryService = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
         IOptions<LocationsOptions>? options = null
@@ -2543,6 +2767,7 @@ public class SubjectMetaServiceTests
             locationRepository ?? Mock.Of<ILocationRepository>(MockBehavior.Strict),
             Mock.Of<ILogger<SubjectMetaService>>(),
             observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
+            parquetV1QueryService ?? Mock.Of<IParquetV1QueryService>(MockBehavior.Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
             userService ?? AlwaysTrueUserService().Object,
             options ?? DefaultLocationOptions()
