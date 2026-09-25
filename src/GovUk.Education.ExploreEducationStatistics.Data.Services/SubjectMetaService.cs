@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
@@ -30,17 +28,11 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class SubjectMetaService(
-    StatisticsDbContext statisticsDbContext,
     ContentDbContext contentDbContext,
     IBlobCacheService cacheService,
     IReleaseSubjectService releaseSubjectService,
-    IFilterRepository filterRepository,
-    IFilterItemRepository filterItemRepository,
-    IIndicatorGroupRepository indicatorGroupRepository,
-    ILocationRepository locationRepository,
+    IStorageDataSetResolver storageDataSetResolver,
     ILogger<SubjectMetaService> logger,
-    IObservationService observationService,
-    ITimePeriodService timePeriodService,
     IUserService userService,
     IOptions<LocationsOptions> locationOptions
 ) : ISubjectMetaService
@@ -75,16 +67,18 @@ public class SubjectMetaService(
                     )
                     .SingleAsync();
 
+                var dataSet = await storageDataSetResolver.Resolve(releaseSubject.SubjectId);
+
                 return new SubjectMetaViewModel
                 {
-                    Filters = await GetFilters(releaseSubject.SubjectId, releaseFile.FilterSequence),
+                    Filters = await GetFilters(dataSet, releaseFile.FilterSequence),
                     Indicators = await GetIndicators(
-                        releaseSubject.SubjectId,
+                        dataSet,
                         releaseFile.IndicatorSequence,
                         releaseFile.PairedIndicators
                     ),
-                    Locations = await GetLocations(releaseSubject.SubjectId),
-                    TimePeriod = await GetTimePeriods(releaseSubject.SubjectId),
+                    Locations = await GetLocations(dataSet),
+                    TimePeriod = BuildTimePeriodsViewModels(await dataSet.ListTimePeriods()),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                 };
             });
@@ -116,7 +110,11 @@ public class SubjectMetaService(
                 && rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
             )
-            .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
+            .OnSuccessDo(async () =>
+            {
+                var dataSet = await storageDataSetResolver.Resolve(subjectId);
+                return await ValidateFiltersForSubject(dataSet, request);
+            })
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of filters, filter groups and indicators observed
@@ -176,6 +174,8 @@ public class SubjectMetaService(
         var subjectMetaStep =
             request.TimePeriod == null ? SubjectMetaQueryStep.GetTimePeriods : SubjectMetaQueryStep.GetFilterItems;
 
+        var dataSet = await storageDataSetResolver.Resolve(request.SubjectId, cancellationToken);
+
         // Only data relevant to the step being executed in the table tool needs to be returned, so only the
         // minimum requisite DB calls for the task are performed.
         switch (subjectMetaStep)
@@ -184,17 +184,11 @@ public class SubjectMetaService(
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                var observations = statisticsDbContext
-                    .Observation.AsNoTracking()
-                    .Where(o =>
-                        o.SubjectId == request.SubjectId && EF.Constant(request.LocationIds).Contains(o.LocationId)
-                    );
-
-                var timePeriods = await GetTimePeriods(observations);
+                var timePeriods = await dataSet.ListTimePeriods(request.LocationIds, cancellationToken);
 
                 logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
-                return new SubjectMetaViewModel { TimePeriod = timePeriods };
+                return new SubjectMetaViewModel { TimePeriod = BuildTimePeriodsViewModels(timePeriods) };
             }
 
             case SubjectMetaQueryStep.GetFilterItems:
@@ -210,18 +204,7 @@ public class SubjectMetaService(
                     )
                     .SingleAsync(cancellationToken: cancellationToken);
 
-                var matchingObservationsTable = await observationService.GetMatchedObservations(
-                    request.AsFullTableQuery(),
-                    cancellationToken
-                );
-                logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-
-                var filterItems = await filterItemRepository.GetFilterItemsFromMatchedObservationIds(
-                    request.SubjectId,
-                    matchingObservationsTable,
-                    cancellationToken
-                );
+                var filterItems = await dataSet.ListFilterItemsForQuery(request.AsFullTableQuery(), cancellationToken);
                 var filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,
                     releaseFile.FilterSequence
@@ -230,7 +213,7 @@ public class SubjectMetaService(
                 stopwatch.Restart();
 
                 var indicators = await GetIndicators(
-                    releaseSubject.SubjectId,
+                    dataSet,
                     releaseFile.IndicatorSequence,
                     releaseFile.PairedIndicators
                 );
@@ -251,30 +234,18 @@ public class SubjectMetaService(
         }
     }
 
-    private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(
-        Guid subjectId,
+    private static async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(
+        IStorageDataSet dataSet,
         List<FilterSequenceEntry>? filterSequence
     )
     {
-        var filters = await filterRepository.GetFiltersIncludingItems(subjectId);
+        var filters = await dataSet.ListFilters();
         return FiltersMetaViewModelBuilder.BuildFilters(filters, filterSequence);
     }
 
-    private async Task<TimePeriodsMetaViewModel> GetTimePeriods(Guid subjectId)
+    private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(IStorageDataSet dataSet)
     {
-        var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
-        return BuildTimePeriodsViewModels(timePeriods);
-    }
-
-    private async Task<TimePeriodsMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)
-    {
-        var timePeriods = await timePeriodService.GetTimePeriods(observations);
-        return BuildTimePeriodsViewModels(timePeriods);
-    }
-
-    private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
-    {
-        var locations = await locationRepository.GetDistinctForSubject(subjectId);
+        var locations = await dataSet.ListLocations();
         var locationViewModels = BuildLocationAttributeViewModels(locations, _locationOptions.Hierarchies);
 
         return locationViewModels.ToDictionary(
@@ -308,13 +279,13 @@ public class SubjectMetaService(
             .ToList();
     }
 
-    private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(
-        Guid subjectId,
+    private static async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(
+        IStorageDataSet dataSet,
         List<IndicatorGroupSequenceEntry>? indicatorSequence,
         List<PairedIndicatorEntry>? pairedIndicators
     )
     {
-        var indicators = await indicatorGroupRepository.GetIndicatorGroups(subjectId);
+        var indicators = await dataSet.ListIndicatorGroups();
         return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators, indicatorSequence, pairedIndicators);
     }
 
@@ -337,11 +308,11 @@ public class SubjectMetaService(
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(
-        Guid subjectId,
+        IStorageDataSet dataSet,
         List<FilterUpdateViewModel> requestFilters
     )
     {
-        var filters = await filterRepository.GetFiltersIncludingItems(subjectId);
+        var filters = await dataSet.ListFilters();
         return AssertCollectionsAreSameIgnoringOrder(
                 filters,
                 requestFilters,
@@ -390,7 +361,8 @@ public class SubjectMetaService(
         List<IndicatorGroupUpdateViewModel> requestIndicatorGroups
     )
     {
-        var indicatorGroups = await indicatorGroupRepository.GetIndicatorGroups(subjectId);
+        var dataSet = await storageDataSetResolver.Resolve(subjectId);
+        var indicatorGroups = await dataSet.ListIndicatorGroups();
         return AssertCollectionsAreSameIgnoringOrder(
                 indicatorGroups,
                 requestIndicatorGroups,

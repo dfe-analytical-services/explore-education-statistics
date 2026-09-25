@@ -6,8 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
@@ -17,7 +15,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -139,17 +136,12 @@ public class SubjectMetaServicePermissionTests
                 contextDbContext.ReleaseFiles.Add(ReleaseFile);
                 await contextDbContext.SaveChangesAsync();
 
-                await using var statisticsDbContext = InMemoryStatisticsDbContext();
-                statisticsDbContext.ReleaseSubject.Add(ReleaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-
                 var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
 
                 releaseSubjectService.Setup(s => s.Find(SubjectId, null)).ReturnsAsync(ReleaseSubject);
 
                 var service = SetupService(
                     userService: userService.Object,
-                    statisticsDbContext: statisticsDbContext,
                     contentDbContext: contextDbContext,
                     releaseSubjectService: releaseSubjectService.Object
                 );
@@ -161,32 +153,20 @@ public class SubjectMetaServicePermissionTests
     }
 
     private static SubjectMetaService SetupService(
-        StatisticsDbContext? statisticsDbContext = null,
         ContentDbContext? contentDbContext = null,
         IBlobCacheService? cacheService = null,
         IReleaseSubjectService? releaseSubjectService = null,
-        IFilterRepository? filterRepository = null,
-        IFilterItemRepository? filterItemRepository = null,
-        IIndicatorGroupRepository? indicatorGroupRepository = null,
-        ILocationRepository? locationRepository = null,
-        IObservationService? observationService = null,
-        ITimePeriodService? timePeriodService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IUserService? userService = null,
         IOptions<LocationsOptions>? options = null
     )
     {
         return new(
-            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
             contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
             cacheService ?? Mock.Of<IBlobCacheService>(Strict),
             releaseSubjectService ?? Mock.Of<IReleaseSubjectService>(Strict),
-            filterRepository ?? Mock.Of<IFilterRepository>(Strict),
-            filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
-            indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(Strict),
-            locationRepository ?? Mock.Of<ILocationRepository>(Strict),
+            storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(Strict),
             Mock.Of<ILogger<SubjectMetaService>>(),
-            observationService ?? Mock.Of<IObservationService>(Strict),
-            timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService ?? Mock.Of<IUserService>(),
             options ?? DefaultLocationOptions()
         );
