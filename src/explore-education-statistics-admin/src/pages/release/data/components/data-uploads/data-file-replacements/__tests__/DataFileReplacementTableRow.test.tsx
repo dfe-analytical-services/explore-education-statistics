@@ -5,10 +5,10 @@ import _releaseDataFileService, {
 import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
-import DataFilesReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
+import DataFileReplacementTableRow from '@admin/pages/release/data/components/data-uploads/data-file-replacements/DataFileReplacementTableRow';
 import render from '@common-test/render';
 import React from 'react';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseDataFileService');
@@ -17,7 +17,7 @@ jest.mock('@admin/services/dataReplacementService');
 const releaseDataFileService = jest.mocked(_releaseDataFileService);
 const dataReplacementService = jest.mocked(_dataReplacementService);
 
-describe('DataFilesReplacementTableRow', () => {
+describe('DataFileReplacementTableRow', () => {
   const testDataFile: DataFile = {
     fileName: '',
     metaFileName: '',
@@ -98,7 +98,9 @@ describe('DataFilesReplacementTableRow', () => {
         <MemoryRouter>
           <table>
             <tbody>
-              <DataFilesReplacementTableRow
+              <DataFileReplacementTableRow
+                onCancelReplacement={jest.fn()}
+                onConfirmReplacement={jest.fn()}
                 dataFile={testDataFile}
                 publicationId="test-publication"
                 releaseVersionId="test-release-version"
@@ -133,6 +135,50 @@ describe('DataFilesReplacementTableRow', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not confirm a replacement again while its request is pending', async () => {
+    const { promise: testReplacementRequest, resolve: resolveReplacement } =
+      Promise.withResolvers<void>();
+    releaseDataFileService.getDataFile.mockResolvedValue(
+      testReplacementDataFile,
+    );
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testDataReplacementPlan,
+    );
+    dataReplacementService.replaceData.mockReturnValue(testReplacementRequest);
+    const onConfirmReplacement = jest.fn();
+    const { user: userEvent } = render(
+      <MemoryRouter>
+        <table>
+          <tbody>
+            <DataFileReplacementTableRow
+              dataFile={testDataFile}
+              publicationId="test-publication"
+              releaseVersionId="test-release-version"
+              onCancelReplacement={jest.fn()}
+              onConfirmReplacement={onConfirmReplacement}
+            />
+          </tbody>
+        </table>
+      </MemoryRouter>,
+    );
+    const confirmButton = await screen.findByRole('button', {
+      name: 'Confirm replacement for Test File',
+    });
+    expect(dataReplacementService.replaceData).not.toHaveBeenCalled();
+    await userEvent.click(confirmButton);
+    await userEvent.click(confirmButton);
+    expect(dataReplacementService.replaceData).toHaveBeenCalledTimes(1);
+    expect(dataReplacementService.replaceData).toHaveBeenCalledWith(
+      'test-release-version',
+      ['file-1'],
+    );
+    expect(onConfirmReplacement).not.toHaveBeenCalled();
+    await act(async () => {
+      resolveReplacement();
+    });
+    await waitFor(() => expect(onConfirmReplacement).toHaveBeenCalledTimes(1));
+  });
+
   test('renders with a replacement error', async () => {
     releaseDataFileService.getDataFile.mockResolvedValue(
       testReplacementDataFile,
@@ -147,7 +193,9 @@ describe('DataFilesReplacementTableRow', () => {
       <MemoryRouter>
         <table>
           <tbody>
-            <DataFilesReplacementTableRow
+            <DataFileReplacementTableRow
+              onCancelReplacement={jest.fn()}
+              onConfirmReplacement={jest.fn()}
               dataFile={testDataFile}
               publicationId="test-publication"
               releaseVersionId="test-release-version"
@@ -192,7 +240,9 @@ describe('DataFilesReplacementTableRow', () => {
       <MemoryRouter>
         <table>
           <tbody>
-            <DataFilesReplacementTableRow
+            <DataFileReplacementTableRow
+              onCancelReplacement={jest.fn()}
+              onConfirmReplacement={jest.fn()}
               dataFile={testDataFile}
               publicationId="test-publication"
               releaseVersionId="test-release-version"
@@ -244,7 +294,9 @@ describe('DataFilesReplacementTableRow', () => {
       <MemoryRouter>
         <table>
           <tbody>
-            <DataFilesReplacementTableRow
+            <DataFileReplacementTableRow
+              onCancelReplacement={jest.fn()}
+              onConfirmReplacement={jest.fn()}
               dataFile={testDataFile}
               publicationId="test-publication"
               releaseVersionId="test-release-version"
@@ -297,7 +349,9 @@ describe('DataFilesReplacementTableRow', () => {
                 },
               }}
             >
-              <DataFilesReplacementTableRow
+              <DataFileReplacementTableRow
+                onCancelReplacement={jest.fn()}
+                onConfirmReplacement={jest.fn()}
                 dataFile={{
                   ...testDataFile,
                   publicApiDataSetId: 'api-dataset-id',
@@ -359,7 +413,9 @@ describe('DataFilesReplacementTableRow', () => {
                 },
               }}
             >
-              <DataFilesReplacementTableRow
+              <DataFileReplacementTableRow
+                onCancelReplacement={jest.fn()}
+                onConfirmReplacement={jest.fn()}
                 dataFile={{
                   ...testDataFile,
                   publicApiDataSetId: undefined,
@@ -421,7 +477,9 @@ describe('DataFilesReplacementTableRow', () => {
         >
           <table>
             <tbody>
-              <DataFilesReplacementTableRow
+              <DataFileReplacementTableRow
+                onCancelReplacement={jest.fn()}
+                onConfirmReplacement={jest.fn()}
                 dataFile={{
                   ...testDataFile,
                   publicApiDataSetId: 'api-dataset-id',

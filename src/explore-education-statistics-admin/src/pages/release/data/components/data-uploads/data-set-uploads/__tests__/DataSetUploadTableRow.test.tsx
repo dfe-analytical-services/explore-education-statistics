@@ -5,17 +5,22 @@ import render from '@common-test/render';
 import { Dictionary } from '@common/types';
 import React from 'react';
 import { screen, waitFor, within } from '@testing-library/dom';
-import DataFilesTableUploadRow from '../DataFilesTableUploadsRow';
+import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
 
 jest.mock('@admin/services/releaseDataFileService');
 const releaseDataFileService = jest.mocked(_releaseDataFileService);
 
-describe('DataFilesTableUploadsRow', () => {
+describe('DataSetUploadTableRow', () => {
   const rowBaseProps = {
-    canUpdateRelease: true,
+    isReplacement: false,
+    permissions: {
+      canUpdateRelease: true,
+      canOverrideScreenerResult: false,
+      canManagePublicApiDataSets: false,
+    },
     releaseVersionId: 'release-version-id-1',
-    onConfirmDelete: jest.fn(),
-    onConfirmImport: jest.fn(),
+    onImportDataSets: jest.fn(),
+    onDeleteUpload: jest.fn(),
     onRefreshUploads: jest.fn(),
   };
 
@@ -153,7 +158,7 @@ describe('DataFilesTableUploadsRow', () => {
     const { user } = render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.pass}
           />
@@ -218,7 +223,7 @@ describe('DataFilesTableUploadsRow', () => {
 
     user.click(screen.getByRole('button', { name: 'Continue import' }));
     await waitFor(async () =>
-      expect(rowBaseProps.onConfirmImport).toHaveBeenCalled(),
+      expect(rowBaseProps.onImportDataSets).toHaveBeenCalled(),
     );
   });
 
@@ -226,7 +231,7 @@ describe('DataFilesTableUploadsRow', () => {
     const { user } = render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.passAndWarning}
           />
@@ -321,15 +326,143 @@ describe('DataFilesTableUploadsRow', () => {
     await waitFor(async () => expect(importButton).not.toBeAriaDisabled());
     user.click(importButton);
     await waitFor(async () =>
-      expect(rowBaseProps.onConfirmImport).toHaveBeenCalled(),
+      expect(rowBaseProps.onImportDataSets).toHaveBeenCalled(),
     );
+  });
+
+  test('keeps acknowledged warnings when the details modal is reopened', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.passAndWarning}
+          />
+        </tbody>
+      </table>,
+    );
+
+    const detailsButton = screen.getByRole('button', {
+      name: 'View details for pass',
+    });
+
+    await user.click(detailsButton);
+    await user.click(screen.getByRole('tab', { name: 'Warnings' }));
+
+    const warningsTabPanel = screen.getByTestId('screener-results-filtered');
+    await user.click(
+      within(warningsTabPanel).getByLabelText('check_filename_spaces'),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Continue import with warnings' }),
+      ).toBeAriaDisabled(),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', { name: 'Data set details' }),
+      ).not.toBeInTheDocument(),
+    );
+
+    await user.click(detailsButton);
+    await user.click(screen.getByRole('tab', { name: 'Warnings' }));
+
+    const reopenedPanel = screen.getByTestId('screener-results-filtered');
+    expect(
+      within(reopenedPanel).getByLabelText('check_filename_spaces'),
+    ).toBeChecked();
+    expect(
+      within(reopenedPanel).getByLabelText('check_empty_cols'),
+    ).not.toBeChecked();
+    expect(
+      screen.getByRole('button', { name: 'Continue import with warnings' }),
+    ).toBeAriaDisabled();
+    await user.click(within(reopenedPanel).getByLabelText('check_empty_cols'));
+    expect(
+      screen.getByRole('button', { name: 'Continue import with warnings' }),
+    ).not.toBeAriaDisabled();
+    await user.click(
+      within(reopenedPanel).getByLabelText('check_filename_spaces'),
+    );
+    expect(
+      screen.getByRole('button', { name: 'Continue import with warnings' }),
+    ).toBeAriaDisabled();
+  });
+
+  test('shows replacement wording when isReplacement is set', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            isReplacement
+            dataSetUpload={fileUploads.pass}
+          />
+        </tbody>
+      </table>,
+    );
+
+    // The upload below carries no replacingFileId, so this asserts the prop is
+    // what drives the wording rather than the shape of the data.
+    expect(fileUploads.pass.replacingFileId).toBeUndefined();
+
+    const cancelButton = screen.getByRole('button', {
+      name: 'Cancel replacement for pass',
+    });
+    expect(cancelButton).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Delete files for pass' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(cancelButton);
+
+    expect(
+      await screen.findByRole('heading', { name: 'Cancel replacement' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Are you sure you want to cancel this data replacement? The pending replacement data file will be deleted.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  test('shows deletion wording when isReplacement is not set', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.pass}
+          />
+        </tbody>
+      </table>,
+    );
+
+    const deleteButton = screen.getByRole('button', {
+      name: 'Delete files for pass',
+    });
+    expect(deleteButton).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Cancel replacement for pass' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(deleteButton);
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Confirm deletion of selected data files',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('"Failed screening" screener file', async () => {
     const { user } = render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.fail}
           />
@@ -418,7 +551,7 @@ describe('DataFilesTableUploadsRow', () => {
     const { user } = render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.screening}
           />
@@ -497,6 +630,97 @@ describe('DataFilesTableUploadsRow', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('hides the import confirm for a failed screening without override', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.fail}
+          />
+        </tbody>
+      </table>,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'View details for fail' }),
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Data set details' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Continue import/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('offers an override import for a failed screening when permitted', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            permissions={{
+              ...rowBaseProps.permissions,
+              canOverrideScreenerResult: true,
+            }}
+            dataSetUpload={fileUploads.fail}
+          />
+        </tbody>
+      </table>,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'View details for fail' }),
+    );
+
+    const importButton = await screen.findByRole('button', {
+      name: 'Continue import (override failures)',
+    });
+
+    // The override bypasses the warning-acknowledgement gate, which is
+    // otherwise what disables this button.
+    expect(importButton).not.toBeAriaDisabled();
+
+    await user.click(importButton);
+
+    expect(rowBaseProps.onImportDataSets).toHaveBeenCalledWith([
+      fileUploads.fail.id,
+    ]);
+  });
+
+  test('blocks importing when the release can no longer be updated', async () => {
+    const { user } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            permissions={{
+              ...rowBaseProps.permissions,
+              canUpdateRelease: false,
+            }}
+            dataSetUpload={fileUploads.pass}
+          />
+        </tbody>
+      </table>,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'View details for pass' }),
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Data set details' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Continue import/ }),
+    ).not.toBeInTheDocument();
+    // Destructive actions are hidden too.
+    expect(
+      screen.queryByRole('button', { name: 'Delete files for pass' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('refreshes the uploads once screening reaches a terminal status', async () => {
     releaseDataFileService.getDataFileScreeningStatus.mockResolvedValue({
       percentageComplete: 100,
@@ -508,7 +732,7 @@ describe('DataFilesTableUploadsRow', () => {
     render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.screening}
           />
@@ -527,7 +751,7 @@ describe('DataFilesTableUploadsRow', () => {
     render(
       <table>
         <tbody>
-          <DataFilesTableUploadRow
+          <DataSetUploadTableRow
             {...rowBaseProps}
             dataSetUpload={fileUploads.pass}
           />

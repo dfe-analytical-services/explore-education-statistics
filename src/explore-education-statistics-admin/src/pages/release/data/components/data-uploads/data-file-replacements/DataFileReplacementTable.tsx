@@ -1,38 +1,41 @@
+import DataUploadsPermissions from '@admin/pages/release/data/types/dataUploadsPermissions';
 import {
   DataFile,
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import styles from '@admin/pages/release/data/components/DataFilesTable.module.scss';
-import DataFileReplacementTableRow from '@admin/pages/release/data/components/DataFilesReplacementTableRow';
 import React from 'react';
-import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
+import styles from '@admin/pages/release/data/components/data-uploads/DataFilesTable.module.scss';
+import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
+import DataFileReplacementTableRow from './DataFileReplacementTableRow';
 
 interface Props {
-  canUpdateRelease?: boolean;
+  permissions: DataUploadsPermissions;
   caption: string;
   dataFiles: DataFile[];
   dataSetUploads: DataSetUpload[];
   publicationId: string;
   releaseVersionId: string;
   testId?: string;
-  onConfirmReplacement?: () => void;
+  onCancelReplacement: () => void;
+  onConfirmReplacement: () => void;
   onDeleteUpload: (deletedUploadId: string) => void;
-  onDataSetImport: (dataSetImportIds: string[]) => void;
+  onImportDataSets: (dataSetUploadIds: string[]) => void;
   onRefreshUploads: () => void;
 }
 
-export default function DataFilesReplacementTable({
-  canUpdateRelease,
+export default function DataFileReplacementTable({
+  permissions,
   caption,
   dataFiles,
   dataSetUploads,
   publicationId,
   releaseVersionId,
   testId,
+  onCancelReplacement,
   onConfirmReplacement,
   onRefreshUploads,
   onDeleteUpload,
-  onDataSetImport,
+  onImportDataSets,
 }: Props) {
   return (
     <div className="table-container">
@@ -57,17 +60,19 @@ export default function DataFilesReplacementTable({
               key={dataFile.title}
               publicationId={publicationId}
               releaseVersionId={releaseVersionId}
-              onConfirmAction={onConfirmReplacement}
+              onCancelReplacement={onCancelReplacement}
+              onConfirmReplacement={onConfirmReplacement}
             />
           ))}
           {dataSetUploads.map((upload, index) => (
-            <DataFilesTableUploadRow // These are rows for data sets that have been put through the screener
-              canUpdateRelease={canUpdateRelease}
+            <DataSetUploadTableRow // These are rows for data sets that have been put through the screener
+              permissions={permissions}
               dataSetUpload={upload}
               key={upload.id}
               releaseVersionId={releaseVersionId}
-              onConfirmDelete={onDeleteUpload}
-              onConfirmImport={onDataSetImport}
+              isReplacement
+              onDeleteUpload={onDeleteUpload}
+              onImportDataSets={onImportDataSets}
               onRefreshUploads={onRefreshUploads}
               testId={`data-set-upload-row-${index + 1}`}
             />

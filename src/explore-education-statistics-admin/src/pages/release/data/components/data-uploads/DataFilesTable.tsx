@@ -1,15 +1,16 @@
+import DataUploadsPermissions from '@admin/pages/release/data/types/dataUploadsPermissions';
 import {
   DataFile,
   DataFileImportStatus,
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
-import DataFilesTableRow from '@admin/pages/release/data/components/DataFilesTableRow';
+import DataFileTableRow from '@admin/pages/release/data/components/data-uploads/data-files/DataFileTableRow';
 import React from 'react';
+import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
 import styles from './DataFilesTable.module.scss';
-import DataFilesTableUploadRow from './DataFilesTableUploadsRow';
 
 interface Props {
-  canUpdateRelease?: boolean;
+  permissions: DataUploadsPermissions;
   caption: string;
   dataFiles: DataFile[];
   dataSetUploads: DataSetUpload[];
@@ -18,7 +19,7 @@ interface Props {
   testId?: string;
   onDeleteFile: (deletedFileId: string) => void;
   onDeleteUpload: (deletedUploadId: string) => void;
-  onDataSetImport: (dataSetImportIds: string[]) => void;
+  onImportDataSets: (dataSetUploadIds: string[]) => void;
   onEditFile: () => void;
   onReplaceFile: () => void;
   onStatusChange: (
@@ -29,7 +30,7 @@ interface Props {
 }
 
 export default function DataFilesTable({
-  canUpdateRelease,
+  permissions,
   caption,
   dataFiles,
   dataSetUploads,
@@ -38,7 +39,7 @@ export default function DataFilesTable({
   testId,
   onDeleteFile,
   onDeleteUpload,
-  onDataSetImport,
+  onImportDataSets,
   onEditFile,
   onReplaceFile,
   onRefreshUploads,
@@ -62,26 +63,27 @@ export default function DataFilesTable({
 
         <tbody>
           {dataFiles.map(dataFile => (
-            <DataFilesTableRow
-              canUpdateRelease={canUpdateRelease}
+            <DataFileTableRow
+              permissions={permissions}
               dataFile={dataFile}
               key={dataFile.id}
               publicationId={publicationId}
               releaseVersionId={releaseVersionId}
-              onConfirmDelete={onDeleteFile}
+              onDeleteFile={onDeleteFile}
               onEditFile={onEditFile}
               onReplaceFile={onReplaceFile}
               onStatusChange={onStatusChange}
             />
           ))}
           {dataSetUploads.map(upload => (
-            <DataFilesTableUploadRow
-              canUpdateRelease={canUpdateRelease}
+            <DataSetUploadTableRow
+              permissions={permissions}
               dataSetUpload={upload}
               key={upload.id}
               releaseVersionId={releaseVersionId}
-              onConfirmDelete={onDeleteUpload}
-              onConfirmImport={onDataSetImport}
+              isReplacement={false}
+              onDeleteUpload={onDeleteUpload}
+              onImportDataSets={onImportDataSets}
               onRefreshUploads={onRefreshUploads}
             />
           ))}

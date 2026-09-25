@@ -1,4 +1,4 @@
-import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
+import ReleaseDataUploadsSection from '@admin/pages/release/data/components/data-uploads/ReleaseDataUploadsSection';
 import _releaseDataFileService, {
   DataFileImportStatus,
   DataFile,
@@ -10,7 +10,7 @@ import _releaseDataFileService, {
 import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import _permissionService, {
@@ -218,6 +218,87 @@ describe('ReleaseDataUploadsSection', () => {
     expect(
       fileTableRow.getByTestId('Test data set upload 1-actions'),
     ).toHaveTextContent('Delete files');
+  });
+
+  test('keeps a deleted pre-import upload listed until the refreshed list arrives', async () => {
+    const { promise: testUploadsRequest, resolve: resolveUploads } =
+      Promise.withResolvers<DataSetUpload[]>();
+    releaseDataFileService.getDataFiles.mockResolvedValue([]);
+    releaseDataFileService.getDataSetUploads
+      .mockResolvedValueOnce([testDataSetUpload])
+      .mockReturnValue(testUploadsRequest);
+    releaseDataFileService.deleteDataSetUpload.mockResolvedValue();
+    const { user } = renderWithTestConfig(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+    await user.click(
+      await screen.findByRole('button', {
+        name: 'Delete files for Test data set upload 1',
+      }),
+    );
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Confirm',
+      }),
+    );
+    await waitFor(() =>
+      expect(releaseDataFileService.getDataSetUploads).toHaveBeenCalledTimes(2),
+    );
+    expect(releaseDataFileService.deleteDataSetUpload).toHaveBeenCalledWith(
+      'release-1',
+      'upload-1',
+    );
+    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId('Test data set upload 1-title'),
+    ).toBeInTheDocument();
+    await act(async () => {
+      resolveUploads([]);
+    });
+    expect(
+      await screen.findByText('No data files have been uploaded.'),
+    ).toBeInTheDocument();
+  });
+
+  test('uses the submitted file order rather than the response after reordering', async () => {
+    releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+    releaseDataFileService.updateDataFilesOrder.mockResolvedValue(
+      testDataFiles,
+    );
+    const { user } = renderWithTestConfig(
+      <MemoryRouter>
+        <ReleaseDataUploadsSection
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+    await user.click(
+      await screen.findByRole('button', { name: 'Reorder data files' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Reverse order' }));
+    await user.click(screen.getByRole('button', { name: 'Confirm order' }));
+    await screen.findByRole('button', { name: 'Reorder data files' });
+    expect(releaseDataFileService.updateDataFilesOrder).toHaveBeenCalledWith(
+      'release-1',
+      ['data-2', 'data-1'],
+    );
+    const rows = getAllFileTableRows('Data files');
+    expect(
+      within(rows[1]).getByTestId('Test data 2-title'),
+    ).toBeInTheDocument();
+    expect(
+      within(rows[2]).getByTestId('Test data 1-title'),
+    ).toBeInTheDocument();
+    expect(releaseDataFileService.getDataFiles).toHaveBeenCalledTimes(1);
   });
 
   test('renders imported data files in the uploaded data files table', async () => {
@@ -861,6 +942,8 @@ describe('ReleaseDataUploadsSection', () => {
       expect(
         within(fileTableRows[1]).getByTestId('Test data 1-title'),
       ).toHaveTextContent('Test data 1');
+      expect(releaseDataFileService.getDataFiles).toHaveBeenCalledTimes(1);
+      expect(releaseDataFileService.getDataSetUploads).toHaveBeenCalledTimes(1);
     });
 
     test('does not allow deleting files when it is being replaced', async () => {

@@ -1,4 +1,4 @@
-import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
+import DataFileUploadForm from '@admin/pages/release/data/components/data-uploads/DataFileUploadForm';
 import _releaseDataFileService from '@admin/services/releaseDataFileService';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';

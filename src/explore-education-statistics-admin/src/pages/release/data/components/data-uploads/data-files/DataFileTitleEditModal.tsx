@@ -1,4 +1,5 @@
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
+import dataFileTitleMaxLength from '@admin/pages/release/data/utils/dataFileTitleMaxLength';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -14,8 +15,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import ButtonGroup from '@common/components/ButtonGroup';
 
-const titleMaxLength = 120;
-
 interface Props {
   releaseVersionId: string;
   dataFileId: string;
@@ -27,7 +26,7 @@ interface FormValues {
   title: string;
 }
 
-export default function DataFilesTableRowEditTitleModal({
+export default function DataFileTitleEditModal({
   releaseVersionId,
   dataFileId,
   dataFileTitle,
@@ -89,8 +88,8 @@ export default function DataFilesTableRowEditTitleModal({
                 title: Yup.string()
                   .required('Enter a title')
                   .max(
-                    titleMaxLength,
-                    `Title must be ${titleMaxLength} characters or fewer`,
+                    dataFileTitleMaxLength,
+                    `Title must be ${dataFileTitleMaxLength} characters or fewer`,
                   ),
               })}
               enableReinitialize
@@ -101,7 +100,7 @@ export default function DataFilesTableRowEditTitleModal({
                     className="govuk-!-width-full"
                     label="Title"
                     name="title"
-                    maxLength={titleMaxLength}
+                    maxLength={dataFileTitleMaxLength}
                     disabled={dataFile.replacementInProgress}
                   />
                 )}
