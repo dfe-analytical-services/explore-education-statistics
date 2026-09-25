@@ -218,46 +218,14 @@ resource masterDbDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
   ]
 }
 
-resource firewallRuleResources 'Microsoft.Sql/servers/firewallRules@2025-01-01' = [
-  for rule in firewallRules: if (sqlServerPublicNetworkAccess == 'Enabled') {
-    parent: sqlServer
-    name: rule.name
-    properties: {
-      startIpAddress: rule.startIpAddress
-      endIpAddress: rule.endIpAddress
-    }
-  }
-]
-
-var sqlAllowedSubnets = [
-  subnets.admin
-  subnets.importer
-  subnets.publisher
-  subnets.content
-  subnets.data
-  subnets.notify
-  subnets.publicApiDataProcessor
-]
-
-resource virtualNetworkRuleResources 'Microsoft.Sql/servers/virtualNetworkRules@2025-01-01' = [
-  for allowedSubnet in sqlAllowedSubnets: if (sqlServerPublicNetworkAccess == 'Enabled') {
-    parent: sqlServer
-    name: allowedSubnet.name
-    properties: {
-      virtualNetworkSubnetId: allowedSubnet.id
-      ignoreMissingVnetServiceEndpoint: false
-    }
-  }
-]
-
-module privateEndpointModule '../../../common/components/privateEndpoint.bicep' = {
-  name: 'coreSqlServerPrivateEndpointDeploy'
+module networkingModule 'networking.bicep' = {
+  name: 'coreSqlServerNetworkingDeploy'
   params: {
-    serviceId: sqlServer.id
-    serviceName: coreSqlServerName
-    serviceType: 'azureSql'
-    subnetId: subnets.sqlServerPrivateEndpoints.id
+    sqlServerName: sqlServer.name
     location: location
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    firewallRules: firewallRules
+    subnets: subnets
     tagValues: tagValues
   }
 }
