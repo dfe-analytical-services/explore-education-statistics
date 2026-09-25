@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -79,7 +80,7 @@ public class ReleaseVersionService(
                     .AnyAsync();
 
                 var publishingOrganisations = releaseVersion
-                    .PublishingOrganisations.OrderBy(o => o.Title)
+                    .PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
                     .Select(OrganisationViewModel.FromOrganisation)
                     .ToList();
 

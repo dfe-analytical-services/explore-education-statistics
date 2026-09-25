@@ -171,6 +171,53 @@ public abstract class ReleaseSearchableDocumentsServiceTests
         }
 
         [Fact]
+        public async Task WhenDepartmentForEducationExists_ReturnsItFirstThenOthersOrderedByTitle()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            releaseVersion.PublishingOrganisations = _dataFixture
+                .DefaultOrganisation()
+                .ForIndex(0, s => s.SetTitle("Organisation C"))
+                .ForIndex(1, s => s.SetTitle(Organisation.DepartmentForEducationTitle))
+                .ForIndex(2, s => s.SetTitle("Organisation A"))
+                .ForIndex(3, s => s.SetTitle("Organisation B"))
+                .GenerateList(4);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var sut = BuildService(context);
+
+                // Act
+                var outcome = await sut.GetLatestReleaseAsSearchableDocument(publication.Slug);
+
+                // Assert
+                var result = outcome.AssertRight();
+
+                string[] expectedTitles =
+                [
+                    Organisation.DepartmentForEducationTitle,
+                    "Organisation A",
+                    "Organisation B",
+                    "Organisation C",
+                ];
+
+                Assert.Equal(expectedTitles, result.PublishingOrganisations.Select(o => o.Title));
+            }
+        }
+
+        [Fact]
         public async Task WhenContentContainsOtherBlockTypes_OnlyIncludesHtmlBlocksInHtmlContent()
         {
             // Arrange
