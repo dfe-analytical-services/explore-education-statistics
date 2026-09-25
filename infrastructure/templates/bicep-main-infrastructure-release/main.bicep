@@ -5,6 +5,7 @@ import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configura
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
+import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-configuration.bicep'
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
@@ -86,6 +87,16 @@ var importerConfig = mergeImporterConfig(importerConfigParam)
 
 
 //
+// Notifier-specific config.
+//
+param notifierConfigParam NotifierConfig = {}
+
+// Merge default configuration with overridden configuration from params files.
+var notifierConfig = mergeNotifierConfig(notifierConfigParam)
+
+
+
+//
 // Publisher-specific config.
 //
 param publisherConfigParam PublisherConfig = {}
@@ -134,11 +145,17 @@ var newResourcePrefix = '${environmentConfig.environmentIdentifier!}-ees'
 var publicApiResourcePrefix = '${newResourcePrefix}-papi'
 var screenerResourcePrefix = '${newResourcePrefix}-sapi'
 
+// TODO EES-7502 - use standardised naming convention for Notifier storage.
+var notifierStorageAccountPrefix = environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production' 
+  ? 'storage'
+  : 'sa'
+
 var resourceNames = getResourceNames(
   legacyResourcePrefix,
   publicApiResourcePrefix,
   screenerResourcePrefix,
-  newResourcePrefix
+  newResourcePrefix,
+  notifierStorageAccountPrefix
 )
 
 var minTlsVersion = '1.2'
@@ -162,7 +179,9 @@ var baseAdminAllowedOrigins = [
 
 var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
 
+// TODO EES-7502 - use standardised hostname for the Content API .
 var contentApiPublicHostname = '${environmentConfig.environmentName! == 'Pre-Production' ? 'cont' : 'content'}.${environmentConfig.domain!}'
+
 var dataApiPublicHostname = 'data.${environmentConfig.domain!}'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
@@ -181,6 +200,24 @@ module importerModuleDeploy '../importer/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    tagValues: tags
+  }
+}
+
+module notifierModuleDeploy '../notifier/main.bicep' = {
+  name: 'notifierModuleDeploy'
+  params: {
+    resourceNames: resourceNames
+    appServiceSku: notifierConfig.appServiceSku!
+    suppressExceptionsForTeamOnlyApiKeyErrors: notifierConfig.suppressExceptionsForTeamOnlyApiKeyErrors!
+    publicAppUrl: 'https://${environmentConfig.domain!}'
+    allowedOrigins: publicSiteAllowedOrigins
+    minTlsVersion: minTlsVersion
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.notifier.databaseUserPassword)
+    maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    deployAlerts: true
     tagValues: tags
   }
 }
@@ -205,6 +242,11 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     deployAlerts: true
     tagValues: tags
   }
+  dependsOn: [
+    // Publisher is dependent on Notifier's storage account being available
+    // in order to reference its connection string secret in Key Vault.
+    notifierModuleDeploy
+  ]
 }
 
 module adminModuleDeploy '../admin/main.bicep' = {
