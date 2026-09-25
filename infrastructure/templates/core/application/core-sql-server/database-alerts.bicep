@@ -1,3 +1,6 @@
+import { staticAverageGreaterThanZero, staticMaxGreaterThanZero, staticTotalGreaterThanZero } from '../../../common/components/alerts/staticAlertConfig.bicep'
+import { fastEvaluation } from '../../../common/components/alerts/evaluation-config.bicep'
+
 @description('Name of the database that these alerts are being applied to, e.g. "statistics" or "content".')
 param resourceName string
 
@@ -23,13 +26,10 @@ module cpuPercentAlert '../../../common/components/alerts/staticMetricAlert.bice
       metric: 'cpu_percent'
     }
     config: {
+      ...staticAverageGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'cpu-percent'
-      aggregation: 'Average'
-      operator: 'GreaterThan'
       threshold: '85'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -46,13 +46,10 @@ module dataIoPercentAlert '../../../common/components/alerts/staticMetricAlert.b
       metric: 'physical_data_read_percent'
     }
     config: {
+      ...staticAverageGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'data-io-percent'
-      aggregation: 'Average'
-      operator: 'GreaterThan'
       threshold: '85'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -69,13 +66,9 @@ module failedConnectionsAlert '../../../common/components/alerts/staticMetricAle
       metric: 'connection_failed'
     }
     config: {
+      ...staticTotalGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'failed-connections'
-      aggregation: 'Total'
-      operator: 'GreaterThan'
-      threshold: '0'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -92,13 +85,9 @@ module deadlockAlert '../../../common/components/alerts/staticMetricAlert.bicep'
       metric: 'deadlock'
     }
     config: {
+      ...staticTotalGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'deadlock'
-      aggregation: 'Total'
-      operator: 'GreaterThan'
-      threshold: '0'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -115,13 +104,10 @@ module dataSpaceUsedPercentAlert '../../../common/components/alerts/staticMetric
       metric: 'storage_percent'
     }
     config: {
+      ...staticMaxGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'data-space-used-percent'
-      aggregation: 'Maximum'
-      operator: 'GreaterThan'
       threshold: '85'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -138,13 +124,11 @@ module dataSpaceUsedPercentUrgentAlert '../../../common/components/alerts/static
       metric: 'storage_percent'
     }
     config: {
+      ...staticMaxGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'data-space-used-percent-urgent'
-      aggregation: 'Maximum'
-      operator: 'GreaterThan'
       threshold: '95'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
+      severity: 'Critical'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
@@ -161,13 +145,9 @@ module blockedByFirewallAlert '../../../common/components/alerts/staticMetricAle
       metric: 'blocked_by_firewall'
     }
     config: {
+      ...staticTotalGreaterThanZero
+      ...fastEvaluation
       nameSuffix: 'blocked-by-firewall'
-      aggregation: 'Total'
-      operator: 'GreaterThan'
-      threshold: '0'
-      evaluationFrequency: 'PT1M'
-      windowSize: 'PT5M'
-      severity: 'Informational'
     }
     alertsGroupName: alertsGroupName
     tagValues: tagValues
