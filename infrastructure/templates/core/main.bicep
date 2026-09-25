@@ -1,6 +1,7 @@
 import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 import { IpRange } from '../common/types.bicep'
+import { AzureSqlDatabaseConfig } from 'application/core-sql-server/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -64,6 +65,57 @@ param deployContainerRegistry bool = false
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
+
+@description('The admin user of the Core SQL Server.')
+param sqlAdministratorLogin string = ''
+
+@secure()
+@description('The password of the admin user of the Core SQL Server.')
+param sqlAdministratorLoginPassword string = ''
+
+@description('The login name of the Entra ID admin for the Core SQL Server.')
+param sqlAzureAdministratorLogin string = ''
+
+@description('The object id of the Entra ID admin for the Core SQL Server.')
+param sqlAzureAdministratorSid string = ''
+
+@description('Whether or not public access is enabled for the Core SQL Server.')
+param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
+
+@description('Firewall rules for the Core SQL Server, applied when public network access is enabled.')
+param sqlFirewallRules {
+  name: string
+  startIpAddress: string
+  endIpAddress: string
+}[] = []
+
+@description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
+param teamEmailAddresses string[] = []
+
+@description('Number of days to retain SQL database audit logs for in blob storage.')
+param databaseAuditBlobRetentionDays int = 365
+
+@description('Configuration for the Content database.')
+param contentDbConfig AzureSqlDatabaseConfig = {
+  sku: {
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    capacity: 1
+  }
+  licenseType: 'LicenseIncluded'
+  maxSizeBytes: 1073741824
+}
+
+@description('Configuration for the Statistics database.')
+param statisticsDbConfig AzureSqlDatabaseConfig = {
+  sku: {
+    name: 'GP_Gen5'
+    tier: 'GeneralPurpose'
+    capacity: 2
+  }
+  licenseType: 'LicenseIncluded'
+  maxSizeBytes: 268435456000
+}
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -262,6 +314,30 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
     alertsGroupName: alertsModule.outputs.actionGroupName
     blobDeleteRetentionDays: blobDeleteRetentionDays
     firewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
+  name: 'coreSqlServerModuleDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
+    sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
+    sqlAzureAdministratorSid: sqlAzureAdministratorSid
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    subnets: vNetModule.outputs.subnets
+    firewallRules: sqlFirewallRules
+    teamEmailAddresses: teamEmailAddresses
+    databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
+    loggingStorageAccountName: '${subscription}${abbreviations.storageStorageAccounts}eeslogging'
+    contentDbConfig: contentDbConfig
+    statisticsDbConfig: statisticsDbConfig
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+    alertsGroupName: alertsModule.outputs.actionGroupName
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

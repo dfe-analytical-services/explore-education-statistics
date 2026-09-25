@@ -121,6 +121,17 @@ type PostgreSqlMetric = {
     | 'storage_percent'
 }
 
+type SqlDatabaseMetric = {
+  resourceType: 'Microsoft.Sql/servers/databases'
+  metric:
+    | 'blocked_by_firewall'
+    | 'connection_failed'
+    | 'cpu_percent'
+    | 'deadlock'
+    | 'physical_data_read_percent'
+    | 'storage_percent'
+}
+
 type SearchServiceMetric = {
   resourceType: 'Microsoft.Search/searchServices'
   metric:
@@ -165,4 +176,5 @@ type ResourceMetric =
   | PostgreSqlMetric
   | SearchServiceMetric
   | SiteMetric
+  | SqlDatabaseMetric
   | StorageAccountMetric
