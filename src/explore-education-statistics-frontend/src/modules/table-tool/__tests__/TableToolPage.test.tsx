@@ -152,6 +152,7 @@ describe('TableToolPage', () => {
       content: '<p>ryt</p>',
       timePeriods: { from: '2020 Week 13', to: '2021 Week 24' },
       geographicLevels: ['National'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-1',
         name: 'Test subject',

@@ -94,7 +94,7 @@ public record ReleaseDataContentDataSetMetaDto
     ) =>
         [
             .. dataSetFileVersionGeographicLevels
-                .Where(level => (level.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
+                .Where(level => level.CsvOnly == csvOnly)
                 .Select(level => level.GeographicLevel.GetEnumLabel())
                 .Order(),
         ];

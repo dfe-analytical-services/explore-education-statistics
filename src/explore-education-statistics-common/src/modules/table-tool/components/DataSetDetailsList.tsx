@@ -30,7 +30,7 @@ export default function DataSetDetailsList({ subject }: Props) {
           {orderBy(geographicLevels).join('; ')}
         </SummaryListItem>
       )}
-      {geographicLevelsCsvOnly && geographicLevelsCsvOnly.length > 0 && (
+      {geographicLevelsCsvOnly.length > 0 && (
         <SummaryListItem term="Geographic levels (only available via download / public API)">
           {orderBy(geographicLevelsCsvOnly).join('; ')}
         </SummaryListItem>

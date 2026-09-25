@@ -74,6 +74,7 @@ describe('ReleaseTableToolPage', () => {
           to: '2020',
         },
         geographicLevels: ['National'],
+        geographicLevelsCsvOnly: [],
         file: {
           id: 'file-1',
           name: 'Subject 1',
@@ -95,6 +96,7 @@ describe('ReleaseTableToolPage', () => {
           to: '2018/19',
         },
         geographicLevels: ['National'],
+        geographicLevelsCsvOnly: [],
         file: {
           id: 'file-2',
           name: 'Subject 2',
