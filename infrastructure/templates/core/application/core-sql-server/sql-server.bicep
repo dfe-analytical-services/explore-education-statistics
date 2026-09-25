@@ -65,10 +65,6 @@ param tagValues object
 
 var coreSqlServerName = '${subscription}-sqlsvr-ees-01'
 
-var databaseTagValues = union(tagValues, {
-  ServiceType: 'SQL Database'
-})
-
 resource loggingStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
   name: loggingStorageAccountName
 }
@@ -89,44 +85,6 @@ resource sqlServer 'Microsoft.Sql/servers@2025-01-01' = {
   tags: union(tagValues, {
     ServiceType: 'SQL Server'
   })
-}
-
-resource statisticsDb 'Microsoft.Sql/servers/databases@2025-01-01' = {
-  parent: sqlServer
-  name: 'statistics'
-  location: location
-  sku: statisticsDbConfig.sku
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    licenseType: statisticsDbConfig.licenseType
-    maxSizeBytes: statisticsDbConfig.maxSizeBytes
-    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
-    zoneRedundant: false
-    readScale: 'Disabled'
-    autoPauseDelay: -1
-    requestedBackupStorageRedundancy: 'GRS'
-    minCapacity: json(string(statisticsDbConfig.?minCapacity))
-  }
-  tags: databaseTagValues
-}
-
-resource contentDb 'Microsoft.Sql/servers/databases@2025-01-01' = {
-  parent: sqlServer
-  name: 'content'
-  location: location
-  sku: contentDbConfig.sku
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
-    licenseType: contentDbConfig.licenseType
-    maxSizeBytes: contentDbConfig.maxSizeBytes
-    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
-    zoneRedundant: false
-    readScale: 'Disabled'
-    autoPauseDelay: -1
-    requestedBackupStorageRedundancy: 'GRS'
-    minCapacity: json(string(contentDbConfig.?minCapacity))
-  }
-  tags: databaseTagValues
 }
 
 resource masterDb 'Microsoft.Sql/servers/databases@2025-01-01' existing = {
@@ -150,49 +108,7 @@ var databaseDiagnosticsLogsAndMetrics = {
   ]
 }
 
-resource statisticsDbAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = {
-  parent: statisticsDb
-  name: 'default'
-  properties: {
-    state: 'Disabled'
-  }
-}
-
-resource statisticsDbDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'serverAuditToLogAnalytics'
-  scope: statisticsDb
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: databaseDiagnosticsLogsAndMetrics.logs
-    metrics: databaseDiagnosticsLogsAndMetrics.metrics
-  }
-  dependsOn: [
-    statisticsDbAuditingSettings
-  ]
-}
-
-resource contentDbAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = {
-  parent: contentDb
-  name: 'default'
-  properties: {
-    state: 'Disabled'
-  }
-}
-
-resource contentDbDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'serverAuditToLogAnalytics'
-  scope: contentDb
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: databaseDiagnosticsLogsAndMetrics.logs
-    metrics: databaseDiagnosticsLogsAndMetrics.metrics
-  }
-  dependsOn: [
-    contentDbAuditingSettings
-  ]
-}
-
-resource sqlServerAadAdmin 'Microsoft.Sql/servers/administrators@2025-01-01' = {
+resource entraIdAdministrator 'Microsoft.Sql/servers/administrators@2025-01-01' = {
   parent: sqlServer
   name: 'activeDirectory'
   properties: {
@@ -202,30 +118,8 @@ resource sqlServerAadAdmin 'Microsoft.Sql/servers/administrators@2025-01-01' = {
     tenantId: az.subscription().tenantId
   }
   dependsOn: [
-    contentDb
+    contentDbModule
   ]
-}
-
-resource contentDbLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies@2025-01-01' = {
-  parent: contentDb
-  name: 'default'
-  properties: {
-    weeklyRetention: 'P4W'
-    monthlyRetention: 'P12M'
-    yearlyRetention: 'P1Y'
-    weekOfYear: 1
-  }
-}
-
-resource statisticsDbLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies@2025-01-01' = {
-  parent: statisticsDb
-  name: 'default'
-  properties: {
-    weeklyRetention: 'P4W'
-    monthlyRetention: 'P3M'
-    yearlyRetention: 'P1Y'
-    weekOfYear: 1
-  }
 }
 
 resource securityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2025-01-01' = {
@@ -324,28 +218,6 @@ resource masterDbDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
   ]
 }
 
-resource statisticsDbTransparentDataEncryption 'Microsoft.Sql/servers/databases/transparentDataEncryption@2025-01-01' = {
-  parent: statisticsDb
-  name: 'current'
-  properties: {
-    state: 'Enabled'
-  }
-  dependsOn: [
-    masterDbDiagnostics
-  ]
-}
-
-resource contentDbTransparentDataEncryption 'Microsoft.Sql/servers/databases/transparentDataEncryption@2025-01-01' = {
-  parent: contentDb
-  name: 'current'
-  properties: {
-    state: 'Enabled'
-  }
-  dependsOn: [
-    masterDbDiagnostics
-  ]
-}
-
 resource firewallRuleResources 'Microsoft.Sql/servers/firewallRules@2025-01-01' = [
   for rule in firewallRules: if (sqlServerPublicNetworkAccess == 'Enabled') {
     parent: sqlServer
@@ -390,26 +262,40 @@ module privateEndpointModule '../../../common/components/privateEndpoint.bicep' 
   }
 }
 
-module statisticsDbAlertsModule 'database-alerts.bicep' = {
-  name: 'statisticsDbAlertsDeploy'
+module contentDbModule 'database.bicep' = {
+  name: 'contentDbDeploy'
   params: {
-    resourceName: 'statistics'
-    databaseId: statisticsDb.id
+    sqlServerName: sqlServer.name
+    location: location
+    resourceName: 'content'
+    config: contentDbConfig
+    longTermMonthlyRetention: 'P12M'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     alertsGroupName: alertsGroupName
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
+  dependsOn: [
+    masterDbDiagnostics
+  ]
 }
 
-module contentDbAlertsModule 'database-alerts.bicep' = {
-  name: 'contentDbAlertsDeploy'
+module statisticsDbModule 'database.bicep' = {
+  name: 'statisticsDbDeploy'
   params: {
-    resourceName: 'content'
-    databaseId: contentDb.id
+    sqlServerName: sqlServer.name
+    location: location
+    resourceName: 'statistics'
+    config: statisticsDbConfig
+    longTermMonthlyRetention: 'P3M'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     alertsGroupName: alertsGroupName
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
+  dependsOn: [
+    masterDbDiagnostics
+  ]
 }
 
 output serverName string = sqlServer.name
