@@ -160,7 +160,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy

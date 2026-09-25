@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,25 +20,18 @@ public class TimePeriodService : ITimePeriodService
         _context = context;
     }
 
-    public Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(Guid subjectId)
+    public async Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(Guid subjectId)
     {
         var observationsQuery = _context
             .Observation.AsNoTracking()
             .Where(observation => observation.SubjectId == subjectId);
 
-        return GetDistinctObservationTimePeriods(observationsQuery);
-    }
-
-    public Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(
-        IQueryable<Observation> observationsQuery
-    )
-    {
-        return GetDistinctObservationTimePeriods(observationsQuery);
+        return await TimePeriodQueryUtils.ListDistinctTimePeriods(observationsQuery);
     }
 
     public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IList<Observation> observations)
     {
-        var timePeriods = GetDistinctObservationTimePeriods(observations);
+        var timePeriods = TimePeriodQueryUtils.Order(observations.Select(o => (o.Year, o.TimeIdentifier)).Distinct());
 
         var start = timePeriods.First();
         var end = timePeriods.Last();
@@ -79,34 +73,5 @@ public class TimePeriodService : ITimePeriodService
             TimePeriodLabelFormatter.Format(first.Year, first.TimeIdentifier),
             TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier)
         );
-    }
-
-    private static async Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetDistinctObservationTimePeriods(
-        IQueryable<Observation> observationsQuery
-    )
-    {
-        var timePeriods = (
-            await observationsQuery.Select(o => new { o.Year, o.TimeIdentifier }).Distinct().ToListAsync()
-        ).Select(tuple => (tuple.Year, tuple.TimeIdentifier));
-
-        return OrderTimePeriods(timePeriods);
-    }
-
-    private static IList<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
-        IList<Observation> observations
-    )
-    {
-        var timePeriods = observations.Select(o => (o.Year, o.TimeIdentifier)).Distinct();
-
-        return OrderTimePeriods(timePeriods);
-    }
-
-    private static List<(int Year, TimeIdentifier TimeIdentifier)> OrderTimePeriods(
-        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> timePeriods
-    )
-    {
-        // Ordering of time periods must be evaluated in memory rather than being translated to a database query.
-        // They are expected to be ordered by their definition order, not by their enum value
-        return timePeriods.OrderBy(tuple => tuple.Year).ThenBy(tuple => tuple.TimeIdentifier).ToList();
     }
 }
