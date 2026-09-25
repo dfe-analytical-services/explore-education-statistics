@@ -28,6 +28,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
@@ -165,7 +166,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectResultMetaService: subjectResultMetaService.Object,
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
@@ -440,7 +444,10 @@ public class TableBuilderServiceTests
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectResultMetaService: subjectResultMetaService.Object,
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
@@ -758,7 +765,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1033,7 +1043,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1160,7 +1173,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1284,7 +1300,7 @@ public class TableBuilderServiceTests
         StatisticsDbContext statisticsDbContext,
         ContentDbContext? contentDbContext = null,
         ILocationService? locationService = null,
-        IObservationService? observationService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         ISubjectResultMetaService? subjectResultMetaService = null,
         ISubjectCsvMetaService? subjectCsvMetaService = null,
@@ -1296,10 +1312,9 @@ public class TableBuilderServiceTests
     )
     {
         return new(
-            statisticsDbContext,
             contentDbContext ?? InMemoryContentDbContext(),
             locationService ?? Mock.Of<ILocationService>(Strict),
-            observationService ?? Mock.Of<IObservationService>(Strict),
+            storageDataSetResolver ?? BuildStatisticsDbDataSetResolver(statisticsDbContext),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
