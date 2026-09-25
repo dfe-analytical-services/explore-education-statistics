@@ -32,6 +32,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -179,8 +180,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
-        services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddStorageDataSets();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
