@@ -20,11 +20,13 @@ export function createStatisticalReleasesSuggestRequest(
   query: SearchDataPageQuery,
   searchTerm: string,
 ): AzureDataSetListRequest {
-  const { releaseTypes, sortBy, themeIds } = getParamsFromQuery(query);
+  const { organisationIds, releaseTypes, sortBy, themeIds } =
+    getParamsFromQuery(query);
 
   const orderBy = getSortParam(sortBy);
 
   const filter = buildODataFilter({
+    organisationIds,
     releaseTypes,
     themeIds,
   });
@@ -44,6 +46,7 @@ export default function createStatisticalReleasesListRequest(
   query: SearchDataPageQuery,
 ): AzureDataSetListRequest {
   const {
+    organisationIds,
     releaseTypes,
     search: searchParam,
     sortBy,
@@ -53,6 +56,7 @@ export default function createStatisticalReleasesListRequest(
   const orderBy = getSortParam(sortBy);
 
   const filter = buildODataFilter({
+    organisationIds,
     releaseTypes,
     themeIds,
   });
@@ -73,12 +77,20 @@ export default function createStatisticalReleasesListRequest(
 }
 
 interface SearchFilters {
+  organisationIds?: string[];
   releaseTypes?: string[];
   themeIds?: string[];
 }
 
 function buildODataFilter(filters: SearchFilters): string | undefined {
   const conditions: string[] = [];
+
+  if (filters.organisationIds?.length) {
+    const joined = filters.organisationIds.join('|');
+    conditions.push(
+      odata`publishingOrganisationIds/any(g: search.in(g, ${joined}, '|'))`,
+    );
+  }
 
   if (filters.releaseTypes?.length) {
     const joined = filters.releaseTypes.join('|');
@@ -116,6 +128,7 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
 
   return {
     page: getFirst(query.page),
+    organisationIds: getAsArray(query.organisationId),
     releaseTypes: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
     search: getFirst(query.search),
     sortBy:
