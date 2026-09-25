@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -23,6 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -1731,16 +1730,9 @@ public class SubjectCsvMetaServiceTests
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
-            statisticsDbContext: statisticsDbContext,
             contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
-            filterItemRepository: new FilterItemRepository(
-                statisticsDbContext,
-                Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<ILogger<FilterItemRepository>>()
-            ),
+            storageDataSetResolver: BuildStatisticsDbDataSetResolver(statisticsDbContext),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }

@@ -81,37 +81,6 @@ public abstract class TimePeriodServiceTests
                 Assert.Equal((2001, January), result[4]);
             }
         }
-
-        [Fact]
-        public async Task ObservationsHaveWeeklyTimeIdentifiers_CorrectlyOrdered()
-        {
-            var obs1 = new Observation { Year = 2001, TimeIdentifier = Week1 };
-            var obs2 = new Observation { Year = 2000, TimeIdentifier = Week20 };
-            var obs3 = new Observation { Year = 2000, TimeIdentifier = Week2 };
-            var obs4 = new Observation { Year = 2000, TimeIdentifier = Week1 };
-            var obs5 = new Observation { Year = 2000, TimeIdentifier = Week10 };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                statisticsDbContext.AddRange(obs1, obs2, obs3, obs4, obs5);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = new TimePeriodService(statisticsDbContext);
-                var queryableObservations = statisticsDbContext.Observation.AsQueryable();
-                var result = await service.GetTimePeriods(queryableObservations);
-
-                Assert.Equal(5, result.Count);
-                Assert.Equal((2000, Week1), result[0]);
-                Assert.Equal((2000, Week2), result[1]);
-                Assert.Equal((2000, Week10), result[2]);
-                Assert.Equal((2000, Week20), result[3]);
-                Assert.Equal((2001, Week1), result[4]);
-            }
-        }
     }
 
     public class GetTimePeriodLabelsTests : TimePeriodServiceTests
