@@ -1,6 +1,7 @@
 import ErrorMessage from '@common/components/ErrorMessage';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
@@ -45,13 +46,21 @@ const TableToolSearchFinalResult = ({
   dataset,
   releaseVersionSummary,
 }: TableToolSearchFinalResultProps) => {
+  const { isValidForTableGeneration, validationErrors, validationWarnings } =
+    dataset;
+
   const fullTableQuery = generateQueryFromResult(dataset);
 
-  const { data, isError, isLoading } = useQuery({
+  const {
+    data,
+    isError,
+    isInitialLoading: isLoading,
+  } = useQuery({
     ...tableBuilderQueries.getFullTable(
       fullTableQuery,
       releaseVersionSummary.id,
     ),
+    enabled: isValidForTableGeneration,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
@@ -75,41 +84,63 @@ const TableToolSearchFinalResult = ({
       <Link to={`/data-catalogue/data-set/${dataset.dataSetFileId}`}>
         View this data set <VisuallyHidden> - {dataset.title}</VisuallyHidden>
       </Link>
-      <h3 className="govuk-heading-s govuk-!-margin-top-4">Relevance</h3>
-      <p className="govuk-body">{dataset.relevanceReason}</p>
+      <p className="govuk-body govuk-!-margin-top-4">
+        {dataset.relevanceReason}
+      </p>
 
-      <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
-        {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
-        {table && tableHeaders && (
-          <>
-            <div className={styles.previewNotice}>
-              <p className="govuk-body govuk-!-margin-bottom-0">
-                Table showing a preview from:
-                <br />
-                {dataset.title}
-              </p>
-              <Link
-                to={`/data-tables/${releaseVersionSummary.publication.slug}/${
-                  releaseVersionSummary.slug
-                }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
-              >
-                View and edit this table{' '}
-                <VisuallyHidden> - {dataset.title}</VisuallyHidden>
-              </Link>
-            </div>
-            <TimePeriodDataTable
-              capMaxHeight
-              captionTitle={generatedCaption}
-              defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
-              defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
-              fullTable={table}
-              query={fullTableQuery}
-              releaseVersionId={releaseVersionSummary.id}
-              tableHeadersConfig={tableHeaders}
-            />
-          </>
-        )}
-      </LoadingSpinner>
+      {isValidForTableGeneration ? (
+        <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
+          {validationWarnings.map(warning => (
+            <WarningMessage key={`${warning.code}-${warning.message}`}>
+              {warning.message}
+            </WarningMessage>
+          ))}
+
+          {isError && <ErrorMessage>Error loading table preview.</ErrorMessage>}
+
+          {table && tableHeaders && (
+            <>
+              <div className={styles.previewNotice}>
+                <p className="govuk-body govuk-!-margin-bottom-0">
+                  Table showing a preview from:
+                  <br />
+                  {dataset.title}
+                </p>
+                <Link
+                  to={`/data-tables/${releaseVersionSummary.publication.slug}/${
+                    releaseVersionSummary.slug
+                  }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
+                >
+                  View and edit this table{' '}
+                  <VisuallyHidden> - {dataset.title}</VisuallyHidden>
+                </Link>
+              </div>
+              <TimePeriodDataTable
+                capMaxHeight
+                captionTitle={generatedCaption}
+                defaultCaptionId={`dataTableCaption-${dataset.fileId}`}
+                defaultFootnotesId={`dataTableFootnotes-${dataset.fileId}`}
+                fullTable={table}
+                query={fullTableQuery}
+                releaseVersionId={releaseVersionSummary.id}
+                tableHeadersConfig={tableHeaders}
+              />
+            </>
+          )}
+        </LoadingSpinner>
+      ) : (
+        <>
+          {validationErrors.length > 0 ? (
+            validationErrors.map(error => (
+              <ErrorMessage key={`${error.code}-${error.message}`}>
+                {error.message}
+              </ErrorMessage>
+            ))
+          ) : (
+            <ErrorMessage>A table preview could not be generated.</ErrorMessage>
+          )}
+        </>
+      )}
     </li>
   );
 };
