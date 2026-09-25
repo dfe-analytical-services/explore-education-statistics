@@ -1,7 +1,8 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -12,12 +13,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -32,7 +35,10 @@ public class ThemeService(
     IPublishingService publishingService,
     IReleaseVersionService releaseVersionService,
     IAdminEventRaiser eventRaiser,
-    IUserPublicationRoleRepository userPublicationRoleRepository
+    IUserPublicationRoleRepository userPublicationRoleRepository,
+    IRedirectsCacheService redirectsCacheService,
+    IPublicationCacheService publicationCacheService,
+    ILogger<ThemeService> logger
 ) : IThemeService
 {
     private readonly bool _themeDeletionAllowed = appOptions.Value.EnableThemeDeletion;
@@ -135,7 +141,10 @@ public class ThemeService(
                     .Themes.Where(t => themeIds.Contains(t.Id))
                     .ToListAsync(cancellationToken);
 
+                var notFoundThemeIds = themeIds.Except(themes.Select(theme => theme.Id)).ToList();
+
                 var failures = new List<ActionResult>();
+                var deletedThemeCount = 0;
 
                 foreach (var theme in themes)
                 {
@@ -146,10 +155,34 @@ public class ThemeService(
                     {
                         failures.AddRange(result.Left);
                     }
+                    else
+                    {
+                        deletedThemeCount++;
+                    }
                 }
 
                 await contentDbContext.SaveChangesAsync(cancellationToken);
                 await publishingService.TaxonomyChanged(cancellationToken);
+                await redirectsCacheService.UpdateRedirects();
+
+                if (notFoundThemeIds.Count > 0)
+                {
+                    logger.LogWarning(
+                        "Themes not found during deletion, and therefore not deleted: {NotFoundThemeIds}",
+                        notFoundThemeIds
+                    );
+
+                    // Only fail the request with a 404 if nothing was deleted. Returning one alongside
+                    // successful deletions would misleadingly suggest that no Themes were deleted at all.
+                    if (deletedThemeCount == 0)
+                    {
+                        failures.AddRange(
+                            notFoundThemeIds.Select(themeId =>
+                                ValidationUtils.NotFoundResult<Theme, Guid>(themeId, nameof(themeIds))
+                            )
+                        );
+                    }
+                }
 
                 return failures.Count > 0 ? failures[0] : Unit.Instance;
             });
@@ -201,6 +234,12 @@ public class ThemeService(
             .Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
 
+        // Publications superseded by this one may live in a Theme that is not being deleted, so their
+        // references have to be cleared or the delete breaches FK_Publications_Publications_SupersededById.
+        // SQL Server cannot do this for us, as it rejects cascading actions on self-referencing foreign
+        // keys, so load them here and let EF's ClientSetNull behaviour null them when changes are saved.
+        await contentDbContext.Publications.Where(p => p.SupersededById == publicationId).LoadAsync(cancellationToken);
+
         // Capture details of the latest published release before it is deleted
         // so that they can be used to raise an event after the publication is deleted.
         var latestPublicationRelease =
@@ -246,7 +285,14 @@ public class ThemeService(
                 contentDbContext.Publications.Remove(publication);
                 contentDbContext.Contacts.Remove(publication.Contact);
 
-                await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, latestPublicationRelease);
+                await publicationCacheService.RemovePublication(publication.Slug);
+
+                await eventRaiser.OnPublicationDeleted(
+                    publication.Id,
+                    publication.Slug,
+                    latestPublicationRelease,
+                    releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList()
+                );
             });
     }
 

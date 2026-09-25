@@ -14,4 +14,14 @@ public class RedirectsCacheServiceMockBuilder
 
         return _mock.Object;
     }
+
+    public Asserter Assert => new(_mock);
+
+    public class Asserter(Mock<IRedirectsCacheService> mock)
+    {
+        public void UpdateRedirectsCalled()
+        {
+            mock.Verify(m => m.UpdateRedirects(), Times.Once);
+        }
+    }
 }

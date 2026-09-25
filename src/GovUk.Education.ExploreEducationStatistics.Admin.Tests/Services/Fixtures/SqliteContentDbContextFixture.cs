@@ -44,7 +44,26 @@ public sealed class SqliteContentDbContextFixture : IDisposable
 
         using var context = CreateContext();
         context.Database.EnsureCreated();
+        CreateTablesExcludedFromMigrations(context);
     }
+
+    /// <summary>
+    /// <c>AspNetRoles</c> belongs to <c>UsersAndRolesDbContext</c>, and <see cref="ContentDbContext"/> maps it
+    /// only so that it can reference it, deliberately excluding it from its own migrations. <c>EnsureCreated</c>
+    /// honours that exclusion and does not create the table, but the <c>Users</c> table still carries a foreign
+    /// key to it, which SQLite enforces - so without this, no test could insert a User.
+    /// </summary>
+    private static void CreateTablesExcludedFromMigrations(ContentDbContext context) =>
+        context.Database.ExecuteSqlRaw(
+            """
+            CREATE TABLE IF NOT EXISTS "AspNetRoles" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_AspNetRoles" PRIMARY KEY,
+                "Name" TEXT NULL,
+                "NormalizedName" TEXT NULL,
+                "ConcurrencyStamp" TEXT NULL
+            );
+            """
+        );
 
     /// <summary>
     /// Creates a new <see cref="ContentDbContext"/> bound to the shared connection. Use separate

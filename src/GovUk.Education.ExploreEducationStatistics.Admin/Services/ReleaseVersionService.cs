@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -55,6 +56,7 @@ public class ReleaseVersionService(
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
+    IPublicBlobStorageService publicBlobStorageService,
     IOrganisationsValidator organisationsValidator,
     IUserPreReleaseRoleRepository userPreReleaseRoleRepository,
     IUserPublicationRoleRepository userPublicationRoleRepository,
@@ -198,8 +200,19 @@ public class ReleaseVersionService(
                 releaseFileService.DeleteAll(releaseVersionId: releaseVersion.Id, forceDelete: forceDeleteRelatedData)
             )
             .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(releaseVersion.Id, cancellationToken))
+            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
             .OnSuccessDo(async _ =>
             {
+                // Methodologies scheduled with this ReleaseVersion have to be unscheduled before it is
+                // deleted. ScheduledWithReleaseVersionId is an optional foreign key with no cascading
+                // action, so the database rejects the delete while any of them still reference it, and
+                // EF's ClientSetNull behaviour cannot save us as they are not being tracked. A
+                // Methodology adopted by this Publication but owned by another one survives the deletion
+                // of this Theme, so this is not only a concern for the Publication being deleted.
+                UpdateMethodologies(releaseVersion.Id);
+
+                await context.SaveChangesAsync(cancellationToken);
+
                 if (hardDeleteContentReleaseVersion)
                 {
                     await HardDeleteReleaseVersion(releaseVersion, cancellationToken);
@@ -209,18 +222,19 @@ public class ReleaseVersionService(
                     await SoftDeleteReleaseVersion(releaseVersion, cancellationToken);
                 }
 
-                UpdateMethodologies(releaseVersion.Id);
-
                 await context.SaveChangesAsync(cancellationToken);
 
-                if (releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved)
-                {
-                    // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
-                    // deleted releases that were left scheduled
-                    await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
-                        releaseVersionIds: [releaseVersion.Id]
-                    );
-                }
+                // Delete this ReleaseVersion's entries in the Azure Storage ReleaseStatus table, or the
+                // Publisher will attempt to publish a deleted ReleaseVersion that was left scheduled.
+                //
+                // This is deliberately not limited to ReleaseVersions that are currently Approved. Entries
+                // outlive that status: un-approving a scheduled ReleaseVersion only has the Publisher mark
+                // its entry as superseded - see NotifyChangeFunction.MarkScheduledReleaseStatusAsSuperseded -
+                // so entries are left behind under a ReleaseVersion that is now back in Draft. Removing
+                // entries for a ReleaseVersion that has none is a no-op.
+                await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
+                    releaseVersionIds: [releaseVersion.Id]
+                );
 
                 // TODO: This may be redundant (investigate as part of EES-1295)
                 await releaseSubjectRepository.DeleteAllReleaseSubjects(
@@ -230,6 +244,12 @@ public class ReleaseVersionService(
 
                 if (forceDeleteRelatedData)
                 {
+                    // DeleteAllReleaseSubjects only deletes Footnotes that are reachable from a Subject of
+                    // this ReleaseVersion, so any Footnote left linked to it solely by its ReleaseFootnote
+                    // has to be removed before deleting the statistics ReleaseVersion cascades that link
+                    // away and strands the Footnote row.
+                    await footnoteRepository.DeleteFootnotesByReleaseVersion(releaseVersion.Id);
+
                     var statsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
                         statsReleaseVersion => statsReleaseVersion.Id == releaseVersion.Id,
                         cancellationToken
@@ -244,20 +264,124 @@ public class ReleaseVersionService(
             });
     }
 
+    /// <summary>
+    /// Deletes any Permalinks belonging to a ReleaseVersion, along with their snapshots in blob storage.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Permalinks have no foreign key to ReleaseVersions, so they are not removed by any cascade delete.
+    /// </para>
+    /// <para>
+    /// Matching on ReleaseVersionId alone is not enough to find them all. The column has been optional since
+    /// the Permalinks table was created and was never backfilled, so Permalinks carried over from the legacy
+    /// storage can hold no ReleaseVersion at all; and until this deletion existed, hard-deleting a
+    /// ReleaseVersion left its Permalinks behind still pointing at it. Both kinds are now only reachable
+    /// through their SubjectId, so Permalinks are matched against the Subjects that this deletion orphans as
+    /// well. Those Subjects belong to no other ReleaseVersion, so no surviving ReleaseVersion can lay claim
+    /// to a Permalink of theirs.
+    /// </para>
+    /// </remarks>
+    private async Task DeletePermalinks(Guid releaseVersionId, CancellationToken cancellationToken)
+    {
+        var orphanedSubjectIds = await GetSubjectIdsOrphanedByDeletion(releaseVersionId, cancellationToken);
+
+        var permalinks = await context
+            .Permalinks.Where(permalink =>
+                permalink.ReleaseVersionId == releaseVersionId || orphanedSubjectIds.Contains(permalink.SubjectId)
+            )
+            .ToListAsync(cancellationToken);
+
+        if (permalinks.Count == 0)
+        {
+            return;
+        }
+
+        // Snapshots are stored as flat blobs named after the Permalink id, so they have to be deleted
+        // individually. The CSV is absent for Permalinks of cropped tables, but deleting a blob that
+        // doesn't exist is a no-op.
+        foreach (var permalink in permalinks)
+        {
+            await publicBlobStorageService.DeleteBlob(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.json.zst"
+            );
+
+            await publicBlobStorageService.DeleteBlob(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.csv.zst"
+            );
+        }
+
+        context.Permalinks.RemoveRange(permalinks);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets the ids of the Subjects that belong to this ReleaseVersion and to no other, and which deleting
+    /// it therefore leaves orphaned.
+    /// </summary>
+    /// <remarks>
+    /// Must be called before the ReleaseSubjects are deleted, as they are what a Subject is reachable by.
+    /// </remarks>
+    private async Task<List<Guid>> GetSubjectIdsOrphanedByDeletion(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        // The Subjects of a cancelled amendment are soft-deleted, so ignore query filters to see them all.
+        var subjectIds = await statisticsDbContext
+            .ReleaseSubject.AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersionId)
+            .Select(releaseSubject => releaseSubject.SubjectId)
+            .ToListAsync(cancellationToken);
+
+        if (subjectIds.Count == 0)
+        {
+            return [];
+        }
+
+        var subjectIdsSharedWithOtherReleaseVersions = await statisticsDbContext
+            .ReleaseSubject.AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(releaseSubject =>
+                subjectIds.Contains(releaseSubject.SubjectId) && releaseSubject.ReleaseVersionId != releaseVersionId
+            )
+            .Select(releaseSubject => releaseSubject.SubjectId)
+            .ToListAsync(cancellationToken);
+
+        return subjectIds.Except(subjectIdsSharedWithOtherReleaseVersions).ToList();
+    }
+
     private async Task HardDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
     {
+        await publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicReleaseFiles,
+            directoryPath: $"{releaseVersion.Id}/"
+        );
+
         await DeleteReleaseSeriesItem(releaseVersion, cancellationToken);
         await DeleteDataBlocks(releaseVersion.Id, cancellationToken);
 
         context.ReleaseVersions.Remove(releaseVersion);
         await context.SaveChangesAsync(cancellationToken);
 
-        var release = await context
-            .Releases.Include(release => release.Versions)
-            .SingleAsync(release => release.Id == releaseVersion.ReleaseId, cancellationToken);
+        // Query filters are ignored here so that soft-deleted ReleaseVersions are counted as remaining.
+        // They are invisible by default, so without this the Release would be removed while they still
+        // referenced it, and the cascade from Releases to ReleaseVersions would either take them with it -
+        // bypassing the file, blob, Permalink and statistics clean-up that deleting a ReleaseVersion goes
+        // through - or fail outright against FK_ReleaseFiles_ReleaseVersions, which does not cascade.
+        var releaseHasRemainingVersions = await context
+            .ReleaseVersions.IgnoreQueryFilters()
+            .AnyAsync(version => version.ReleaseId == releaseVersion.ReleaseId, cancellationToken);
 
-        if (release.Versions.Count == 0)
+        if (!releaseHasRemainingVersions)
         {
+            var release = await context.Releases.SingleAsync(
+                release => release.Id == releaseVersion.ReleaseId,
+                cancellationToken
+            );
+
             context.Releases.Remove(release);
             await context.SaveChangesAsync(cancellationToken);
         }

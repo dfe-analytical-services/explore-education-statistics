@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -29,6 +30,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -1584,6 +1586,11 @@ public abstract class ReleaseVersionServiceTests
                 PublicationId = releaseVersion.Publication.Id,
             };
 
+            var permalink = new Permalink { Id = Guid.NewGuid(), ReleaseVersionId = releaseVersion.Id };
+
+            // This Permalink should not be removed as it is for another ReleaseVersion.
+            var anotherPermalink = new Permalink { Id = Guid.NewGuid(), ReleaseVersionId = anotherReleaseVersion.Id };
+
             // This Methodology is scheduled to go out with the Release being deleted.
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
@@ -1619,6 +1626,7 @@ public abstract class ReleaseVersionServiceTests
                     methodologyScheduledWithRelease,
                     methodologyScheduledWithAnotherRelease
                 );
+                context.Permalinks.AddRange(permalink, anotherPermalink);
                 await context.SaveChangesAsync();
             }
 
@@ -1632,7 +1640,9 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
 
@@ -1654,6 +1664,10 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
             privateCacheService
                 .Setup(mock =>
                     mock.DeleteCacheFolderAsync(
@@ -1661,6 +1675,23 @@ public abstract class ReleaseVersionServiceTests
                     )
                 )
                 .Returns(Task.CompletedTask);
+
+            // Only the snapshots of the deleted ReleaseVersion's Permalink are expected to be deleted.
+            // As this is a Strict mock, deleting the snapshots of any other Permalink would fail the test.
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalink.Id}.json.zst"))
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalink.Id}.csv.zst"))
+                .Returns(Task.CompletedTask);
+
+            if (!releaseVersion.Amendment)
+            {
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                    .Returns(Task.CompletedTask);
+            }
 
             processorClient
                 .Setup(mock =>
@@ -1690,7 +1721,9 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     processorClient: processorClient.Object,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
                 );
@@ -1716,12 +1749,17 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once
                 );
 
+                // This ReleaseVersion is a Draft, so verifying the Strict releasePublishingStatusRepository
+                // asserts that its Azure Storage ReleaseStatus entries are removed regardless of it never
+                // having been Approved - entries outlive that status when a ReleaseVersion is un-approved.
                 VerifyAllMocks(
                     privateCacheService,
+                    publicBlobStorageService,
                     releaseDataFilesService,
                     releaseFileService,
                     dataSetUploadRepository,
                     processorClient,
+                    releasePublishingStatusRepository,
                     userPreReleaseRoleRepository
                 );
 
@@ -1776,6 +1814,11 @@ public abstract class ReleaseVersionServiceTests
                     Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
                 }
 
+                // Assert that the Permalinks belonging to the deleted ReleaseVersion have been removed, and
+                // that Permalinks belonging to other ReleaseVersions are unaffected
+                var remainingPermalink = Assert.Single(contentDbContext.Permalinks);
+                Assert.Equal(anotherPermalink.Id, remainingPermalink.Id);
+
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodologyVersion = await contentDbContext.MethodologyVersions.SingleAsync(m =>
@@ -1808,6 +1851,316 @@ public abstract class ReleaseVersionServiceTests
                         rv.Id == statisticsReleaseVersion.Id
                     )
                 );
+            }
+        }
+
+        [Fact]
+        public async Task Success_ReleaseIsRetainedWhileASoftDeletedVersionStillReferencesIt()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            // Version 0 is not an Amendment, so deleting it hard-deletes it.
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release).WithVersion(0);
+
+            // A cancelled amendment of the same Release. It is soft-deleted, so it is invisible to any
+            // query that does not ignore query filters - including the one that decides whether the Release
+            // still has any versions left.
+            ReleaseVersion cancelledAmendment = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(1);
+            cancelledAmendment.SoftDeleted = true;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.AddRange(releaseVersion, cancelledAmendment);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<List<UserPreReleaseRole>>(), default))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: InMemoryStatisticsDbContext(contextId),
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                // The deleted ReleaseVersion is gone
+                Assert.Null(
+                    await contentDbContext
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == releaseVersion.Id)
+                );
+
+                // The Release survives, because removing it would cascade into the soft-deleted amendment
+                // and take it away without any of its own clean-up having been done
+                Assert.NotNull(await contentDbContext.Releases.SingleOrDefaultAsync(r => r.Id == release.Id));
+
+                Assert.NotNull(
+                    await contentDbContext
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == cancelledAmendment.Id)
+                );
+            }
+        }
+
+        [Fact]
+        public async Task Success_DeletesPermalinksOfSubjectsOrphanedByTheDeletion()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(release).WithVersion(0);
+
+            ReleaseVersion survivingReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(_dataFixture.DefaultRelease().WithPublication(release.Publication))
+                .WithVersion(0);
+
+            // Attached to the ReleaseVersion being deleted and to no other, so the deletion orphans it.
+            var orphanedSubjectId = Guid.NewGuid();
+
+            // Attached to the ReleaseVersion being deleted and to one that survives it, so it lives on.
+            var sharedSubjectId = Guid.NewGuid();
+
+            // A Permalink carried over from the legacy storage, which holds no ReleaseVersion at all and so
+            // is only reachable through its Subject.
+            var legacyPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = null,
+                SubjectId = orphanedSubjectId,
+            };
+
+            // A Permalink left behind by an earlier deletion, still pointing at a ReleaseVersion that no
+            // longer exists.
+            var strandedPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
+                SubjectId = orphanedSubjectId,
+            };
+
+            // This Permalink's Subject is still attached to a surviving ReleaseVersion, so it must be kept.
+            var sharedSubjectPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = null,
+                SubjectId = sharedSubjectId,
+            };
+
+            // This Permalink has nothing to do with the ReleaseVersion being deleted.
+            var unrelatedPermalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                ReleaseVersionId = survivingReleaseVersion.Id,
+                SubjectId = Guid.NewGuid(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.ReleaseVersions.AddRange(releaseVersion, survivingReleaseVersion);
+                context.Permalinks.AddRange(
+                    legacyPermalink,
+                    strandedPermalink,
+                    sharedSubjectPermalink,
+                    unrelatedPermalink
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                context.ReleaseSubject.AddRange(
+                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = orphanedSubjectId },
+                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = sharedSubjectId },
+                    new ReleaseSubject { ReleaseVersionId = survivingReleaseVersion.Id, SubjectId = sharedSubjectId }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            // As this is a Strict mock, deleting the snapshots of any other Permalink would fail the test.
+            foreach (var permalinkId in new[] { legacyPermalink.Id, strandedPermalink.Id })
+            {
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalinkId}.json.zst"))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobStorageService
+                    .Setup(mock => mock.DeleteBlob(BlobContainers.PermalinkSnapshots, $"{permalinkId}.csv.zst"))
+                    .Returns(Task.CompletedTask);
+            }
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<List<UserPreReleaseRole>>(), default))
+                .Returns(Task.CompletedTask);
+
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+
+                VerifyAllMocks(publicBlobStorageService);
+
+                // The Permalinks of the orphaned Subject are gone, however they referenced their
+                // ReleaseVersion, while those still claimed by a surviving ReleaseVersion are untouched.
+                var remainingPermalinkIds = contentDbContext.Permalinks.Select(p => p.Id).ToList();
+
+                Assert.Equal(2, remainingPermalinkIds.Count);
+                Assert.Contains(sharedSubjectPermalink.Id, remainingPermalinkIds);
+                Assert.Contains(unrelatedPermalink.Id, remainingPermalinkIds);
             }
         }
 
@@ -1904,6 +2257,179 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 VerifyAllMocks(processorClient);
+            }
+        }
+
+        /// <summary>
+        /// A Methodology scheduled with the ReleaseVersion being deleted has to be unscheduled before the
+        /// ReleaseVersion row is removed, not after. ScheduledWithReleaseVersionId is an optional foreign
+        /// key with no cascading action, and the Methodology is not tracked at that point, so the database
+        /// rejects the delete while the reference stands.
+        /// </summary>
+        /// <remarks>
+        /// This runs against SQLite with foreign keys enforced. The EF Core in-memory provider enforces
+        /// none, so it would report a pass whichever order the two steps run in.
+        /// </remarks>
+        [Fact]
+        public async Task ScheduledMethodologyIsUnscheduledBeforeReleaseVersionIsDeleted()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            var role = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "BAU User",
+                NormalizedName = "BAU USER",
+            };
+
+            // Users.CreatedById is a required self-referencing foreign key, so the user has to be created
+            // by a user that exists - itself, here.
+            var createdById = Guid.NewGuid();
+
+            User createdBy = _dataFixture
+                .DefaultUser()
+                .WithId(createdById)
+                .WithCreatedById(createdById)
+                .WithRoleId(role.Id);
+
+            // Version 0 is not an Amendment, so this is hard deleted and the DELETE actually reaches the
+            // database. An Amendment is only soft deleted, where the ordering does not matter.
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(0)
+                .WithCreated(createdById: createdBy.Id);
+
+            // A Methodology owned by another Publication, adopted by this one and scheduled to publish
+            // with the ReleaseVersion being deleted. It outlives the ReleaseVersion, so nothing removes
+            // it on our behalf.
+            var methodology = new Methodology
+            {
+                Id = Guid.NewGuid(),
+                OwningPublicationTitle = "Adopted methodology",
+                OwningPublicationSlug = "adopted-methodology",
+            };
+
+            var scheduledMethodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                Status = MethodologyApprovalStatus.Approved,
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
+                Methodology = methodology,
+                CreatedById = createdBy.Id,
+            };
+
+            using var sqliteFixture = new SqliteContentDbContextFixture(enforceForeignKeys: true);
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                context.Set<IdentityRole>().Add(role);
+                context.Users.Add(createdBy);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.MethodologyVersions.Add(scheduledMethodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseSubjectRepository
+                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<IList<UserPreReleaseRole>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: InMemoryStatisticsDbContext(),
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+            }
+
+            await using (var context = sqliteFixture.CreateContext())
+            {
+                Assert.Null(
+                    await context
+                        .ReleaseVersions.IgnoreQueryFilters()
+                        .SingleOrDefaultAsync(rv => rv.Id == releaseVersion.Id)
+                );
+
+                // The Methodology survives the ReleaseVersion it was scheduled with, reverted to a draft
+                // that publishes immediately
+                var updatedMethodologyVersion = await context.MethodologyVersions.SingleAsync(mv =>
+                    mv.Id == scheduledMethodologyVersion.Id
+                );
+
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersionId);
+                Assert.True(updatedMethodologyVersion.ScheduledForPublishingImmediately);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodologyVersion.Status);
             }
         }
     }
@@ -2003,9 +2529,11 @@ public abstract class ReleaseVersionServiceTests
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             var forceDeleteRelatedData = true;
 
@@ -2023,6 +2551,10 @@ public abstract class ReleaseVersionServiceTests
 
             releaseSubjectRepository
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+                .Returns(Task.CompletedTask);
+
+            footnoteRepository
+                .Setup(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id))
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2047,6 +2579,11 @@ public abstract class ReleaseVersionServiceTests
                 )
                 .ReturnsAsync(Unit.Instance);
 
+            // The files copied into public storage when the ReleaseVersion was published are deleted with it
+            publicBlobStorageService
+                .Setup(mock => mock.DeleteBlobs(BlobContainers.PublicReleaseFiles, $"{releaseVersion.Id}/", null))
+                .Returns(Task.CompletedTask);
+
             userPreReleaseRoleRepository.SetupQuery(
                 ResourceRoleFilter.All,
                 [userPreReleaseRoles[0], userPreReleaseRoles[1]]
@@ -2066,9 +2603,11 @@ public abstract class ReleaseVersionServiceTests
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
+                    footnoteRepository: footnoteRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
-                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object
                 );
 
                 // Act
@@ -2090,13 +2629,17 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once
                 );
 
+                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
+
                 VerifyAllMocks(
                     privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
+                    footnoteRepository,
                     processorClient,
                     releasePublishingStatusRepository,
-                    userPreReleaseRoleRepository
+                    userPreReleaseRoleRepository,
+                    publicBlobStorageService
                 );
 
                 result.AssertRight();
@@ -2645,6 +3188,7 @@ public abstract class ReleaseVersionServiceTests
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null,
         IUserPreReleaseRoleRepository? userPreReleaseRoleRepository = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
@@ -2676,6 +3220,7 @@ public abstract class ReleaseVersionServiceTests
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),
+            publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             _organisationsValidator.Build(),
             userPreReleaseRoleRepository ?? Mock.Of<IUserPreReleaseRoleRepository>(Strict),
             userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
