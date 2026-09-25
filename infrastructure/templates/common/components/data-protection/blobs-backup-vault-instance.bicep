@@ -33,6 +33,9 @@ resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2
       objectType: 'Datasource'
       resourceID: resourceId
       resourceLocation: resourceLocation
+      resourceName: last(split(resourceId, '/'))
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      resourceUri: ''
     }
     policyInfo: {
       policyId: policy.id

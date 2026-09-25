@@ -41,8 +41,8 @@ resource backupVault 'Microsoft.DataProtection/backupVaults@2026-06-01' existing
 
 // TODO EES-7502 - use standardised naming convention for Core Storage.
 var storageAccountName = environmentName == 'Test' || environmentName == 'Pre-Production' 
-  ? '${subscription}${abbreviations.storageStorageAccounts}eescore'
-  : '${subscription}storageeescore'
+  ? '${subscription}storageeescore'
+  : '${subscription}${abbreviations.storageStorageAccounts}eescore'
 
 // TODO EES-7502 - remove when standardising role assignment GUID generation.
 var backupContributorRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1') 
