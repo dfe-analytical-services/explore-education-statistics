@@ -20,8 +20,14 @@ param sku StorageAccountSku = 'Standard_LRS'
 @description('Storage Account kind')
 param kind StorageAccountKind = 'StorageV2'
 
+@description('The access tier for Blob access.')
+param accessTier 'Hot' | 'Cool' | 'Cold' | 'Premium' = 'Hot'
+
 @description('Key Vault Name.  If specified, a Key Vault secret will be added for this storage account connection string.')
 param keyVaultName string?
+
+@description('The name of the Key Vault secret holding the connection string for this storage account. Defaults to "<storageAccountName>-connection-string" if not supplied.')
+param connectionStringSecretNameOverride string?
 
 @description('Whether the storage account is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -51,6 +57,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     name: sku
   }
   properties: {
+    accessTier: accessTier
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
@@ -161,7 +168,8 @@ module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && 
 var key = storageAccount.listKeys().keys[0].value
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
-var connectionStringSecretName = '${storageAccountName}-connection-string'
+// TODO EES-7502 - make secret names consistent.
+var connectionStringSecretName = connectionStringSecretNameOverride ?? '${storageAccountName}-connection-string'
 
 module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null) {
   name: '${storageAccountName}ConnectionStringSecretDeploy'

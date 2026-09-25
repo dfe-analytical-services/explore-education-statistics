@@ -1,5 +1,6 @@
 import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
+import { IpRange } from '../common/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -33,6 +34,9 @@ param recoveryServicesVaultImmutable bool = false
 
 @description('Retention of storage account blobs in days.')
 param blobDeleteRetentionDays int = 90
+
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[] = []
 
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
@@ -225,6 +229,23 @@ module loggingStorageAccountModule 'application/logging-storage-account/logging-
     subscription: subscription
     alertsGroupName: alertsModule.outputs.actionGroupName
     blobDeleteRetentionDays: blobDeleteRetentionDays
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module coreStorageAccountModule 'application/core-storage-account/core-storage-account.bicep' = {
+  name: 'coreStorageAccountModuleDeploy'
+  params: {
+    subscription: subscription
+    environmentName: environmentName
+    subnets: vNetModule.outputs.subnets
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    backupVaultName: backupsModule.outputs.backupVaultName
+    backupBlobsPolicyName: backupsModule.outputs.backupVaultBlobsPolicyName
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    firewallRules: maintenanceIpRanges
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

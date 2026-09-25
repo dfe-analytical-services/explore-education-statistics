@@ -4,6 +4,7 @@ type StorageAccountRole =
   | 'Storage Blob Data Owner'
   | 'Storage Blob Data Reader'
   | 'Storage Queue Data Contributor'
+  | 'Storage Account Backup Contributor'
 
 @description('Specifies the name of the Storage Account.')
 param storageAccountName string
@@ -17,6 +18,10 @@ param principalIds string[]
 // principal is allowed to assign.
 @description('Specifies the role to assign to the service principals')
 param role StorageAccountRole
+
+// TODO EES-7502 - standardise role assignment GUIDs.
+@description('The name of the role assignment resource. Auto-calculated by default, so little need to use this unless supporting existing role assignments when switching to Bicep.')
+param roleAssignmentNameOverride string?
 
 var rolesToRoleIds = {
   'Storage Blob Data Contributor': 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
@@ -35,7 +40,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
 // role.
 resource storageAccountRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principalId in principalIds: {
   scope: storageAccount
-  name: guid(storageAccount.id, principalId, rolesToRoleIds[role])
+  name: roleAssignmentNameOverride ?? guid(storageAccount.id, principalId, rolesToRoleIds[role])
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', rolesToRoleIds[role])
     principalId: principalId

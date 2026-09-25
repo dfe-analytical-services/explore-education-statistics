@@ -21,7 +21,7 @@ param excludedContainerPrefixes string[] = []
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2022-05-01' existing = {
+resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2026-06-01' existing = {
   name: '${vaultName}/${backupPolicyName}'
 }
 
@@ -33,6 +33,9 @@ resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2
       objectType: 'Datasource'
       resourceID: resourceId
       resourceLocation: resourceLocation
+      resourceName: last(split(resourceId, '/'))
+      resourceType: 'Microsoft.Storage/storageAccounts'
+      resourceUri: ''
     }
     policyInfo: {
       policyId: policy.id
