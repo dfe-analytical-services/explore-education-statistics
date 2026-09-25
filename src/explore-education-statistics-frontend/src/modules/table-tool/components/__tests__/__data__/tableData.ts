@@ -286,6 +286,9 @@ export const testFinalResult: FinalDataset = {
     end: { code: 'AY', year: 2016 },
   },
   indicators: [],
+  isValidForTableGeneration: true,
+  validationErrors: [],
+  validationWarnings: [],
 };
 
 export const testTableDataResponse: TableDataResponse = {
