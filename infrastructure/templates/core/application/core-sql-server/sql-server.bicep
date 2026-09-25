@@ -390,100 +390,27 @@ module privateEndpointModule '../../../common/components/privateEndpoint.bicep' 
   }
 }
 
-var sqlDatabaseAlertDefinitions = [
-  {
-    metric: 'cpu_percent'
-    nameSuffix: 'cpu-percent'
-    threshold: '85'
-    aggregation: 'Average'
+module statisticsDbAlertsModule 'database-alerts.bicep' = {
+  name: 'statisticsDbAlertsDeploy'
+  params: {
+    resourceName: 'statistics'
+    databaseId: statisticsDb.id
+    alertsGroupName: alertsGroupName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
   }
-  {
-    metric: 'physical_data_read_percent'
-    nameSuffix: 'data-io-percent'
-    threshold: '85'
-    aggregation: 'Average'
-  }
-  {
-    metric: 'connection_failed'
-    nameSuffix: 'failed-connections'
-    threshold: '0'
-    aggregation: 'Total'
-  }
-  {
-    metric: 'deadlock'
-    nameSuffix: 'deadlock'
-    threshold: '0'
-    aggregation: 'Total'
-  }
-  {
-    metric: 'storage_percent'
-    nameSuffix: 'data-space-used-percent'
-    threshold: '85'
-    aggregation: 'Maximum'
-  }
-  {
-    metric: 'storage_percent'
-    nameSuffix: 'data-space-used-percent-urgent'
-    threshold: '95'
-    aggregation: 'Maximum'
-  }
-  {
-    metric: 'blocked_by_firewall'
-    nameSuffix: 'blocked-by-firewall'
-    threshold: '0'
-    aggregation: 'Total'
-  }
-]
+}
 
-module statisticsDbAlerts '../../../common/components/alerts/staticMetricAlert.bicep' = [
-  for alertDefinition in sqlDatabaseAlertDefinitions: if (deployAlerts) {
-    name: 'statisticsDb${alertDefinition.nameSuffix}AlertDeploy'
-    params: {
-      resourceName: 'statistics'
-      id: statisticsDb.id
-      resourceMetric: {
-        resourceType: 'Microsoft.Sql/servers/databases'
-        metric: alertDefinition.metric
-      }
-      config: {
-        nameSuffix: alertDefinition.nameSuffix
-        aggregation: alertDefinition.aggregation
-        operator: 'GreaterThan'
-        threshold: alertDefinition.threshold
-        evaluationFrequency: 'PT1M'
-        windowSize: 'PT5M'
-        severity: 'Informational'
-      }
-      alertsGroupName: alertsGroupName
-      tagValues: tagValues
-    }
+module contentDbAlertsModule 'database-alerts.bicep' = {
+  name: 'contentDbAlertsDeploy'
+  params: {
+    resourceName: 'content'
+    databaseId: contentDb.id
+    alertsGroupName: alertsGroupName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
   }
-]
-
-module contentDbAlerts '../../../common/components/alerts/staticMetricAlert.bicep' = [
-  for alertDefinition in sqlDatabaseAlertDefinitions: if (deployAlerts) {
-    name: 'contentDb${alertDefinition.nameSuffix}AlertDeploy'
-    params: {
-      resourceName: 'content'
-      id: contentDb.id
-      resourceMetric: {
-        resourceType: 'Microsoft.Sql/servers/databases'
-        metric: alertDefinition.metric
-      }
-      config: {
-        nameSuffix: alertDefinition.nameSuffix
-        aggregation: alertDefinition.aggregation
-        operator: 'GreaterThan'
-        threshold: alertDefinition.threshold
-        evaluationFrequency: 'PT1M'
-        windowSize: 'PT5M'
-        severity: 'Informational'
-      }
-      alertsGroupName: alertsGroupName
-      tagValues: tagValues
-    }
-  }
-]
+}
 
 output serverName string = sqlServer.name
 output serverFqdn string = sqlServer.properties.fullyQualifiedDomainName
