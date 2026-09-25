@@ -46,7 +46,7 @@ const ListItem = ({ children, term, testId = term }: ListItemProps) => {
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;

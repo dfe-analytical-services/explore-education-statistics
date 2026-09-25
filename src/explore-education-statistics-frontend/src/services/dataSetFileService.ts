@@ -79,6 +79,7 @@ export interface DataSetFileSummary {
     title: string;
     slug: string;
   };
+  publishingOrganisationTitles?: string[];
   release: {
     id: string;
     title: string;

@@ -13,7 +13,7 @@ const ContactUsSection = ({
 }: {
   publicationContact: Contact;
   publicationTitle: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
 }) => {
   const isSkillsEngland = !!publishingOrganisations?.find(
     org => org.title === 'Skills England',

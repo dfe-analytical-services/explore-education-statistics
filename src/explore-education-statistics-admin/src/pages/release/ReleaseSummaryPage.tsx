@@ -58,6 +58,7 @@ const ReleaseSummaryPage = () => {
               {releaseVersion.label ?? ''}
             </SummaryListItem>
             <SummaryListItem term="Published by">
+              {/* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */}
               {releaseVersion.publishingOrganisations?.length
                 ? releaseVersion.publishingOrganisations.map((org, index) => (
                     <Fragment key={org.id}>
