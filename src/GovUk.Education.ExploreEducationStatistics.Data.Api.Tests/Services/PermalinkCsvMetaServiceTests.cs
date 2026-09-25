@@ -10,8 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
@@ -891,7 +894,21 @@ public class PermalinkCsvMetaServiceTests
         return new(
             logger: Mock.Of<ILogger<PermalinkCsvMetaService>>(),
             contentDbContext: contentDbContext,
-            statisticsDbContext: statisticsDbContext,
+            storageDataSetResolver: new StatisticsDbDataSetResolver(
+                context: statisticsDbContext,
+                observationService: Mock.Of<IObservationService>(Strict),
+                filterRepository: new FilterRepository(statisticsDbContext),
+                indicatorGroupRepository: new IndicatorGroupRepository(statisticsDbContext),
+                locationRepository: new LocationRepository(statisticsDbContext),
+                allObservationsMatchedFilterItemsStrategy: Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
+                sparseObservationsMatchedFilterItemsStrategy: Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(
+                    Strict
+                ),
+                denseObservationsMatchedFilterItemsStrategy: Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(
+                    Strict
+                ),
+                logger: Mock.Of<ILogger<StatisticsDbDataSet>>()
+            ),
             releaseSubjectService: releaseSubjectService ?? Mock.Of<IReleaseSubjectService>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );

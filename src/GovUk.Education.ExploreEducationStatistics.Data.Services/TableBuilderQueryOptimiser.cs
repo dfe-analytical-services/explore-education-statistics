@@ -1,19 +1,15 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class TableBuilderQueryOptimiser(
-    StatisticsDbContext statisticsDbContext,
-    IFilterItemRepository filterItemRepository,
+    IStorageDataSetResolver storageDataSetResolver,
     IOptions<TableBuilderOptions> options
 ) : ITableBuilderQueryOptimiser
 {
@@ -21,16 +17,18 @@ public class TableBuilderQueryOptimiser(
     {
         var filterItemIds = query.GetFilterItemIds();
 
-        var countsOfFilterItemsByFilter =
-            filterItemIds.Count == 0
-                ? []
-                : (await filterItemRepository.CountFilterItemsByFilter(filterItemIds))
-                    .Select(pair =>
-                    {
-                        var (_, count) = pair;
-                        return count;
-                    })
-                    .ToList();
+        List<int> countsOfFilterItemsByFilter;
+
+        if (filterItemIds.Count == 0)
+        {
+            countsOfFilterItemsByFilter = [];
+        }
+        else
+        {
+            var dataSet = await storageDataSetResolver.Resolve(query.SubjectId);
+            var countsByFilter = await dataSet.CountFilterItemsByFilter(filterItemIds);
+            countsOfFilterItemsByFilter = countsByFilter.Values.ToList();
+        }
 
         return TableBuilderUtils.MaximumTableCellCount(
             countOfIndicators: query.Indicators.Count(),
@@ -92,9 +90,8 @@ public class TableBuilderQueryOptimiser(
             { GeographicLevel.Ward, 2 },
         };
 
-        var locations = await statisticsDbContext
-            .Location.Where(l => query.LocationIds.Contains(l.Id))
-            .ToListAsync(cancellationToken);
+        var dataSet = await storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
+        var locations = await dataSet.ListLocations(query.LocationIds, cancellationToken);
 
         var croppedLocationIds = locations
             .GroupBy(l => l.GeographicLevel)

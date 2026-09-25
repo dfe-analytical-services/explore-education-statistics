@@ -9,8 +9,6 @@ public interface ITimePeriodService
 {
     Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(Guid subjectId);
 
-    Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(IQueryable<Observation> observationsQuery);
-
     IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IList<Observation> observations);
 
     Task<TimePeriodLabels> GetTimePeriodLabels(Guid subjectId);
