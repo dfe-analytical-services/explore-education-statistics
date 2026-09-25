@@ -29,9 +29,8 @@ public class SubjectResultMetaService : ISubjectResultMetaService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
     private readonly IBoundaryLevelRepository _boundaryLevelRepository;
-    private readonly IFilterItemRepository _filterItemRepository;
     private readonly IFootnoteRepository _footnoteRepository;
-    private readonly IIndicatorRepository _indicatorRepository;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly ILocationService _locationService;
     private readonly ITimePeriodService _timePeriodService;
     private readonly IUserService _userService;
@@ -44,9 +43,8 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         ContentDbContext contentDbContext,
         IPersistenceHelper<StatisticsDbContext> persistenceHelper,
         IBoundaryLevelRepository boundaryLevelRepository,
-        IFilterItemRepository filterItemRepository,
         IFootnoteRepository footnoteRepository,
-        IIndicatorRepository indicatorRepository,
+        IStorageDataSetResolver storageDataSetResolver,
         ILocationService locationService,
         ITimePeriodService timePeriodService,
         IUserService userService,
@@ -59,9 +57,8 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
         _boundaryLevelRepository = boundaryLevelRepository;
-        _filterItemRepository = filterItemRepository;
         _footnoteRepository = footnoteRepository;
-        _indicatorRepository = indicatorRepository;
+        _storageDataSetResolver = storageDataSetResolver;
         _locationService = locationService;
         _timePeriodService = timePeriodService;
         _userService = userService;
@@ -85,6 +82,8 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                 var stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
 
+                var dataSet = await _storageDataSetResolver.Resolve(releaseSubject.SubjectId);
+
                 var locations = observations.Select(o => o.Location).Distinct().ToList();
 
                 _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -95,7 +94,12 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                     subjectId: releaseSubject.SubjectId
                 );
 
-                var filterItems = await _filterItemRepository.GetFilterItemsFromObservations(observations);
+                var filterItemIds = observations
+                    .SelectMany(observation => observation.FilterItems)
+                    .Select(ofi => ofi.FilterItemId)
+                    .Distinct()
+                    .ToList();
+                var filterItems = await dataSet.ListFilterItems(filterItemIds);
                 var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,
                     releaseFile.FilterSequence
@@ -103,7 +107,11 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                 _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                var indicatorViewModels = GetIndicatorViewModels(query, releaseFile.IndicatorSequence);
+                var indicatorViewModels = await GetIndicatorViewModels(
+                    dataSet,
+                    query.Indicators,
+                    releaseFile.IndicatorSequence
+                );
                 _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
@@ -167,12 +175,13 @@ public class SubjectResultMetaService : ISubjectResultMetaService
             .ToList();
     }
 
-    private List<IndicatorMetaViewModel> GetIndicatorViewModels(
-        FullTableQuery query,
+    private static async Task<List<IndicatorMetaViewModel>> GetIndicatorViewModels(
+        IStorageDataSet dataSet,
+        IEnumerable<Guid> indicatorIds,
         List<IndicatorGroupSequenceEntry>? indicatorSequence
     )
     {
-        var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
+        var indicators = await dataSet.ListIndicators(indicatorIds);
 
         // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
         // been fetched without groups
