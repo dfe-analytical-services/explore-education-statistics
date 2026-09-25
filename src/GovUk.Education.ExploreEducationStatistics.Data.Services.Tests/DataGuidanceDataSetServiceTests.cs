@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
@@ -725,7 +726,7 @@ public class DataGuidanceDataSetServiceTests
     private static DataGuidanceDataSetService SetupService(
         StatisticsDbContext? statisticsDbContext = null,
         ContentDbContext? contentDbContext = null,
-        IIndicatorRepository? indicatorRepository = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IFootnoteRepository? footnoteRepository = null,
         ITimePeriodService? timePeriodService = null
     )
@@ -734,11 +735,10 @@ public class DataGuidanceDataSetServiceTests
         contentDbContext ??= InMemoryContentDbContext();
 
         return new(
-            statisticsDbContext,
             contentDbContext,
-            indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
-            timePeriodService ?? new TimePeriodService(statisticsDbContext)
+            timePeriodService ?? new TimePeriodService()
         );
     }
 }
