@@ -2,8 +2,8 @@ import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../a
 import { StorageAccountPrivateEndpoints, StorageAccountKind, StorageAccountSku } from 'types.bicep'
 import { IpRange } from '../../types.bicep'
 
-@description('Specifies the location for all resources.')
-param location string
+@description('Specifies the location for all resources.  Defaults to the Resource Group location.')
+param location string = resourceGroup().location
 
 @description('Storage Account Name')
 param storageAccountName string
@@ -20,8 +20,8 @@ param sku StorageAccountSku = 'Standard_LRS'
 @description('Storage Account kind')
 param kind StorageAccountKind = 'StorageV2'
 
-@description('Key Vault Name')
-param keyVaultName string
+@description('Key Vault Name.  If specified, a Key Vault secret will be added for this storage account connection string.')
+param keyVaultName string?
 
 @description('Whether the storage account is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -41,6 +41,8 @@ param tagValues object
 
 var endpointSuffix = environment().suffixes.storage
 
+var deployNetworkAccessRestrictions = publicNetworkAccessEnabled && (length(firewallRules) > 0 || length(allowedSubnetIds) > 0)
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
@@ -52,19 +54,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
     publicNetworkAccess: publicNetworkAccessEnabled ? 'Enabled' : 'Disabled'
-    networkAcls: {
+    networkAcls: deployNetworkAccessRestrictions ? {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules: [for firewallRule in firewallRules: {
+      ipRules: map(firewallRules, firewallRule => {
         value: firewallRule.cidr
         action: 'Allow'
-      }]
-      virtualNetworkRules: [for subnetId in allowedSubnetIds: {
+      })
+      virtualNetworkRules: map(allowedSubnetIds, subnetId => {
         #disable-next-line use-resource-id-functions
         id: subnetId
         action: 'Allow'
-      }]
-    }
+      })
+    } : null
   }
   tags: tagValues
 }
@@ -161,21 +163,21 @@ var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName
 
 var connectionStringSecretName = '${storageAccountName}-connection-string'
 
-module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = {
+module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null) {
   name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
-    keyVaultName: keyVaultName
-    secretValue: storageAccountConnectionString
+    keyVaultName: keyVaultName!
     secretName: connectionStringSecretName
+    secretValue: storageAccountConnectionString
   }
 }
 
 var accessKeySecretName = '${storageAccountName}-access-key'
 
-module storeAccessKeyToKeyVault '../key-vault/keyVaultSecret.bicep' = {
+module storeAccessKeyToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null) {
   name: '${storageAccountName}AccessKeySecretDeploy'
   params: {
-    keyVaultName: keyVaultName
+    keyVaultName: keyVaultName!
     secretValue: key
     secretName: accessKeySecretName
   }
