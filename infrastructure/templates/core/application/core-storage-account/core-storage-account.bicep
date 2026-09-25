@@ -102,4 +102,8 @@ module backupVaultRegistration '../../../common/components/data-protection/blobs
     excludedContainerPrefixes: ['cache']
     tagValues: tagValues
   }
+  dependsOn: [
+    blobServiceModule
+    backupVaultRoleAssignmentModule
+  ]
 }
