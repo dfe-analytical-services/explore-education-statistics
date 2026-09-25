@@ -47,6 +47,11 @@ public static class FileExtensions
         return $"{FilesPath(rootPath, type)}{fileId}";
     }
 
+    public static string ParquetV1Path(this File file)
+    {
+        return $"{file.Path()}.parquet";
+    }
+
     public static string PublicPath(this File file, Guid releaseVersionId)
     {
         if (!PublicFileTypes.Contains(file.Type))

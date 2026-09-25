@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -203,11 +204,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -225,7 +232,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -418,11 +425,14 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -440,7 +450,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -553,11 +563,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -575,7 +591,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -703,11 +719,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -725,7 +747,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -842,11 +864,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -864,7 +892,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -1011,11 +1039,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -1033,7 +1067,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -1154,11 +1188,14 @@ public class ProcessorStage3Tests
             observationBatchImporterMock.Object
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -1181,7 +1218,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -1269,11 +1306,14 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -1291,7 +1331,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -1424,11 +1464,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -1446,7 +1492,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 
@@ -1598,11 +1644,17 @@ public class ProcessorStage3Tests
             observationBatchImporter
         );
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService
+            .Setup(s => s.WriteParquetV1File(It.Is<DataImport>(i => i.Id == import.Id)))
+            .Returns(Task.CompletedTask);
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            dataSetParquetService.Object,
             importerService
         );
 
@@ -1620,7 +1672,7 @@ public class ProcessorStage3Tests
 
         var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService);
+        VerifyAllMocks(privateBlobStorageService, dataSetParquetService);
 
         Assert.Empty(outputMessages);
 

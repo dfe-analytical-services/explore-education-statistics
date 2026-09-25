@@ -16,6 +16,7 @@ public class FileImportService(
     IPrivateBlobStorageService privateBlobStorageService,
     IDataImportService dataImportService,
     IDataSetMappingService dataSetMappingService,
+    IDataSetParquetService dataSetParquetService,
     IImporterService importerService
 ) : IFileImportService
 {
@@ -124,6 +125,7 @@ public class FileImportService(
         {
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
             await dataImportService.WriteDataSetFileMeta(import);
+            await dataSetParquetService.WriteParquetV1File(import);
         }
         catch (Exception e)
         {

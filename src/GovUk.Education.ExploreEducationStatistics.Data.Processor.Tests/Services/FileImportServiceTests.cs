@@ -56,6 +56,9 @@ public class FileImportServiceTests
             .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
             .Returns(Task.CompletedTask);
 
+        var dataSetParquetService = new Mock<IDataSetParquetService>(Strict);
+        dataSetParquetService.Setup(s => s.WriteParquetV1File(import)).Returns(Task.CompletedTask);
+
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -73,12 +76,13 @@ public class FileImportServiceTests
         {
             var service = BuildFileImportService(
                 dataImportService: dataImportService.Object,
-                dataSetMappingService: dataSetMappingService.Object
+                dataSetMappingService: dataSetMappingService.Object,
+                dataSetParquetService: dataSetParquetService.Object
             );
             await service.CompleteImport(import, statisticsDbContext);
         }
 
-        VerifyAllMocks(dataImportService);
+        VerifyAllMocks(dataImportService, dataSetMappingService, dataSetParquetService);
     }
 
     [Fact]
@@ -248,7 +252,8 @@ public class FileImportServiceTests
         IImporterService importerService = null,
         ILogger<FileImportService> logger = null,
         IDataImportService dataImportService = null,
-        IDataSetMappingService dataSetMappingService = null
+        IDataSetMappingService dataSetMappingService = null,
+        IDataSetParquetService dataSetParquetService = null
     )
     {
         return new FileImportService(
@@ -256,6 +261,7 @@ public class FileImportServiceTests
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             dataSetMappingService ?? Mock.Of<IDataSetMappingService>(Strict),
+            dataSetParquetService ?? Mock.Of<IDataSetParquetService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict)
         );
     }

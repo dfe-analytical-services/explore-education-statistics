@@ -257,6 +257,7 @@ public class ProcessorStage2Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
+            Mock.Of<IDataSetParquetService>(Strict),
             importerService
         );
 
