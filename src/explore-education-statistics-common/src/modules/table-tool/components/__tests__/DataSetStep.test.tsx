@@ -44,6 +44,7 @@ describe('DataSetStep', () => {
         to: '2020',
       },
       geographicLevels: ['National', 'Local Authority'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-2',
         name: 'Subject 2',
