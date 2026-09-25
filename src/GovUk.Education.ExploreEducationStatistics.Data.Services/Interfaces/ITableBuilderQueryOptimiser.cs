@@ -1,10 +1,12 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface ITableBuilderQueryOptimiser
 {
-    Task<bool> IsCroppingRequired(FullTableQuery query);
+    Task<Either<ActionResult, bool>> IsCroppingRequired(FullTableQuery query);
 
-    Task<FullTableQuery> CropQuery(FullTableQuery query, CancellationToken cancellationToken);
+    Task<Either<ActionResult, FullTableQuery>> CropQuery(FullTableQuery query, CancellationToken cancellationToken);
 }
