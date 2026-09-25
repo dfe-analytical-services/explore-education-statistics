@@ -65,13 +65,6 @@ param tagValues object
 
 var coreSqlServerName = '${subscription}-sqlsvr-ees-01'
 
-resource loggingStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
-  name: loggingStorageAccountName
-}
-
-var loggingStorageEndpoint = loggingStorageAccount.properties.primaryEndpoints.blob
-var loggingStorageAccessKey = loggingStorageAccount.listKeys().keys[0].value
-
 resource sqlServer 'Microsoft.Sql/servers@2025-01-01' = {
   name: coreSqlServerName
   location: location
@@ -85,27 +78,6 @@ resource sqlServer 'Microsoft.Sql/servers@2025-01-01' = {
   tags: union(tagValues, {
     ServiceType: 'SQL Server'
   })
-}
-
-resource masterDb 'Microsoft.Sql/servers/databases@2025-01-01' existing = {
-  parent: sqlServer
-  name: 'master'
-}
-
-var databaseDiagnosticsLogsAndMetrics = {
-  logs: [
-    { category: 'SQLSecurityAuditEvents', enabled: true }
-    { category: 'Errors', enabled: true }
-    { category: 'Timeouts', enabled: true }
-    { category: 'Blocks', enabled: true }
-    { category: 'Deadlocks', enabled: true }
-    { category: 'DatabaseWaitStatistics', enabled: true }
-  ]
-  metrics: [
-    { category: 'Basic', enabled: true }
-    { category: 'InstanceAndAppAdvanced', enabled: true }
-    { category: 'WorkloadManagement', enabled: true }
-  ]
 }
 
 resource entraIdAdministrator 'Microsoft.Sql/servers/administrators@2025-01-01' = {
@@ -122,100 +94,15 @@ resource entraIdAdministrator 'Microsoft.Sql/servers/administrators@2025-01-01' 
   ]
 }
 
-resource securityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2025-01-01' = {
-  parent: sqlServer
-  name: 'Default'
-  properties: {
-    state: 'Enabled'
-    disabledAlerts: []
-    emailAddresses: teamEmailAddresses
-    emailAccountAdmins: true
+module diagnosticsAndAuditingModule 'diagnostics-and-auditing.bicep' = {
+  name: 'coreSqlServerDiagnosticsAndAuditingDeploy'
+  params: {
+    sqlServerName: sqlServer.name
+    teamEmailAddresses: teamEmailAddresses
+    databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
+    loggingStorageAccountName: loggingStorageAccountName
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
-}
-
-resource vulnerabilityAssessment 'Microsoft.Sql/servers/vulnerabilityAssessments@2025-01-01' = {
-  parent: sqlServer
-  name: 'Default'
-  properties: {
-    storageContainerPath: '${loggingStorageEndpoint}vulnerability-assessment'
-    storageAccountAccessKey: loggingStorageAccessKey
-    recurringScans: {
-      isEnabled: true
-      emailSubscriptionAdmins: true
-      emails: teamEmailAddresses
-    }
-  }
-  dependsOn: [
-    securityAlertPolicy
-  ]
-}
-
-resource masterDbAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = {
-  parent: masterDb
-  name: 'default'
-  properties: {
-    auditActionsAndGroups: [
-      'SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP'
-      'FAILED_DATABASE_AUTHENTICATION_GROUP'
-      'BATCH_COMPLETED_GROUP'
-    ]
-    state: 'Disabled'
-  }
-  dependsOn: [
-    vulnerabilityAssessment
-  ]
-}
-
-resource serverAuditingSettings 'Microsoft.Sql/servers/extendedAuditingSettings@2025-01-01' = {
-  parent: sqlServer
-  name: 'default'
-  properties: {
-    auditActionsAndGroups: [
-      'SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP'
-      'FAILED_DATABASE_AUTHENTICATION_GROUP'
-      'BATCH_COMPLETED_GROUP'
-    ]
-    isAzureMonitorTargetEnabled: true
-    isManagedIdentityInUse: false
-    isStorageSecondaryKeyInUse: false
-    state: 'Enabled'
-    storageEndpoint: loggingStorageEndpoint
-    storageAccountAccessKey: loggingStorageAccessKey
-    storageAccountSubscriptionId: az.subscription().subscriptionId
-    retentionDays: databaseAuditBlobRetentionDays
-  }
-  dependsOn: [
-    masterDbAuditingSettings
-  ]
-}
-
-resource devOpsAuditingSettings 'Microsoft.Sql/servers/devOpsAuditingSettings@2025-01-01' = {
-  parent: sqlServer
-  name: 'Default'
-  properties: {
-    isAzureMonitorTargetEnabled: true
-    isManagedIdentityInUse: false
-    state: 'Enabled'
-    storageEndpoint: loggingStorageEndpoint
-    storageAccountAccessKey: loggingStorageAccessKey
-    storageAccountSubscriptionId: az.subscription().subscriptionId
-  }
-  dependsOn: [
-    serverAuditingSettings
-  ]
-}
-
-resource masterDbDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: 'serverAuditToLogAnalytics'
-  scope: masterDb
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: databaseDiagnosticsLogsAndMetrics.logs
-    metrics: databaseDiagnosticsLogsAndMetrics.metrics
-  }
-  dependsOn: [
-    devOpsAuditingSettings
-  ]
 }
 
 module networkingModule 'networking.bicep' = {
@@ -244,7 +131,7 @@ module contentDbModule 'database.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
-    masterDbDiagnostics
+    diagnosticsAndAuditingModule
   ]
 }
 
@@ -262,7 +149,7 @@ module statisticsDbModule 'database.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
-    masterDbDiagnostics
+    diagnosticsAndAuditingModule
   ]
 }
 
