@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 1. Define exact versions
 ENV NVM_DIR=/usr/local/nvm
 ENV NODE_VERSION=22.23.1
-ENV RUBY_VERSION=4.0.6
+ENV RUBY_VERSION=4.0.7
 # IMPORTANT: Ruby 4.0.x uses '4.0.0' as the ABI directory name for gems
 ENV RUBY_ABI_VERSION=4.0.0
 
