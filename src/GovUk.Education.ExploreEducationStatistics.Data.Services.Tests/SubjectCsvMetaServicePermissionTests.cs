@@ -4,8 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -43,18 +42,16 @@ public class SubjectCsvMetaServicePermissionTests
 
     private static SubjectCsvMetaService BuildService(
         IUserService userService,
-        StatisticsDbContext? statisticsDbContext = null,
         ContentDbContext? contentDbContext = null,
-        IFilterItemRepository? filterItemRepository = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
-            statisticsDbContext: statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
             contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             userService: userService,
-            filterItemRepository: filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
+            storageDataSetResolver: storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }
