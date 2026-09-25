@@ -1,8 +1,8 @@
 # Installs the Python version in .python-version and puts it on PATH.
 #
-# The ees-ubuntu2204-large agents only have the Python that ships with Ubuntu
-# 22.04, and UsePythonVersion@0 cannot download newer versions on a self-hosted
-# agent, so we install the one we need with uv instead.
+# Our self-hosted agents only have whatever Python ships with the base OS
+# image, and UsePythonVersion@0 cannot download newer versions on a
+# self-hosted agent, so we install the one we need with uv instead.
 steps:
 - bash: |
     set -euo pipefail
