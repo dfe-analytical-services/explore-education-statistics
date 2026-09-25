@@ -112,14 +112,7 @@ function ApplicationInsightsContextProvider({
 }
 
 function QueryClientProvider({ children }: { children?: ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: { useErrorBoundary: true },
-        },
-      }),
-  );
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <BaseQueryClientProvider client={queryClient}>

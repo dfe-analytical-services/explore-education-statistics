@@ -51,7 +51,7 @@ class PageErrorBoundary extends Component<Props, State> {
 
     // errors can now come via react-query and not through "unhandledrejection"
     this.setState({
-      errorCode: isAxiosError(error) ? error.response?.status : 500,
+      errorCode: (isAxiosError(error) && error.response?.status) || 500,
     });
   }
 

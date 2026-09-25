@@ -19,7 +19,7 @@ export const methodologySummaryEditRoute: MethodologyRouteProps = {
 };
 
 export const methodologyContentRoute: MethodologyRouteProps = {
-  fullPath: '/methodology/:methodologyId/content/',
+  fullPath: '/methodology/:methodologyId/content',
   path: 'content',
   title: 'Manage content',
 };

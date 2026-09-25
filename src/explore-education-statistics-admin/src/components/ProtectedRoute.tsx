@@ -40,7 +40,7 @@ const ProtectedRoute = ({
     return <ForbiddenPage />;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export default ProtectedRoute;

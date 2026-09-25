@@ -71,6 +71,9 @@ const PublicationsTab = ({ isBauUser }: Props) => {
         appendQuery<ThemeParams>(location.pathname, {
           themeId: selectedTheme?.id,
         }),
+        {
+          replace: true,
+        },
       );
     }
   }, [

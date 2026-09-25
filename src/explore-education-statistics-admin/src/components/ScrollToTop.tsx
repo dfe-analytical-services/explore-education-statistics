@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 interface Props {
@@ -12,5 +12,5 @@ export default function ScrollToTop({ children }: Props) {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  return <>{children}</>;
+  return children;
 }

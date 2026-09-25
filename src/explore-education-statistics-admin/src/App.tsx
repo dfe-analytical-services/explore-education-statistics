@@ -21,59 +21,36 @@ import {
   createHead,
   UnheadProvider as BaseUnheadProvider,
 } from '@unhead/react/client';
-import React, { DependencyList, ReactNode, useEffect } from 'react';
-import {
-  Location,
-  Outlet,
-  RouteObject,
-  RouterProvider,
-  useLocation,
-} from 'react-router';
+import React, { ReactNode, useEffect } from 'react';
+import { Outlet, RouteObject, RouterProvider, useLocation } from 'react-router';
 import { createBrowserRouter } from 'react-router-dom';
+import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 
 import 'ckeditor5/ckeditor5.css';
 import { NotificationHubContextProvider } from './contexts/NotificationHubContext';
 
-// react router will now swallow errors thrown by react-query, react query should pass these into the boundary
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { useErrorBoundary: true } },
-});
+const queryClient = new QueryClient();
 
 const head = createHead();
 
-const useLocationEffect = (
-  callback: (location: Location) => void,
-  deps: DependencyList = [],
-) => {
-  const location = useLocation();
-
-  callback(location);
-
-  useEffect(() => {
-    callback(location);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callback, location, ...deps]);
-};
-
 function ApplicationInsightsTracking() {
   const appInsights = useApplicationInsights();
+
+  const location = useLocation();
 
   useEffect(() => {
     document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   }, []);
 
-  useLocationEffect(
-    location => {
-      if (appInsights) {
-        appInsights.trackPageView({
-          uri: location.pathname,
-        });
-      }
-    },
-    [appInsights],
-  );
+  useEffect(() => {
+    if (appInsights) {
+      appInsights.trackPageView({
+        uri: location.pathname,
+      });
+    }
+  }, [appInsights, location]);
 
   return null;
 }
@@ -95,6 +72,7 @@ function AppLayout() {
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
+    errorElement: <ServiceProblemsPage />,
 
     children: [
       ...Object.entries(publicRoutes).map(([key, route]) => ({

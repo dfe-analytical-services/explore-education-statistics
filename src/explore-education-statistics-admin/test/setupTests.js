@@ -14,12 +14,12 @@ if (typeof window !== 'undefined') {
  * required global objects in the browser aren't available.
  */
 if (typeof global.Request === 'undefined') {
-  global.Request = jest.fn().mockImplementation(() => ({
-    signal: {
+  global.Request = class {
+    signal = {
       removeEventListener: () => {},
       addEventListener: () => {},
-    },
-  }));
+    };
+  };
 }
 
 errorOnConsoleError();
