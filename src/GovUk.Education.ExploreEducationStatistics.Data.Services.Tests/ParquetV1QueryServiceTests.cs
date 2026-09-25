@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -366,13 +365,6 @@ public class ParquetV1QueryServiceTests : IAsyncLifetime
         return new ParquetV1QueryService(
             statisticsDbContext,
             new FilterRepository(statisticsDbContext),
-            new FilterItemRepository(
-                statisticsDbContext,
-                Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
-                Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(Strict),
-                Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict),
-                Mock.Of<ILogger<FilterItemRepository>>()
-            ),
             new IndicatorRepository(statisticsDbContext),
             dataFilesPathResolver.Object,
             Mock.Of<ILogger<ParquetV1QueryService>>()

@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -29,8 +28,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
@@ -165,7 +164,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectResultMetaService: subjectResultMetaService.Object,
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
@@ -438,7 +440,10 @@ public class TableBuilderServiceTests
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectResultMetaService: subjectResultMetaService.Object,
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
@@ -467,134 +472,6 @@ public class TableBuilderServiceTests
             Assert.Single(observationResults[1].Measures);
             Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
             Assert.Equal([observations[2].FilterItems.ToList()[0].FilterItemId], observationResults[1].Filters);
-
-            Assert.Equal(subjectMeta, result.Right.SubjectMeta);
-        }
-    }
-
-    [Fact]
-    public async Task Query_ReleaseVersionId_Parquet()
-    {
-        Publication publication = _fixture
-            .DefaultPublication()
-            .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
-
-        var releaseVersion = publication.Releases.Single().Versions.Single();
-
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
-
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersionId = releaseVersion.Id,
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                HasParquet = true,
-            },
-        };
-
-        var indicatorId = Guid.NewGuid();
-        var locationId = Guid.NewGuid();
-
-        var observations = new List<Observation>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Location = new Location { Id = locationId, GeographicLevel = GeographicLevel.Country },
-                LocationId = locationId,
-                Measures = new Dictionary<Guid, string> { { indicatorId, "123" } },
-                FilterItems = [new ObservationFilterItem { FilterItemId = Guid.NewGuid() }],
-                Year = 2019,
-                TimeIdentifier = AcademicYear,
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Location = new Location { Id = locationId, GeographicLevel = GeographicLevel.Country },
-                LocationId = locationId,
-                Measures = new Dictionary<Guid, string> { { indicatorId, "456" } },
-                FilterItems = [new ObservationFilterItem { FilterItemId = Guid.NewGuid() }],
-                Year = 2020,
-                TimeIdentifier = AcademicYear,
-            },
-        };
-
-        var subjectMeta = new SubjectResultMetaViewModel { Indicators = [new() { Label = "Test indicator" }] };
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            contentDbContext.Publications.Add(publication);
-            contentDbContext.ReleaseFiles.Add(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Indicators = [indicatorId],
-                LocationIds = [locationId],
-                TimePeriod = new TimePeriodQuery
-                {
-                    StartYear = 2019,
-                    StartCode = AcademicYear,
-                    EndYear = 2020,
-                    EndCode = AcademicYear,
-                },
-            };
-
-            var parquetV1QueryService = new Mock<IParquetV1QueryService>(Strict);
-            var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
-            var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
-
-            parquetV1QueryService
-                .Setup(s => s.ListObservations(It.Is<File>(file => file.Id == releaseFile.FileId), query, default))
-                .ReturnsAsync(observations);
-
-            subjectResultMetaService
-                .Setup(s => s.GetSubjectMeta(releaseSubject.ReleaseVersionId, query, observations, false))
-                .ReturnsAsync(subjectMeta);
-
-            tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(false);
-
-            var service = BuildTableBuilderService(
-                statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
-                parquetV1QueryService: parquetV1QueryService.Object,
-                subjectResultMetaService: subjectResultMetaService.Object,
-                tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
-            );
-
-            var result = await service.Query(releaseSubject.ReleaseVersionId, query);
-
-            VerifyAllMocks(parquetV1QueryService, subjectResultMetaService, tableBuilderQueryOptimiser);
-
-            var observationResults = result.AssertRight().Results.ToList();
-
-            Assert.Equal(2, observationResults.Count);
-
-            Assert.Equal(observations[0].Id, observationResults[0].Id);
-            Assert.Equal(locationId, observationResults[0].LocationId);
-            Assert.Equal("2019_AY", observationResults[0].TimePeriod);
-            Assert.Equal("123", observationResults[0].Measures[indicatorId]);
-            Assert.Equal([observations[0].FilterItems[0].FilterItemId], observationResults[0].Filters);
-
-            Assert.Equal(observations[1].Id, observationResults[1].Id);
-            Assert.Equal("2020_AY", observationResults[1].TimePeriod);
-            Assert.Equal("456", observationResults[1].Measures[indicatorId]);
 
             Assert.Equal(subjectMeta, result.Right.SubjectMeta);
         }
@@ -884,7 +761,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1159,7 +1039,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1286,7 +1169,10 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(
                 statisticsDbContext,
                 contentDbContext,
-                observationService: observationService.Object,
+                storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                    statisticsDbContext,
+                    observationService.Object
+                ),
                 subjectCsvMetaService: subjectCsvMetaService.Object
             );
 
@@ -1410,8 +1296,7 @@ public class TableBuilderServiceTests
         StatisticsDbContext statisticsDbContext,
         ContentDbContext? contentDbContext = null,
         ILocationService? locationService = null,
-        IObservationService? observationService = null,
-        IParquetV1QueryService? parquetV1QueryService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         ISubjectResultMetaService? subjectResultMetaService = null,
         ISubjectCsvMetaService? subjectCsvMetaService = null,
@@ -1423,11 +1308,9 @@ public class TableBuilderServiceTests
     )
     {
         return new(
-            statisticsDbContext,
             contentDbContext ?? InMemoryContentDbContext(),
             locationService ?? Mock.Of<ILocationService>(Strict),
-            observationService ?? Mock.Of<IObservationService>(Strict),
-            parquetV1QueryService ?? Mock.Of<IParquetV1QueryService>(Strict),
+            storageDataSetResolver ?? BuildStatisticsDbDataSetResolver(statisticsDbContext),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),

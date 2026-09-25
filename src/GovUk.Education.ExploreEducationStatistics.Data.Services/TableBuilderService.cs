@@ -1,7 +1,6 @@
 #nullable enable
 using System.Dynamic;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -32,11 +31,9 @@ public class TableBuilderService : ITableBuilderService
 {
     private const int ObservationBatchSize = 1000;
 
-    private readonly StatisticsDbContext _statisticsDbContext;
     private readonly ContentDbContext _contentDbContext;
     private readonly ILocationService _locationService;
-    private readonly IObservationService _observationService;
-    private readonly IParquetV1QueryService _parquetV1QueryService;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly ISubjectResultMetaService _subjectResultMetaService;
     private readonly ISubjectCsvMetaService _subjectCsvMetaService;
@@ -47,11 +44,9 @@ public class TableBuilderService : ITableBuilderService
     private readonly LocationsOptions _locationOptions;
 
     public TableBuilderService(
-        StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
         ILocationService locationService,
-        IObservationService observationService,
-        IParquetV1QueryService parquetV1QueryService,
+        IStorageDataSetResolver storageDataSetResolver,
         IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
         ISubjectResultMetaService subjectResultMetaService,
         ISubjectCsvMetaService subjectCsvMetaService,
@@ -62,11 +57,9 @@ public class TableBuilderService : ITableBuilderService
         IOptions<LocationsOptions> locationOptions
     )
     {
-        _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
         _locationService = locationService;
-        _observationService = observationService;
-        _parquetV1QueryService = parquetV1QueryService;
+        _storageDataSetResolver = storageDataSetResolver;
         _statisticsPersistenceHelper = statisticsPersistenceHelper;
         _subjectResultMetaService = subjectResultMetaService;
         _subjectCsvMetaService = subjectCsvMetaService;
@@ -94,7 +87,7 @@ public class TableBuilderService : ITableBuilderService
     {
         return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccess(() => ListQueryObservations(releaseVersionId, query, cancellationToken))
+            .OnSuccess(() => ListQueryObservations(query, cancellationToken))
             .OnSuccess(async queryObservations =>
             {
                 var (observations, isCroppedTable) = queryObservations;
@@ -128,7 +121,7 @@ public class TableBuilderService : ITableBuilderService
     {
         return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccess(() => ListQueryObservations(releaseVersionId, query, cancellationToken))
+            .OnSuccess(() => ListQueryObservations(query, cancellationToken))
             .OnSuccess(async queryObservations =>
             {
                 var (observations, _) = queryObservations;
@@ -173,11 +166,15 @@ public class TableBuilderService : ITableBuilderService
                     .GetSubjectCsvMeta(releaseSubject, query, cancellationToken)
                     .OnSuccessVoid(async meta =>
                     {
+                        var dataSet = await _storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
+
                         await using var writer = new StreamWriter(stream, leaveOpen: true);
                         await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
 
                         await WriteCsvHeaderRow(csv, meta);
-                        await foreach (var batch in ListQueryObservationBatches(query, cancellationToken))
+                        await foreach (
+                            var batch in dataSet.ListObservationBatches(query, ObservationBatchSize, cancellationToken)
+                        )
                         {
                             await WriteCsvRows(csv, batch, meta, cancellationToken);
                         }
@@ -186,7 +183,6 @@ public class TableBuilderService : ITableBuilderService
     }
 
     private async Task<Either<ActionResult, (List<Observation>, bool)>> ListQueryObservations(
-        Guid releaseVersionId,
         FullTableQuery query,
         CancellationToken cancellationToken = default
     )
@@ -194,38 +190,11 @@ public class TableBuilderService : ITableBuilderService
         return await PrepareObservationQuery(query, cancellationToken)
             .OnSuccess(async preparedQuery =>
             {
-                var observations = await ListObservations(releaseVersionId, preparedQuery.Query, cancellationToken);
+                var dataSet = await _storageDataSetResolver.Resolve(preparedQuery.Query.SubjectId, cancellationToken);
+                var observations = await dataSet.ListObservations(preparedQuery.Query, cancellationToken);
 
                 return (observations, preparedQuery.RequiresCropping);
             });
-    }
-
-    /// <summary>
-    /// Lists the observations matching the query, reading them from the data file's Parquet copy where one exists
-    /// and otherwise from the statistics database.
-    /// </summary>
-    private async Task<List<Observation>> ListObservations(
-        Guid releaseVersionId,
-        FullTableQuery query,
-        CancellationToken cancellationToken
-    )
-    {
-        var dataFile = await _contentDbContext
-            .ReleaseFiles.Where(rf =>
-                rf.ReleaseVersionId == releaseVersionId
-                && rf.File.SubjectId == query.SubjectId
-                && rf.File.Type == FileType.Data
-            )
-            .Select(rf => rf.File)
-            .SingleOrDefaultAsync(cancellationToken);
-
-        if (dataFile?.HasParquet == true)
-        {
-            return (await _parquetV1QueryService.ListObservations(dataFile, query, cancellationToken)).ToList();
-        }
-
-        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
-        return await observationsQuery.ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -250,59 +219,6 @@ public class TableBuilderService : ITableBuilderService
         }
 
         return new PreparedObservationQuery(query, requiresCropping);
-    }
-
-    /// <summary>
-    /// Populates the matched observations for the query and returns a queryable over the corresponding
-    /// observations. The query is not executed here, allowing callers to either materialise it in full or
-    /// stream it.
-    /// </summary>
-    private async Task<IQueryable<Observation>> BuildMatchedObservationsQuery(
-        FullTableQuery query,
-        CancellationToken cancellationToken
-    )
-    {
-        await _observationService.GetMatchedObservations(query, cancellationToken);
-
-        var matchedObservationIds = _statisticsDbContext.MatchedObservations.Select(o => o.Id);
-
-        return _statisticsDbContext
-            .Observation.AsNoTracking()
-            .Include(o => o.Location)
-            .Include(o => o.FilterItems)
-            .Where(o => matchedObservationIds.Contains(o.Id));
-    }
-
-    /// <summary>
-    /// Streams the observations matching the query from the database in batches of
-    /// <see cref="ObservationBatchSize"/>. Each batch is yielded as it is read so that callers only need to hold a
-    /// single batch in memory at any one time. Once a batch has been consumed it becomes eligible for garbage
-    /// collection.
-    /// </summary>
-    private async IAsyncEnumerable<List<Observation>> ListQueryObservationBatches(
-        FullTableQuery query,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default
-    )
-    {
-        var observations = await BuildMatchedObservationsQuery(query, cancellationToken);
-
-        var batch = new List<Observation>(ObservationBatchSize);
-
-        await foreach (var observation in observations.AsAsyncEnumerable().WithCancellation(cancellationToken))
-        {
-            batch.Add(observation);
-
-            if (batch.Count == ObservationBatchSize)
-            {
-                yield return batch;
-                batch = new List<Observation>(ObservationBatchSize);
-            }
-        }
-
-        if (batch.Count > 0)
-        {
-            yield return batch;
-        }
     }
 
     private record PreparedObservationQuery(FullTableQuery Query, bool RequiresCropping);
@@ -344,7 +260,7 @@ public class TableBuilderService : ITableBuilderService
 
     private async Task WriteCsvRows(
         IWriter csv,
-        List<Observation> observations,
+        IReadOnlyList<Observation> observations,
         SubjectCsvMetaViewModel meta,
         CancellationToken cancellationToken
     )

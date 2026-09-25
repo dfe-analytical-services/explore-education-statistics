@@ -167,7 +167,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
         ));
         services.AddTransient<IParquetV1QueryService, ParquetV1QueryService>();
-        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy

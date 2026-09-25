@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
@@ -19,12 +18,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Thinktecture.EntityFrameworkCore.TempTables;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
@@ -84,26 +83,19 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-        var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository
-            .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(new List<Filter>());
+        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
 
-        indicatorGroupRepository
-            .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<IndicatorGroup>());
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        locationRepository
-            .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
-            .ReturnsAsync(new List<Location>());
+        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Location>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -111,10 +103,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object,
-                locationRepository: locationRepository.Object,
-                timePeriodService: timePeriodService.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = (
@@ -124,7 +113,7 @@ public class SubjectMetaServiceTests
                 )
             ).AssertRight();
 
-            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
+            VerifyAllMocks(dataSet);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -225,24 +214,19 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-        var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository
-            .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(new List<Filter>());
+        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
 
-        indicatorGroupRepository
-            .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<IndicatorGroup>());
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        locationRepository.Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId)).ReturnsAsync(locations);
+        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync(locations);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -250,10 +234,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object,
-                locationRepository: locationRepository.Object,
-                timePeriodService: timePeriodService.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object,
                 options: options
             );
 
@@ -264,7 +245,7 @@ public class SubjectMetaServiceTests
                 )
             ).AssertRight();
 
-            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
+            VerifyAllMocks(dataSet);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -411,24 +392,19 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-        var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository
-            .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-            .ReturnsAsync(new List<Filter>());
+        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
 
-        indicatorGroupRepository
-            .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<IndicatorGroup>());
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
+        dataSet
+            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        locationRepository.Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId)).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -436,10 +412,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object,
-                locationRepository: locationRepository.Object,
-                timePeriodService: timePeriodService.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object,
                 options: options
             );
 
@@ -450,7 +423,7 @@ public class SubjectMetaServiceTests
                 )
             ).AssertRight();
 
-            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
+            VerifyAllMocks(dataSet);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -481,12 +454,12 @@ public class SubjectMetaServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
         var cancellationToken = new CancellationTokenSource().Token;
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriods(It.IsAny<IQueryable<Observation>>()))
+        dataSet
+            .Setup(s => s.ListTimePeriods(It.IsAny<IEnumerable<Guid>>(), cancellationToken))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -497,13 +470,16 @@ public class SubjectMetaServiceTests
                 LocationIds = ListOf(Guid.NewGuid()),
             };
 
-            var service = BuildSubjectMetaService(statisticsDbContext, timePeriodService: timePeriodService.Object);
+            var service = BuildSubjectMetaService(
+                statisticsDbContext,
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
+            );
 
             var result = (
                 await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
             ).AssertRight();
 
-            VerifyAllMocks(timePeriodService);
+            VerifyAllMocks(dataSet);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -543,12 +519,12 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
         var cancellationToken = new CancellationTokenSource().Token;
 
-        timePeriodService
-            .Setup(s => s.GetTimePeriods(It.IsAny<IQueryable<Observation>>()))
+        dataSet
+            .Setup(s => s.ListTimePeriods(It.IsAny<IEnumerable<Guid>>(), cancellationToken))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -563,12 +539,12 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                timePeriodService: timePeriodService.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = (await service.FilterSubjectMeta(null, request, cancellationToken)).AssertRight();
 
-            VerifyAllMocks(timePeriodService);
+            VerifyAllMocks(dataSet);
 
             var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -586,81 +562,17 @@ public class SubjectMetaServiceTests
 
         var releaseSubject = new ReleaseSubject { ReleaseVersion = new ReleaseVersion(), Subject = subject };
 
-        var location1 = new Location { Id = Guid.NewGuid(), LocalAuthority = _blackpool };
-
-        var location2 = new Location { Id = Guid.NewGuid(), LocalAuthority = _derby };
-
-        var location3 = new Location { Id = Guid.NewGuid(), Country = _england };
-
-        var location4 = new Location { Id = Guid.NewGuid(), LocalAuthority = _nottingham };
-
-        var location5 = new Location { Id = Guid.NewGuid(), LocalAuthority = _sunderland };
-
         var request = new LocationsOrTimePeriodsQueryRequest
         {
             SubjectId = subject.Id,
-            LocationIds = ListOf(location1.Id, location2.Id, location3.Id),
+            LocationIds = ListOf(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()),
         };
-
-        var observations = ListOf(
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location1,
-            },
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location2,
-            },
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location3,
-            }
-        );
-
-        var observationsWithDifferentLocations = ListOf(
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location4,
-            },
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location5,
-            }
-        );
-
-        var observationsFromAnotherSubject = ListOf(
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location2,
-            },
-            new Observation
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
-                Location = location3,
-            }
-        );
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-            await statisticsDbContext.Observation.AddRangeAsync(observations);
-            await statisticsDbContext.Observation.AddRangeAsync(observationsWithDifferentLocations);
-            await statisticsDbContext.Observation.AddRangeAsync(observationsFromAnotherSubject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -668,17 +580,13 @@ public class SubjectMetaServiceTests
         {
             var cancellationToken = new CancellationTokenSource().Token;
 
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+            var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-            timePeriodService
+            dataSet
                 .Setup(s =>
-                    s.GetTimePeriods(
-                        It.Is<IQueryable<Observation>>(observationsWihMatchingLocations =>
-                            observationsWihMatchingLocations
-                                .ToList()
-                                .Select(o => o.Id)
-                                .SequenceEqual(observationsWihMatchingLocations.Select(m => m.Id))
-                        )
+                    s.ListTimePeriods(
+                        It.Is<IEnumerable<Guid>>(locationIds => locationIds.SequenceEqual(request.LocationIds)),
+                        cancellationToken
                     )
                 )
                 .ReturnsAsync(
@@ -690,13 +598,16 @@ public class SubjectMetaServiceTests
                     }
                 );
 
-            var service = BuildSubjectMetaService(statisticsDbContext, timePeriodService: timePeriodService.Object);
+            var service = BuildSubjectMetaService(
+                statisticsDbContext,
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
+            );
 
             var result = (
                 await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
             ).AssertRight();
 
-            VerifyAllMocks(timePeriodService);
+            VerifyAllMocks(dataSet);
 
             Assert.Empty(result.Locations);
             Assert.Empty(result.Filters);
@@ -762,11 +673,6 @@ public class SubjectMetaServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
             await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-            await statisticsDbContext.MatchedObservations.AddRangeAsync(
-                new MatchedObservation(Guid.NewGuid()),
-                new MatchedObservation(Guid.NewGuid()),
-                new MatchedObservation(Guid.NewGuid())
-            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -775,20 +681,7 @@ public class SubjectMetaServiceTests
         {
             var cancellationToken = new CancellationTokenSource().Token;
 
-            var observationService = new Mock<IObservationService>(MockBehavior.Strict);
-
-            var matchedObservationsTable = Mock.Of<ITempTableReference>();
-
-            observationService
-                .Setup(s =>
-                    s.GetMatchedObservations(
-                        It.Is<FullTableQuery>(ctx => ctx.Equals(request.AsFullTableQuery())),
-                        cancellationToken
-                    )
-                )
-                .ReturnsAsync(matchedObservationsTable);
-
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
+            var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
             var filter1 = new Filter
             {
@@ -812,18 +705,14 @@ public class SubjectMetaServiceTests
 
             var allFilterItems = filter1FilterItems.Concat(filter2FilterItems);
 
-            filterItemRepository
+            dataSet
                 .Setup(s =>
-                    s.GetFilterItemsFromMatchedObservationIds(
-                        // ReSharper disable once AccessToDisposedClosure
-                        releaseSubject.SubjectId,
-                        matchedObservationsTable,
+                    s.ListFilterItemsForQuery(
+                        It.Is<FullTableQuery>(ctx => ctx.Equals(request.AsFullTableQuery())),
                         cancellationToken
                     )
                 )
-                .ReturnsAsync(allFilterItems);
-
-            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+                .ReturnsAsync(allFilterItems.ToList());
 
             var indicatorGroups = ListOf(
                 new IndicatorGroup
@@ -854,23 +743,19 @@ public class SubjectMetaServiceTests
                 }
             );
 
-            indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .ReturnsAsync(indicatorGroups);
+            dataSet.Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
             var service = BuildSubjectMetaService(
                 statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
-                observationService: observationService.Object,
-                filterItemRepository: filterItemRepository.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = (
                 await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
             ).AssertRight();
 
-            VerifyAllMocks(filterItemRepository, indicatorGroupRepository, observationService);
+            VerifyAllMocks(dataSet);
 
             result.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
             Assert.Empty(result.Locations);
@@ -991,229 +876,6 @@ public class SubjectMetaServiceTests
     }
 
     [Fact]
-    public async Task FilterSubjectMeta_TimePeriods_Parquet()
-    {
-        var subject = new Subject { Id = Guid.NewGuid() };
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            SubjectId = subject.Id,
-        };
-
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = new Content.Model.ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-                Published = DateTimeOffset.UtcNow,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                HasParquet = true,
-            },
-        };
-
-        var request = new LocationsOrTimePeriodsQueryRequest
-        {
-            SubjectId = releaseSubject.SubjectId,
-            LocationIds = ListOf(Guid.NewGuid(), Guid.NewGuid()),
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var cancellationToken = new CancellationTokenSource().Token;
-
-            var parquetV1QueryService = new Mock<IParquetV1QueryService>(MockBehavior.Strict);
-
-            parquetV1QueryService
-                .Setup(s =>
-                    s.ListTimePeriods(
-                        It.Is<File>(file => file.Id == releaseFile.FileId),
-                        request.LocationIds,
-                        cancellationToken
-                    )
-                )
-                .ReturnsAsync(
-                    new List<(int Year, TimeIdentifier TimeIdentifier)>
-                    {
-                        (2012, TimeIdentifier.April),
-                        (2012, TimeIdentifier.May),
-                    }
-                );
-
-            var service = BuildSubjectMetaService(
-                statisticsDbContext,
-                contentDbContext: contentDbContext,
-                parquetV1QueryService: parquetV1QueryService.Object
-            );
-
-            var result = (
-                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
-            ).AssertRight();
-
-            VerifyAllMocks(parquetV1QueryService);
-
-            Assert.Empty(result.Locations);
-            Assert.Empty(result.Filters);
-            Assert.Empty(result.Indicators);
-
-            var periods = result.TimePeriod.Options.ToList();
-            Assert.Equal(2, periods.Count);
-            Assert.Equal(2012, periods[0].Year);
-            Assert.Equal(TimeIdentifier.April, periods[0].Code);
-            Assert.Equal(2012, periods[1].Year);
-            Assert.Equal(TimeIdentifier.May, periods[1].Code);
-        }
-    }
-
-    [Fact]
-    public async Task FilterSubjectMeta_FiltersAndIndicators_Parquet()
-    {
-        var subject = new Subject { Id = Guid.NewGuid() };
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            SubjectId = subject.Id,
-        };
-
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = new Content.Model.ReleaseVersion
-            {
-                Id = releaseSubject.ReleaseVersion.Id,
-                Published = DateTimeOffset.UtcNow,
-            },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                HasParquet = true,
-                FilterHierarchies = null,
-            },
-        };
-
-        var request = new LocationsOrTimePeriodsQueryRequest
-        {
-            SubjectId = releaseSubject.SubjectId,
-            LocationIds = ListOf(Guid.NewGuid()),
-            TimePeriod = new TimePeriodQuery
-            {
-                StartYear = 2012,
-                StartCode = TimeIdentifier.AcademicYear,
-                EndYear = 2012,
-                EndCode = TimeIdentifier.AcademicYear,
-            },
-        };
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var cancellationToken = new CancellationTokenSource().Token;
-
-            var filter = new Filter
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = releaseSubject.SubjectId,
-                Label = "Filter 1",
-            };
-            filter.FilterGroups = CreateFilterGroups(filter, 2);
-
-            var filterItems = filter.FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
-
-            var parquetV1QueryService = new Mock<IParquetV1QueryService>(MockBehavior.Strict);
-
-            parquetV1QueryService
-                .Setup(s =>
-                    s.ListFilterItems(
-                        It.Is<File>(file => file.Id == releaseFile.FileId),
-                        It.Is<FullTableQuery>(query => query.Equals(request.AsFullTableQuery())),
-                        cancellationToken
-                    )
-                )
-                .ReturnsAsync(filterItems);
-
-            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-
-            var indicatorGroup = new IndicatorGroup
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator Group 1",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Id = Guid.NewGuid(),
-                        Unit = IndicatorUnit.Percent,
-                        Label = "Indicator 1",
-                    }
-                ),
-            };
-
-            indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .ReturnsAsync(ListOf(indicatorGroup));
-
-            var service = BuildSubjectMetaService(
-                statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
-                parquetV1QueryService: parquetV1QueryService.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object
-            );
-
-            var result = (
-                await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, request, cancellationToken)
-            ).AssertRight();
-
-            VerifyAllMocks(indicatorGroupRepository, parquetV1QueryService);
-
-            result.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
-            Assert.Empty(result.Locations);
-
-            var filterViewModel = Assert.Single(result.Filters).Value;
-            Assert.Equal(filter.Id, filterViewModel.Id);
-            var filterGroupViewModel = Assert.Single(filterViewModel.Options).Value;
-            Assert.Equal(filter.FilterGroups[0].Id, filterGroupViewModel.Id);
-            Assert.Equal(filterItems.Select(fi => fi.Id), filterGroupViewModel.Options.Select(option => option.Value));
-
-            var indicatorGroupViewModel = Assert.Single(result.Indicators).Value;
-            Assert.Equal(indicatorGroup.Id, indicatorGroupViewModel.Id);
-            Assert.Equal(indicatorGroup.Indicators[0].Id, Assert.Single(indicatorGroupViewModel.Options).Value);
-
-            Assert.Null(result.FilterHierarchies);
-        }
-    }
-
-    [Fact]
     public async Task UpdateSubjectFilters()
     {
         var subject = new Subject { Id = Guid.NewGuid() };
@@ -1300,7 +962,7 @@ public class SubjectMetaServiceTests
         }
 
         var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
         cacheService
             .Setup(service =>
@@ -1310,7 +972,7 @@ public class SubjectMetaServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1319,7 +981,7 @@ public class SubjectMetaServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 cacheService: cacheService.Object,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1328,7 +990,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(cacheService, filterRepository);
+            VerifyAllMocks(cacheService, dataSet);
 
             result.AssertRight();
         }
@@ -1452,9 +1114,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1462,7 +1124,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1471,7 +1133,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FiltersDifferFromSubject);
         }
@@ -1555,9 +1217,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1565,7 +1227,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1574,7 +1236,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FilterGroupsDifferFromSubject);
         }
@@ -1657,9 +1319,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1667,7 +1329,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1676,7 +1338,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FilterItemsDifferFromSubject);
         }
@@ -1767,9 +1429,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1777,7 +1439,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1786,7 +1448,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FiltersDifferFromSubject);
         }
@@ -1870,9 +1532,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1880,7 +1542,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1889,7 +1551,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FilterGroupsDifferFromSubject);
         }
@@ -1968,9 +1630,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId)).ReturnsAsync(filters);
+        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1978,7 +1640,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                filterRepository: filterRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectFilters(
@@ -1987,7 +1649,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(filterRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(FilterItemsDifferFromSubject);
         }
@@ -2171,7 +1833,7 @@ public class SubjectMetaServiceTests
         }
 
         var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
         cacheService
             .Setup(service =>
@@ -2181,9 +1843,7 @@ public class SubjectMetaServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        indicatorGroupRepository
-            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
-            .ReturnsAsync(indicatorGroups);
+        dataSet.Setup(mock => mock.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2192,7 +1852,7 @@ public class SubjectMetaServiceTests
                 statisticsDbContext,
                 contentDbContext,
                 cacheService: cacheService.Object,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectIndicators(
@@ -2201,7 +1861,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(cacheService, indicatorGroupRepository);
+            VerifyAllMocks(cacheService, dataSet);
 
             result.AssertRight();
         }
@@ -2290,11 +1950,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        indicatorGroupRepository
-            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
-            .ReturnsAsync(indicatorGroups);
+        dataSet.Setup(mock => mock.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2302,7 +1960,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectIndicators(
@@ -2311,7 +1969,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(indicatorGroupRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
         }
@@ -2380,11 +2038,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        indicatorGroupRepository
-            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
-            .ReturnsAsync(indicatorGroups);
+        dataSet.Setup(mock => mock.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2392,7 +2048,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectIndicators(
@@ -2401,7 +2057,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(indicatorGroupRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(IndicatorsDifferFromSubject);
         }
@@ -2471,11 +2127,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        indicatorGroupRepository
-            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
-            .ReturnsAsync(indicatorGroups);
+        dataSet.Setup(mock => mock.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2483,7 +2137,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectIndicators(
@@ -2492,7 +2146,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(indicatorGroupRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
         }
@@ -2557,11 +2211,9 @@ public class SubjectMetaServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        indicatorGroupRepository
-            .Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
-            .ReturnsAsync(indicatorGroups);
+        dataSet.Setup(mock => mock.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(indicatorGroups);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2569,7 +2221,7 @@ public class SubjectMetaServiceTests
             var service = BuildSubjectMetaService(
                 statisticsDbContext,
                 contentDbContext,
-                indicatorGroupRepository: indicatorGroupRepository.Object
+                storageDataSetResolver: MockStorageDataSetResolver(releaseSubject.SubjectId, dataSet.Object).Object
             );
 
             var result = await service.UpdateSubjectIndicators(
@@ -2578,7 +2230,7 @@ public class SubjectMetaServiceTests
                 request
             );
 
-            VerifyAllMocks(indicatorGroupRepository);
+            VerifyAllMocks(dataSet);
 
             result.AssertBadRequest(IndicatorsDifferFromSubject);
         }
@@ -2743,13 +2395,7 @@ public class SubjectMetaServiceTests
         ContentDbContext? contentDbContext = null,
         IBlobCacheService? cacheService = null,
         IReleaseSubjectService? releaseSubjectService = null,
-        IFilterRepository? filterRepository = null,
-        IFilterItemRepository? filterItemRepository = null,
-        IIndicatorGroupRepository? indicatorGroupRepository = null,
-        ILocationRepository? locationRepository = null,
-        IObservationService? observationService = null,
-        IParquetV1QueryService? parquetV1QueryService = null,
-        ITimePeriodService? timePeriodService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IUserService? userService = null,
         IOptions<LocationsOptions>? options = null
     )
@@ -2757,18 +2403,11 @@ public class SubjectMetaServiceTests
         var contentDbContextInstance = contentDbContext ?? InMemoryContentDbContext();
 
         return new(
-            statisticsDbContext,
             contentDbContextInstance,
             cacheService ?? Mock.Of<IBlobCacheService>(MockBehavior.Strict),
             releaseSubjectService ?? new ReleaseSubjectService(statisticsDbContext, contentDbContextInstance),
-            filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
-            filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
-            indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
-            locationRepository ?? Mock.Of<ILocationRepository>(MockBehavior.Strict),
+            storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(MockBehavior.Strict),
             Mock.Of<ILogger<SubjectMetaService>>(),
-            observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
-            parquetV1QueryService ?? Mock.Of<IParquetV1QueryService>(MockBehavior.Strict),
-            timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
             userService ?? AlwaysTrueUserService().Object,
             options ?? DefaultLocationOptions()
         );

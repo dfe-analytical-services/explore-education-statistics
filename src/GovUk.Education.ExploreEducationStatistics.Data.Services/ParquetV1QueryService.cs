@@ -20,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 public class ParquetV1QueryService(
     StatisticsDbContext statisticsDbContext,
     IFilterRepository filterRepository,
-    IFilterItemRepository filterItemRepository,
     IIndicatorRepository indicatorRepository,
     IDataFilesPathResolver dataFilesPathResolver,
     ILogger<ParquetV1QueryService> logger
@@ -160,7 +159,7 @@ public class ParquetV1QueryService(
 
         var filters = await filterRepository.GetFiltersIncludingItems(query.SubjectId);
         var filterItemLookup = BuildFilterItemLookup(filters);
-        var requestedFilterItems = await filterItemRepository.GetFilterItems(query.GetFilterItemIds());
+        var requestedFilterItems = await ListFilterItems(query.GetFilterItemIds(), cancellationToken);
         var indicators = indicatorRepository.GetIndicators(query.SubjectId, query.Indicators).ToList();
 
         await using var parquet = await OpenParquetFile(dataFile, cancellationToken);
@@ -244,6 +243,19 @@ public class ParquetV1QueryService(
         );
 
         return observations;
+    }
+
+    private async Task<List<FilterItem>> ListFilterItems(
+        IEnumerable<Guid> filterItemIds,
+        CancellationToken cancellationToken
+    )
+    {
+        return await statisticsDbContext
+            .FilterItem.AsNoTracking()
+            .Include(filterItem => filterItem.FilterGroup)
+                .ThenInclude(filterGroup => filterGroup.Filter)
+            .Where(filterItem => filterItemIds.Contains(filterItem.Id))
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken)
