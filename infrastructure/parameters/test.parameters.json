@@ -5,9 +5,6 @@
     "useSubnets": {
       "value": true
     },
-    "domain": {
-      "value": "test.explore-education-statistics.service.gov.uk"
-    },
     "skuContentDb": {
       "value": "Standard"
     },

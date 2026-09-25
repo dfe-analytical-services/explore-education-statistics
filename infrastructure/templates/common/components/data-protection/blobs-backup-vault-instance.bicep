@@ -25,20 +25,28 @@ resource policy 'Microsoft.DataProtection/backupVaults/backupPolicies@2026-06-01
   name: '${vaultName}/${backupPolicyName}'
 }
 
+var dataSourceInfo = {
+  objectType: 'Datasource'
+  resourceID: resourceId
+  resourceName: last(split(resourceId, '/'))
+  resourceType: 'Microsoft.Storage/storageAccounts'
+  resourceUri: resourceId
+  resourceLocation: resourceLocation
+  datasourceType: getFullBackupVaultDataSourceType('blobs')
+}
+
 resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2026-06-01' = {
   name: '${vaultName}/${instanceName}'
   properties: {
-    dataSourceInfo: {
-      datasourceType: getFullBackupVaultDataSourceType('blobs')
-      objectType: 'Datasource'
-      resourceID: resourceId
-      resourceLocation: resourceLocation
-      resourceName: last(split(resourceId, '/'))
-      resourceType: 'Microsoft.Storage/storageAccounts'
-      resourceUri: ''
-    }
+    objectType: 'BackupInstance'
+    friendlyName: instanceName
+    dataSourceInfo: dataSourceInfo
+    dataSourceSetInfo: union(dataSourceInfo, {
+      objectType: 'DatasourceSet'
+    })
     policyInfo: {
       policyId: policy.id
+      name: backupPolicyName
       policyParameters: {
         backupDatasourceParametersList: [
           {
@@ -59,7 +67,6 @@ resource backupInstance 'Microsoft.DataProtection/backupVaults/backupInstances@2
         ]
       }
     }
-    objectType: 'BackupInstance'
   }
   tags: tagValues
 }

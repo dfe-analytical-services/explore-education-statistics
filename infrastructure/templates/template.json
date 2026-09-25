@@ -2,9 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "domain": {
-      "type": "string"
-    },
     "subscription": {
       "type": "string",
       "defaultValue": "",
@@ -17,12 +14,6 @@
       "defaultValue": "ees",
       "metadata": {
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
-      }
-    },
-    "storageFirewallRules": {
-      "type": "array",
-      "metadata": {
-        "description": "Firewall restrictions for storage accounts, string array"
       }
     },
     "sqlFirewallRules": {
@@ -143,48 +134,9 @@
         "1.2"
       ]
     },
-    "minTlsVersionStorageAccounts": {
-      "type": "string",
-      "defaultValue": "TLS1_2",
-      "allowedValues": [
-        "TLS1_2"
-      ]
-    },
     "useSubnets": {
       "type": "bool",
       "defaultValue": true
-    },
-    "backupVaultAzureBlobsRegistrationsDeployed": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether or not the Azure Blobs are already registered for an environment. Adding temporarily as the deploy process is trying to recreate the registrations every time rather than updating."
-      }
-    },
-    "deployBackupVaultRegistrations": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Whether or not to register data sources with Backup Vault."
-      }
-    },
-    "blobDeleteRetentionEnabled": {
-      "defaultValue": true,
-      "type": "bool",
-      "metadata": {
-        "description": "Retain blobs after delete"
-      }
-    },
-    "blobDeleteRetentionDays": {
-      "defaultValue": 90,
-      "type": "int",
-      "metadata": {
-        "description": "Number of days to retain blobs after delete"
-      }
-    },
-    "storageAccountPrefix": {
-      "type": "string",
-      "defaultValue": "storage"
     },
     "licenseTypeContentDb": {
       "type": "string",
@@ -265,13 +217,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "additionalPublicAllowedOrigins": {
-      "type": "array",
-      "defaultValue": [],
-      "metadata": {
-        "description": "Additional CORS allowed origins for the public"
-      }
-    },
     "sqlServerPublicNetworkAccess": {
       "type": "string",
       "defaultValue": "Enabled",
@@ -289,31 +234,8 @@
     "statisticsDbName": "statistics",
     "statisticsReplicaDbName": "statistics",
     "appInsightsWorkspaceName": "[concat(parameters('subscription'), '-', parameters('environment'), '-log')]",
-    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
-    "publicAppUrl": "[concat('https://', parameters('domain'))]",
-    "adminAppUrl": "[concat('https://admin.', parameters('domain'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
-    "publicStorageAccountName": "[concat(parameters('subscription'), 'saeespublic')]",
-    "publicStorageVnetRules": [
-      {
-        "id": "[variables('adminSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('contentSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('dataSubnetRef')]",
-        "action": "Allow"
-      },
-      {
-        "id": "[variables('publisherSubnetRef')]",
-        "action": "Allow"
-      }
-    ],
-    "publicStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('publicStorageAccountName'))]",
     "loggingStorageAccountName": "[concat(parameters('subscription'), 'saeeslogging')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
@@ -566,8 +488,6 @@
     "publicApiDataProcessorSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('publicApiDataProcessorSubnetName'))]",
     "sqlServerPrivateEndpointsSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-sqlsvr-pep')]",
     "sqlServerPrivateEndpointsSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('sqlServerPrivateEndpointsSubnetName'))]",
-    "screenerFunctionAppSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-sapi-snet-fa-screener')]",
-    "screenerFunctionAppSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('screenerFunctionAppSubnetName'))]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -611,29 +531,7 @@
         "name": "publisher",
         "id": "[variables('publisherSubnetRef')]"
       }
-    ],
-    "backupVaultName": "[concat(parameters('subscription'), '-', parameters('environment'), '-bvault')]",
-    "backupVaultBlobPolicyName": "[concat(parameters('subscription'), '-', parameters('environment'), '-blobs-bkpol')]",
-    "frontDoorName": "[concat(parameters('subscription'), '-', parameters('environment'), '-afd')]",
-    "frontDoorEndpointName": "[concat(parameters('subscription'), '-', parameters('environment'), '-fde')]",
-    "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
-    "ees-bau-email": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-bau-email')]",
-    "ees-storage-core": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-core')]",
-    "ees-storage-public": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-storage-public')]",
-    "eventGridTopicNamePublicationChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-publication-changed')]",
-    "eventGridTopicNameReleaseVersionChanged": "[concat(parameters('subscription'), '-', parameters('environment'), '-evgt-release-version-changed')]",
-    "storageAccountBackupContributorRoleId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1')]",
-    "basePublicAllowedOrigins": [
-      "[concat('https://', parameters('domain'))]",
-      "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]"
-    ],
-    "publicAllowedOrigins": "[union(variables('basePublicAllowedOrigins'), parameters('additionalPublicAllowedOrigins'))]",
-    "apiVersions": {
-      "afdEndpoint": "2025-06-01"
-    },
-    "resourceIds": {
-      "afdEndpoint": "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('frontDoorName'), variables('frontDoorEndpointName'))]"
-    }
+    ]
   },
   "resources": [
     {
@@ -1518,137 +1416,6 @@
           }
         ]
       }
-    },
-    {
-      "name": "[variables('publicStorageAccountName')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2023-05-01",
-      "location": "[resourceGroup().location]",
-      "kind": "StorageV2",
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "properties": {
-        "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minTlsVersionStorageAccounts')]",
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": "[if(parameters('useSubnets'), variables('publicStorageVnetRules'), createArray())]",
-          "ipRules": "[parameters('storageFirewallRules')]",
-          "defaultAction": "Deny"
-        }
-      },
-      "resources": [
-        {
-          "name": "default",
-          "type": "blobServices",
-          "condition": "[not(parameters('deployBackupVaultRegistrations'))]",
-          "apiVersion": "2019-04-01",
-          "properties": {
-            "deleteRetentionPolicy": {
-              "enabled": "[parameters('blobDeleteRetentionEnabled')]",
-              "days": "[parameters('blobDeleteRetentionDays')]"
-            }
-          },
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
-        }
-      ],
-      "tags": {
-        "Department": "[parameters('departmentName')]",
-        "Solution": "[parameters('solutionName')]",
-        "ServiceType": "Storage account",
-        "Environment": "[parameters('environmentName')]",
-        "Subscription": "[parameters('subscriptionName')]",
-        "CostCentre": "[parameters('costCentre')]",
-        "ServiceOwner": "[parameters('serviceOwnerName')]",
-        "DateProvisioned": "[parameters('dateProvisioned')]",
-        "CreatedBy": "[parameters('createdBy')]",
-        "DeploymentRepo": "[parameters('deploymentRepo')]",
-        "DeploymentScript": "[parameters('deploymentScript')]"
-      }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "name": "[concat(variables('keyVaultName'), '/ees-storage-public')]",
-      "apiVersion": "2016-10-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ],
-      "properties": {
-        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('publicStorageAccountName'), ';AccountKey=', listKeys(variables('publicStorageAccountId'),'2015-05-01-preview').key1)]"
-      }
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "condition": "[parameters('deployBackupVaultRegistrations')]",
-      "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-      "name": "[guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')))]",
-      "properties": {
-        "roleDefinitionId": "[variables('storageAccountBackupContributorRoleId')]",
-        "principalId": "[reference(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), '2021-01-01', 'Full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.DataProtection/backupVaults/backupInstances",
-      "apiVersion": "2026-06-01",
-      "condition": "[and(parameters('deployBackupVaultRegistrations'), not(parameters('backupVaultAzureBlobsRegistrationsDeployed')))]",
-      "name": "[format('{0}/{1}', variables('backupVaultName'), variables('publicStorageAccountName'))]",
-      "properties": {
-        "objectType": "BackupInstance",
-        "friendlyName": "[variables('publicStorageAccountName')]",
-        "dataSourceInfo": {
-          "objectType": "Datasource",
-          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceName": "[variables('publicStorageAccountName')]",
-          "resourceType": "Microsoft.Storage/storageAccounts",
-          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceLocation": "[resourceGroup().location]",
-          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
-        },
-        "dataSourceSetInfo": {
-          "objectType": "DatasourceSet",
-          "resourceID": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceName": "[variables('publicStorageAccountName')]",
-          "resourceType": "Microsoft.Storage/storageAccounts",
-          "resourceUri": "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]",
-          "resourceLocation": "[resourceGroup().location]",
-          "datasourceType": "Microsoft.Storage/storageAccounts/blobServices"
-        },
-        "policyInfo": {
-          "policyId": "[resourceId('Microsoft.DataProtection/backupVaults/backupPolicies', variables('backupVaultName'), variables('backupVaultBlobPolicyName'))]",
-          "name": "[variables('backupVaultBlobPolicyName')]",
-          "policyParameters": {
-            "backupDatasourceParametersList": [
-              {
-                "objectType": "BlobBackupDatasourceParametersForAutoProtection",
-                "autoProtectionSettings": {
-                  "objectType": "BlobBackupRuleBasedAutoProtectionSettings",
-                  "enabled": true,
-                  "rules": [
-                    {
-                      "objectType": "BlobBackupAutoProtectionRule",
-                      "mode": "Exclude",
-                      "type": "Prefix",
-                      "pattern": "cache"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceId('Microsoft.DataProtection/backupVaults', variables('backupVaultName')), variables('storageAccountBackupContributorRoleId'), resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('publicStorageAccountName'))]"
-      ]
     },
     {
       "type": "Microsoft.Insights/metricAlerts",
