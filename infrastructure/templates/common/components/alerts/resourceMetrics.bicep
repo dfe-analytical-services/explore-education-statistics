@@ -121,7 +121,7 @@ type PostgreSqlMetric = {
     | 'storage_percent'
 }
 
-type SqlDatabaseMetric = {
+type AzureSqlDatabaseMetric = {
   resourceType: 'Microsoft.Sql/servers/databases'
   metric:
     | 'blocked_by_firewall'
@@ -176,5 +176,5 @@ type ResourceMetric =
   | PostgreSqlMetric
   | SearchServiceMetric
   | SiteMetric
-  | SqlDatabaseMetric
+  | AzureSqlDatabaseMetric
   | StorageAccountMetric

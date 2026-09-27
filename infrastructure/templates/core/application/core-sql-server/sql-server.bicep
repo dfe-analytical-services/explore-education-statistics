@@ -106,6 +106,3 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     tagValues: tagValues
   }
 }
-
-output serverName string = sqlServerModule.outputs.serverName
-output serverFqdn string = sqlServerModule.outputs.serverFqdn
