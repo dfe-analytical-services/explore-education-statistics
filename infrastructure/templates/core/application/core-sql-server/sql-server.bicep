@@ -1,5 +1,6 @@
 import { VNetSubnets } from '../virtual-network/types.bicep'
 import { AzureSqlDatabaseConfig } from '../../../common/components/azure-sql/types.bicep'
+import { IpRange } from '../../../common/types.bicep'
 
 @description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string
@@ -27,11 +28,7 @@ param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
 param subnets VNetSubnets
 
 @description('Firewall rules for the SQL Server, applied when public network access is enabled.')
-param firewallRules {
-  name: string
-  startIpAddress: string
-  endIpAddress: string
-}[] = []
+param firewallRules IpRange[] = []
 
 @description('Email addresses to notify for security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[]

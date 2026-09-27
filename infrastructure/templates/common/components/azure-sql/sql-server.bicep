@@ -1,4 +1,5 @@
 import { SqlDatabaseDefinition, SubnetReference } from 'types.bicep'
+import { IpRange } from '../../types.bicep'
 
 @description('Name of the SQL Server.')
 param serverName string
@@ -26,11 +27,7 @@ param minTlsVersion string = '1.2'
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
 
 @description('Firewall rules for the SQL Server, applied when public network access is enabled.')
-param firewallRules {
-  name: string
-  startIpAddress: string
-  endIpAddress: string
-}[] = []
+param firewallRules IpRange[] = []
 
 @description('Subnets to allow direct VNet access from, applied when public network access is enabled.')
 param allowedSubnets SubnetReference[] = []

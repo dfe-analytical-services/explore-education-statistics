@@ -83,11 +83,7 @@ param sqlAzureAdministratorSid string = ''
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
 
 @description('Firewall rules for the Core SQL Server, applied when public network access is enabled.')
-param sqlFirewallRules {
-  name: string
-  startIpAddress: string
-  endIpAddress: string
-}[] = []
+param sqlFirewallRules IpRange[] = []
 
 @description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[] = []

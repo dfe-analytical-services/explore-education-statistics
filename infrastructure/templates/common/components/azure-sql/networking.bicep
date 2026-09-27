@@ -1,4 +1,5 @@
 import { SubnetReference } from 'types.bicep'
+import { IpRange } from '../../types.bicep'
 
 @description('Name of the SQL Server that this networking configuration belongs to.')
 param sqlServerName string
@@ -10,11 +11,7 @@ param location string
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled'
 
 @description('Firewall rules for the SQL Server, applied when public network access is enabled.')
-param firewallRules {
-  name: string
-  startIpAddress: string
-  endIpAddress: string
-}[] = []
+param firewallRules IpRange[] = []
 
 @description('Subnets to allow direct VNet access from, applied when public network access is enabled.')
 param allowedSubnets SubnetReference[] = []
@@ -34,8 +31,8 @@ resource firewallRuleResources 'Microsoft.Sql/servers/firewallRules@2025-01-01' 
     parent: sqlServer
     name: rule.name
     properties: {
-      startIpAddress: rule.startIpAddress
-      endIpAddress: rule.endIpAddress
+      startIpAddress: parseCidr(rule.cidr).firstUsable
+      endIpAddress: parseCidr(rule.cidr).lastUsable
     }
   }
 ]
