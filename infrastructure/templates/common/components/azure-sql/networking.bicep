@@ -1,4 +1,4 @@
-import { VNetSubnets } from '../virtual-network/types.bicep'
+import { SubnetReference } from 'types.bicep'
 
 @description('Name of the SQL Server that this networking configuration belongs to.')
 param sqlServerName string
@@ -14,10 +14,13 @@ param firewallRules {
   name: string
   startIpAddress: string
   endIpAddress: string
-}[]
+}[] = []
 
-@description('Subnets from the VNet.')
-param subnets VNetSubnets
+@description('Subnets to allow direct VNet access from, applied when public network access is enabled.')
+param allowedSubnets SubnetReference[] = []
+
+@description('Id of the subnet to deploy a private endpoint into. Omit to skip deploying a private endpoint.')
+param privateEndpointSubnetId string?
 
 @description('Tags for the resources')
 param tagValues object
@@ -37,18 +40,8 @@ resource firewallRuleResources 'Microsoft.Sql/servers/firewallRules@2025-01-01' 
   }
 ]
 
-var sqlAllowedSubnets = [
-  subnets.admin
-  subnets.importer
-  subnets.publisher
-  subnets.content
-  subnets.data
-  subnets.notify
-  subnets.publicApiDataProcessor
-]
-
 resource virtualNetworkRuleResources 'Microsoft.Sql/servers/virtualNetworkRules@2025-01-01' = [
-  for allowedSubnet in sqlAllowedSubnets: if (sqlServerPublicNetworkAccess == 'Enabled') {
+  for allowedSubnet in allowedSubnets: if (sqlServerPublicNetworkAccess == 'Enabled') {
     parent: sqlServer
     name: allowedSubnet.name
     properties: {
@@ -58,13 +51,13 @@ resource virtualNetworkRuleResources 'Microsoft.Sql/servers/virtualNetworkRules@
   }
 ]
 
-module privateEndpointModule '../../../common/components/privateEndpoint.bicep' = {
-  name: 'coreSqlServerPrivateEndpointDeploy'
+module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
+  name: 'sqlServerPrivateEndpointDeploy'
   params: {
     serviceId: sqlServer.id
     serviceName: sqlServerName
     serviceType: 'azureSql'
-    subnetId: subnets.sqlServerPrivateEndpoints.id
+    subnetId: privateEndpointSubnetId!
     location: location
     tagValues: tagValues
   }

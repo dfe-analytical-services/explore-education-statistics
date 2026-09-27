@@ -1,7 +1,7 @@
 import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 import { IpRange } from '../common/types.bicep'
-import { AzureSqlDatabaseConfig } from 'application/core-sql-server/types.bicep'
+import { AzureSqlDatabaseConfig } from '../common/components/azure-sql/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''

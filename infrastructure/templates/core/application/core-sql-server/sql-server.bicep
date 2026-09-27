@@ -1,5 +1,5 @@
 import { VNetSubnets } from '../virtual-network/types.bicep'
-import { AzureSqlDatabaseConfig } from 'types.bicep'
+import { AzureSqlDatabaseConfig } from '../../../common/components/azure-sql/types.bicep'
 
 @description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string
@@ -19,9 +19,6 @@ param sqlAzureAdministratorLogin string
 
 @description('The object id of the Entra ID admin for the SQL Server.')
 param sqlAzureAdministratorSid string
-
-@description('Minimum TLS version supported.')
-param minTlsVersion string = '1.2'
 
 @description('Whether or not public access is enabled for the SQL Server. Firewall and VNet rules only apply when this is Enabled.')
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
@@ -65,93 +62,50 @@ param tagValues object
 
 var coreSqlServerName = '${subscription}-sqlsvr-ees-01'
 
-resource sqlServer 'Microsoft.Sql/servers@2025-01-01' = {
-  name: coreSqlServerName
-  location: location
-  properties: {
-    administratorLogin: sqlAdministratorLogin
-    administratorLoginPassword: sqlAdministratorLoginPassword
-    version: '12.0'
-    minimalTlsVersion: minTlsVersion
-    publicNetworkAccess: sqlServerPublicNetworkAccess
-  }
-  tags: union(tagValues, {
-    ServiceType: 'SQL Server'
-  })
-}
+var allowedSubnets = [
+  subnets.admin
+  subnets.importer
+  subnets.publisher
+  subnets.content
+  subnets.data
+  subnets.notify
+  subnets.publicApiDataProcessor
+]
 
-resource entraIdAdministrator 'Microsoft.Sql/servers/administrators@2025-01-01' = {
-  parent: sqlServer
-  name: 'activeDirectory'
-  properties: {
-    administratorType: 'ActiveDirectory'
-    login: sqlAzureAdministratorLogin
-    sid: sqlAzureAdministratorSid
-    tenantId: az.subscription().tenantId
-  }
-  dependsOn: [
-    contentDbModule
-  ]
-}
-
-module diagnosticsAndAuditingModule 'diagnostics-and-auditing.bicep' = {
-  name: 'coreSqlServerDiagnosticsAndAuditingDeploy'
+module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' = {
+  name: 'coreSqlServerModuleDeploy'
   params: {
-    sqlServerName: sqlServer.name
+    serverName: coreSqlServerName
+    location: location
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
+    sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
+    sqlAzureAdministratorSid: sqlAzureAdministratorSid
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    allowedSubnets: allowedSubnets
+    privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
+    firewallRules: firewallRules
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountName
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-  }
-}
-
-module networkingModule 'networking.bicep' = {
-  name: 'coreSqlServerNetworkingDeploy'
-  params: {
-    sqlServerName: sqlServer.name
-    location: location
-    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
-    firewallRules: firewallRules
-    subnets: subnets
-    tagValues: tagValues
-  }
-}
-
-module contentDbModule 'database.bicep' = {
-  name: 'contentDbDeploy'
-  params: {
-    sqlServerName: sqlServer.name
-    location: location
-    resourceName: 'content'
-    config: contentDbConfig
-    longTermMonthlyRetention: 'P12M'
+    databases: [
+      {
+        name: 'content'
+        config: contentDbConfig
+        longTermMonthlyRetention: 'P12M'
+      }
+      {
+        name: 'statistics'
+        config: statisticsDbConfig
+        longTermMonthlyRetention: 'P3M'
+      }
+    ]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     alertsGroupName: alertsGroupName
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
-  dependsOn: [
-    diagnosticsAndAuditingModule
-  ]
 }
 
-module statisticsDbModule 'database.bicep' = {
-  name: 'statisticsDbDeploy'
-  params: {
-    sqlServerName: sqlServer.name
-    location: location
-    resourceName: 'statistics'
-    config: statisticsDbConfig
-    longTermMonthlyRetention: 'P3M'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    alertsGroupName: alertsGroupName
-    deployAlerts: deployAlerts
-    tagValues: tagValues
-  }
-  dependsOn: [
-    diagnosticsAndAuditingModule
-  ]
-}
-
-output serverName string = sqlServer.name
-output serverFqdn string = sqlServer.properties.fullyQualifiedDomainName
+output serverName string = sqlServerModule.outputs.serverName
+output serverFqdn string = sqlServerModule.outputs.serverFqdn

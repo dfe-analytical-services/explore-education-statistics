@@ -12,8 +12,17 @@ param resourceName string
 @description('Configuration for the database.')
 param config AzureSqlDatabaseConfig
 
-@description('Monthly long term retention, e.g. "P12M" or "P3M".')
+@description('Monthly long term backup retention, e.g. "P12M" or "P3M".')
 param longTermMonthlyRetention string
+
+@description('Weekly long term backup retention.')
+param longTermWeeklyRetention string = 'P4W'
+
+@description('Yearly long term backup retention.')
+param longTermYearlyRetention string = 'P1Y'
+
+@description('Week of the year that the yearly long term backup is taken.')
+param longTermRetentionWeekOfYear int = 1
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -95,10 +104,10 @@ resource databaseLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backup
   parent: database
   name: 'default'
   properties: {
-    weeklyRetention: 'P4W'
+    weeklyRetention: longTermWeeklyRetention
     monthlyRetention: longTermMonthlyRetention
-    yearlyRetention: 'P1Y'
-    weekOfYear: 1
+    yearlyRetention: longTermYearlyRetention
+    weekOfYear: longTermRetentionWeekOfYear
   }
 }
 
