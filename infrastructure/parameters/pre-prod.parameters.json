@@ -5,15 +5,6 @@
     "useSubnets": {
       "value": true
     },
-    "skuContentDb": {
-      "value": "Standard"
-    },
-    "tierContentDb": {
-      "value": "Standard"
-    },
-    "capacityContentDb": {
-      "value": 50
-    },
     "licenseTypeStatisticsDb": {
       "value": "BasePrice"
     },
@@ -25,9 +16,6 @@
     },
     "capacityStatisticsDb": {
       "value": 2
-    },
-    "maxContentDbSizeBytes": {
-      "value": 1073741824
     },
     "maxStatsDbSizeBytes": {
       "value": 1099511627776
