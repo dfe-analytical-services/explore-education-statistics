@@ -35,6 +35,10 @@ param allowedSubnets SubnetReference[] = []
 @description('Id of the subnet to deploy a private endpoint into. Omit to skip deploying a private endpoint.')
 param privateEndpointSubnetId string?
 
+@description('Specifies an optional name for the private endpoint\'s private link service connection.')
+@minLength(0)
+param privateLinkServiceConnectionNameOverride string?
+
 @description('Email addresses to notify for security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[]
 
@@ -117,6 +121,7 @@ module networkingModule 'networking.bicep' = {
     firewallRules: firewallRules
     allowedSubnets: allowedSubnets
     privateEndpointSubnetId: privateEndpointSubnetId
+    privateLinkServiceConnectionNameOverride: privateLinkServiceConnectionNameOverride
     tagValues: tagValues
   }
 }

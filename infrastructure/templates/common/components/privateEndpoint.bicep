@@ -12,6 +12,10 @@ param serviceId string
 @minLength(0)
 param privateEndpointNameOverride string?
 
+@description('Specifies an optional name for the private link service connection. Defaults to the private endpoint name.')
+@minLength(0)
+param privateLinkServiceConnectionNameOverride string?
+
 @description('Specifies the resource id of the subnet with which the service will be attached to the VNet')
 @minLength(0)
 param subnetId string
@@ -38,7 +42,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   properties: {
     privateLinkServiceConnections: [
       {
-        name: privateEndpointName
+        name: privateLinkServiceConnectionNameOverride ?? privateEndpointName
         properties: {
           privateLinkServiceId: serviceId
           groupIds: [

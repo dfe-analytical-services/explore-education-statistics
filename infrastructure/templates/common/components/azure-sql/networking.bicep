@@ -19,6 +19,10 @@ param allowedSubnets SubnetReference[] = []
 @description('Id of the subnet to deploy a private endpoint into. Omit to skip deploying a private endpoint.')
 param privateEndpointSubnetId string?
 
+@description('Specifies an optional name for the private endpoint\'s private link service connection.')
+@minLength(0)
+param privateLinkServiceConnectionNameOverride string?
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -56,6 +60,7 @@ module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSub
     serviceType: 'azureSql'
     subnetId: privateEndpointSubnetId!
     location: location
+    privateLinkServiceConnectionNameOverride: privateLinkServiceConnectionNameOverride
     tagValues: tagValues
   }
 }

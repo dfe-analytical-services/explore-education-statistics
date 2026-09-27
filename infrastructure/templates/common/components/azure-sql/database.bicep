@@ -73,8 +73,9 @@ resource database 'Microsoft.Sql/servers/databases@2025-01-01' = {
     zoneRedundant: false
     readScale: 'Disabled'
     autoPauseDelay: -1
-    requestedBackupStorageRedundancy: 'GRS'
-    minCapacity: json(string(config.?minCapacity))
+    requestedBackupStorageRedundancy: 'Geo'
+    // Workaround for Bicep validation on minCapacity which doesn't accept float values.
+    minCapacity: config.?minCapacity != null ? json(config.minCapacity!) : null
   }
   tags: databaseTagValues
 }

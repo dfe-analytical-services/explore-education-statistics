@@ -81,6 +81,8 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
     allowedSubnets: allowedSubnets
     privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
+    // TODO EES-7502 - use standardised name for private endpoint connections.
+    privateLinkServiceConnectionNameOverride: '${coreSqlServerName}-pep-conn'
     firewallRules: firewallRules
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
