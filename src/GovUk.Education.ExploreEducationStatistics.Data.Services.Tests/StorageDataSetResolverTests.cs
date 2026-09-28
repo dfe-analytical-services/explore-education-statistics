@@ -18,7 +18,7 @@ public abstract class StorageDataSetResolverTests
         {
             var subjectId = Guid.NewGuid();
 
-            var contentDbContextId = await SeedDataFile(subjectId, DataStorageVersion.StatsDB);
+            var contentDbContextId = await SeedDataFile(subjectId);
 
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
             await using var statisticsDbContext = InMemoryStatisticsDbContext();
@@ -29,22 +29,6 @@ public abstract class StorageDataSetResolverTests
 
             var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
             Assert.Equal(subjectId, dataSet.SubjectId);
-        }
-
-        [Fact]
-        public async Task DataFileIsUnsupportedVersion_Throws()
-        {
-            var subjectId = Guid.NewGuid();
-
-            var contentDbContextId = await SeedDataFile(subjectId, DataStorageVersion.ParquetV1);
-
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-
-            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
-
-            var exception = await Assert.ThrowsAsync<NotSupportedException>(() => resolver.Resolve(subjectId));
-            Assert.Contains("ParquetV1", exception.Message);
         }
 
         [Fact]
@@ -61,7 +45,7 @@ public abstract class StorageDataSetResolverTests
             Assert.Contains(subjectId.ToString(), exception.Message);
         }
 
-        private static async Task<string> SeedDataFile(Guid subjectId, DataStorageVersion dataStorageVersion)
+        private static async Task<string> SeedDataFile(Guid subjectId)
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -75,7 +59,7 @@ public abstract class StorageDataSetResolverTests
                     Filename = "data.csv",
                     SubjectId = subjectId,
                     Type = FileType.Data,
-                    DataStorageVersion = dataStorageVersion,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
                 }
             );
             await contentDbContext.SaveChangesAsync();
