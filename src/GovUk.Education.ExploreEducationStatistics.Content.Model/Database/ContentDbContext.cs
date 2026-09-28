@@ -449,6 +449,10 @@ public class ContentDbContext : DbContext
             entity.Property(f => f.ContentType).HasMaxLength(255);
             entity.Property(f => f.Type).HasConversion(new EnumToStringConverter<FileType>()).HasMaxLength(25);
             entity.HasIndex(f => f.Type);
+            entity
+                .Property(f => f.DataStorageVersion)
+                .HasConversion(new EnumToStringConverter<DataStorageVersion>())
+                .HasMaxLength(25);
             entity.HasOne(f => f.Replacing).WithOne().HasForeignKey<File>(f => f.ReplacingId).IsRequired(false);
             entity.HasOne(f => f.ReplacedBy).WithOne().HasForeignKey<File>(f => f.ReplacedById).IsRequired(false);
             entity
