@@ -23,6 +23,7 @@ public class MethodologyImageService : IMethodologyImageService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
     private readonly IPrivateBlobStorageService _privateBlobStorageService;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly IFileValidatorService _fileValidatorService;
     private readonly IFileRepository _fileRepository;
     private readonly IMethodologyFileRepository _methodologyFileRepository;
@@ -32,6 +33,7 @@ public class MethodologyImageService : IMethodologyImageService
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IPrivateBlobStorageService privateBlobStorageService,
+        IPublicBlobStorageService publicBlobStorageService,
         IFileValidatorService fileValidatorService,
         IFileRepository fileRepository,
         IMethodologyFileRepository methodologyFileRepository,
@@ -41,6 +43,7 @@ public class MethodologyImageService : IMethodologyImageService
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
         _privateBlobStorageService = privateBlobStorageService;
+        _publicBlobStorageService = publicBlobStorageService;
         _fileValidatorService = fileValidatorService;
         _fileRepository = fileRepository;
         _methodologyFileRepository = methodologyFileRepository;
@@ -93,6 +96,7 @@ public class MethodologyImageService : IMethodologyImageService
                         )
                         {
                             await _privateBlobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                            await _publicBlobStorageService.DeleteBlob(PublicMethodologyFiles, file.Path());
                             await _fileRepository.Delete(file.Id);
                         }
                     });

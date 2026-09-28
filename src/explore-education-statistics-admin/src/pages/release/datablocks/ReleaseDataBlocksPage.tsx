@@ -121,7 +121,9 @@ const ReleaseDataBlocksPage = () => {
 
   const sortedDataBlocks = useMemo(() => {
     const unfeaturedDataBlocks = dataBlocks.filter(dataBlock => {
-      return !featuredTables.find(table => table.dataBlockId === dataBlock.id);
+      return !featuredTables.find(
+        table => table.dataBlockVersionId === dataBlock.id,
+      );
     });
 
     return orderBy(

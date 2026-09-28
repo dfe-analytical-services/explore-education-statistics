@@ -204,7 +204,7 @@ Remove publication filter
     ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks selected option label    css:select[id="filters-form-publication"]    All publications
 

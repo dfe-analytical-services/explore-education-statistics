@@ -8,7 +8,8 @@ public record PublicationDeletedEvent : IEvent
     public PublicationDeletedEvent(
         Guid publicationId,
         string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease
+        LatestPublishedReleaseInfo? latestPublishedRelease,
+        IReadOnlyList<Guid> releaseIds
     )
     {
         Subject = publicationId.ToString();
@@ -16,11 +17,12 @@ public record PublicationDeletedEvent : IEvent
         {
             PublicationSlug = publicationSlug,
             LatestPublishedRelease = latestPublishedRelease,
+            ReleaseIds = releaseIds,
         };
     }
 
     // Changes to this event should also increment the version accordingly.
-    private const string DataVersion = "1.0";
+    private const string DataVersion = "1.1";
     private const string EventType = PublicationChangedEventTypes.PublicationDeleted;
 
     // Which Topic endpoint to use from the appsettings
@@ -40,6 +42,15 @@ public record PublicationDeletedEvent : IEvent
     {
         public required string PublicationSlug { get; init; }
         public required LatestPublishedReleaseInfo? LatestPublishedRelease { get; init; }
+
+        /// <summary>
+        /// The ids of every Release that belonged to the deleted Publication.
+        /// </summary>
+        /// <remarks>
+        /// A subscriber cannot look these up once the Publication is gone, and a searchable document is
+        /// named after the Release it was built from, so they have to travel with the event.
+        /// </remarks>
+        public required IReadOnlyList<Guid> ReleaseIds { get; init; }
     }
 
     public EventGridEvent ToEventGridEvent() => new(Subject, EventType, DataVersion, Payload);

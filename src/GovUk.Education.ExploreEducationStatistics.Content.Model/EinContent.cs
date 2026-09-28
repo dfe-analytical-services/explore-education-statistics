@@ -112,6 +112,16 @@ public class EinApiQueryStatTile : EinTile
 
             builder.Property(o => o.Version).HasMaxLength(32);
             builder.Property(o => o.Statistic).HasMaxLength(64);
+
+            // Education in Numbers pages are global, so a tile can reference a Release belonging to any
+            // Theme and will outlive it. The reference is optional provenance for the tile's query rather
+            // than something it depends on, so deleting the Release nulls it instead of being blocked by
+            // it.
+            builder
+                .HasOne(tile => tile.Release)
+                .WithMany()
+                .HasForeignKey(tile => tile.ReleaseId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

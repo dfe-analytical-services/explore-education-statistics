@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -656,7 +656,17 @@ public class MethodologyServiceTests
             ApprovalStatus = Approved,
         };
 
-        var adoptingPublication = new Publication { Contact = MockContact };
+        // A contact belongs to a single publication, so this can't share MockContact with the
+        // owning publication above.
+        var adoptingPublication = new Publication
+        {
+            Contact = new Contact
+            {
+                TeamName = "Adopting Team Name",
+                TeamEmail = "adoptingteam@adoptingteam.com",
+                ContactName = "Adopting Contact Name",
+            },
+        };
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
