@@ -620,7 +620,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
         services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
+        services.AddTransient<StatisticsDbDataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy
@@ -635,7 +636,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
