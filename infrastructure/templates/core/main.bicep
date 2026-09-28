@@ -69,10 +69,6 @@ param deployAlerts bool = false
 @description('The admin user of the Core SQL Server.')
 param sqlAdministratorLogin string = ''
 
-@secure()
-@description('The password of the admin user of the Core SQL Server.')
-param sqlAdministratorLoginPassword string = ''
-
 @description('The login name of the Entra ID admin for the Core SQL Server.')
 param sqlAzureAdministratorLogin string = ''
 
@@ -81,9 +77,6 @@ param sqlAzureAdministratorSid string = ''
 
 @description('Whether or not public access is enabled for the Core SQL Server.')
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
-
-@description('Firewall rules for the Core SQL Server, applied when public network access is enabled.')
-param sqlFirewallRules IpRange[] = []
 
 @description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[] = []
@@ -321,12 +314,12 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
     subscription: subscription
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
-    sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
     sqlAzureAdministratorSid: sqlAzureAdministratorSid
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
     subnets: vNetModule.outputs.subnets
-    firewallRules: sqlFirewallRules
+    firewallRules: maintenanceIpRanges
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: '${subscription}${abbreviations.storageStorageAccounts}eeslogging'

@@ -11,9 +11,8 @@ param location string = resourceGroup().location
 @description('The admin user of the SQL Server.')
 param sqlAdministratorLogin string
 
-@secure()
-@description('The password of the admin user of the SQL Server.')
-param sqlAdministratorLoginPassword string
+@description('The Key Vault instance that holds the SQL Server admin password.')
+param keyVaultName string
 
 @description('The login name of the Entra ID admin for the SQL Server.')
 param sqlAzureAdministratorLogin string
@@ -59,6 +58,10 @@ param tagValues object
 
 var coreSqlServerName = '${subscription}-sqlsvr-ees-01'
 
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
+  name: keyVaultName
+}
+
 var allowedSubnets = [
   subnets.admin
   subnets.importer
@@ -75,7 +78,7 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     serverName: coreSqlServerName
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
-    sqlAdministratorLoginPassword: sqlAdministratorLoginPassword
+    sqlAdministratorLoginPassword: keyVault.getSecret('ees-sql-admin-password')
     sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
     sqlAzureAdministratorSid: sqlAzureAdministratorSid
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess

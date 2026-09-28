@@ -49,10 +49,8 @@ steps:
               publicSiteUrl='$(publicSiteUrl)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               sqlAdministratorLogin='$(sqlAdministratorLogin)' \
-              sqlAdministratorLoginPassword='$(sqlAdministratorLoginPassword)' \
               sqlAzureAdministratorLogin='$(sqlAzureAdministratorLogin)' \
               sqlAzureAdministratorSid='$(sqlAzureAdministratorSid)' \
-              sqlFirewallRules='$(sqlFirewallRules)' \
               teamEmailAddresses='$(teamEmailAddresses)' \
               deploySubnets=${{ parameters.deploySubnets }} \
               deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
