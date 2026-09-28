@@ -1,4 +1,4 @@
-import { SubnetReference } from 'types.bicep'
+import { SubnetReference } from '../../types.bicep'
 import { IpRange } from '../../types.bicep'
 
 @description('Name of the SQL Server that this networking configuration belongs to.')

@@ -1,5 +1,5 @@
-import { SqlDatabaseDefinition, SubnetReference } from 'types.bicep'
-import { IpRange } from '../../types.bicep'
+import { SqlDatabaseDefinition } from 'types.bicep'
+import { IpRange, SubnetReference } from '../../types.bicep'
 
 @description('Name of the SQL Server.')
 param serverName string

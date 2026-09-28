@@ -322,7 +322,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
     firewallRules: maintenanceIpRanges
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
-    loggingStorageAccountName: '${subscription}${abbreviations.storageStorageAccounts}eeslogging'
+    loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
     contentDbConfig: contentDbConfig
     statisticsDbConfig: statisticsDbConfig
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId

@@ -40,3 +40,5 @@ module blobServiceModule '../../../common/components/blobService.bicep' = {
     deleteRetentionPolicy: blobDeleteRetentionDays
   }
 }
+
+output storageAccountName string = storageAccountName

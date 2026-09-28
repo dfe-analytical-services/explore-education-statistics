@@ -62,18 +62,41 @@ resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 
+// EES-7502 - allow full subnet name to be used as virtualNetworkRules
+// names rather than shorthand names.
 var allowedSubnets = [
-  subnets.admin
-  subnets.importer
-  subnets.publisher
-  subnets.content
-  subnets.data
-  subnets.notify
-  subnets.publicApiDataProcessor
+  {
+    name: 'admin'
+    id: subnets.admin.id
+  }
+  {
+    name: 'importer'
+    id: subnets.importer.id
+  }
+  {
+    name: 'publisher'
+    id: subnets.publisher.id
+  }
+  {
+    name: 'content'
+    id: subnets.content.id
+  }
+  {
+    name: 'data'
+    id: subnets.data.id
+  }
+  {
+    name: 'notify'
+    id: subnets.notify.id
+  }
+  {
+    name: 'admin'
+    id: subnets.publicApiDataProcessor.id
+  }
 ]
 
 module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' = {
-  name: 'coreSqlServerModuleDeploy'
+  name: 'coreSqlServerDeploy'
   params: {
     serverName: coreSqlServerName
     location: location
