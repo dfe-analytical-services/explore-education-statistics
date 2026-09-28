@@ -50,7 +50,8 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
-        var locations = await GetLocations(subjectId, tableResultMeta.Locations, cancellationToken);
+        var dataSet = await _storageDataSetResolver.Resolve(subjectId, cancellationToken);
+        var locations = await GetLocations(dataSet, tableResultMeta.Locations, cancellationToken);
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
             filter => filter.Name,
@@ -160,7 +161,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     }
 
     private async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        Guid subjectId,
+        IStorageDataSet dataSet,
         Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy,
         CancellationToken cancellationToken
     )
@@ -176,16 +177,12 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var locationIds = locationAttributePaths.Select(location => location.Id).ToHashSet();
 
-        // If possible, use the locations from the database as these contain
-        // all the attributes from when it was originally created.
-        // Locations in the database are immutable, but they may have been deleted
-        // if they have been orphaned from any subject for too long.
-        var dataSet = await _storageDataSetResolver.Resolve(subjectId, cancellationToken);
+        // If possible, fetch locations from the IStorageDataSet
         var locations = (await dataSet.ListLocations(locationIds, cancellationToken)).ToDictionary(location =>
             location.Id
         );
 
-        // For any locations that no longer exist in the database, fallback to using the
+        // For any locations that no longer exist in IStorageDataSet, fallback to using the
         // permalink's location hierarchy metadata. It should be noted that this meta
         // doesn't provide the full set of location attributes so the location will
         // most likely be missing columns that existed in the original CSV.

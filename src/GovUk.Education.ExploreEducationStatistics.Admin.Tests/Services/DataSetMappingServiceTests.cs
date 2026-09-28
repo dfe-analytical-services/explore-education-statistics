@@ -12,9 +12,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -3555,8 +3555,7 @@ public class DataSetMappingServiceTests
 
         return new DataSetMappingService(
             contentDbContext,
-            statisticsDbContext,
-            new LocationRepository(statisticsDbContext),
+            BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             userService ?? MockUtils.AlwaysTrueUserService().Object
         );
     }
