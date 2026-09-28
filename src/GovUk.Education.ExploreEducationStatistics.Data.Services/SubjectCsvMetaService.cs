@@ -54,9 +54,17 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             {
                 var dataSet = await _storageDataSetResolver.Resolve(releaseSubject.SubjectId, cancellationToken);
 
-                var locations = await GetLocations(dataSet, query.LocationIds, cancellationToken);
-                var filters = await GetFilters(dataSet, query.GetFilterItemIds(), cancellationToken);
-                var indicators = await GetIndicators(dataSet, query.Indicators, cancellationToken);
+                var locations = (await dataSet.ListLocations(query.LocationIds, cancellationToken)).ToDictionary(
+                    location => location.Id,
+                    location => location.GetCsvValues()
+                );
+                var filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                    await dataSet.ListFilterItems(query.GetFilterItemIds(), cancellationToken)
+                );
+                var indicators = (await dataSet.ListIndicators(query.Indicators, cancellationToken)).ToDictionary(
+                    indicator => indicator.Name,
+                    indicator => new IndicatorCsvMetaViewModel(indicator)
+                );
                 var headers = csvStream is not null
                     ? await ListCsvHeaders(csvStream, filters, indicators)
                     : ListCsvHeaders(filters, indicators, locations);
@@ -152,38 +160,5 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
 
         return filteredHeaders;
-    }
-
-    private static async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        IStorageDataSet dataSet,
-        IEnumerable<Guid> locationIds,
-        CancellationToken cancellationToken
-    )
-    {
-        var locations = await dataSet.ListLocations(locationIds, cancellationToken);
-        return locations.ToDictionary(location => location.Id, location => location.GetCsvValues());
-    }
-
-    private static async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(
-        IStorageDataSet dataSet,
-        IEnumerable<Guid> filterItemIds,
-        CancellationToken cancellationToken
-    )
-    {
-        var filterItems = await dataSet.ListFilterItems(filterItemIds, cancellationToken);
-        return FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems);
-    }
-
-    private static async Task<Dictionary<string, IndicatorCsvMetaViewModel>> GetIndicators(
-        IStorageDataSet dataSet,
-        IEnumerable<Guid> indicatorIds,
-        CancellationToken cancellationToken
-    )
-    {
-        var indicators = await dataSet.ListIndicators(indicatorIds, cancellationToken);
-        return indicators.ToDictionary(
-            indicator => indicator.Name,
-            indicator => new IndicatorCsvMetaViewModel(indicator)
-        );
     }
 }
