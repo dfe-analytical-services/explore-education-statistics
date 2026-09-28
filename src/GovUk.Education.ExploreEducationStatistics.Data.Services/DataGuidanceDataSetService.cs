@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -15,23 +14,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class DataGuidanceDataSetService : IDataGuidanceDataSetService
 {
-    private readonly StatisticsDbContext _statisticsDbContext;
     private readonly ContentDbContext _contentDbContext;
-    private readonly IIndicatorRepository _indicatorRepository;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly ITimePeriodService _timePeriodService;
 
     public DataGuidanceDataSetService(
-        StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
-        IIndicatorRepository indicatorRepository,
+        IStorageDataSetResolver storageDataSetResolver,
         IFootnoteRepository footnoteRepository,
         ITimePeriodService timePeriodService
     )
     {
-        _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
-        _indicatorRepository = indicatorRepository;
+        _storageDataSetResolver = storageDataSetResolver;
         _footnoteRepository = footnoteRepository;
         _timePeriodService = timePeriodService;
     }
@@ -68,9 +64,10 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
                     .SelectAwait(async releaseFile =>
                     {
                         var subjectId = releaseFile.File.SubjectId!.Value;
+                        var dataSet = await _storageDataSetResolver.Resolve(subjectId, cancellationToken);
 
-                        var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
-                        var variables = await ListVariables(subjectId, cancellationToken);
+                        var timePeriods = await _timePeriodService.GetTimePeriodLabels(dataSet);
+                        var variables = await ListVariables(dataSet, cancellationToken);
                         var footnotes = await ListFootnotes(releaseVersionId: releaseVersionId, subjectId: subjectId);
 
                         return BuildDataGuidanceDataSetViewModel(releaseFile, timePeriods, variables, footnotes);
@@ -81,19 +78,20 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             });
     }
 
-    private async Task<List<LabelValue>> ListVariables(Guid subjectId, CancellationToken cancellationToken = default)
+    private static async Task<List<LabelValue>> ListVariables(
+        IStorageDataSet dataSet,
+        CancellationToken cancellationToken = default
+    )
     {
-        var filters = await _statisticsDbContext
-            .Filter.Where(filter => filter.SubjectId == subjectId)
-            .Select(filter => new LabelValue(
-                string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
-                filter.Name
-            ))
-            .ToListAsync(cancellationToken);
+        var filters = (await dataSet.ListFilters(cancellationToken)).Select(filter => new LabelValue(
+            string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
+            filter.Name
+        ));
 
-        var indicators = _indicatorRepository
-            .GetIndicators(subjectId)
-            .Select(indicator => new LabelValue(indicator.Label, indicator.Name));
+        var indicators = (await dataSet.ListIndicators(cancellationToken)).Select(indicator => new LabelValue(
+            indicator.Label,
+            indicator.Name
+        ));
 
         return filters.Concat(indicators).OrderBy(labelValue => labelValue.Value).ToList();
     }

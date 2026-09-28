@@ -41,6 +41,7 @@ public class ReleaseServicePermissionTests
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+            Mock.Of<IStorageDataSetResolver>(),
             userService ?? Mock.Of<IUserService>(),
             timePeriodService ?? Mock.Of<ITimePeriodService>()
         );
