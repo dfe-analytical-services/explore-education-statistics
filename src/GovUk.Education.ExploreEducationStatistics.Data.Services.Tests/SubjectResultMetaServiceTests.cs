@@ -407,7 +407,6 @@ public class SubjectResultMetaServiceTests
         var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
         var dataSet = new Mock<IStorageDataSet>(Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-        var indicatorRepository = new Mock<IIndicatorRepository>(Strict);
         var locationService = new Mock<ILocationService>(Strict);
         var locationRepository = new Mock<ILocationRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
