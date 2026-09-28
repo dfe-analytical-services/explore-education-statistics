@@ -154,8 +154,25 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
+        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
+        services.AddTransient<StatisticsDbDataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
+        services.AddTransient<
+            ISparseObservationsMatchedFilterItemsStrategy,
+            SparseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<
+            IDenseObservationsMatchedFilterItemsStrategy,
+            DenseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+        services.AddTransient<ILocationRepository, LocationRepository>();
+        services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();

@@ -160,7 +160,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-        services.AddTransient<IStorageDataSetResolver, StatisticsDbDataSetResolver>();
+        services.AddTransient<StatisticsDbDataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy
@@ -175,7 +176,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IFrontendService, FrontendService>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();

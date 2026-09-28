@@ -7,9 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface ITimePeriodService
 {
-    Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(Guid subjectId);
-
     IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IList<Observation> observations);
 
-    Task<TimePeriodLabels> GetTimePeriodLabels(Guid subjectId);
+    Task<TimePeriodLabels> GetTimePeriodLabels(IStorageDataSet dataSet);
 }

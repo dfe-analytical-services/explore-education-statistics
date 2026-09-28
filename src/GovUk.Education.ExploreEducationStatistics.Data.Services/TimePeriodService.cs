@@ -2,33 +2,15 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class TimePeriodService : ITimePeriodService
 {
-    private readonly StatisticsDbContext _context;
-
-    public TimePeriodService(StatisticsDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<IList<(int Year, TimeIdentifier TimeIdentifier)>> GetTimePeriods(Guid subjectId)
-    {
-        var observationsQuery = _context
-            .Observation.AsNoTracking()
-            .Where(observation => observation.SubjectId == subjectId);
-
-        return await TimePeriodQueryUtils.ListDistinctTimePeriods(observationsQuery);
-    }
-
     public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IList<Observation> observations)
     {
         var timePeriods = TimePeriodQueryUtils.Order(observations.Select(o => (o.Year, o.TimeIdentifier)).Distinct());
@@ -57,9 +39,9 @@ public class TimePeriodService : ITimePeriodService
         return range.Where(timePeriodsSet.Contains).ToList();
     }
 
-    public async Task<TimePeriodLabels> GetTimePeriodLabels(Guid subjectId)
+    public async Task<TimePeriodLabels> GetTimePeriodLabels(IStorageDataSet dataSet)
     {
-        var orderedTimePeriods = await GetTimePeriods(subjectId);
+        var orderedTimePeriods = await dataSet.ListTimePeriods();
 
         if (!orderedTimePeriods.Any())
         {

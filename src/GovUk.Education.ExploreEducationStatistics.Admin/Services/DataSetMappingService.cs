@@ -9,8 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -20,8 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class DataSetMappingService(
     ContentDbContext contentDbContext,
-    StatisticsDbContext statisticsDbContext,
-    ILocationRepository locationRepository,
+    IStorageDataSetResolver storageDataSetResolver,
     IUserService userService
 ) : IDataSetMappingService
 {
@@ -47,12 +45,11 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementFilters = await statisticsDbContext
-                    .Filter.AsNoTracking()
-                    .Include(f => f.FilterGroups)
-                        .ThenInclude(fg => fg.FilterItems)
-                    .Where(f => f.SubjectId == replacementReleaseFile.File.SubjectId!.Value)
-                    .ToListAsync(cancellationToken);
+                var replacementDataSet = await storageDataSetResolver.Resolve(
+                    replacementReleaseFile.File.SubjectId!.Value,
+                    cancellationToken
+                );
+                var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
 
                 // Filters
                 var updatedFilterMappings = request
@@ -163,11 +160,13 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementIndicators = await statisticsDbContext
-                    .Indicator.AsNoTracking()
-                    .Include(i => i.IndicatorGroup)
-                    .Where(i => i.IndicatorGroup.SubjectId == replacementReleaseFile.File.SubjectId!.Value)
-                    .ToListAsync(cancellationToken);
+                var replacementDataSet = await storageDataSetResolver.Resolve(
+                    replacementReleaseFile.File.SubjectId!.Value,
+                    cancellationToken
+                );
+                var replacementIndicators = (await replacementDataSet.ListIndicatorGroups(cancellationToken))
+                    .SelectMany(ig => ig.Indicators)
+                    .ToList();
 
                 var updatedMappings = request
                     .Updates.Select(update =>
@@ -215,9 +214,11 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementLocations = (
-                    await locationRepository.GetDistinctForSubject(replacementReleaseFile.File.SubjectId!.Value)
-                ).ToList();
+                var replacementDataSet = await storageDataSetResolver.Resolve(
+                    replacementReleaseFile.File.SubjectId!.Value,
+                    cancellationToken
+                );
+                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
 
                 var updatedMappings = request
                     .Updates.Select(update =>

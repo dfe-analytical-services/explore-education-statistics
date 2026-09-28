@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -23,7 +24,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -1400,6 +1403,16 @@ public class FootnoteServiceTests
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
             );
+            contentDbContext.Files.Add(
+                new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject.SubjectId,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1901,6 +1914,21 @@ public class FootnoteServiceTests
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
             );
+
+            if (!subjects.IsNullOrEmpty())
+            {
+                contentDbContext.Files.AddRange(
+                    subjects!.Select(subject => new File
+                    {
+                        Id = Guid.NewGuid(),
+                        RootPath = Guid.NewGuid(),
+                        Filename = "data.csv",
+                        Type = FileType.Data,
+                        SubjectId = subject.Id,
+                    })
+                );
+            }
+
             await contentDbContext.SaveChangesAsync();
         }
     }
@@ -1996,7 +2024,8 @@ public class FootnoteServiceTests
         IUserService? userService = null,
         IDataBlockService? dataBlockService = null,
         IReleaseSubjectRepository? releaseSubjectRepository = null,
-        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null
+        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+        IStorageDataSetResolver? storageDataSetResolver = null
     )
     {
         var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
@@ -2010,7 +2039,8 @@ public class FootnoteServiceTests
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository,
             releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext, footnoteRepository),
-            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
+            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentContext, statisticsDbContext)
         );
     }
 }

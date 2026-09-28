@@ -21,6 +21,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -147,11 +148,15 @@ public class ReleaseServiceTests
             var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
+                .Setup(s =>
+                    s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject1.SubjectId))
+                )
                 .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
+                .Setup(s =>
+                    s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject2.SubjectId))
+                )
                 .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
 
             var service = BuildReleaseService(
@@ -397,7 +402,9 @@ public class ReleaseServiceTests
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
-        timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
+        timePeriodService
+            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -488,7 +495,9 @@ public class ReleaseServiceTests
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
-        timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
+        timePeriodService
+            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -682,7 +691,9 @@ public class ReleaseServiceTests
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
-        timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
+        timePeriodService
+            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -775,7 +786,9 @@ public class ReleaseServiceTests
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
-        timePeriodService.Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>())).ReturnsAsync(new TimePeriodLabels());
+        timePeriodService
+            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1123,14 +1136,18 @@ public class ReleaseServiceTests
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         StatisticsDbContext? statisticsDbContext = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IUserService? userService = null,
         ITimePeriodService? timePeriodService = null
     )
     {
+        statisticsDbContext ??= Mock.Of<StatisticsDbContext>();
+
         return new ReleaseService(
             contentDbContext,
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-            statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+            statisticsDbContext,
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict)
         );
