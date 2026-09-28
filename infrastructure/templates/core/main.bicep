@@ -66,16 +66,16 @@ param deployContainerRegistry bool = false
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
-@description('The admin user of the Core SQL Server.')
+@description('The admin user of the Core and Public SQL Servers.')
 param sqlAdministratorLogin string = ''
 
-@description('The login name of the Entra ID admin for the Core SQL Server.')
+@description('The login name of the Entra ID admin for the Core and Public SQL Servers.')
 param sqlAzureAdministratorLogin string = ''
 
-@description('The object id of the Entra ID admin for the Core SQL Server.')
+@description('The object id of the Entra ID admin for the Core and Public SQL Servers.')
 param sqlAzureAdministratorSid string = ''
 
-@description('Whether or not public access is enabled for the Core SQL Server.')
+@description('Whether or not public access is enabled for the Core and Public SQL Servers.')
 param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
 
 @description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
@@ -95,7 +95,7 @@ param contentDbConfig AzureSqlDatabaseConfig = {
   maxSizeBytes: 1073741824
 }
 
-@description('Configuration for the Statistics database.')
+@description('Configuration for the Statistics database and its geo-replica.')
 param statisticsDbConfig AzureSqlDatabaseConfig = {
   sku: {
     name: 'GP_Gen5'
@@ -325,6 +325,30 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
     loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
     contentDbConfig: contentDbConfig
     statisticsDbConfig: statisticsDbConfig
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
+  name: 'publicSqlServerModuleDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    sqlAdministratorLogin: sqlAdministratorLogin
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
+    sqlAzureAdministratorSid: sqlAzureAdministratorSid
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    subnets: vNetModule.outputs.subnets
+    firewallRules: maintenanceIpRanges
+    teamEmailAddresses: teamEmailAddresses
+    databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
+    loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    statisticsDbConfig: statisticsDbConfig
+    statisticsPrimaryDatabaseId: coreSqlServerModule.outputs.statisticsDatabaseId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     alertsGroupName: alertsModule.outputs.actionGroupName
     deployAlerts: deployAlerts

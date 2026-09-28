@@ -128,13 +128,14 @@ module networkingModule 'networking.bicep' = {
 
 module databaseModules 'database.bicep' = [
   for db in databases: {
-    name: '${db.name}DbDeploy'
+    name: '${serverName}-${db.name}DbDeploy'
     params: {
       sqlServerName: sqlServer.name
       location: location
       resourceName: db.name
       config: db.config
-      longTermMonthlyRetention: db.longTermMonthlyRetention
+      longTermMonthlyRetention: db.?longTermMonthlyRetention
+      geoReplicaSourceDatabaseId: db.?geoReplicaSourceDatabaseId
       longTermWeeklyRetention: longTermWeeklyRetention
       longTermYearlyRetention: longTermYearlyRetention
       longTermRetentionWeekOfYear: longTermRetentionWeekOfYear
@@ -146,5 +147,15 @@ module databaseModules 'database.bicep' = [
     dependsOn: [
       diagnosticsAndAuditingModule
     ]
+  }
+]
+
+output databases {
+  name: string
+  id: string
+}[] = [
+  for (db, i) in databases: {
+    name: databaseModules[i].outputs.databaseName
+    id: databaseModules[i].outputs.databaseId
   }
 ]

@@ -1,5 +1,4 @@
-import { SubnetReference } from '../../types.bicep'
-import { IpRange } from '../../types.bicep'
+import { IpRange, SubnetReference } from '../../types.bicep'
 
 @description('Name of the SQL Server that this networking configuration belongs to.')
 param sqlServerName string
@@ -53,7 +52,7 @@ resource virtualNetworkRuleResources 'Microsoft.Sql/servers/virtualNetworkRules@
 ]
 
 module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSubnetId != null) {
-  name: 'sqlServerPrivateEndpointDeploy'
+  name: '${sqlServerName}PrivateEndpointDeploy'
   params: {
     serviceId: sqlServer.id
     serviceName: sqlServerName

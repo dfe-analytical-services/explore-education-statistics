@@ -18,6 +18,6 @@ type SqlDatabaseDefinition = {
   @description('Configuration for the database.')
   config: AzureSqlDatabaseConfig
 
-  @description('Monthly long term backup retention for this database, e.g. "P12M" or "P3M".')
-  longTermMonthlyRetention: string
+  @description('Monthly long term backup retention for this database, e.g. "P12M" or "P3M". Required unless this database is a geo-replica.')
+  longTermMonthlyRetention: string?
 }

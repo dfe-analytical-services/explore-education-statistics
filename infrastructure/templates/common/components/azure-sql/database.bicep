@@ -12,8 +12,11 @@ param resourceName string
 @description('Configuration for the database.')
 param config AzureSqlDatabaseConfig
 
-@description('Monthly long term backup retention, e.g. "P12M" or "P3M".')
-param longTermMonthlyRetention string
+@description('Monthly long term backup retention, e.g. "P12M" or "P3M". Required unless this database is a geo-replica.')
+param longTermMonthlyRetention string?
+
+@description('Resource id of the primary database, if this database is to be created as a geo-replica of it.')
+param geoReplicaSourceDatabaseId string?
 
 @description('Weekly long term backup retention.')
 param longTermWeeklyRetention string = 'P4W'
@@ -39,6 +42,22 @@ param tagValues object
 var databaseTagValues = union(tagValues, {
   ServiceType: 'SQL Database'
 })
+
+var isGeoReplica = geoReplicaSourceDatabaseId != null
+
+// Backup, auditing and encryption settings are inherited from the primary database by geo-replicas.
+var primaryDatabaseProperties = {
+  requestedBackupStorageRedundancy: 'Geo'
+}
+
+var geoReplicaDatabaseProperties = {
+  createMode: 'OnlineSecondary'
+  sourceDatabaseId: geoReplicaSourceDatabaseId
+  secondaryType: 'Geo'
+}
+
+// Server and database names are combined to keep alert and deployment names unique across SQL Servers.
+var alertsResourceName = '${sqlServerName}-${resourceName}'
 
 var databaseDiagnosticsLogsAndMetrics = {
   logs: [
@@ -73,14 +92,14 @@ resource database 'Microsoft.Sql/servers/databases@2025-01-01' = {
     zoneRedundant: false
     readScale: 'Disabled'
     autoPauseDelay: -1
-    requestedBackupStorageRedundancy: 'Geo'
     // Workaround for Bicep validation on minCapacity which doesn't accept float values.
     minCapacity: config.?minCapacity != null ? json(config.minCapacity!) : null
+    ...(isGeoReplica ? geoReplicaDatabaseProperties : primaryDatabaseProperties)
   }
   tags: databaseTagValues
 }
 
-resource databaseAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = {
+resource databaseAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = if (!isGeoReplica) {
   parent: database
   name: 'default'
   properties: {
@@ -101,18 +120,18 @@ resource databaseDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
   ]
 }
 
-resource databaseLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies@2025-01-01' = {
+resource databaseLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies@2025-01-01' = if (!isGeoReplica) {
   parent: database
   name: 'default'
   properties: {
     weeklyRetention: longTermWeeklyRetention
-    monthlyRetention: longTermMonthlyRetention
+    monthlyRetention: longTermMonthlyRetention!
     yearlyRetention: longTermYearlyRetention
     weekOfYear: longTermRetentionWeekOfYear
   }
 }
 
-resource databaseTransparentDataEncryption 'Microsoft.Sql/servers/databases/transparentDataEncryption@2025-01-01' = {
+resource databaseTransparentDataEncryption 'Microsoft.Sql/servers/databases/transparentDataEncryption@2025-01-01' = if (!isGeoReplica) {
   parent: database
   name: 'current'
   properties: {
@@ -121,9 +140,9 @@ resource databaseTransparentDataEncryption 'Microsoft.Sql/servers/databases/tran
 }
 
 module databaseAlertsModule 'database-alerts.bicep' = {
-  name: '${resourceName}DbAlertsDeploy'
+  name: '${alertsResourceName}AlertsDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: alertsResourceName
     databaseId: database.id
     alertsGroupName: alertsGroupName
     deployAlerts: deployAlerts

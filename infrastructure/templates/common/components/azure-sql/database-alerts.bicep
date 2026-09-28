@@ -1,7 +1,7 @@
 import { staticAverageGreaterThanZero, staticMaxGreaterThanZero, staticTotalGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { fastEvaluation } from '../alerts/evaluation-config.bicep'
 
-@description('Name of the database that these alerts are being applied to, e.g. "statistics" or "content".')
+@description('Name used to identify the database in alert and deployment names, e.g. "s101d01-sqlsvr-ees-01-statistics".')
 param resourceName string
 
 @description('Resource id of the database that these alerts are being applied to.')
@@ -17,7 +17,7 @@ param deployAlerts bool
 param tagValues object
 
 module cpuPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbCpuPercentAlertDeploy'
+  name: '${resourceName}CpuPercentAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -37,7 +37,7 @@ module cpuPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
 }
 
 module dataIoPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbDataIoPercentAlertDeploy'
+  name: '${resourceName}DataIoPercentAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -57,7 +57,7 @@ module dataIoPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts
 }
 
 module failedConnectionsAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbFailedConnectionsAlertDeploy'
+  name: '${resourceName}FailedConnectionsAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -76,7 +76,7 @@ module failedConnectionsAlert '../alerts/staticMetricAlert.bicep' = if (deployAl
 }
 
 module deadlockAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbDeadlockAlertDeploy'
+  name: '${resourceName}DeadlockAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -95,7 +95,7 @@ module deadlockAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
 }
 
 module dataSpaceUsedPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbDataSpaceUsedPercentAlertDeploy'
+  name: '${resourceName}DataSpaceUsedPercentAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -115,7 +115,7 @@ module dataSpaceUsedPercentAlert '../alerts/staticMetricAlert.bicep' = if (deplo
 }
 
 module dataSpaceUsedPercentUrgentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbDataSpaceUsedPercentUrgentAlertDeploy'
+  name: '${resourceName}DataSpaceUrgentAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
@@ -136,7 +136,7 @@ module dataSpaceUsedPercentUrgentAlert '../alerts/staticMetricAlert.bicep' = if 
 }
 
 module blockedByFirewallAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DbBlockedByFirewallAlertDeploy'
+  name: '${resourceName}BlockedByFirewallAlertDeploy'
   params: {
     resourceName: resourceName
     id: databaseId
