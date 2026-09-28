@@ -13,19 +13,19 @@ import { NavRouteProps } from '@admin/routes/types';
 const methodologyPageRoutes: NavRouteProps[] = [
   {
     ...methodologySummaryRoute,
-    component: MethodologySummaryPage,
+    element: <MethodologySummaryPage />,
   },
   {
     ...methodologyContentRoute,
-    component: MethodologyContentPage,
+    element: <MethodologyContentPage />,
   },
   {
     ...methodologyStatusRoute,
-    component: MethodologyStatusPage,
+    element: <MethodologyStatusPage />,
   },
   {
     ...methodologySummaryEditRoute,
-    component: MethodologySummaryEditPage,
+    element: <MethodologySummaryEditPage />,
   },
 ];
 

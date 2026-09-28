@@ -13,19 +13,19 @@ import { NavRouteProps } from '@admin/routes/types';
 const educationInNumbersPageRoutes: NavRouteProps[] = [
   {
     ...educationInNumbersSummaryRoute,
-    component: EducationInNumbersSummaryPage,
+    element: <EducationInNumbersSummaryPage />,
   },
   {
     ...educationInNumbersContentRoute,
-    component: EducationInNumbersContentPage,
+    element: <EducationInNumbersContentPage />,
   },
   {
     ...educationInNumbersSignOffRoute,
-    component: EducationInNumbersSignOffPage,
+    element: <EducationInNumbersSignOffPage />,
   },
   {
     ...educationInNumbersSummaryEditRoute,
-    component: EducationInNumbersSummaryEditPage,
+    element: <EducationInNumbersSummaryEditPage />,
   },
 ];
 

@@ -1,16 +1,12 @@
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
-import {
-  MethodologyRouteParams,
-  methodologySummaryRoute,
-} from '@admin/routes/methodologyRoutes';
+import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
-const MethodologySummaryEditPage = ({
-  history,
-}: RouteComponentProps<MethodologyRouteParams>) => {
+const MethodologySummaryEditPage = () => {
+  const navigate = useNavigate();
   const { methodologyId, methodology, onMethodologyChange } =
     useMethodologyContext();
 
@@ -32,8 +28,8 @@ const MethodologySummaryEditPage = ({
 
     onMethodologyChange(nextMethodology);
 
-    history.push(
-      generatePath<MethodologyRouteParams>(methodologySummaryRoute.path, {
+    navigate(
+      generatePath(methodologySummaryRoute.fullPath, {
         methodologyId,
       }),
     );
@@ -55,7 +51,7 @@ const MethodologySummaryEditPage = ({
           defaultTitle={methodology.owningPublication.title}
           submitText="Update methodology"
           onSubmit={handleSubmit}
-          onCancel={history.goBack}
+          onCancel={() => navigate(-1)}
         />
       )}
     </>

@@ -4,7 +4,6 @@ import {
   releaseApiDataSetDetailsRoute,
   releaseApiDataSetPreviewTokenLogRoute,
   ReleaseDataSetPreviewTokenRouteParams,
-  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
@@ -22,17 +21,18 @@ import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiD
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useHistory, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 export default function ReleaseApiDataSetPreviewTokenPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const lastLocation = useLastLocation();
 
   const { publicApiUrl, publicApiDocsUrl } = useConfig();
 
   const { dataSetId, previewTokenId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetPreviewTokenRouteParams>();
+    useParams<ReleaseDataSetPreviewTokenRouteParams>() as ReleaseDataSetPreviewTokenRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -42,17 +42,14 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
     ...previewTokenQueries.get(previewTokenId),
   });
 
-  const detailsPagePath = generatePath<ReleaseDataSetRouteParams>(
-    releaseApiDataSetDetailsRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-      dataSetId,
-    },
-  );
+  const detailsPagePath = generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+    dataSetId,
+  });
 
-  const tokenLogPagePath = generatePath<ReleaseDataSetRouteParams>(
-    releaseApiDataSetPreviewTokenLogRoute.path,
+  const tokenLogPagePath = generatePath(
+    releaseApiDataSetPreviewTokenLogRoute.fullPath,
     {
       publicationId,
       releaseVersionId,
@@ -62,7 +59,7 @@ export default function ReleaseApiDataSetPreviewTokenPage() {
 
   const handleRevoke = async (id: string) => {
     await previewTokenService.revokePreviewToken(id);
-    history.push(tokenLogPagePath);
+    navigate(tokenLogPagePath);
   };
 
   const tokenExampleUrl = `${publicApiUrl}/v1/data-sets/${dataSet?.id}`;

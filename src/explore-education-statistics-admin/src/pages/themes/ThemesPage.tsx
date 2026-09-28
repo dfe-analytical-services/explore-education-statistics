@@ -42,7 +42,7 @@ const ThemesPage = () => {
                     <Link
                       data-testid={`Edit link for ${theme.title}`}
                       unvisited
-                      to={generatePath<ThemeParams>(themeEditRoute.path, {
+                      to={generatePath(themeEditRoute.fullPath, {
                         themeId: theme.id,
                       })}
                     >
@@ -57,7 +57,7 @@ const ThemesPage = () => {
           ))}
         </Accordion>
 
-        <ButtonLink to={themeCreateRoute.path}>Create theme</ButtonLink>
+        <ButtonLink to={themeCreateRoute.fullPath}>Create theme</ButtonLink>
       </LoadingSpinner>
     </Page>
   );

@@ -7,22 +7,26 @@ export type MethodologyRouteParams = {
 };
 
 export const methodologySummaryRoute: MethodologyRouteProps = {
-  path: '/methodology/:methodologyId/summary',
+  fullPath: '/methodology/:methodologyId/summary',
+  path: 'summary',
   title: 'Summary',
 };
 
 export const methodologySummaryEditRoute: MethodologyRouteProps = {
-  path: '/methodology/:methodologyId/summary/edit',
+  fullPath: '/methodology/:methodologyId/summary/edit',
+  path: 'summary/edit',
   title: 'Edit summary',
 };
 
 export const methodologyContentRoute: MethodologyRouteProps = {
-  path: '/methodology/:methodologyId/content',
+  fullPath: '/methodology/:methodologyId/content',
+  path: 'content',
   title: 'Manage content',
 };
 
 export const methodologyStatusRoute: MethodologyRouteProps = {
-  path: '/methodology/:methodologyId/status',
+  fullPath: '/methodology/:methodologyId/status',
+  path: 'status',
   title: 'Sign off',
 };
 

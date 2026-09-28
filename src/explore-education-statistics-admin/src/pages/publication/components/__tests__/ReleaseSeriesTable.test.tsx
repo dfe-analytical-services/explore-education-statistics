@@ -1,12 +1,13 @@
 import ReleaseSeriesTable from '@admin/pages/publication/components/ReleaseSeriesTable';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { testReleaseSeries } from '@admin/pages/publication/__data__/testReleaseSeries';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import { Router } from 'react-router';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import React from 'react';
 import noop from 'lodash/noop';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { publicationEditReleaseSeriesLegacyLinkRoute } from '@admin/routes/publicationRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 describe('ReleaseSeriesTable', () => {
   const testPublicationId = 'publication-1';
@@ -14,7 +15,7 @@ describe('ReleaseSeriesTable', () => {
 
   test('renders the release series table correctly', () => {
     render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer initialUrl="/" route="/">
         <ReleaseSeriesTable
           canManageReleaseSeries
           isReordering={false}
@@ -25,7 +26,7 @@ describe('ReleaseSeriesTable', () => {
           onConfirmReordering={noop}
           onDelete={noop}
         />
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
 
     const table = screen.getByRole('table');
@@ -95,22 +96,19 @@ describe('ReleaseSeriesTable', () => {
   describe('editing', () => {
     test('shows a warning modal when the edit release button is clicked', async () => {
       const user = userEvent.setup();
-      const history = createMemoryHistory();
       render(
-        <Router history={history}>
-          <TestConfigContextProvider>
-            <ReleaseSeriesTable
-              canManageReleaseSeries
-              isReordering={false}
-              releaseSeries={testReleaseSeries}
-              publicationId={testPublicationId}
-              publicationSlug={testPublicationSlug}
-              onCancelReordering={noop}
-              onConfirmReordering={noop}
-              onDelete={noop}
-            />
-          </TestConfigContextProvider>
-        </Router>,
+        <TestRouterRenderer initialUrl="/" route="/">
+          <ReleaseSeriesTable
+            canManageReleaseSeries
+            isReordering={false}
+            releaseSeries={testReleaseSeries}
+            publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
+            onCancelReordering={noop}
+            onConfirmReordering={noop}
+            onDelete={noop}
+          />
+        </TestRouterRenderer>,
       );
 
       const caption = screen.getByRole('caption');
@@ -137,9 +135,12 @@ describe('ReleaseSeriesTable', () => {
 
     test('goes to the edit page when OK is clicked', async () => {
       const user = userEvent.setup();
-      const history = createMemoryHistory();
       render(
-        <Router history={history}>
+        <TestRouterRenderer
+          initialUrl="/"
+          route="/"
+          routes={[publicationEditReleaseSeriesLegacyLinkRoute.fullPath]}
+        >
           <TestConfigContextProvider>
             <ReleaseSeriesTable
               canManageReleaseSeries
@@ -152,7 +153,7 @@ describe('ReleaseSeriesTable', () => {
               onDelete={noop}
             />
           </TestConfigContextProvider>
-        </Router>,
+        </TestRouterRenderer>,
       );
       await user.click(
         screen.getByRole('button', { name: 'Edit Legacy link 1' }),
@@ -165,17 +166,15 @@ describe('ReleaseSeriesTable', () => {
       const modal = within(screen.getByRole('dialog'));
       await user.click(modal.getByRole('button', { name: 'OK' }));
 
-      await waitFor(() => {
-        expect(history.location.pathname).toBe(
-          `/publication/${testPublicationId}/releases/legacy/${testReleaseSeries[3].id}/edit`,
-        );
-      });
+      await expectLocation(
+        `/publication/${testPublicationId}/releases/legacy/${testReleaseSeries[3].id}/edit`,
+      );
     });
   });
 
   test('does not show edit and delete actions when user does not have permission to manage the release series', () => {
     render(
-      <TestConfigContextProvider>
+      <TestRouterRenderer initialUrl="/" route="/">
         <ReleaseSeriesTable
           canManageReleaseSeries={false}
           isReordering={false}
@@ -187,7 +186,7 @@ describe('ReleaseSeriesTable', () => {
           onDelete={noop}
         />
         ,
-      </TestConfigContextProvider>,
+      </TestRouterRenderer>,
     );
 
     const table = screen.getByRole('table');
@@ -218,7 +217,7 @@ describe('ReleaseSeriesTable', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
       const user = userEvent.setup();
       render(
-        <TestConfigContextProvider>
+        <TestRouterRenderer initialUrl="/" route="/">
           <ReleaseSeriesTable
             canManageReleaseSeries
             isReordering={false}
@@ -229,7 +228,7 @@ describe('ReleaseSeriesTable', () => {
             onConfirmReordering={noop}
             onDelete={noop}
           />
-        </TestConfigContextProvider>,
+        </TestRouterRenderer>,
       );
       await user.click(
         screen.getByRole('button', { name: 'Delete Legacy link 1' }),
@@ -256,7 +255,7 @@ describe('ReleaseSeriesTable', () => {
       const user = userEvent.setup();
       const handleDelete = jest.fn();
       render(
-        <TestConfigContextProvider>
+        <TestRouterRenderer initialUrl="/" route="/">
           <ReleaseSeriesTable
             canManageReleaseSeries
             isReordering={false}
@@ -267,7 +266,7 @@ describe('ReleaseSeriesTable', () => {
             onConfirmReordering={noop}
             onDelete={handleDelete}
           />
-        </TestConfigContextProvider>,
+        </TestRouterRenderer>,
       );
       await user.click(
         screen.getByRole('button', { name: 'Delete Legacy link 1' }),
@@ -288,7 +287,7 @@ describe('ReleaseSeriesTable', () => {
   describe('reordering', () => {
     test('shows the reordering UI when `isReordering` is true', async () => {
       render(
-        <TestConfigContextProvider>
+        <TestRouterRenderer initialUrl="/" route="/">
           <ReleaseSeriesTable
             canManageReleaseSeries
             isReordering
@@ -299,7 +298,7 @@ describe('ReleaseSeriesTable', () => {
             onConfirmReordering={noop}
             onDelete={noop}
           />
-        </TestConfigContextProvider>,
+        </TestRouterRenderer>,
       );
 
       expect(

@@ -16,10 +16,7 @@ import {
   releaseApiDataSetsRoute,
   releaseApiDataSetVersionHistoryRoute,
   releaseDataFileReplaceRoute,
-  ReleaseDataFileReplaceRouteParams,
-  ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetRouteParams,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import { ApiDataSet, DataSetStatus } from '@admin/services/apiDataSetService';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
@@ -33,20 +30,22 @@ import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
+import { useNavigate } from 'react-router';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;
 
 export default function ReleaseApiDataSetDetailsPage() {
-  const { dataSetId } = useParams<ReleaseDataSetRouteParams>();
-  const history = useHistory();
+  const { dataSetId } =
+    useParams<ReleaseDataSetRouteParams>() as ReleaseDataSetRouteParams;
+  const navigate = useNavigate();
   const { publicAppUrl } = useConfig();
   const { releaseVersion } = useReleaseVersionContext();
   const { user } = useAuthContext();
@@ -159,8 +158,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                 {dataSet.draftVersion.version !== '1.0' && (
                   <li>
                     <Link
-                      to={generatePath<ReleaseDataSetChangelogRouteParams>(
-                        releaseApiDataSetChangelogRoute.path,
+                      to={generatePath(
+                        releaseApiDataSetChangelogRoute.fullPath,
                         {
                           publicationId: releaseVersion.publicationId,
                           releaseVersionId: releaseVersion.id,
@@ -175,22 +174,19 @@ export default function ReleaseApiDataSetDetailsPage() {
                 )}
                 <li>
                   <Link
-                    to={generatePath<ReleaseDataSetRouteParams>(
-                      releaseApiDataSetPreviewRoute.path,
-                      {
-                        publicationId: releaseVersion.publicationId,
-                        releaseVersionId: releaseVersion.id,
-                        dataSetId,
-                      },
-                    )}
+                    to={generatePath(releaseApiDataSetPreviewRoute.fullPath, {
+                      publicationId: releaseVersion.publicationId,
+                      releaseVersionId: releaseVersion.id,
+                      dataSetId,
+                    })}
                   >
                     Preview API data set
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to={generatePath<ReleaseDataSetRouteParams>(
-                      releaseApiDataSetPreviewTokenLogRoute.path,
+                    to={generatePath(
+                      releaseApiDataSetPreviewTokenLogRoute.fullPath,
                       {
                         publicationId: releaseVersion.publicationId,
                         releaseVersionId: releaseVersion.id,
@@ -214,14 +210,11 @@ export default function ReleaseApiDataSetDetailsPage() {
                         dataSet={dataSet}
                         dataSetVersion={dataSet.draftVersion}
                         onDeleted={() =>
-                          history.push(
-                            generatePath<ReleaseRouteParams>(
-                              releaseApiDataSetsRoute.path,
-                              {
-                                publicationId: releaseVersion.publicationId,
-                                releaseVersionId: releaseVersion.id,
-                              },
-                            ),
+                          navigate(
+                            generatePath(releaseApiDataSetsRoute.fullPath, {
+                              publicationId: releaseVersion.publicationId,
+                              releaseVersionId: releaseVersion.id,
+                            }),
                           )
                         }
                       >
@@ -257,16 +250,12 @@ export default function ReleaseApiDataSetDetailsPage() {
           {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
               <Link
-                to={generatePath<ReleaseDataSetChangelogRouteParams>(
-                  releaseApiDataSetChangelogRoute.path,
-                  {
-                    publicationId: releaseVersion.publicationId,
-                    releaseVersionId:
-                      dataSet.latestLiveVersion.releaseVersion.id,
-                    dataSetId,
-                    dataSetVersionId: dataSet.latestLiveVersion.id,
-                  },
-                )}
+                to={generatePath(releaseApiDataSetChangelogRoute.fullPath, {
+                  publicationId: releaseVersion.publicationId,
+                  releaseVersionId: dataSet.latestLiveVersion.releaseVersion.id,
+                  dataSetId,
+                  dataSetVersionId: dataSet.latestLiveVersion.id,
+                })}
               >
                 View changelog and guidance notes
               </Link>
@@ -275,8 +264,8 @@ export default function ReleaseApiDataSetDetailsPage() {
           {dataSet.latestLiveVersion.version !== '1.0' && (
             <li>
               <Link
-                to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetVersionHistoryRoute.path,
+                to={generatePath(
+                  releaseApiDataSetVersionHistoryRoute.fullPath,
                   {
                     publicationId: releaseVersion.publicationId,
                     releaseVersionId:
@@ -322,8 +311,8 @@ export default function ReleaseApiDataSetDetailsPage() {
       }
     : undefined;
   const replaceTabRoute = replaceRouteParams
-    ? `${generatePath<ReleaseDataFileReplaceRouteParams>(
-        releaseDataFileReplaceRoute.path,
+    ? `${generatePath(
+        releaseDataFileReplaceRoute.fullPath,
         replaceRouteParams,
       )}`
     : '';
@@ -438,7 +427,7 @@ export default function ReleaseApiDataSetDetailsPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseRouteParams>(releaseApiDataSetsRoute.path, {
+        to={generatePath(releaseApiDataSetsRoute.fullPath, {
           releaseVersionId: releaseVersion.id,
           publicationId: releaseVersion.publicationId,
         })}
@@ -490,8 +479,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                         dataSet.draftVersion.mappingStatus
                           ?.locationsHaveMajorChange ?? false
                       }
-                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
-                        releaseApiDataSetLocationsMappingRoute.path,
+                      mappingPageRoute={generatePath(
+                        releaseApiDataSetLocationsMappingRoute.fullPath,
                         {
                           publicationId: releaseVersion.publicationId,
                           releaseVersionId: releaseVersion.id,
@@ -513,8 +502,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                         dataSet.draftVersion.mappingStatus
                           ?.filtersHaveMajorChange ?? false
                       }
-                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
-                        releaseApiDataSetFiltersMappingRoute.path,
+                      mappingPageRoute={generatePath(
+                        releaseApiDataSetFiltersMappingRoute.fullPath,
                         {
                           publicationId: releaseVersion.publicationId,
                           releaseVersionId: releaseVersion.id,
@@ -536,8 +525,8 @@ export default function ReleaseApiDataSetDetailsPage() {
                         dataSet.draftVersion.mappingStatus
                           ?.indicatorsHaveMajorChange ?? false
                       }
-                      mappingPageRoute={generatePath<ReleaseDataSetRouteParams>(
-                        releaseApiDataSetIndicatorsMappingRoute.path,
+                      mappingPageRoute={generatePath(
+                        releaseApiDataSetIndicatorsMappingRoute.fullPath,
                         {
                           publicationId: releaseVersion.publicationId,
                           releaseVersionId: releaseVersion.id,

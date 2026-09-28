@@ -1,14 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { generatePath, MemoryRouter } from 'react-router';
+import { generatePath } from 'react-router';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
-import {
-  MethodologyRouteParams,
-  methodologySummaryRoute,
-} from '@admin/routes/methodologyRoutes';
-import { Route } from 'react-router-dom';
+import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
 import testMethodology from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 describe('MethodologySummaryPage', () => {
   test('renders methodology summary page correctly', async () => {
@@ -62,20 +59,16 @@ describe('MethodologySummaryPage', () => {
 
   function renderPage() {
     render(
-      <MemoryRouter
-        initialEntries={[
-          generatePath<MethodologyRouteParams>(methodologySummaryRoute.path, {
-            methodologyId: testMethodology.id,
-          }),
-        ]}
+      <TestRouterRenderer
+        initialUrl={generatePath(methodologySummaryRoute.fullPath, {
+          methodologyId: testMethodology.id,
+        })}
+        route={methodologySummaryRoute.fullPath}
       >
         <MethodologyContextProvider methodology={testMethodology}>
-          <Route
-            path={methodologySummaryRoute.path}
-            component={MethodologySummaryPage}
-          />
+          <MethodologySummaryPage />
         </MethodologyContextProvider>
-      </MemoryRouter>,
+      </TestRouterRenderer>,
     );
   }
 });

@@ -1,10 +1,8 @@
 import Link from '@admin/components/Link';
 import {
-  ReleaseDataBlockRouteParams,
   releaseDataBlocksRoute,
   releaseDataFileReplaceRoute,
   ReleaseDataFileReplaceRouteParams,
-  ReleaseFootnoteRouteParams,
   releaseFootnotesRoute,
 } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -12,13 +10,13 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import { useParams } from 'react-router-dom';
 
-const ReleaseDataFileReplacementCompletePage = ({
-  match,
-}: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
-  const { publicationId, releaseVersionId, fileId } = match.params;
+const ReleaseDataFileReplacementCompletePage = () => {
+  const { publicationId, releaseVersionId, fileId } =
+    useParams<ReleaseDataFileReplaceRouteParams>() as ReleaseDataFileReplaceRouteParams;
 
   const {
     value: dataSetAccoutrements,
@@ -33,14 +31,11 @@ const ReleaseDataFileReplacementCompletePage = ({
     [releaseVersionId, fileId],
   );
 
-  const dataFilePath = generatePath<ReleaseDataFileReplaceRouteParams>(
-    releaseDataFileReplaceRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-      fileId,
-    },
-  );
+  const dataFilePath = generatePath(releaseDataFileReplaceRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+    fileId,
+  });
 
   if (error) {
     return (
@@ -83,14 +78,11 @@ const ReleaseDataFileReplacementCompletePage = ({
                     <li key={dataBlock.id}>
                       <Link
                         unvisited
-                        to={generatePath<ReleaseDataBlockRouteParams>(
-                          releaseDataBlocksRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            dataBlockVersionId: dataBlock.id,
-                          },
-                        )}
+                        to={generatePath(releaseDataBlocksRoute.fullPath, {
+                          publicationId,
+                          releaseVersionId,
+                          dataBlockVersionId: dataBlock.id,
+                        })}
                       >
                         {dataBlock.name}
                       </Link>
@@ -113,14 +105,11 @@ const ReleaseDataFileReplacementCompletePage = ({
                     <li key={footnote.id}>
                       <Link
                         unvisited
-                        to={generatePath<ReleaseFootnoteRouteParams>(
-                          releaseFootnotesRoute.path,
-                          {
-                            publicationId,
-                            releaseVersionId,
-                            footnoteId: footnote.id,
-                          },
-                        )}
+                        to={generatePath(releaseFootnotesRoute.fullPath, {
+                          publicationId,
+                          releaseVersionId,
+                          footnoteId: footnote.id,
+                        })}
                       >
                         {sanitizeHtml(footnote.content, {
                           allowedTags: [],

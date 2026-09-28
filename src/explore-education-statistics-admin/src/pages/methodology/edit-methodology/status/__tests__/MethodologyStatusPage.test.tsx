@@ -4,17 +4,13 @@ import _methodologyService, {
   MethodologyVersion,
 } from '@admin/services/methodologyService';
 import _permissionService from '@admin/services/permissionService';
-import { generatePath, MemoryRouter } from 'react-router';
+import { generatePath } from 'react-router';
 import MethodologyStatusPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusPage';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
-import {
-  MethodologyRouteParams,
-  methodologyStatusRoute,
-} from '@admin/routes/methodologyRoutes';
+import { methodologyStatusRoute } from '@admin/routes/methodologyRoutes';
 import userEvent from '@testing-library/user-event';
-import { Route } from 'react-router-dom';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/permissionService');
@@ -435,22 +431,16 @@ describe('MethodologyStatusPage', () => {
 
   function renderPage(methodology: MethodologyVersion) {
     render(
-      <MemoryRouter
-        initialEntries={[
-          generatePath<MethodologyRouteParams>(methodologyStatusRoute.path, {
-            methodologyId: testMethodology.id,
-          }),
-        ]}
+      <TestRouterRenderer
+        initialUrl={generatePath(methodologyStatusRoute.fullPath, {
+          methodologyId: testMethodology.id,
+        })}
+        route={methodologyStatusRoute.fullPath}
       >
-        <TestConfigContextProvider>
-          <MethodologyContextProvider methodology={methodology}>
-            <Route
-              path={methodologyStatusRoute.path}
-              component={MethodologyStatusPage}
-            />
-          </MethodologyContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+        <MethodologyContextProvider methodology={methodology}>
+          <MethodologyStatusPage />
+        </MethodologyContextProvider>
+      </TestRouterRenderer>,
     );
   }
 });

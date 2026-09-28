@@ -9,26 +9,23 @@ import footnoteService from '@admin/services/footnoteService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseFootnoteCreatePage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleaseFootnoteCreatePage = () => {
+  const navigate = useNavigate();
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
 
   const { value: footnoteMeta, isLoading } = useAsyncHandledRetry(
     () => footnoteService.getFootnoteMeta(releaseVersionId),
     [releaseVersionId],
   );
 
-  const footnotesPath = generatePath<ReleaseRouteParams>(
-    releaseFootnotesRoute.path,
-    {
-      publicationId,
-      releaseVersionId,
-    },
-  );
+  const footnotesPath = generatePath(releaseFootnotesRoute.fullPath, {
+    publicationId,
+    releaseVersionId,
+  });
 
   return (
     <>
@@ -45,7 +42,7 @@ const ReleaseFootnoteCreatePage = ({
             footnoteMeta={footnoteMeta}
             onSubmit={async values => {
               await footnoteService.createFootnote(releaseVersionId, values);
-              history.push(footnotesPath);
+              navigate(footnotesPath);
             }}
             cancelButton={
               <Link unvisited to={footnotesPath}>

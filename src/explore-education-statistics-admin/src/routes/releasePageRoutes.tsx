@@ -59,115 +59,115 @@ import { NavRouteProps } from '@admin/routes/types';
 const releasePageRoutes: NavRouteProps[] = [
   {
     ...releaseSummaryRoute,
-    component: ReleaseSummaryPage,
+    element: <ReleaseSummaryPage />,
   },
   {
     ...releaseDataRoute,
-    component: ReleaseDataPage,
+    element: <ReleaseDataPage />,
   },
   {
     ...releaseFootnotesRoute,
-    component: ReleaseFootnotesPage,
+    element: <ReleaseFootnotesPage />,
   },
   {
     ...releaseDataBlocksRoute,
-    component: ReleaseDataBlocksPage,
+    element: <ReleaseDataBlocksPage />,
   },
   {
     ...releaseContentRoute,
-    component: ReleaseContentPage,
+    element: <ReleaseContentPage />,
   },
   {
     ...releaseChecklistRoute,
-    component: ReleasePublishChecklistPage,
+    element: <ReleasePublishChecklistPage />,
   },
   {
     ...releaseStatusRoute,
-    component: ReleasePublishStatusPage,
+    element: <ReleasePublishStatusPage />,
   },
   {
     ...releasePreReleaseAccessRoute,
-    component: ReleasePreReleaseAccessPage,
+    element: <ReleasePreReleaseAccessPage />,
   },
   {
     ...releaseAncillaryFilesRoute,
-    component: ReleaseDataPage,
+    element: <ReleaseDataPage />,
   },
   {
     ...releaseAncillaryFileRoute,
-    component: ReleaseAncillaryFilePage,
+    element: <ReleaseAncillaryFilePage />,
   },
   {
     ...releaseDataFileReplaceRoute,
-    component: ReleaseDataFileReplacePage,
+    element: <ReleaseDataFileReplacePage />,
   },
   {
     ...releaseDataFileReplacementCompleteRoute,
-    component: ReleaseDataFileReplacementCompletePage,
+    element: <ReleaseDataFileReplacementCompletePage />,
   },
   {
     ...releaseApiDataSetsRoute,
-    component: ReleaseDataPage,
+    element: <ReleaseDataPage />,
   },
   {
     ...releaseApiDataSetDetailsRoute,
-    component: ReleaseApiDataSetDetailsPage,
+    element: <ReleaseApiDataSetDetailsPage />,
   },
   {
     ...releaseApiDataSetFiltersMappingRoute,
-    component: ReleaseApiDataSetFiltersMappingPage,
+    element: <ReleaseApiDataSetFiltersMappingPage />,
   },
   {
     ...releaseApiDataSetLocationsMappingRoute,
-    component: ReleaseApiDataSetLocationsMappingPage,
+    element: <ReleaseApiDataSetLocationsMappingPage />,
   },
   {
     ...releaseApiDataSetIndicatorsMappingRoute,
-    component: ReleaseApiDataSetIndicatorsMappingPage,
+    element: <ReleaseApiDataSetIndicatorsMappingPage />,
   },
   {
     ...releaseApiDataSetPreviewRoute,
-    component: ReleaseApiDataSetPreviewPage,
+    element: <ReleaseApiDataSetPreviewPage />,
   },
   {
     ...releaseApiDataSetPreviewTokenRoute,
-    component: ReleaseApiDataSetPreviewTokenPage,
+    element: <ReleaseApiDataSetPreviewTokenPage />,
   },
   {
     ...releaseApiDataSetPreviewTokenLogRoute,
-    component: ReleaseApiDataSetPreviewTokenLogPage,
+    element: <ReleaseApiDataSetPreviewTokenLogPage />,
   },
   {
     ...releaseApiDataSetVersionHistoryRoute,
-    component: ReleaseApiDataSetVersionHistoryPage,
+    element: <ReleaseApiDataSetVersionHistoryPage />,
   },
   {
     ...releaseApiDataSetChangelogRoute,
-    component: ReleaseApiDataSetChangelogPage,
+    element: <ReleaseApiDataSetChangelogPage />,
   },
   {
     ...releaseSummaryEditRoute,
-    component: ReleaseSummaryEditPage,
+    element: <ReleaseSummaryEditPage />,
   },
   {
     ...releaseFootnotesCreateRoute,
-    component: ReleaseFootnoteCreatePage,
+    element: <ReleaseFootnoteCreatePage />,
   },
   {
     ...releaseFootnotesEditRoute,
-    component: ReleaseFootnoteEditPage,
+    element: <ReleaseFootnoteEditPage />,
   },
   {
     ...releaseTableToolRoute,
-    component: ReleaseTableToolPage,
+    element: <ReleaseTableToolPage />,
   },
   {
     ...releaseDataBlockCreateRoute,
-    component: ReleaseDataBlockCreatePage,
+    element: <ReleaseDataBlockCreatePage />,
   },
   {
     ...releaseDataBlockEditRoute,
-    component: ReleaseDataBlockEditPage,
+    element: <ReleaseDataBlockEditPage />,
   },
 ];
 

@@ -1,11 +1,7 @@
 import render from '@common-test/render';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import PreReleaseMethodologyPage from '@admin/pages/release/pre-release/PreReleaseMethodologyPage';
-import {
-  preReleaseMethodologyRoute,
-  PreReleaseMethodologyRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseMethodologyRoute } from '@admin/routes/preReleaseRoutes';
 import _methodologyContentService, {
   MethodologyContent,
 } from '@admin/services/methodologyContentService';
@@ -15,8 +11,8 @@ import _methodologyService, {
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyContentService');
 jest.mock('@admin/services/methodologyService');
@@ -331,29 +327,22 @@ describe('PreReleaseMethodologyPage', () => {
     });
   });
 
-  const renderPage = (
-    initialEntries: string[] = [
-      generatePath<PreReleaseMethodologyRouteParams>(
-        preReleaseMethodologyRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-          methodologyId: 'methodology-1',
-        },
-      ),
-    ],
-  ) => {
+  const renderPage = () => {
+    const path = generatePath(preReleaseMethodologyRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+      methodologyId: 'methodology-1',
+    });
+
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <TestConfigContextProvider>
-          <MethodologyContextProvider methodology={testMethodologyVersion}>
-            <Route
-              component={PreReleaseMethodologyPage}
-              path={preReleaseMethodologyRoute.path}
-            />
-          </MethodologyContextProvider>
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={preReleaseMethodologyRoute.fullPath}
+      >
+        <MethodologyContextProvider methodology={testMethodologyVersion}>
+          <PreReleaseMethodologyPage />
+        </MethodologyContextProvider>
+      </TestRouterRenderer>,
     );
   };
 });

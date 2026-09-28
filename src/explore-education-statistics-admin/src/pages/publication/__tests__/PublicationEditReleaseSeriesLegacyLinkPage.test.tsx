@@ -1,10 +1,7 @@
 import PublicationEditReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import {
-  PublicationEditReleaseSeriesLegacyLinkRouteParams,
-  publicationEditReleaseSeriesLegacyLinkRoute,
-} from '@admin/routes/publicationRoutes';
+import { publicationEditReleaseSeriesLegacyLinkRoute } from '@admin/routes/publicationRoutes';
 import _publicationService, {
   PublicationWithPermissions,
   ReleaseSeriesTableEntry,
@@ -12,10 +9,10 @@ import _publicationService, {
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
 import render from '@common-test/render';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -111,27 +108,23 @@ function renderPage(
   releaseSeriesItemId: string,
 ) {
   render(
-    <MemoryRouter
-      initialEntries={[
-        generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
-          publicationEditReleaseSeriesLegacyLinkRoute.path,
-          {
-            publicationId: publication.id,
-            releaseSeriesItemId,
-          },
-        ),
-      ]}
+    <TestRouterRenderer
+      initialUrl={generatePath(
+        publicationEditReleaseSeriesLegacyLinkRoute.fullPath,
+        {
+          publicationId: publication.id,
+          releaseSeriesItemId,
+        },
+      )}
+      route={publicationEditReleaseSeriesLegacyLinkRoute.fullPath}
     >
       <PublicationContextProvider
         publication={publication}
         onPublicationChange={noop}
         onReload={noop}
       >
-        <Route
-          path={publicationEditReleaseSeriesLegacyLinkRoute.path}
-          component={PublicationEditReleaseSeriesLegacyLinkPage}
-        />
+        <PublicationEditReleaseSeriesLegacyLinkPage />
       </PublicationContextProvider>
-    </MemoryRouter>,
+    </TestRouterRenderer>,
   );
 }

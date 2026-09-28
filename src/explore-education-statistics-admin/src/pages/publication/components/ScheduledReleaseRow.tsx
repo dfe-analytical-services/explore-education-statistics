@@ -2,10 +2,7 @@ import Link from '@admin/components/Link';
 import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
 import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import { ReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -46,7 +43,7 @@ const ScheduledReleaseRow = ({ publicationId, release }: Props) => {
       </td>
       <td>
         <Link
-          to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+          to={generatePath(releaseSummaryRoute.fullPath, {
             publicationId,
             releaseVersionId: release.id,
           })}

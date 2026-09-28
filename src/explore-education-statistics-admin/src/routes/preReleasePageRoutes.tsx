@@ -13,19 +13,19 @@ import { NavRouteProps } from '@admin/routes/types';
 const preReleasePageRoutes: NavRouteProps[] = [
   {
     ...preReleaseContentRoute,
-    component: PreReleaseContentPage,
+    element: <PreReleaseContentPage />,
   },
   {
     ...preReleaseTableToolRoute,
-    component: PreReleaseTableToolPage,
+    element: <PreReleaseTableToolPage />,
   },
   {
     ...preReleaseMethodologiesRoute,
-    component: PreReleaseMethodologiesPage,
+    element: <PreReleaseMethodologiesPage />,
   },
   {
     ...preReleaseMethodologyRoute,
-    component: PreReleaseMethodologyPage,
+    element: <PreReleaseMethodologyPage />,
   },
 ];
 

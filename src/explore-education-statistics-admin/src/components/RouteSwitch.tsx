@@ -1,7 +1,7 @@
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { NavRouteProps } from '@admin/routes/types';
 import React from 'react';
-import { Route, Switch } from 'react-router';
+import { Route, Routes } from 'react-router';
 
 interface Props {
   /**
@@ -18,15 +18,24 @@ interface Props {
  */
 const RouteSwitch = ({ protect = false, routes }: Props) => {
   return (
-    <Switch>
-      {routes.map(route =>
+    <Routes>
+      {routes.map(({ protectionAction, element, ...route }) =>
         protect ? (
-          <ProtectedRoute exact key={route.path} {...route} />
+          <Route
+            key={route.path}
+            {...route}
+
+            element={
+              <ProtectedRoute protectionAction={protectionAction}>
+                {element}
+              </ProtectedRoute>
+            }
+          />
         ) : (
-          <Route exact key={route.path} {...route} />
+          <Route key={route.path} {...route} element={element} />
         ),
       )}
-    </Switch>
+    </Routes>
   );
 };
 

@@ -1,4 +1,3 @@
-import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import BauDashboardPage from '@admin/pages/bau/BauDashboardPage';
 import BauUsersPage from '@admin/pages/bau/BauUsersPage';
 import BauImportsPage from '@admin/pages/bau/BauImportsPage';
@@ -12,148 +11,150 @@ import BoundaryDataUploadPage from '@admin/pages/bau/BoundaryDataUploadPage';
 import GlossaryPage from '@admin/pages/bau/GlossaryPage';
 import PageFeedbackPage from '@admin/pages/bau/PageFeedbackPage';
 import ServiceAnnouncementPage from '@admin/pages/bau/ServiceAnnouncementPage';
+import { ProtectedRouteProps } from './types';
 
 export const administrationIndexRoute: ProtectedRouteProps = {
-  path: '/administration',
+  fullPath: '/administration',
+  path: 'administration',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationImportsRoute: ProtectedRouteProps = {
-  path: '/administration/imports',
+  fullPath: '/administration/imports',
+  path: 'administration/imports',
   protectionAction: permissions => permissions.canAccessAllImports,
-  exact: true,
 };
 
 export const administrationBoundaryDataRoute: ProtectedRouteProps = {
-  path: '/administration/boundary-data',
+  fullPath: '/administration/boundary-data',
+  path: 'administration/boundary-data',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationBoundaryDataEditRoute: ProtectedRouteProps = {
-  path: '/administration/boundary-data/boundary-level/:id',
+  fullPath: '/administration/boundary-data/boundary-level/:id',
+  path: 'administration/boundary-data/boundary-level/:id',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationGlossaryRoute: ProtectedRouteProps = {
-  path: '/administration/glossary',
+  fullPath: '/administration/glossary',
+  path: 'administration/glossary',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationBoundaryDataUploadRoute: ProtectedRouteProps = {
-  path: '/administration/boundary-data/upload',
+  fullPath: '/administration/boundary-data/upload',
+  path: 'administration/boundary-data/upload',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationFeedbackRoute: ProtectedRouteProps = {
-  path: '/administration/feedback',
+  fullPath: '/administration/feedback',
+  path: 'administration/feedback',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationServiceAnnouncementRoute: ProtectedRouteProps = {
-  path: '/administration/service-announcement',
+  fullPath: '/administration/service-announcement',
+  path: 'administration/service-announcement',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationUsersRoute: ProtectedRouteProps = {
-  path: '/administration/users',
+  fullPath: '/administration/users',
+  path: 'administration/users',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationUserInviteRoute: ProtectedRouteProps = {
-  path: '/administration/users/invites/create',
+  fullPath: '/administration/users/invites/create',
+  path: 'administration/users/invites/create',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationInvitedUsersRoute: ProtectedRouteProps = {
-  path: '/administration/users/invites',
+  fullPath: '/administration/users/invites',
+  path: 'administration/users/invites',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationPreReleaseUsersRoute: ProtectedRouteProps = {
-  path: '/administration/users/pre-release',
+  fullPath: '/administration/users/pre-release',
+  path: 'administration/users/pre-release',
   protectionAction: permissions => permissions.isBauUser,
-  exact: true,
 };
 
 export const administrationUserManageRoute: ProtectedRouteProps = {
-  path: '/administration/users/:userId',
+  fullPath: '/administration/users/:userId',
+  path: 'administration/users/:userId',
   protectionAction: permissions => permissions.isBauUser,
 };
 
-const administrationRoutes = {
+const administrationRoutes: Record<string, ProtectedRouteProps> = {
   administrationIndexRoute: {
     ...administrationIndexRoute,
-    component: BauDashboardPage,
+    element: <BauDashboardPage />,
   },
 
   administrationImportsRoute: {
     ...administrationImportsRoute,
-    component: BauImportsPage,
+    element: <BauImportsPage />,
   },
 
   administrationBoundaryDataRoute: {
     ...administrationBoundaryDataRoute,
-    component: BoundaryDataPage,
+    element: <BoundaryDataPage />,
   },
 
   administrationBoundaryDataEditRoute: {
     ...administrationBoundaryDataEditRoute,
-    component: BoundaryLevelEditPage,
+    element: <BoundaryLevelEditPage />,
   },
 
   administrationBoundaryDataUploadRoute: {
     ...administrationBoundaryDataUploadRoute,
-    component: BoundaryDataUploadPage,
+    element: <BoundaryDataUploadPage />,
   },
 
   administrationGlossaryRoute: {
     ...administrationGlossaryRoute,
-    component: GlossaryPage,
+    element: <GlossaryPage />,
   },
 
   administrationFeedbackRoute: {
     ...administrationFeedbackRoute,
-    component: PageFeedbackPage,
+    element: <PageFeedbackPage />,
   },
 
   administrationServiceAnnouncementRoute: {
     ...administrationServiceAnnouncementRoute,
-    component: ServiceAnnouncementPage,
+    element: <ServiceAnnouncementPage />,
   },
 
   administrationUsersRoute: {
     ...administrationUsersRoute,
-    component: BauUsersPage,
+    element: <BauUsersPage />,
   },
 
   administrationUserInviteRoute: {
     ...administrationUserInviteRoute,
-    component: UserInvitePage,
+    element: <UserInvitePage />,
   },
 
   administrationInvitedUsersRoute: {
     ...administrationInvitedUsersRoute,
-    component: InvitedUsersPage,
+    element: <InvitedUsersPage />,
   },
 
   administrationPreReleaseUsersRoute: {
     ...administrationPreReleaseUsersRoute,
-    component: PreReleaseUsersPage,
+    element: <PreReleaseUsersPage />,
   },
 
   administrationUserManageRoute: {
     ...administrationUserManageRoute,
-    component: ManageUserPage,
+    element: <ManageUserPage />,
   },
 };
 

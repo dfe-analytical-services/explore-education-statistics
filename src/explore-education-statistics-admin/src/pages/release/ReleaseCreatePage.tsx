@@ -16,15 +16,16 @@ import { IdTitlePair } from '@admin/services/types/common';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps, withRouter } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
 }
 
-interface MatchProps {
+type MatchProps = {
   publicationId: string;
-}
+};
 
 interface Model {
   publication: Publication;
@@ -32,11 +33,9 @@ interface Model {
   timePeriodCoverageGroups: TimePeriodCoverageGroup[];
 }
 
-const ReleaseCreatePage = ({
-  match,
-  history,
-}: RouteComponentProps<MatchProps>) => {
-  const { publicationId } = match.params;
+const ReleaseCreatePage = () => {
+  const { publicationId } = useParams<MatchProps>() as MatchProps;
+  const navigate = useNavigate();
 
   const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
     const [publication, templateRelease, timePeriodCoverageGroups] =
@@ -67,15 +66,15 @@ const ReleaseCreatePage = ({
       publishingOrganisations: values.publishingOrganisations ?? [],
     });
 
-    history.push(
-      generatePath(releaseSummaryRoute.path, {
+    navigate(
+      generatePath(releaseSummaryRoute.fullPath, {
         publicationId,
         releaseVersionId: createdRelease.id,
       }),
     );
   };
 
-  const handleCancel = () => history.push(dashboardRoute.path);
+  const handleCancel = () => navigate(dashboardRoute.fullPath);
 
   return (
     <Page
@@ -117,4 +116,4 @@ const ReleaseCreatePage = ({
   );
 };
 
-export default withRouter(ReleaseCreatePage);
+export default ReleaseCreatePage;

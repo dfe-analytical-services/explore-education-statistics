@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import { DataSetFinalisingStatus } from '@admin/pages/release/data/ReleaseApiDataSetDetailsPage';
-import {
-  releaseApiDataSetChangelogRoute,
-  ReleaseDataSetChangelogRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetChangelogRoute } from '@admin/routes/releaseRoutes';
 import { DataSetDraftVersionStatus } from '@admin/services/apiDataSetService';
 import NotificationBanner from '@common/components/NotificationBanner';
 import Button from '@common/components/Button';
@@ -89,15 +86,12 @@ export default function ApiDataSetFinaliseBanner({
 
         <p>
           <Link
-            to={generatePath<ReleaseDataSetChangelogRouteParams>(
-              releaseApiDataSetChangelogRoute.path,
-              {
-                publicationId,
-                releaseVersionId,
-                dataSetId,
-                dataSetVersionId,
-              },
-            )}
+            to={generatePath(releaseApiDataSetChangelogRoute.fullPath, {
+              publicationId,
+              releaseVersionId,
+              dataSetId,
+              dataSetVersionId,
+            })}
           >
             View changelog and guidance notes
           </Link>

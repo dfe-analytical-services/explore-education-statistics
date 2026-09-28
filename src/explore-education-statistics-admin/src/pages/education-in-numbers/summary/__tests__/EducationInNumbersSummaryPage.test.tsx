@@ -1,12 +1,10 @@
 import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
 import { EinSummary } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import EducationInNumbersSummaryPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryPage';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 describe('EducationInNumbersSummaryPage', () => {
   const testDraftPage: EinSummary = {
@@ -88,18 +86,13 @@ describe('EducationInNumbersSummaryPage', () => {
     expect(screen.queryByRole('link', { name: 'Edit summary' })).toBeNull();
   });
 
-  function renderPage(
-    page: EinSummary,
-    history: MemoryHistory = createMemoryHistory(),
-  ) {
+  function renderPage(page: EinSummary) {
     return render(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersPageContextProvider educationInNumbersPage={page}>
-            <EducationInNumbersSummaryPage />
-          </EducationInNumbersPageContextProvider>
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer initialUrl="/" route="/">
+        <EducationInNumbersPageContextProvider educationInNumbersPage={page}>
+          <EducationInNumbersSummaryPage />
+        </EducationInNumbersPageContextProvider>
+      </TestRouterRenderer>,
     );
   }
 });
