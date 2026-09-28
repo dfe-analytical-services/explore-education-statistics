@@ -167,7 +167,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
         ));
         services.AddTransient<StatisticsDbDataSetResolver>();
-        services.AddTransient<IStorageDataSetResolver, ParquetV1DataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
         services.AddTransient<
             ISparseObservationsMatchedFilterItemsStrategy,
             SparseObservationsMatchedFilterItemsStrategy
@@ -182,7 +182,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IFrontendService, FrontendService>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();

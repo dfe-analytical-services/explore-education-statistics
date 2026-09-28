@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20260925133641_Ees7690AddDataStorageVersionAndHasParquetToFiles")]
-    partial class Ees7690AddDataStorageVersionAndHasParquetToFiles
+    [Migration("20260928155000_Ees7690AddHasParquetToFiles")]
+    partial class Ees7690AddHasParquetToFiles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

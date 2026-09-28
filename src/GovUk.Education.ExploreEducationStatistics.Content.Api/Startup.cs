@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -34,6 +35,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -122,6 +124,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         // Options - to allow them to be injected into services
         services.AddOptions<AnalyticsOptions>().Bind(configuration.GetSection(AnalyticsOptions.Section));
+        services.AddOptions<DataFilesOptions>().Bind(configuration.GetSection(DataFilesOptions.Section));
 
         // Services
         services.AddSingleton<IBlobSasService, BlobSasService>();
@@ -154,8 +157,28 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
+        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
+        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
+        services.AddSingleton<IDataFilesPathResolver>(provider => new DataFilesPathResolver(
+            basePath: provider.GetRequiredService<IOptions<DataFilesOptions>>().Value.BasePath
+        ));
+        services.AddTransient<StatisticsDbDataSetResolver>();
+        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
+        services.AddTransient<
+            ISparseObservationsMatchedFilterItemsStrategy,
+            SparseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<
+            IDenseObservationsMatchedFilterItemsStrategy,
+            DenseObservationsMatchedFilterItemsStrategy
+        >();
+        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
         services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+        services.AddTransient<ILocationRepository, LocationRepository>();
+        services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
