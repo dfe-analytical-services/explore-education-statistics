@@ -106,7 +106,11 @@ public class SubjectMetaService(
                 && rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
             )
-            .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
+            .OnSuccessDo(async () =>
+            {
+                var dataSet = await storageDataSetResolver.Resolve(subjectId);
+                return await ValidateFiltersForSubject(dataSet, request);
+            })
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of filters, filter groups and indicators observed
@@ -295,11 +299,10 @@ public class SubjectMetaService(
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(
-        Guid subjectId,
+        IStorageDataSet dataSet,
         List<FilterUpdateViewModel> requestFilters
     )
     {
-        var dataSet = await storageDataSetResolver.Resolve(subjectId);
         var filters = await dataSet.ListFilters();
         return AssertCollectionsAreSameIgnoringOrder(
                 filters,

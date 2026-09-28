@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
@@ -29,6 +30,7 @@ public class FootnoteService : IFootnoteService
     private readonly IDataBlockService _dataBlockService;
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly IReleaseSubjectRepository _releaseSubjectRepository;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
 
     public FootnoteService(
         StatisticsDbContext context,
@@ -37,7 +39,8 @@ public class FootnoteService : IFootnoteService
         IDataBlockService dataBlockService,
         IFootnoteRepository footnoteRepository,
         IReleaseSubjectRepository releaseSubjectRepository,
-        IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper
+        IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
+        IStorageDataSetResolver storageDataSetResolver
     )
     {
         _context = context;
@@ -47,6 +50,7 @@ public class FootnoteService : IFootnoteService
         _footnoteRepository = footnoteRepository;
         _releaseSubjectRepository = releaseSubjectRepository;
         _statisticsPersistenceHelper = statisticsPersistenceHelper;
+        _storageDataSetResolver = storageDataSetResolver;
     }
 
     public async Task<Either<ActionResult, Footnote>> CreateFootnote(
@@ -247,7 +251,7 @@ public class FootnoteService : IFootnoteService
 
     /// <summary>
     /// Finds the subject of each of the given filters, filter groups, filter items and indicators among the
-    /// release version's subjects, failing if any of them, or any of the given subjects, are not linked to the
+    /// release version's data sets, failing if any of them, or any of the given subjects, are not linked to the
     /// release version.
     /// </summary>
     private async Task<Either<ActionResult, FootnoteLinks>> CreateFootnoteLinks(
@@ -259,9 +263,11 @@ public class FootnoteService : IFootnoteService
         IReadOnlySet<Guid> indicatorIds
     )
     {
-        var releaseSubjects = await _releaseSubjectRepository.FindAll(releaseVersionId, HydrateReleaseSubjects);
+        var releaseSubjectIds = (await _releaseSubjectRepository.FindAll(releaseVersionId))
+            .Select(rs => rs.SubjectId)
+            .ToList();
 
-        var unlinkedSubjectIds = subjectIds.Except(releaseSubjects.Select(rs => rs.SubjectId)).ToList();
+        var unlinkedSubjectIds = subjectIds.Except(releaseSubjectIds).ToList();
         if (unlinkedSubjectIds.Count > 0)
         {
             return ValidationResult(
@@ -272,57 +278,70 @@ public class FootnoteService : IFootnoteService
             );
         }
 
-        var filters = releaseSubjects.SelectMany(rs => rs.Subject.Filters).ToList();
+        var footnoteLinks = new FootnoteLinks(Filters: [], FilterGroups: [], FilterItems: [], Indicators: []);
 
-        var footnoteLinks = new FootnoteLinks(
-            Filters: filters
-                .Where(filter => filterIds.Contains(filter.Id))
-                .Select(filter => new FilterFootnote { FilterId = filter.Id, SubjectId = filter.SubjectId })
-                .ToList(),
-            FilterGroups: filters
-                .SelectMany(
-                    filter => filter.FilterGroups,
-                    (filter, filterGroup) =>
-                        new FilterGroupFootnote
-                        {
-                            FilterGroupId = filterGroup.Id,
-                            FilterId = filter.Id,
-                            SubjectId = filter.SubjectId,
-                        }
-                )
-                .Where(link => filterGroupIds.Contains(link.FilterGroupId))
-                .ToList(),
-            FilterItems: filters
-                .SelectMany(filter =>
-                    filter.FilterGroups.SelectMany(
-                        filterGroup => filterGroup.FilterItems,
-                        (filterGroup, filterItem) =>
-                            new FilterItemFootnote
+        if (filterIds.Count == 0 && filterGroupIds.Count == 0 && filterItemIds.Count == 0 && indicatorIds.Count == 0)
+        {
+            return footnoteLinks;
+        }
+
+        foreach (var subjectId in releaseSubjectIds)
+        {
+            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
+            var filters = await dataSet.ListFilters();
+            var indicatorGroups = await dataSet.ListIndicatorGroups();
+
+            footnoteLinks.Filters.AddRange(
+                filters
+                    .Where(filter => filterIds.Contains(filter.Id))
+                    .Select(filter => new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId })
+            );
+            footnoteLinks.FilterGroups.AddRange(
+                filters
+                    .SelectMany(
+                        filter => filter.FilterGroups,
+                        (filter, filterGroup) =>
+                            new FilterGroupFootnote
                             {
-                                FilterItemId = filterItem.Id,
                                 FilterGroupId = filterGroup.Id,
                                 FilterId = filter.Id,
-                                SubjectId = filter.SubjectId,
+                                SubjectId = subjectId,
                             }
                     )
-                )
-                .Where(link => filterItemIds.Contains(link.FilterItemId))
-                .ToList(),
-            Indicators: releaseSubjects
-                .SelectMany(rs => rs.Subject.IndicatorGroups)
-                .SelectMany(
-                    indicatorGroup => indicatorGroup.Indicators,
-                    (indicatorGroup, indicator) =>
-                        new IndicatorFootnote
-                        {
-                            IndicatorId = indicator.Id,
-                            IndicatorGroupId = indicatorGroup.Id,
-                            SubjectId = indicatorGroup.SubjectId,
-                        }
-                )
-                .Where(link => indicatorIds.Contains(link.IndicatorId))
-                .ToList()
-        );
+                    .Where(link => filterGroupIds.Contains(link.FilterGroupId))
+            );
+            footnoteLinks.FilterItems.AddRange(
+                filters
+                    .SelectMany(filter =>
+                        filter.FilterGroups.SelectMany(
+                            filterGroup => filterGroup.FilterItems,
+                            (filterGroup, filterItem) =>
+                                new FilterItemFootnote
+                                {
+                                    FilterItemId = filterItem.Id,
+                                    FilterGroupId = filterGroup.Id,
+                                    FilterId = filter.Id,
+                                    SubjectId = subjectId,
+                                }
+                        )
+                    )
+                    .Where(link => filterItemIds.Contains(link.FilterItemId))
+            );
+            footnoteLinks.Indicators.AddRange(
+                indicatorGroups
+                    .SelectMany(
+                        indicatorGroup => indicatorGroup.Indicators,
+                        (indicatorGroup, indicator) =>
+                            new IndicatorFootnote
+                            {
+                                IndicatorId = indicator.Id,
+                                IndicatorGroupId = indicatorGroup.Id,
+                                SubjectId = subjectId,
+                            }
+                    )
+                    .Where(link => indicatorIds.Contains(link.IndicatorId))
+            );
+        }
 
         var unlinkedFilterIds = filterIds.Except(footnoteLinks.Filters.Select(link => link.FilterId)).ToList();
         var unlinkedFilterGroupIds = filterGroupIds
@@ -354,18 +373,6 @@ public class FootnoteService : IFootnoteService
         }
 
         return footnoteLinks;
-    }
-
-    private IQueryable<ReleaseSubject> HydrateReleaseSubjects(IQueryable<ReleaseSubject> queryable)
-    {
-        return queryable
-            .Include(rs => rs.Subject)
-                .ThenInclude(s => s.IndicatorGroups)
-                    .ThenInclude(ig => ig.Indicators)
-            .Include(rs => rs.Subject)
-                .ThenInclude(s => s.Filters)
-                    .ThenInclude(f => f.FilterGroups)
-                        .ThenInclude(fg => fg.FilterItems);
     }
 
     /// <summary>

@@ -563,13 +563,6 @@ public class DataSetMappingServiceTests
             ReleaseVersion = releaseVersion,
         };
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
