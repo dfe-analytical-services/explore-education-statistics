@@ -204,6 +204,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -436,6 +437,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -742,6 +744,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1096,6 +1099,7 @@ public class ReleaseFileServiceTests : IDisposable
                 SubjectId = Guid.NewGuid(),
                 CreatedBy = _dataFixture.DefaultUser().WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1221,6 +1225,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Type = FileType.Data,
                 CreatedBy = _dataFixture.DefaultUser().WithEmail("dataFile@test.com"),
                 Created = DateTime.UtcNow,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1547,6 +1552,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -1654,6 +1660,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data-1.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -1664,6 +1671,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data-2.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -1939,6 +1947,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.pdf",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -2214,6 +2223,7 @@ public class ReleaseFileServiceTests : IDisposable
                 Type = FileType.Data,
                 Created = new DateTime(),
                 CreatedBy = _dataFixture.DefaultUser(),
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2277,6 +2287,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = releaseVersion.Id,
                 Type = FileType.Data,
                 Filename = "test.csv",
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Published = originalPublishedDate,
         };

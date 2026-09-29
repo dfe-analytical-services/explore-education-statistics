@@ -35,7 +35,7 @@ public class StorageDataSetResolver(
 
         var dataStorageVersion = await contentDbContext
             .Files.Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
-            .Select(file => (DataStorageVersion?)file.DataStorageVersion)
+            .Select(file => file.DataStorageVersion)
             .SingleOrDefaultAsync(cancellationToken);
 
         dataSet = dataStorageVersion switch

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -32,7 +33,12 @@ public class FileImportServiceTests
     [Fact]
     public async Task CompleteImport()
     {
-        var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            Filename = "my_data_file.csv",
+            DataStorageVersion = DataStorageVersion.StatsDB,
+        };
 
         var import = new DataImport
         {
@@ -84,7 +90,12 @@ public class FileImportServiceTests
     [Fact]
     public async Task CompleteImport_Errors()
     {
-        var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            Filename = "my_data_file.csv",
+            DataStorageVersion = DataStorageVersion.StatsDB,
+        };
 
         var import = new DataImport
         {
@@ -125,7 +136,12 @@ public class FileImportServiceTests
     [Fact]
     public async Task CompleteImport_IncorrectObservationCount()
     {
-        var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            Filename = "my_data_file.csv",
+            DataStorageVersion = DataStorageVersion.StatsDB,
+        };
 
         var import = new DataImport
         {
@@ -179,7 +195,12 @@ public class FileImportServiceTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async finishedStatus =>
             {
-                var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
+                var file = new File
+                {
+                    Id = Guid.NewGuid(),
+                    Filename = "my_data_file.csv",
+                    DataStorageVersion = DataStorageVersion.StatsDB,
+                };
 
                 var import = new DataImport
                 {
@@ -212,7 +233,12 @@ public class FileImportServiceTests
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async abortingStatus =>
             {
-                var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
+                var file = new File
+                {
+                    Id = Guid.NewGuid(),
+                    Filename = "my_data_file.csv",
+                    DataStorageVersion = DataStorageVersion.StatsDB,
+                };
 
                 var import = new DataImport
                 {

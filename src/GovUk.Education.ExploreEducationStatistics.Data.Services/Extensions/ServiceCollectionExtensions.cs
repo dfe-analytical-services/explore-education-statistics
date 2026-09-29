@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services
             .AddScoped<IStorageDataSetResolver, StorageDataSetResolver>()
             // StatsDB
+            // @MarkFix rename these so it's clear they're for the StatisticsDB data sets?
             .AddTransient<StatisticsDbDataSetFactory>()
             .AddTransient<IObservationService, ObservationService>()
             .AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>()

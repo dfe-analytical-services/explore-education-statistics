@@ -3,10 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Moq;
+using DataStorageVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.DataStorageVersion;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -78,9 +80,17 @@ public class ReleasePublishingValidatorTests
         };
         var dataFileUploads = new List<File>
         {
-            new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id },
-            new() { DataSetFileId = dataSets[1].DraftVersion!.File.Id },
-            new() { DataSetFileId = Guid.NewGuid() }, // Spare unassociated upload should not affect result
+            new()
+            {
+                DataSetFileId = dataSets[0].DraftVersion!.File.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
+            new()
+            {
+                DataSetFileId = dataSets[1].DraftVersion!.File.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
+            new() { DataSetFileId = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB }, // Spare unassociated upload should not affect result
         };
 
         var dataSetService = new Mock<IDataSetService>();
@@ -106,7 +116,10 @@ public class ReleasePublishingValidatorTests
 
         var builder = new DataSetSummaryViewModelBuilder();
         var dataSets = new List<DataSetSummaryViewModel> { builder.WithLiveVersion(Guid.NewGuid()).Build() };
-        var dataFileUploads = new List<File> { new() { DataSetFileId = Guid.NewGuid() } };
+        var dataFileUploads = new List<File>
+        {
+            new() { DataSetFileId = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB },
+        };
 
         var dataSetService = new Mock<IDataSetService>();
         dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);
@@ -138,8 +151,8 @@ public class ReleasePublishingValidatorTests
         };
         var dataFileUploads = new List<File>
         {
-            new() { DataSetFileId = Guid.NewGuid() },
-            new() { DataSetFileId = Guid.NewGuid() },
+            new() { DataSetFileId = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB },
+            new() { DataSetFileId = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB },
         };
 
         var dataSetService = new Mock<IDataSetService>();
@@ -168,7 +181,10 @@ public class ReleasePublishingValidatorTests
 
         var builder = new DataSetSummaryViewModelBuilder();
         var dataSets = new List<DataSetSummaryViewModel> { builder.WithDraftVersion(releaseVersion.Id).Build() };
-        var dataFileUploads = new List<File> { new() { DataSetFileId = Guid.NewGuid() } };
+        var dataFileUploads = new List<File>
+        {
+            new() { DataSetFileId = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB },
+        };
 
         var dataSetService = new Mock<IDataSetService>();
         dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);
@@ -196,7 +212,14 @@ public class ReleasePublishingValidatorTests
         {
             builder.WithDraftVersion(releaseVersion.Id, DataSetVersionStatus.Failed).Build(),
         };
-        var dataFileUploads = new List<File> { new() { DataSetFileId = dataSets[0].DraftVersion!.File.Id } };
+        var dataFileUploads = new List<File>
+        {
+            new()
+            {
+                DataSetFileId = dataSets[0].DraftVersion!.File.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
+        };
 
         var dataSetService = new Mock<IDataSetService>();
         dataSetService.Setup(s => s.ListDataSets(releaseVersion.Release.PublicationId, default)).ReturnsAsync(dataSets);

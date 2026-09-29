@@ -86,7 +86,7 @@ public class ReleaseDataFileServicePermissionTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = _releaseVersion,
-            File = new File { Id = Guid.NewGuid() },
+            File = new File { Id = Guid.NewGuid(), DataStorageVersion = DataStorageVersion.StatsDB },
         };
 
         var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
@@ -109,7 +109,12 @@ public class ReleaseDataFileServicePermissionTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = _releaseVersion,
-            File = new File { Id = Guid.NewGuid(), Type = FileType.Data },
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);

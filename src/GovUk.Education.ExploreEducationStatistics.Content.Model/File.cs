@@ -46,7 +46,7 @@ public partial class File : ICreatedTimestamp<DateTime?>
 
     public Guid? CreatedById { get; set; }
 
-    public DataStorageVersion DataStorageVersion { get; set; } = DataStorageVersion.StatsDB;
+    public DataStorageVersion? DataStorageVersion { get; set; }
 
     public string Extension => Path.GetExtension(Filename).TrimStart('.');
 }
