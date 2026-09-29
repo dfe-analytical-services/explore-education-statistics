@@ -28,8 +28,12 @@ export interface User {
   permissions: GlobalPermissions;
 }
 
+export type AuthStatus =
+  'checking' | 'authenticated' | 'unauthenticated' | 'redirecting';
+
 export interface AuthContextState {
   user?: User;
+  status: AuthStatus;
 }
 
 export const AuthContext = createContext<AuthContextState | undefined>(
@@ -107,6 +111,10 @@ export const AuthContextProvider = ({
   children,
   verboseLogging = false,
 }: Props) => {
+  const location = useLocation();
+
+  const currentPath = `${location.pathname}${location.search}`;
+
   const [state, setState] = useState<State>({
     readyToRenderChildren: false,
   });
@@ -120,7 +128,6 @@ export const AuthContextProvider = ({
   const loginInProgress = authenticationInProgress !== 'none';
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const log = useCallback(
     (message: string) => {
@@ -157,19 +164,37 @@ export const AuthContextProvider = ({
   // route. This can occur if a login failure occurs or if login is successful
   // and an explicit redirect URL has been specified post-login.
   useEffect(() => {
-    if (state.redirect) {
+    if (!state.redirect) {
+      return;
+    }
+
+    if (currentPath === state.redirect) {
       log(
-        `AuthContext: redirect to ${state.redirect} requested. Setting user ` +
+        `AuthContext: redirect to ${state.redirect} complete. Setting user ` +
           'ready to use service.',
       );
+
       setState(previousState => ({
         ...previousState,
+        redirect: undefined,
         readyToRenderChildren: true,
       }));
-      log(`AuthContext: redirecting to ${state.redirect}.`);
-      navigate(state.redirect);
+
+      return;
     }
-  }, [state.redirect, log, navigate]);
+
+    log(
+      `AuthContext: redirect to ${state.redirect} requested. Setting user ` +
+        'ready to use service.',
+    );
+
+    navigate(state.redirect, { replace: true });
+
+    setState(previousState => ({
+      ...previousState,
+      readyToRenderChildren: true,
+    }));
+  }, [state.redirect, currentPath, log, navigate]);
 
   useEffect(() => {
     (async () => {
@@ -379,10 +404,20 @@ export const AuthContextProvider = ({
   ]);
 
   const contextState: AuthContextState = useMemo(() => {
+    let status: AuthStatus = 'checking';
+
+    if (state.redirect) {
+      status = 'redirecting';
+    } else if (state.user) {
+      status = 'authenticated';
+    } else if (state.readyToRenderChildren) {
+      status = 'unauthenticated';
+    }
     return {
       user: state.user,
+      status,
     };
-  }, [state.user]);
+  }, [state.user, state.readyToRenderChildren, state.redirect]);
 
   return state.readyToRenderChildren ? (
     <AuthContext value={contextState}>{children}</AuthContext>
@@ -391,7 +426,7 @@ export const AuthContextProvider = ({
 
 export function useAuthContext(): AuthContextState {
   const context = useContext(AuthContext);
-  return context ?? {};
+  return context ?? { status: 'unauthenticated' };
 }
 
 interface AuthContextTestProviderProps {
@@ -405,6 +440,8 @@ export function AuthContextTestProvider({
 }: AuthContextTestProviderProps) {
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <AuthContext value={{ user }}>{children}</AuthContext>
+    <AuthContext value={{ user, status: 'authenticated' }}>
+      {children}
+    </AuthContext>
   );
 }

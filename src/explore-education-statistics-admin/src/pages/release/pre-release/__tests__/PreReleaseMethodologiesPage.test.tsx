@@ -6,7 +6,7 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyService');

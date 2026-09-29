@@ -9,7 +9,7 @@ import DataFileReplacementTableRow from '@admin/pages/release/data/components/da
 import render from '@common-test/render';
 import React from 'react';
 import { act, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/dataReplacementService');

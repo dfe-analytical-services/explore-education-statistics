@@ -12,8 +12,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 
 export default function ReleaseAncillaryFilePage() {
   const navigate = useNavigate();

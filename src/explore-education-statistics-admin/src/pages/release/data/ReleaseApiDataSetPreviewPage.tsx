@@ -13,11 +13,10 @@ import useToggle from '@common/hooks/useToggle';
 import Button from '@common/components/Button';
 import Modal from '@common/components/Modal';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import React from 'react';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
-import { useNavigate } from 'react-router';
 
 export default function ReleaseApiDataSetPreviewPage() {
   const navigate = useNavigate();

@@ -8,7 +8,7 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
