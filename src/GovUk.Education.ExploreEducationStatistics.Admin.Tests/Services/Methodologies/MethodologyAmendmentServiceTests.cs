@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -486,14 +487,14 @@ public class MethodologyAmendmentServiceTests
         {
             Id = Guid.NewGuid(),
             MethodologyVersionId = originalVersion.Id,
-            File = new File { Id = Guid.NewGuid() },
+            File = new File { Id = Guid.NewGuid(), Type = FileType.Image },
         };
 
         var originalMethodologyFile2 = new MethodologyFile
         {
             Id = Guid.NewGuid(),
             MethodologyVersionId = originalVersion.Id,
-            File = new File { Id = Guid.NewGuid() },
+            File = new File { Id = Guid.NewGuid(), Type = FileType.Image },
         };
 
         var contextId = Guid.NewGuid().ToString();

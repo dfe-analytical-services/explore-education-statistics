@@ -113,7 +113,9 @@ public class ReleaseChecklistServiceTests
 
             releaseDataFileRepository.Setup(r => r.ListDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
-            releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([new()]);
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync([new() { DataStorageVersion = DataStorageVersion.StatsDB }]);
 
             dataImportService.Setup(s => s.HasIncompleteUploadsOrImports(releaseVersion.Id)).ReturnsAsync(true);
 
@@ -316,6 +318,7 @@ public class ReleaseChecklistServiceTests
                         Filename = "test-file-1.csv",
                         Type = FileType.Data,
                         SubjectId = subject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
                     },
                     new()
                     {
@@ -323,6 +326,7 @@ public class ReleaseChecklistServiceTests
                         Filename = "test-file-2.csv",
                         Type = FileType.Data,
                         SubjectId = otherSubject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
                     },
                 ]);
 
@@ -590,6 +594,7 @@ public class ReleaseChecklistServiceTests
                         Filename = "test-file-1.csv",
                         Type = FileType.Data,
                         SubjectId = subject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
                     },
                 ]);
 
