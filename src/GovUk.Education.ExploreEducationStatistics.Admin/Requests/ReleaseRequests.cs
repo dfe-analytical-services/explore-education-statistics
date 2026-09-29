@@ -37,6 +37,8 @@ public record ReleaseCreateRequest
 
             RuleFor(request => request.Label).MaximumLength(20);
 
+            RuleFor(request => request.PublishingOrganisations).NotEmpty();
+
             RuleFor(request => request.PublishingOrganisations.Length).LessThanOrEqualTo(3);
         }
     }

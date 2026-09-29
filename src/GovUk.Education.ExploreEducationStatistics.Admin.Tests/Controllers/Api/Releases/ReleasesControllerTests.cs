@@ -201,6 +201,28 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
         }
 
         [Fact]
+        public async Task NoPublishingOrganisations()
+        {
+            Publication publication = DataFixture.DefaultPublication();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
+
+            var response = await CreateRelease(
+                publicationId: publication.Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: []
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst()
+            );
+        }
+
+        [Fact]
         public async Task TooManyPublishingOrganisations()
         {
             Publication publication = DataFixture.DefaultPublication();
