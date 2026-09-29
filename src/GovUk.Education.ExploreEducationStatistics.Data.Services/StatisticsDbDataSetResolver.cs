@@ -9,9 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 public class StatisticsDbDataSetResolver(
     StatisticsDbContext context,
     IObservationService observationService,
-    IFilterRepository filterRepository,
-    IIndicatorGroupRepository indicatorGroupRepository,
-    ILocationRepository locationRepository,
     IAllObservationsMatchedFilterItemsStrategy allObservationsMatchedFilterItemsStrategy,
     ISparseObservationsMatchedFilterItemsStrategy sparseObservationsMatchedFilterItemsStrategy,
     IDenseObservationsMatchedFilterItemsStrategy denseObservationsMatchedFilterItemsStrategy,
@@ -25,14 +22,16 @@ public class StatisticsDbDataSetResolver(
                 subjectId: subjectId,
                 context: context,
                 observationService: observationService,
-                filterRepository: filterRepository,
-                indicatorGroupRepository: indicatorGroupRepository,
-                locationRepository: locationRepository,
                 allObservationsMatchedFilterItemsStrategy: allObservationsMatchedFilterItemsStrategy,
                 sparseObservationsMatchedFilterItemsStrategy: sparseObservationsMatchedFilterItemsStrategy,
                 denseObservationsMatchedFilterItemsStrategy: denseObservationsMatchedFilterItemsStrategy,
                 logger: logger
             )
         );
+    }
+
+    public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
+    {
+        return await Resolve(subjectId, cancellationToken);
     }
 }
