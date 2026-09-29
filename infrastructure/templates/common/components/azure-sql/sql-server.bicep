@@ -51,15 +51,6 @@ param loggingStorageAccountName string
 @description('The databases to create on this SQL Server.')
 param databases SqlDatabaseDefinition[]
 
-@description('Weekly long term backup retention, applied to all databases.')
-param longTermWeeklyRetention string = 'P4W'
-
-@description('Yearly long term backup retention, applied to all databases.')
-param longTermYearlyRetention string = 'P1Y'
-
-@description('Week of the year that the yearly long term backup is taken, applied to all databases.')
-param longTermRetentionWeekOfYear int = 1
-
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -128,16 +119,13 @@ module networkingModule 'networking.bicep' = {
 
 module databaseModules 'database.bicep' = [
   for db in databases: {
-    name: '${db.name}DbDeploy'
+    name: '${serverName}-${db.name}DbDeploy'
     params: {
       sqlServerName: sqlServer.name
       location: location
       resourceName: db.name
       config: db.config
-      longTermMonthlyRetention: db.longTermMonthlyRetention
-      longTermWeeklyRetention: longTermWeeklyRetention
-      longTermYearlyRetention: longTermYearlyRetention
-      longTermRetentionWeekOfYear: longTermRetentionWeekOfYear
+      extendedConfig: db.extendedConfig
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       alertsGroupName: alertsGroupName
       deployAlerts: deployAlerts
@@ -146,5 +134,15 @@ module databaseModules 'database.bicep' = [
     dependsOn: [
       diagnosticsAndAuditingModule
     ]
+  }
+]
+
+output databases {
+  name: string
+  id: string
+}[] = [
+  for (db, i) in databases: {
+    name: databaseModules[i].outputs.databaseName
+    id: databaseModules[i].outputs.databaseId
   }
 ]

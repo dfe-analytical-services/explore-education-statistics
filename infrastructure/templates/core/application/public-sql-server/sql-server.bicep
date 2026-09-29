@@ -38,11 +38,11 @@ param databaseAuditBlobRetentionDays int = 365
 @description('Name of the storage account that database audit logs and vulnerability assessment scans are written to.')
 param loggingStorageAccountName string
 
-@description('Configuration for the Content database.')
-param contentDbConfig AzureSqlDatabaseConfig
-
-@description('Configuration for the Statistics database.')
+@description('Configuration for the Statistics database geo-replica.')
 param statisticsDbConfig AzureSqlDatabaseConfig
+
+@description('Resource id of the primary Statistics database that the Statistics database geo-replica is created from.')
+param statisticsPrimaryDatabaseId string
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -56,30 +56,23 @@ param deployAlerts bool
 @description('Tags for the resources')
 param tagValues object
 
-var coreSqlServerName = '${subscription}-sqlsvr-ees-01'
+var publicSqlServerName = '${subscription}-sqlsvr-ees-02'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 
-var statisticsDbName = 'statistics'
-
-// EES-7502 - allow full subnet name to be used as virtualNetworkRules
-// names rather than shorthand names.
+// Rule names are retained from the original ARM template.
 var allowedSubnets = [
-  { name: 'admin', id: subnets.admin.id }
-  { name: 'importer', id: subnets.importer.id }
-  { name: 'publisher', id: subnets.publisher.id }
   { name: 'content', id: subnets.content.id }
   { name: 'data', id: subnets.data.id }
-  { name: 'notifier', id: subnets.notify.id }
-  { name: 'publicApiDataProcessor', id: subnets.publicApiDataProcessor.id }
+  { name: 'publisher', id: subnets.publisher.id }
 ]
 
 module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' = {
-  name: 'coreSqlServerDeploy'
+  name: 'publicSqlServerDeploy'
   params: {
-    serverName: coreSqlServerName
+    serverName: publicSqlServerName
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorLoginPassword: keyVault.getSecret('ees-sql-admin-password')
@@ -89,32 +82,18 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     allowedSubnets: allowedSubnets
     privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
     // TODO EES-7502 - use standardised name for private endpoint connections.
-    privateLinkServiceConnectionNameOverride: '${coreSqlServerName}-pep-conn'
+    privateLinkServiceConnectionNameOverride: '${publicSqlServerName}-pep-conn'
     firewallRules: firewallRules
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountName
     databases: [
       {
-        name: 'content'
-        config: contentDbConfig
-        extendedConfig: {
-          type: 'primary'
-          longTermWeeklyRetention: 'P4W'
-          longTermMonthlyRetention: 'P12M'
-          longTermYearlyRetention: 'P1Y'
-          longTermRetentionWeekOfYear: 1
-        }
-      }
-      {
-        name: statisticsDbName
+        name: 'statistics'
         config: statisticsDbConfig
         extendedConfig: {
-          type: 'primary'
-          longTermWeeklyRetention: 'P4W'
-          longTermMonthlyRetention: 'P3M'
-          longTermYearlyRetention: 'P1Y'
-          longTermRetentionWeekOfYear: 1
+          type: 'georeplica'
+          geoReplicaSourceDatabaseId: statisticsPrimaryDatabaseId
         }
       }
     ]
@@ -124,5 +103,3 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     tagValues: tagValues
   }
 }
-
-output statisticsDatabaseId string = first(filter(sqlServerModule.outputs.databases, db => db.name == statisticsDbName))!.id
