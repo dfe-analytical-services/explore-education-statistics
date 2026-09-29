@@ -342,7 +342,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -503,7 +508,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseDataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         // Create a file for the subject and release which is not a data file
@@ -517,7 +527,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseDataFileOtherRelease = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -739,7 +754,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();

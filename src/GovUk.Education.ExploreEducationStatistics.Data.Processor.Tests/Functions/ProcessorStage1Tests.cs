@@ -54,14 +54,12 @@ public class ProcessorStage1Tests
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest,
                 Type = FileType.Metadata,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Status = DataImportStatus.STAGE_1,
         };
