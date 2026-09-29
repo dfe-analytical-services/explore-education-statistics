@@ -53,6 +53,16 @@ public interface IStorageDataSet
     Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
+    /// observation. Filters belonging to other data sets yield no pairs.
+    /// </summary>
+    Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
+        Guid parentFilterId,
+        Guid childFilterId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// All filters for the data set without their FilterGroups and FilterItems. Prefer this over
     /// <see cref="ListFilters" /> when only the filters themselves are needed, as filter items can be numerous.
     /// </summary>
