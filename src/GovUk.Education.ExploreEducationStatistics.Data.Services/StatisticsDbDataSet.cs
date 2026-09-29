@@ -97,7 +97,8 @@ public class StatisticsDbDataSet(
     public async Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default)
     {
         return await context
-            .Filter.Include(filter => filter.FilterGroups)
+            .Filter.AsNoTracking()
+            .Include(filter => filter.FilterGroups)
                 .ThenInclude(group => group.FilterItems)
             .Where(filter => filter.SubjectId == SubjectId)
             .ToListAsync(cancellationToken);
@@ -136,7 +137,8 @@ public class StatisticsDbDataSet(
     public async Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
     {
         return await context
-            .IndicatorGroup.Include(group => group.Indicators)
+            .IndicatorGroup.AsNoTracking()
+            .Include(group => group.Indicators)
             .Where(indicatorGroup => indicatorGroup.SubjectId == SubjectId)
             .ToListAsync(cancellationToken);
     }
