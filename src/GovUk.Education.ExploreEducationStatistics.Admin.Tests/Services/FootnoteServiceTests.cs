@@ -27,6 +27,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using DataStorageVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.DataStorageVersion;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -1733,6 +1734,7 @@ public class FootnoteServiceTests
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject.SubjectId,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -2314,6 +2316,7 @@ public class FootnoteServiceTests
                         Filename = "data.csv",
                         Type = FileType.Data,
                         SubjectId = subject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
                     })
                 );
             }

@@ -111,6 +111,7 @@ public class ReleaseServiceTests
                     new() { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
                     new() { GeographicLevel = GeographicLevel.School, CsvOnly = true },
                 ],
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Summary = "Data set 1 guidance",
         };
@@ -126,6 +127,7 @@ public class ReleaseServiceTests
                 Type = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
                 DataSetFileVersionGeographicLevels = [new() { GeographicLevel = GeographicLevel.Country }],
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Summary = "Data set 2 guidance",
         };
@@ -354,6 +356,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -362,6 +365,7 @@ public class ReleaseServiceTests
             Filename = "data2.csv",
             Type = FileType.Data,
             SubjectId = releaseSubject2.Subject.Id,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var file2Replacement = new File
@@ -370,6 +374,7 @@ public class ReleaseServiceTests
             Type = FileType.Data,
             SubjectId = releaseSubject2Replacement.Subject.Id,
             Replacing = file2,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         file2.ReplacedBy = file2Replacement;
@@ -466,6 +471,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -478,6 +484,7 @@ public class ReleaseServiceTests
                 Filename = "data2.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -545,6 +552,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -580,7 +588,12 @@ public class ReleaseServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File { Filename = "data1.csv", Type = FileType.Data },
+            File = new File
+            {
+                Filename = "data1.csv",
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var import = new DataImport { File = releaseFile.File, Status = DataImportStatus.COMPLETE };
@@ -670,6 +683,7 @@ public class ReleaseServiceTests
                 ContentLength = 10240,
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             FilterSequence = new List<FilterSequenceEntry>
             {
@@ -766,6 +780,7 @@ public class ReleaseServiceTests
                 ContentLength = 10240,
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             IndicatorSequence = new List<IndicatorGroupSequenceEntry>
             {
@@ -837,6 +852,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -848,6 +864,7 @@ public class ReleaseServiceTests
                 Filename = "data2.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject2.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -948,6 +965,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1014,6 +1032,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1080,6 +1099,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 Type = FileType.Data,
                 SubjectId = releaseSubject1.Subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 

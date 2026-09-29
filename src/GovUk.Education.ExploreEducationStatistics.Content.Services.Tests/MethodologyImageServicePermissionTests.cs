@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,7 +18,7 @@ public class MethodologyImageServicePermissionTests
 {
     private static readonly MethodologyVersion MethodologyVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly File File = new() { Id = Guid.NewGuid() };
+    private static readonly File File = new() { Id = Guid.NewGuid(), Type = FileType.Image };
 
     private static readonly MethodologyFile MethodologyFile = new()
     {
