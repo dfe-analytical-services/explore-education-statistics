@@ -193,7 +193,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
-        AnalyticsServiceCollectionExtensions.AddAnalytics(services, configuration);
+        services.AddContentAnalytics(configuration);
 
         services.AddSingleton<DateTimeProvider>();
         services.AddSingleton(TimeProvider.System);
