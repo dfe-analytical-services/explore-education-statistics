@@ -577,14 +577,10 @@ public class ReleaseVersionService(
         ReleaseVersionUpdateRequest request
     )
     {
-        return await ReleaseVersionUpdateRequestValidator
-            .Validate(request)
-            .OnSuccess(async () =>
-                await context
-                    .ReleaseVersions.Include(rv => rv.Release)
-                    .Include(rv => rv.PublishingOrganisations)
-                    .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            )
+        return await context
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Include(rv => rv.PublishingOrganisations)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessDo(releaseVersion => ValidateUpdateRequest(releaseVersion, request))
             .OnSuccessDo(async releaseVersion =>
