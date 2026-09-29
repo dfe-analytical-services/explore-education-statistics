@@ -25,7 +25,7 @@ public class FootnoteService : IFootnoteService
 {
     private readonly StatisticsDbContext _context;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-    private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+    private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper; // for Footnotes only
     private readonly IUserService _userService;
     private readonly IDataBlockService _dataBlockService;
     private readonly IFootnoteRepository _footnoteRepository;

@@ -1734,6 +1734,7 @@ public class FootnoteServiceTests
                     Filename = "data.csv",
                     Type = FileType.Data,
                     SubjectId = releaseSubject.SubjectId,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
                 }
             );
             await contentDbContext.SaveChangesAsync();
@@ -2608,6 +2609,7 @@ public class FootnoteServiceTests
                         Filename = "data.csv",
                         Type = FileType.Data,
                         SubjectId = subject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
                     })
                 );
             }
