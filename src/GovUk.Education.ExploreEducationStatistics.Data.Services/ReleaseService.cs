@@ -131,7 +131,7 @@ public class ReleaseService : IReleaseService
         List<FilterSequenceEntry>? filterSequence
     )
     {
-        var filters = await dataSet.ListFilters();
+        var filters = await dataSet.ListFiltersExcludingItems();
 
         return MetaViewModelBuilderUtils
             .OrderBySequenceOrLabel(
