@@ -15,9 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "Files",
                 type: "nvarchar(25)",
                 maxLength: 25,
-                nullable: false,
-                defaultValue: "StatsDB"
+                nullable: true
             );
+
+            migrationBuilder.Sql("UPDATE dbo.Files SET DataStorageVersion = 'StatsDB' WHERE Type = 'Data'");
         }
 
         /// <inheritdoc />

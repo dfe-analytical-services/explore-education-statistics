@@ -58,7 +58,7 @@ public class DataImportServiceTests
         var import = new DataImport
         {
             File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
-            MetaFile = new File { Type = FileType.Metadata, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata },
             Status = STAGE_1,
         };
 
@@ -90,7 +90,7 @@ public class DataImportServiceTests
         {
             Errors = new List<DataImportError> { new("error 1"), new("error 2") },
             File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
-            MetaFile = new File { Type = FileType.Metadata, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata },
             Status = STAGE_1,
         };
 

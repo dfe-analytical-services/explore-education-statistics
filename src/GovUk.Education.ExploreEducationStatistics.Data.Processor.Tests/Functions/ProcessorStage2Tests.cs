@@ -182,7 +182,6 @@ public class ProcessorStage2Tests
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest,
                 Type = FileType.Metadata,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             TotalRows = 16,
             Status = DataImportStatus.STAGE_2,

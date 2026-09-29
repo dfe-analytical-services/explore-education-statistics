@@ -58,6 +58,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 ContentLength = contentLength,
                 ContentType = "text/csv",
                 Type = type,
+                DataStorageVersion = type != Data ? null : DataStorageVersion.StatsDB,
                 Replacing = replacingDataFile,
             },
             PublicApiCompatible = apiCompatible,

@@ -71,6 +71,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -79,6 +80,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -201,6 +203,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -209,6 +212,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -799,6 +803,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -807,6 +812,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -1460,6 +1466,7 @@ public class ReplacementServiceTests
                     Tiers: [new Dictionary<Guid, List<Guid>> { { originalFilterItem1Id, [originalFilterItem2Id] } }]
                 ),
             ],
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -1468,6 +1475,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -1942,6 +1950,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -1950,6 +1959,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2347,6 +2357,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2355,6 +2366,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2652,6 +2664,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2660,6 +2673,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2913,6 +2927,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2921,6 +2936,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
