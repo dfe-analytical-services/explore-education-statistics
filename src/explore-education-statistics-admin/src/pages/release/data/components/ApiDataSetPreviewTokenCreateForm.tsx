@@ -247,6 +247,8 @@ export default function ApiDataSetPreviewTokenCreateForm({
             {!isBau && (
               <InsetText>
                 <p>
+                  This preview token will expire tomorrow at 23:59:59 UK time.
+                  <br />
                   If you would like to extend the period that this new token is
                   valid for, please contact{' '}
                   <a href="mailto:explore.statistics@education.gov.uk">
