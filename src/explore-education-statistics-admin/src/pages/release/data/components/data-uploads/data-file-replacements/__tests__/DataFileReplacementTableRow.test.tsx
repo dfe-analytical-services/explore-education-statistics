@@ -347,6 +347,7 @@ describe('DataFileReplacementTableRow', () => {
                   ...user,
                   permissions: { ...defaultPermissions, isBauUser: false },
                 },
+                status: 'authenticated',
               }}
             >
               <DataFileReplacementTableRow
@@ -411,6 +412,7 @@ describe('DataFileReplacementTableRow', () => {
                   ...user,
                   permissions: { ...defaultPermissions, isBauUser: false },
                 },
+                status: 'authenticated',
               }}
             >
               <DataFileReplacementTableRow
@@ -473,6 +475,7 @@ describe('DataFileReplacementTableRow', () => {
               ...user,
               permissions: { ...defaultPermissions, isBauUser: true },
             },
+            status: 'authenticated',
           }}
         >
           <table>
