@@ -134,9 +134,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Section));
         services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.Section));
 
-        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
-        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
-        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
         services.AddSingleton<IBlobSasService, BlobSasService>();
         services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>(
             provider => new PublicBlobStorageService(
@@ -160,22 +157,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-        services.AddTransient<StatisticsDbDataSetResolver>();
-        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
-        services.AddTransient<
-            ISparseObservationsMatchedFilterItemsStrategy,
-            SparseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<
-            IDenseObservationsMatchedFilterItemsStrategy,
-            DenseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
+        services.AddStorageDataSets();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IFrontendService, FrontendService>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
-        services.AddTransient<IObservationService, ObservationService>();
-        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
         services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();

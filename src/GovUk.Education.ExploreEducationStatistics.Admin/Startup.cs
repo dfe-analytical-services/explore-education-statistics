@@ -55,6 +55,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
@@ -579,10 +580,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             return new LoggingNotificationClient(logger);
         });
 
-        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
-        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
-        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
-
         services.AddSingleton<IDbContextSupplier, DbContextSupplier>();
         services.AddSingleton<IDatabaseHelper, DatabaseHelper>();
 
@@ -592,25 +589,13 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
-        services.AddTransient<StatisticsDbDataSetResolver>();
-        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
-        services.AddTransient<
-            ISparseObservationsMatchedFilterItemsStrategy,
-            SparseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<
-            IDenseObservationsMatchedFilterItemsStrategy,
-            DenseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
+        services.AddStorageDataSets();
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IGlossaryService, GlossaryService>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
-        services.AddTransient<IObservationService, ObservationService>();
-        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IOrganisationsService, OrganisationsService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
