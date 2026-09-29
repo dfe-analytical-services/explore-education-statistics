@@ -280,86 +280,90 @@ public class FootnoteService : IFootnoteService
 
         var footnoteLinks = new FootnoteLinks(Filters: [], FilterGroups: [], FilterItems: [], Indicators: []);
 
-        if (filterIds.Count == 0 && filterGroupIds.Count == 0 && filterItemIds.Count == 0 && indicatorIds.Count == 0)
-        {
-            return footnoteLinks;
-        }
+        // We look for these specified ids in the release's datasets, stopping when all have been found
+        var unlinkedFilterIds = filterIds.ToHashSet();
+        var unlinkedFilterGroupIds = filterGroupIds.ToHashSet();
+        var unlinkedFilterItemIds = filterItemIds.ToHashSet();
+        var unlinkedIndicatorIds = indicatorIds.ToHashSet();
 
         foreach (var subjectId in releaseSubjectIds)
         {
-            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
-            var filters = await dataSet.ListFilters();
-            var indicatorGroups = await dataSet.ListIndicatorGroups();
+            if (AllLinked())
+            {
+                break;
+            }
 
-            footnoteLinks.Filters.AddRange(
-                filters
-                    .Where(filter => filterIds.Contains(filter.Id))
-                    .Select(filter => new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId })
-            );
-            footnoteLinks.FilterGroups.AddRange(
-                filters
-                    .SelectMany(
-                        filter => filter.FilterGroups,
-                        (filter, filterGroup) =>
-                            new FilterGroupFootnote
-                            {
-                                FilterGroupId = filterGroup.Id,
-                                FilterId = filter.Id,
-                                SubjectId = subjectId,
-                            }
-                    )
-                    .Where(link => filterGroupIds.Contains(link.FilterGroupId))
-            );
-            footnoteLinks.FilterItems.AddRange(
-                filters
-                    .SelectMany(filter =>
-                        filter.FilterGroups.SelectMany(
-                            filterGroup => filterGroup.FilterItems,
-                            (filterGroup, filterItem) =>
-                                new FilterItemFootnote
+            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
+
+            if (unlinkedFilterIds.Count > 0 || unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
+            {
+                var filters = await dataSet.ListFilters();
+
+                foreach (var filter in filters)
+                {
+                    if (unlinkedFilterIds.Remove(filter.Id))
+                    {
+                        footnoteLinks.Filters.Add(new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId });
+                    }
+
+                    foreach (var filterGroup in filter.FilterGroups)
+                    {
+                        if (unlinkedFilterGroupIds.Remove(filterGroup.Id))
+                        {
+                            footnoteLinks.FilterGroups.Add(
+                                new FilterGroupFootnote
                                 {
-                                    FilterItemId = filterItem.Id,
                                     FilterGroupId = filterGroup.Id,
                                     FilterId = filter.Id,
                                     SubjectId = subjectId,
                                 }
-                        )
-                    )
-                    .Where(link => filterItemIds.Contains(link.FilterItemId))
-            );
-            footnoteLinks.Indicators.AddRange(
-                indicatorGroups
-                    .SelectMany(
-                        indicatorGroup => indicatorGroup.Indicators,
-                        (indicatorGroup, indicator) =>
-                            new IndicatorFootnote
+                            );
+                        }
+
+                        foreach (var filterItem in filterGroup.FilterItems)
+                        {
+                            if (unlinkedFilterItemIds.Remove(filterItem.Id))
                             {
-                                IndicatorId = indicator.Id,
-                                IndicatorGroupId = indicatorGroup.Id,
-                                SubjectId = subjectId,
+                                footnoteLinks.FilterItems.Add(
+                                    new FilterItemFootnote
+                                    {
+                                        FilterItemId = filterItem.Id,
+                                        FilterGroupId = filterGroup.Id,
+                                        FilterId = filter.Id,
+                                        SubjectId = subjectId,
+                                    }
+                                );
                             }
-                    )
-                    .Where(link => indicatorIds.Contains(link.IndicatorId))
-            );
+                        }
+                    }
+                }
+            }
+
+            if (unlinkedIndicatorIds.Count > 0)
+            {
+                var indicatorGroups = await dataSet.ListIndicatorGroups();
+
+                foreach (var indicatorGroup in indicatorGroups)
+                {
+                    foreach (var indicator in indicatorGroup.Indicators)
+                    {
+                        if (unlinkedIndicatorIds.Remove(indicator.Id))
+                        {
+                            footnoteLinks.Indicators.Add(
+                                new IndicatorFootnote
+                                {
+                                    IndicatorId = indicator.Id,
+                                    IndicatorGroupId = indicatorGroup.Id,
+                                    SubjectId = subjectId,
+                                }
+                            );
+                        }
+                    }
+                }
+            }
         }
 
-        var unlinkedFilterIds = filterIds.Except(footnoteLinks.Filters.Select(link => link.FilterId)).ToList();
-        var unlinkedFilterGroupIds = filterGroupIds
-            .Except(footnoteLinks.FilterGroups.Select(link => link.FilterGroupId))
-            .ToList();
-        var unlinkedFilterItemIds = filterItemIds
-            .Except(footnoteLinks.FilterItems.Select(link => link.FilterItemId))
-            .ToList();
-        var unlinkedIndicatorIds = indicatorIds
-            .Except(footnoteLinks.Indicators.Select(link => link.IndicatorId))
-            .ToList();
-
-        if (
-            unlinkedFilterIds.Count > 0
-            || unlinkedFilterGroupIds.Count > 0
-            || unlinkedFilterItemIds.Count > 0
-            || unlinkedIndicatorIds.Count > 0
-        )
+        if (!AllLinked())
         {
             return ValidationResult(
                 ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
@@ -373,6 +377,12 @@ public class FootnoteService : IFootnoteService
         }
 
         return footnoteLinks;
+
+        bool AllLinked() =>
+            unlinkedFilterIds.Count == 0
+            && unlinkedFilterGroupIds.Count == 0
+            && unlinkedFilterItemIds.Count == 0
+            && unlinkedIndicatorIds.Count == 0;
     }
 
     /// <summary>

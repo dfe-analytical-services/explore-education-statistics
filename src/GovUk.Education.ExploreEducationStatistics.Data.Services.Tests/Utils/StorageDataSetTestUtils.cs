@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -53,9 +52,6 @@ public static class StorageDataSetTestUtils
         return new StatisticsDbDataSetResolver(
             context: statisticsDbContext,
             observationService: observationService ?? Mock.Of<IObservationService>(Strict),
-            filterRepository: new FilterRepository(statisticsDbContext),
-            indicatorGroupRepository: new IndicatorGroupRepository(statisticsDbContext),
-            locationRepository: new LocationRepository(statisticsDbContext),
             allObservationsMatchedFilterItemsStrategy: allObservationsMatchedFilterItemsStrategy
                 ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
             sparseObservationsMatchedFilterItemsStrategy: sparseObservationsMatchedFilterItemsStrategy
