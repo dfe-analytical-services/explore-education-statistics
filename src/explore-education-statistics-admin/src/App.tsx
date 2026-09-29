@@ -22,12 +22,17 @@ import {
   UnheadProvider as BaseUnheadProvider,
 } from '@unhead/react/client';
 import React, { ReactNode, useEffect } from 'react';
-import { Outlet, RouteObject, RouterProvider, useLocation } from 'react-router';
-import { createBrowserRouter } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Outlet,
+  RouteObject,
+  useLocation,
+} from 'react-router';
+import { RouterProvider } from 'react-router/dom';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
+import { ProtectedRouteProps, PublicRouteProps } from '@admin/routes/types';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
-
 import 'ckeditor5/ckeditor5.css';
 import { NotificationHubContextProvider } from './contexts/NotificationHubContext';
 
@@ -69,32 +74,65 @@ function AppLayout() {
   );
 }
 
+function generatePublicRoute(id: string, route: PublicRouteProps) {
+  return {
+    id,
+    ...route,
+  } as RouteObject;
+}
+
+function generateProtectedRoute(
+  id: string,
+  route: ProtectedRouteProps,
+): RouteObject {
+  const { element, protectionAction, path } = route;
+
+  const protectedElement = (
+    <ProtectedRoute protectionAction={protectionAction}>
+      {element}
+    </ProtectedRoute>
+  );
+
+  if (path.endsWith('/*')) {
+    const parentPath = path.substring(0, path.length - 2);
+
+    return {
+      id,
+      path: parentPath,
+      children: [
+        {
+          id: `${id}_child`,
+          element: protectedElement,
+          path: '*',
+        },
+      ],
+    } as RouteObject;
+  }
+
+  return {
+    id,
+    path,
+    element: protectedElement,
+  } as RouteObject;
+}
+
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
     errorElement: <ServiceProblemsPage />,
 
     children: [
-      ...Object.entries(publicRoutes).map(([key, route]) => ({
-        id: key,
-        ...route,
-      })),
+      ...Object.entries(publicRoutes).map(([key, route]) =>
+        generatePublicRoute(key, route),
+      ),
 
-      ...Object.entries(routes).map(
-        ([key, { element, protectionAction, ...route }]) =>
-          ({
-            id: key,
-            element: (
-              <ProtectedRoute protectionAction={protectionAction}>
-                {element}
-              </ProtectedRoute>
-            ),
-            ...route,
-          }) as RouteObject,
+      ...Object.entries(routes).map(([key, route]) =>
+        generateProtectedRoute(key, route),
       ),
 
       {
         path: '*',
+
         element: (
           <ProtectedRoute>
             <PageNotFoundPage />

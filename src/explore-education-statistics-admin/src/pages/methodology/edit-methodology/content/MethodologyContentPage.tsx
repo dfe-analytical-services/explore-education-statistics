@@ -10,7 +10,7 @@ import {
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import methodologyContentQueries from '@admin/queries/methodologyContentQueries';
 import permissionQueries from '@admin/queries/permissionQueries';

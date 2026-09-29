@@ -15,8 +15,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { generatePath } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 
 type MatchProps = {
   publicationId: string;

@@ -6,7 +6,7 @@ import {
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import React from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { useQuery } from '@tanstack/react-query';
 import publicationQueries from '@admin/queries/publicationQueries';

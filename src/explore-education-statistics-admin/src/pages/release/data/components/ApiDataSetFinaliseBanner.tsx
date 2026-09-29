@@ -5,7 +5,7 @@ import { DataSetDraftVersionStatus } from '@admin/services/apiDataSetService';
 import NotificationBanner from '@common/components/NotificationBanner';
 import Button from '@common/components/Button';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 
 interface Props {
   dataSetId: string;

@@ -12,7 +12,7 @@ import _publicationService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import noop from 'lodash/noop';
 import { produce } from 'immer';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';

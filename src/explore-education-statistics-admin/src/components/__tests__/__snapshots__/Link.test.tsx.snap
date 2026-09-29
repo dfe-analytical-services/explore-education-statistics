@@ -3,6 +3,7 @@
 exports[`Link renders correctly with \`unvisited\` state 1`] = `
 <a
   class="govuk-link govuk-link--no-visited-state"
+  data-discover="true"
   href="/the-link"
 >
   Test Link
@@ -12,6 +13,7 @@ exports[`Link renders correctly with \`unvisited\` state 1`] = `
 exports[`Link renders correctly without \`unvisited\` state 1`] = `
 <a
   class="govuk-link"
+  data-discover="true"
   href="/the-link"
 >
   Test Link

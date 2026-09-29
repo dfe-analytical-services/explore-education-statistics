@@ -30,14 +30,13 @@ import Tag, { TagProps } from '@common/components/Tag';
 import TaskList from '@common/components/TaskList';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
-import { useNavigate } from 'react-router';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 
 export type DataSetFinalisingStatus = 'finalising' | 'finalised' | undefined;

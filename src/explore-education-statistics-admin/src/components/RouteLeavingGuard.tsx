@@ -43,7 +43,9 @@ const RouteLeavingGuard = ({
     <ModalConfirm
       title={title}
       open={blocker.state === 'blocked'}
-      onConfirm={() => blocker.proceed?.()}
+      onConfirm={() => {
+        blocker.proceed?.();
+      }}
       onExit={() => blocker.reset?.()}
       onCancel={() => blocker.reset?.()}
     >

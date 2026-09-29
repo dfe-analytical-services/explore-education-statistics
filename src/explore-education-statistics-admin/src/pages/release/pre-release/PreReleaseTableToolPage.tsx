@@ -18,7 +18,7 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import { useQuery } from '@tanstack/react-query';

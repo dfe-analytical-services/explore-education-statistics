@@ -22,7 +22,7 @@ import featuredTableService from '@admin/services/featuredTableService';
 import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release, featuredTables } =

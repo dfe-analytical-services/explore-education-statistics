@@ -12,7 +12,7 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import testIndicatorsMapping from '@admin/pages/release/data/__data__/testIndicatorsMapping';
 import ReleaseApiDataSetIndicatorsMappingPage from '@admin/pages/release/data/ReleaseApiDataSetIndicatorsMappingPage';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';

@@ -9,8 +9,7 @@ import footnoteService from '@admin/services/footnoteService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 
 const ReleaseFootnoteCreatePage = () => {
   const navigate = useNavigate();
