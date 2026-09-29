@@ -115,7 +115,6 @@ public class SubjectResultMetaServiceTests
         var dataSet = new Mock<IStorageDataSet>(Strict);
         var locationService = new Mock<ILocationService>(Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-        var locationRepository = new Mock<ILocationRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
@@ -139,7 +138,7 @@ public class SubjectResultMetaServiceTests
             .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        dataSet.Setup(s => s.ListIndicators(query.Indicators, It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
 
@@ -165,7 +164,6 @@ public class SubjectResultMetaServiceTests
                 boundaryLevelRepository,
                 dataSet,
                 footnoteRepository,
-                locationRepository,
                 releaseDataFileRepository,
                 timePeriodService
             );
@@ -408,7 +406,6 @@ public class SubjectResultMetaServiceTests
         var dataSet = new Mock<IStorageDataSet>(Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
         var locationService = new Mock<ILocationService>(Strict);
-        var locationRepository = new Mock<ILocationRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
@@ -436,7 +433,7 @@ public class SubjectResultMetaServiceTests
             .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        dataSet.Setup(s => s.ListIndicators(query.Indicators, It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository
             .Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
@@ -465,7 +462,6 @@ public class SubjectResultMetaServiceTests
                 boundaryLevelRepository,
                 dataSet,
                 footnoteRepository,
-                locationRepository,
                 releaseDataFileRepository,
                 timePeriodService
             );

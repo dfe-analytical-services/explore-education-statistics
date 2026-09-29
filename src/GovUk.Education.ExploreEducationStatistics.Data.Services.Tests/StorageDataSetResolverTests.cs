@@ -44,27 +44,63 @@ public abstract class StorageDataSetResolverTests
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => resolver.Resolve(subjectId));
             Assert.Contains(subjectId.ToString(), exception.Message);
         }
+    }
 
-        private static async Task<string> SeedDataFile(Guid subjectId)
+    public class TryResolveTests : StorageDataSetResolverTests
+    {
+        [Fact]
+        public async Task DataFileIsStatsDb_ReturnsStatisticsDbDataSet()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var subjectId = Guid.NewGuid();
+
+            var contentDbContextId = await SeedDataFile(subjectId);
 
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
 
-            contentDbContext.Files.Add(
-                new File
-                {
-                    Id = Guid.NewGuid(),
-                    RootPath = Guid.NewGuid(),
-                    Filename = "data.csv",
-                    SubjectId = subjectId,
-                    Type = FileType.Data,
-                    DataStorageVersion = DataStorageVersion.StatsDB,
-                }
-            );
-            await contentDbContext.SaveChangesAsync();
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
 
-            return contentDbContextId;
+            var result = await resolver.TryResolve(subjectId);
+
+            var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
+            Assert.Equal(subjectId, dataSet.SubjectId);
         }
+
+        [Fact]
+        public async Task NoDataFile_ReturnsNull()
+        {
+            var subjectId = Guid.NewGuid();
+
+            await using var contentDbContext = InMemoryContentDbContext();
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
+
+            var result = await resolver.TryResolve(subjectId);
+
+            Assert.Null(result);
+        }
+    }
+
+    private static async Task<string> SeedDataFile(Guid subjectId)
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+
+        contentDbContext.Files.Add(
+            new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.csv",
+                SubjectId = subjectId,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            }
+        );
+        await contentDbContext.SaveChangesAsync();
+
+        return contentDbContextId;
     }
 }

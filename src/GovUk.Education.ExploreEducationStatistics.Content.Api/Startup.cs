@@ -168,9 +168,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             DenseObservationsMatchedFilterItemsStrategy
         >();
         services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
-        services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
