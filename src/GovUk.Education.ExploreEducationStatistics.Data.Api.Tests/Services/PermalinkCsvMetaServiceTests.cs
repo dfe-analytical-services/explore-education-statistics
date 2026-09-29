@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -999,15 +1000,14 @@ public class PermalinkCsvMetaServiceTests
 
     private static StatisticsDbDataSetResolver BuildStatisticsDbDataSetResolver(StatisticsDbContext statisticsDbContext)
     {
-        return new StatisticsDbDataSetResolver(
-            context: statisticsDbContext,
-            observationService: Mock.Of<IObservationService>(Strict),
-            allObservationsMatchedFilterItemsStrategy: Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
-            sparseObservationsMatchedFilterItemsStrategy: Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(
-                Strict
-            ),
-            denseObservationsMatchedFilterItemsStrategy: Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict),
-            logger: Mock.Of<ILogger<StatisticsDbDataSet>>()
-        );
+        var services = new ServiceCollection()
+            .AddSingleton(statisticsDbContext)
+            .AddSingleton(Mock.Of<IObservationService>(Strict))
+            .AddSingleton(Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict))
+            .AddSingleton(Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(Strict))
+            .AddSingleton(Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict))
+            .AddSingleton(Mock.Of<ILogger<StatisticsDbDataSet>>());
+
+        return new StatisticsDbDataSetResolver(services.BuildServiceProvider());
     }
 }

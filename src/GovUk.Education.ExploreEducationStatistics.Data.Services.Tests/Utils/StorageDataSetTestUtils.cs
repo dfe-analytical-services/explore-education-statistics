@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static Moq.MockBehavior;
@@ -49,17 +50,23 @@ public static class StorageDataSetTestUtils
         IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null
     )
     {
-        return new StatisticsDbDataSetResolver(
-            context: statisticsDbContext,
-            observationService: observationService ?? Mock.Of<IObservationService>(Strict),
-            allObservationsMatchedFilterItemsStrategy: allObservationsMatchedFilterItemsStrategy
-                ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
-            sparseObservationsMatchedFilterItemsStrategy: sparseObservationsMatchedFilterItemsStrategy
-                ?? Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(Strict),
-            denseObservationsMatchedFilterItemsStrategy: denseObservationsMatchedFilterItemsStrategy
-                ?? Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict),
-            logger: Mock.Of<ILogger<StatisticsDbDataSet>>()
-        );
+        var services = new ServiceCollection()
+            .AddSingleton(statisticsDbContext)
+            .AddSingleton(observationService ?? Mock.Of<IObservationService>(Strict))
+            .AddSingleton(
+                allObservationsMatchedFilterItemsStrategy ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict)
+            )
+            .AddSingleton(
+                sparseObservationsMatchedFilterItemsStrategy
+                    ?? Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(Strict)
+            )
+            .AddSingleton(
+                denseObservationsMatchedFilterItemsStrategy
+                    ?? Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict)
+            )
+            .AddSingleton(Mock.Of<ILogger<StatisticsDbDataSet>>());
+
+        return new StatisticsDbDataSetResolver(services.BuildServiceProvider());
     }
 
     /// <summary>
