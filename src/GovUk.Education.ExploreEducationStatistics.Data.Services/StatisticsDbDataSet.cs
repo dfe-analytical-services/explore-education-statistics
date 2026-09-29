@@ -17,9 +17,6 @@ public class StatisticsDbDataSet(
     Guid subjectId,
     StatisticsDbContext context,
     IObservationService observationService,
-    IFilterRepository filterRepository,
-    IIndicatorGroupRepository indicatorGroupRepository,
-    ILocationRepository locationRepository,
     IAllObservationsMatchedFilterItemsStrategy allObservationsMatchedFilterItemsStrategy,
     ISparseObservationsMatchedFilterItemsStrategy sparseObservationsMatchedFilterItemsStrategy,
     IDenseObservationsMatchedFilterItemsStrategy denseObservationsMatchedFilterItemsStrategy,
@@ -98,7 +95,19 @@ public class StatisticsDbDataSet(
 
     public async Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default)
     {
-        return filterRepository.GetFiltersIncludingItems(SubjectId);
+        return await context
+            .Filter.Include(filter => filter.FilterGroups)
+                .ThenInclude(group => group.FilterItems)
+            .Where(filter => filter.SubjectId == SubjectId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Filter>> ListFiltersExcludingItems(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Filter.AsNoTracking()
+            .Where(filter => filter.SubjectId == SubjectId)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
@@ -123,14 +132,22 @@ public class StatisticsDbDataSet(
             .ToListAsync(cancellationToken);
     }
 
-    public Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
+    public async Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
     {
-        return indicatorGroupRepository.GetIndicatorGroups(SubjectId);
+        return await context
+            .IndicatorGroup.Include(group => group.Indicators)
+            .Where(indicatorGroup => indicatorGroup.SubjectId == SubjectId)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<Location>> ListLocations(CancellationToken cancellationToken = default)
     {
-        return [.. await locationRepository.GetDistinctForSubject(SubjectId)];
+        return await context
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == SubjectId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<Location>> ListLocations(

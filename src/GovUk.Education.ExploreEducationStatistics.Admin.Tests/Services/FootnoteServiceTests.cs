@@ -458,6 +458,105 @@ public class FootnoteServiceTests
     }
 
     [Fact]
+    public async Task CreateFootnote_AllIdsLinkedToFirstSubject_DoesNotReadRemainingSubjects()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var filterItem = _fixture.DefaultFilterItem().Generate();
+        var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
+        var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
+        var indicator = _fixture.DefaultIndicator().Generate();
+        var indicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { indicator })
+            .Generate();
+        var subject1 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
+            .Generate();
+        var subject2 = _fixture.DefaultSubject().Generate();
+        var releaseSubject1 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject1)
+            .Generate();
+        var releaseSubject2 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject2)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject1, subject2),
+            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
+        );
+
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet.Setup(ds => ds.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(indicatorGroup));
+
+        var storageDataSetResolver = MockStorageDataSetResolver(subject1.Id, dataSet.Object);
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            // NOTE: subject2 shouldn't be resolved
+
+            contextId,
+            filterIds: SetOf(filter.Id),
+            filterGroupIds: SetOf(filterGroup.Id),
+            filterItemIds: SetOf(filterItem.Id),
+            indicatorIds: SetOf(indicator.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(dataSet, storageDataSetResolver);
+
+        result.AssertRight();
+    }
+
+    [Fact]
+    public async Task CreateFootnote_OnlyFilterIdsSpecified_DoesNotReadIndicators()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var filter = _fixture.DefaultFilter().Generate();
+        var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject),
+            releaseSubjects: ListOf(releaseSubject)
+        );
+
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+
+        var storageDataSetResolver = MockStorageDataSetResolver(subject.Id, dataSet.Object);
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(filter.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(dataSet, storageDataSetResolver);
+
+        result.AssertRight();
+    }
+
+    [Fact]
     public async Task UpdateFootnote_SubjectNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
@@ -1941,7 +2040,8 @@ public class FootnoteServiceTests
         IReadOnlySet<Guid>? filterGroupIds = null,
         IReadOnlySet<Guid>? filterItemIds = null,
         IReadOnlySet<Guid>? indicatorIds = null,
-        IReadOnlySet<Guid>? subjectIds = null
+        IReadOnlySet<Guid>? subjectIds = null,
+        IStorageDataSetResolver? storageDataSetResolver = null
     )
     {
         filterIds ??= SetOf<Guid>();
@@ -1959,7 +2059,8 @@ public class FootnoteServiceTests
             var footnoteService = SetupFootnoteService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataBlockService: dataBlockService.Object
+                dataBlockService: dataBlockService.Object,
+                storageDataSetResolver: storageDataSetResolver
             );
 
             return await footnoteService.CreateFootnote(
