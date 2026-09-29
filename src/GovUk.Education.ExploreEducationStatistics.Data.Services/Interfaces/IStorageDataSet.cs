@@ -9,8 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 /// Storage-agnostic read access to the content of a single data set (Subject): its observations, filters and
 /// filter items, indicators, locations and time periods.
 ///
-/// All methods are scoped to <see cref="SubjectId" />. Methods that accept a <see cref="FullTableQuery" />
-/// require the query's SubjectId to match <see cref="SubjectId" />.
+/// All methods are scoped to <see cref="SubjectId" /> unless stated otherwise. Methods that accept a
+/// <see cref="FullTableQuery" /> require the query's SubjectId to match <see cref="SubjectId" />.
 /// </summary>
 public interface IStorageDataSet
 {
@@ -39,7 +39,8 @@ public interface IStorageDataSet
     Task<List<FilterItem>> ListFilterItemsForQuery(FullTableQuery query, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Filter items (with their FilterGroup and Filter) by id. Unknown ids are ignored.
+    /// Filter items (with their FilterGroup and Filter) for the data set restricted to the given ids.
+    /// Ids that are unknown or belong to other data sets are ignored.
     /// </summary>
     Task<List<FilterItem>> ListFilterItems(
         IEnumerable<Guid> filterItemIds,

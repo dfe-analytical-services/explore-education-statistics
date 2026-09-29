@@ -89,6 +89,7 @@ public class StatisticsDbDataSet(
             .FilterItem.AsNoTracking()
             .Include(fi => fi.FilterGroup)
                 .ThenInclude(fg => fg.Filter)
+            .Where(fi => fi.FilterGroup.Filter.SubjectId == SubjectId)
             .Where(fi => filterItemIdList.Contains(fi.Id))
             .ToListAsync(cancellationToken);
     }
