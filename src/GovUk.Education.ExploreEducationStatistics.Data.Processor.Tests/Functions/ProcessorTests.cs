@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -23,7 +24,7 @@ public class ProcessorTests
         var import = new DataImport
         {
             Id = Guid.NewGuid(),
-            File = new File { Filename = "my_data_file.csv" },
+            File = new File { Filename = "my_data_file.csv", DataStorageVersion = DataStorageVersion.StatsDB },
             Status = QUEUED,
         };
 
@@ -62,7 +63,7 @@ public class ProcessorTests
                 var import = new DataImport
                 {
                     Id = Guid.NewGuid(),
-                    File = new File { Filename = "my_data_file.csv" },
+                    File = new File { Filename = "my_data_file.csv", DataStorageVersion = DataStorageVersion.StatsDB },
                     Status = currentState,
                 };
 
@@ -95,7 +96,7 @@ public class ProcessorTests
         var import = new DataImport
         {
             Id = Guid.NewGuid(),
-            File = new File { Filename = "my_data_file.csv" },
+            File = new File { Filename = "my_data_file.csv", DataStorageVersion = DataStorageVersion.StatsDB },
             Status = CANCELLING,
         };
 

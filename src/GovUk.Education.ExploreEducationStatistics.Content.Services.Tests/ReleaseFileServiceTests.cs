@@ -199,6 +199,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -320,6 +321,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data-1.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -531,6 +533,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.pdf",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -854,6 +857,7 @@ public class ReleaseFileServiceTests : IDisposable
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var releaseFile2 = new ReleaseFile
