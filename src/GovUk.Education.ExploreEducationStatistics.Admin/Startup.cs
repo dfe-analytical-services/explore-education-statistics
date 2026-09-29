@@ -592,7 +592,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
-        services.AddTransient<IFilterRepository, FilterRepository>();
         services.AddTransient<StatisticsDbDataSetResolver>();
         services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
         services.AddTransient<
@@ -608,8 +607,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IGlossaryService, GlossaryService>();
-        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<IObservationService, ObservationService>();

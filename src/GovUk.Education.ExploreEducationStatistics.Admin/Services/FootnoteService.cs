@@ -357,33 +357,50 @@ public class FootnoteService : IFootnoteService
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
 
-        if (filterIds.Count == 0 && filterGroupIds.Count == 0 && filterItemIds.Count == 0 && indicatorIds.Count == 0)
-        {
-            return Unit.Instance;
-        }
-
-        var releaseFilters = new List<Filter>();
-        var releaseIndicatorGroups = new List<IndicatorGroup>();
+        // Search the release's data sets for the specified ids, stopping as soon as all of them have been found
+        var unlinkedFilterIds = filterIds.ToHashSet();
+        var unlinkedFilterGroupIds = filterGroupIds.ToHashSet();
+        var unlinkedFilterItemIds = filterItemIds.ToHashSet();
+        var unlinkedIndicatorIds = indicatorIds.ToHashSet();
 
         foreach (var subjectId in releaseSubjectIds)
         {
+            if (AllLinked())
+            {
+                break;
+            }
+
             var dataSet = await _storageDataSetResolver.Resolve(subjectId);
-            releaseFilters.AddRange(await dataSet.ListFilters());
-            releaseIndicatorGroups.AddRange(await dataSet.ListIndicatorGroups());
+
+            if (unlinkedFilterIds.Count > 0 || unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
+            {
+                var filters = await dataSet.ListFilters();
+                var filterGroups = filters.SelectMany(f => f.FilterGroups).ToList();
+
+                unlinkedFilterIds.ExceptWith(filters.Select(f => f.Id));
+                unlinkedFilterGroupIds.ExceptWith(filterGroups.Select(fg => fg.Id));
+                unlinkedFilterItemIds.ExceptWith(filterGroups.SelectMany(fg => fg.FilterItems).Select(fi => fi.Id));
+            }
+
+            if (unlinkedIndicatorIds.Count > 0)
+            {
+                var indicatorGroups = await dataSet.ListIndicatorGroups();
+
+                unlinkedIndicatorIds.ExceptWith(indicatorGroups.SelectMany(ig => ig.Indicators).Select(i => i.Id));
+            }
         }
 
-        var releaseFilterGroups = releaseFilters.SelectMany(f => f.FilterGroups).ToList();
-
-        if (
-            !releaseFilters.Select(f => f.Id).ContainsAll(filterIds)
-            || !releaseFilterGroups.Select(fg => fg.Id).ContainsAll(filterGroupIds)
-            || !releaseFilterGroups.SelectMany(fg => fg.FilterItems).Select(fi => fi.Id).ContainsAll(filterItemIds)
-            || !releaseIndicatorGroups.SelectMany(ig => ig.Indicators).Select(i => i.Id).ContainsAll(indicatorIds)
-        )
+        if (!AllLinked())
         {
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
 
         return Unit.Instance;
+
+        bool AllLinked() =>
+            unlinkedFilterIds.Count == 0
+            && unlinkedFilterGroupIds.Count == 0
+            && unlinkedFilterItemIds.Count == 0
+            && unlinkedIndicatorIds.Count == 0;
     }
 }

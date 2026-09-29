@@ -181,7 +181,11 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         List<IndicatorGroupSequenceEntry>? indicatorSequence
     )
     {
-        var indicators = await dataSet.ListIndicators(indicatorIds);
+        var indicatorIdList = indicatorIds.ToList();
+
+        // A query with no indicators returns all the data set's indicators
+        var indicators =
+            indicatorIdList.Count == 0 ? await dataSet.ListIndicators() : await dataSet.ListIndicators(indicatorIdList);
 
         // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
         // been fetched without groups

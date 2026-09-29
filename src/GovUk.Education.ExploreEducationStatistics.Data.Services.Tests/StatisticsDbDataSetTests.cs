@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -687,6 +686,46 @@ public abstract class StatisticsDbDataSetTests
         }
     }
 
+    public class ListFiltersExcludingItemsTests : StatisticsDbDataSetTests
+    {
+        [Fact]
+        public async Task FiltersForSubject_ReturnedWithoutFilterGroups()
+        {
+            Subject subject = Fixture
+                .DefaultSubject()
+                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 2, filterItemCount: 2).Generate(2));
+
+            Subject otherSubject = Fixture
+                .DefaultSubject()
+                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1));
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Subject.AddRange(subject, otherSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
+
+                var result = await dataSet.ListFiltersExcludingItems();
+
+                Assert.Equal(2, result.Count);
+                Assert.All(
+                    result,
+                    filter =>
+                    {
+                        Assert.Contains(filter.Id, subject.Filters.Select(f => f.Id));
+                        Assert.Empty(filter.FilterGroups);
+                    }
+                );
+            }
+        }
+    }
+
     public class ListIndicatorGroupsTests : StatisticsDbDataSetTests
     {
         [Fact]
@@ -1025,9 +1064,6 @@ public abstract class StatisticsDbDataSetTests
             subjectId: subjectId,
             context: statisticsDbContext,
             observationService: observationService ?? Mock.Of<IObservationService>(Strict),
-            filterRepository: new FilterRepository(statisticsDbContext),
-            indicatorGroupRepository: new IndicatorGroupRepository(statisticsDbContext),
-            locationRepository: new LocationRepository(statisticsDbContext),
             allObservationsMatchedFilterItemsStrategy: allObservationsMatchedFilterItemsStrategy
                 ?? Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict),
             sparseObservationsMatchedFilterItemsStrategy: sparseObservationsMatchedFilterItemsStrategy

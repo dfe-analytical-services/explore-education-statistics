@@ -61,12 +61,19 @@ public interface IStorageDataSet
     Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// All filters for the data set without their FilterGroups and FilterItems. Prefer this over
+    /// <see cref="ListFilters" /> when only the filters themselves are needed, as filter items can be numerous.
+    /// </summary>
+    Task<List<Filter>> ListFiltersExcludingItems(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// All indicators for the data set.
     /// </summary>
     Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Indicators for the data set restricted to the given ids. Ids belonging to other data sets are excluded.
+    /// Indicators for the data set restricted to the given ids. Ids belonging to other data sets are excluded,
+    /// and an empty set of ids yields no indicators.
     /// </summary>
     Task<List<Indicator>> ListIndicators(IEnumerable<Guid> indicatorIds, CancellationToken cancellationToken = default);
 

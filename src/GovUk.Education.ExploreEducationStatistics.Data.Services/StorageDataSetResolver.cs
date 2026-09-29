@@ -18,6 +18,12 @@ public class StorageDataSetResolver(
 {
     public async Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
     {
+        return await TryResolve(subjectId, cancellationToken)
+            ?? throw new InvalidOperationException($"No data file found for subject {subjectId}");
+    }
+
+    public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
+    {
         var dataStorageVersion = await contentDbContext
             .Files.Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
             .Select(file => (DataStorageVersion?)file.DataStorageVersion)
@@ -26,7 +32,7 @@ public class StorageDataSetResolver(
         return dataStorageVersion switch
         {
             DataStorageVersion.StatsDB => await statisticsDbDataSetResolver.Resolve(subjectId, cancellationToken),
-            null => throw new InvalidOperationException($"No data file found for subject {subjectId}"),
+            null => null,
             _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
         };
     }
