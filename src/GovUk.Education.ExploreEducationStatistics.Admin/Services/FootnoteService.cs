@@ -365,11 +365,6 @@ public class FootnoteService : IFootnoteService
 
         foreach (var subjectId in releaseSubjectIds)
         {
-            if (AllLinked())
-            {
-                break;
-            }
-
             var dataSet = await _storageDataSetResolver.TryResolve(subjectId);
 
             if (dataSet is null)
@@ -398,6 +393,11 @@ public class FootnoteService : IFootnoteService
                 var indicatorGroups = await dataSet.ListIndicatorGroups();
 
                 unlinkedIndicatorIds.ExceptWith(indicatorGroups.SelectMany(ig => ig.Indicators).Select(i => i.Id));
+            }
+
+            if (AllLinked())
+            {
+                break;
             }
         }
 
