@@ -13,17 +13,31 @@ public class ServiceCollectionExtensionsTests
     [Fact]
     public void AddStorageDataSets_ResolvesStorageDataSetResolver()
     {
-        // Only the db contexts and logging are registered, so that ValidateOnBuild proves the extension registers
-        // every other collaborator a data set needs
-        var serviceProvider = new ServiceCollection()
+        using var scope = BuildServiceProvider().CreateScope();
+
+        Assert.IsType<StorageDataSetResolver>(scope.ServiceProvider.GetRequiredService<IStorageDataSetResolver>());
+    }
+
+    [Fact]
+    public async Task AddStorageDataSets_ResolvesStatisticsDbDataSet()
+    {
+        using var scope = BuildServiceProvider().CreateScope();
+
+        var resolver = scope.ServiceProvider.GetRequiredService<StatisticsDbDataSetResolver>();
+
+        // The data set is created per subject rather than registered, so its collaborators are only checked here
+        Assert.IsType<StatisticsDbDataSet>(await resolver.Resolve(Guid.NewGuid()));
+    }
+
+    // Only the db contexts and logging are registered, so that resolving proves the extension registers every
+    // other collaborator a data set needs
+    private static ServiceProvider BuildServiceProvider()
+    {
+        return new ServiceCollection()
             .AddLogging()
             .AddScoped(_ => InMemoryContentDbContext())
             .AddScoped(_ => InMemoryStatisticsDbContext())
             .AddStorageDataSets()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-
-        using var scope = serviceProvider.CreateScope();
-
-        Assert.IsType<StorageDataSetResolver>(scope.ServiceProvider.GetRequiredService<IStorageDataSetResolver>());
     }
 }
