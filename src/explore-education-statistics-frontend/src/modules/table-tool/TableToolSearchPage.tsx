@@ -17,6 +17,7 @@ import SearchForm from '@frontend/components/SearchForm';
 import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
 import TableToolSearchShortlistedResult from '@frontend/modules/table-tool/components/TableToolSearchShortlistedResult';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import tableToolSearchService, {
   FatalError,
   PipelineStage,
@@ -28,6 +29,8 @@ import tableToolSearchService, {
 } from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRef, useState } from 'react';
+
+const GOOGLE_ANALYTICS_EVENT_CATEGORY = 'Table Tool Search';
 
 export interface TableToolSearchPageProps {
   latestReleaseVersion: ReleaseVersionSummary;
@@ -60,7 +63,8 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleSearchSubmit = async (searchTerm: string) => {
-    if (!searchTerm.trim() || searchedTerm === searchTerm.trim()) return;
+    const trimmedSearchTerm = searchTerm.trim();
+    if (!trimmedSearchTerm || searchedTerm === trimmedSearchTerm) return;
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -71,13 +75,18 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
       ...initialPipelineData,
       currentStage: PipelineStage.CONNECTING,
     });
-    setSearchedTerm(searchTerm.trim());
+    setSearchedTerm(trimmedSearchTerm);
     setError(null);
+    logEvent({
+      category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
+      action: `Search submitted in ${publicationSummary.title}}`,
+      label: trimmedSearchTerm,
+    });
 
     try {
       await tableToolSearchService.postSearchStream(
         {
-          userQuery: searchTerm.trim(),
+          userQuery: trimmedSearchTerm,
           publicationId: publicationSummary.id,
         },
         {
@@ -114,7 +123,24 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               (message.stage === PipelineStage.RERANKER &&
                 message.data.datasets.length === 0)
             ) {
+              logEvent({
+                category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
+                action: `No results returned in ${publicationSummary.title}`,
+                label: trimmedSearchTerm,
+                value: 0,
+              });
               abortControllerRef.current?.abort();
+            }
+
+            if (message.stage === PipelineStage.COMPLETE) {
+              logEvent({
+                category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
+                action: message.data.datasets.length
+                  ? `Results returned in ${publicationSummary.title}`
+                  : `No results returned in ${publicationSummary.title}`,
+                label: `${trimmedSearchTerm}, Datasets: ${message.data.datasets.map(dataset => dataset.subjectId).join(', ')}`,
+                value: message.data.datasets.length,
+              });
             }
           },
           onRetriableError: errorMessage => {

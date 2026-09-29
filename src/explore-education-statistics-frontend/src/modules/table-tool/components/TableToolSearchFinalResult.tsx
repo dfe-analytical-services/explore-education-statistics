@@ -10,6 +10,7 @@ import { FullTableQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/table-tool/components/TableToolSearchFinalResult.module.scss';
 import { encodeFullTableQueryToParams } from '@frontend/modules/table-tool/utils/fullTableQueryTranscode';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { FinalDataset } from '@frontend/services/tableToolSearchService';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -110,6 +111,13 @@ const TableToolSearchFinalResult = ({
                   to={`/data-tables/${releaseVersionSummary.publication.slug}/${
                     releaseVersionSummary.slug
                   }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
+                  onClick={() =>
+                    logEvent({
+                      category: 'Table Tool Search',
+                      action: 'View and edit table for result',
+                      label: dataset.title,
+                    })
+                  }
                 >
                   View and edit this table{' '}
                   <VisuallyHidden> - {dataset.title}</VisuallyHidden>
