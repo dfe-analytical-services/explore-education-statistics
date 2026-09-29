@@ -14,6 +14,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -56,8 +57,8 @@ public class DataImportServiceTests
     {
         var import = new DataImport
         {
-            File = new File(),
-            MetaFile = new File(),
+            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata, DataStorageVersion = DataStorageVersion.StatsDB },
             Status = STAGE_1,
         };
 
@@ -88,8 +89,8 @@ public class DataImportServiceTests
         var import = new DataImport
         {
             Errors = new List<DataImportError> { new("error 1"), new("error 2") },
-            File = new File(),
-            MetaFile = new File(),
+            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata, DataStorageVersion = DataStorageVersion.StatsDB },
             Status = STAGE_1,
         };
 
@@ -451,19 +452,9 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(
-                statisticsDbContext,
-                filters
-                    .Select(f => new FilterMeta
-                    {
-                        Id = f.Id,
-                        Label = f.Label,
-                        Hint = f.Hint,
-                        ColumnName = f.Name,
-                        ParentFilter = f.ParentFilter,
-                    })
-                    .ToList()
-            );
+            var dataSet = BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSet, filters);
 
             var hierarchy = Assert.Single(results);
             Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
@@ -581,19 +572,9 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(
-                statisticsDbContext,
-                filters
-                    .Select(f => new FilterMeta
-                    {
-                        Id = f.Id,
-                        Label = f.Label,
-                        Hint = f.Hint,
-                        ColumnName = f.Name,
-                        ParentFilter = f.ParentFilter,
-                    })
-                    .ToList()
-            );
+            var dataSet = BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSet, filters);
 
             Assert.Equal(2, results.Count);
 
@@ -626,11 +607,18 @@ public class DataImportServiceTests
         string? statisticsDbContextId = null
     )
     {
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId ?? Guid.NewGuid().ToString(),
-            statisticsDbContextId ?? Guid.NewGuid().ToString()
-        );
+        contentDbContextId ??= Guid.NewGuid().ToString();
+        statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        return new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>(Strict));
+        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
+
+        return new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(contentDbContextId),
+                InMemoryStatisticsDbContext(statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>(Strict)
+        );
     }
 }
