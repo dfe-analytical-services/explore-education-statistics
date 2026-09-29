@@ -31,6 +31,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -180,22 +181,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
-        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
-        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
-        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
-        services.AddTransient<StatisticsDbDataSetResolver>();
-        services.AddTransient<IStorageDataSetResolver, StorageDataSetResolver>();
-        services.AddTransient<
-            ISparseObservationsMatchedFilterItemsStrategy,
-            SparseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<
-            IDenseObservationsMatchedFilterItemsStrategy,
-            DenseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
-        services.AddTransient<IObservationService, ObservationService>();
-        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
+        services.AddStorageDataSets();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
