@@ -10,4 +10,10 @@ public interface IStorageDataSetResolver
     /// The returned instance is only valid for the lifetime of the current request scope and must not be cached.
     /// </summary>
     Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// As <see cref="Resolve" />, but returns null when no data file is recorded for the subject,
+    /// for example because the data set has since been deleted.
+    /// </summary>
+    Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default);
 }
