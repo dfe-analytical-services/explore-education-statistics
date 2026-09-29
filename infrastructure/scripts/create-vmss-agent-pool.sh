@@ -45,6 +45,8 @@ OS_DISK_SIZE_GB=86
 STORAGE_SKU="Standard_LRS"
 
 # EES runner agents subnet - shared by both the large and xlarge scale sets.
+# Reusing the same subnet used by the old ubuntu2204 scale sets for speed/convenience. We could change/update this
+# at a later date if we felt it necessary.
 SUBNET_ID="/subscriptions/48ea0797-73c6-4202-bf90-b01c817058e9/resourceGroups/s101d01-rg-ees/providers/Microsoft.Network/virtualNetworks/s101d01-vnet-ees-runners/subnets/s101d01-snet-ees-runners-ubuntu2204"
 
 # az vmss create requires an admin account, but nothing actually uses this
