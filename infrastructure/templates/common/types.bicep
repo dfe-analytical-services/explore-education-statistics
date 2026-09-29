@@ -42,3 +42,9 @@ type ConnectionString = {
     | 'Custom'
     | 'PostgreSQL'
 }
+
+@export()
+type SubnetReference = {
+  name: string
+  id: string
+}

@@ -5,15 +5,6 @@
     "useSubnets": {
       "value": true
     },
-    "skuContentDb": {
-      "value": "Standard"
-    },
-    "tierContentDb": {
-      "value": "Standard"
-    },
-    "capacityContentDb": {
-      "value": 50
-    },
     "skuStatisticsDb": {
       "value": "GP_Gen5"
     },
@@ -22,9 +13,6 @@
     },
     "capacityStatisticsDb": {
       "value": 2
-    },
-    "maxContentDbSizeBytes": {
-      "value": 2147483648
     },
     "maxStatsDbSizeBytes": {
       "value": 1099511627776

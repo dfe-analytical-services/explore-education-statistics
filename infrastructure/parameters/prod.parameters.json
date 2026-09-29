@@ -5,18 +5,6 @@
     "useSubnets": {
       "value": true
     },
-    "skuContentDb": {
-      "value": "GP_S_Gen5"
-    },
-    "tierContentDb": {
-      "value": "GeneralPurpose"
-    },
-    "capacityContentDb": {
-      "value": 4
-    },
-    "minCapacityContentDb": {
-      "value": "0.5"
-    },
     "licenseTypeStatisticsDb": {
       "value": "BasePrice"
     },
@@ -28,9 +16,6 @@
     },
     "capacityStatisticsDb": {
       "value": 12
-    },
-    "maxContentDbSizeBytes": {
-      "value": 6442450944
     },
     "maxStatsDbSizeBytes": {
       "value": 3298534883328

@@ -1,8 +1,4 @@
-@export()
-type SubnetReference = {
-  name: string
-  id: string
-}
+import { SubnetReference } from '../../../common/types.bicep'
 
 @export()
 type VNetSubnets = {
