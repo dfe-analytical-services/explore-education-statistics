@@ -7,7 +7,8 @@ public interface IStorageDataSetResolver
     /// Returns an <see cref="IStorageDataSet" /> bound to the data set (Subject) identified by
     /// <paramref name="subjectId" />. The Subject is not checked for existence.
     ///
-    /// The returned instance is only valid for the lifetime of the current request scope and must not be cached.
+    /// Resolving the same subject again within the current request scope returns the same instance. That instance
+    /// is only valid for the lifetime of the scope and must not be cached beyond it.
     /// </summary>
     Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default);
 

@@ -10,21 +10,19 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -387,10 +385,7 @@ public class PermalinkCsvMetaServiceTests
             var service = BuildService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                storageDataSetResolver: new StorageDataSetResolver(
-                    contentDbContext: contentDbContext,
-                    statisticsDbDataSetResolver: BuildStatisticsDbDataSetResolver(statisticsDbContext)
-                ),
+                storageDataSetResolver: BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
                 releaseSubjectService: releaseSubjectService.Object
             );
 
@@ -996,18 +991,5 @@ public class PermalinkCsvMetaServiceTests
             releaseSubjectService: releaseSubjectService ?? Mock.Of<IReleaseSubjectService>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
-    }
-
-    private static StatisticsDbDataSetResolver BuildStatisticsDbDataSetResolver(StatisticsDbContext statisticsDbContext)
-    {
-        var services = new ServiceCollection()
-            .AddSingleton(statisticsDbContext)
-            .AddSingleton(Mock.Of<IObservationService>(Strict))
-            .AddSingleton(Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(Strict))
-            .AddSingleton(Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(Strict))
-            .AddSingleton(Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(Strict))
-            .AddSingleton(Mock.Of<ILogger<StatisticsDbDataSet>>());
-
-        return new StatisticsDbDataSetResolver(services.BuildServiceProvider());
     }
 }
