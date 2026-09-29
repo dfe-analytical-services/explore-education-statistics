@@ -348,6 +348,7 @@ describe('ReleaseDataFileReplacePage', () => {
               ...user,
               permissions: { ...defaultPermissions, isBauUser: true },
             },
+            status: 'authenticated',
           }}
         >
           <Routes>
