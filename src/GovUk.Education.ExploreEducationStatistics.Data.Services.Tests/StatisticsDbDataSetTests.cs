@@ -586,6 +586,101 @@ public abstract class StatisticsDbDataSetTests
         }
     }
 
+    public class ListFilterItemRelationshipsTests : StatisticsDbDataSetTests
+    {
+        [Fact]
+        public async Task ParentAndChildFilterItemsOnSameObservation_ReturnedAsDistinctPairs()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+
+            Filter parentFilter = Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2).WithSubject(subject);
+            Filter childFilter = Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2).WithSubject(subject);
+
+            var parentItems = parentFilter.FilterGroups[0].FilterItems;
+            var childItems = childFilter.FilterGroups[0].FilterItems;
+
+            var observations = new List<Observation>
+            {
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[0], childItems[0]]),
+                // Same pair as above, which should only be returned once
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[0], childItems[0]]),
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[1], childItems[0]]),
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[1], childItems[1]]),
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(parentFilter, childFilter);
+                statisticsDbContext.Observation.AddRange(observations);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
+
+                var result = await dataSet.ListFilterItemRelationships(
+                    parentFilterId: parentFilter.Id,
+                    childFilterId: childFilter.Id
+                );
+
+                Assert.Equal(
+                    new HashSet<(Guid, Guid)>
+                    {
+                        (parentItems[0].Id, childItems[0].Id),
+                        (parentItems[1].Id, childItems[0].Id),
+                        (parentItems[1].Id, childItems[1].Id),
+                    },
+                    result.ToHashSet()
+                );
+            }
+        }
+
+        [Fact]
+        public async Task FiltersBelongToOtherSubject_ReturnsEmpty()
+        {
+            var otherSubject = new Subject { Id = Guid.NewGuid() };
+
+            Filter parentFilter = Fixture
+                .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                .WithSubject(otherSubject);
+            Filter childFilter = Fixture
+                .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                .WithSubject(otherSubject);
+
+            Observation observation = Fixture
+                .DefaultObservation()
+                .WithSubject(otherSubject)
+                .WithFilterItems([
+                    parentFilter.FilterGroups[0].FilterItems[0],
+                    childFilter.FilterGroups[0].FilterItems[0],
+                ]);
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(parentFilter, childFilter);
+                statisticsDbContext.Observation.Add(observation);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: Guid.NewGuid());
+
+                var result = await dataSet.ListFilterItemRelationships(
+                    parentFilterId: parentFilter.Id,
+                    childFilterId: childFilter.Id
+                );
+
+                Assert.Empty(result);
+            }
+        }
+    }
+
     public class ListFiltersExcludingItemsTests : StatisticsDbDataSetTests
     {
         [Fact]
