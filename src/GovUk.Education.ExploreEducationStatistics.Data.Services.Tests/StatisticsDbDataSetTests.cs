@@ -496,28 +496,43 @@ public abstract class StatisticsDbDataSetTests
     public class ListFilterItemsTests : StatisticsDbDataSetTests
     {
         [Fact]
-        public async Task FilterItemIds_ReturnedWithFilterGroupAndFilter()
+        public async Task FilterItemIds_ReturnedWithFilterGroupAndFilterForSubjectOnly()
         {
+            var subjectId = Guid.NewGuid();
+
             var filter = new Filter
             {
+                SubjectId = subjectId,
                 FilterGroups = [new() { FilterItems = [new(), new()] }, new() { FilterItems = [new()] }],
             };
 
+            var otherSubjectFilter = new Filter
+            {
+                SubjectId = Guid.NewGuid(),
+                FilterGroups = [new() { FilterItems = [new()] }],
+            };
+
             var filterItems = filter.FilterGroups.SelectMany(fg => fg.FilterItems).ToList();
+            var otherSubjectFilterItem = otherSubjectFilter.FilterGroups[0].FilterItems[0];
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                statisticsDbContext.Filter.Add(filter);
+                statisticsDbContext.Filter.AddRange(filter, otherSubjectFilter);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var dataSet = BuildDataSet(statisticsDbContext, subjectId: Guid.NewGuid());
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId);
 
-                var result = await dataSet.ListFilterItems([filterItems[0].Id, filterItems[2].Id, Guid.NewGuid()]);
+                var result = await dataSet.ListFilterItems([
+                    filterItems[0].Id,
+                    filterItems[2].Id,
+                    otherSubjectFilterItem.Id,
+                    Guid.NewGuid(),
+                ]);
 
                 Assert.Equal(2, result.Count);
 

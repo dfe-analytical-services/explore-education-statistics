@@ -19,14 +19,14 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public async Task AddStorageDataSets_ResolvesStatisticsDbDataSet()
+    public void AddStorageDataSets_CreatesStatisticsDbDataSet()
     {
         using var scope = BuildServiceProvider().CreateScope();
 
-        var resolver = scope.ServiceProvider.GetRequiredService<StatisticsDbDataSetResolver>();
+        var factory = scope.ServiceProvider.GetRequiredService<StatisticsDbDataSetFactory>();
 
         // The data set is created per subject rather than registered, so its collaborators are only checked here
-        Assert.IsType<StatisticsDbDataSet>(await resolver.Resolve(Guid.NewGuid()));
+        Assert.IsType<StatisticsDbDataSet>(factory.Create(Guid.NewGuid()));
     }
 
     // Only the db contexts and logging are registered, so that resolving proves the extension registers every

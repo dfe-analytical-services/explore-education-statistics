@@ -2,13 +2,14 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils;
 
 public static class StorageDataSetTestUtils
 {
@@ -27,7 +28,7 @@ public static class StorageDataSetTestUtils
     {
         return new StorageDataSetResolver(
             contentDbContext: contentDbContext,
-            statisticsDbDataSetResolver: BuildStatisticsDbDataSetResolver(
+            statisticsDbDataSetFactory: BuildStatisticsDbDataSetFactory(
                 statisticsDbContext,
                 observationService,
                 allObservationsMatchedFilterItemsStrategy,
@@ -38,11 +39,35 @@ public static class StorageDataSetTestUtils
     }
 
     /// <summary>
-    /// Builds a real <see cref="StatisticsDbDataSetResolver" /> over the given (typically in-memory) context.
+    /// An <see cref="IStorageDataSetResolver" /> that resolves every subject to a <see cref="StatisticsDbDataSet" />
+    /// over the given (typically in-memory) context without consulting the content database, for tests that only
+    /// seed the statistics database.
+    /// </summary>
+    public static IStorageDataSetResolver BuildStatisticsDbDataSetResolver(
+        StatisticsDbContext statisticsDbContext,
+        IObservationService? observationService = null,
+        IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,
+        ISparseObservationsMatchedFilterItemsStrategy? sparseObservationsMatchedFilterItemsStrategy = null,
+        IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null
+    )
+    {
+        return new StatisticsDbOnlyResolver(
+            BuildStatisticsDbDataSetFactory(
+                statisticsDbContext,
+                observationService,
+                allObservationsMatchedFilterItemsStrategy,
+                sparseObservationsMatchedFilterItemsStrategy,
+                denseObservationsMatchedFilterItemsStrategy
+            )
+        );
+    }
+
+    /// <summary>
+    /// Builds a real <see cref="StatisticsDbDataSetFactory" /> over the given (typically in-memory) context.
     /// The raw SQL temp table plumbing cannot run against the in-memory provider, so those collaborators default
     /// to Strict mocks and tests seed <c>MatchedObservations</c> directly instead.
     /// </summary>
-    public static StatisticsDbDataSetResolver BuildStatisticsDbDataSetResolver(
+    public static StatisticsDbDataSetFactory BuildStatisticsDbDataSetFactory(
         StatisticsDbContext statisticsDbContext,
         IObservationService? observationService = null,
         IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,
@@ -66,7 +91,7 @@ public static class StorageDataSetTestUtils
             )
             .AddSingleton(Mock.Of<ILogger<StatisticsDbDataSet>>());
 
-        return new StatisticsDbDataSetResolver(services.BuildServiceProvider());
+        return new StatisticsDbDataSetFactory(services.BuildServiceProvider());
     }
 
     /// <summary>
@@ -80,5 +105,18 @@ public static class StorageDataSetTestUtils
         resolver.Setup(r => r.Resolve(subjectId, It.IsAny<CancellationToken>())).ReturnsAsync(dataSet);
 
         return resolver;
+    }
+
+    private class StatisticsDbOnlyResolver(StatisticsDbDataSetFactory factory) : IStorageDataSetResolver
+    {
+        public Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IStorageDataSet>(factory.Create(subjectId));
+        }
+
+        public Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IStorageDataSet?>(factory.Create(subjectId));
+        }
     }
 }

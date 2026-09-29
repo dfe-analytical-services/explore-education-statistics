@@ -10,12 +10,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 /// <summary>
 /// Resolves a data set to the <see cref="IStorageDataSet" /> implementation for the
 /// <see cref="DataStorageVersion" /> recorded against its data file.
+///
+/// Registered per scope, so each subject's data file is looked up at most once per request.
 /// </summary>
 public class StorageDataSetResolver(
     ContentDbContext contentDbContext,
-    StatisticsDbDataSetResolver statisticsDbDataSetResolver
+    StatisticsDbDataSetFactory statisticsDbDataSetFactory
 ) : IStorageDataSetResolver
 {
+    private readonly Dictionary<Guid, IStorageDataSet?> _resolved = [];
+
     public async Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
     {
         return await TryResolve(subjectId, cancellationToken)
@@ -24,16 +28,25 @@ public class StorageDataSetResolver(
 
     public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
     {
+        if (_resolved.TryGetValue(subjectId, out var dataSet))
+        {
+            return dataSet;
+        }
+
         var dataStorageVersion = await contentDbContext
             .Files.Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
             .Select(file => (DataStorageVersion?)file.DataStorageVersion)
             .SingleOrDefaultAsync(cancellationToken);
 
-        return dataStorageVersion switch
+        dataSet = dataStorageVersion switch
         {
-            DataStorageVersion.StatsDB => await statisticsDbDataSetResolver.Resolve(subjectId, cancellationToken),
+            DataStorageVersion.StatsDB => statisticsDbDataSetFactory.Create(subjectId),
             null => null,
             _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
         };
+
+        _resolved[subjectId] = dataSet;
+
+        return dataSet;
     }
 }
