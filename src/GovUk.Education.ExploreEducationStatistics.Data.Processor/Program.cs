@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,13 @@ var host = new HostBuilder()
                         providerOptions => providerOptions.EnableCustomRetryOnFailure()
                     )
                 )
+                .AddDbContext<StatisticsDbContext>(options =>
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()
+                    )
+                )
+                .AddStorageDataSets()
                 .AddSingleton<IBlobSasService, BlobSasService>()
                 .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(
                     provider => new PrivateBlobStorageService(
