@@ -105,6 +105,7 @@ const ReleaseCreatePage = () => {
             templateReleaseId: '',
             releaseType: undefined,
             releaseLabel: '',
+            publishingOrganisations: [],
           }}
           releaseVersion={0}
           templateRelease={model?.templateRelease}

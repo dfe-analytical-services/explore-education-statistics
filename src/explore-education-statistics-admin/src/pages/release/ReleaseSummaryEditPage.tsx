@@ -83,7 +83,7 @@ export default function ReleaseSummaryEditPage() {
               publishingOrganisations:
                 releaseVersion.publishingOrganisations?.map(
                   organisation => organisation.id,
-                ),
+                ) ?? [],
             }}
             releaseVersion={releaseVersion.version}
             onSubmit={handleSubmit}
