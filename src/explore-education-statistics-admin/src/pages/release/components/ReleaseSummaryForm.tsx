@@ -159,11 +159,17 @@ export default function ReleaseSummaryForm({
   const disableReleaseSlugChange = releaseVersion > 0;
 
   // Pre-select DfE if there is no saved publishing organisation.
+  const defaultPublishingOrganisationId = organisations?.find(
+    organisation => organisation.title === defaultOrganisation.title,
+  )?.id;
+
   const initialValuesWithDefaults: ReleaseSummaryFormValues = {
     ...initialValues,
-    publishingOrganisations: initialValues.publishingOrganisations?.length
-      ? initialValues.publishingOrganisations
-      : [defaultOrganisation.id],
+    publishingOrganisations:
+      initialValues.publishingOrganisations?.length ||
+      !defaultPublishingOrganisationId
+        ? initialValues.publishingOrganisations
+        : [defaultPublishingOrganisationId],
   };
 
   return (
