@@ -1,6 +1,12 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Analytics.Writers;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,4 +20,22 @@ public static class ServiceCollectionExtensions
             .WhenEnabled.AddWriteStrategy<CaptureTableToolDownloadCallAnalyticsWriteStrategy>()
             .AddWriteStrategy<CapturePermaLinkTableDownloadCallAnalyticsWriteStrategy>()
             .Services;
+
+    /// <summary>
+    /// Registers <see cref="IStorageDataSetResolver" /> together with everything needed to read data sets from
+    /// each supported storage, so that hosts need not know which collaborators a particular storage requires.
+    /// </summary>
+    public static IServiceCollection AddStorageDataSets(this IServiceCollection services) =>
+        services
+            .AddTransient<IStorageDataSetResolver, StorageDataSetResolver>()
+            // StatsDB
+            .AddTransient<StatisticsDbDataSetResolver>()
+            .AddTransient<IObservationService, ObservationService>()
+            .AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>()
+            .AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>()
+            .AddTransient<ISparseObservationsMatchedFilterItemsStrategy, SparseObservationsMatchedFilterItemsStrategy>()
+            .AddTransient<IDenseObservationsMatchedFilterItemsStrategy, DenseObservationsMatchedFilterItemsStrategy>()
+            .AddTransient<ISqlStatementsHelper, SqlStatementsHelper>()
+            .AddTransient<IRawSqlExecutor, RawSqlExecutor>()
+            .AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
 }
