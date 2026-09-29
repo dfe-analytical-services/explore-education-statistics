@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -174,12 +175,14 @@ public class ProcessorStage2Tests
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest,
                 Type = FileType.Metadata,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             TotalRows = 16,
             Status = DataImportStatus.STAGE_2,
@@ -230,9 +233,16 @@ public class ProcessorStage2Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var guidGenerator = new SequentialGuidGenerator();
 
