@@ -27,9 +27,9 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddStorageDataSets(this IServiceCollection services) =>
         services
-            .AddTransient<IStorageDataSetResolver, StorageDataSetResolver>()
+            .AddScoped<IStorageDataSetResolver, StorageDataSetResolver>()
             // StatsDB
-            .AddTransient<StatisticsDbDataSetResolver>()
+            .AddTransient<StatisticsDbDataSetFactory>()
             .AddTransient<IObservationService, ObservationService>()
             .AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>()
             .AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>()

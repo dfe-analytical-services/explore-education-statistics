@@ -293,9 +293,14 @@ public class FootnoteService : IFootnoteService
                 break;
             }
 
-            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
+            var dataSet = await _storageDataSetResolver.TryResolve(subjectId);
 
-            if (unlinkedFilterIds.Count > 0 || unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
+            if (dataSet is null)
+            {
+                continue;
+            }
+
+            if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
             {
                 var filters = await dataSet.ListFilters();
 
@@ -337,6 +342,12 @@ public class FootnoteService : IFootnoteService
                         }
                     }
                 }
+            }
+            else if (unlinkedFilterIds.Count > 0)
+            {
+                var filters = await dataSet.ListFiltersExcludingItems();
+
+                unlinkedFilterIds.ExceptWith(filters.Select(f => f.Id));
             }
 
             if (unlinkedIndicatorIds.Count > 0)
