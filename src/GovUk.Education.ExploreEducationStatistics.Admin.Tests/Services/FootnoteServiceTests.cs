@@ -23,8 +23,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -499,7 +499,10 @@ public class FootnoteServiceTests
         dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
         dataSet.Setup(ds => ds.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(indicatorGroup));
 
-        var storageDataSetResolver = MockStorageDataSetResolver(subject1.Id, dataSet.Object);
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.TryResolve(subject1.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -519,7 +522,58 @@ public class FootnoteServiceTests
     }
 
     [Fact]
-    public async Task CreateFootnote_OnlyFilterIdsSpecified_DoesNotReadIndicators()
+    public async Task CreateFootnote_SubjectWithoutDataFile_IsSkipped()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var filter = _fixture.DefaultFilter().Generate();
+        var subjectWithoutDataFile = _fixture.DefaultSubject().Generate();
+        var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
+        var releaseSubjectWithoutDataFile = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subjectWithoutDataFile)
+            .Generate();
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subjectWithoutDataFile, subject),
+            releaseSubjects: ListOf(releaseSubjectWithoutDataFile, releaseSubject)
+        );
+
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        dataSet.Setup(ds => ds.ListFiltersExcludingItems(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.TryResolve(subjectWithoutDataFile.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IStorageDataSet?)null);
+        storageDataSetResolver
+            .Setup(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(filter.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(dataSet);
+        storageDataSetResolver.Verify(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()), Times.Once);
+
+        result.AssertRight();
+    }
+
+    [Fact]
+    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersExcludingItemsOnly()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
         var filter = _fixture.DefaultFilter().Generate();
@@ -540,9 +594,12 @@ public class FootnoteServiceTests
         );
 
         var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet.Setup(ds => ds.ListFiltersExcludingItems(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
 
-        var storageDataSetResolver = MockStorageDataSetResolver(subject.Id, dataSet.Object);
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,

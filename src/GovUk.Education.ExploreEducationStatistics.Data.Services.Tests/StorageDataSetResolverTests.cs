@@ -3,8 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils.StorageDataSetTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
@@ -29,6 +29,24 @@ public abstract class StorageDataSetResolverTests
 
             var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
             Assert.Equal(subjectId, dataSet.SubjectId);
+        }
+
+        [Fact]
+        public async Task SameSubjectResolvedTwice_ReturnsSameInstance()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var contentDbContextId = await SeedDataFile(subjectId);
+
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
+
+            var first = await resolver.Resolve(subjectId);
+            var second = await resolver.Resolve(subjectId);
+
+            Assert.Same(first, second);
         }
 
         [Fact]
