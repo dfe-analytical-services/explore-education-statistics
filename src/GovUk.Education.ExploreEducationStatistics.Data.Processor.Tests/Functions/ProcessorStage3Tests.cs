@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -27,6 +28,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
@@ -169,9 +171,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -384,9 +396,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -519,9 +541,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -669,9 +701,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -808,9 +850,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -977,9 +1029,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -1120,9 +1182,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -1235,9 +1307,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -1390,9 +1472,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
@@ -1564,9 +1656,19 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 

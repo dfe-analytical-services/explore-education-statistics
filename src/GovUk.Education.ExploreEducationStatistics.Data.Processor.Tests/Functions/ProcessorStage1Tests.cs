@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -53,12 +54,14 @@ public class ProcessorStage1Tests
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest,
                 Type = FileType.Metadata,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Status = DataImportStatus.STAGE_1,
         };
@@ -108,9 +111,16 @@ public class ProcessorStage1Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
