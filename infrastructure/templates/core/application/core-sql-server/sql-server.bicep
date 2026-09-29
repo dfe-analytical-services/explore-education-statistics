@@ -98,12 +98,24 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
       {
         name: 'content'
         config: contentDbConfig
-        longTermMonthlyRetention: 'P12M'
+        extendedConfig: {
+          type: 'primary'
+          longTermWeeklyRetention: 'P4W'
+          longTermMonthlyRetention: 'P12M'
+          longTermYearlyRetention: 'P1Y'
+          longTermRetentionWeekOfYear: 1
+        }
       }
       {
         name: statisticsDbName
         config: statisticsDbConfig
-        longTermMonthlyRetention: 'P3M'
+        extendedConfig: {
+          type: 'primary'
+          longTermWeeklyRetention: 'P4W'
+          longTermMonthlyRetention: 'P3M'
+          longTermYearlyRetention: 'P1Y'
+          longTermRetentionWeekOfYear: 1
+        }
       }
     ]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

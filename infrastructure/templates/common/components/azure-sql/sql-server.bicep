@@ -51,15 +51,6 @@ param loggingStorageAccountName string
 @description('The databases to create on this SQL Server.')
 param databases SqlDatabaseDefinition[]
 
-@description('Weekly long term backup retention, applied to all databases.')
-param longTermWeeklyRetention string = 'P4W'
-
-@description('Yearly long term backup retention, applied to all databases.')
-param longTermYearlyRetention string = 'P1Y'
-
-@description('Week of the year that the yearly long term backup is taken, applied to all databases.')
-param longTermRetentionWeekOfYear int = 1
-
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -134,11 +125,7 @@ module databaseModules 'database.bicep' = [
       location: location
       resourceName: db.name
       config: db.config
-      longTermMonthlyRetention: db.?longTermMonthlyRetention
-      geoReplicaSourceDatabaseId: db.?geoReplicaSourceDatabaseId
-      longTermWeeklyRetention: longTermWeeklyRetention
-      longTermYearlyRetention: longTermYearlyRetention
-      longTermRetentionWeekOfYear: longTermRetentionWeekOfYear
+      extendedConfig: db.extendedConfig
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       alertsGroupName: alertsGroupName
       deployAlerts: deployAlerts

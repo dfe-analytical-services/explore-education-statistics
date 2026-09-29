@@ -1,4 +1,4 @@
-import { AzureSqlDatabaseConfig } from 'types.bicep'
+import { AzureSqlDatabaseConfig, SqlDatabaseDefinition } from 'types.bicep'
 
 @description('Name of the SQL Server that this database belongs to.')
 param sqlServerName string
@@ -12,20 +12,8 @@ param resourceName string
 @description('Configuration for the database.')
 param config AzureSqlDatabaseConfig
 
-@description('Monthly long term backup retention, e.g. "P12M" or "P3M". Required unless this database is a geo-replica.')
-param longTermMonthlyRetention string?
-
-@description('Resource id of the primary database, if this database is to be created as a geo-replica of it.')
-param geoReplicaSourceDatabaseId string?
-
-@description('Weekly long term backup retention.')
-param longTermWeeklyRetention string = 'P4W'
-
-@description('Yearly long term backup retention.')
-param longTermYearlyRetention string = 'P1Y'
-
-@description('Week of the year that the yearly long term backup is taken.')
-param longTermRetentionWeekOfYear int = 1
+@description('Settings specific to whether this is a primary database or a geo-replica.')
+param extendedConfig SqlDatabaseDefinition.extendedConfig
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -43,16 +31,13 @@ var databaseTagValues = union(tagValues, {
   ServiceType: 'SQL Database'
 })
 
-var isGeoReplica = geoReplicaSourceDatabaseId != null
-
-// Backup, auditing and encryption settings are inherited from the primary database by geo-replicas.
 var primaryDatabaseProperties = {
   requestedBackupStorageRedundancy: 'Geo'
 }
 
 var geoReplicaDatabaseProperties = {
   createMode: 'OnlineSecondary'
-  sourceDatabaseId: geoReplicaSourceDatabaseId
+  sourceDatabaseId: extendedConfig.?geoReplicaSourceDatabaseId
   secondaryType: 'Geo'
 }
 
@@ -94,19 +79,25 @@ resource database 'Microsoft.Sql/servers/databases@2025-01-01' = {
     autoPauseDelay: -1
     // Workaround for Bicep validation on minCapacity which doesn't accept float values.
     minCapacity: config.?minCapacity != null ? json(config.minCapacity!) : null
-    ...(isGeoReplica ? geoReplicaDatabaseProperties : primaryDatabaseProperties)
+    ...(extendedConfig.type == 'georeplica' ? geoReplicaDatabaseProperties : primaryDatabaseProperties)
   }
   tags: databaseTagValues
 }
 
-resource databaseAuditingSettings 'Microsoft.Sql/servers/databases/extendedAuditingSettings@2025-01-01' = if (!isGeoReplica) {
-  parent: database
-  name: 'default'
-  properties: {
-    state: 'Disabled'
+// Backup, auditing and encryption settings are inherited from the primary database by geo-replicas.
+module primaryDatabaseSettingsModule 'primary-database-settings.bicep' = if (extendedConfig.type != 'georeplica') {
+  name: '${sqlServerName}-${resourceName}PrimarySettingsDeploy'
+  params: {
+    sqlServerName: sqlServerName
+    databaseName: database.name
+    longTermWeeklyRetention: extendedConfig.longTermWeeklyRetention
+    longTermMonthlyRetention: extendedConfig.longTermMonthlyRetention
+    longTermYearlyRetention: extendedConfig.longTermYearlyRetention
+    longTermRetentionWeekOfYear: extendedConfig.longTermRetentionWeekOfYear
   }
 }
 
+// Diagnostics are applied to both primaries and replicas.
 resource databaseDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: 'serverAuditToLogAnalytics'
   scope: database
@@ -115,34 +106,17 @@ resource databaseDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
     logs: databaseDiagnosticsLogsAndMetrics.logs
     metrics: databaseDiagnosticsLogsAndMetrics.metrics
   }
+  // Added to prevent diagnosticSettings from rolling out in parallel with primary
+  // database settings. In the case of a replica, this can execute immediately.
   dependsOn: [
-    databaseAuditingSettings
+    primaryDatabaseSettingsModule
   ]
-}
-
-resource databaseLongTermRetentionPolicy 'Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies@2025-01-01' = if (!isGeoReplica) {
-  parent: database
-  name: 'default'
-  properties: {
-    weeklyRetention: longTermWeeklyRetention
-    monthlyRetention: longTermMonthlyRetention!
-    yearlyRetention: longTermYearlyRetention
-    weekOfYear: longTermRetentionWeekOfYear
-  }
-}
-
-resource databaseTransparentDataEncryption 'Microsoft.Sql/servers/databases/transparentDataEncryption@2025-01-01' = if (!isGeoReplica) {
-  parent: database
-  name: 'current'
-  properties: {
-    state: 'Enabled'
-  }
 }
 
 module databaseAlertsModule 'database-alerts.bicep' = {
   name: '${alertsResourceName}AlertsDeploy'
   params: {
-    resourceName: alertsResourceName
+    databaseAlertsPrefix: alertsResourceName
     databaseId: database.id
     alertsGroupName: alertsGroupName
     deployAlerts: deployAlerts

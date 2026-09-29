@@ -91,7 +91,10 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
       {
         name: 'statistics'
         config: statisticsDbConfig
-        geoReplicaSourceDatabaseId: statisticsPrimaryDatabaseId
+        extendedConfig: {
+          type: 'georeplica'
+          geoReplicaSourceDatabaseId: statisticsPrimaryDatabaseId
+        }
       }
     ]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

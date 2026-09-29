@@ -1,10 +1,10 @@
 import { staticAverageGreaterThanZero, staticMaxGreaterThanZero, staticTotalGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { fastEvaluation } from '../alerts/evaluation-config.bicep'
 
-@description('Name used to identify the database in alert and deployment names, e.g. "s101d01-sqlsvr-ees-01-statistics".')
-param resourceName string
+@description('Name used to prefix alert and deployment names for the target database.')
+param databaseAlertsPrefix string
 
-@description('Resource id of the database that these alerts are being applied to.')
+@description('Resource id of the database that these alerts are being applied to. Passed as the id of every alert.')
 param databaseId string
 
 @description('Name of the Action Group that receives alerts.')
@@ -17,9 +17,9 @@ param deployAlerts bool
 param tagValues object
 
 module cpuPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}CpuPercentAlertDeploy'
+  name: '${databaseAlertsPrefix}CpuPercentAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -37,9 +37,9 @@ module cpuPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
 }
 
 module dataIoPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DataIoPercentAlertDeploy'
+  name: '${databaseAlertsPrefix}DataIoPercentAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -57,9 +57,9 @@ module dataIoPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts
 }
 
 module failedConnectionsAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}FailedConnectionsAlertDeploy'
+  name: '${databaseAlertsPrefix}FailedConnectionsAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -76,9 +76,9 @@ module failedConnectionsAlert '../alerts/staticMetricAlert.bicep' = if (deployAl
 }
 
 module deadlockAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DeadlockAlertDeploy'
+  name: '${databaseAlertsPrefix}DeadlockAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -95,9 +95,9 @@ module deadlockAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
 }
 
 module dataSpaceUsedPercentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DataSpaceUsedPercentAlertDeploy'
+  name: '${databaseAlertsPrefix}DataSpaceUsedPercentAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -115,9 +115,9 @@ module dataSpaceUsedPercentAlert '../alerts/staticMetricAlert.bicep' = if (deplo
 }
 
 module dataSpaceUsedPercentUrgentAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}DataSpaceUrgentAlertDeploy'
+  name: '${databaseAlertsPrefix}DataSpaceUrgentAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
@@ -136,9 +136,9 @@ module dataSpaceUsedPercentUrgentAlert '../alerts/staticMetricAlert.bicep' = if 
 }
 
 module blockedByFirewallAlert '../alerts/staticMetricAlert.bicep' = if (deployAlerts) {
-  name: '${resourceName}BlockedByFirewallAlertDeploy'
+  name: '${databaseAlertsPrefix}BlockedByFirewallAlertDeploy'
   params: {
-    resourceName: resourceName
+    resourceName: databaseAlertsPrefix
     id: databaseId
     resourceMetric: {
       resourceType: 'Microsoft.Sql/servers/databases'
