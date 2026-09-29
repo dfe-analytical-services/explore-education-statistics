@@ -23,7 +23,7 @@ Create new publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
-Verify default "Published by" shows as Department for Education
+Verify "Published by" shows as Department for Education
     user checks published by in admin    ${DEFAULT_ORGANISATION_TEXT}
 
 Go back to "Release summary" page
@@ -36,9 +36,8 @@ Set "Published by" options for release
     user clicks link    Edit release summary
     user waits until page finishes loading
     user waits until h2 is visible    Edit release summary
-    user checks checkbox is not checked    Department for Education
+    user checks checkbox is checked    Department for Education
     user checks checkbox is not checked    Skills England
-    user clicks checkbox    Department for Education
     user clicks checkbox    Skills England
     user clicks button    Update release summary
     user waits until h2 is visible    Release summary
@@ -90,13 +89,12 @@ Verify the Organisation checkboxes are preselected
     user checks checkbox is checked    Department for Education
     user checks checkbox is checked    Skills England
 
-Verify the user can unselect organisations for amendment
-    user clicks checkbox    Department for Education
+Verify the user can unselect an organisation for amendment
     user clicks checkbox    Skills England
     user clicks button    Update release summary
     user waits until h2 is visible    Release summary
 
-Verify "Published by" shows default organisation
+Verify "Published by" shows remaining organisation
     user checks published by in admin    ${DEFAULT_ORGANISATION_TEXT}
 
 Publish amendment
@@ -108,7 +106,7 @@ Publish amendment
     user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
-Verify default organisation is showing on public page again
+Verify remaining organisation is showing on public page
     user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user checks published by on public release page
     ...    ${DEFAULT_ORGANISATION_TEXT}
