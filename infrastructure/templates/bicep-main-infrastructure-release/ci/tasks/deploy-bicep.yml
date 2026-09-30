@@ -22,13 +22,13 @@ steps:
     inputs:
       operation: ${{ parameters.action }}
       validationLevel: template
-      name: '$(Release.ReleaseName)-$(Release.AttemptNumber)-${{ parameters.action }}'
+      name: MainInfrastructure$(Build.BuildNumber)-${{ parameters.action }}
       azureResourceManagerConnection: ${{ parameters.serviceConnection }}
       subscriptionId: ${{ parameters.subscriptionId }}
       resourceGroupName: ${{ parameters.resourceGroupName }}
       templateFile: $(templateFile)
       parametersFile: ${{ parameters.parameterFile }}
       parameters: |
-        tags: '$(resourceTags)'
+        tags: $(resourceTags)
         environmentPipelineVariables:
           maintenanceIpRanges: $(maintenanceFirewallRules)
