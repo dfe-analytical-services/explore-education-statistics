@@ -1,7 +1,7 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
-import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
@@ -50,9 +50,6 @@ param adminConfigParam AdminConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
-
-// These values are all supplied specifically by pipeline variables.
-param adminPipelineVariables AdminPipelineVariables = {}
 
 
 
@@ -254,9 +251,9 @@ module adminModuleDeploy '../admin/main.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
     enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
-    publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
-    screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
+    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
+    publicDataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
+    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
     publicApiUrl: publicApiConfig.publicUrl!
     publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
     prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
