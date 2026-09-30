@@ -1,8 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import {
-  MethodologyRouteParams,
-  methodologySummaryEditRoute,
-} from '@admin/routes/methodologyRoutes';
+import { methodologySummaryEditRoute } from '@admin/routes/methodologyRoutes';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -10,10 +7,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import React from 'react';
 import { generatePath } from 'react-router';
-import {
-  publicationReleasesRoute,
-  PublicationRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import Link from '@admin/components/Link';
 
 const MethodologySummaryPage = () => {
@@ -36,10 +30,9 @@ const MethodologySummaryPage = () => {
             </SummaryListItem>
             <SummaryListItem term="Owning publication">
               <Link
-                to={generatePath<PublicationRouteParams>(
-                  publicationReleasesRoute.path,
-                  { publicationId: methodology.owningPublication.id },
-                )}
+                to={generatePath(publicationReleasesRoute.fullPath, {
+                  publicationId: methodology.owningPublication.id,
+                })}
               >
                 {methodology.owningPublication.title}
               </Link>
@@ -54,8 +47,8 @@ const MethodologySummaryPage = () => {
                         data-testid="other-publication-item"
                       >
                         <Link
-                          to={`${generatePath<PublicationRouteParams>(
-                            publicationReleasesRoute.path,
+                          to={`${generatePath(
+                            publicationReleasesRoute.fullPath,
                             { publicationId: publication.id },
                           )}`}
                         >
@@ -70,12 +63,9 @@ const MethodologySummaryPage = () => {
 
           {methodology.status !== 'Approved' && (
             <ButtonLink
-              to={generatePath<MethodologyRouteParams>(
-                methodologySummaryEditRoute.path,
-                {
-                  methodologyId,
-                },
-              )}
+              to={generatePath(methodologySummaryEditRoute.fullPath, {
+                methodologyId,
+              })}
             >
               Edit summary
             </ButtonLink>

@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -18,7 +18,7 @@ public static class PublicationGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Summary)
             .SetDefault(p => p.Title)
-            .SetContact(
+            .SetContact(() =>
                 new Contact
                 {
                     Id = Guid.NewGuid(),
@@ -217,7 +217,12 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
         Contact contact
-    ) => setters.Set(p => p.Contact, contact).SetContactId(contact.Id);
+    ) => setters.SetContact(() => contact);
+
+    private static InstanceSetters<Publication> SetContact(
+        this InstanceSetters<Publication> setters,
+        Func<Contact> contact
+    ) => setters.Set(p => p.Contact, contact).Set(p => p.ContactId, (_, publication) => publication.Contact.Id);
 
     private static InstanceSetters<Publication> SetContactId(
         this InstanceSetters<Publication> setters,

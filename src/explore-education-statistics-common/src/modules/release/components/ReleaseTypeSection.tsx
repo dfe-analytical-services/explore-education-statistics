@@ -18,7 +18,7 @@ const releaseTypeComponents = {
 };
 
 export interface ReleaseTypeSectionProps {
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
   showHeading?: boolean;
 }
 

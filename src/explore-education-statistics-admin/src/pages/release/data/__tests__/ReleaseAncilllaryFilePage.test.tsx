@@ -1,7 +1,7 @@
 import ReleaseAncillaryFilePage from '@admin/pages/release/data/ReleaseAncillaryFilePage';
 import {
   releaseAncillaryFileRoute,
-  ReleaseAncillaryFileRouteParams,
+  releaseDataRoute,
 } from '@admin/routes/releaseRoutes';
 import _releaseAncillaryFileService, {
   AncillaryFile,
@@ -9,9 +9,13 @@ import _releaseAncillaryFileService, {
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import React from 'react';
-import { generatePath, Route, Router } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import {
+  expectLocation,
+  expectLocationHash,
+} from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
@@ -95,39 +99,31 @@ describe('ReleaseAncillaryFilePage', () => {
     releaseAncillaryFileService.getFile.mockResolvedValue(testFile);
     releaseAncillaryFileService.listFiles.mockResolvedValue([testFile]);
 
-    const history = createMemoryHistory();
-
-    await renderPage(history);
+    await renderPage();
 
     await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
-    await waitFor(() => {
-      expect(history.location.pathname).toBe(
-        '/publication/publication-1/release/release-1/data',
-      );
-      expect(history.location.hash).toBe('#file-uploads');
+    await waitFor(async () => {
+      await expectLocation('/publication/publication-1/release/release-1/data');
+      await expectLocationHash('#file-uploads');
     });
   });
 
-  async function renderPage(history: MemoryHistory = createMemoryHistory()) {
-    history.push(
-      generatePath<ReleaseAncillaryFileRouteParams>(
-        releaseAncillaryFileRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-          fileId: 'file-1',
-        },
-      ),
-    );
+  async function renderPage() {
+    const path = generatePath(releaseAncillaryFileRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+      fileId: 'file-1',
+    });
 
     render(
-      <Router history={history}>
-        <Route
-          path={releaseAncillaryFileRoute.path}
-          component={ReleaseAncillaryFilePage}
-        />
-      </Router>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={releaseAncillaryFileRoute.fullPath}
+        routes={[releaseDataRoute.fullPath]}
+      >
+        <ReleaseAncillaryFilePage />
+      </TestRouterRenderer>,
     );
 
     await waitFor(() => {

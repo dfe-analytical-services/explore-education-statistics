@@ -4,7 +4,6 @@ import {
   releaseApiDataSetDetailsRoute,
   releaseApiDataSetPreviewTokenRoute,
   ReleaseDataSetPreviewTokenRouteParams,
-  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import ApiDataSetPreviewTokenCreateForm from '@admin/pages/release/data/components/ApiDataSetPreviewTokenCreateForm';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
@@ -14,19 +13,20 @@ import useToggle from '@common/hooks/useToggle';
 import Button from '@common/components/Button';
 import Modal from '@common/components/Modal';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useHistory, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import React from 'react';
 import { PreviewTokenCreateValues } from '@admin/pages/release/data/types/PreviewTokenCreateValues';
 import PreviewTokenDateHelper from '@admin/pages/release/data/utils/previewTokenDateHelper';
+import { useNavigate } from 'react-router';
 
 export default function ReleaseApiDataSetPreviewPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { publicApiDocsUrl } = useConfig();
 
   const [modalOpen, toggleModalOpen] = useToggle(false);
 
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetPreviewTokenRouteParams>();
+    useParams<ReleaseDataSetPreviewTokenRouteParams>() as ReleaseDataSetPreviewTokenRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -55,16 +55,13 @@ export default function ReleaseApiDataSetPreviewPage() {
       expires: endDate,
     });
 
-    history.push(
-      generatePath<ReleaseDataSetPreviewTokenRouteParams>(
-        releaseApiDataSetPreviewTokenRoute.path,
-        {
-          publicationId,
-          releaseVersionId,
-          dataSetId,
-          previewTokenId: token.id,
-        },
-      ),
+    navigate(
+      generatePath(releaseApiDataSetPreviewTokenRoute.fullPath, {
+        publicationId,
+        releaseVersionId,
+        dataSetId,
+        previewTokenId: token.id,
+      }),
     );
   };
 
@@ -73,14 +70,11 @@ export default function ReleaseApiDataSetPreviewPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back to API data set details
       </Link>

@@ -1,4 +1,3 @@
-import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import {
@@ -11,7 +10,7 @@ export type LinkProps = {
   children: ReactNode;
   className?: string;
   unvisited?: boolean;
-} & OmitStrict<RouterLinkProps, 'href'>;
+} & RouterLinkProps;
 
 const Link = ({
   back,

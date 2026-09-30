@@ -5,9 +5,6 @@ import { StorageAccountConfig } from '../../../common/components/storage/types.b
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
-@description('Specifies the location for all resources.')
-param location string
-
 @description('Public API storage account and file share configuration.')
 param config StorageAccountConfig
 
@@ -29,10 +26,9 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
   parent: vNet
 }
 
-module publicApiStorageAccountModule '../../../common/components/storage/storageAccount.bicep' = {
+module publicApiStorageAccountModule '../../../common/components/storage/storage-account.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: resourceNames.publicApi.publicApiStorageAccount
     publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules

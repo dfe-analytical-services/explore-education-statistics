@@ -16,6 +16,7 @@ param principalIds string[]
 @description('Specifies the role to assign to the service principals')
 param role SearchServiceRole
 
+// TODO EES-7502 - standardise role assignment GUIDs.
 @description('The name of the role assignment resource. Auto-calculated by default, so little need to use this unless supporting existing role assignments when switching to Bicep.')
 param roleAssignmentNameOverride string?
 

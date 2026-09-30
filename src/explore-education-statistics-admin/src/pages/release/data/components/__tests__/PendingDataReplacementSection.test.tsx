@@ -1,11 +1,10 @@
 import { AuthContext, AuthContextState } from '@admin/contexts/AuthContext';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { ReleaseDataFileReplaceRouteParams } from '@admin/routes/releaseRoutes';
 import { ImportStatusCode } from '@admin/services/releaseDataFileService';
 import render from '@common-test/render';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { RouteComponentProps } from 'react-router';
+import { MemoryRouter } from 'react-router';
 import PendingDataReplacementSection from '../PendingDataReplacementSection';
 
 jest.mock('@admin/services/dataReplacementService');
@@ -15,21 +14,6 @@ jest.mock('@admin/services/releaseDataFileService', () => ({
     deleteDataFiles: jest.fn().mockResolvedValue(undefined),
   },
 }));
-
-const mockHistory: RouteComponentProps<ReleaseDataFileReplaceRouteParams>['history'] =
-  {
-    length: 1,
-    location: { pathname: '/', search: '', state: undefined, hash: '' },
-    push: jest.fn(),
-    replace: jest.fn(),
-    go: jest.fn(),
-    goBack: jest.fn(),
-    goForward: jest.fn(),
-    block: jest.fn(),
-    listen: jest.fn(),
-    createHref: jest.fn(),
-    action: 'PUSH',
-  };
 
 const defaultProps = {
   dataFileId: 'd4tad0e4-00fd-090a-ca30-0d00a0038ba0',
@@ -59,7 +43,6 @@ const defaultProps = {
   replacementDataFileError: undefined,
   publicationId: 'p0pfd0e4-00fd-090a-ca30-0d00a0038ba0',
   releaseVersionId: 'rel2fd0e4-00fd-090a-ca30-0d00a0038ba0',
-  history: mockHistory,
   fetchDataFile: jest.fn(),
 };
 
@@ -86,11 +69,14 @@ describe('PendingDataReplacementSection', () => {
 
   test('cancelling as an bau when there is a public API linked to the data file is not possible', async () => {
     render(
-      <TestConfigContextProvider>
-        <AuthContext value={{ user: bau }}>
-          <PendingDataReplacementSection {...defaultProps} />
-        </AuthContext>
-      </TestConfigContextProvider>,
+      <MemoryRouter>
+        <TestConfigContextProvider>
+          <AuthContext value={{ user: bau }}>
+            <PendingDataReplacementSection {...defaultProps} />
+          </AuthContext>
+        </TestConfigContextProvider>
+        ,
+      </MemoryRouter>,
     );
 
     expect(

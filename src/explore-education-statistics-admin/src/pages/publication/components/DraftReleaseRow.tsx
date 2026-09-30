@@ -8,7 +8,6 @@ import releaseVersionService, {
 } from '@admin/services/releaseVersionService';
 import {
   releaseChecklistRoute,
-  ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import DeleteDraftModal from '@admin/pages/admin-dashboard/components/DeleteDraftModal';
@@ -68,7 +67,7 @@ const DraftReleaseRow = ({
       <td>
         <div className={styles.actionsColumn}>
           <Link
-            to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+            to={generatePath(releaseSummaryRoute.fullPath, {
               publicationId,
               releaseVersionId: release.id,
             })}
@@ -132,7 +131,7 @@ const DraftReleaseRow = ({
             )}
           {totalIssues > 0 && (
             <Link
-              to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+              to={generatePath(releaseChecklistRoute.fullPath, {
                 publicationId,
                 releaseVersionId: release.id,
               })}

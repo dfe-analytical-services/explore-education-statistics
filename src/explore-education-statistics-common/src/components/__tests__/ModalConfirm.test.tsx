@@ -1,5 +1,5 @@
 import ModalConfirm from '@common/components/ModalConfirm';
-import delay from '@common/utils/delay';
+import createDeferredHandler from '@common-test/createDeferredHandler';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -9,9 +9,7 @@ describe('ModalConfirm', () => {
     test('clicking Confirm button disables all buttons and shows loading spinner', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
-      const handleConfirm = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handler: handleConfirm } = createDeferredHandler();
 
       render(
         <ModalConfirm
@@ -30,15 +28,17 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
-      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
+      expect(handleConfirm).toHaveBeenCalled();
+
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     });
 
     test('clicking Confirm button prevents closing modal using Esc', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
-      const handleConfirm = jest.fn();
+      const { handler: handleConfirm } = createDeferredHandler();
 
       render(
         <ModalConfirm
@@ -53,17 +53,19 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       await userEvent.keyboard('[Escape]');
 
-      await waitFor(() => {
-        expect(handleExit).not.toHaveBeenCalled();
-      });
+      expect(handleExit).not.toHaveBeenCalled();
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     test('clicking Confirm button prevents closing modal by clicking the underlay', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
-      const handleConfirm = jest.fn();
+      const { handler: handleConfirm } = createDeferredHandler();
 
       const { baseElement } = render(
         <ModalConfirm
@@ -78,21 +80,23 @@ describe('ModalConfirm', () => {
       );
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       await userEvent.click(
         baseElement.querySelector('.underlay') as HTMLElement,
       );
 
-      await waitFor(() => {
-        expect(handleExit).not.toHaveBeenCalled();
-      });
+      expect(handleExit).not.toHaveBeenCalled();
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     test('closes the modal once `onConfirm` has completed', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
-      const handleConfirm = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handler: handleConfirm, resolveHandler: resolveConfirm } =
+        createDeferredHandler();
 
       render(
         <ModalConfirm
@@ -107,12 +111,13 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
 
-      await waitFor(() => {
-        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
-      });
+      await resolveConfirm();
 
+      expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
@@ -170,9 +175,7 @@ describe('ModalConfirm', () => {
 
     test('clicking Cancel button disables all buttons and shows loading spinner', async () => {
       const handleExit = jest.fn();
-      const handleCancel = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handler: handleCancel } = createDeferredHandler();
       const handleConfirm = jest.fn();
 
       render(
@@ -188,14 +191,16 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
 
-      expect(screen.getByTestId('loadingSpinner')).toBeInTheDocument();
+      expect(handleCancel).toHaveBeenCalled();
+
+      expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
     });
 
     test('clicking Cancel button prevents closing modal using Esc', async () => {
       const handleExit = jest.fn();
-      const handleCancel = jest.fn();
+      const { handler: handleCancel } = createDeferredHandler();
       const handleConfirm = jest.fn();
 
       render(
@@ -211,15 +216,18 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       await userEvent.keyboard('[Escape]');
-      await waitFor(() => {
-        expect(handleExit).not.toHaveBeenCalled();
-      });
+
+      expect(handleExit).not.toHaveBeenCalled();
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     test('clicking Cancel button prevents closing modal by clicking the underlay', async () => {
       const handleExit = jest.fn();
-      const handleCancel = jest.fn();
+      const { handler: handleCancel } = createDeferredHandler();
       const handleConfirm = jest.fn();
 
       const { baseElement } = render(
@@ -235,20 +243,22 @@ describe('ModalConfirm', () => {
       );
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       await userEvent.click(
         baseElement.querySelector('.underlay') as HTMLElement,
       );
 
-      await waitFor(() => {
-        expect(handleExit).not.toHaveBeenCalled();
-      });
+      expect(handleExit).not.toHaveBeenCalled();
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     test('closes the modal once `onCancel` has completed', async () => {
       const handleExit = jest.fn();
-      const handleCancel = jest.fn(async () => {
-        await delay(100);
-      });
+      const { handler: handleCancel, resolveHandler: resolveCancel } =
+        createDeferredHandler();
       const handleConfirm = jest.fn();
 
       render(
@@ -264,12 +274,13 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
+      expect(await screen.findByTestId('loadingSpinner')).toBeInTheDocument();
+
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
 
-      await waitFor(() => {
-        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
-      });
+      await resolveCancel();
 
+      expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });

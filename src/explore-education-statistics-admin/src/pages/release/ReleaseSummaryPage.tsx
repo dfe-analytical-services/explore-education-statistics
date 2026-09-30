@@ -1,10 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  ReleaseRouteParams,
-  releaseSummaryEditRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryEditRoute } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseVersionService from '@admin/services/releaseVersionService';
 import Gate from '@common/components/Gate';
@@ -58,6 +55,7 @@ const ReleaseSummaryPage = () => {
               {releaseVersion.label ?? ''}
             </SummaryListItem>
             <SummaryListItem term="Published by">
+              {/* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */}
               {releaseVersion.publishingOrganisations?.length
                 ? releaseVersion.publishingOrganisations.map((org, index) => (
                     <Fragment key={org.id}>
@@ -78,13 +76,10 @@ const ReleaseSummaryPage = () => {
             }
           >
             <ButtonLink
-              to={generatePath<ReleaseRouteParams>(
-                releaseSummaryEditRoute.path,
-                {
-                  publicationId: releaseVersion.publicationId,
-                  releaseVersionId,
-                },
-              )}
+              to={generatePath(releaseSummaryEditRoute.fullPath, {
+                publicationId: releaseVersion.publicationId,
+                releaseVersionId,
+              })}
             >
               Edit release summary
             </ButtonLink>

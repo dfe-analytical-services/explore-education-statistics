@@ -59,6 +59,7 @@ export default function DataSetFileSummary({
     latestData,
     publication,
     published,
+    publishingOrganisationTitles,
     lastUpdated,
     release,
     theme,
@@ -151,6 +152,12 @@ export default function DataSetFileSummary({
             {release.title}
           </Link>
         </SummaryListItem>
+        {publishingOrganisationTitles &&
+          publishingOrganisationTitles.length > 0 && (
+            <SummaryListItem term="Published by">
+              {publishingOrganisationTitles.join(', ')}
+            </SummaryListItem>
+          )}
         <SummaryListItem term="Theme">{theme.title}</SummaryListItem>
         <SummaryListItem term="Published">
           <FormattedDate format="d MMM yyyy">{published}</FormattedDate>

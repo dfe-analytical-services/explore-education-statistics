@@ -32,7 +32,7 @@ interface Props {
   lastUpdated?: string | Date;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
   releaseDate?: string;
   releaseType: ReleaseType;
   renderReleaseNotes: ReactNode;

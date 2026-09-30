@@ -70,6 +70,7 @@ describe('DataBlockPageTabs', () => {
         to: '2020',
       },
       geographicLevels: ['National'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-1',
         name: 'Test subject',

@@ -8,13 +8,14 @@ import styles from '@common/modules/find-statistics/components/PublishingOrganis
 import React from 'react';
 
 interface Props {
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
 }
 
 export default function PublishingOrganisations({
   publishingOrganisations,
 }: Props) {
   let sortedOrganisations: Organisation[];
+  /* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */
   if (!publishingOrganisations || publishingOrganisations?.length === 0) {
     sortedOrganisations = [defaultOrganisation];
   } else {

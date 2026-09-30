@@ -28,6 +28,7 @@ export function createDataSetSuggestRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    organisationIds,
     publicationIds,
     releaseTypes,
     sortBy,
@@ -40,6 +41,7 @@ export function createDataSetSuggestRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    organisationIds,
     publicationIds,
     releaseTypes,
     themeIds,
@@ -63,6 +65,7 @@ export default function createDataSetListRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    organisationIds,
     publicationIds,
     releaseTypes,
     search: searchParam,
@@ -76,6 +79,7 @@ export default function createDataSetListRequest(
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    organisationIds,
     publicationIds,
     releaseTypes,
     themeIds,
@@ -100,6 +104,7 @@ interface SearchFilters {
   geographicLevels?: string[];
   dataSetType: string;
   latestDataOnly?: boolean;
+  organisationIds?: string[];
   publicationIds?: string[];
   releaseTypes?: string[];
   themeIds?: string[];
@@ -131,6 +136,13 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
   } else {
     // If no publication or theme ids are provided, only include non-superseded data sets.
     conditions.push(odata`isSuperseded eq false`);
+  }
+
+  if (filters.organisationIds?.length) {
+    const joined = filters.organisationIds.join('|');
+    conditions.push(
+      odata`publishingOrganisationIds/any(g: search.in(g, ${joined}, '|'))`,
+    );
   }
 
   if (filters.releaseTypes?.length) {
@@ -193,6 +205,7 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
     geographicLevels:
       validGeographicLevels.length > 0 ? validGeographicLevels : undefined,
     latestDataOnly: !query.latestDataOnly || query.latestDataOnly !== 'false',
+    organisationIds: getAsArray(query.organisationId),
     page: getFirst(query.page),
     publicationIds: getAsArray(query.publicationId),
     releaseTypes: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,

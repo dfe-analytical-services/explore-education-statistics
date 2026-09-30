@@ -36,6 +36,8 @@ interface Props {
   geographicLevelOptions: CheckboxOption[];
   includeDataFilters: boolean;
   latestDataOnly?: boolean;
+  organisationIds?: string[];
+  organisationOptions: CheckboxOption[];
   publicationIds?: string[];
   publicationTree: Theme[];
   releaseTypes?: ReleaseType[];
@@ -56,6 +58,8 @@ export default function Filters({
   geographicLevelOptions,
   includeDataFilters,
   latestDataOnly,
+  organisationIds,
+  organisationOptions,
   publicationIds,
   publicationTree,
   releaseTypes,
@@ -72,6 +76,27 @@ export default function Filters({
   return (
     <form className={styles.form} id={formId}>
       <h2 className="govuk-heading-m">Filter and sort</h2>
+      <ExpandableFilterGroup
+        id={`${formId}-organisation-group`}
+        label="Published by"
+      >
+        <FormCheckboxGroup
+          id={`${formId}-organisation`}
+          legend="Filter by Organisation"
+          legendHidden
+          name="organisationId"
+          options={organisationOptions}
+          small
+          value={organisationIds || []}
+          onChange={e => {
+            onChange({
+              filterType: 'organisationId',
+              nextValue: e.target.value,
+            });
+          }}
+        />
+      </ExpandableFilterGroup>
+
       <ExpandableFilterGroup id={`${formId}-theme-group`} label="Theme">
         {includeDataFilters ? (
           <ThemesAndReleasesFilterGroup

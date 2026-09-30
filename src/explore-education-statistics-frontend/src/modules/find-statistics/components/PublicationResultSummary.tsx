@@ -20,6 +20,7 @@ const PublicationResultSummary = ({ publication }: Props) => {
     highlightContent,
     highlightSummary,
     highlightTitle,
+    publishingOrganisationTitles,
     theme,
     title,
     type,
@@ -74,6 +75,12 @@ const PublicationResultSummary = ({ publication }: Props) => {
             {published}
           </FormattedDate>
         </SummaryListItem>
+        {publishingOrganisationTitles &&
+          publishingOrganisationTitles.length > 0 && (
+            <SummaryListItem term="Published by">
+              {publishingOrganisationTitles.join(', ')}
+            </SummaryListItem>
+          )}
         <SummaryListItem term="Theme">{theme}</SummaryListItem>
       </SummaryList>
     </li>

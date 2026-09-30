@@ -2,13 +2,14 @@ import { EducationInNumbersPageContextProvider } from '@admin/pages/education-in
 import _educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
 import EducationInNumbersSignOffPage from '@admin/pages/education-in-numbers/sign-off/EducationInNumbersSignOffPage';
-import { Router } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/educationInNumbersService');
 
@@ -99,9 +100,7 @@ describe('EducationInNumbersSignOffPage', () => {
         testPublishedPage,
       );
 
-      const history = createMemoryHistory();
-
-      const { user } = renderPage(testDraftPage, history);
+      const { user } = renderPage(testDraftPage);
 
       expect(await screen.findByText('Sign off')).toBeInTheDocument();
 
@@ -114,25 +113,23 @@ describe('EducationInNumbersSignOffPage', () => {
         expect(
           educationInNumbersService.publishEducationInNumbersPage,
         ).toHaveBeenCalledWith('page-1-id');
-        expect(history.location.pathname).toBe(
-          '/education-in-numbers/page-1-id/summary',
-        );
       });
+
+      await expectLocation('/education-in-numbers/page-1-id/summary');
     });
   });
 
-  function renderPage(
-    page: EinSummary,
-    history: MemoryHistory = createMemoryHistory(),
-  ) {
+  function renderPage(page: EinSummary) {
     return render(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersPageContextProvider educationInNumbersPage={page}>
-            <EducationInNumbersSignOffPage />
-          </EducationInNumbersPageContextProvider>
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer
+        initialUrl={educationInNumbersListRoute.fullPath}
+        route={educationInNumbersListRoute.fullPath}
+        routes={[educationInNumbersSummaryRoute.fullPath]}
+      >
+        <EducationInNumbersPageContextProvider educationInNumbersPage={page}>
+          <EducationInNumbersSignOffPage />
+        </EducationInNumbersPageContextProvider>
+      </TestRouterRenderer>,
     );
   }
 });

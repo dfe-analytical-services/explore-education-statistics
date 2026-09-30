@@ -9,9 +9,10 @@ import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryHistory } from 'history';
 import React from 'react';
-import { MemoryRouter, Router } from 'react-router';
+import { MemoryRouter } from 'react-router';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { expectLocationSearch } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/permissionService');
 jest.mock('@admin/services/publicationService');
@@ -173,17 +174,13 @@ describe('PublicationsTab', () => {
       );
       permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
-      const history = createMemoryHistory();
-
       render(
-        <Router history={history}>
+        <TestRouterRenderer initialUrl="/" route="/">
           <PublicationsTab isBauUser />
-        </Router>,
+        </TestRouterRenderer>,
       );
 
-      await waitFor(() => {
-        expect(history.location.search).toBe('?themeId=theme-1');
-      });
+      await waitFor(async () => expectLocationSearch('?themeId=theme-1'));
     });
 
     test('renders with saved theme', async () => {
@@ -251,17 +248,13 @@ describe('PublicationsTab', () => {
       );
       permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
-      const history = createMemoryHistory();
-
       render(
-        <Router history={history}>
+        <TestRouterRenderer initialUrl="/" route="/">
           <PublicationsTab isBauUser />
-        </Router>,
+        </TestRouterRenderer>,
       );
 
-      await waitFor(() => {
-        expect(history.location.search).toBe('?themeId=theme-2');
-      });
+      await waitFor(async () => expectLocationSearch('?themeId=theme-2'));
     });
 
     test('renders theme selected from query params instead of saved theme', async () => {
@@ -355,12 +348,10 @@ describe('PublicationsTab', () => {
       );
       permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
-      const history = createMemoryHistory();
-
       render(
-        <Router history={history}>
+        <TestRouterRenderer initialUrl="/dashboard" route="/dashboard">
           <PublicationsTab isBauUser />
-        </Router>,
+        </TestRouterRenderer>,
       );
 
       await waitFor(() => {
@@ -374,8 +365,8 @@ describe('PublicationsTab', () => {
         'theme-2',
       );
 
-      await waitFor(() => {
-        expect(history.location.search).toBe('?themeId=theme-2');
+      await waitFor(async () => {
+        await expectLocationSearch('?themeId=theme-2');
       });
     });
 
@@ -464,12 +455,10 @@ describe('PublicationsTab', () => {
       );
       permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
-      const history = createMemoryHistory();
-
       render(
-        <Router history={history}>
+        <TestRouterRenderer initialUrl="/" route="/">
           <PublicationsTab isBauUser={false} />
-        </Router>,
+        </TestRouterRenderer>,
       );
 
       await waitFor(() => {
@@ -478,7 +467,7 @@ describe('PublicationsTab', () => {
         ).toBeInTheDocument();
       });
 
-      expect(history.location.search).toBe('');
+      await waitFor(async () => expectLocationSearch(''));
     });
 
     test('renders a list of all publications grouped by theme', async () => {

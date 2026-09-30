@@ -1699,6 +1699,171 @@ public class FootnoteRepositoryTests
         }
     }
 
+    [Fact]
+    public async Task DeleteFootnotesByReleaseVersion_DeletesFootnoteReachableOnlyByReleaseFootnote()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        // This Footnote has no Subject, Filter or Indicator links at all, so DeleteFootnotesBySubject
+        // cannot find it. Only the sweep by ReleaseVersion picks it up.
+        var releaseFootnote = _fixture
+            .DefaultReleaseFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithFootnote(_fixture.DefaultFootnote().WithContent("Linked to the release version only"))
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseFootnote.Add(releaseFootnote);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesByReleaseVersion(releaseVersion.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(context.Footnote);
+            Assert.Empty(context.ReleaseFootnote);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFootnotesByReleaseVersion_DeletesFootnotesWithSubjectCriteria()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(1))
+            .GenerateList();
+
+        var subject = releaseSubjects[0].Subject;
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithFootnotes([
+                _fixture.DefaultFootnote().WithContent("Applies to the subject").WithSubjects(ListOf(subject)),
+                _fixture.DefaultFootnote().WithContent("Linked to the release version only"),
+            ])
+            .GenerateList(2);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseSubject.AddRange(releaseSubjects);
+            context.ReleaseFootnote.AddRange(releaseFootnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesByReleaseVersion(releaseVersion.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(context.Footnote);
+            Assert.Empty(context.ReleaseFootnote);
+            Assert.Empty(context.SubjectFootnote);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFootnotesByReleaseVersion_FootnoteSharedWithAnotherReleaseVersion_RemovesLinkOnly()
+    {
+        var (releaseVersion1, releaseVersion2) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
+
+        // TODO EES-2979 A Footnote should only belong to one ReleaseVersion. Until then, a Footnote shared
+        // with another ReleaseVersion must survive with only its link to this one removed.
+        var sharedFootnote = _fixture.DefaultFootnote().WithContent("Shared between release versions").Generate();
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .ForIndex(0, s => s.SetReleaseVersion(releaseVersion1).SetFootnote(sharedFootnote))
+            .ForIndex(1, s => s.SetReleaseVersion(releaseVersion2).SetFootnote(sharedFootnote))
+            .GenerateList(2);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.AddRange(releaseVersion1, releaseVersion2);
+            context.ReleaseFootnote.AddRange(releaseFootnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesByReleaseVersion(releaseVersion1.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var remainingFootnote = Assert.Single(context.Footnote);
+            Assert.Equal(sharedFootnote.Id, remainingFootnote.Id);
+
+            var remainingReleaseFootnote = Assert.Single(context.ReleaseFootnote);
+            Assert.Equal(releaseVersion2.Id, remainingReleaseFootnote.ReleaseVersionId);
+            Assert.Equal(sharedFootnote.Id, remainingReleaseFootnote.FootnoteId);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFootnotesByReleaseVersion_IgnoresFootnotesOfOtherReleaseVersions()
+    {
+        var (releaseVersion1, releaseVersion2) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
+
+        var otherReleaseVersionFootnote = _fixture.DefaultFootnote().WithContent("Another release version").Generate();
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetReleaseVersion(releaseVersion1)
+                        .SetFootnote(_fixture.DefaultFootnote().WithContent("This release version"))
+            )
+            .ForIndex(1, s => s.SetReleaseVersion(releaseVersion2).SetFootnote(otherReleaseVersionFootnote))
+            .GenerateList(2);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.AddRange(releaseVersion1, releaseVersion2);
+            context.ReleaseFootnote.AddRange(releaseFootnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesByReleaseVersion(releaseVersion1.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var remainingFootnote = Assert.Single(context.Footnote);
+            Assert.Equal(otherReleaseVersionFootnote.Id, remainingFootnote.Id);
+
+            var remainingReleaseFootnote = Assert.Single(context.ReleaseFootnote);
+            Assert.Equal(releaseVersion2.Id, remainingReleaseFootnote.ReleaseVersionId);
+        }
+    }
+
     private static Tuple<Subject, Subject> GetSubjectsTuple2(List<ReleaseSubject> releaseSubjects)
     {
         return releaseSubjects.Select(rs => rs.Subject).ToTuple2();

@@ -1,7 +1,5 @@
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import PreReleaseContentPage from '@admin/pages/release/pre-release/PreReleaseContentPage';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import _releaseContentService, {
   EditableRelease,
   ReleaseContent,
@@ -12,8 +10,8 @@ import _featuredTableService, {
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/featuredTableService');
 jest.mock('@admin/services/releaseContentService');
@@ -249,23 +247,18 @@ describe('PreReleaseContentPage', () => {
     );
   });
 
-  const renderPage = (
-    initialEntries: string[] = [
-      generatePath<ReleaseRouteParams>(preReleaseContentRoute.path, {
-        publicationId: 'publication-1',
-        releaseVersionId: 'release-1',
-      }),
-    ],
-  ) => {
+  const renderPage = () => {
+    const path = generatePath(preReleaseContentRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+    });
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <TestConfigContextProvider>
-          <Route
-            component={PreReleaseContentPage}
-            path={preReleaseContentRoute.path}
-          />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={preReleaseContentRoute.fullPath}
+      >
+        <PreReleaseContentPage />
+      </TestRouterRenderer>,
     );
   };
 });

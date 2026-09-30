@@ -72,6 +72,7 @@ const ReleaseHomePage = ({
             }
             releaseType={releaseVersionSummary.type}
             renderProducerLink={
+              /* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */
               releaseVersionSummary.publishingOrganisations?.length ? (
                 <span>
                   {releaseVersionSummary.publishingOrganisations.map(

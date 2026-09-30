@@ -1,5 +1,7 @@
 import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
+import { IpRange } from '../common/types.bicep'
+import { AzureSqlDatabaseConfig } from '../common/components/azure-sql/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -31,6 +33,12 @@ param averagePublicSiteResponseTimeAlertThresholdMillis int = 2500
 @description('Specify if manual deletion of backups is allowed in Recovery Services Vault.')
 param recoveryServicesVaultImmutable bool = false
 
+@description('Retention of storage account blobs in days.')
+param blobDeleteRetentionDays int = 90
+
+@description('Provides access to resources for specific IP address ranges used for service maintenance.')
+param maintenanceIpRanges IpRange[] = []
+
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool = true
 
@@ -57,6 +65,46 @@ param deployContainerRegistry bool = false
 
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
+
+@description('The admin user of the Core and Public SQL Servers.')
+param sqlAdministratorLogin string = ''
+
+@description('The login name of the Entra ID admin for the Core and Public SQL Servers.')
+param sqlAzureAdministratorLogin string = ''
+
+@description('The object id of the Entra ID admin for the Core and Public SQL Servers.')
+param sqlAzureAdministratorSid string = ''
+
+@description('Whether or not public access is enabled for the Core and Public SQL Servers.')
+param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
+
+@description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
+param teamEmailAddresses string[] = []
+
+@description('Number of days to retain SQL database audit logs for in blob storage.')
+param databaseAuditBlobRetentionDays int = 365
+
+@description('Configuration for the Content database.')
+param contentDbConfig AzureSqlDatabaseConfig = {
+  sku: {
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    capacity: 1
+  }
+  licenseType: 'LicenseIncluded'
+  maxSizeBytes: 1073741824
+}
+
+@description('Configuration for the Statistics database and its geo-replica.')
+param statisticsDbConfig AzureSqlDatabaseConfig = {
+  sku: {
+    name: 'GP_Gen5'
+    tier: 'GeneralPurpose'
+    capacity: 2
+  }
+  licenseType: 'LicenseIncluded'
+  maxSizeBytes: 268435456000
+}
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -212,6 +260,98 @@ module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (dep
 module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
   name: 'containerRegistryModuleDeploy'
   params: {
+    tagValues: tagValues
+  }
+}
+
+module loggingStorageAccountModule 'application/logging-storage-account/logging-storage-account.bicep' = {
+  name: 'loggingStorageAccountModuleDeploy'
+  params: {
+    subscription: subscription
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module coreStorageAccountModule 'application/core-storage-account/core-storage-account.bicep' = {
+  name: 'coreStorageAccountModuleDeploy'
+  params: {
+    subscription: subscription
+    environmentName: environmentName
+    subnets: vNetModule.outputs.subnets
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    backupVaultName: backupsModule.outputs.backupVaultName
+    backupBlobsPolicyName: backupsModule.outputs.backupVaultBlobsPolicyName
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    firewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module publicStorageAccountModule 'application/public-storage-account/public-storage-account.bicep' = {
+  name: 'publicStorageAccountModuleDeploy'
+  params: {
+    subscription: subscription
+    subnets: vNetModule.outputs.subnets
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    backupVaultName: backupsModule.outputs.backupVaultName
+    backupBlobsPolicyName: backupsModule.outputs.backupVaultBlobsPolicyName
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    blobDeleteRetentionDays: blobDeleteRetentionDays
+    firewallRules: maintenanceIpRanges
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
+  name: 'coreSqlServerModuleDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    sqlAdministratorLogin: sqlAdministratorLogin
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
+    sqlAzureAdministratorSid: sqlAzureAdministratorSid
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    subnets: vNetModule.outputs.subnets
+    firewallRules: maintenanceIpRanges
+    teamEmailAddresses: teamEmailAddresses
+    databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
+    loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    contentDbConfig: contentDbConfig
+    statisticsDbConfig: statisticsDbConfig
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    deployAlerts: deployAlerts
+    tagValues: tagValues
+  }
+}
+
+module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
+  name: 'publicSqlServerModuleDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    sqlAdministratorLogin: sqlAdministratorLogin
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
+    sqlAzureAdministratorSid: sqlAzureAdministratorSid
+    sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
+    subnets: vNetModule.outputs.subnets
+    firewallRules: maintenanceIpRanges
+    teamEmailAddresses: teamEmailAddresses
+    databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
+    loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    statisticsDbConfig: statisticsDbConfig
+    statisticsPrimaryDatabaseId: coreSqlServerModule.outputs.statisticsDatabaseId
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+    alertsGroupName: alertsModule.outputs.actionGroupName
+    deployAlerts: deployAlerts
     tagValues: tagValues
   }
 }

@@ -6,7 +6,6 @@ import ApiDataSetGuidanceNotesForm, {
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetChangelogRouteParams,
-  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
@@ -28,7 +27,7 @@ const dataSetVersionIsDraft = (dataSetVersionStatus: DataSetVersionStatus) =>
 
 export default function ReleaseApiDataSetChangelogPage() {
   const { dataSetId, dataSetVersionId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetChangelogRouteParams>();
+    useParams<ReleaseDataSetChangelogRouteParams>() as ReleaseDataSetChangelogRouteParams;
 
   const { user } = useAuthContext();
   const canManagePublicApiDataSets =
@@ -84,14 +83,11 @@ export default function ReleaseApiDataSetChangelogPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back to API data set details
       </Link>

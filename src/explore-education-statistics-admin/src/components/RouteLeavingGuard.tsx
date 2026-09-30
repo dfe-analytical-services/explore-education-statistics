@@ -1,8 +1,6 @@
 import ModalConfirm from '@common/components/ModalConfirm';
-import useToggle from '@common/hooks/useToggle';
-import React, { ReactNode, useEffect, useState } from 'react';
-import { Prompt, useLocation } from 'react-router';
-import { useHistory } from 'react-router-dom';
+import React, { ReactNode, useCallback, useEffect } from 'react';
+import { BlockerFunction, useBlocker } from 'react-router';
 
 interface Props {
   blockRouteChange: boolean;
@@ -15,11 +13,16 @@ const RouteLeavingGuard = ({
   children,
   title,
 }: Props) => {
-  const location = useLocation();
-  const history = useHistory();
-  const [lastLocation, setLastLocation] = useState(location);
-  const [showModal, toggleShowModal] = useToggle(false);
-  const [confirmedNavigation, toggleConfirmedNavigation] = useToggle(false);
+  const blockerFunction = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) => {
+      return (
+        blockRouteChange && currentLocation.pathname !== nextLocation.pathname
+      );
+    },
+    [blockRouteChange],
+  );
+
+  const blocker = useBlocker(blockerFunction);
 
   // Block non-react routes
   useEffect(() => {
@@ -36,40 +39,16 @@ const RouteLeavingGuard = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [blockRouteChange]);
 
-  // Block react routes
-  useEffect(() => {
-    if (confirmedNavigation && lastLocation) {
-      toggleConfirmedNavigation.off();
-      history.push(lastLocation.pathname);
-    }
-  }, [confirmedNavigation, lastLocation, history, toggleConfirmedNavigation]);
-
   return (
-    <>
-      <Prompt
-        when={blockRouteChange}
-        message={nextLocation => {
-          if (!confirmedNavigation && blockRouteChange) {
-            setLastLocation(nextLocation);
-            toggleShowModal.on();
-            return false;
-          }
-          return true;
-        }}
-      />
-      <ModalConfirm
-        title={title}
-        open={showModal}
-        onConfirm={() => {
-          toggleShowModal.off();
-          toggleConfirmedNavigation.on();
-        }}
-        onExit={toggleShowModal.off}
-        onCancel={toggleShowModal.off}
-      >
-        {children}
-      </ModalConfirm>
-    </>
+    <ModalConfirm
+      title={title}
+      open={blocker.state === 'blocked'}
+      onConfirm={() => blocker.proceed?.()}
+      onExit={() => blocker.reset?.()}
+      onCancel={() => blocker.reset?.()}
+    >
+      {children}
+    </ModalConfirm>
   );
 };
 

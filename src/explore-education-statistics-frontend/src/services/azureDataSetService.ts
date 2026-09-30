@@ -22,6 +22,8 @@ export interface AzureDataSetIndexItem {
   publicationId: string;
   publicationSlug: string;
   publicationTitle: string;
+  publishingOrganisationIds: string[];
+  publishingOrganisationTitles: string[];
   releaseId: string;
   releaseTitle: string;
   releaseSlug: string;

@@ -13,13 +13,13 @@ import {
   FormFieldSelect,
   FormFieldTextInput,
 } from '@common/components/form';
-import { useHistory } from 'react-router-dom';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Link from '@admin/components/Link';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import Yup from '@common/validation/yup';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { ObjectSchema } from 'yup';
+import { useNavigate } from 'react-router';
 
 export default function BoundaryDataUploadPage() {
   interface FormValues {
@@ -29,7 +29,8 @@ export default function BoundaryDataUploadPage() {
     boundaryDataFile: File;
   }
 
-  const history = useHistory();
+  const navigate = useNavigate();
+
   const boundaryDataPath = '/administration/boundary-data';
 
   const handleSubmit = useCallback(
@@ -42,9 +43,9 @@ export default function BoundaryDataUploadPage() {
       };
 
       await boundaryDataService.uploadBoundaryFile(data);
-      history.push(boundaryDataPath);
+      navigate(boundaryDataPath);
     },
-    [boundaryDataPath, history],
+    [navigate],
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {

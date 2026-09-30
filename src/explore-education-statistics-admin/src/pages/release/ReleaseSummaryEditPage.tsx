@@ -3,21 +3,17 @@ import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '@admin/pages/release/components/ReleaseSummaryForm';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import releaseVersionService from '@admin/services/releaseVersionService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, RouteComponentProps, useLocation } from 'react-router';
+import { generatePath, useLocation, useNavigate } from 'react-router';
 
-export default function ReleaseSummaryEditPage({
-  history,
-}: RouteComponentProps) {
+export default function ReleaseSummaryEditPage() {
   const location = useLocation();
   const lastLocation = useLastLocation();
+  const nevigate = useNavigate();
 
   const {
     releaseVersionId,
@@ -50,8 +46,8 @@ export default function ReleaseSummaryEditPage({
 
     onReleaseChange();
 
-    history.push(
-      generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+    nevigate(
+      generatePath(releaseSummaryRoute.fullPath, {
         publicationId: releaseVersion.publicationId,
         releaseVersionId,
       }),
@@ -63,8 +59,8 @@ export default function ReleaseSummaryEditPage({
       return;
     }
 
-    history.push(
-      generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+    nevigate(
+      generatePath(releaseSummaryRoute.fullPath, {
         publicationId: releaseVersion.publicationId,
         releaseVersionId,
       }),

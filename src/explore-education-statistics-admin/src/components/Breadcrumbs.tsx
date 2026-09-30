@@ -12,7 +12,7 @@ export interface BreadcrumbsProps {
 
 const Breadcrumbs = ({
   breadcrumbs = [],
-  homePath = dashboardRoute.path,
+  homePath = dashboardRoute.fullPath,
 }: BreadcrumbsProps): ReactNode => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 

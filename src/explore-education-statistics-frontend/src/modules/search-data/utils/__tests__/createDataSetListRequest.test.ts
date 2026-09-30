@@ -80,6 +80,30 @@ describe('createDataSetListRequest', () => {
       );
     });
 
+    test('includes organisation filter when single organisationId provided', () => {
+      const testQuery: SearchDataPageQuery = {
+        organisationId: 'organisation-1',
+      };
+
+      const result = createDataSetListRequest(testQuery);
+
+      expect(result.filter).toBe(
+        "isSuperseded eq false and publishingOrganisationIds/any(g: search.in(g, 'organisation-1', '|')) and latestData eq true",
+      );
+    });
+
+    test('includes organisation filter when multiple organisationIds provided', () => {
+      const testQuery: SearchDataPageQuery = {
+        organisationId: ['organisation-1', 'organisation-2'],
+      };
+
+      const result = createDataSetListRequest(testQuery);
+
+      expect(result.filter).toBe(
+        "isSuperseded eq false and publishingOrganisationIds/any(g: search.in(g, 'organisation-1|organisation-2', '|')) and latestData eq true",
+      );
+    });
+
     test('includes publication filter when single publicationId provided', () => {
       const testQuery: SearchDataPageQuery = {
         publicationId: 'pub-1',
@@ -197,6 +221,7 @@ describe('createDataSetListRequest', () => {
         page: 2,
         search: 'test search',
         sortBy: 'title',
+        organisationId: 'organisation-1',
         themeId: 'theme-1',
         publicationId: 'pub-3',
         releaseType: 'AccreditedOfficialStatistics',
@@ -212,7 +237,7 @@ describe('createDataSetListRequest', () => {
         search: 'test search',
         orderBy: 'title asc',
         filter:
-          "(search.in(themeId, 'theme-1', '|') or search.in(publicationId, 'pub-3', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics', '|') and geographicLevels/any(g: search.in(g, 'NAT', '|')) and latestData eq true and api/id ne null and api/id ne ''",
+          "(search.in(themeId, 'theme-1', '|') or search.in(publicationId, 'pub-3', '|')) and publishingOrganisationIds/any(g: search.in(g, 'organisation-1', '|')) and search.in(releaseType, 'AccreditedOfficialStatistics', '|') and geographicLevels/any(g: search.in(g, 'NAT', '|')) and latestData eq true and api/id ne null and api/id ne ''",
       });
     });
   });
@@ -244,6 +269,7 @@ describe('getParamsFromQuery', () => {
       dataSetType: 'all',
       geographicLevels: undefined,
       latestDataOnly: true,
+      organisationIds: undefined,
       page: undefined,
       publicationIds: undefined,
       releaseTypes: undefined,
@@ -251,6 +277,29 @@ describe('getParamsFromQuery', () => {
       sortBy: 'newest',
       themeIds: undefined,
     });
+  });
+
+  test('converts single organisationId to array', () => {
+    const testQuery: SearchDataPageQuery = {
+      organisationId: 'organisation-1',
+    };
+
+    const result = getParamsFromQuery(testQuery);
+
+    expect(result.organisationIds).toEqual(['organisation-1']);
+  });
+
+  test('keeps organisationId array as is', () => {
+    const testQuery: SearchDataPageQuery = {
+      organisationId: ['organisation-1', 'organisation-2'],
+    };
+
+    const result = getParamsFromQuery(testQuery);
+
+    expect(result.organisationIds).toEqual([
+      'organisation-1',
+      'organisation-2',
+    ]);
   });
 
   test('converts single themeId to array', () => {

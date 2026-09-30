@@ -21,3 +21,5 @@ module backupVaultPolicyModule '../../../common/components/data-protection/blobB
     vaultTierYearlyRetentionInYears: 1
   }
 }
+
+output policyName string = policyName

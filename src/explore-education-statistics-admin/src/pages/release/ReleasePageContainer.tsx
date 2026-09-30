@@ -7,10 +7,7 @@ import { useAuthContext } from '@admin/contexts/AuthContext';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
-import {
-  publicationReleasesRoute,
-  PublicationRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import releasePageRoutes from '@admin/routes/releasePageRoutes';
 import { releaseNavRoutes } from '@admin/routes/releaseRoutes';
 import useNavRoutes from '@admin/hooks/useNavRoutes';
@@ -18,15 +15,17 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-interface MatchProps {
+type MatchProps = {
   publicationId: string;
   releaseVersionId: string;
-}
+};
 
-const ReleasePageContainer = ({ match }: RouteComponentProps<MatchProps>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleasePageContainer = () => {
+  const { publicationId, releaseVersionId } =
+    useParams<MatchProps>() as MatchProps;
 
   const { user } = useAuthContext();
 
@@ -56,10 +55,9 @@ const ReleasePageContainer = ({ match }: RouteComponentProps<MatchProps>) => {
           breadcrumbs={[
             {
               name: 'Publication',
-              link: `${generatePath<PublicationRouteParams>(
-                publicationReleasesRoute.path,
-                { publicationId: releaseVersion.publicationId },
-              )}`,
+              link: `${generatePath(publicationReleasesRoute.fullPath, {
+                publicationId: releaseVersion.publicationId,
+              })}`,
             },
             { name: 'Edit release' },
           ]}

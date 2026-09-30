@@ -54,7 +54,7 @@ const defaultTestConfig: Config = {
 };
 
 interface TestConfigContextProps {
-  children: ReactNode;
+  children?: ReactNode;
   config?: Config;
 }
 

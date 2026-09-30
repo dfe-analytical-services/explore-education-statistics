@@ -200,16 +200,18 @@ export default class Client {
   public removeRequestInterceptor(interceptor: RequestInterceptor): void {
     const id = this.requestInterceptors.get(interceptor);
 
-    if (id) {
+    if (id !== undefined) {
       this.axios.interceptors.request.eject(id);
+      this.requestInterceptors.delete(interceptor);
     }
   }
 
   public removeResponseInterceptor(interceptor: ResponseInterceptor): void {
     const id = this.responseInterceptors.get(interceptor);
 
-    if (id) {
+    if (id !== undefined) {
       this.axios.interceptors.response.eject(id);
+      this.responseInterceptors.delete(interceptor);
     }
   }
 
