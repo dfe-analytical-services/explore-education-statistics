@@ -7,14 +7,14 @@
 #     - test
 #   paths:
 #     include:
-#     - infrastructure/common
-#     - infrastructure/admin
-#     - infrastructure/bicep-main-infrastructure-release
-#     - infrastructure/content-api
-#     - infrastructure/data-api
-#     - infrastructure/importer
-#     - infrastructure/notifier
-#     - infrastructure/publisher
+#     - infrastructure/templates/common
+#     - infrastructure/templates/admin
+#     - infrastructure/templates/bicep-main-infrastructure-release
+#     - infrastructure/templates/content-api
+#     - infrastructure/templates/data-api
+#     - infrastructure/templates/importer
+#     - infrastructure/templates/notifier
+#     - infrastructure/templates/publisher
 trigger: none
 pr: none
 
@@ -75,7 +75,7 @@ stages:
   - template: stages/deploy.yml
     parameters:
       stageName: DeployProd
-      condition:  and(succeeded(), eq(variables.isMaster, true))
+      condition: and(succeeded(), eq(variables.isMaster, true))
       dependsOn: DeployPreProd
       environment: Prod
       serviceConnection: $(serviceConnectionProd)

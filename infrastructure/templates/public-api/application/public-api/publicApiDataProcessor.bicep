@@ -18,6 +18,7 @@ param processorProdAppSettings object = {}
 @description('The existing app settings for the staging slot, fetched by the pipeline before deployment.')
 param processorStagingAppSettings object = {}
 
+@secure()
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
 param dataProcessorAppRegistrationClientId string
 

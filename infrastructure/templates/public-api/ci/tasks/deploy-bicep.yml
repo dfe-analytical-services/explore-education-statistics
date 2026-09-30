@@ -61,6 +61,4 @@ steps:
               deployAlerts=${{ parameters.deployAlerts }} \
               processorProdAppSettings='${{ parameters.processorProdAppSettings }}' \
               processorStagingAppSettings='${{ parameters.processorStagingAppSettings }}' \
-              dataProcessorAppRegistrationClientId='$(dataProcessorAppRegistrationClientId)' \
-              apiAppRegistrationClientId='$(apiAppRegistrationClientId)' \
               devopsServicePrincipalId="$servicePrincipalId"
