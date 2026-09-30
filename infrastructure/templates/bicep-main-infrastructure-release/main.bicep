@@ -1,5 +1,4 @@
 import { getResourceNames } from 'resource-names.bicep'
-import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
@@ -15,18 +14,7 @@ import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-si
 //
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
-param tags Tags = {
-  Department: ''
-  Solution: ''
-  Environment: ''
-  Subscription: ''
-  CostCentre: ''
-  ServiceOwner: ''
-  DateProvisioned: ''
-  CreatedBy: ''
-  DeploymentRepo: ''
-  DeploymentScript: ''
-}
+param tags object
 
 
 
