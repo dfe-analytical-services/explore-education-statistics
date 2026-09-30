@@ -53,9 +53,6 @@ type EnvironmentConfig = {
 @export()
 type EnvironmentPipelineVariables = {
 
-  @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-  publicAppBasicAuthUsername: string?
-
   @description('Provides access to resources for specific IP address ranges used for service maintenance.')
   maintenanceIpRanges: IpRange[]?
 }
