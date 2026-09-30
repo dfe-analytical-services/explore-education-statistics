@@ -122,6 +122,10 @@ type ResourceNames = {
         notifyApiKey: string
         publicDataDbConnectionString: string
       }
+      publicSite: {
+        basicAuthUsername: string
+        basicAuthPassword: string
+      }
       bauEmail: string
       coreStorageAccountConnectionString: string
       importerStorageAccountConnectionString: string
@@ -276,6 +280,10 @@ func getResourceNames(
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
         publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
+      }
+      publicSite: {
+        basicAuthUsername: 'ees-public-site-basic-auth-username'
+        basicAuthPassword: 'ees-public-site-basic-auth-password'
       }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       bauEmail: 'ees-bau-email'

@@ -1,0 +1,38 @@
+parameters:
+  - name: action
+    type: string
+    default: create
+    values:
+      - create
+      - validate
+  - name: displayName
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: subscriptionId
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: parameterFile
+    type: string
+
+steps:
+  - task: BicepDeploy@0
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      operation: ${{ parameters.action }}
+      validationLevel: template
+      name: '$(Release.ReleaseName)-$(Release.AttemptNumber)-${{ parameters.action }}'
+      azureResourceManagerConnection: ${{ parameters.serviceConnection }}
+      subscriptionId: ${{ parameters.subscriptionId }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      templateFile: $(templateFile)
+      parametersFile: ${{ parameters.parameterFile }}
+      parameters: |
+        tags: '$(resourceTags)'
+        environmentPipelineVariables:
+          maintenanceIpRanges: $(maintenanceFirewallRules)
+        adminPipelineVariables:
+          apiAppRegistrationClientId: '$(apiAppRegistrationClientId)'
+          publicDataProcessorAppRegistrationClientId: '$(publicDataProcessorAppRegistrationClientId)'
+          screenerAppRegistrationClientId: '$(screenerAppRegistrationClientId)'
