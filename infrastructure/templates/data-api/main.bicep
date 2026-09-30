@@ -34,8 +34,9 @@ param tableBuilderMaxTableCellsAllowed int
 param publicAppUrl string
 
 @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuth bool
+param publicAppBasicAuthEnabled bool
 
+@secure()
 @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
 param publicAppBasicAuthUsername string
 
@@ -152,7 +153,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
       enableSwagger: enableSwagger
       PublicApp__Url: publicAppUrl
-      PublicApp__BasicAuth: publicAppBasicAuth
+      PublicApp__BasicAuth: publicAppBasicAuthEnabled
       PublicApp__BasicAuthUsername: publicAppBasicAuthUsername
       PublicApp__BasicAuthPassword: publicAppBasicAuthPassword
       Analytics__Enabled: analyticsEnabled

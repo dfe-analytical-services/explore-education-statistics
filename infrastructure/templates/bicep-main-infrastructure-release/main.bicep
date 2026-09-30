@@ -127,16 +127,6 @@ var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 
 
 //
-// Secret pipeline variables (required to be top-level params).
-//
-
-@secure()
-@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-param publicAppBasicAuthPassword string = ''
-
-
-
-//
 // Resource provisioning.
 //
 
@@ -318,9 +308,9 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
@@ -349,9 +339,9 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion

@@ -24,8 +24,9 @@ param autoscaleAppServices bool
 param publicAppUrl string
 
 @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuth bool
+param publicAppBasicAuthEnabled bool
 
+@secure()
 @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
 param publicAppBasicAuthUsername string
 
@@ -142,7 +143,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       AZURE_SEARCH_INDEX: 'index-1'
       AZURE_DATASETS_SEARCH_INDEX: 'nl-search-dataset-index'
       AZURE_TABLE_TOOL_SEARCH_ENDPOINT: 'https://${nlSearchFunctionApp.properties.defaultHostName}/api/natural_language_search_function'
-      BASIC_AUTH: publicAppBasicAuth
+      BASIC_AUTH: publicAppBasicAuthEnabled
       BASIC_AUTH_USERNAME: publicAppBasicAuthUsername
       BASIC_AUTH_PASSWORD: publicAppBasicAuthPassword
       CONTENT_API_BASE_URL: 'https://${contentApiPublicHostname}/api'
