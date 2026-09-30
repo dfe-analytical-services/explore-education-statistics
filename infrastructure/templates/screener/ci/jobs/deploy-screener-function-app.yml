@@ -23,6 +23,22 @@ jobs:
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
 
+          - task: AzureCLI@2
+            displayName: Look up Screener app registration client id from Key Vault
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+
+                clientId=$(az keyvault secret show \
+                  --vault-name $(keyVaultName) \
+                  --name ees-screener-app-registration-client-id \
+                  --query value -o tsv)
+
+                echo "##vso[task.setvariable variable=screenerAppRegistrationClientId]$clientId"
+
           - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}

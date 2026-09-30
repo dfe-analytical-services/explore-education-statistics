@@ -32,7 +32,3 @@ steps:
         tags: '$(resourceTags)'
         environmentPipelineVariables:
           maintenanceIpRanges: $(maintenanceFirewallRules)
-        adminPipelineVariables:
-          apiAppRegistrationClientId: '$(apiAppRegistrationClientId)'
-          publicDataProcessorAppRegistrationClientId: '$(publicDataProcessorAppRegistrationClientId)'
-          screenerAppRegistrationClientId: '$(screenerAppRegistrationClientId)'
