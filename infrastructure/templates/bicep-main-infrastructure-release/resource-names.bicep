@@ -117,14 +117,21 @@ type ResourceNames = {
         govUkNotifyApiKey: string
         tokenSecretKey: string
       }
+      publicApi: {
+        apiAppRegistrationClientId: string
+        dataProcessorAppRegistrationClientId: string
+      }
+      publicSite: {
+        basicAuthUsername: string
+        basicAuthPassword: string
+      }
       publisher: {
         databaseUserPassword: string
         notifyApiKey: string
         publicDataDbConnectionString: string
       }
-      publicSite: {
-        basicAuthUsername: string
-        basicAuthPassword: string
+      screener: {
+        appRegistrationClientId: string
       }
       bauEmail: string
       coreStorageAccountConnectionString: string
@@ -276,14 +283,21 @@ func getResourceNames(
         govUkNotifyApiKey: 'ees-notifier-govuknotify-api-key'
         tokenSecretKey: 'ees-notifier-token-secret-key'
       }
+      publicApi: {
+        apiAppRegistrationClientId: 'ees-public-api-app-registration-client-id'
+        dataProcessorAppRegistrationClientId: 'ees-public-api-data-processor-app-registration-client-id'
+      }
+      publicSite: {
+        basicAuthUsername: 'ees-public-site-basic-auth-username'
+        basicAuthPassword: 'ees-public-site-basic-auth-password'
+      }
       publisher: {
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
         publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
       }
-      publicSite: {
-        basicAuthUsername: 'ees-public-site-basic-auth-username'
-        basicAuthPassword: 'ees-public-site-basic-auth-password'
+      screener: {
+        appRegistrationClientId: 'ees-screener-app-registration-client-id'
       }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       bauEmail: 'ees-bau-email'
