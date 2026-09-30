@@ -1,33 +1,26 @@
 import OrgLogoGov from '@common/components/OrgLogoGov';
 import OrgLogoNonGov from '@common/components/OrgLogoNonGov';
-import {
-  defaultOrganisation,
-  Organisation,
-} from '@common/services/types/organisation';
+import { Organisation } from '@common/services/types/organisation';
 import styles from '@common/modules/find-statistics/components/PublishingOrganisations.module.scss';
 import React from 'react';
 
+const departmentForEducationTitle = 'Department for Education';
+
 interface Props {
-  publishingOrganisations?: Organisation[]; // TODO EES-7673 - make required when all releases have an organisation
+  publishingOrganisations: Organisation[];
 }
 
 export default function PublishingOrganisations({
   publishingOrganisations,
 }: Props) {
-  let sortedOrganisations: Organisation[];
-  /* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */
-  if (!publishingOrganisations || publishingOrganisations?.length === 0) {
-    sortedOrganisations = [defaultOrganisation];
-  } else {
-    sortedOrganisations = publishingOrganisations.sort((a, b) => {
-      // DfE should always be first
-      if (a.title === 'Department for Education') return -1;
-      if (b.title === 'Department for Education') return 1;
+  const sortedOrganisations = [...publishingOrganisations].sort((a, b) => {
+    // DfE should always be first
+    if (a.title === departmentForEducationTitle) return -1;
+    if (b.title === departmentForEducationTitle) return 1;
 
-      // Sort remaining alphabetically
-      return a.title.localeCompare(b.title);
-    });
-  }
+    // Sort remaining alphabetically
+    return a.title.localeCompare(b.title);
+  });
 
   return (
     <div className={`${styles.container} govuk-!-margin-bottom-6`}>

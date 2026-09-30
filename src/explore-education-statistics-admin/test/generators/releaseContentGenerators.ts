@@ -22,6 +22,7 @@ import {
   KeyStatistic,
 } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
+import { Organisation } from '@common/services/types/organisation';
 
 const defaultContent: ContentSection<
   EditableContentBlock | EditableDataBlock | EditableEmbedBlock
@@ -124,6 +125,16 @@ const defaultKeyStatisticsSecondarySection: ContentSection<EditableDataBlock> =
     order: 0,
   };
 
+const defaultPublishingOrganisations: Organisation[] = [
+  {
+    id: 'org-id-1',
+    title: 'Department for Education',
+    url: 'https://www.gov.uk/government/organisations/department-for-education',
+    useGISLogo: true,
+    logoFileName: 'logo.png',
+  },
+];
+
 const defaultRelatedInformation: BasicLink[] = [
   {
     id: 'related-information-id',
@@ -191,6 +202,7 @@ export function generateEditableRelease({
   published,
   publishedDisplayDate,
   publishScheduled,
+  publishingOrganisations = defaultPublishingOrganisations,
   relatedDashboardsSection = defaultRelatedDashoardsSection,
   relatedInformation = defaultRelatedInformation,
   title = 'Release title',
@@ -221,6 +233,7 @@ export function generateEditableRelease({
     published,
     publishedDisplayDate,
     publishScheduled,
+    publishingOrganisations,
     relatedDashboardsSection,
     relatedInformation,
     slug: slug ?? releaseSlug,

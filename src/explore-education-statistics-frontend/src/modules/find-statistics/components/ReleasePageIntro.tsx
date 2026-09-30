@@ -111,32 +111,20 @@ const ReleasePageIntro = ({
           releaseDate={published}
           releaseType={type}
           renderProducerLink={
-            /* TODO EES-7673 - remove fallback for DfE once all releases have an organisation */
-            publishingOrganisations?.length ? (
-              <span data-testid="Produced by-value">
-                {publishingOrganisations.map((org, index) => (
-                  <Fragment key={org.id}>
-                    {getListStringSeparator(publishingOrganisations, index)}
-                    <Link
-                      unvisited
-                      to={org.url}
-                      className="govuk-link--no-underline"
-                    >
-                      {org.title}
-                    </Link>
-                  </Fragment>
-                ))}
-              </span>
-            ) : (
-              <Link
-                testId="Produced by-value"
-                unvisited
-                className="govuk-link--no-underline"
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
-            )
+            <span data-testid="Produced by-value">
+              {publishingOrganisations.map((org, index) => (
+                <Fragment key={org.id}>
+                  {getListStringSeparator(publishingOrganisations, index)}
+                  <Link
+                    unvisited
+                    to={org.url}
+                    className="govuk-link--no-underline"
+                  >
+                    {org.title}
+                  </Link>
+                </Fragment>
+              ))}
+            </span>
           }
           renderUpdatesLink={
             showUpdatesInfo ? (

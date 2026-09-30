@@ -261,6 +261,7 @@ describe('TableToolWizard', () => {
             selectedRelease: {
               id: 'selected-release',
               latestData: false,
+              publishingOrganisations: [],
               slug: 'selected-release-slug',
               title: 'Selected release',
               type: 'AdHocStatistics',

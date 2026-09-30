@@ -81,7 +81,7 @@ export default function ReleaseSummaryEditPage() {
               releaseType: releaseVersion.type,
               releaseLabel: releaseVersion.label,
               publishingOrganisations:
-                releaseVersion.publishingOrganisations?.map(
+                releaseVersion.publishingOrganisations.map(
                   organisation => organisation.id,
                 ) ?? [],
             }}

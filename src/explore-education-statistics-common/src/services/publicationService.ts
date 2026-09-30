@@ -147,7 +147,7 @@ export interface ReleaseVersionSummary {
     title: string;
   };
   published: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   slug: string;
   title: string;
   type: ReleaseType;

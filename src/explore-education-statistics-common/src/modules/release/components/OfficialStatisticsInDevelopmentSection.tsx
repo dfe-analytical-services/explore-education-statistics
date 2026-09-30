@@ -5,7 +5,7 @@ export default function OfficialStatisticsInDevelopmentSection({
   publishingOrganisations,
   showHeading = true,
 }: ReleaseTypeSectionProps) {
-  const isSkillsEngland = !!publishingOrganisations?.find(
+  const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
   return (

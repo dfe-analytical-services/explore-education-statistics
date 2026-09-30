@@ -4,7 +4,9 @@ import AccreditedOfficialStatisticsSection from '@common/modules/release/compone
 
 describe('AccreditedOfficialStatisticsSection', () => {
   test('renders', () => {
-    render(<AccreditedOfficialStatisticsSection />);
+    render(
+      <AccreditedOfficialStatisticsSection publishingOrganisations={[]} />,
+    );
 
     expect(
       screen.getByRole('link', {
@@ -14,7 +16,12 @@ describe('AccreditedOfficialStatisticsSection', () => {
   });
 
   test('shows the heading if showHeading is true', () => {
-    render(<AccreditedOfficialStatisticsSection showHeading />);
+    render(
+      <AccreditedOfficialStatisticsSection
+        publishingOrganisations={[]}
+        showHeading
+      />,
+    );
 
     expect(
       screen.getByRole('heading', { name: 'Accredited official statistics' }),
@@ -22,7 +29,12 @@ describe('AccreditedOfficialStatisticsSection', () => {
   });
 
   test('hides the heading if showHeading is false', () => {
-    render(<AccreditedOfficialStatisticsSection showHeading={false} />);
+    render(
+      <AccreditedOfficialStatisticsSection
+        publishingOrganisations={[]}
+        showHeading={false}
+      />,
+    );
 
     expect(
       screen.queryByRole('heading', { name: 'Official statistics' }),
@@ -33,7 +45,9 @@ describe('AccreditedOfficialStatisticsSection', () => {
     // Introduced because of changes to the National Statistics Designation Review,
     // Documented in https://dfedigital.atlassian.net/browse/EES-4620
 
-    render(<AccreditedOfficialStatisticsSection />);
+    render(
+      <AccreditedOfficialStatisticsSection publishingOrganisations={[]} />,
+    );
 
     expect(
       screen.getByText(
