@@ -99,7 +99,28 @@ describe('transformDataSetListResults', () => {
     ]);
   });
 
+  test('returns no geographic levels as CSV only when no level is CSV only', async () => {
+    const results = await transformDataSetListResults(
+      testResults([
+        {
+          ...testDocument,
+          geographicLevelDetails: [
+            { code: 'NAT', label: 'National', csvOnly: false },
+            { code: 'REG', label: 'Regional', csvOnly: false },
+          ],
+        },
+      ]),
+    );
+
+    expect(results[0].meta.geographicLevels).toEqual(['National', 'Regional']);
+    expect(results[0].meta.geographicLevelsCsvOnly).toEqual([]);
+  });
+
   test('returns all geographic levels as CSV only when every level is CSV only', async () => {
+    // This shouldn't happen in practice as the Importer only skips
+    // Institution, Planning area, Provider and School rows (making them CSV
+    // only) when the data set has more than one geographic level. A data set
+    // with only one of these levels is imported as normal (making it not CSV only).
     const results = await transformDataSetListResults(
       testResults([
         {
