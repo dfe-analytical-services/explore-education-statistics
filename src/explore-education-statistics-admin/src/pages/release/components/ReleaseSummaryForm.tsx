@@ -19,10 +19,7 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import {
-  defaultOrganisation,
-  Organisation,
-} from '@common/services/types/organisation';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -37,7 +34,7 @@ export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseLabel?: string;
-  publishingOrganisations?: string[];
+  publishingOrganisations: string[];
 }
 
 const formId = 'releaseSummaryForm';
@@ -160,13 +157,13 @@ export default function ReleaseSummaryForm({
 
   // Pre-select DfE if there is no saved publishing organisation.
   const defaultPublishingOrganisationId = organisations?.find(
-    organisation => organisation.title === defaultOrganisation.title,
+    organisation => organisation.title === 'Department for Education',
   )?.id;
 
   const initialValuesWithDefaults: ReleaseSummaryFormValues = {
     ...initialValues,
     publishingOrganisations:
-      initialValues.publishingOrganisations?.length ||
+      initialValues.publishingOrganisations.length ||
       !defaultPublishingOrganisationId
         ? initialValues.publishingOrganisations
         : [defaultPublishingOrganisationId],

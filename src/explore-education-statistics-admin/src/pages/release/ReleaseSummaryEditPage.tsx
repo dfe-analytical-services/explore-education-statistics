@@ -41,7 +41,7 @@ export default function ReleaseSummaryEditPage() {
       },
       type: values.releaseType ?? 'AdHocStatistics',
       label: values.releaseLabel,
-      publishingOrganisations: values.publishingOrganisations ?? [],
+      publishingOrganisations: values.publishingOrganisations,
     });
 
     onReleaseChange();
@@ -83,7 +83,7 @@ export default function ReleaseSummaryEditPage() {
               publishingOrganisations:
                 releaseVersion.publishingOrganisations.map(
                   organisation => organisation.id,
-                ) ?? [],
+                ),
             }}
             releaseVersion={releaseVersion.version}
             onSubmit={handleSubmit}
