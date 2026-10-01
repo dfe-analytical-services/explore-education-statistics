@@ -7,9 +7,11 @@ parameters:
   - name: condition
     type: string
     default: succeeded()
+  # Optional. Only set this if the endpoint is protected by EasyAuth and requires
+  # a bearer token to call. Leave unset to call an unauthenticated endpoint.
   - name: accessTokenScope
     type: string
-    default: null
+    default: ''
   - name: pollingDelaySeconds
     type: number
     default: 5
