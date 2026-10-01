@@ -1,5 +1,4 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -21,14 +20,8 @@ param logAnalyticsWorkspaceId string
 @description('Whether to display detailed error messages in this environment or not.')
 param detailedErrors bool
 
-@description('Whether or not to support Swagger routes for these APIs.')
-param enableSwagger bool
-
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
-
-@description('Public URL of the public site.')
-param publicAppUrl string
 
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
@@ -44,22 +37,11 @@ param deployAlerts bool
 param existingProdAppSettings object = {}
 
 @secure()
-@description('The existing appsettings for the deploy slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
-param existingDeploySlotAppSettings object = {}
+@description('The existing appsettings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingSlotAppSettings object = {}
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
-
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
-
-// Used to encrypt the ASP.NET Core Data Protection key ring - see app-service.bicep /
-// bicep-main-infrastructure-release/main.bicep's dataProtectionKey resource for why this is
-// needed (the key ring can't safely live on local disk when shared across deployment slots).
-var dataProtectionKeyUri = '${vaultUri}keys/${resourceNames.keyVault.keys.dataProtection}'
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.publicSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
@@ -150,17 +132,13 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       httpErrors: true
       alertsGroupName: resourceNames.alertsGroup
     } : null
-    applicationAppSettings: {
-      PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
-      enableSwagger: enableSwagger
-      PublicApp__Url: publicAppUrl
-      Analytics__Enabled: analyticsEnabled
-      Analytics__BasePath: analyticsFileShareMountPath
-      DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
-      DataProtection__KeyVaultUri: vaultUri
-    }
+    // Application-specific appsettings (PublicStorage, enableSwagger, PublicApp__Url, Analytics__*)
+    // are no longer seeded from here - the app-release pipeline applies them to the staging slot
+    // via content-api-bicep-config.bicep ahead of each code deploy. See existingProdAppSettings/
+    // existingStagingSlotAppSettings below for how they're preserved across infrastructure deploys.
+    applicationAppSettings: {}
     existingProdAppSettings: existingProdAppSettings
-    existingDeploySlotAppSettings: existingDeploySlotAppSettings
+    existingStagingSlotAppSettings: existingStagingSlotAppSettings
     tagValues: tagValues
   }
 }

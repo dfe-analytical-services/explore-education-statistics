@@ -1,4 +1,5 @@
 import { abbreviations } from '../common/abbreviations.bicep'
+import { EnvironmentConfig } from 'configuration/environment-configuration.bicep'
 
 @export()
 type ResourceNames = {
@@ -163,7 +164,16 @@ type ResourceNames = {
   logAnalyticsWorkspace: string
 }
 
+// TODO EES-7502 - use standardised naming convention for Notifier storage.
 @export()
+func getResourceNamesForEnvironment(environmentConfig EnvironmentConfig) ResourceNames => getResourceNames(
+  environmentConfig.environmentIdentifier!,
+  '${environmentConfig.environmentIdentifier!}-ees-papi',
+  '${environmentConfig.environmentIdentifier!}-ees-sapi',
+  '${environmentConfig.environmentIdentifier!}-ees',
+  (environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production') ? 'storage' : 'sa'
+)
+
 func getResourceNames(
   legacyResourcePrefix string,
   publicApiResourcePrefix string,

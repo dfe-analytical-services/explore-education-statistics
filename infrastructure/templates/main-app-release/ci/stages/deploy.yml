@@ -5,6 +5,13 @@ parameters:
     type: string
   - name: serviceConnection
     type: string
+  - name: bicepParamFile
+    type: string
+    values:
+      - dev
+      - test
+      - preprod
+      - prod
   - name: condition
     type: string
   - name: dependsOn
@@ -32,6 +39,7 @@ stages:
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
 
       - template: ../jobs/deploy-data-api.yml
         parameters:
