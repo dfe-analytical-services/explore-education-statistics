@@ -122,7 +122,7 @@ var baseSettings = union(applicationAppSettings, {
     resourceId('Microsoft.Insights/components', appInsightsName),
     '2020-02-02'
   ).InstrumentationKey
-  WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
+  WEBSITE_NODE_DEFAULT_VERSION: '22.23.3'
   ASPNETCORE_DETAILEDERRORS: detailedErrors
   WEBSITES_PORT: websitePort
   
