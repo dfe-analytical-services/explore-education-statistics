@@ -16,6 +16,7 @@ import logger from '@common/services/logger';
 import { acquireTokenSilent, PostLoginState } from '@admin/auth/msal';
 import {
   expiredInviteRoute,
+  homeRoute,
   noInvitationRoute,
   signInRoute,
 } from '@admin/routes/routes';
@@ -28,8 +29,7 @@ export interface User {
   permissions: GlobalPermissions;
 }
 
-export type AuthStatus =
-  'checking' | 'authenticated' | 'unauthenticated' | 'redirecting';
+export type AuthStatus = 'authenticated' | 'unauthenticated' | 'redirecting';
 
 export interface AuthContextState {
   user?: User;
@@ -206,10 +206,19 @@ export const AuthContextProvider = ({
       }
 
       function requestRedirect(path: string) {
+        let targetPath = path;
         log(`AuthContext: Requesting that user is redirected to ${path}.`);
+
+        if (!path.startsWith('/')) {
+          log(
+            'AuthContext: Invalid redirect URL provided, redirecting user to home route',
+          );
+          targetPath = homeRoute.fullPath;
+        }
+
         setState(previousState => ({
           ...previousState,
-          redirect: path,
+          redirect: targetPath,
         }));
       }
 
@@ -404,7 +413,7 @@ export const AuthContextProvider = ({
   ]);
 
   const contextState: AuthContextState = useMemo(() => {
-    let status: AuthStatus = 'checking';
+    let status: AuthStatus = 'unauthenticated';
 
     if (state.redirect) {
       status = 'redirecting';
@@ -439,8 +448,13 @@ export function AuthContextTestProvider({
   user,
 }: AuthContextTestProviderProps) {
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <AuthContext value={{ user, status: 'authenticated' }}>
+    <AuthContext
+      // eslint-disable-next-line react/jsx-no-constructed-context-values
+      value={{
+        user,
+        status: user ? 'authenticated' : 'unauthenticated',
+      }}
+    >
       {children}
     </AuthContext>
   );

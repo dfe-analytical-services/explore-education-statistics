@@ -52,7 +52,6 @@ import { ProtectedRouteProps, PublicRouteProps } from '@admin/routes/types';
 export const publicRoutes: Record<string, PublicRouteProps> = {
   signInRoute: {
     ...signInRoute,
-
     element: <SignInPage />,
   },
   signedOutRoute: {
