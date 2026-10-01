@@ -89,6 +89,14 @@ Verify the Organisation checkboxes are preselected
     user checks checkbox is checked    Department for Education
     user checks checkbox is checked    Skills England
 
+Verify at least one organisation is required
+    user clicks checkbox    Department for Education
+    user clicks checkbox    Skills England
+    user clicks button    Update release summary
+    user waits until page contains    Select at least one publishing organisation
+    user clicks checkbox    Department for Education
+    user clicks checkbox    Skills England
+
 Verify the user can unselect an organisation for amendment
     user clicks checkbox    Skills England
     user clicks button    Update release summary
