@@ -276,3 +276,26 @@ module storageAccountBlobServiceModule '../common/components/blobService.bicep' 
     functionAppModule
   ]
 }
+
+// Publication metadata changes can make a previously cached ZIP stale without publishing a new release.
+// Deliver the existing PublicationChanged event to Publisher so it can purge affected AFD paths.
+module publicationZipPurgeQueue '../common/components/queueService.bicep' = {
+  name: 'publicationZipPurgeQueueModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.publisher.storageAccount
+    queueNames: ['publication-zip-purge']
+  }
+  dependsOn: [functionAppModule]
+}
+
+module publicationZipPurgeSubscription '../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = {
+  name: 'publicationZipPurgeSubscriptionModuleDeploy'
+  params: {
+    name: '${resourceNames.publisher.functionApp}-publication-zip-purge'
+    topicName: resourceNames.eventGrid.topics.publicationChanged
+    includedEventTypes: ['publication-changed']
+    storageAccountName: resourceNames.publisher.storageAccount
+    queueName: 'publication-zip-purge'
+  }
+  dependsOn: [publicationZipPurgeQueue]
+}

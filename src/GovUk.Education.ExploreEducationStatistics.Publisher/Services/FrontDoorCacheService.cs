@@ -19,7 +19,12 @@ public class FrontDoorCacheService(
 {
     private const string AzureManagementScope = "https://management.azure.com/.default";
     private const string ApiVersion = "2025-04-15";
-    private static readonly TimeSpan[] RetryDelays = [TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)];
+    private static readonly TimeSpan[] RetryDelays =
+    [
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(2),
+        TimeSpan.FromSeconds(10),
+    ];
 
     public async Task PurgeAllFilesZipCache(
         IReadOnlySet<Guid> releaseVersionIds,

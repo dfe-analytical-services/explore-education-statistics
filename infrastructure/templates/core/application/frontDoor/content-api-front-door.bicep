@@ -24,11 +24,6 @@ param publisherFunctionName string
 var contentApiResourcePrefix = '${subscription}-ees-content'
 var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
 var certificateName = '${subscription}-as-ees-content-afd-certificate'
-// CDN Endpoint Contributor only covers classic CDN endpoints, not afdEndpoints.
-var cdnProfileContributorRoleDefinitionId = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  'ec156ff8-a8d1-4d15-830c-5b80698ca432'
-)
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
@@ -43,13 +38,13 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
   name: publisherFunctionName
 }
 
-resource publisherFrontDoorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(endpoint.id, publisherFunction.id, cdnProfileContributorRoleDefinitionId)
-  scope: endpoint
-  properties: {
-    roleDefinitionId: cdnProfileContributorRoleDefinitionId
+module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = {
+  name: '${contentApiResourcePrefix}PublisherRoleAssignmentModuleDeploy'
+  params: {
+    frontDoorProfileName: frontDoorProfileName
+    frontDoorEndpointName: frontDoorEndpointName
+    principalResourceId: publisherFunction.id
     principalId: publisherFunction.identity.principalId
-    principalType: 'ServicePrincipal'
   }
 }
 

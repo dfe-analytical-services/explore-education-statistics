@@ -70,7 +70,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
     ruleSetNames: [nextJsRuleSetName]
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployWaf: true
-    deployWafSecurityPolicy: false
+    deployWafDomainAssociation: false
     alerts: deployAlerts ? {
       latency: true
       originHealth: true
@@ -86,7 +86,7 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
   }
 }
 
-module contentApiFrontDoorModule 'contentApiFrontDoor.bicep' = {
+module contentApiFrontDoorModule 'content-api-front-door.bicep' = {
   name: '${frontDoorProfileName}ContentApiModuleDeploy'
   params: {
     subscription: subscription

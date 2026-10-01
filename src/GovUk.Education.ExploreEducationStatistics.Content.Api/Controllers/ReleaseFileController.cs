@@ -68,6 +68,8 @@ public class ReleaseFileController(
             return BadRequest(ModelState);
         }
 
+        // The first all-files request streams and stores the ZIP. Later requests redirect to the
+        // versioned URL below so only that payload is cached by Front Door.
         return await persistenceHelper
             .CheckEntityExists<ReleaseVersion>(
                 releaseVersionId,

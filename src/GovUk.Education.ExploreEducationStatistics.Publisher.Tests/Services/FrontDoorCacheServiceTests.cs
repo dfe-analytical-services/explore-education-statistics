@@ -66,18 +66,19 @@ public class FrontDoorCacheServiceTests
     }
 
     [Fact]
-    public async Task PurgeAllFilesZipCache_TransientFailures_RetriesAndDoesNotThrow()
+    public async Task PurgeAllFilesZipCache_TransientFailures_RetriesUntilAccepted()
     {
         var handler = new RecordingHttpMessageHandler(
             HttpStatusCode.InternalServerError,
             HttpStatusCode.TooManyRequests,
-            HttpStatusCode.ServiceUnavailable
+            HttpStatusCode.ServiceUnavailable,
+            HttpStatusCode.Accepted
         );
         var service = BuildService(handler);
 
         await service.PurgeAllFilesZipCache(new HashSet<Guid> { Guid.NewGuid() });
 
-        Assert.Equal(3, handler.Requests.Count);
+        Assert.Equal(4, handler.Requests.Count);
     }
 
     private static FrontDoorCacheService BuildService(
