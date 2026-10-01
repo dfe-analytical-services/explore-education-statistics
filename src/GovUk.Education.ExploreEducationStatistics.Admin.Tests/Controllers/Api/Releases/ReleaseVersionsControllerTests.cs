@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -900,7 +899,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -932,7 +931,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -964,7 +963,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -1049,9 +1048,46 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEqualError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.Type).ToLowerFirst(),
+                comparisonValue: ReleaseType.ExperimentalStatistics
+            );
+        }
 
-            Assert.Equal(ValidationErrorMessages.ReleaseTypeInvalid.ToString(), error.Code);
+        [Fact]
+        public async Task TooManyPublishingOrganisations()
+        {
+            // Arrange
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var organisations = DataFixture.DefaultOrganisation().GenerateArray(4);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.Organisations.AddRange(organisations);
+                });
+
+            // Act
+            var response = await UpdateRelease(
+                releaseVersionId: publication.Releases[0].Versions[0].Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: [.. organisations.Select(o => o.Id)]
+            );
+
+            // Assert
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasLessThanOrEqualError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst(),
+                comparisonValue: 3
+            );
         }
 
         [Theory]
@@ -1095,7 +1131,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(SlugNotUnique.ToString(), error.Code);
+            Assert.Equal(nameof(SlugNotUnique), error.Code);
         }
 
         [Fact]
@@ -1135,7 +1171,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseSlugUsedByRedirect), error.Code);
         }
 
         [Fact]
@@ -1195,13 +1231,20 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
-
-            Assert.Equal(
-                $"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.",
-                error.Message
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasMaximumLengthError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.Label).ToLowerFirst(),
+                maxLength: 50
             );
-            Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
+        }
+
+        private async Task<Guid[]> CreateDefaultPublishingOrganisations()
+        {
+            Organisation organisation = DataFixture.DefaultOrganisation();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Organisations.Add(organisation));
+
+            return [organisation.Id];
         }
 
         private async Task<HttpResponseMessage> UpdateRelease(
@@ -1211,6 +1254,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
             string? preReleaseAccessList = "",
+            Guid[]? publishingOrganisations = null,
             ClaimsPrincipal? user = null
         )
         {
@@ -1223,6 +1267,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
                 TimePeriodCoverage = new { Value = timePeriodCoverage.GetEnumValue() },
                 Label = label,
                 PreReleaseAccessList = preReleaseAccessList,
+                PublishingOrganisations = publishingOrganisations ?? await CreateDefaultPublishingOrganisations(),
             };
 
             return await client.PatchAsJsonAsync($"api/releaseVersions/{releaseVersionId}", request);

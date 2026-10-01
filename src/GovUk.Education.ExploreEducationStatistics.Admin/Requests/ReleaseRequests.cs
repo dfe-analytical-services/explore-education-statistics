@@ -1,5 +1,5 @@
 #nullable enable
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,28 +12,45 @@ public record ReleaseCreateRequest
 {
     public Guid PublicationId { get; set; }
 
-    [Required]
     public ReleaseType? Type { get; init; }
 
-    [Required]
     [JsonConverter(typeof(TimeIdentifierJsonConverter))]
     public TimeIdentifier TimePeriodCoverage { get; init; }
 
     public string Slug => CreateReleaseSlug(year: Year, timePeriodCoverage: TimePeriodCoverage, label: Label);
 
-    [Range(1000, 9999)]
     public int Year { get; init; }
 
-    [MaxLength(20)]
     public string? Label { get; init; }
 
     public Guid[] PublishingOrganisations { get; init; } = [];
 
     public Guid? TemplateReleaseId { get; init; }
+
+    public class Validator : AbstractValidator<ReleaseCreateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Type).NotNull().NotEqual(ReleaseType.ExperimentalStatistics);
+
+            RuleFor(request => request.Year).InclusiveBetween(1000, 9999);
+
+            RuleFor(request => request.Label).MaximumLength(20);
+
+            RuleFor(request => request.PublishingOrganisations.Length).LessThanOrEqualTo(3);
+        }
+    }
 }
 
 public record ReleaseUpdateRequest
 {
-    [MaxLength(20)]
     public string? Label { get; init; }
+
+    public class Validator : AbstractValidator<ReleaseUpdateRequest>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Label).MaximumLength(20);
+        }
+    }
 }
