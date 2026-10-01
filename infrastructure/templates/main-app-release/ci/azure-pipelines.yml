@@ -22,6 +22,10 @@ parameters:
       - Swap
       - 'No swap'
     default: Default
+  - name: deployAdminFirst
+    displayName: Deploy Admin first in order for it to apply database migrations.  Uncheck this to deploy Admin in parallel with everything else instead.
+    type: boolean
+    default: true
 
 resources:
   pipelines:
@@ -55,6 +59,7 @@ stages:
       serviceConnection: $(serviceConnectionDev)
       bicepParamFile: dev
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+      deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
   - template: stages/deploy.yml
     parameters:
@@ -64,6 +69,7 @@ stages:
       serviceConnection: $(serviceConnectionTest)
       bicepParamFile: test
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+      deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
   - template: stages/deploy.yml
     parameters:
@@ -73,6 +79,7 @@ stages:
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+      deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
   - template: stages/deploy.yml
     parameters:
@@ -83,3 +90,4 @@ stages:
       serviceConnection: $(serviceConnectionProd)
       bicepParamFile: prod
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+      deployAdminFirst: ${{ parameters.deployAdminFirst }}
