@@ -5,6 +5,9 @@ parameters:
     type: string
   - name: bicepParamFile
     type: string
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
 
 jobs:
   - deployment: DeployAdmin
@@ -43,7 +46,7 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 deploymentName: $(bicepConfigDeployName)
 
-            - template: ../tasks/deploy-app-service-with-slot.yml
+            - template: ../tasks/deploy-app-service.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayNamePrefix: Admin
@@ -51,3 +54,5 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
                 appSettingsJson: $(appSettings)
+                environment: ${{ parameters.environment }}
+                slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
