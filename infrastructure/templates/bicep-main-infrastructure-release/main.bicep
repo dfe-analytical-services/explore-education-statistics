@@ -39,6 +39,14 @@ param adminConfigParam AdminConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
 
+@secure()
+@description('The existing appsettings for the Admin App Service production slot, fetched by the pipeline before deployment.')
+param adminProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Admin App Service deploy slot, fetched by the pipeline before deployment.')
+param adminDeploySlotAppSettings object = {}
+
 
 
 //
@@ -49,6 +57,14 @@ param contentApiConfigParam ContentApiConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var contentApiConfig = mergeContentApiConfig(contentApiConfigParam)
 
+@secure()
+@description('The existing appsettings for the Content API App Service production slot, fetched by the pipeline before deployment.')
+param contentApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Content API App Service deploy slot, fetched by the pipeline before deployment.')
+param contentApiDeploySlotAppSettings object = {}
+
 
 
 //
@@ -58,6 +74,14 @@ param dataApiConfigParam DataApiConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
+
+@secure()
+@description('The existing appsettings for the Data API App Service production slot, fetched by the pipeline before deployment.')
+param dataApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Data API App Service deploy slot, fetched by the pipeline before deployment.')
+param dataApiDeploySlotAppSettings object = {}
 
 
 
@@ -267,6 +291,8 @@ module adminModuleDeploy '../admin/main.bicep' = {
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
+    existingProdAppSettings: adminProdAppSettings
+    existingDeploySlotAppSettings: adminDeploySlotAppSettings
     tagValues: tags
   }
   dependsOn: [
@@ -291,6 +317,8 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
+    existingProdAppSettings: contentApiProdAppSettings
+    existingDeploySlotAppSettings: contentApiDeploySlotAppSettings
     tagValues: tags
   }
 }
@@ -314,6 +342,8 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
+    existingProdAppSettings: dataApiProdAppSettings
+    existingDeploySlotAppSettings: dataApiDeploySlotAppSettings
     tagValues: tags
   }
 }

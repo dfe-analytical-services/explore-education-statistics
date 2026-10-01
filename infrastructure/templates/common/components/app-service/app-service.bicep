@@ -41,8 +41,26 @@ param vnetLink {
 @description('Database connection strings.')
 param connectionStrings ConnectionString[]?
 
-@description('Application-specific appsettings. These will be merged with infrastructure appsettings.')
+@description('''
+Application-specific appsettings. These will be merged with infrastructure appsettings and applied
+to both the production and deploy slots. This serves only as a bootstrap default for the very first
+deploy of this App Service - on every subsequent deploy, "existingProdAppSettings" / "existingDeploySlotAppSettings"
+take precedence over these values, so that infrastructure deploys do not reset application-specific
+appsettings back to these original values.
+''')
 param applicationAppSettings object
+
+@secure()
+@description('''
+The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings back to their original values.
+See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
+''')
+param existingProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the deploy slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingDeploySlotAppSettings object = {}
 
 @description('Whether or not to display detailed error messages in this environment.')
 param detailedErrors bool
@@ -142,10 +160,17 @@ var osSpecificSettings = union(baseSettings,
   } : {}
 )
 
+// Existing settings take precedence over settings computed in this Bicep file so that
+// infrastructure deploys do not reset application-specific appsettings back to their
+// bootstrap values, causing unwanted updates ahead of a slot swap deploy being ready to run.
+// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
+var combinedProdSettings = union(osSpecificSettings, existingProdAppSettings)
+var combinedDeploySlotSettings = union(osSpecificSettings, existingDeploySlotAppSettings)
+
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
   name: 'appsettings'
-  properties: osSpecificSettings
+  properties: combinedProdSettings
 }
 
 module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
@@ -208,6 +233,14 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     vnetLink: vnetLink
     tagValues: tagValues
   }
+}
+
+resource deploySlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = if (swapSlotEnabled) {
+  name: '${appServiceName}/${deploySlotName}/appsettings'
+  properties: combinedDeploySlotSettings
+  dependsOn: [
+    stagingSlotModule
+  ]
 }
 
 module autoscaleSettingsModule 'autoscale-settings.bicep' = {
