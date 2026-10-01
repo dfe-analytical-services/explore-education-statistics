@@ -1,0 +1,25 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: DeployAdmin
+    displayName: Deploy Admin
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Admin artifact
+              artifact: admin
+
+            - template: ../tasks/deploy-app-service-with-slot.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Admin
+                appName: $(subscription)-as-ees-admin
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
