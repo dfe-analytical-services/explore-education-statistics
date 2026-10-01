@@ -33,6 +33,8 @@ public record ReleaseVersionUpdateRequest
 
             RuleFor(request => request.Label).MaximumLength(50);
 
+            RuleFor(request => request.PublishingOrganisations).NotEmpty();
+
             RuleFor(request => request.PublishingOrganisations.Length).LessThanOrEqualTo(3);
         }
     }

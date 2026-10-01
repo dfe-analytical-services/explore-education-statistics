@@ -78,6 +78,16 @@ public class ReleaseCreateRequestValidatorTests
         result.ShouldNotHaveValidationErrorFor(r => r.Label);
     }
 
+    [Fact]
+    public void WhenPublishingOrganisationsIsEmpty_ValidationFails()
+    {
+        var result = _validator.TestValidate(ValidRequest() with { PublishingOrganisations = [] });
+
+        result
+            .ShouldHaveValidationErrorFor(r => r.PublishingOrganisations)
+            .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
+    }
+
     [Theory]
     [InlineData(1)]
     [InlineData(3)]
