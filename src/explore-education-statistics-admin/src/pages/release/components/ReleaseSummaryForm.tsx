@@ -19,7 +19,10 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { Organisation } from '@common/services/types/organisation';
+import {
+  DEPARTMENT_FOR_EDUCATION_TITLE,
+  Organisation,
+} from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -157,7 +160,7 @@ export default function ReleaseSummaryForm({
 
   // Pre-select DfE if there is no saved publishing organisation.
   const defaultPublishingOrganisationId = organisations?.find(
-    organisation => organisation.title === 'Department for Education',
+    organisation => organisation.title === DEPARTMENT_FOR_EDUCATION_TITLE,
   )?.id;
 
   const initialValuesWithDefaults: ReleaseSummaryFormValues = {

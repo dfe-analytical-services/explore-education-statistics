@@ -7,8 +7,10 @@ export interface Organisation {
   logoFileName: string;
 }
 
+export const DEPARTMENT_FOR_EDUCATION_TITLE = 'Department for Education';
+
 export type OrganisationTitle =
-  | 'Department for Education'
+  | typeof DEPARTMENT_FOR_EDUCATION_TITLE
   | 'Department for Work & Pensions'
   | 'Ofsted'
   | 'Ofqual'

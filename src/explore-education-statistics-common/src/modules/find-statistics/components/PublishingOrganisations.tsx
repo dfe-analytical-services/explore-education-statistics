@@ -1,10 +1,11 @@
 import OrgLogoGov from '@common/components/OrgLogoGov';
 import OrgLogoNonGov from '@common/components/OrgLogoNonGov';
-import { Organisation } from '@common/services/types/organisation';
+import {
+  DEPARTMENT_FOR_EDUCATION_TITLE,
+  Organisation,
+} from '@common/services/types/organisation';
 import styles from '@common/modules/find-statistics/components/PublishingOrganisations.module.scss';
 import React from 'react';
-
-const departmentForEducationTitle = 'Department for Education';
 
 interface Props {
   publishingOrganisations: Organisation[];
@@ -15,8 +16,8 @@ export default function PublishingOrganisations({
 }: Props) {
   const sortedOrganisations = [...publishingOrganisations].sort((a, b) => {
     // DfE should always be first
-    if (a.title === departmentForEducationTitle) return -1;
-    if (b.title === departmentForEducationTitle) return 1;
+    if (a.title === DEPARTMENT_FOR_EDUCATION_TITLE) return -1;
+    if (b.title === DEPARTMENT_FOR_EDUCATION_TITLE) return 1;
 
     // Sort remaining alphabetically
     return a.title.localeCompare(b.title);
