@@ -39,6 +39,9 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
   kind: kind
   location: resourceGroup().location
   tags: tagValues
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     serverFarmId: appServicePlanId
     httpsOnly: true
@@ -68,3 +71,5 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site-s
     azureFileShares: azureFileShares
   }
 }
+
+output slotIdentityPrincipalId string = stagingSlot.identity.principalId

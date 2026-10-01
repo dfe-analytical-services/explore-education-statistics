@@ -243,6 +243,24 @@ resource stagingSlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = 
   ]
 }
 
+module stagingSlotSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?secretsUser ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultSecretsUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Secrets User'
+  }
+}
+
+module stagingSlotCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?certificateUser ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultCertificateUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Certificate User'
+  }
+}
+
 module autoscaleSettingsModule 'autoscale-settings.bicep' = {
   name: '${appServiceName}AutoscaleSettingsDeploy'
   params: {
