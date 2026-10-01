@@ -13,7 +13,7 @@ jobs:
     variables:
       templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/content-api-bicep-config.bicep
       paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
-      contentApiBicepConfigDeployName: ContentApiBicepConfig$(Build.BuildNumber)
+      bicepConfigDeployName: ContentApiBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
@@ -33,7 +33,7 @@ jobs:
                 inlineScript: |
                   set -e
                   az deployment group create \
-                    --name $(contentApiBicepConfigDeployName) \
+                    --name $(bicepConfigDeployName) \
                     --resource-group $(resourceGroupName) \
                     --template-file $(templateFile) \
                     --parameters $(paramFile)
@@ -41,7 +41,7 @@ jobs:
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                deploymentName: $(contentApiBicepConfigDeployName)
+                deploymentName: $(bicepConfigDeployName)
 
             - template: ../tasks/deploy-app-service-with-slot.yml
               parameters:

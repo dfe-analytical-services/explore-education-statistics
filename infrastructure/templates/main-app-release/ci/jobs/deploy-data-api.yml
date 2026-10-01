@@ -3,18 +3,45 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
 
 jobs:
   - deployment: DeployDataApi
     displayName: Deploy Data API
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/data-api/data-api-bicep-config.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/data-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: DataApiBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - download: MainBuild
               displayName: Download Data API artifact
               artifact: data-api
+
+            - task: AzureCLI@2
+              displayName: Data API - Deploy appsettings config Bicep
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az deployment group create \
+                    --name $(bicepConfigDeployName) \
+                    --resource-group $(resourceGroupName) \
+                    --template-file $(templateFile) \
+                    --parameters $(paramFile)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                deploymentName: $(bicepConfigDeployName)
 
             - template: ../tasks/deploy-app-service-with-slot.yml
               parameters:
@@ -23,3 +50,4 @@ jobs:
                 appName: $(subscription)-as-ees-data
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/data-api/GovUk.Education.ExploreEducationStatistics.Data.Api.zip
+                appSettingsJson: $(appSettings)
