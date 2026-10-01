@@ -907,22 +907,17 @@ docker compose up data-storage
 
 ### Taking a backup of Keycloak users
 
-If wanting to add more users to the standard set of users we use and are using Keycloak as the Identity Provider, the users will firstly need to be
-added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
-
+To take a backup of the current state of Keycloak:
 ```bash
-docker exec -it ees-idp /opt/keycloak/bin/kc.sh export --file /tmp/new-ees-realm.json --realm ees-realm --users realm_file
+docker stop ees-idp
+docker commit ees-idp ees-idp-export
+docker run --rm -v "$PWD/docker/keycloak:/export" ees-idp-export export --file /export/keycloak-ees-realm.json --realm ees-realm
+docker rmi ees-idp-export
+docker start ees-idp
 ```
 
-The export runs to completion and exits. Keycloak recommends that the server is stopped whilst exporting; if the command fails with a
-database lock error, stop the Admin (so that nothing is using the IdP), re-run the export, and then start the Admin again.
-
-Then copy `/tmp/new-ees-realm.json` out of the `ees-idp` container, overwriting the existing `docker/keycloak/keycloak-ees-realm.json` in the repo, so that
-future rebuilds of the IdP image use the new realm configuration. From the project root, run:
-
-```bash
-docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.json
-```
+This overwrites `docker/keycloak/keycloak-ees-realm.json` with the updated, exported realm, including its users, so that future rebuilds of the IdP image
+use the new realm configuration.
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 
