@@ -1,4 +1,15 @@
 trigger: none
+pr: none
+
+resources:
+  pipelines:
+    - pipeline: MainBuild
+      source: Explore Education Statistics
+      trigger:
+        branches:
+          - dev
+          - test
+          - master
 
 parameters:
   - name: deployPsqlFlexibleServer
@@ -59,16 +70,6 @@ parameters:
       - test
       - preprod
     default: none
-
-resources:
-  pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
-      trigger:
-        branches:
-          - dev
-          - test
-          - master
 
 variables:
   - group: Public API Infrastructure - Common
