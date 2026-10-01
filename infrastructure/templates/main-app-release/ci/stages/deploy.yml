@@ -20,6 +20,9 @@ parameters:
   - name: slotSwappingBehaviour
     type: string
     default: Default
+  - name: deployAdminFirst
+    type: boolean
+    default: true
 
 stages:
   - stage: ${{ parameters.stageName }}
@@ -46,6 +49,9 @@ stages:
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
           slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
 
       - template: ../jobs/deploy-data-api.yml
         parameters:
@@ -53,23 +59,38 @@ stages:
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
           slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
 
       - template: ../jobs/deploy-notifier.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
 
       - template: ../jobs/deploy-publisher.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
 
       - template: ../jobs/deploy-importer.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
 
       - template: ../jobs/deploy-public-site.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
