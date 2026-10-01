@@ -1,0 +1,25 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: DeployContentApi
+    displayName: Deploy Content API
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Content API artifact
+              artifact: content-api
+
+            - template: ../tasks/deploy-app-service-with-slot.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Content API
+                appName: $(subscription)-as-ees-content
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/content-api/GovUk.Education.ExploreEducationStatistics.Content.Api.zip

@@ -1,0 +1,59 @@
+parameters:
+  - name: stageName
+    type: string
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: condition
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Deploy ${{ parameters.environment }}
+    dependsOn: ${{ parameters.dependsOn }}
+    # Prevent this stage from running in parallel with the same deploy stage in other
+    # ongoing runs of this pipeline. Instead, multiple executions of this stage will
+    # be queued and run sequentially in the order that their pipelines were triggered.
+    lockBehavior: sequential
+    condition: ${{ parameters.condition }}
+    variables:
+      - group: Common - ${{ parameters.environment }}
+    jobs:
+      - template: ../jobs/deploy-admin.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-content-api.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-data-api.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-notifier.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-publisher.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-importer.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+
+      - template: ../jobs/deploy-public-site.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
