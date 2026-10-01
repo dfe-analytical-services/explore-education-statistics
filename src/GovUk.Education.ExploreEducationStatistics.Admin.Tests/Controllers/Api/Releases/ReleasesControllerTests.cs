@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Releases;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -194,9 +193,63 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEqualError(
+                expectedPath: nameof(ReleaseCreateRequest.Type).ToLowerFirst(),
+                comparisonValue: ReleaseType.ExperimentalStatistics
+            );
+        }
 
-            Assert.Equal(ValidationErrorMessages.ReleaseTypeInvalid.ToString(), error.Code);
+        [Fact]
+        public async Task NoPublishingOrganisations()
+        {
+            Publication publication = DataFixture.DefaultPublication();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
+
+            var response = await CreateRelease(
+                publicationId: publication.Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: []
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst()
+            );
+        }
+
+        [Fact]
+        public async Task TooManyPublishingOrganisations()
+        {
+            Publication publication = DataFixture.DefaultPublication();
+            var organisations = DataFixture.DefaultOrganisation().GenerateArray(4);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.Organisations.AddRange(organisations);
+                });
+
+            var response = await CreateRelease(
+                publicationId: publication.Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: [.. organisations.Select(o => o.Id)]
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasLessThanOrEqualError(
+                expectedPath: nameof(ReleaseCreateRequest.PublishingOrganisations).ToLowerFirst(),
+                comparisonValue: 3
+            );
         }
 
         [Theory]
@@ -232,7 +285,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(SlugNotUnique.ToString(), error.Code);
+            Assert.Equal(nameof(SlugNotUnique), error.Code);
         }
 
         [Fact]
@@ -263,7 +316,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseSlugUsedByRedirect), error.Code);
         }
 
         [Fact]
@@ -313,13 +366,20 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
-
-            Assert.Equal(
-                $"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '20'.",
-                error.Message
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasMaximumLengthError(
+                expectedPath: nameof(ReleaseCreateRequest.Label).ToLowerFirst(),
+                maxLength: 20
             );
-            Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
+        }
+
+        private async Task<Guid[]> CreateDefaultPublishingOrganisations()
+        {
+            Organisation organisation = DataFixture.DefaultOrganisation();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Organisations.Add(organisation));
+
+            return [organisation.Id];
         }
 
         private async Task<HttpResponseMessage> CreateRelease(
@@ -328,6 +388,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
             TimeIdentifier timePeriodCoverage,
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
+            Guid[]? publishingOrganisations = null,
             ClaimsPrincipal? user = null
         )
         {
@@ -340,6 +401,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
                 Year = year,
                 TimePeriodCoverage = new { Value = timePeriodCoverage.GetEnumValue() },
                 Label = label,
+                PublishingOrganisations = publishingOrganisations ?? await CreateDefaultPublishingOrganisations(),
             };
 
             return await client.PostAsJsonAsync("api/releases", request);
@@ -842,7 +904,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(SlugNotUnique.ToString(), error.Code);
+            Assert.Equal(nameof(SlugNotUnique), error.Code);
         }
 
         [Fact]
@@ -889,7 +951,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseUndergoingPublishing.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseUndergoingPublishing), error.Code);
         }
 
         [Fact]
@@ -912,7 +974,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseSlugUsedByRedirect), error.Code);
         }
 
         [Fact]
@@ -947,7 +1009,7 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseSlugUsedByRedirect), error.Code);
         }
 
         [Fact]
@@ -992,13 +1054,11 @@ public abstract class ReleasesControllerIntegrationTests(ReleasesControllerInteg
 
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
-
-            Assert.Equal(
-                $"The field {nameof(ReleaseUpdateRequest.Label)} must be a string or array type with a maximum length of '20'.",
-                error.Message
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasMaximumLengthError(
+                expectedPath: nameof(ReleaseUpdateRequest.Label).ToLowerFirst(),
+                maxLength: 20
             );
-            Assert.Equal(nameof(ReleaseUpdateRequest.Label), error.Path);
         }
 
         private async Task<HttpResponseMessage> UpdateRelease(

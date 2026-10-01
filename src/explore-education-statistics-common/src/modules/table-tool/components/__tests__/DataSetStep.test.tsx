@@ -106,6 +106,7 @@ describe('DataSetStep', () => {
     title: 'Release 1',
     slug: 'release-1',
     latestData: true,
+    publishingOrganisations: [],
     type: 'OfficialStatistics',
   };
 

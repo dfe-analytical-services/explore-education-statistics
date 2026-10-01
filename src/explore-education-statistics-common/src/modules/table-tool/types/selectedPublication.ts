@@ -18,7 +18,7 @@ export interface SelectedRelease {
   id: string;
   slug: string;
   latestData: boolean;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   title: string;
   type: ReleaseType;
 }

@@ -33,8 +33,7 @@ export interface AzureDataSetIndexItem {
   lastUpdated: string;
   api: DataSetFileApi;
   numDataFileRows: number;
-  geographicLevels: GeographicLevelCode[];
-  geographicLevelsLabels: string[];
+  geographicLevelDetails: AzureGeographicLevel[];
   indicators: string[];
   filters: string[];
   releaseType: string;
@@ -42,6 +41,12 @@ export interface AzureDataSetIndexItem {
     from: string;
     to: string;
   };
+}
+
+export interface AzureGeographicLevel {
+  code: GeographicLevelCode;
+  label: string;
+  csvOnly: boolean;
 }
 
 export interface AzureDataSetListRequest {

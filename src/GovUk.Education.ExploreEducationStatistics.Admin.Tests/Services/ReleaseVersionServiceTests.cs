@@ -1127,18 +1127,6 @@ public abstract class ReleaseVersionServiceTests
         }
 
         [Fact]
-        public async Task ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
-        {
-            var releaseUpdateRequest = new ReleaseVersionUpdateRequest { Type = ReleaseType.ExperimentalStatistics };
-
-            var releaseVersionService = BuildService(Mock.Of<ContentDbContext>());
-
-            var result = await releaseVersionService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
-
-            result.AssertBadRequest(ValidationErrorMessages.ReleaseTypeInvalid);
-        }
-
-        [Fact]
         public async Task GivenReleaseVersionExists_AndIsFirstVersion_NewReleaseSlugIsValidated()
         {
             Release release = _dataFixture

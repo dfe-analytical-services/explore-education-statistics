@@ -37,18 +37,6 @@ public abstract class ReleaseServiceTests
     public class CreateReleaseTests : ReleaseServiceTests
     {
         [Fact]
-        public async Task ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
-        {
-            var releaseCreateRequest = new ReleaseCreateRequest { Type = ReleaseType.ExperimentalStatistics };
-
-            var releaseService = BuildService(Mock.Of<ContentDbContext>());
-
-            var result = await releaseService.CreateRelease(releaseCreateRequest);
-
-            result.AssertBadRequest(ReleaseTypeInvalid);
-        }
-
-        [Fact]
         public async Task NoTemplate()
         {
             Publication publication = _dataFixture.DefaultPublication();

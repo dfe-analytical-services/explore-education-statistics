@@ -153,7 +153,7 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
   if (filters.geographicLevels?.length) {
     const joined = filters.geographicLevels.join('|');
     conditions.push(
-      odata`geographicLevels/any(g: search.in(g, ${joined}, '|'))`,
+      odata`geographicLevelDetails/any(g: search.in(g/code, ${joined}, '|'))`,
     );
   }
 

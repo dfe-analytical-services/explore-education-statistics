@@ -4,7 +4,7 @@ import OfficialStatisticsSection from '@common/modules/release/components/Offici
 
 describe('OfficialStatisticsSection', () => {
   test('renders', () => {
-    render(<OfficialStatisticsSection />);
+    render(<OfficialStatisticsSection publishingOrganisations={[]} />);
 
     expect(
       screen.getByRole('link', {
@@ -14,7 +14,9 @@ describe('OfficialStatisticsSection', () => {
   });
 
   test('shows the heading if showHeading is true', () => {
-    render(<OfficialStatisticsSection showHeading />);
+    render(
+      <OfficialStatisticsSection publishingOrganisations={[]} showHeading />,
+    );
 
     expect(
       screen.getByRole('heading', { name: 'Official statistics' }),
@@ -22,7 +24,12 @@ describe('OfficialStatisticsSection', () => {
   });
 
   test('hides the heading if showHeading is false', () => {
-    render(<OfficialStatisticsSection showHeading={false} />);
+    render(
+      <OfficialStatisticsSection
+        publishingOrganisations={[]}
+        showHeading={false}
+      />,
+    );
 
     expect(
       screen.queryByRole('heading', { name: 'Official statistics' }),
@@ -33,7 +40,7 @@ describe('OfficialStatisticsSection', () => {
     // Introduced because of changes to the National Statistics Designation Review,
     // Documented in https://dfedigital.atlassian.net/browse/EES-4621
 
-    render(<OfficialStatisticsSection />);
+    render(<OfficialStatisticsSection publishingOrganisations={[]} />);
 
     expect(
       screen.getByText(

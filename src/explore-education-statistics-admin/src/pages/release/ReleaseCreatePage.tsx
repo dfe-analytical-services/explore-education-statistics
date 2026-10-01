@@ -63,7 +63,7 @@ const ReleaseCreatePage = () => {
       templateReleaseId:
         values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
       label: values.releaseLabel,
-      publishingOrganisations: values.publishingOrganisations ?? [],
+      publishingOrganisations: values.publishingOrganisations,
     });
 
     navigate(
@@ -105,6 +105,7 @@ const ReleaseCreatePage = () => {
             templateReleaseId: '',
             releaseType: undefined,
             releaseLabel: '',
+            publishingOrganisations: [],
           }}
           releaseVersion={0}
           templateRelease={model?.templateRelease}

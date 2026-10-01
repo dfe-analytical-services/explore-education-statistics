@@ -167,6 +167,7 @@ const ReleaseContentPageLoaded = () => {
                     releaseVersionId={release.id}
                     releaseType={release.type}
                     publication={release.publication}
+                    publishingOrganisations={release.publishingOrganisations}
                     featuredTableId={previewFeaturedTableId}
                   />
                 )}

@@ -162,7 +162,7 @@ export interface ReleaseVersion<
   publication: ContentPublication;
   published: string;
   publishedDisplayDate?: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   relatedDashboardsSection: ContentSection<ContentBlockType>;
   relatedInformation: BasicLink[];
   slug: string;

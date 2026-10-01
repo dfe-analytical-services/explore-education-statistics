@@ -53,6 +53,7 @@ const testRelease: ReleaseVersion = {
   version: 0,
   type: 'AccreditedOfficialStatistics',
   preReleaseAccessList: 'test',
+  publishingOrganisations: [],
   year: 2023,
   yearTitle: '2023',
 };

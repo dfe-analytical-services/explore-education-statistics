@@ -37,6 +37,7 @@ const ReleaseTableToolPage = () => {
           <ReleasePreviewTableTool
             releaseVersionId={releaseVersionId}
             publication={publication}
+            publishingOrganisations={releaseVersion.publishingOrganisations}
             releaseType={releaseVersion.type}
           />
         )}

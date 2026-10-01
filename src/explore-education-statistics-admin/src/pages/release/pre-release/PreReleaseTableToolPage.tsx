@@ -134,7 +134,8 @@ const PreReleaseTableToolPage = () => {
               release && (
                 <ReleaseTableToolInfoWrapper
                   publication={publication}
-                  releaseType={release?.type}
+                  publishingOrganisations={release.publishingOrganisations}
+                  releaseType={release.type}
                 />
               )
             }

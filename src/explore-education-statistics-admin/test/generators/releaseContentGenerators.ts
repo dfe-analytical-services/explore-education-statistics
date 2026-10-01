@@ -22,6 +22,7 @@ import {
   KeyStatistic,
 } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 
 const defaultContent: ContentSection<
   EditableContentBlock | EditableDataBlock | EditableEmbedBlock
@@ -191,6 +192,7 @@ export function generateEditableRelease({
   published,
   publishedDisplayDate,
   publishScheduled,
+  publishingOrganisations = [testOrganisation],
   relatedDashboardsSection = defaultRelatedDashoardsSection,
   relatedInformation = defaultRelatedInformation,
   title = 'Release title',
@@ -221,6 +223,7 @@ export function generateEditableRelease({
     published,
     publishedDisplayDate,
     publishScheduled,
+    publishingOrganisations,
     relatedDashboardsSection,
     relatedInformation,
     slug: slug ?? releaseSlug,

@@ -1,4 +1,5 @@
 import ReleaseTableToolInfoWrapper from '@admin/pages/release/content/components/ReleaseTableToolInfoWrapper';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -24,12 +25,14 @@ interface Props {
   releaseVersionId: string;
   releaseType: ReleaseType;
   publication: Publication | ContentPublication;
+  publishingOrganisations: Organisation[];
 }
 const ReleasePreviewTableTool = ({
   featuredTableId,
   releaseVersionId,
   releaseType,
   publication,
+  publishingOrganisations,
 }: Props) => {
   const [dataBlockVersionId, setDataBlockVersionId] = useState(
     featuredTableId ?? '',
@@ -115,6 +118,7 @@ const ReleasePreviewTableTool = ({
             renderRelatedInfo={
               <ReleaseTableToolInfoWrapper
                 publication={publication}
+                publishingOrganisations={publishingOrganisations}
                 releaseType={releaseType}
               />
             }
