@@ -39,6 +39,14 @@ param analyticsEnabled bool
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
+@secure()
+@description('The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the deploy slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingDeploySlotAppSettings object = {}
+
 @description('''
 Whether to restrict this App Service origin to requests routed through this environment's Azure Front Door
 profile. Enable only after the Content API custom domain has been cut over to Front Door, as enabling it
@@ -178,6 +186,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
       DataProtection__KeyVaultUri: vaultUri
     }
+    existingProdAppSettings: existingProdAppSettings
+    existingDeploySlotAppSettings: existingDeploySlotAppSettings
     tagValues: tagValues
   }
 }

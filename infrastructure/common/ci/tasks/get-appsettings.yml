@@ -3,7 +3,7 @@ parameters:
     type: string
   - name: resourceGroupName
     type: string
-  - name: functionAppName
+  - name: appName
     type: string
   - name: variableName
     type: string
@@ -12,6 +12,11 @@ parameters:
   - name: slotName
     type: string
     default: ''
+  - name: appType
+    type: string
+    values:
+      - functionApp
+      - webApp
 
 steps:
   - task: AzureCLI@2
@@ -23,36 +28,42 @@ steps:
       inlineScript: |
         set -e
 
+        if [ "${{ parameters.appType }}" == "webApp" ]; then
+          cliCommand=webapp
+        else
+          cliCommand=functionapp
+        fi
+
         slotArgs=()
         if [ -n "${{ parameters.slotName }}" ]; then
           slotArgs=(--slot "${{ parameters.slotName }}")
         fi
 
-        # Check whether or not the target Function App or slot exists yet.
+        # Check whether or not the target App or slot exists yet.
         if [ -n "${{ parameters.slotName }}" ]; then
-          exists=$(az functionapp deployment slot list \
-            --name ${{ parameters.functionAppName }} \
+          exists=$(az $cliCommand deployment slot list \
+            --name ${{ parameters.appName }} \
             --resource-group ${{ parameters.resourceGroupName }} \
             --query "[?name=='${{ parameters.slotName }}']" | jq '. != []')
         else
-          exists=$(az functionapp list \
+          exists=$(az $cliCommand list \
             --resource-group ${{ parameters.resourceGroupName }} \
-            --query "[?name=='${{ parameters.functionAppName }}']" | jq '. != []')
+            --query "[?name=='${{ parameters.appName }}']" | jq '. != []')
         fi
 
-        # If the Function App or slot doesn't exist yet, return an empty set of appsettings.
+        # If the App or slot doesn't exist yet, return an empty set of appsettings.
         if [ "$exists" != "true" ]; then
-          echo "${{ parameters.functionAppName }} (slot: '${{ parameters.slotName }}') does not exist yet - defaulting to no existing app settings."
+          echo "${{ parameters.appName }} (slot: '${{ parameters.slotName }}') does not exist yet - defaulting to no existing app settings."
           echo "##vso[task.setvariable variable=${{ parameters.variableName }};issecret=true]{}"
           exit 0
         fi
 
-        # If the Function App exists, we should be able to get its appsettings without issue.
+        # If the App exists, we should be able to get its appsettings without issue.
         # If we run into any errors, they will not be caught and so will fail the job.
-        # This prevents us from risking applying empty appsettings against a running Function
-        # App or slot.
-        rawAppSettings=$(az functionapp config appsettings list \
-          --name ${{ parameters.functionAppName }} \
+        # This prevents us from risking applying empty appsettings against a running App
+        # or slot.
+        rawAppSettings=$(az $cliCommand config appsettings list \
+          --name ${{ parameters.appName }} \
           --resource-group ${{ parameters.resourceGroupName }} \
           "${slotArgs[@]}")
 
