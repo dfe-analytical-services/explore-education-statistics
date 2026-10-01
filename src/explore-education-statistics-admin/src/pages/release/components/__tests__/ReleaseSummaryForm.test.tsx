@@ -548,7 +548,7 @@ describe('ReleaseSummaryForm', () => {
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
           publishingOrganisations: [
-            '5E089801-CF1A-B375-ACD3-88E9D8AECE66',
+            '5e089801-cf1a-b375-acd3-88e9d8aece66',
             '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
           ],
         }}
