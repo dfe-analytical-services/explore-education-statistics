@@ -17,6 +17,9 @@ parameters:
   - name: dependsOn
     type: object
     default: []
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
 
 stages:
   - stage: ${{ parameters.stageName }}
@@ -35,18 +38,21 @@ stages:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
       - template: ../jobs/deploy-content-api.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
       - template: ../jobs/deploy-data-api.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
       - template: ../jobs/deploy-notifier.yml
         parameters:
