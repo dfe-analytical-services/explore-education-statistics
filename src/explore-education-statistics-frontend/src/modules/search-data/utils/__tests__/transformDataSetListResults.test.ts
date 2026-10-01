@@ -17,6 +17,7 @@ type SelectedIndexItem = Pick<
   | 'publicationId'
   | 'publicationTitle'
   | 'publicationSlug'
+  | 'publishingOrganisationTitles'
   | 'releaseId'
   | 'releaseTitle'
   | 'releaseSlug'
@@ -60,6 +61,7 @@ const testDocument: SelectedIndexItem = {
   publicationId: 'publication-1',
   publicationTitle: 'Publication 1',
   publicationSlug: 'publication-1-slug',
+  publishingOrganisationTitles: ['Department for Education'],
   releaseId: 'release-1',
   releaseTitle: 'Release 1',
   releaseSlug: 'release-1-slug',
