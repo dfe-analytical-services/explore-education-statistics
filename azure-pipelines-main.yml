@@ -362,14 +362,15 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/admin
+          zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         displayName: Publish Admin artifact
         inputs:
           artifactName: admin
-          targetPath: $(Build.ArtifactStagingDirectory)
+          targetPath: $(Build.ArtifactStagingDirectory)/admin
 
   - job: Frontend
     pool: ees-ubuntu2204-xlarge
