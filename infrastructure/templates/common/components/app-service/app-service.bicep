@@ -41,8 +41,8 @@ param connectionStrings ConnectionString[]?
 
 @description('''
 Application-specific appsettings. These will be merged with infrastructure appsettings and applied
-to both the production and deploy slots. This serves only as a bootstrap default for the very first
-deploy of this App Service - on every subsequent deploy, "existingProdAppSettings" / "existingDeploySlotAppSettings"
+to both the production and staging slots. This serves only as a bootstrap default for the very first
+deploy of this App Service - on every subsequent deploy, "existingProdAppSettings" / "existingStagingSlotAppSettings"
 take precedence over these values, so that infrastructure deploys do not reset application-specific
 appsettings back to these original values.
 ''')
@@ -57,8 +57,8 @@ See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
 param existingProdAppSettings object = {}
 
 @secure()
-@description('The existing appsettings for the deploy slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
-param existingDeploySlotAppSettings object = {}
+@description('The existing appsettings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingSlotAppSettings object = {}
 
 @description('Whether or not to display detailed error messages in this environment.')
 param detailedErrors bool
@@ -89,7 +89,7 @@ param alerts {
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var deploySlotName = 'deploy'
+var stagingSlotName = 'deploy'
 
 var vnetIntegrationSubnetRef = vnetLink != null 
   ? resourceId('Microsoft.Network/virtualNetworks/subnets', vnetLink!.vnetName, vnetLink!.subnetName)
@@ -163,7 +163,7 @@ var osSpecificSettings = union(baseSettings,
 // bootstrap values, causing unwanted updates ahead of a slot swap deploy being ready to run.
 // See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
 var combinedProdSettings = union(osSpecificSettings, existingProdAppSettings)
-var combinedDeploySlotSettings = union(osSpecificSettings, existingDeploySlotAppSettings)
+var combinedStagingSlotSettings = union(osSpecificSettings, existingStagingSlotAppSettings)
 
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
@@ -196,12 +196,12 @@ module appServiceCertificateUserRoleAssignmentModule '../../../common/components
 }
 
 module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
-  name: '${appServiceName}${deploySlotName}Deploy'
+  name: '${appServiceName}${stagingSlotName}Deploy'
   params: {
     appServiceName: appService.name
     kind: kind
     operatingSystem: operatingSystem
-    slotName: deploySlotName
+    slotName: stagingSlotName
     appServicePlanId: appServicePlanId
     minTlsVersion: minTlsVersion
     vnetLink: vnetLink
@@ -209,9 +209,9 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
   }
 }
 
-resource deploySlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = if (swapSlotEnabled) {
-  name: '${appServiceName}/${deploySlotName}/appsettings'
-  properties: combinedDeploySlotSettings
+resource stagingSlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = if (swapSlotEnabled) {
+  name: '${appServiceName}/${stagingSlotName}/appsettings'
+  properties: combinedStagingSlotSettings
   dependsOn: [
     stagingSlotModule
   ]
