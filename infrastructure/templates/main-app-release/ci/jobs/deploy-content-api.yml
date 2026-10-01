@@ -3,18 +3,45 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
 
 jobs:
   - deployment: DeployContentApi
     displayName: Deploy Content API
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/content-api-bicep-config.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      contentApiBicepConfigDeployName: ContentApiBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - download: MainBuild
               displayName: Download Content API artifact
               artifact: content-api
+
+            - task: AzureCLI@2
+              displayName: Content API - Deploy appsettings config Bicep
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az deployment group create \
+                    --name $(contentApiBicepConfigDeployName) \
+                    --resource-group $(resourceGroupName) \
+                    --template-file $(templateFile) \
+                    --parameters $(paramFile)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                deploymentName: $(contentApiBicepConfigDeployName)
 
             - template: ../tasks/deploy-app-service-with-slot.yml
               parameters:
@@ -23,3 +50,4 @@ jobs:
                 appName: $(subscription)-as-ees-content
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/content-api/GovUk.Education.ExploreEducationStatistics.Content.Api.zip
+                appSettingsJson: $(appSettings)

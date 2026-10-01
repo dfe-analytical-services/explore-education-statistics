@@ -45,6 +45,7 @@ stages:
       condition: eq(variables.isDev, true)
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
+      bicepParamFile: dev
 
   - template: stages/deploy.yml
     parameters:
@@ -52,6 +53,7 @@ stages:
       condition: eq(variables.isTest, true)
       environment: Test
       serviceConnection: $(serviceConnectionTest)
+      bicepParamFile: test
 
   - template: stages/deploy.yml
     parameters:
@@ -59,6 +61,7 @@ stages:
       condition: eq(variables.isPreProd, true)
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
+      bicepParamFile: preprod
 
   - template: stages/deploy.yml
     parameters:
@@ -67,3 +70,4 @@ stages:
       dependsOn: DeployPreProd
       environment: Prod
       serviceConnection: $(serviceConnectionProd)
+      bicepParamFile: prod
