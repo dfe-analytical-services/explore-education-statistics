@@ -11,7 +11,7 @@ parameters:
     type: string
   - name: healthCheckPath
     type: string
-    default: '/'
+    default: /api/health
   - name: appSettingsJson
     type: string
     default: '{}'

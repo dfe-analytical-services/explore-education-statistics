@@ -3,10 +3,14 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: dependsOn
+    type: object
+    default: []
 
 jobs:
   - deployment: DeployNotifier
     displayName: Deploy Notifier
+    dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     strategy:
       runOnce:

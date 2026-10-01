@@ -3,10 +3,14 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: dependsOn
+    type: object
+    default: []
 
 jobs:
   - deployment: DeployPublicSite
     displayName: Deploy Public Site
+    dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     strategy:
       runOnce:
@@ -44,5 +48,5 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Public Site - Checking app is healthy after deploy
-                endpoint: https://$(subscription)-as-ees-public-site.azurewebsites.net/
+                endpoint: https://$(subscription)-as-ees-public-site.azurewebsites.net/health
                 maxAttempts: 20
