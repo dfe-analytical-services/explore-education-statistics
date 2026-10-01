@@ -1,8 +1,15 @@
 trigger: none
 pr: none
 
-pool:
-  vmImage: $(vmImageName)
+# resources:
+#   pipelines:
+#     - pipeline: MainBuild
+#       source: Explore Education Statistics
+#       trigger:
+#         branches:
+#           - dev
+#           - test
+#           - master
 
 parameters:
   - name: forceDeployToEnvironment
@@ -27,13 +34,8 @@ parameters:
     type: boolean
     default: true
 
-resources:
-  pipelines:
-    - pipeline: MainBuild
-      source: Explore Education Statistics
-      trigger:
-        branches:
-          - dev
+pool:
+  vmImage: $(vmImageName)
 
 variables:
   - group: Common
