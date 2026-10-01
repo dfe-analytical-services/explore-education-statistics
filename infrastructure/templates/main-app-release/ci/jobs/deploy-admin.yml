@@ -46,13 +46,47 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 deploymentName: $(bicepConfigDeployName)
 
-            - template: ../tasks/deploy-app-service.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                displayNamePrefix: Admin
-                appName: $(subscription)-as-ees-admin
-                resourceGroupName: $(resourceGroupName)
-                artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
-                appSettingsJson: $(appSettings)
-                environment: ${{ parameters.environment }}
-                slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+            # Database migrations run as part of Admin's startup, so by the time the staging
+            # slot (or production, on the direct path) reports healthy here, they've already
+            # run successfully. This job intentionally stops right after that health check -
+            # see SwapAdminIntoProduction below - so that services waiting on Admin (via
+            # deployAdminFirst) can start as soon as migrations are done, without also waiting
+            # for the slot swap itself to complete.
+            - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
+                - template: ../tasks/deploy-app-service-to-staging-slot.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(subscription)-as-ees-admin
+                    resourceGroupName: $(resourceGroupName)
+                    artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
+                    appSettingsJson: $(appSettings)
+            - ${{ else }}:
+                - template: ../tasks/deploy-app-service-direct.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(subscription)-as-ees-admin
+                    resourceGroupName: $(resourceGroupName)
+                    artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
+                    appSettingsJson: $(appSettings)
+
+  # Only exists when slot swapping is actually in play for this run - see deploy-app-service.yml
+  # for the equivalent decision used by Content API/Data API. Kept as its own job (rather than
+  # more steps in DeployAdmin above) specifically so it does NOT block services that depend on
+  # Admin's migrations having run, not on the swap having completed.
+  - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
+      - deployment: SwapAdminIntoProduction
+        displayName: Swap Admin Into Production
+        dependsOn: DeployAdmin
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: ../tasks/swap-staging-slot-into-production.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(subscription)-as-ees-admin
+                    resourceGroupName: $(resourceGroupName)

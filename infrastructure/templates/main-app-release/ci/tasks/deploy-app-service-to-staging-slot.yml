@@ -1,0 +1,69 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: artifactZipPath
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: /api/health
+  # A JSON object ({"SettingName": "value", ...}) of application-specific appsettings to push
+  # to the staging slot ahead of the code deploy. Defaults to making no changes, relying on
+  # whatever the staging slot already has (preserved across infrastructure deploys - see
+  # app-service.bicep).
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Update staging slot app settings
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        settingsArgs=()
+        while IFS= read -r kv; do
+          settingsArgs+=("$kv")
+        done < <(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+
+        if [ ${#settingsArgs[@]} -gt 0 ]; then
+          az webapp config appsettings set \
+            --name ${{ parameters.appName }} \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --slot deploy \
+            --settings "${settingsArgs[@]}"
+        else
+          echo "No application-specific appsettings to apply - leaving the staging slot's existing appsettings untouched."
+        fi
+
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Deploy code to staging slot
+    retryCountOnTaskFailure: 3
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        az webapp deploy \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          --slot deploy \
+          --type zip \
+          --src-path "${{ parameters.artifactZipPath }}"
+
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Checking staging slot is healthy after appsettings and code deploy
+      endpoint: https://${{ parameters.appName }}-deploy.azurewebsites.net${{ parameters.healthCheckPath }}
+      maxAttempts: 20
