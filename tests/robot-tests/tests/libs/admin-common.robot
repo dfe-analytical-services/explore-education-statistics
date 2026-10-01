@@ -184,7 +184,6 @@ user creates release from publication page
     user enters text into element    id:releaseSummaryForm-releaseLabel    ${label}
     user clicks radio    Accredited official statistics
     user clicks radio if exists    Create new template
-    user clicks checkbox    Department for Education
     user waits until button is enabled    Create new release    %{WAIT_SMALL}
     user clicks button    Create new release
 

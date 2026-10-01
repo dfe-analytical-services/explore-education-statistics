@@ -123,6 +123,8 @@ Verify user can choose an organisation when creating a new release
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    3001
     user clicks radio    Accredited official statistics
     user clicks radio if exists    Create new template
+    user checks checkbox is checked    Department for Education
+    user clicks checkbox    Department for Education
     user clicks checkbox    Skills England
     user waits until button is enabled    Create new release    %{WAIT_SMALL}
     user clicks button    Create new release
