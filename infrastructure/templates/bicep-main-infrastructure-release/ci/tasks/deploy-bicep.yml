@@ -18,19 +18,19 @@ parameters:
   - name: adminProdAppSettings
     type: string
     default: '{}'
-  - name: adminDeploySlotAppSettings
+  - name: adminStagingSlotAppSettings
     type: string
     default: '{}'
   - name: contentApiProdAppSettings
     type: string
     default: '{}'
-  - name: contentApiDeploySlotAppSettings
+  - name: contentApiStagingSlotAppSettings
     type: string
     default: '{}'
   - name: dataApiProdAppSettings
     type: string
     default: '{}'
-  - name: dataApiDeploySlotAppSettings
+  - name: dataApiStagingSlotAppSettings
     type: string
     default: '{}'
 
@@ -51,8 +51,8 @@ steps:
         environmentPipelineVariables:
           maintenanceIpRanges: $(maintenanceFirewallRules)
         adminProdAppSettings: ${{ parameters.adminProdAppSettings }}
-        adminDeploySlotAppSettings: ${{ parameters.adminDeploySlotAppSettings }}
+        adminStagingSlotAppSettings: ${{ parameters.adminStagingSlotAppSettings }}
         contentApiProdAppSettings: ${{ parameters.contentApiProdAppSettings }}
-        contentApiDeploySlotAppSettings: ${{ parameters.contentApiDeploySlotAppSettings }}
+        contentApiStagingSlotAppSettings: ${{ parameters.contentApiStagingSlotAppSettings }}
         dataApiProdAppSettings: ${{ parameters.dataApiProdAppSettings }}
-        dataApiDeploySlotAppSettings: ${{ parameters.dataApiDeploySlotAppSettings }}
+        dataApiStagingSlotAppSettings: ${{ parameters.dataApiStagingSlotAppSettings }}

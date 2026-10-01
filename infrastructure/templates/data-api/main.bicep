@@ -58,8 +58,8 @@ param deployAlerts bool
 param existingProdAppSettings object = {}
 
 @secure()
-@description('The existing appsettings for the deploy slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
-param existingDeploySlotAppSettings object = {}
+@description('The existing appsettings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingSlotAppSettings object = {}
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -178,7 +178,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       DataProtection__KeyVaultUri: vaultUri
     }
     existingProdAppSettings: existingProdAppSettings
-    existingDeploySlotAppSettings: existingDeploySlotAppSettings
+    existingStagingSlotAppSettings: existingStagingSlotAppSettings
     tagValues: tagValues
   }
 }

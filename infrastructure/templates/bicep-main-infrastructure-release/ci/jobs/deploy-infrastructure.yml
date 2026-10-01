@@ -33,7 +33,7 @@ jobs:
                 parameterFile: $(paramFile)
 
             # Fetch the existing application-specific appsettings for each App Service and its
-            # deploy slot, so that this infrastructure deploy can merge them with its own
+            # staging slot, so that this infrastructure deploy can merge them with its own
             # infrastructure-specific appsettings rather than resetting them back to their
             # bootstrap values. See app-service.bicep for how these are merged.
             - template: ../../../../common/ci/tasks/get-appsettings.yml
@@ -47,12 +47,12 @@ jobs:
 
             - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
-                displayName: Get existing Admin deploy slot app settings
+                displayName: Get existing Admin staging slot app settings
                 appName: $(subscription)-as-ees-admin
                 appType: webApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                variableName: adminDeploySlotAppSettings
+                variableName: adminStagingSlotAppSettings
                 slotName: deploy
 
             - template: ../../../../common/ci/tasks/get-appsettings.yml
@@ -66,12 +66,12 @@ jobs:
 
             - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
-                displayName: Get existing Content API deploy slot app settings
+                displayName: Get existing Content API staging slot app settings
                 appName: $(subscription)-as-ees-content
                 appType: webApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                variableName: contentApiDeploySlotAppSettings
+                variableName: contentApiStagingSlotAppSettings
                 slotName: deploy
 
             - template: ../../../../common/ci/tasks/get-appsettings.yml
@@ -85,12 +85,12 @@ jobs:
 
             - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
-                displayName: Get existing Data API deploy slot app settings
+                displayName: Get existing Data API staging slot app settings
                 appName: $(subscription)-as-ees-data
                 appType: webApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                variableName: dataApiDeploySlotAppSettings
+                variableName: dataApiStagingSlotAppSettings
                 slotName: deploy
 
             - template: ../tasks/deploy-bicep.yml
@@ -102,8 +102,8 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 parameterFile: $(paramFile)
                 adminProdAppSettings: $(adminProdAppSettings)
-                adminDeploySlotAppSettings: $(adminDeploySlotAppSettings)
+                adminStagingSlotAppSettings: $(adminStagingSlotAppSettings)
                 contentApiProdAppSettings: $(contentApiProdAppSettings)
-                contentApiDeploySlotAppSettings: $(contentApiDeploySlotAppSettings)
+                contentApiStagingSlotAppSettings: $(contentApiStagingSlotAppSettings)
                 dataApiProdAppSettings: $(dataApiProdAppSettings)
-                dataApiDeploySlotAppSettings: $(dataApiDeploySlotAppSettings)
+                dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
