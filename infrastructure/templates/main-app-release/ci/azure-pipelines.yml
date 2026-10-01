@@ -1,15 +1,15 @@
 trigger: none
 pr: none
 
-# resources:
-#   pipelines:
-#     - pipeline: MainBuild
-#       source: Explore Education Statistics
-#       trigger:
-#         branches:
-#           - dev
-#           - test
-#           - master
+resources:
+  pipelines:
+    - pipeline: MainBuild
+      source: Explore Education Statistics
+      trigger:
+        branches:
+          - dev
+          - test
+          - master
 
 parameters:
   - name: forceDeployToEnvironment

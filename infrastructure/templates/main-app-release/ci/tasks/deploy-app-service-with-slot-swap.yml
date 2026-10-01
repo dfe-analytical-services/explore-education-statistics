@@ -17,70 +17,20 @@ parameters:
     default: '{}'
 
 steps:
-  - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - Update staging slot app settings
-    inputs:
-      azureSubscription: ${{ parameters.serviceConnection }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -e
-
-        settingsArgs=()
-        while IFS= read -r kv; do
-          settingsArgs+=("$kv")
-        done < <(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"')
-
-        if [ ${#settingsArgs[@]} -gt 0 ]; then
-          az webapp config appsettings set \
-            --name ${{ parameters.appName }} \
-            --resource-group ${{ parameters.resourceGroupName }} \
-            --slot deploy \
-            --settings "${settingsArgs[@]}"
-        else
-          echo "No application-specific appsettings to apply - leaving the staging slot's existing appsettings untouched."
-        fi
-
-  - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - Deploy code to staging slot
-    retryCountOnTaskFailure: 3
-    inputs:
-      azureSubscription: ${{ parameters.serviceConnection }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -e
-        az webapp deploy \
-          --name ${{ parameters.appName }} \
-          --resource-group ${{ parameters.resourceGroupName }} \
-          --slot deploy \
-          --type zip \
-          --src-path "${{ parameters.artifactZipPath }}"
-
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  - template: deploy-app-service-to-staging-slot.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - Checking staging slot is healthy after appsettings and code deploy
-      endpoint: https://${{ parameters.appName }}-deploy.azurewebsites.net${{ parameters.healthCheckPath }}
-      maxAttempts: 20
+      displayNamePrefix: ${{ parameters.displayNamePrefix }}
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      artifactZipPath: ${{ parameters.artifactZipPath }}
+      healthCheckPath: ${{ parameters.healthCheckPath }}
+      appSettingsJson: ${{ parameters.appSettingsJson }}
 
-  - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - Swap staging slot into production
-    inputs:
-      azureSubscription: ${{ parameters.serviceConnection }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -e
-        az webapp deployment slot swap \
-          --name ${{ parameters.appName }} \
-          --resource-group ${{ parameters.resourceGroupName }} \
-          --slot deploy \
-          --target-slot production
-
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  - template: swap-staging-slot-into-production.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - Checking production is healthy after swap
-      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
-      maxAttempts: 20
+      displayNamePrefix: ${{ parameters.displayNamePrefix }}
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      healthCheckPath: ${{ parameters.healthCheckPath }}
