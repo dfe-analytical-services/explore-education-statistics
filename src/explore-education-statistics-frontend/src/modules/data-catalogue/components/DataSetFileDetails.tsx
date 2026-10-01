@@ -78,7 +78,11 @@ export default function DataSetFileDetails({
               </ButtonText>
             }
           >
-            <ReleaseTypeSection showHeading={false} type={release.type} />
+            <ReleaseTypeSection
+              publishingOrganisations={[]}
+              showHeading={false}
+              type={release.type}
+            />
           </Modal>
         </SummaryListItem>
 

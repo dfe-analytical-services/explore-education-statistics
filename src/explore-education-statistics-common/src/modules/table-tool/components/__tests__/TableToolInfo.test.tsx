@@ -5,7 +5,7 @@ import { ReleaseType } from '@common/services/types/releaseType';
 
 describe('TableToolInfo', () => {
   test('renders', () => {
-    render(<TableToolInfo />);
+    render(<TableToolInfo publishingOrganisations={[]} />);
 
     expect(
       screen.getByRole('heading', { name: 'Related information' }),
@@ -15,7 +15,12 @@ describe('TableToolInfo', () => {
   test('displays Release Type and helper modal if one is provided', () => {
     const testReleaseType: ReleaseType = 'OfficialStatistics';
 
-    render(<TableToolInfo releaseType={testReleaseType} />);
+    render(
+      <TableToolInfo
+        publishingOrganisations={[]}
+        releaseType={testReleaseType}
+      />,
+    );
 
     expect(screen.getByText('Release type:')).toBeInTheDocument();
 
@@ -29,7 +34,9 @@ describe('TableToolInfo', () => {
   });
 
   test('does not display the helper modal if no Release Type is given, but still displays the regulation text', () => {
-    render(<TableToolInfo releaseType={undefined} />);
+    render(
+      <TableToolInfo publishingOrganisations={[]} releaseType={undefined} />,
+    );
 
     expect(
       screen.queryByRole('button', { name: 'Official statistics' }),

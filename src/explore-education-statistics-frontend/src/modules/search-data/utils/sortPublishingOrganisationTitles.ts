@@ -1,21 +1,14 @@
-import { defaultOrganisation } from '@common/services/types/organisation';
+import { DEPARTMENT_FOR_EDUCATION_TITLE } from '@common/services/types/organisation';
 
-// TODO EES-7673 - remove fallback for DfE once all releases have an organisation
 export default function sortPublishingOrganisationTitles(
-  publishingOrganisations?: string[],
+  publishingOrganisations: string[],
 ): string[] {
-  let sortedOrganisations: string[];
-  if (!publishingOrganisations || publishingOrganisations?.length === 0) {
-    sortedOrganisations = [defaultOrganisation.title];
-  } else {
-    sortedOrganisations = publishingOrganisations.sort((a, b) => {
-      // DfE should always be first
-      if (a === defaultOrganisation.title) return -1;
-      if (b === defaultOrganisation.title) return 1;
+  return [...publishingOrganisations].sort((a, b) => {
+    // DfE should always be first
+    if (a === DEPARTMENT_FOR_EDUCATION_TITLE) return -1;
+    if (b === DEPARTMENT_FOR_EDUCATION_TITLE) return 1;
 
-      // Sort remaining alphabetically
-      return a.localeCompare(b);
-    });
-  }
-  return sortedOrganisations;
+    // Sort remaining alphabetically
+    return a.localeCompare(b);
+  });
 }

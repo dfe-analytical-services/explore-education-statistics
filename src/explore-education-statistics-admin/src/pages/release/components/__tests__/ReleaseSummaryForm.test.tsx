@@ -3,10 +3,7 @@ import _metaService, {
 } from '@admin/services/metaService';
 import _organisationService from '@admin/services/organisationService';
 import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
-import {
-  defaultOrganisation,
-  Organisation,
-} from '@common/services/types/organisation';
+import { Organisation } from '@common/services/types/organisation';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import { releaseTypes } from '@common/services/types/releaseType';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -38,7 +35,13 @@ describe('ReleaseSummaryForm', () => {
     },
   ];
   const testOrganisations: Organisation[] = [
-    defaultOrganisation,
+    {
+      id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
+      title: 'Department for Education',
+      url: 'https://www.gov.uk/government/organisations/department-for-education',
+      useGISLogo: true,
+      logoFileName: 'logo.png',
+    },
     {
       id: '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
       title: 'Ofsted',
@@ -65,7 +68,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
-          publishingOrganisations: undefined,
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -151,6 +154,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         templateRelease={{
@@ -234,6 +238,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -279,6 +284,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '2022',
           releaseType: 'OfficialStatistics',
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -329,6 +335,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -383,6 +390,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -437,6 +445,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -548,7 +557,7 @@ describe('ReleaseSummaryForm', () => {
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
           publishingOrganisations: [
-            '5E089801-CF1A-B375-ACD3-88E9D8AECE66',
+            '5e089801-cf1a-b375-acd3-88e9d8aece66',
             '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
           ],
         }}
@@ -586,7 +595,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
-          publishingOrganisations: undefined,
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -644,6 +653,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -703,6 +713,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -740,6 +751,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -777,6 +789,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'ExperimentalStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -816,6 +829,7 @@ describe('ReleaseSummaryForm', () => {
             timePeriodCoverageStartYear: '1966',
             releaseType: 'AccreditedOfficialStatistics',
             releaseLabel: 'initial',
+            publishingOrganisations: [],
           }}
           releaseVersion={releaseVersion}
           onSubmit={noop}
@@ -869,6 +883,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'ExperimentalStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}

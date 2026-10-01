@@ -1,5 +1,6 @@
 import render from '@common-test/render';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import ReleaseContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
 import { Matcher, screen } from '@testing-library/react';
 import React from 'react';
@@ -10,6 +11,7 @@ describe('ReleaseContactUsSection', () => {
       <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
@@ -35,6 +37,7 @@ describe('ReleaseContactUsSection', () => {
         <ReleaseContactUsSection
           publicationContact={testContact}
           publicationTitle={publicationTitle}
+          publishingOrganisations={[testOrganisation]}
         />,
       );
 
@@ -49,6 +52,7 @@ describe('ReleaseContactUsSection', () => {
       <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
@@ -66,6 +70,7 @@ describe('ReleaseContactUsSection', () => {
       <ReleaseContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
@@ -79,6 +84,7 @@ describe('ReleaseContactUsSection', () => {
       <ReleaseContactUsSection
         publicationContact={{ ...testContact, contactTelNo: undefined }}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
