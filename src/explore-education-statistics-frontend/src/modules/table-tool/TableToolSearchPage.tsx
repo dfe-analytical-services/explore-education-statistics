@@ -318,6 +318,13 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                             <TableToolSearchFinalResult
                               key={dataset.fileId}
                               dataset={dataset}
+                              onClick={() => {
+                                logEvent({
+                                  category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
+                                  action: `View and edit table for ${searchedTerm?.trim()}`,
+                                  label: dataset.title,
+                                });
+                              }}
                               releaseVersionSummary={latestReleaseVersion}
                             />
                           ))}

@@ -10,13 +10,13 @@ import { FullTableQuery } from '@common/services/tableBuilderService';
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/table-tool/components/TableToolSearchFinalResult.module.scss';
 import { encodeFullTableQueryToParams } from '@frontend/modules/table-tool/utils/fullTableQueryTranscode';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { FinalDataset } from '@frontend/services/tableToolSearchService';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 interface TableToolSearchFinalResultProps {
   dataset: FinalDataset;
+  onClick?: () => void;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
@@ -45,6 +45,7 @@ const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
 
 const TableToolSearchFinalResult = ({
   dataset,
+  onClick,
   releaseVersionSummary,
 }: TableToolSearchFinalResultProps) => {
   const { isValidForTableGeneration, validationErrors, validationWarnings } =
@@ -111,13 +112,7 @@ const TableToolSearchFinalResult = ({
                   to={`/data-tables/${releaseVersionSummary.publication.slug}/${
                     releaseVersionSummary.slug
                   }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
-                  onClick={() =>
-                    logEvent({
-                      category: 'Table Tool Search',
-                      action: 'View and edit table for result',
-                      label: dataset.title,
-                    })
-                  }
+                  onClick={onClick}
                 >
                   View and edit this table{' '}
                   <VisuallyHidden> - {dataset.title}</VisuallyHidden>
