@@ -237,27 +237,12 @@ module adminModuleDeploy '../admin/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: adminConfig.appServiceSku!
-    adminHostname: 'admin.${environmentConfig.domain!}'
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     signalRAllowedOrigins: adminSiteAllowedOrigins
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    enableThemeDeletion: adminConfig.enableThemeDeletion!
-    enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
-    publicDataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
-    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
-    publicApiUrl: publicApiConfig.publicUrl!
-    publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
-    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-    preReleaseMinutesBeforeStart: adminConfig.preReleaseMinutesBeforeStart!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
-    memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
     existingProdAppSettings: adminProdAppSettings

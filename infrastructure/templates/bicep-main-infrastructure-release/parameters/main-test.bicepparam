@@ -6,14 +6,12 @@ param environmentConfigParam = {
   domain: 'test.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  enableSwagger: true
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
   basicAuthEnabled: true
 }
 
 param adminConfigParam = {
-  enableThemeDeletion: true
   appServiceSku: {
     tier: 'Standard'
     name: 'S1'
