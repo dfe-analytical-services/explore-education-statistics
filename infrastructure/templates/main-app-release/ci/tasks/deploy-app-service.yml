@@ -1,0 +1,44 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: artifactZipPath
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: '/'
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+  - name: environment
+    type: string
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
+
+steps:
+  - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
+      - template: deploy-app-service-with-slot-swap.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          displayNamePrefix: ${{ parameters.displayNamePrefix }}
+          appName: ${{ parameters.appName }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          artifactZipPath: ${{ parameters.artifactZipPath }}
+          healthCheckPath: ${{ parameters.healthCheckPath }}
+          appSettingsJson: ${{ parameters.appSettingsJson }}
+  - ${{ else }}:
+      - template: deploy-app-service-direct.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          displayNamePrefix: ${{ parameters.displayNamePrefix }}
+          appName: ${{ parameters.appName }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          artifactZipPath: ${{ parameters.artifactZipPath }}
+          healthCheckPath: ${{ parameters.healthCheckPath }}
+          appSettingsJson: ${{ parameters.appSettingsJson }}

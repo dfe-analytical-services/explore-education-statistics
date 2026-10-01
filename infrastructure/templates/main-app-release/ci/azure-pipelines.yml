@@ -14,6 +14,14 @@ parameters:
       - test
       - preprod
     default: none
+  - name: slotSwappingBehaviour
+    displayName: Force slot-swapping deploys on or off for this run. Leave as Default for default behaviour (slot swapping in Pre-Prod/Prod only).
+    type: string
+    values:
+      - Default
+      - Swap
+      - 'No swap'
+    default: Default
 
 resources:
   pipelines:
@@ -46,6 +54,7 @@ stages:
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
       bicepParamFile: dev
+      slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
   - template: stages/deploy.yml
     parameters:
@@ -54,6 +63,7 @@ stages:
       environment: Test
       serviceConnection: $(serviceConnectionTest)
       bicepParamFile: test
+      slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
   - template: stages/deploy.yml
     parameters:
@@ -62,6 +72,7 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
+      slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
 
   - template: stages/deploy.yml
     parameters:
@@ -71,3 +82,4 @@ stages:
       environment: Prod
       serviceConnection: $(serviceConnectionProd)
       bicepParamFile: prod
+      slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
