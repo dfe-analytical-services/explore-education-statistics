@@ -132,10 +132,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       httpErrors: true
       alertsGroupName: resourceNames.alertsGroup
     } : null
-    // Application-specific appsettings (PublicStorage, enableSwagger, PublicApp__Url, Analytics__*)
-    // are no longer seeded from here - the app-release pipeline applies them to the staging slot
-    // via content-api-bicep-config.bicep ahead of each code deploy. See existingProdAppSettings/
-    // existingStagingSlotAppSettings below for how they're preserved across infrastructure deploys.
+    // Application-specific appsettings are controlled in the application release pipeline
+    // rather than in the infrastructure rollout so that we can support slot swapping.
     applicationAppSettings: {}
     existingProdAppSettings: existingProdAppSettings
     existingStagingSlotAppSettings: existingStagingSlotAppSettings

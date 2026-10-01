@@ -310,17 +310,11 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: dataApiConfig.appServiceSku!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
-    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
