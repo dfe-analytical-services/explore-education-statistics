@@ -37,20 +37,22 @@ jobs:
                 processorProdAppSettings: '{}'
                 processorStagingAppSettings: '{}'
 
-            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
                 displayName: Get existing Data Processor production app settings
+                appName: $(dataProcessorFunctionAppName)
+                appType: functionApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                functionAppName: $(dataProcessorFunctionAppName)
                 variableName: processorProdAppSettings
 
-            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
                 displayName: Get existing Data Processor staging app settings
+                appName: $(dataProcessorFunctionAppName)
+                appType: functionApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                functionAppName: $(dataProcessorFunctionAppName)
                 variableName: processorStagingAppSettings
                 slotName: staging
 

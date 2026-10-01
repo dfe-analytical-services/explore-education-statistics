@@ -32,6 +32,67 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 parameterFile: $(paramFile)
 
+            # Fetch the existing application-specific appsettings for each App Service and its
+            # deploy slot, so that this infrastructure deploy can merge them with its own
+            # infrastructure-specific appsettings rather than resetting them back to their
+            # bootstrap values. See app-service.bicep for how these are merged.
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Admin production app settings
+                appName: $(subscription)-as-ees-admin
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: adminProdAppSettings
+
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Admin deploy slot app settings
+                appName: $(subscription)-as-ees-admin
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: adminDeploySlotAppSettings
+                slotName: deploy
+
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Content API production app settings
+                appName: $(subscription)-as-ees-content
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: contentApiProdAppSettings
+
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Content API deploy slot app settings
+                appName: $(subscription)-as-ees-content
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: contentApiDeploySlotAppSettings
+                slotName: deploy
+
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Data API production app settings
+                appName: $(subscription)-as-ees-data
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: dataApiProdAppSettings
+
+            - template: ../../../../common/ci/tasks/get-appsettings.yml
+              parameters:
+                displayName: Get existing Data API deploy slot app settings
+                appName: $(subscription)-as-ees-data
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                variableName: dataApiDeploySlotAppSettings
+                slotName: deploy
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Deploy Bicep template
@@ -40,3 +101,9 @@ jobs:
                 subscriptionId: $(subscriptionId)
                 resourceGroupName: $(resourceGroupName)
                 parameterFile: $(paramFile)
+                adminProdAppSettings: $(adminProdAppSettings)
+                adminDeploySlotAppSettings: $(adminDeploySlotAppSettings)
+                contentApiProdAppSettings: $(contentApiProdAppSettings)
+                contentApiDeploySlotAppSettings: $(contentApiDeploySlotAppSettings)
+                dataApiProdAppSettings: $(dataApiProdAppSettings)
+                dataApiDeploySlotAppSettings: $(dataApiDeploySlotAppSettings)

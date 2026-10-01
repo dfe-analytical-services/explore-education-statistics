@@ -15,6 +15,24 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: adminProdAppSettings
+    type: string
+    default: '{}'
+  - name: adminDeploySlotAppSettings
+    type: string
+    default: '{}'
+  - name: contentApiProdAppSettings
+    type: string
+    default: '{}'
+  - name: contentApiDeploySlotAppSettings
+    type: string
+    default: '{}'
+  - name: dataApiProdAppSettings
+    type: string
+    default: '{}'
+  - name: dataApiDeploySlotAppSettings
+    type: string
+    default: '{}'
 
 steps:
   - task: BicepDeploy@0
@@ -32,3 +50,9 @@ steps:
         tags: $(resourceTags)
         environmentPipelineVariables:
           maintenanceIpRanges: $(maintenanceFirewallRules)
+        adminProdAppSettings: ${{ parameters.adminProdAppSettings }}
+        adminDeploySlotAppSettings: ${{ parameters.adminDeploySlotAppSettings }}
+        contentApiProdAppSettings: ${{ parameters.contentApiProdAppSettings }}
+        contentApiDeploySlotAppSettings: ${{ parameters.contentApiDeploySlotAppSettings }}
+        dataApiProdAppSettings: ${{ parameters.dataApiProdAppSettings }}
+        dataApiDeploySlotAppSettings: ${{ parameters.dataApiDeploySlotAppSettings }}
