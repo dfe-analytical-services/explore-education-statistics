@@ -8,10 +8,14 @@ parameters:
   - name: slotSwappingBehaviour
     type: string
     default: Default
+  - name: dependsOn
+    type: object
+    default: []
 
 jobs:
   - deployment: DeployDataApi
     displayName: Deploy Data API
+    dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     variables:
       templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/data-api/data-api-bicep-config.bicep
