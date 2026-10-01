@@ -31,9 +31,8 @@ const ProtectedRoute = ({
     return (
       <Navigate
         replace
-
         to={appendQuery(signInRoute.fullPath, {
-          returnUrl: encodeURI(`${location.pathname}${location.search}`),
+          returnUrl: `${location.pathname}${location.search}`,
         })}
       />
     );
