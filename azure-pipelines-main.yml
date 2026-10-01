@@ -6,6 +6,14 @@ parameters:
       - master
       - dev
       - test
+  - name: includeTests
+    displayName: Run test steps
+    type: boolean
+    default: true
+  - name: includeFormattingAndLinting
+    displayName: Run formatting and linting checks
+    type: boolean
+    default: true
 
 variables:
   - group: EES - Build
@@ -70,19 +78,20 @@ jobs:
           performMultiLevelLookup: true
 
       # Check code formatting
-      - task: DotNetCoreCLI@2
-        displayName: Restore .NET tools
-        inputs:
-          command: custom
-          custom: tool
-          arguments: restore
+      - ${{ if eq(parameters.includeFormattingAndLinting, true) }}:
+          - task: DotNetCoreCLI@2
+            displayName: Restore .NET tools
+            inputs:
+              command: custom
+              custom: tool
+              arguments: restore
 
-      - task: DotNetCoreCLI@2
-        displayName: CSharpier check formatting
-        inputs:
-          command: custom
-          custom: csharpier
-          arguments: check .
+          - task: DotNetCoreCLI@2
+            displayName: CSharpier check formatting
+            inputs:
+              command: custom
+              custom: csharpier
+              arguments: check .
 
       # Check Public API OpenAPI docs
       - task: DotNetCoreCLI@2
@@ -104,29 +113,32 @@ jobs:
               tufin/oasdiff \
               /scripts/public-api-openapi-diff.sh
 
-  - job: BackendTest
-    pool: ees-ubuntu2604-xlarge-v2
-    workspace:
-      clean: all
-    steps:
-      - task: NuGetAuthenticate@1
-        inputs:
-          nuGetServiceConnections: $(NuGetServiceConnectionName)
+  - ${{ if eq(parameters.includeTests, true) }}:
+      - job: BackendTest
+        pool: ees-ubuntu2604-xlarge-v2
+        workspace:
+          clean: all
+        steps:
+          - task: NuGetAuthenticate@1
+            inputs:
+              nuGetServiceConnections: $(NuGetServiceConnectionName)
 
-      - task: UseDotNet@2
-        displayName: Install .NET $(DotNetVersion)
-        inputs:
-          version: $(DotNetVersion)
-          performMultiLevelLookup: true
+          - task: UseDotNet@2
+            displayName: Install .NET $(DotNetVersion)
+            inputs:
+              version: $(DotNetVersion)
+              performMultiLevelLookup: true
 
-      - task: DotNetCoreCLI@2
-        displayName: Test
-        inputs:
-          command: test
-          projects: |
-            **/GovUk.*[Tt]ests/*.csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
-          arguments: --configuration $(BuildConfiguration)
+          - task: DotNetCoreCLI@2
+            displayName: Test
+            inputs:
+              command: test
+              projects: |
+                **/GovUk.*[Tt]ests/*.csproj
+                !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
+              arguments: --configuration $(BuildConfiguration)
+            env:
+              DOCKER_API_VERSION: 1.43
 
   - job: BackendPublish
     pool:
@@ -326,12 +338,15 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: --configuration $(BuildConfiguration)
 
-      - task: DotNetCoreCLI@2
-        displayName: Test
-        inputs:
-          command: test
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-          arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
+      - ${{ if eq(parameters.includeTests, true) }}:
+          - task: DotNetCoreCLI@2
+            displayName: Test
+            inputs:
+              command: test
+              projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+              arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
+            env:
+              DOCKER_API_VERSION: 1.43
 
       - task: Bash@3
         displayName: pnpm i
@@ -358,14 +373,15 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/admin
+          zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         displayName: Publish Admin artifact
         inputs:
           artifactName: admin
-          targetPath: $(Build.ArtifactStagingDirectory)
+          targetPath: $(Build.ArtifactStagingDirectory)/admin
 
   - job: Frontend
     pool: ees-ubuntu2604-xlarge-v2
@@ -405,35 +421,37 @@ jobs:
           targetType: inline
           script: pnpm tsc
 
-      - task: Bash@3
-        displayName: pnpm lint
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm lint
+      - ${{ if eq(parameters.includeFormattingAndLinting, true) }}:
+          - task: Bash@3
+            displayName: pnpm lint
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: pnpm lint
 
-      - task: Bash@3
-        displayName: pnpm format:check
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm format:check
+          - task: Bash@3
+            displayName: pnpm format:check
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: pnpm format:check
 
-      - task: Bash@3
-        displayName: pnpm test:ci
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm test:ci
+      - ${{ if eq(parameters.includeTests, true) }}:
+          - task: Bash@3
+            displayName: pnpm test:ci
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: pnpm test:ci
 
-      - task: PublishTestResults@2
-        displayName: Publish frontend test results
-        inputs:
-          testResultsFormat: JUnit
-          testResultsFiles: explore-education-statistics-*/junit-*.xml
-          searchFolder: ./src
-          testRunTitle: Release Jest tests
-          mergeTestResults: true
+          - task: PublishTestResults@2
+            displayName: Publish frontend test results
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: explore-education-statistics-*/junit-*.xml
+              searchFolder: ./src
+              testRunTitle: Release Jest tests
+              mergeTestResults: true
 
       - task: Bash@3
         displayName: pnpm run build

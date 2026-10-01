@@ -1,0 +1,25 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: DeployNotifier
+    displayName: Deploy Notifier
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Notifier artifact
+              artifact: notifier
+
+            - template: ../tasks/deploy-function-app.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Notifier
+                appName: $(subscription)-fa-ees-notify
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/notifier/GovUk.Education.ExploreEducationStatistics.Notifier.zip

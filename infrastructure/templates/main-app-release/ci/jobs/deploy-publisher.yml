@@ -1,0 +1,25 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: DeployPublisher
+    displayName: Deploy Publisher
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Publisher artifact
+              artifact: publisher
+
+            - template: ../tasks/deploy-function-app.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Publisher
+                appName: $(subscription)-fa-ees-publisher
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/publisher/GovUk.Education.ExploreEducationStatistics.Publisher.zip

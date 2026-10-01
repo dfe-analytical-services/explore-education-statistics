@@ -1,0 +1,89 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: artifactZipPath
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: '/'
+  # A JSON object ({"SettingName": "value", ...}) of application-specific appsettings to push to
+  # the deploy slot ahead of the code deploy. Defaults to making no changes, relying on whatever
+  # the deploy slot already has (preserved across infrastructure deploys - see app-service.bicep).
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Update deploy slot app settings
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        settingsArgs=()
+        while IFS= read -r kv; do
+          settingsArgs+=("$kv")
+        done < <(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+
+        if [ ${#settingsArgs[@]} -gt 0 ]; then
+          az webapp config appsettings set \
+            --name ${{ parameters.appName }} \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            --slot deploy \
+            --settings "${settingsArgs[@]}"
+        else
+          echo "No application-specific appsettings to apply - leaving the deploy slot's existing appsettings untouched."
+        fi
+
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Deploy to deploy slot
+    retryCountOnTaskFailure: 3
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        az webapp deploy \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          --slot deploy \
+          --type zip \
+          --src-path "${{ parameters.artifactZipPath }}"
+
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Checking deploy slot is healthy
+      endpoint: https://${{ parameters.appName }}-deploy.azurewebsites.net${{ parameters.healthCheckPath }}
+      maxAttempts: 20
+
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Swap deploy slot into production
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        az webapp deployment slot swap \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          --slot deploy \
+          --target-slot production
+
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Checking production is healthy after swap
+      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+      maxAttempts: 20

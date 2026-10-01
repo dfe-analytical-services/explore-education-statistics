@@ -1,0 +1,25 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+
+jobs:
+  - deployment: DeployDataApi
+    displayName: Deploy Data API
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Data API artifact
+              artifact: data-api
+
+            - template: ../tasks/deploy-app-service-with-slot.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Data API
+                appName: $(subscription)-as-ees-data
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/data-api/GovUk.Education.ExploreEducationStatistics.Data.Api.zip
