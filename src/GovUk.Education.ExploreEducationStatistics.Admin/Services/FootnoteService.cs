@@ -352,9 +352,15 @@ public class FootnoteService : IFootnoteService
             .Select(rs => rs.SubjectId)
             .ToList();
 
-        if (!releaseSubjectIds.ContainsAll(subjectIds))
+        var unlinkedSubjectIds = subjectIds.Except(releaseSubjectIds).ToList();
+        if (unlinkedSubjectIds.Count > 0)
         {
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return ValidationResult(
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(
+                    releaseVersionId,
+                    unlinkedSubjectIds
+                )
+            );
         }
 
         // We look for these specified ids in the release's datasets, stopping when all have been found
@@ -363,14 +369,14 @@ public class FootnoteService : IFootnoteService
         var unlinkedFilterItemIds = filterItemIds.ToHashSet();
         var unlinkedIndicatorIds = indicatorIds.ToHashSet();
 
+        if (AllLinked())
+        {
+            return Unit.Instance;
+        }
+
         foreach (var subjectId in releaseSubjectIds)
         {
-            var dataSet = await _storageDataSetResolver.TryResolve(subjectId);
-
-            if (dataSet is null)
-            {
-                continue;
-            }
+            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
 
             if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
             {
@@ -403,7 +409,15 @@ public class FootnoteService : IFootnoteService
 
         if (!AllLinked())
         {
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return ValidationResult(
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersionId,
+                    unlinkedFilterIds,
+                    unlinkedFilterGroupIds,
+                    unlinkedFilterItemIds,
+                    unlinkedIndicatorIds
+                )
+            );
         }
 
         return Unit.Instance;

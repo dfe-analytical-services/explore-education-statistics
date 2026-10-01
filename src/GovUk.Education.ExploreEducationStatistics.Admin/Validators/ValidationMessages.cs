@@ -524,4 +524,56 @@ public static class ValidationMessages
             Message = string.Format(ReplacementError.Message, originalFileId),
         };
     }
+
+    public static readonly LocalizableMessage FootnoteSubjectNotAttachedToRelease = new(
+        Code: nameof(FootnoteSubjectNotAttachedToRelease),
+        Message: "Subject id(s) not attached to release version {0}. UnlinkedSubjectIds: [{1}]"
+    );
+
+    public static ErrorViewModel GenerateErrorFootnoteSubjectNotAttachedToRelease(
+        Guid releaseVersionId,
+        IEnumerable<Guid> unlinkedSubjectIds
+    )
+    {
+        return new ErrorViewModel
+        {
+            Code = FootnoteSubjectNotAttachedToRelease.Code,
+            Message = string.Format(
+                FootnoteSubjectNotAttachedToRelease.Message,
+                releaseVersionId,
+                unlinkedSubjectIds.JoinToString(", ")
+            ),
+        };
+    }
+
+    public static readonly LocalizableMessage FootnoteFilterOrIndicatorNotAttachedToRelease = new(
+        Code: nameof(FootnoteFilterOrIndicatorNotAttachedToRelease),
+        Message: "Filter or indicator id(s) not attached to release version {0}.\n"
+            + "UnlinkedFilterIds: [{1}]\n"
+            + "UnlinkedFilterGroupIds: [{2}]\n"
+            + "UnlinkedFilterItemIds: [{3}]\n"
+            + "UnlinkedIndicatorIds: [{4}]"
+    );
+
+    public static ErrorViewModel GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+        Guid releaseVersionId,
+        IEnumerable<Guid> unlinkedFilterIds,
+        IEnumerable<Guid> unlinkedFilterGroupIds,
+        IEnumerable<Guid> unlinkedFilterItemIds,
+        IEnumerable<Guid> unlinkedIndicatorIds
+    )
+    {
+        return new ErrorViewModel
+        {
+            Code = FootnoteFilterOrIndicatorNotAttachedToRelease.Code,
+            Message = string.Format(
+                FootnoteFilterOrIndicatorNotAttachedToRelease.Message,
+                releaseVersionId,
+                unlinkedFilterIds.JoinToString(", "),
+                unlinkedFilterGroupIds.JoinToString(", "),
+                unlinkedFilterItemIds.JoinToString(", "),
+                unlinkedIndicatorIds.JoinToString(", ")
+            ),
+        };
+    }
 }
