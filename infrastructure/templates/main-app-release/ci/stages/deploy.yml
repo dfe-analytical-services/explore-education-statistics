@@ -34,6 +34,7 @@ stages:
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
 
       - template: ../jobs/deploy-content-api.yml
         parameters:

@@ -3,18 +3,45 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
 
 jobs:
   - deployment: DeployAdmin
     displayName: Deploy Admin
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/admin/admin-bicep-config.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/admin/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: AdminBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - download: MainBuild
               displayName: Download Admin artifact
               artifact: admin
+
+            - task: AzureCLI@2
+              displayName: Admin - Deploy appsettings config Bicep
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az deployment group create \
+                    --name $(bicepConfigDeployName) \
+                    --resource-group $(resourceGroupName) \
+                    --template-file $(templateFile) \
+                    --parameters $(paramFile)
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                deploymentName: $(bicepConfigDeployName)
 
             - template: ../tasks/deploy-app-service-with-slot.yml
               parameters:
@@ -23,3 +50,4 @@ jobs:
                 appName: $(subscription)-as-ees-admin
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
+                appSettingsJson: $(appSettings)
