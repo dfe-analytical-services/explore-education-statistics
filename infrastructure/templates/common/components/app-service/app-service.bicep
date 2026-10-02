@@ -166,10 +166,6 @@ var osSpecificSettings = union(baseSettings,
   } : {},
   operatingSystem == 'Windows' ? {
     WEBSITE_LOAD_CERTIFICATES: '*'
-    // Ensures IIS also binds the app's own *.azurewebsites.net hostname (and its slots'
-    // equivalents) alongside any custom domain bindings, so requests/health checks/swap
-    // warm-up made directly against that hostname don't 404 at the IIS level.
-    WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG: '1'
   } : {}
 )
 
