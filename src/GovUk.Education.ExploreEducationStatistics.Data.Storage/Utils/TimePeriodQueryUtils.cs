@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Utils;
 
 public static class TimePeriodQueryUtils
 {
