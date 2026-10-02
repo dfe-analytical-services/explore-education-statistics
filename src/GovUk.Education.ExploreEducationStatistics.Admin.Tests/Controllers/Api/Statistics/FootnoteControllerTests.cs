@@ -118,8 +118,8 @@ public class FootnoteControllerTests
             );
 
         storageDataSetResolver
-            .Setup(s => s.Resolve(It.IsIn(subjectIds), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(dataSet.Object);
+            .Setup(s => s.Resolve(It.Is<File>(f => subjectIds.Contains(f.SubjectId!.Value))))
+            .Returns(dataSet.Object);
 
         dataSet
             .Setup(s => s.ListFilters(It.IsAny<CancellationToken>()))

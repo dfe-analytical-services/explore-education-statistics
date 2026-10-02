@@ -93,7 +93,7 @@ public class ReleaseService : IReleaseService
             await releaseSubjects.SelectAsync(async rs =>
             {
                 var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
-                var dataSet = await _storageDataSetResolver.Resolve(rs.SubjectId);
+                var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
 
                 return new SubjectViewModel(
                     id: rs.SubjectId,
