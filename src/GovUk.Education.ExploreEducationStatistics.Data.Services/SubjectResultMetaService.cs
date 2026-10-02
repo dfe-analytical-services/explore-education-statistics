@@ -82,8 +82,6 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                 var stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
 
-                var dataSet = await _storageDataSetResolver.Resolve(releaseSubject.SubjectId);
-
                 var locations = observations.Select(o => o.Location).Distinct().ToList();
 
                 _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -93,6 +91,8 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                     releaseVersionId: releaseVersionId,
                     subjectId: releaseSubject.SubjectId
                 );
+
+                var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
 
                 var filterItemIds = observations
                     .SelectMany(observation => observation.FilterItems)
