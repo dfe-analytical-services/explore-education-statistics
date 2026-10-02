@@ -140,10 +140,7 @@ public class DataImportService(
 
         var dataSet = await storageDataSetResolver.Resolve(subjectId);
 
-        var importedGeographicLevels = (await dataSet.ListLocations())
-            .Select(location => location.GeographicLevel)
-            .Distinct()
-            .ToList();
+        var importedGeographicLevels = await dataSet.ListGeographicLevels();
 
         var timePeriods = (await dataSet.ListTimePeriods())
             .Select(tp => new TimePeriodRangeBoundMeta
