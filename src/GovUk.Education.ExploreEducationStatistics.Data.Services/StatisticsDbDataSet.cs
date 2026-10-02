@@ -1,6 +1,7 @@
 #nullable enable
 using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -195,6 +196,16 @@ public class StatisticsDbDataSet(
         return await context
             .Location.AsNoTracking()
             .Where(location => locationIdList.Contains(location.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == SubjectId)
+            .Select(observation => observation.Location.GeographicLevel)
+            .Distinct()
             .ToListAsync(cancellationToken);
     }
 
