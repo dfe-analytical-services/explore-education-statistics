@@ -46,10 +46,7 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementDataSet = await storageDataSetResolver.Resolve(
-                    replacementReleaseFile.File.SubjectId!.Value,
-                    cancellationToken
-                );
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
                 var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
 
                 // Filters
@@ -162,10 +159,7 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementDataSet = await storageDataSetResolver.Resolve(
-                    replacementReleaseFile.File.SubjectId!.Value,
-                    cancellationToken
-                );
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
                 var replacementIndicators = (await replacementDataSet.ListIndicatorGroups(cancellationToken))
                     .SelectMany(ig => ig.Indicators)
                     .ToList();
@@ -217,10 +211,7 @@ public class DataSetMappingService(
             {
                 var (mapping, replacementReleaseFile) = validated;
 
-                var replacementDataSet = await storageDataSetResolver.Resolve(
-                    replacementReleaseFile.File.SubjectId!.Value,
-                    cancellationToken
-                );
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
                 var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
 
                 var updatedMappings = request

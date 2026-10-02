@@ -64,7 +64,7 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
                     .SelectAwait(async releaseFile =>
                     {
                         var subjectId = releaseFile.File.SubjectId!.Value;
-                        var dataSet = await _storageDataSetResolver.Resolve(subjectId, cancellationToken);
+                        var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
 
                         var timePeriods = await _timePeriodService.GetTimePeriodLabels(dataSet);
                         var variables = await ListVariables(dataSet, cancellationToken);
