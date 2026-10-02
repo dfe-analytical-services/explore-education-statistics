@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -907,6 +908,63 @@ public abstract class StatisticsDbDataSetTests
                 Assert.Equal(
                     new HashSet<Guid> { locations[0].Id, locations[2].Id },
                     result.Select(l => l.Id).ToHashSet()
+                );
+            }
+        }
+    }
+
+    public class ListGeographicLevelsTests : StatisticsDbDataSetTests
+    {
+        [Fact]
+        public async Task ReturnsDistinctGeographicLevelsForSubject()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+            var otherSubject = new Subject { Id = Guid.NewGuid() };
+
+            var regions = Fixture
+                .DefaultLocation()
+                .WithGeographicLevel(GeographicLevel.Region)
+                .WithPresetRegion()
+                .GenerateList(2);
+            var localAuthority = Fixture
+                .DefaultLocation()
+                .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                .WithPresetRegionAndLocalAuthority()
+                .Generate();
+            var country = Fixture.DefaultLocation().WithGeographicLevel(GeographicLevel.Country).Generate();
+
+            var subjectObservations = Fixture
+                .DefaultObservation()
+                .WithSubject(subject)
+                .ForRange(..2, o => o.SetLocation(regions[0]))
+                .ForRange(2..3, o => o.SetLocation(regions[1]))
+                .ForRange(3..4, o => o.SetLocation(localAuthority))
+                .GenerateList(4);
+
+            var otherSubjectObservations = Fixture
+                .DefaultObservation()
+                .WithSubject(otherSubject)
+                .WithLocation(country)
+                .GenerateList(2);
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Observation.AddRange(subjectObservations.Concat(otherSubjectObservations));
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
+
+                var result = await dataSet.ListGeographicLevels();
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal(
+                    new HashSet<GeographicLevel> { GeographicLevel.Region, GeographicLevel.LocalAuthority },
+                    result.ToHashSet()
                 );
             }
         }
