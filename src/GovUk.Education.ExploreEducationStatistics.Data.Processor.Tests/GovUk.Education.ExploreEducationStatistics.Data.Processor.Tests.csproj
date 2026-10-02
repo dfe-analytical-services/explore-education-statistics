@@ -20,10 +20,8 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Api.Tests\GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
-    <!-- Data.Services required only for ITimePeriodService in DataSetMappingServiceTests -->
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests\GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Resources\**" />
