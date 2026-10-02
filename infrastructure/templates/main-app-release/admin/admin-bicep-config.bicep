@@ -2,7 +2,7 @@ import { getResourceNamesForEnvironment } from '../../bicep-main-infrastructure-
 import { EnvironmentConfig, mergeEnvironmentConfig } from '../../bicep-main-infrastructure-release/configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from '../../bicep-main-infrastructure-release/configuration/admin-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from '../../bicep-main-infrastructure-release/configuration/public-api-configuration.bicep'
-import { keyVaultRef } from '../../common/functions.bicep'
+import { secretRefsFromSecrets } from '../../common/functions.bicep'
 
 @description('Environment-wide configuration values needed to compute this app\'s appsettings.')
 param environmentConfigParam EnvironmentConfig = {}
@@ -20,13 +20,36 @@ var resourceNames = getResourceNamesForEnvironment(environmentConfig)
 
 var adminHostname = 'admin.${environmentConfig.domain!}'
 var publicApiUrl = publicApiConfig.publicUrl!
-
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
 var memoryCacheConfig = environmentConfig.memoryCacheConfig!
+
+var keyVaultName = resourceNames.keyVault.keyVault
+
+// Every secret this stub's appsettings reference, looked up in one array/resource-loop rather
+// than one named "existing" resource per secret.
+var secretNames = [
+  resourceNames.keyVault.secrets.admin.adminSignalrConnectionString
+  resourceNames.keyVault.secrets.admin.adminGovUkNotifyApiKey
+  resourceNames.keyVault.secrets.admin.openIdConnectClientId
+  resourceNames.keyVault.secrets.admin.openIdConnectAuthority
+  resourceNames.keyVault.secrets.admin.openIdConnectValidAudience
+  resourceNames.keyVault.secrets.admin.openIdConnectValidIssuers
+  resourceNames.keyVault.secrets.admin.openIdConnectFullyQualifiedScopeName
+  resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+  resourceNames.keyVault.secrets.importerStorageAccountConnectionString
+  resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+  resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
+  resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl
+  resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId
+  resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId
+  resourceNames.keyVault.secrets.screener.appRegistrationClientId
+  resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString
+]
+
+resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
+  name: '${keyVaultName}/${secretName}'
+}]
+
+var secretRefs = secretRefsFromSecrets(secrets)
 
 @description('Application-specific appsettings for Admin, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
@@ -34,7 +57,7 @@ output appSettings object = {
   App__EnableSwagger: environmentConfig.enableSwagger!
   App__EnableThemeDeletion: adminConfig.enableThemeDeletion!
   App__EnableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-  Azure__SignalR__ConnectionString: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.adminSignalrConnectionString)
+  Azure__SignalR__ConnectionString: secretRefs[resourceNames.keyVault.secrets.admin.adminSignalrConnectionString]
   EventGrid__EventTopics__0__Key: 'PublicationChangedEvent'
   EventGrid__EventTopics__0__TopicEndpoint: reference(
     resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.publicationChanged),
@@ -52,24 +75,24 @@ output appSettings object = {
   ).endpoint
   IdentityServer__IssuerUri: 'urn=${adminHostname}'
   IdentityServer__Key__Name: 'CN=${adminHostname}'
-  Notify__ApiKey: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.adminGovUkNotifyApiKey)
-  OpenIdConnectIdentityFramework__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectClientId)
-  OpenIdConnectIdentityFramework__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
-  OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectValidAudience)
-  OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectValidIssuers)
-  OpenIdConnectSpaClient__ClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectClientId)
-  OpenIdConnectSpaClient__Authority: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
-  'OpenIdConnectSpaClient__KnownAuthorities:0': keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectAuthority)
-  OpenIdConnectSpaClient__AdminApiScope: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.openIdConnectFullyQualifiedScopeName)
+  Notify__ApiKey: secretRefs[resourceNames.keyVault.secrets.admin.adminGovUkNotifyApiKey]
+  OpenIdConnectIdentityFramework__ClientId: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectClientId]
+  OpenIdConnectIdentityFramework__Authority: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectAuthority]
+  OpenIdConnectIdentityFramework__TokenValidationParameters__ValidAudience: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectValidAudience]
+  OpenIdConnectIdentityFramework__TokenValidationParameters__ValidIssuers: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectValidIssuers]
+  OpenIdConnectSpaClient__ClientId: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectClientId]
+  OpenIdConnectSpaClient__Authority: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectAuthority]
+  'OpenIdConnectSpaClient__KnownAuthorities:0': secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectAuthority]
+  OpenIdConnectSpaClient__AdminApiScope: secretRefs[resourceNames.keyVault.secrets.admin.openIdConnectFullyQualifiedScopeName]
   MemoryCache__Enabled: true
   MemoryCache__MaxCacheSizeMb: memoryCacheConfig.maxCacheSizeMb
   MemoryCache__ExpirationScanFrequencySeconds: memoryCacheConfig.expirationScanFrequencySeconds
   MemoryCache__Overrides__DurationInSeconds: memoryCacheConfig.?overridesDurationInSeconds
   MemoryCache__Overrides__ExpirySchedule: memoryCacheConfig.?overridesExpirySchedule
-  CoreStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
-  ImporterStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
-  PublicStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
-  PublisherStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
+  CoreStorage: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
+  ImporterStorage: secretRefs[resourceNames.keyVault.secrets.importerStorageAccountConnectionString]
+  PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
+  PublisherStorage: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
   PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: adminConfig.preReleaseMinutesBeforeStart!
   ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
   ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
@@ -77,14 +100,14 @@ output appSettings object = {
   PublicApp__Url: 'https://${environmentConfig.domain!}'
   PublicDataDbExists: true
   PublicDataApi__PublicUrl: 'https://${publicApiUrl}'
-  PublicDataApi__PrivateUrl: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl)
+  PublicDataApi__PrivateUrl: secretRefs[resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl]
   PublicDataApi__DocsUrl: 'https://${publicApiUrl}/docs'
-  PublicDataApi__AppRegistrationClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
+  PublicDataApi__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId]
   PublicDataProcessor__Url: 'https://${resourceNames.publicApi.processor.functionApp}.azurewebsites.net'
-  PublicDataProcessor__AppRegistrationClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
+  PublicDataProcessor__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId]
   DataScreener__Url: 'https://${resourceNames.screener.functionApp}.azurewebsites.net/api'
-  DataScreener__AppRegistrationClientId: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.screener.appRegistrationClientId)
-  DataScreener__ScreenerStorage: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString)
+  DataScreener__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.screener.appRegistrationClientId]
+  DataScreener__ScreenerStorage: secretRefs[resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString]
   DataScreener__ScreenerProgressUpdateIntervalSeconds: 5
   DataScreener__ScreenerProgressUpdateFailureIntervalMinutes: 1440
 }
