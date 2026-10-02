@@ -67,7 +67,7 @@ public class SubjectMetaService(
                     )
                     .SingleAsync();
 
-                var dataSet = await storageDataSetResolver.Resolve(releaseSubject.SubjectId);
+                var dataSet = storageDataSetResolver.Resolve(releaseFile.File);
 
                 return new SubjectMetaViewModel
                 {
@@ -101,16 +101,15 @@ public class SubjectMetaService(
     )
     {
         return await contentDbContext
-            .ReleaseFiles.SingleOrNotFoundAsync(rf =>
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleOrNotFoundAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId
                 && rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
             )
-            .OnSuccessDo(async () =>
-            {
-                var dataSet = await storageDataSetResolver.Resolve(subjectId);
-                return await ValidateFiltersForSubject(dataSet, request);
-            })
+            .OnSuccessDo(releaseFile =>
+                ValidateFiltersForSubject(storageDataSetResolver.Resolve(releaseFile.File), request)
+            )
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of filters, filter groups and indicators observed
@@ -138,12 +137,15 @@ public class SubjectMetaService(
     )
     {
         return await contentDbContext
-            .ReleaseFiles.SingleOrNotFoundAsync(rf =>
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleOrNotFoundAsync(rf =>
                 rf.ReleaseVersionId == releaseVersionId
                 && rf.File.SubjectId == subjectId
                 && rf.File.Type == FileType.Data
             )
-            .OnSuccessDo(() => ValidateIndicatorGroupsForSubject(subjectId, request))
+            .OnSuccessDo(releaseFile =>
+                ValidateIndicatorGroupsForSubject(storageDataSetResolver.Resolve(releaseFile.File), request)
+            )
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of indicator groups and indicators observed
@@ -348,11 +350,10 @@ public class SubjectMetaService(
     }
 
     private async Task<Either<ActionResult, Unit>> ValidateIndicatorGroupsForSubject(
-        Guid subjectId,
+        IStorageDataSet dataSet,
         List<IndicatorGroupUpdateViewModel> requestIndicatorGroups
     )
     {
-        var dataSet = await storageDataSetResolver.Resolve(subjectId);
         var indicatorGroups = await dataSet.ListIndicatorGroups();
         return AssertCollectionsAreSameIgnoringOrder(
                 indicatorGroups,

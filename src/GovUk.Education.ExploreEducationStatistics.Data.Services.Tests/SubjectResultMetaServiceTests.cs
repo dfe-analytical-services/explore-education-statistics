@@ -91,7 +91,9 @@ public class SubjectResultMetaServiceTests
             )
             .WithSubject(subject);
 
-        ReleaseFile releaseFile = _dataFixture.DefaultReleaseFile();
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var observations = new List<Observation>();
 
@@ -203,7 +205,9 @@ public class SubjectResultMetaServiceTests
             )
             .WithSubject(subject);
 
-        ReleaseFile releaseFile = _dataFixture.DefaultReleaseFile();
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         Filter filter = _dataFixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 3).WithSubject(subject);
         var filterItems = filter.FilterGroups[0].FilterItems;
@@ -442,7 +446,11 @@ public class SubjectResultMetaServiceTests
 
         releaseDataFileRepository
             .Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
-            .ReturnsAsync(new ReleaseFile());
+            .ReturnsAsync(
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
+            );
 
         timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
 

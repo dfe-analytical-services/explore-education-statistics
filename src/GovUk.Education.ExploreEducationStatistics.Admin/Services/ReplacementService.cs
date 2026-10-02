@@ -120,7 +120,7 @@ public class ReplacementService(
                     && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
 
-                var replacementDataSet = await storageDataSetResolver.Resolve(replacementSubjectId, cancellationToken);
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
 
                 replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
                     originalReleaseFile,
