@@ -175,7 +175,6 @@ public class ProcessorStage2Tests
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             MetaFile = new File
             {
