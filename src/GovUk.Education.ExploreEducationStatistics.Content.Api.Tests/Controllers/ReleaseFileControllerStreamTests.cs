@@ -92,6 +92,62 @@ public abstract class ReleaseFileControllerStreamTests(ReleaseFileControllerStre
     public class StreamFilesToZipTests(ReleaseFileControllerStreamTestsFixture fixture)
         : ReleaseFileControllerStreamTests(fixture)
     {
+        [Theory]
+        [InlineData("*/*")]
+        [InlineData("application/json")]
+        [InlineData("application/octet-stream")]
+        public async Task UnavailableRelease_ReturnsNotFound(string accept)
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).GenerateList(1));
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
+
+            // Draft and superseded releases are rejected by the service with NotFound.
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.GetZipDelivery(
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                        AnalyticsFromPage.ReleaseDownloads,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(new NotFoundResult());
+
+            var client = fixture.CreateClient();
+            client.DefaultRequestHeaders.Accept.ParseAdd(accept);
+            var response = await client.GetAsync($"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseDownloads");
+
+            MockUtils.VerifyAllMocks(fixture.ReleaseFileServiceMock);
+            response.AssertNotFound();
+            Assert.True(response.Headers.CacheControl?.NoStore);
+        }
+
+        [Theory]
+        [InlineData(1, "*/*")]
+        [InlineData(1, "application/json")]
+        [InlineData(1, "application/zip")]
+        [InlineData(999, "*/*")]
+        public async Task UnavailableVersionedPayload_ReturnsNotFound(int formatVersion, string accept)
+        {
+            var releaseVersionId = Guid.NewGuid();
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.StreamCachedAllFilesZip(releaseVersionId, formatVersion, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(new NotFoundResult());
+
+            var client = fixture.CreateClient();
+            client.DefaultRequestHeaders.Accept.ParseAdd(accept);
+            var response = await client.GetAsync($"/api/all-files/{releaseVersionId}/v{formatVersion}");
+
+            MockUtils.VerifyAllMocks(fixture.ReleaseFileServiceMock);
+            response.AssertNotFound();
+            Assert.True(response.Headers.CacheControl?.NoStore);
+        }
+
         [Fact]
         public async Task ZipWithSpecificFile_Success()
         {
@@ -109,6 +165,17 @@ public abstract class ReleaseFileControllerStreamTests(ReleaseFileControllerStre
                 });
 
             var fileId = Guid.NewGuid();
+
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.GetZipDelivery(
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                        AnalyticsFromPage.ReleaseUsefulInfo,
+                        It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(ListOf(fileId))),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(new ZipDelivery.Stream(releaseVersion));
 
             fixture
                 .ReleaseFileServiceMock.Setup(s =>
@@ -152,6 +219,17 @@ public abstract class ReleaseFileControllerStreamTests(ReleaseFileControllerStre
 
             fixture
                 .ReleaseFileServiceMock.Setup(s =>
+                    s.GetZipDelivery(
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                        AnalyticsFromPage.ReleaseDownloads,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(new ZipDelivery.Stream(releaseVersion));
+
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
                     s.ZipFilesToStream(
                         releaseVersion.Id,
                         It.IsAny<Stream>(),
@@ -172,6 +250,93 @@ public abstract class ReleaseFileControllerStreamTests(ReleaseFileControllerStre
             MockUtils.VerifyAllMocks(fixture.ReleaseFileServiceMock);
 
             response.AssertOk("Test zip");
+            Assert.Contains("no-store", response.Headers.CacheControl.ToString());
+            Assert.Equal(MediaTypeNames.Application.Octet, response.Content.Headers.ContentType?.MediaType);
+        }
+
+        [Fact]
+        public async Task WarmAllFilesZip_RoutesToVersionedPayload()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases(DataFixture.DefaultRelease(publishedVersions: 1).GenerateList(1));
+
+            var releaseVersion = publication.Releases.Single().Versions.Single();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
+
+            var redirectPath = $"/api/all-files/{releaseVersion.Id}/v1";
+            await using var stream = "Test cached zip".ToStream();
+
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.GetZipDelivery(
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
+                        AnalyticsFromPage.ReleaseDownloads,
+                        null,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(new ZipDelivery.Redirect(redirectPath));
+
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.StreamCachedAllFilesZip(releaseVersion.Id, 1, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(
+                    new FileStreamResult(stream, MediaTypeNames.Application.Zip)
+                    {
+                        FileDownloadName = "release.zip",
+                        EnableRangeProcessing = true,
+                    }
+                );
+
+            var response = await fixture
+                .CreateClient()
+                .GetAsync($"/api/releases/{releaseVersion.Id}/files?fromPage=ReleaseDownloads");
+
+            MockUtils.VerifyAllMocks(fixture.ReleaseFileServiceMock);
+
+            response.AssertOk("Test cached zip");
+            Assert.Contains("s-maxage=3600", response.Headers.CacheControl.ToString());
+            Assert.Equal(MediaTypeNames.Application.Zip, response.Content.Headers.ContentType?.MediaType);
+            fixture.ReleaseFileServiceMock.Verify(
+                s =>
+                    s.ZipFilesToStream(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Stream>(),
+                        It.IsAny<AnalyticsFromPage>(),
+                        It.IsAny<IEnumerable<Guid>?>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+        }
+
+        [Fact]
+        public async Task VersionedPayload_IsCacheableAndRangeEnabled()
+        {
+            var releaseVersionId = Guid.NewGuid();
+            await using var stream = "Test cached zip".ToStream();
+
+            fixture
+                .ReleaseFileServiceMock.Setup(s =>
+                    s.StreamCachedAllFilesZip(releaseVersionId, 1, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(
+                    new FileStreamResult(stream, MediaTypeNames.Application.Zip)
+                    {
+                        FileDownloadName = "release.zip",
+                        EnableRangeProcessing = true,
+                    }
+                );
+
+            var response = await fixture.CreateClient().GetAsync($"/api/all-files/{releaseVersionId}/v1");
+
+            MockUtils.VerifyAllMocks(fixture.ReleaseFileServiceMock);
+
+            response.AssertOk("Test cached zip");
+            Assert.Contains("s-maxage=3600", response.Headers.CacheControl.ToString());
         }
     }
 }

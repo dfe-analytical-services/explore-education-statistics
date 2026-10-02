@@ -40,6 +40,18 @@ param adminAppUrl string
 @description('The public-facing URL of the public site.')
 param publicAppUrl string
 
+@description('The public-facing host name of the Content API, used to build Front Door cache purge paths.')
+param contentApiHostName string
+
+@description('''
+Whether the Publisher is allowed to purge superseded all-files ZIPs from Azure Front Door. Requires the Front
+Door role assignment granting the Publisher purge permissions to have been deployed to this environment.
+''')
+param frontDoorCachePurgeEnabled bool
+
+@description('Resource id of the Azure Front Door endpoint that the Publisher purges cached ZIPs from.')
+param frontDoorEndpointResourceId string
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[]
 
@@ -210,6 +222,18 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         value: publicAppUrl
       }
       {
+        name: 'AzureFrontDoor__CachePurgeEnabled'
+        value: string(frontDoorCachePurgeEnabled)
+      }
+      {
+        name: 'AzureFrontDoor__EndpointResourceId'
+        value: frontDoorEndpointResourceId
+      }
+      {
+        name: 'AzureFrontDoor__ContentApiHostName'
+        value: contentApiHostName
+      }
+      {
         name: 'Notify__ApiKey'
         value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisher.notifyApiKey)
       }
@@ -251,4 +275,27 @@ module storageAccountBlobServiceModule '../common/components/blobService.bicep' 
   dependsOn: [
     functionAppModule
   ]
+}
+
+// Publication metadata changes can make a previously cached ZIP stale without publishing a new release.
+// Deliver the existing PublicationChanged event to Publisher so it can purge affected AFD paths.
+module publicationZipPurgeQueue '../common/components/queueService.bicep' = {
+  name: 'publicationZipPurgeQueueModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.publisher.storageAccount
+    queueNames: ['publication-zip-purge']
+  }
+  dependsOn: [functionAppModule]
+}
+
+module publicationZipPurgeSubscription '../common/components/event-grid/eventGridCustomTopicQueueSubscription.bicep' = {
+  name: 'publicationZipPurgeSubscriptionModuleDeploy'
+  params: {
+    name: '${resourceNames.publisher.functionApp}-publication-zip-purge'
+    topicName: resourceNames.eventGrid.topics.publicationChanged
+    includedEventTypes: ['publication-changed']
+    storageAccountName: resourceNames.publisher.storageAccount
+    queueName: 'publication-zip-purge'
+  }
+  dependsOn: [publicationZipPurgeQueue]
 }
