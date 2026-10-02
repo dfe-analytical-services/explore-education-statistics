@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -116,8 +117,8 @@ public class FootnoteControllerTests
             );
 
         storageDataSetResolver
-            .Setup(s => s.Resolve(It.IsIn(subjectIds), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(dataSet.Object);
+            .Setup(s => s.Resolve(It.Is<File>(f => subjectIds.Contains(f.SubjectId!.Value))))
+            .Returns(dataSet.Object);
 
         dataSet
             .Setup(s => s.ListFilters(It.IsAny<CancellationToken>()))

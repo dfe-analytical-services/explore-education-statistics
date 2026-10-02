@@ -138,7 +138,8 @@ public class DataImportService(
 
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
-        var dataSet = await storageDataSetResolver.Resolve(subjectId);
+        var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
+        var dataSet = storageDataSetResolver.Resolve(file);
 
         var importedGeographicLevels = await dataSet.ListGeographicLevels();
 
@@ -182,7 +183,6 @@ public class DataImportService(
             Indicators = indicators,
         };
 
-        var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         file.DataSetFileMeta = dataSetFileMeta;
 
         var csvGeographicLevels = import.GeographicLevels!;
