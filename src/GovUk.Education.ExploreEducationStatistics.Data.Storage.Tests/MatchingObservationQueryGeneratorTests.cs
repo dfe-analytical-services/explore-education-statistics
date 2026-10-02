@@ -18,7 +18,7 @@ using static Moq.MockBehavior;
 
 // ReSharper disable AccessToDisposedClosure
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests;
 
 public class MatchingObservationQueryGeneratorTests
 {

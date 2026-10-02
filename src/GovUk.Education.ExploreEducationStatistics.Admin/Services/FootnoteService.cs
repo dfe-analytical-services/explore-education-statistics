@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
@@ -263,11 +263,11 @@ public class FootnoteService : IFootnoteService
         IReadOnlySet<Guid> indicatorIds
     )
     {
-        var releaseSubjectIds = (await _releaseSubjectRepository.FindAll(releaseVersionId))
+        var releaseVersionSubjectIds = (await _releaseSubjectRepository.FindAll(releaseVersionId))
             .Select(rs => rs.SubjectId)
             .ToList();
 
-        var unlinkedSubjectIds = subjectIds.Except(releaseSubjectIds).ToList();
+        var unlinkedSubjectIds = subjectIds.Except(releaseVersionSubjectIds).ToList();
         if (unlinkedSubjectIds.Count > 0)
         {
             return ValidationResult(
@@ -286,14 +286,14 @@ public class FootnoteService : IFootnoteService
         var unlinkedFilterItemIds = filterItemIds.ToHashSet();
         var unlinkedIndicatorIds = indicatorIds.ToHashSet();
 
-        foreach (var subjectId in releaseSubjectIds)
+        if (AllLinked())
         {
-            var dataSet = await _storageDataSetResolver.TryResolve(subjectId);
+            return footnoteLinks;
+        }
 
-            if (dataSet is null)
-            {
-                continue;
-            }
+        foreach (var subjectId in releaseVersionSubjectIds)
+        {
+            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
 
             if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
             {
@@ -301,10 +301,7 @@ public class FootnoteService : IFootnoteService
 
                 foreach (var filter in filters)
                 {
-                    if (unlinkedFilterIds.Remove(filter.Id))
-                    {
-                        footnoteLinks.Filters.Add(new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId });
-                    }
+                    LinkFilter(filter, subjectId);
 
                     foreach (var filterGroup in filter.FilterGroups)
                     {
@@ -342,7 +339,10 @@ public class FootnoteService : IFootnoteService
             {
                 var filters = await dataSet.ListFiltersExcludingItems();
 
-                unlinkedFilterIds.ExceptWith(filters.Select(f => f.Id));
+                foreach (var filter in filters)
+                {
+                    LinkFilter(filter, subjectId);
+                }
             }
 
             if (unlinkedIndicatorIds.Count > 0)
@@ -394,6 +394,14 @@ public class FootnoteService : IFootnoteService
             && unlinkedFilterGroupIds.Count == 0
             && unlinkedFilterItemIds.Count == 0
             && unlinkedIndicatorIds.Count == 0;
+
+        void LinkFilter(Filter filter, Guid subjectId)
+        {
+            if (unlinkedFilterIds.Remove(filter.Id))
+            {
+                footnoteLinks.Filters.Add(new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId });
+            }
+        }
     }
 
     /// <summary>
