@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

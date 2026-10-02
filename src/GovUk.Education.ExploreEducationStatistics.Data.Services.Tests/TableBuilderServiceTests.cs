@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -27,8 +28,8 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;

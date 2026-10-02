@@ -58,6 +58,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;

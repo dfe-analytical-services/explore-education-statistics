@@ -21,7 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
@@ -34,8 +34,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FilterMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.FilterMapping;

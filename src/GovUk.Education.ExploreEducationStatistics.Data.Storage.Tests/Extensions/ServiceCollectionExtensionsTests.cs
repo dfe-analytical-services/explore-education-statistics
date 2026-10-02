@@ -1,12 +1,12 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Extensions;
 
 public class ServiceCollectionExtensionsTests
 {

@@ -3,11 +3,11 @@ using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
 
 public class ObservationService(
     StatisticsDbContext context,

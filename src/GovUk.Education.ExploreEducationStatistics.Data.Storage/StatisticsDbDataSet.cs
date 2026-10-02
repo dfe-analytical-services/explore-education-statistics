@@ -6,13 +6,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
 
 public class StatisticsDbDataSet(
     Guid subjectId,

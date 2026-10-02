@@ -2,11 +2,11 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
 
 /// <summary>
 /// Resolves a data set to the <see cref="IStorageDataSet" /> implementation for the

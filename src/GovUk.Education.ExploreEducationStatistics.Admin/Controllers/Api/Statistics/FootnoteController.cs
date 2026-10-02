@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
