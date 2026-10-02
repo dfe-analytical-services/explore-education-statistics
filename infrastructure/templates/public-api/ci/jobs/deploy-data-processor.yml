@@ -24,7 +24,23 @@ jobs:
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                
+
+            - task: AzureCLI@2
+              displayName: Look up Data Processor app registration client id from Key Vault
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+
+                  clientId=$(az keyvault secret show \
+                    --vault-name $(keyVaultName) \
+                    --name ees-public-api-data-processor-app-registration-client-id \
+                    --query value -o tsv)
+
+                  echo "##vso[task.setvariable variable=dataProcessorAppRegistrationClientId]$clientId"
+
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.

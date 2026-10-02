@@ -69,12 +69,15 @@ param publicApiUrl string
 @description('Public URL of the public API documentation site.')
 param publicApiDocsUrl string
 
+@secure()
 @description('The Client ID of a manually-created App Registration that represents the Public API Container App in Entra ID.')
 param apiAppRegistrationClientId string
 
+@secure()
 @description('The Client ID of a manually-created App Registration that represents the Public API Data Processor Function App in Entra ID.')
 param publicDataProcessorAppRegistrationClientId string
 
+@secure()
 @description('The Client ID of a manually-created App Registration that represents the Screener API Function App in Entra ID.')
 param screenerAppRegistrationClientId string
 

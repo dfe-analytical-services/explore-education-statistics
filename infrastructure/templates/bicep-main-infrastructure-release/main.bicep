@@ -1,7 +1,6 @@
 import { getResourceNames } from 'resource-names.bicep'
-import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
-import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
@@ -15,18 +14,7 @@ import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-si
 //
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
-param tags Tags = {
-  Department: ''
-  Solution: ''
-  Environment: ''
-  Subscription: ''
-  CostCentre: ''
-  ServiceOwner: ''
-  DateProvisioned: ''
-  CreatedBy: ''
-  DeploymentRepo: ''
-  DeploymentScript: ''
-}
+param tags object
 
 
 
@@ -50,9 +38,6 @@ param adminConfigParam AdminConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
-
-// These values are all supplied specifically by pipeline variables.
-param adminPipelineVariables AdminPipelineVariables = {}
 
 
 
@@ -123,16 +108,6 @@ param publicSiteConfigParam PublicSiteConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
-
-
-
-//
-// Secret pipeline variables (required to be top-level params).
-//
-
-@secure()
-@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-param publicAppBasicAuthPassword string = ''
 
 
 
@@ -264,9 +239,9 @@ module adminModuleDeploy '../admin/main.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
     enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
-    publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
-    screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
+    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
+    publicDataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
+    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
     publicApiUrl: publicApiConfig.publicUrl!
     publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
     prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
@@ -314,9 +289,9 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
@@ -345,9 +320,9 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
