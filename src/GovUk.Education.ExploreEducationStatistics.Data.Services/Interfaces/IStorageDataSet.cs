@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
@@ -96,6 +97,11 @@ public interface IStorageDataSet
     /// locations that are no longer linked to any data set.
     /// </summary>
     Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The distinct geographic levels of the locations referenced by the data set's observations.
+    /// </summary>
+    Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The distinct time periods across the data set's observations, ordered by year and then time identifier.
