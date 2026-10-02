@@ -1,3 +1,4 @@
+import { ConnectionString } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 
 @description('Name of the App Service that owns the swap slot.')
@@ -20,6 +21,15 @@ param minTlsVersion string
 
 @description('Path the platform should ping to judge the app healthy.')
 param healthCheckPath string?
+
+@description('''
+Database connection strings. Connection strings (like appsettings) are NOT slot-specific by
+default - they swap along with the deployment content unless explicitly marked as sticky via a
+slotConfigNames resource, which this setup does not use. Since these connection strings don't
+differ between the production and staging slots anyway, the fix is to configure the same values
+on both slots, so a swap has no effect on them, rather than relying on sticky-setting semantics.
+''')
+param connectionStrings ConnectionString[]?
 
 @description('Name of the VNet.')
 param vnetLink {
@@ -63,6 +73,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
       healthCheckPath: healthCheckPath
+      connectionStrings: connectionStrings
     }
   }
 }
