@@ -32,7 +32,7 @@ jobs:
               artifact: data-api
 
             - task: AzureCLI@2
-              displayName: Data API - Deploy appsettings config Bicep
+              displayName: Data API - Get new application-specific appsettings to deploy
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
                 scriptType: bash
