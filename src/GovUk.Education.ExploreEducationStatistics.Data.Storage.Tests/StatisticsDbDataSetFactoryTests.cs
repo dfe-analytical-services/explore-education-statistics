@@ -1,9 +1,9 @@
 #nullable enable
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils.StorageDataSetTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests;
 
 public abstract class StatisticsDbDataSetFactoryTests
 {
