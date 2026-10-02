@@ -4,16 +4,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
-    : IDataImportService
+public class DataImportService(
+    IDbContextSupplier dbContextSupplier,
+    IStorageDataSetResolver storageDataSetResolver,
+    ILogger<DataImportService> logger
+) : IDataImportService
 {
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
@@ -133,18 +137,13 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         var subjectId = import.SubjectId;
 
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
-        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
-        var observations = statisticsDbContext.Observation.AsNoTracking().Where(o => o.SubjectId == subjectId);
+        var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
+        var dataSet = storageDataSetResolver.Resolve(file);
 
-        var importedGeographicLevels = observations.Select(o => o.Location.GeographicLevel).Distinct().ToList();
+        var importedGeographicLevels = await dataSet.ListGeographicLevels();
 
-        var timePeriods = observations
-            .Select(o => new { o.Year, o.TimeIdentifier })
-            .Distinct()
-            .OrderBy(o => o.Year)
-            .ThenBy(o => o.TimeIdentifier)
-            .ToList()
+        var timePeriods = (await dataSet.ListTimePeriods())
             .Select(tp => new TimePeriodRangeBoundMeta
             {
                 Period = tp.Year.ToString(),
@@ -152,9 +151,9 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
             })
             .ToList();
 
-        var filters = await statisticsDbContext
-            .Filter.AsNoTracking()
-            .Where(f => f.SubjectId == subjectId)
+        var filters = await dataSet.ListFilters();
+
+        var filterMetas = filters
             .OrderBy(f => f.Label)
             .Select(f => new FilterMeta
             {
@@ -164,11 +163,9 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
                 ColumnName = f.Name,
                 ParentFilter = f.ParentFilter,
             })
-            .ToListAsync();
+            .ToList();
 
-        var indicators = await statisticsDbContext
-            .Indicator.AsNoTracking()
-            .Where(i => i.IndicatorGroup.SubjectId == subjectId)
+        var indicators = (await dataSet.ListIndicators())
             .Select(i => new IndicatorMeta
             {
                 Id = i.Id,
@@ -176,17 +173,16 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
                 ColumnName = i.Name,
             })
             .OrderBy(i => i.Label)
-            .ToListAsync();
+            .ToList();
 
         var dataSetFileMeta = new DataSetFileMeta
         {
             NumDataFileRows = import.TotalRows!.Value,
             TimePeriodRange = new TimePeriodRangeMeta { Start = timePeriods.First(), End = timePeriods.Last() },
-            Filters = filters,
+            Filters = filterMetas,
             Indicators = indicators,
         };
 
-        var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         file.DataSetFileMeta = dataSetFileMeta;
 
         var csvGeographicLevels = import.GeographicLevels!;
@@ -201,26 +197,31 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
             .ToList();
         contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 
-        file.FilterHierarchies = await GenerateFilterHierarchies(statisticsDbContext, filters);
+        file.FilterHierarchies = await GenerateFilterHierarchies(dataSet, filters);
 
         await contentDbContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Builds a hierarchy for each root filter (a filter with no parent that is the parent of another filter).
+    /// The filters must include their FilterGroups and FilterItems, as returned by
+    /// <see cref="IStorageDataSet.ListFilters" />.
+    /// </summary>
     public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
-        StatisticsDbContext statisticsDbContext,
-        List<FilterMeta> filters
+        IStorageDataSet dataSet,
+        List<Filter> filters
     )
     {
         var rootFilters = filters.Where(parentFilter =>
             parentFilter.ParentFilter == null
-            && filters.Any(childFilter => parentFilter.ColumnName == childFilter.ParentFilter)
+            && filters.Any(childFilter => parentFilter.Name == childFilter.ParentFilter)
         );
 
         var hierarchies = new List<DataSetFileFilterHierarchy>();
 
         foreach (var rootFilter in rootFilters)
         {
-            var hierarchy = await GenerateFilterHierarchy(statisticsDbContext, rootFilter, filters);
+            var hierarchy = await GenerateFilterHierarchy(dataSet, rootFilter, filters);
             hierarchies.Add(hierarchy);
         }
 
@@ -228,14 +229,13 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
     }
 
     private static async Task<DataSetFileFilterHierarchy> GenerateFilterHierarchy(
-        StatisticsDbContext statisticsDbContext,
-        FilterMeta rootFilter,
-        List<FilterMeta> filters
+        IStorageDataSet dataSet,
+        Filter rootFilter,
+        List<Filter> filters
     )
     {
-        var rootFilterItemIds = statisticsDbContext
-            .FilterItem.AsNoTracking()
-            .Where(fi => fi.FilterGroup.FilterId == rootFilter.Id)
+        var rootFilterItemIds = rootFilter
+            .FilterGroups.SelectMany(fg => fg.FilterItems)
             .Select(fi => fi.Id)
             .ToHashSet();
 
@@ -244,47 +244,26 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
 
         var parentFilter = rootFilter;
         var parentFilterItemIds = rootFilterItemIds;
-        var childFilter = filters.Single(f => f.ParentFilter == parentFilter.ColumnName);
+        var childFilter = filters.Single(f => f.ParentFilter == parentFilter.Name);
 
         filterIds.Add(rootFilter.Id);
 
         // Loop over each parent/child or tier, starting with the root filter, until no child is found
         while (true)
         {
-            var currentParentFilterId = parentFilter.Id; // avoid closure madness
-            var currentChildFilterId = childFilter.Id;
+            filterIds.Add(childFilter.Id);
 
-            filterIds.Add(currentChildFilterId);
-
-            var filterItemRelationships = await statisticsDbContext
-                .FilterItem.AsNoTracking()
-                .Where(fi => fi.FilterGroup.FilterId == currentParentFilterId)
-                .SelectMany(parentFilterItem =>
-                    statisticsDbContext
-                        .ObservationFilterItem.AsNoTracking()
-                        .Where(childOfi =>
-                            childOfi.FilterId == currentChildFilterId
-                            && statisticsDbContext.ObservationFilterItem.Any(parentOfi =>
-                                childOfi.ObservationId == parentOfi.ObservationId
-                                && parentOfi.FilterItemId == parentFilterItem.Id
-                            )
-                        )
-                        .Select(childOfi => new
-                        {
-                            FilterItemId = childOfi.FilterItem.Id,
-                            ParentItemId = parentFilterItem.Id,
-                        })
-                        .ToList()
-                )
-                .Distinct()
-                .ToListAsync();
+            var filterItemRelationships = await dataSet.ListFilterItemRelationships(
+                parentFilterId: parentFilter.Id,
+                childFilterId: childFilter.Id
+            );
 
             var tier = new Dictionary<Guid, List<Guid>>();
             foreach (var parentFilterItemId in parentFilterItemIds)
             {
                 var childFilterItemIdsForParentItem = filterItemRelationships
-                    .Where(childFilterItem => childFilterItem.ParentItemId == parentFilterItemId)
-                    .Select(childFilterItem => childFilterItem.FilterItemId)
+                    .Where(relationship => relationship.ParentFilterItemId == parentFilterItemId)
+                    .Select(relationship => relationship.ChildFilterItemId)
                     .ToList();
 
                 tier.Add(parentFilterItemId, childFilterItemIdsForParentItem);
@@ -294,7 +273,7 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
 
             // check whether we're finished
             var newChildFilter = filters.SingleOrDefault(newChildFilter =>
-                newChildFilter.ParentFilter == childFilter.ColumnName
+                newChildFilter.ParentFilter == childFilter.Name
             );
             if (newChildFilter == null)
             {
@@ -305,7 +284,7 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
             parentFilter = childFilter;
             childFilter = newChildFilter;
             parentFilterItemIds = filterItemRelationships
-                .Select(childFilterItem => childFilterItem.FilterItemId)
+                .Select(relationship => relationship.ChildFilterItemId)
                 .ToHashSet();
         }
 

@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,7 @@ public class ReleaseService : IReleaseService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly StatisticsDbContext _statisticsDbContext;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IUserService _userService;
     private readonly ITimePeriodService _timePeriodService;
 
@@ -30,6 +32,7 @@ public class ReleaseService : IReleaseService
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         StatisticsDbContext statisticsDbContext,
+        IStorageDataSetResolver storageDataSetResolver,
         IUserService userService,
         ITimePeriodService timePeriodService
     )
@@ -37,6 +40,7 @@ public class ReleaseService : IReleaseService
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _statisticsDbContext = statisticsDbContext;
+        _storageDataSetResolver = storageDataSetResolver;
         _userService = userService;
         _timePeriodService = timePeriodService;
     }
@@ -90,17 +94,18 @@ public class ReleaseService : IReleaseService
             await releaseSubjects.SelectAsync(async rs =>
             {
                 var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
+                var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
 
                 return new SubjectViewModel(
                     id: rs.SubjectId,
                     name: releaseFile.Name ?? string.Empty,
                     order: releaseFile.Order,
                     content: releaseFile.Summary ?? string.Empty,
-                    timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
+                    timePeriods: await _timePeriodService.GetTimePeriodLabels(dataSet),
                     geographicLevels: await GetGeographicLevels(rs.SubjectId),
                     geographicLevelsCsvOnly: await GetGeographicLevels(rs.SubjectId, csvOnly: true),
-                    filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
-                    indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
+                    filters: await GetFilters(dataSet, releaseFile.FilterSequence),
+                    indicators: await GetIndicators(dataSet, releaseFile.IndicatorSequence),
                     file: releaseFile.ToFileInfo(),
                     lastUpdated: releaseFile.Published
                 );
@@ -122,12 +127,12 @@ public class ReleaseService : IReleaseService
         return geographicLevels.Select(gl => gl.GetEnumLabel()).Order().ToList();
     }
 
-    private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
+    private static async Task<List<string>> GetFilters(
+        IStorageDataSet dataSet,
+        List<FilterSequenceEntry>? filterSequence
+    )
     {
-        var filters = await _statisticsDbContext
-            .Filter.AsNoTracking()
-            .Where(filter => filter.SubjectId == subjectId)
-            .ToListAsync();
+        var filters = await dataSet.ListFiltersExcludingItems();
 
         return MetaViewModelBuilderUtils
             .OrderBySequenceOrLabel(
@@ -141,15 +146,12 @@ public class ReleaseService : IReleaseService
             .ToList();
     }
 
-    private async Task<List<string>> GetIndicators(
-        Guid subjectId,
+    private static async Task<List<string>> GetIndicators(
+        IStorageDataSet dataSet,
         List<IndicatorGroupSequenceEntry>? indicatorGroupSequence
     )
     {
-        var indicators = await _statisticsDbContext
-            .Indicator.AsNoTracking()
-            .Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
-            .ToListAsync();
+        var indicators = await dataSet.ListIndicators();
 
         var indicatorSequence = indicatorGroupSequence?.SelectMany(seq => seq.ChildSequence);
         return MetaViewModelBuilderUtils

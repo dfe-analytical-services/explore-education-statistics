@@ -140,7 +140,9 @@ public static class FileGeneratorExtensions
         setters.Set(f => f.RootPath, rootPath);
 
     public static InstanceSetters<File> SetType(this InstanceSetters<File> setters, FileType type) =>
-        setters.Set(f => f.Type, type);
+        setters
+            .Set(f => f.Type, type)
+            .Set(f => f.DataStorageVersion, type == FileType.Data ? DataStorageVersion.StatsDB : null);
 
     public static InstanceSetters<File> SetDataSetFileId(this InstanceSetters<File> setters, Guid dataSetFileId) =>
         setters.Set(f => f.DataSetFileId, dataSetFileId);

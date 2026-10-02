@@ -12,10 +12,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class ReplacementPlanService(
     ContentDbContext contentDbContext,
-    StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ILocationRepository locationRepository,
+    IStorageDataSetResolver storageDataSetResolver,
     IDataSetVersionService dataSetVersionService,
-    ITimePeriodService timePeriodService,
     IUserService userService,
     IDataSetVersionMappingService apiDataSetVersionMappingService,
     IReleaseFileRepository releaseFileRepository
@@ -118,8 +115,9 @@ public class ReplacementPlanService(
             {
                 var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
                 var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
 
-                var replacementTimePeriods = await timePeriodService.GetTimePeriods(replacementSubjectId);
+                var replacementTimePeriods = await replacementDataSet.ListTimePeriods(cancellationToken);
 
                 var mapping = await contentDbContext.DataSetMappings.SingleAsync(
                     map =>
@@ -146,22 +144,9 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
-                var replacementFilters = await statisticsDbContext
-                    .Filter.AsNoTracking()
-                    .Include(f => f.FilterGroups)
-                        .ThenInclude(g => g.FilterItems)
-                    .Where(f => f.SubjectId == replacementSubjectId)
-                    .ToListAsync(cancellationToken);
-
-                var replacementIndicators = await statisticsDbContext
-                    .Indicator.AsNoTracking()
-                    .Include(i => i.IndicatorGroup)
-                    .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
-                    .ToListAsync(cancellationToken);
-
-                var replacementLocations = (
-                    await locationRepository.GetDistinctForSubject(replacementSubjectId)
-                ).ToList();
+                var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
+                var replacementIndicators = await replacementDataSet.ListIndicators(cancellationToken);
+                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
 
                 var mappingPlan = ReplacementPlanMappingViewModel.FromModel(
                     mapping,

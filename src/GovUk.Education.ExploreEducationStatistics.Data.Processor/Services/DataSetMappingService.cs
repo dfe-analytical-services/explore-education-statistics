@@ -4,18 +4,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IDataSetMappingService
+public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorageDataSetResolver storageDataSetResolver)
+    : IDataSetMappingService
 {
     public async Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId)
     {
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
-        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
         var replacementFile = await contentDbContext
             .Files.Include(f => f.Replacing)
@@ -28,23 +28,14 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
 
         var originalFile = replacementFile.Replacing!;
 
-        var indicatorMappings = await GenerateInitialIndicatorMapping(
-            statisticsDbContext,
-            originalFile.SubjectId!.Value,
-            replacementFile.SubjectId!.Value
-        );
+        var originalDataSet = storageDataSetResolver.Resolve(originalFile);
+        var replacementDataSet = storageDataSetResolver.Resolve(replacementFile);
 
-        var locationMappings = await GenerateInitialLocationMapping(
-            statisticsDbContext,
-            originalFile.SubjectId!.Value,
-            replacementFile.SubjectId!.Value
-        );
+        var indicatorMappings = await GenerateInitialIndicatorMapping(originalDataSet, replacementDataSet);
 
-        var filterMappings = await GenerateInitialFilterMapping(
-            statisticsDbContext,
-            originalFile.SubjectId!.Value,
-            replacementFile.SubjectId!.Value
-        );
+        var locationMappings = await GenerateInitialLocationMapping(originalDataSet, replacementDataSet);
+
+        var filterMappings = await GenerateInitialFilterMapping(originalDataSet, replacementDataSet);
 
         var newMapping = new DataSetMapping
         {
@@ -59,21 +50,16 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         await contentDbContext.SaveChangesAsync();
     }
 
-    private async Task<Dictionary<Guid, IndicatorMapping>> GenerateInitialIndicatorMapping(
-        StatisticsDbContext statisticsDbContext,
-        Guid originalSubjectId,
-        Guid replacementSubjectId
+    private static async Task<Dictionary<Guid, IndicatorMapping>> GenerateInitialIndicatorMapping(
+        IStorageDataSet originalDataSet,
+        IStorageDataSet replacementDataSet
     )
     {
-        var originalIndicators = await statisticsDbContext
-            .Indicator.Include(i => i.IndicatorGroup)
-            .Where(i => i.IndicatorGroup.SubjectId == originalSubjectId)
-            .ToListAsync();
+        var originalIndicators = (await originalDataSet.ListIndicatorGroups()).SelectMany(ig => ig.Indicators).ToList();
 
-        var replacementIndicatorNameToIndicatorMap = await statisticsDbContext
-            .Indicator.Include(i => i.IndicatorGroup)
-            .Where(i => i.IndicatorGroup.SubjectId == replacementSubjectId)
-            .ToDictionaryAsync(i => i.Name, i => i);
+        var replacementIndicatorNameToIndicatorMap = (await replacementDataSet.ListIndicatorGroups())
+            .SelectMany(ig => ig.Indicators)
+            .ToDictionary(i => i.Name, i => i);
 
         var indicatorMappings = originalIndicators.ToDictionary(
             originalIndicator => originalIndicator.Id,
@@ -114,25 +100,17 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
         return indicatorMappings;
     }
 
-    private async Task<Dictionary<Guid, LocationMapping>> GenerateInitialLocationMapping(
-        StatisticsDbContext statisticsDbContext,
-        Guid originalSubjectId,
-        Guid replacementSubjectId
+    private static async Task<Dictionary<Guid, LocationMapping>> GenerateInitialLocationMapping(
+        IStorageDataSet originalDataSet,
+        IStorageDataSet replacementDataSet
     )
     {
-        var originalLocations = await statisticsDbContext
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == originalSubjectId)
-            .Select(observation => observation.Location)
-            .Distinct()
-            .ToListAsync();
+        var originalLocations = await originalDataSet.ListLocations();
 
-        var replacementIdToLocationMap = await statisticsDbContext
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == replacementSubjectId)
-            .Select(observation => observation.Location)
-            .Distinct()
-            .ToDictionaryAsync(location => location.Id, location => location);
+        var replacementIdToLocationMap = (await replacementDataSet.ListLocations()).ToDictionary(
+            location => location.Id,
+            location => location
+        );
 
         var locationMappings = originalLocations.ToDictionary(
             originalLocation => originalLocation.Id,
@@ -173,21 +151,13 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
     }
 
     private static async Task<Dictionary<Guid, FilterMapping>> GenerateInitialFilterMapping(
-        StatisticsDbContext statisticsDbContext,
-        Guid originalSubjectId,
-        Guid replacementSubjectId
+        IStorageDataSet originalDataSet,
+        IStorageDataSet replacementDataSet
     )
     {
-        var filters = await statisticsDbContext
-            .Filter.AsNoTracking()
-            .Include(f => f.FilterGroups)
-                .ThenInclude(fg => fg.FilterItems)
-            .Where(f => f.SubjectId == originalSubjectId || f.SubjectId == replacementSubjectId)
-            .ToListAsync();
+        var originalFilters = await originalDataSet.ListFilters();
 
-        var originalFilters = filters.Where(f => f.SubjectId == originalSubjectId).ToList();
-
-        var replacementFilters = filters.Where(f => f.SubjectId == replacementSubjectId).ToList();
+        var replacementFilters = await replacementDataSet.ListFilters();
 
         // Create dictionaries to speed up performance when matching originals to replacements
         var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name

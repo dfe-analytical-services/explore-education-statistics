@@ -10,12 +10,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -39,6 +39,7 @@ public class DataSetMappingServiceTests
             Id = originalDataFileId,
             SubjectId = originalSubjectId,
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -47,6 +48,7 @@ public class DataSetMappingServiceTests
             SubjectId = replacementSubjectId,
             Type = FileType.Data,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -282,6 +284,7 @@ public class DataSetMappingServiceTests
             Id = originalDataFileId,
             SubjectId = originalSubjectId,
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -290,6 +293,7 @@ public class DataSetMappingServiceTests
             SubjectId = replacementSubjectId,
             Type = FileType.Data,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -437,6 +441,7 @@ public class DataSetMappingServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -445,6 +450,7 @@ public class DataSetMappingServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -563,13 +569,6 @@ public class DataSetMappingServiceTests
             ReleaseVersion = releaseVersion,
         };
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
@@ -628,6 +627,7 @@ public class DataSetMappingServiceTests
             Id = Guid.NewGuid(),
             Replacing = null, // a DataSetMapping is only created if a replacement is ongoing
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -656,12 +656,18 @@ public class DataSetMappingServiceTests
         string? statisticsDbContextId = null
     )
     {
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId ?? Guid.NewGuid().ToString(),
-            statisticsDbContextId ?? Guid.NewGuid().ToString()
-        );
+        contentDbContextId ??= Guid.NewGuid().ToString();
+        statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        return new DataSetMappingService(dbContextSupplier);
+        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
+
+        return new DataSetMappingService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(contentDbContextId),
+                InMemoryStatisticsDbContext(statisticsDbContextId)
+            )
+        );
     }
 
     private static FilterMapping CreateFilterMapping(
