@@ -4,49 +4,51 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
-/// <summary>
-/// Resolves a data set to the <see cref="IStorageDataSet" /> implementation for the
-/// <see cref="DataStorageVersion" /> recorded against its data file.
-///
-/// Registered per scope, so each subject's data file is looked up at most once per request.
-/// </summary>
 public class StorageDataSetResolver(
     ContentDbContext contentDbContext,
     StatisticsDbDataSetFactory statisticsDbDataSetFactory
 ) : IStorageDataSetResolver
 {
-    private readonly Dictionary<Guid, IStorageDataSet?> _resolved = [];
-
     public async Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
     {
         return await TryResolve(subjectId, cancellationToken)
             ?? throw new InvalidOperationException($"No data file found for subject {subjectId}");
     }
 
-    public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
+    public IStorageDataSet Resolve(File dataFile)
     {
-        if (_resolved.TryGetValue(subjectId, out var dataSet))
+        if (dataFile.Type != FileType.Data || dataFile.SubjectId is null)
         {
-            return dataSet;
+            throw new ArgumentException($"File {dataFile.Id} is not a data file linked to a subject", nameof(dataFile));
         }
 
+        var subjectId = dataFile.SubjectId.Value;
+
+        return CreateStorageDataSet(subjectId, dataFile.DataStorageVersion)
+            ?? throw new InvalidOperationException($"No data storage version recorded for data file {dataFile.Id}");
+    }
+
+    public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
+    {
         var dataStorageVersion = await contentDbContext
             .Files.Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
             .Select(file => file.DataStorageVersion)
             .SingleOrDefaultAsync(cancellationToken);
 
-        dataSet = dataStorageVersion switch
+        return CreateStorageDataSet(subjectId, dataStorageVersion);
+    }
+
+    private IStorageDataSet? CreateStorageDataSet(Guid subjectId, DataStorageVersion? dataStorageVersion)
+    {
+        return dataStorageVersion switch
         {
             DataStorageVersion.StatsDB => statisticsDbDataSetFactory.Create(subjectId),
             null => null,
             _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
         };
-
-        _resolved[subjectId] = dataSet;
-
-        return dataSet;
     }
 }
