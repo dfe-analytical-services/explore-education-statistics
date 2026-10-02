@@ -71,6 +71,9 @@ param autoscaleEnabled bool
 @description('Whether or not to enable slot swapping. Deploys a swap slot if enabled.')
 param swapSlotEnabled bool = true
 
+@description('Path the platform should ping to judge the app healthy during its own slot-swap warm-up, when swapSlotEnabled is true.')
+param healthCheckPath string = '/api/health'
+
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
 
@@ -126,6 +129,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
       connectionStrings: connectionStrings
+      healthCheckPath: healthCheckPath
       cors: {
         allowedOrigins: allowedOrigins
       }
@@ -145,11 +149,16 @@ var baseSettings = union(applicationAppSettings, {
   WEBSITE_NODE_DEFAULT_VERSION: '22.23.1'
   ASPNETCORE_DETAILEDERRORS: detailedErrors
   WEBSITES_PORT: websitePort
-  
+
   // Enable the App Service to access file shares over the VNet if
-  // file shares are available for this App Service. 
+  // file shares are available for this App Service.
   WEBSITE_CONTENTOVERVNET: length(azureFileShares ?? []) > 0 ? '1' : null
-})
+}, swapSlotEnabled ? {
+  // Point the platform's own slot-swap warm-up check at our lightweight health endpoint,
+  // rather than the site root, so swap doesn't wait on a heavier page to judge readiness.
+  WEBSITE_SWAP_WARMUP_PING_PATH: healthCheckPath
+  WEBSITE_SWAP_WARMUP_PING_STATUSES: '200'
+} : {})
 
 var osSpecificSettings = union(baseSettings,
   kind != 'app,linux,container' ? {
@@ -157,6 +166,10 @@ var osSpecificSettings = union(baseSettings,
   } : {},
   operatingSystem == 'Windows' ? {
     WEBSITE_LOAD_CERTIFICATES: '*'
+    // Ensures IIS also binds the app's own *.azurewebsites.net hostname (and its slots'
+    // equivalents) alongside any custom domain bindings, so requests/health checks/swap
+    // warm-up made directly against that hostname don't 404 at the IIS level.
+    WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG: '1'
   } : {}
 )
 
@@ -232,6 +245,7 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     minTlsVersion: minTlsVersion
     vnetLink: vnetLink
     tagValues: tagValues
+    healthCheckPath: healthCheckPath
   }
 }
 
