@@ -57,7 +57,6 @@ public class ReleaseDataFileServiceTests
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -78,30 +77,25 @@ public class ReleaseDataFileServiceTests
         {
             ReleaseVersion = releaseVersion,
             Order = 0,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseFile3 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 2,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseFile4 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 3,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseFile4Replacement = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 3,
-            File = new File
-            {
-                Type = FileType.Data,
-                Replacing = releaseFile4.File,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Type = FileType.Data, Replacing = releaseFile4.File },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -196,7 +190,6 @@ public class ReleaseDataFileServiceTests
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File
@@ -213,7 +206,6 @@ public class ReleaseDataFileServiceTests
             Type = FileType.Data,
             SubjectId = replacementSubject.Id,
             Replacing = dataFile,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         dataFile.ReplacedBy = replacementDataFile;
@@ -337,7 +329,6 @@ public class ReleaseDataFileServiceTests
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File
@@ -437,7 +428,6 @@ public class ReleaseDataFileServiceTests
                 Filename = "data.csv",
                 Type = FileType.Data,
                 SubjectId = subject.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -542,7 +532,6 @@ public class ReleaseDataFileServiceTests
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File
@@ -560,7 +549,6 @@ public class ReleaseDataFileServiceTests
             Type = FileType.Data,
             SubjectId = replacementSubject.Id,
             Replacing = dataFile,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         dataFile.ReplacedBy = replacementDataFile;
@@ -674,7 +662,6 @@ public class ReleaseDataFileServiceTests
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File
@@ -815,7 +802,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             PublicApiDataSetId = Guid.NewGuid(),
             PublicApiDataSetVersion = SemVersion.Parse("1.0.1", SemVersionStyles.Strict),
@@ -899,7 +885,6 @@ public class ReleaseDataFileServiceTests
             Filename = "test-data.csv",
             Type = FileType.Data,
             CreatedById = _user.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
         var metaFile = new File { Filename = "test-data.meta.csv", Type = Metadata };
 
@@ -939,7 +924,6 @@ public class ReleaseDataFileServiceTests
             Type = FileType.Data,
             Created = DateTime.UtcNow,
             CreatedById = _user.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File { Filename = "test-data.meta.csv", Type = Metadata };
@@ -1006,12 +990,7 @@ public class ReleaseDataFileServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = Guid.NewGuid(),
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = Guid.NewGuid(), Type = FileType.Data },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1071,12 +1050,7 @@ public class ReleaseDataFileServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = Guid.NewGuid(),
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = Guid.NewGuid(), Type = FileType.Data },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1238,31 +1212,31 @@ public class ReleaseDataFileServiceTests
         {
             ReleaseVersion = releaseVersion,
             Order = 5,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseDataFile2 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 3,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseDataFile3 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 1,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseDataFile4 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 2,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
         var releaseDataFile5 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
             Order = 0,
-            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            File = new File { Type = FileType.Data },
         };
 
         var releaseMetaFile1 = new ReleaseFile
@@ -1416,7 +1390,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var metaReleaseFile1 = new ReleaseFile
@@ -1435,7 +1408,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var metaReleaseFile2 = new ReleaseFile
@@ -1535,7 +1507,6 @@ public class ReleaseDataFileServiceTests
             Created = DateTime.UtcNow,
             CreatedById = _user.Id,
             ReplacedById = replacementFileId,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
         var replacementFile = new File
         {
@@ -1546,7 +1517,6 @@ public class ReleaseDataFileServiceTests
             Created = DateTime.UtcNow,
             CreatedById = _user.Id,
             ReplacingId = originalFileId,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
         var originalMetaFile = new File { Filename = "test-data-1.meta.csv", Type = Metadata };
         var replacementMetaFile = new File { Filename = "test-data-2.meta.csv", Type = Metadata };
@@ -1656,7 +1626,6 @@ public class ReleaseDataFileServiceTests
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
                 ReplacedById = replacementFileId,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var originalMetaReleaseFile = new ReleaseFile
@@ -1677,7 +1646,6 @@ public class ReleaseDataFileServiceTests
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
                 ReplacingId = originalFileId,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var replacementMetaReleaseFile = new ReleaseFile
@@ -1782,7 +1750,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow,
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var metaRelease1File = new ReleaseFile
@@ -1801,7 +1768,6 @@ public class ReleaseDataFileServiceTests
                 ContentLength = 10240,
                 Type = FileType.Data,
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var metaRelease2File = new ReleaseFile
@@ -1900,7 +1866,6 @@ public class ReleaseDataFileServiceTests
                 Type = FileType.Data,
                 Created = DateTime.UtcNow.AddDays(-1),
                 CreatedById = _user.Id,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
         var metaReleaseFile1 = new ReleaseFile
@@ -1916,7 +1881,6 @@ public class ReleaseDataFileServiceTests
             Type = FileType.Data,
             Created = DateTime.UtcNow,
             CreatedById = _user.Id,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
         var metaFile2 = new File { Filename = "test-data-2.meta.csv", Type = Metadata };
         var dataOriginalReleaseFile2 = new ReleaseFile
