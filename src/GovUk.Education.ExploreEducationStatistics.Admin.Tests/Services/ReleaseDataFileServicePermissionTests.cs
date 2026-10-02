@@ -99,12 +99,7 @@ public class ReleaseDataFileServicePermissionTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = _releaseVersion,
-            File = new File
-            {
-                Id = Guid.NewGuid(),
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Id = Guid.NewGuid(), Type = FileType.Data },
         };
 
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
@@ -129,12 +124,7 @@ public class ReleaseDataFileServicePermissionTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = _releaseVersion,
-            File = new File
-            {
-                Id = Guid.NewGuid(),
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Id = Guid.NewGuid(), Type = FileType.Data },
         };
 
         await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
