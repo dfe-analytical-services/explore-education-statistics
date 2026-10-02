@@ -1,4 +1,7 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface IStorageDataSetResolver
@@ -13,8 +16,15 @@ public interface IStorageDataSetResolver
     Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// As <see cref="Resolve" />, but returns null when no data file is recorded for the subject,
-    /// for example because the data set has since been deleted.
+    /// As <see cref="Resolve(Guid, CancellationToken)" />, but reads the <see cref="DataStorageVersion" /> from a
+    /// data <see cref="File" /> the caller has already loaded, so the data file is not looked up again.
+    /// <paramref name="dataFile" /> must be of type <see cref="FileType.Data" /> and linked to a subject.
+    /// </summary>
+    IStorageDataSet Resolve(File dataFile);
+
+    /// <summary>
+    /// As <see cref="Resolve(Guid, CancellationToken)" />, but returns null when no data file is recorded for the
+    /// subject, for example because the data set has since been deleted.
     /// </summary>
     Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default);
 }

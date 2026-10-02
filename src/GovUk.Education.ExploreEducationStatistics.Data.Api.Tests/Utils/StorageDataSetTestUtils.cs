@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Utils;
 
@@ -95,14 +96,15 @@ public static class StorageDataSetTestUtils
     }
 
     /// <summary>
-    /// A Strict <see cref="IStorageDataSetResolver" /> mock that resolves <paramref name="subjectId" />
-    /// to the given data set.
+    /// A Strict <see cref="IStorageDataSetResolver" /> mock that resolves <paramref name="subjectId" />, or a data
+    /// file linked to it, to the given data set.
     /// </summary>
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)
     {
         var resolver = new Mock<IStorageDataSetResolver>(Strict);
 
         resolver.Setup(r => r.Resolve(subjectId, It.IsAny<CancellationToken>())).ReturnsAsync(dataSet);
+        resolver.Setup(r => r.Resolve(It.Is<File>(f => f.SubjectId == subjectId))).Returns(dataSet);
 
         return resolver;
     }
@@ -112,6 +114,11 @@ public static class StorageDataSetTestUtils
         public Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IStorageDataSet>(factory.Create(subjectId));
+        }
+
+        public IStorageDataSet Resolve(File dataFile)
+        {
+            return factory.Create(dataFile.SubjectId!.Value);
         }
 
         public Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)

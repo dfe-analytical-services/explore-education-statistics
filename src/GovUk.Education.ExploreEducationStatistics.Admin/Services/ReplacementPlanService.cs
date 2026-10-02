@@ -115,7 +115,7 @@ public class ReplacementPlanService(
             {
                 var originalSubjectId = originalReleaseFile.File.SubjectId!.Value;
                 var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
-                var replacementDataSet = await storageDataSetResolver.Resolve(replacementSubjectId, cancellationToken);
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
 
                 var replacementTimePeriods = await replacementDataSet.ListTimePeriods(cancellationToken);
 

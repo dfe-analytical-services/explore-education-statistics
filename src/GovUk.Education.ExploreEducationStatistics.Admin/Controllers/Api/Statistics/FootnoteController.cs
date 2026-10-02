@@ -118,16 +118,15 @@ public class FootnoteController : ControllerBase
                     .ToAsyncEnumerable()
                     .SelectAwait(async subject =>
                     {
-                        var dataSet = await _storageDataSetResolver.Resolve(subject.Id);
+                        var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseVersionId, subject.Id);
+                        var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
 
                         return new FootnotesSubjectMetaViewModel
                         {
                             Filters = await GetFilters(dataSet),
                             Indicators = await GetIndicators(dataSet),
                             SubjectId = subject.Id,
-                            SubjectName = (
-                                await _releaseDataFileRepository.GetBySubject(releaseVersionId, subject.Id)
-                            ).Name,
+                            SubjectName = releaseFile.Name,
                         };
                     })
                     .ToListAsync();
