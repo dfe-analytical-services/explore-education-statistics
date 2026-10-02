@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     /// <inheritdoc />
-    public partial class Ees7690AddDataStorageVersionToFiles : Migration
+    public partial class Ees7699AddDataStorageVersionToFiles : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
