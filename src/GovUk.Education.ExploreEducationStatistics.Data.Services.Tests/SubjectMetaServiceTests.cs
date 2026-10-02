@@ -66,12 +66,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -147,7 +142,6 @@ public class SubjectMetaServiceTests
                 SubjectId = releaseSubject.SubjectId,
                 Type = FileType.Data,
                 FilterHierarchies = null,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -379,7 +373,6 @@ public class SubjectMetaServiceTests
                         ]
                     ),
                 ],
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -652,8 +645,7 @@ public class SubjectMetaServiceTests
             {
                 SubjectId = releaseSubject.SubjectId,
                 Type = FileType.Data,
-                FilterHierarchies = null, // BuildFilterHierarchyViewModel is tested via GetSubjectMeta, so no need to test it here,
-                DataStorageVersion = DataStorageVersion.StatsDB,
+                FilterHierarchies = null, // BuildFilterHierarchyViewModel is tested via GetSubjectMeta, so no need to test it here
             },
         };
 
@@ -896,12 +888,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1065,12 +1052,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1180,12 +1162,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1288,12 +1265,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1395,12 +1367,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1510,12 +1477,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1618,12 +1580,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var filters = new List<Filter>
@@ -1722,12 +1679,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1782,12 +1734,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1841,12 +1788,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -1967,12 +1909,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2061,12 +1998,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2154,12 +2086,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2248,12 +2175,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var indicatorGroups = new List<IndicatorGroup>
@@ -2338,12 +2260,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -2398,12 +2315,7 @@ public class SubjectMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();

@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -35,7 +34,7 @@ public class SubjectMetaServicePermissionTests
     private static readonly ReleaseFile ReleaseFile = new()
     {
         ReleaseVersionId = ReleaseVersionId,
-        File = new File { SubjectId = SubjectId, DataStorageVersion = DataStorageVersion.StatsDB },
+        File = new File { SubjectId = SubjectId },
     };
 
     [Fact]

@@ -74,7 +74,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -158,7 +157,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -217,7 +215,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -283,7 +280,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -338,7 +334,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1219,7 +1214,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1345,7 +1339,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1466,7 +1459,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1598,7 +1590,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1729,7 +1720,6 @@ public class DataBlockServiceTests
                 SubjectId = subjectId,
                 Filename = "test filename",
                 Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 

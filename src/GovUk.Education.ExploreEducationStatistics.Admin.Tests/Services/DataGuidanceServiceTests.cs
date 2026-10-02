@@ -190,24 +190,14 @@ public class DataGuidanceServiceTests
         var releaseFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion1,
-            File = new File
-            {
-                Filename = "file1.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = "Data set 1 guidance",
         };
 
         var releaseFile2 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion2,
-            File = new File
-            {
-                Filename = "file2.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file2.csv", Type = FileType.Data },
             Summary = "Data set 2 guidance",
         };
 
@@ -275,24 +265,14 @@ public class DataGuidanceServiceTests
         var releaseFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                Filename = "file1.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = "Data set 1 guidance",
         };
 
         var releaseFile2 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                Filename = "file2.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file2.csv", Type = FileType.Data },
             Summary = "Data set 2 guidance",
         };
 
@@ -383,12 +363,7 @@ public class DataGuidanceServiceTests
         var releaseVersion1File1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion1,
-            File = new File
-            {
-                Filename = "file1.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = "Version 1 data set 1 guidance",
             Published = originalPublishedDate,
         };
@@ -396,12 +371,7 @@ public class DataGuidanceServiceTests
         var releaseVersion2File1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion2,
-            File = new File
-            {
-                Filename = "file1.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = "Version 2 data set 1 guidance",
             Published = originalPublishedDate,
         };
@@ -409,12 +379,7 @@ public class DataGuidanceServiceTests
         var releaseVersion2File2 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion2,
-            File = new File
-            {
-                Filename = "file2.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file2.csv", Type = FileType.Data },
             Summary = "Version 2 data set 2 guidance",
             Published = originalPublishedDate,
         };
@@ -559,12 +524,7 @@ public class DataGuidanceServiceTests
         var releaseFile1 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                Filename = "file1.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file1.csv", Type = FileType.Data },
             Summary = dataSet1Guidance,
         };
 
@@ -572,12 +532,7 @@ public class DataGuidanceServiceTests
         var releaseFile2 = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                Filename = "file2.csv",
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { Filename = "file2.csv", Type = FileType.Data },
             Summary = "Data set 2 guidance",
         };
 

@@ -33,7 +33,6 @@ public class FileExtensionTests
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
             Type = Data,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var imageFile = new File
@@ -86,7 +85,6 @@ public class FileExtensionTests
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
             Type = Data,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var imageFile = new File
@@ -138,7 +136,7 @@ public class FileExtensionTests
     [InlineData(1099511627776, "1 Tb")]
     public void DisplaySize_FromFile_ReturnsStringOfCorrectSizeAndUnit(long contentLength, string expectedDisplaySize)
     {
-        var file = new File { ContentLength = contentLength, Type = FileType.Ancillary };
+        var file = new File { ContentLength = contentLength };
 
         Assert.Equal(expectedDisplaySize, file.DisplaySize());
     }
@@ -158,12 +156,7 @@ public class FileExtensionTests
     public void ZipFileEntryName_DataFile_ReturnsExpectedFileName()
     {
         // Arrange
-        var file = new File
-        {
-            Type = Data,
-            Filename = "data.csv",
-            DataStorageVersion = DataStorageVersion.StatsDB,
-        };
+        var file = new File { Type = Data, Filename = "data.csv" };
 
         // Act
         var fileName = file.ZipFileEntryName();

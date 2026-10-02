@@ -48,7 +48,6 @@ public class ReleaseServiceTests
                     Filename = "data.csv",
                     ContentLength = 20480,
                     Type = FileType.Data,
-                    DataStorageVersion = DataStorageVersion.StatsDB,
                 },
             },
             new()
@@ -277,12 +276,7 @@ public class ReleaseServiceTests
                 Name = "file.csv",
                 Summary = "Summary text",
                 FileId = amendedFileId,
-                File = new File
-                {
-                    Id = amendedFileId,
-                    Type = FileType.Data,
-                    DataStorageVersion = DataStorageVersion.StatsDB,
-                },
+                File = new File { Id = amendedFileId, Type = FileType.Data },
             };
 
             var unamendedReleaseFile = new ReleaseFile
@@ -293,12 +287,7 @@ public class ReleaseServiceTests
                 Name = "file.csv",
                 Summary = "Summary text",
                 FileId = unamendedFileId,
-                File = new File
-                {
-                    Id = unamendedFileId,
-                    Type = FileType.Data,
-                    DataStorageVersion = DataStorageVersion.StatsDB,
-                },
+                File = new File { Id = unamendedFileId, Type = FileType.Data },
             };
 
             contentDbContext.ReleaseFiles.AddRange(amendedReleaseFile, unamendedReleaseFile);

@@ -222,7 +222,6 @@ public class ReleaseAmendmentServiceTests
             Id = Guid.NewGuid(),
             Filename = "Filename 1",
             SubjectId = Guid.NewGuid(),
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var dataFile2 = new File
@@ -230,7 +229,6 @@ public class ReleaseAmendmentServiceTests
             Id = Guid.NewGuid(),
             Filename = "Filename 2",
             SubjectId = Guid.NewGuid(),
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var releaseFiles = new List<ReleaseFile>
