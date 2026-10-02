@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
