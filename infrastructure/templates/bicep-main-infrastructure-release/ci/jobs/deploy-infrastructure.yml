@@ -38,60 +38,17 @@ jobs:
             # bootstrap values. See app-service.bicep for how these are merged.
             - template: ../../../../common/ci/tasks/get-appsettings.yml
               parameters:
-                displayName: Get existing Admin production app settings
-                appName: $(subscription)-as-ees-admin
+                displayName: Get existing production and staging app settings for slot-swapping app services
                 appType: webApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                variableName: adminProdAppSettings
-
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
-              parameters:
-                displayName: Get existing Admin staging slot app settings
-                appName: $(subscription)-as-ees-admin
-                appType: webApp
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                variableName: adminStagingSlotAppSettings
                 slotName: deploy
-
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
-              parameters:
-                displayName: Get existing Content API production app settings
-                appName: $(subscription)-as-ees-content
-                appType: webApp
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                variableName: contentApiProdAppSettings
-
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
-              parameters:
-                displayName: Get existing Content API staging slot app settings
-                appName: $(subscription)-as-ees-content
-                appType: webApp
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                variableName: contentApiStagingSlotAppSettings
-                slotName: deploy
-
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
-              parameters:
-                displayName: Get existing Data API production app settings
-                appName: $(subscription)-as-ees-data
-                appType: webApp
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                variableName: dataApiProdAppSettings
-
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
-              parameters:
-                displayName: Get existing Data API staging slot app settings
-                appName: $(subscription)-as-ees-data
-                appType: webApp
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                variableName: dataApiStagingSlotAppSettings
-                slotName: deploy
+                apps: |
+                  [
+                    { "appName": "$(subscription)-as-ees-admin", "prodVariableName": "adminProdAppSettings", "stagingVariableName": "adminStagingSlotAppSettings" },
+                    { "appName": "$(subscription)-as-ees-content", "prodVariableName": "contentApiProdAppSettings", "stagingVariableName": "contentApiStagingSlotAppSettings" },
+                    { "appName": "$(subscription)-as-ees-data", "prodVariableName": "dataApiProdAppSettings", "stagingVariableName": "dataApiStagingSlotAppSettings" }
+                  ]
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
