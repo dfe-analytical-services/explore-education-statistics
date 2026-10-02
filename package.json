@@ -69,6 +69,7 @@
     "lint:python": "python3 -m pipenv run flake8 tests",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "start": "tsx useful-scripts/start.ts",
+    "trust-idp-cert": "tsx useful-scripts/trustIdpCert.ts",
     "test": "pnpm -r --no-bail test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
     "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
