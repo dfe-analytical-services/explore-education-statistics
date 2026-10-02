@@ -15,8 +15,7 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
-import { useNavigate } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
 export interface LiveApiDataSetSummary extends ApiDataSetSummary {
   latestLiveVersion: ApiDataSetLiveVersionSummary;

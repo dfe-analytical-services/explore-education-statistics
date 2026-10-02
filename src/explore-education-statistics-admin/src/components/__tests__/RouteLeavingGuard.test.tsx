@@ -1,8 +1,7 @@
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createMemoryRouter, RouterProvider } from 'react-router';
-import { Link } from 'react-router-dom';
+import { createMemoryRouter, Link, RouterProvider } from 'react-router';
 import TestLocationContext, {
   expectLocation,
 } from '@admin/components/testing/TestLocationContext';
@@ -22,6 +21,7 @@ function renderPage(blockRouteChange = true) {
             </RouteLeavingGuard>
 
             <Link to="/other">Change route</Link>
+
             <TestLocationContext />
           </>
         ),
@@ -91,7 +91,7 @@ describe('RouteLeavingGuard', () => {
     await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
     await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    await waitFor(async () => expectLocation('/other'));
+    await expectLocation('/other');
 
     expect(screen.getByText('Other route')).toBeInTheDocument();
   });

@@ -8,7 +8,7 @@ import _publicationService, {
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import noop from 'lodash/noop';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';

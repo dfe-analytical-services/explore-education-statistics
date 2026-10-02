@@ -12,9 +12,8 @@ import publicationService, {
 } from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
-import { generatePath, useNavigate } from 'react-router';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
 
 export const mapToReleaseSeriesItemUpdateRequest = (
   releaseSeries: ReleaseSeriesTableEntry[],
