@@ -26,7 +26,7 @@ public class DataImportServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var file = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var file = new File { Type = FileType.Data };
 
         var import = new DataImport { File = file };
 
@@ -75,7 +75,7 @@ public class DataImportServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var file = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var file = new File { Type = FileType.Data };
 
         var import = new DataImport { File = file };
 
@@ -121,7 +121,7 @@ public class DataImportServiceTests
         var releaseVersion1 = new ReleaseVersion();
         var releaseVersion2 = new ReleaseVersion();
 
-        var release2File1 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var release2File1 = new File { Type = FileType.Data };
 
         // Incomplete imports for other Releases should be ignored
 
@@ -153,11 +153,11 @@ public class DataImportServiceTests
         var release1 = new ReleaseVersion();
         var release2 = new ReleaseVersion();
 
-        var release1File1 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var release1File1 = new File { Type = FileType.Data };
 
-        var release1File2 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var release1File2 = new File { Type = FileType.Data };
 
-        var release2File1 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var release2File1 = new File { Type = FileType.Data };
 
         var release1Import1 = new DataImport { File = release1File1, Status = DataImportStatus.COMPLETE };
 
@@ -216,9 +216,9 @@ public class DataImportServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var file1 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var file1 = new File { Type = FileType.Data };
 
-        var file2 = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB };
+        var file2 = new File { Type = FileType.Data };
 
         var import1 = new DataImport { File = file1, Status = DataImportStatus.COMPLETE };
 
@@ -255,7 +255,6 @@ public class DataImportServiceTests
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subjectId,
-            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var metaFile = new File
