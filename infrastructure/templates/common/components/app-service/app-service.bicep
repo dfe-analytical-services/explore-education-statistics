@@ -267,6 +267,7 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     vnetLink: vnetLink
     tagValues: tagValues
     healthCheckPath: healthCheckPath
+    connectionStrings: connectionStrings
   }
 }
 
