@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
 /// Storage-agnostic read access to the content of a single data set (Subject): its observations, filters and

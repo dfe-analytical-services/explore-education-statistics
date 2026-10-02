@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
@@ -348,11 +348,11 @@ public class FootnoteService : IFootnoteService
         IReadOnlySet<Guid> indicatorIds
     )
     {
-        var releaseSubjectIds = (await _releaseSubjectRepository.FindAll(releaseVersionId))
+        var releaseVersionSubjectIds = (await _releaseSubjectRepository.FindAll(releaseVersionId))
             .Select(rs => rs.SubjectId)
             .ToList();
 
-        var unlinkedSubjectIds = subjectIds.Except(releaseSubjectIds).ToList();
+        var unlinkedSubjectIds = subjectIds.Except(releaseVersionSubjectIds).ToList();
         if (unlinkedSubjectIds.Count > 0)
         {
             return ValidationResult(
@@ -374,7 +374,7 @@ public class FootnoteService : IFootnoteService
             return Unit.Instance;
         }
 
-        foreach (var subjectId in releaseSubjectIds)
+        foreach (var subjectId in releaseVersionSubjectIds)
         {
             var dataSet = await _storageDataSetResolver.Resolve(subjectId);
 

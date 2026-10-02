@@ -2,7 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 public interface IStorageDataSetResolver
 {
