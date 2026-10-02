@@ -18,6 +18,9 @@ param slotName string
 @description('Minimum TLS version supported.')
 param minTlsVersion string
 
+@description('Path the platform should ping to judge the app healthy.')
+param healthCheckPath string?
+
 @description('Name of the VNet.')
 param vnetLink {
   vnetName: string
@@ -52,13 +55,14 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
       minTlsVersion: minTlsVersion
       ftpsState: 'FtpsOnly'
       netFrameworkVersion: 'v10.0'
-      alwaysOn: false
+      alwaysOn: true
       webSocketsEnabled: false
       remoteDebuggingEnabled: false
       httpLoggingEnabled: true
       detailedErrorLoggingEnabled: true
       requestTracingEnabled: true
       use32BitWorkerProcess: false
+      healthCheckPath: healthCheckPath
     }
   }
 }
