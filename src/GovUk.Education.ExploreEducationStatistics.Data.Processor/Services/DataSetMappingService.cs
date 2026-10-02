@@ -28,8 +28,8 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
 
         var originalFile = replacementFile.Replacing!;
 
-        var originalDataSet = await storageDataSetResolver.Resolve(originalFile.SubjectId!.Value);
-        var replacementDataSet = await storageDataSetResolver.Resolve(replacementFile.SubjectId!.Value);
+        var originalDataSet = storageDataSetResolver.Resolve(originalFile);
+        var replacementDataSet = storageDataSetResolver.Resolve(replacementFile);
 
         var indicatorMappings = await GenerateInitialIndicatorMapping(originalDataSet, replacementDataSet);
 
