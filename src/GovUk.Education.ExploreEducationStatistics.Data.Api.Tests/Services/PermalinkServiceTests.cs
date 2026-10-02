@@ -1395,12 +1395,7 @@ public class PermalinkServiceTests
         return new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File
-            {
-                SubjectId = subjectId,
-                Type = FileType.Data,
-                DataStorageVersion = DataStorageVersion.StatsDB,
-            },
+            File = new File { SubjectId = subjectId, Type = FileType.Data },
         };
     }
 
