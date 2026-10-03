@@ -35,11 +35,18 @@ jobs:
                 scriptLocation: inlineScript
                 inlineScript: |
                   set -e
+
+                  # A marker unique to this deploy, baked in as the Deploy__DeployedAt
+                  # appsetting below - see wait-for-app-service-restart.yml.
+                  deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
+
                   az deployment group create \
                     --name $(bicepConfigDeployName) \
                     --resource-group $(resourceGroupName) \
                     --template-file $(templateFile) \
-                    --parameters $(paramFile)
+                    --parameters $(paramFile) \
+                    --parameters deployedAt="$deployedAt"
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
@@ -61,7 +68,8 @@ jobs:
                     resourceGroupName: $(resourceGroupName)
                     artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
                     appSettingsJson: $(appSettings)
-                    healthCheckPath: /api/config
+                    healthCheckPath: /api/health
+                    deployedAt: $(deployedAt)
             - ${{ else }}:
                 - template: ../tasks/deploy-app-service-direct.yml
                   parameters:
@@ -71,7 +79,8 @@ jobs:
                     resourceGroupName: $(resourceGroupName)
                     artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
                     appSettingsJson: $(appSettings)
-                    healthCheckPath: /api/config
+                    healthCheckPath: /api/health
+                    deployedAt: $(deployedAt)
 
   # Only exists when slot swapping is actually in play for this run - see deploy-app-service.yml
   # for the equivalent decision used by Content API/Data API. Kept as its own job (rather than
@@ -92,4 +101,4 @@ jobs:
                     displayNamePrefix: Admin
                     appName: $(subscription)-as-ees-admin
                     resourceGroupName: $(resourceGroupName)
-                    healthCheckPath: /api/config
+                    healthCheckPath: /api/health

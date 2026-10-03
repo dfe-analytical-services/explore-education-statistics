@@ -1,0 +1,79 @@
+#
+# Polls the app's health endpoint for its "deployedAt" value (see
+# HealthCheckOptionsExtensions.IncludeDeployedAt in the Common project) to match the
+# deployedAt marker generated for this deploy (see deploy-admin.yml/deploy-content-api.yml/
+# deploy-data-api.yml), confirming the new appsettings and code have actually taken
+# effect. An equality check against a marker we chose in advance, rather than comparing
+# against a previously-observed value (e.g. a process start time), avoids false positives
+# from an unrelated restart on some other instance happening to look like a match - the
+# marker can only appear once this deploy's appsettings have actually been applied.
+#
+# This still only confirms *an* instance has it, not *all* instances (there's no session
+# affinity - see app-service.bicep's clientAffinityEnabled - so each call may land on a
+# different instance), but that's an acceptable gap for what's just a diagnostic aid, not
+# the real health gate (that's wait-for-endpoint-result.yml, downstream).
+#
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayName
+    type: string
+    default: Waiting for app service to restart
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  # Leave blank to target production. Set to a slot name (e.g. "deploy") to target that slot.
+  - name: slotName
+    type: string
+    default: ''
+  - name: healthCheckPath
+    type: string
+    default: /api/health
+  # The marker generated for this deploy, which we expect to eventually see reported back
+  # as "deployedAt" once it's taken effect.
+  - name: deployedAt
+    type: string
+  - name: pollingDelaySeconds
+    type: number
+    default: 2
+  - name: maxAttempts
+    type: number
+    default: 60
+
+steps:
+  # Call the health endpoint that will contain our expected "deployedAt" marker if the restart is successful.
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    continueOnError: true
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        host="${{ parameters.appName }}.azurewebsites.net"
+        if [ -n "${{ parameters.slotName }}" ]; then
+          host="${{ parameters.appName }}-${{ parameters.slotName }}.azurewebsites.net"
+        fi
+
+        expectedDeployedAt="${{ parameters.deployedAt }}"
+
+        for attempt in $(seq 1 ${{ parameters.maxAttempts }});
+        do
+          echo "Attempt number $attempt of ${{ parameters.maxAttempts }} - checking $host${{ parameters.healthCheckPath }} for deployedAt == $expectedDeployedAt."
+
+          reportedDeployedAt=$(curl -s "https://$host${{ parameters.healthCheckPath }}" | jq -r '.deployedAt // empty' 2>/dev/null) || reportedDeployedAt=""
+
+          if [ -n "$expectedDeployedAt" ] && [ "$reportedDeployedAt" == "$expectedDeployedAt" ]; then
+            echo "Restart confirmed - $host${{ parameters.healthCheckPath }} reported deployedAt: $reportedDeployedAt."
+            exit 0
+          fi
+
+          echo "Not confirmed yet (reported deployedAt: '$reportedDeployedAt'). Retrying in ${{ parameters.pollingDelaySeconds }} seconds."
+          sleep ${{ parameters.pollingDelaySeconds }}
+        done
+
+        echo "##vso[task.logissue type=error]Timed out waiting for $host${{ parameters.healthCheckPath }} to report deployedAt == $expectedDeployedAt."
+        exit 1

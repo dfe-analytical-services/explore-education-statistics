@@ -13,6 +13,9 @@ param adminConfigParam AdminConfig = {}
 @description('Public API configuration values needed to compute this app\'s appsettings.')
 param publicApiConfigParam PublicApiConfig = {}
 
+@description('A marker unique to this deploy (the pipeline run\'s own timestamp), surfaced via the app\'s health/config endpoint so the pipeline can confirm the new appsettings and code have actually taken effect - see wait-for-app-service-restart.yml.')
+param deployedAt string = ''
+
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 var adminConfig = mergeAdminConfig(adminConfigParam)
 var publicApiConfig = mergePublicApiConfig(publicApiConfigParam)
@@ -120,4 +123,5 @@ output appSettings object = {
   DataScreener__ScreenerProgressUpdateFailureIntervalMinutes: 1440
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri
+  Deploy__DeployedAt: deployedAt
 }
