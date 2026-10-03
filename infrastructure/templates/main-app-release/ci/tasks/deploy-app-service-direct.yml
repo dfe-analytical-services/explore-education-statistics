@@ -65,7 +65,18 @@ steps:
           --type zip \
           --src-path "${{ parameters.artifactZipPath }}"
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  # Wait for the app service restart to begin.
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Confirming production has started restarting
+      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+      expectedResult: unavailable
+      pollingDelaySeconds: 1
+      maxAttempts: 30
+
+  # Wait for the app service restart to complete.
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       displayName: ${{ parameters.displayNamePrefix }} - Checking production is healthy after appsettings and code deploy

@@ -82,7 +82,7 @@ jobs:
                     --settings \
                       "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that staging slot is healthy after updating appsettings
@@ -109,7 +109,7 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --slot staging
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Waiting for staging slot to start successfully
@@ -139,7 +139,7 @@ jobs:
                     --slot staging \
                     --target-slot production
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that production slot is healthy after slot swap

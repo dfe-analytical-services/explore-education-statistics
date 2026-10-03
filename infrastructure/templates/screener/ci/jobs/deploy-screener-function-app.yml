@@ -39,7 +39,7 @@ jobs:
 
                 echo "##vso[task.setvariable variable=screenerAppRegistrationClientId]$clientId"
 
-          - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+          - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
               displayName: Check the Screener API Function App is healthy after deployment

@@ -58,7 +58,7 @@ jobs:
                     --name ${{ parameters.functionAppName }} \
                     --src '$(Pipeline.Workspace)/${{ parameters.downloadPipeline }}/${{ parameters.artifactName }}/${{ parameters.artifactZipName }}'
 
-            - template: ../../../templates/public-api/ci/tasks/wait-for-endpoint-success.yml
+            - template: ../../../templates/public-api/ci/tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Check ${{ parameters.functionAppName }} Function App health
