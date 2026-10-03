@@ -13,7 +13,7 @@ parameters:
 
 steps:
   - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - Swap staging slot into production
+    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into production.
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
@@ -29,6 +29,6 @@ steps:
   - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - Checking production is healthy after swap
+      displayName: ${{ parameters.displayNamePrefix }} - waiting for the app service swapped into production to report healthy after swap.
       endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
       maxAttempts: 20
