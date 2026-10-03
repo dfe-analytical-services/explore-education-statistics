@@ -44,7 +44,7 @@ jobs:
                     --name $(subscription)-as-ees-public-site \
                     --resource-group $(resourceGroupName)
 
-            - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+            - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Public Site - Checking app is healthy after deploy
