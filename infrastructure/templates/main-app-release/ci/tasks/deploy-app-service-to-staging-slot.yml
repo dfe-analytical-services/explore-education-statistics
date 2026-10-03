@@ -71,7 +71,18 @@ steps:
           --type zip \
           --src-path "${{ parameters.artifactZipPath }}"
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  # Wait for the staging slot restart to begin.
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Confirming staging slot has started restarting
+      endpoint: https://${{ parameters.appName }}-deploy.azurewebsites.net${{ parameters.healthCheckPath }}
+      expectedResult: unavailable
+      pollingDelaySeconds: 1
+      maxAttempts: 30
+
+  # Wait for the staging slot restart to complete.
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       displayName: ${{ parameters.displayNamePrefix }} - Checking staging slot is healthy after appsettings and code deploy

@@ -26,7 +26,7 @@ steps:
           --slot deploy \
           --target-slot production
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       displayName: ${{ parameters.displayNamePrefix }} - Checking production is healthy after swap
