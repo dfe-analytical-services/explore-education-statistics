@@ -28,7 +28,7 @@ steps:
           --resource-group ${{ parameters.resourceGroupName }} \
           --src "${{ parameters.artifactZipPath }}"
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
       displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
