@@ -15,6 +15,8 @@ parameters:
   - name: appSettingsJson
     type: string
     default: '{}'
+  - name: deployedAt
+    type: string
   - name: environment
     type: string
   - name: slotSwappingBehaviour
@@ -32,6 +34,7 @@ steps:
           artifactZipPath: ${{ parameters.artifactZipPath }}
           healthCheckPath: ${{ parameters.healthCheckPath }}
           appSettingsJson: ${{ parameters.appSettingsJson }}
+          deployedAt: ${{ parameters.deployedAt }}
   - ${{ else }}:
       - template: deploy-app-service-direct.yml
         parameters:
@@ -42,3 +45,4 @@ steps:
           artifactZipPath: ${{ parameters.artifactZipPath }}
           healthCheckPath: ${{ parameters.healthCheckPath }}
           appSettingsJson: ${{ parameters.appSettingsJson }}
+          deployedAt: ${{ parameters.deployedAt }}

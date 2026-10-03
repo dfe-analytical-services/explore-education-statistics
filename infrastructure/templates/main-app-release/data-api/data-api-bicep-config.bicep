@@ -5,6 +5,9 @@ import { secretRefsFromSecrets } from '../../common/functions.bicep'
 @description('Environment-wide configuration values needed to compute this app\'s appsettings.')
 param environmentConfigParam EnvironmentConfig = {}
 
+@description('A marker unique to this deploy (the pipeline run\'s own timestamp), surfaced via the app\'s health endpoint so the pipeline can confirm the new appsettings and code have actually taken effect - see wait-for-app-service-restart.yml.')
+param deployedAt string = ''
+
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 var resourceNames = getResourceNamesForEnvironment(environmentConfig)
 
@@ -48,4 +51,5 @@ output appSettings object = {
   TableBuilder__MaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri
+  Deploy__DeployedAt: deployedAt
 }

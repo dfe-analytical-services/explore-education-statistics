@@ -33,6 +33,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -265,7 +266,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         app.UseMiddleware(typeof(SeoSecurityHeaderMiddleware));
         app.UseMvc();
-        app.UseHealthChecks("/api/health");
+        app.UseHealthChecks("/api/health", new HealthCheckOptions().IncludeDeployedAt());
 
         app.UseResponseCompression();
 
