@@ -202,11 +202,6 @@ public class DataImportService(
         await contentDbContext.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Builds a hierarchy for each root filter (a filter with no parent that is the parent of another filter).
-    /// The filters must include their FilterGroups and FilterItems, as returned by
-    /// <see cref="IStorageDataSet.ListFilters" />.
-    /// </summary>
     public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
         IStorageDataSet dataSet,
         List<Filter> filters
