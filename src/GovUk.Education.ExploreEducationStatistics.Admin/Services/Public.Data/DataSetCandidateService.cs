@@ -42,11 +42,15 @@ internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserS
         CancellationToken cancellationToken
     )
     {
+        // BAU users can override the screener's API compatibility result, so they can see
+        // all data files. Other users can only choose files that haven't failed the check.
+        var isBauUser = (await userService.CheckIsBauUser()).IsRight;
+
         return await contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
-            .Where(rf => rf.PublicApiCompatible == true || rf.PublicApiCompatible == null)
+            .Where(rf => isBauUser || rf.PublicApiCompatible == true || rf.PublicApiCompatible == null)
             .Where(rf => rf.PublicApiDataSetId == null)
             .Where(rf => rf.File.ReplacedById == null)
             .Where(rf => rf.File.ReplacingId == null)
@@ -58,7 +62,12 @@ internal class DataSetCandidateService(ContentDbContext contentDbContext, IUserS
             )
             .Where(tuple => tuple.DataImport.Status == DataImportStatus.COMPLETE)
             .Select(tuple => tuple.ReleaseFile)
-            .Select(rf => new DataSetCandidateViewModel { ReleaseFileId = rf.Id, Title = rf.Name! })
+            .Select(rf => new DataSetCandidateViewModel
+            {
+                ReleaseFileId = rf.Id,
+                Title = rf.Name!,
+                PublicApiCompatible = rf.PublicApiCompatible,
+            })
             .OrderBy(rf => rf.Title)
             .ToListAsync(cancellationToken: cancellationToken);
     }

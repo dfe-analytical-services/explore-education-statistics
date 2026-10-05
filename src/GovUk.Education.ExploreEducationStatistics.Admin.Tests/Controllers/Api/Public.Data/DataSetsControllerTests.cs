@@ -1217,8 +1217,10 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
 
     public class CreateDataSetTests(DataSetsControllerTestsFixture fixture) : DataSetsControllerTests(fixture)
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)] // BAU users can override the API compatibility result
+        public async Task Success(bool publicApiCompatible)
         {
             Publication publication = DataFixture
                 .DefaultPublication()
@@ -1229,7 +1231,8 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithFile(DataFixture.DefaultFile(FileType.Data))
-                .WithReleaseVersion(draftReleaseVersion);
+                .WithReleaseVersion(draftReleaseVersion)
+                .WithApiCompatibility(publicApiCompatible);
 
             await fixture
                 .GetContentDbContext()
@@ -1293,6 +1296,7 @@ public abstract class DataSetsControllerTests(DataSetsControllerTestsFixture fix
             Assert.Equal(dataSetVersion.VersionType, content.DraftVersion!.Type);
             Assert.Equal(releaseFile.File.DataSetFileId, content.DraftVersion!.File.Id);
             Assert.Equal(releaseFile.Name, content.DraftVersion!.File.Title);
+            Assert.Equal(publicApiCompatible, content.DraftVersion!.PublicApiCompatible);
             Assert.Equal(draftReleaseVersion.Id, content.DraftVersion!.ReleaseVersion.Id);
             Assert.Equal(draftReleaseVersion.Release.Title, content.DraftVersion!.ReleaseVersion.Title);
             Assert.Null(content.DraftVersion!.GeographicLevels);

@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -147,6 +148,22 @@ public static class ValidationMessages
     public static readonly LocalizableMessage DataSetNamesCsvReaderException = new(
         Code: nameof(DataSetNamesCsvReaderException),
         Message: "Failed to read dataset_names.csv. Exception: {0}"
+    );
+
+    public static ErrorViewModel GenerateErrorReleaseFileNotApiCompatible(Guid releaseFileId)
+    {
+        return new ErrorViewModel
+        {
+            Code = ReleaseFileNotApiCompatible.Code,
+            Message = ReleaseFileNotApiCompatible.Message,
+            Detail = new InvalidErrorDetail<Guid>(releaseFileId),
+            Path = "releaseFileId",
+        };
+    }
+
+    public static readonly LocalizableMessage ReleaseFileNotApiCompatible = new(
+        Code: nameof(ReleaseFileNotApiCompatible),
+        Message: "The data file is not API compatible. Only BAU users can create an API data set from it."
     );
 
     public static ErrorViewModel GenerateErrorDataSetIsNotInAnImportableState()

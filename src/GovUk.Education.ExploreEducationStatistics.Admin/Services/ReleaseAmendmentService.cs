@@ -600,6 +600,7 @@ public class ReleaseAmendmentService(
                 Published = originalFile.Published,
                 PublicApiDataSetId = originalFile.PublicApiDataSetId,
                 PublicApiDataSetVersion = originalFile.PublicApiDataSetVersion,
+                PublicApiCompatible = originalFile.PublicApiCompatible,
             })
             .ToList();
 

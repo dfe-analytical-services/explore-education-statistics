@@ -6,4 +6,6 @@ public record DataSetCandidateViewModel
     public required Guid ReleaseFileId { get; init; }
 
     public required string Title { get; init; }
+
+    public required bool? PublicApiCompatible { get; init; }
 }
