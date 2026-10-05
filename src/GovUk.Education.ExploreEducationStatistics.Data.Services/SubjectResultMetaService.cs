@@ -110,7 +110,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
 
                 var indicatorViewModels = await GetIndicatorViewModels(
                     dataSet,
-                    query.Indicators,
+                    query.Indicators.ToList(),
                     releaseFile.IndicatorSequence
                 );
                 _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -178,15 +178,13 @@ public class SubjectResultMetaService : ISubjectResultMetaService
 
     private static async Task<List<IndicatorMetaViewModel>> GetIndicatorViewModels(
         IStorageDataSet dataSet,
-        IEnumerable<Guid> indicatorIds,
+        List<Guid> indicatorIds,
         List<IndicatorGroupSequenceEntry>? indicatorSequence
     )
     {
-        var indicatorIdList = indicatorIds.ToList();
-
         // A query with no indicators returns all the data set's indicators
         var indicators =
-            indicatorIdList.Count == 0 ? await dataSet.ListIndicators() : await dataSet.ListIndicators(indicatorIdList);
+            indicatorIds.Count == 0 ? await dataSet.ListIndicators() : await dataSet.ListIndicators(indicatorIds);
 
         // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
         // been fetched without groups
