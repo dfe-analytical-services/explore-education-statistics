@@ -16,6 +16,7 @@ import { useMemo } from 'react';
 
 interface TableToolSearchFinalResultProps {
   dataset: FinalDataset;
+  onClick?: () => void;
   releaseVersionSummary: ReleaseVersionSummary;
 }
 
@@ -44,6 +45,7 @@ const generateQueryFromResult = (dataset: FinalDataset): FullTableQuery => {
 
 const TableToolSearchFinalResult = ({
   dataset,
+  onClick,
   releaseVersionSummary,
 }: TableToolSearchFinalResultProps) => {
   const { isValidForTableGeneration, validationErrors, validationWarnings } =
@@ -110,6 +112,7 @@ const TableToolSearchFinalResult = ({
                   to={`/data-tables/${releaseVersionSummary.publication.slug}/${
                     releaseVersionSummary.slug
                   }?fromSearch&${encodeFullTableQueryToParams(fullTableQuery)}`}
+                  onClick={onClick}
                 >
                   View and edit this table{' '}
                   <VisuallyHidden> - {dataset.title}</VisuallyHidden>
