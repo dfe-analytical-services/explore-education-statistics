@@ -195,18 +195,43 @@ public class ReleaseVersionsControllerUnitTests
     }
 
     [Fact]
+    public async Task GetDataSetUploads_Success_ReturnsOk()
+    {
+        // Arrange
+        var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+        releaseDataFileService
+            .Setup(mock => mock.ListDataSetUploads(_releaseVersionId, default))
+            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+        // Act
+        var response = await controller.GetDataSetUploads(_releaseVersionId, cancellationToken: default);
+
+        // Assert
+        VerifyAllMocks(releaseDataFileService);
+
+        var responseVms = response.AssertOkResult();
+        var responseVm = Assert.Single(responseVms);
+        Assert.Equivalent(expectedVm, responseVm);
+    }
+
+    [Fact]
     public async Task DeleteDataSetUpload_Success_ReturnsNoContent()
     {
         // Arrange
         var dataSetUploadId = Guid.NewGuid();
 
-        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
-        dataSetUploadRepository
-            .Setup(mock => mock.Delete(_releaseVersionId, dataSetUploadId, default))
+        releaseDataFileService
+            .Setup(mock => mock.DeleteDataSetUpload(_releaseVersionId, dataSetUploadId, default))
             .ReturnsAsync(Unit.Instance);
 
-        var controller = BuildController(dataSetUploadRepository: dataSetUploadRepository.Object);
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
         // Act
         var response = await controller.DeleteDataSetUpload(
@@ -216,7 +241,7 @@ public class ReleaseVersionsControllerUnitTests
         );
 
         // Assert
-        VerifyAllMocks(dataSetUploadRepository);
+        VerifyAllMocks(releaseDataFileService);
         response.AssertNoContent();
     }
 
@@ -717,7 +742,6 @@ public class ReleaseVersionsControllerUnitTests
         IReleasePublishingStatusService? releaseStatusService = null,
         IReleaseChecklistService? releaseChecklistService = null,
         IDataImportService? importService = null,
-        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataSetFileStorage? dataSetFileStorage = null,
         IDataSetScreenerService? dataSetScreenerService = null
     )
@@ -730,7 +754,6 @@ public class ReleaseVersionsControllerUnitTests
             releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
             importService ?? Mock.Of<IDataImportService>(Strict),
-            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict)
         );

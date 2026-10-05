@@ -41,6 +41,7 @@ public class ReleaseDataFileService(
     IDataImportService dataImportService,
     IUserService userService,
     IDataSetFileStorage dataSetFileStorage,
+    IDataSetUploadRepository dataSetUploadRepository,
     IDataBlockService dataBlockService,
     IFootnoteRepository footnoteRepository,
     IDataSetScreenerService dataSetScreenerService,
@@ -240,6 +241,29 @@ public class ReleaseDataFileService(
                     inProgressReplacementsInCurrentReleaseVersion
                 );
             });
+    }
+
+    public async Task<Either<ActionResult, List<DataSetUploadViewModel>>> ListDataSetUploads(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccess(_ => dataSetUploadRepository.ListAll(releaseVersionId, cancellationToken));
+    }
+
+    public async Task<Either<ActionResult, Unit>> DeleteDataSetUpload(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        CancellationToken cancellationToken
+    )
+    {
+        return await persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(_ => dataSetUploadRepository.Delete(releaseVersionId, dataSetUploadId, cancellationToken));
     }
 
     public async Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(

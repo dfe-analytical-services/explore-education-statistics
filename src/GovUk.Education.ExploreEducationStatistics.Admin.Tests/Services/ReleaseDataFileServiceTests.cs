@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -1102,6 +1103,105 @@ public class ReleaseDataFileServiceTests
     }
 
     [Fact]
+    public async Task ListDataSetUploads()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+
+        dataSetUploadRepository
+            .Setup(mock => mock.ListAll(releaseVersion.Id, default))
+            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(
+                contentDbContext: contentDbContext,
+                dataSetUploadRepository: dataSetUploadRepository.Object
+            );
+
+            var result = await service.ListDataSetUploads(releaseVersion.Id, cancellationToken: default);
+
+            MockUtils.VerifyAllMocks(dataSetUploadRepository);
+
+            var uploads = result.AssertRight();
+            Assert.Equal(expectedVm, Assert.Single(uploads));
+        }
+    }
+
+    [Fact]
+    public async Task ListDataSetUploads_ReleaseVersionNotFound()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        var result = await service.ListDataSetUploads(Guid.NewGuid(), cancellationToken: default);
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task DeleteDataSetUpload()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var dataSetUploadId = Guid.NewGuid();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+
+        dataSetUploadRepository
+            .Setup(mock => mock.Delete(releaseVersion.Id, dataSetUploadId, default))
+            .ReturnsAsync(Unit.Instance);
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleaseDataFileService(
+                contentDbContext: contentDbContext,
+                dataSetUploadRepository: dataSetUploadRepository.Object
+            );
+
+            var result = await service.DeleteDataSetUpload(
+                releaseVersion.Id,
+                dataSetUploadId,
+                cancellationToken: default
+            );
+
+            MockUtils.VerifyAllMocks(dataSetUploadRepository);
+
+            result.AssertRight();
+        }
+    }
+
+    [Fact]
+    public async Task DeleteDataSetUpload_ReleaseVersionNotFound()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        var result = await service.DeleteDataSetUpload(Guid.NewGuid(), Guid.NewGuid(), cancellationToken: default);
+
+        result.AssertNotFound();
+    }
+
+    [Fact]
     public async Task ReorderDataFiles()
     {
         ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
@@ -2084,6 +2184,7 @@ public class ReleaseDataFileServiceTests
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetFileStorage? dataSetFileStorage = null,
+        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataBlockService? dataBlockService = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataSetScreenerService? dataSetScreenerService = null,
@@ -2105,6 +2206,7 @@ public class ReleaseDataFileServiceTests
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object,
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
+            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict),

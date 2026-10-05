@@ -142,6 +142,34 @@ public class ReleaseDataFileServicePermissionTests
     }
 
     [Fact]
+    public async Task ListDataSetUploads()
+    {
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificReleaseVersion)
+            .AssertForbidden(userService =>
+            {
+                var service = SetupReleaseDataFileService(userService: userService.Object);
+                return service.ListDataSetUploads(_releaseVersion.Id, cancellationToken: default);
+            });
+    }
+
+    [Fact]
+    public async Task DeleteDataSetUpload()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificReleaseVersion)
+            .AssertForbidden(userService =>
+            {
+                var service = SetupReleaseDataFileService(userService: userService.Object);
+                return service.DeleteDataSetUpload(
+                    releaseVersionId: _releaseVersion.Id,
+                    dataSetUploadId: Guid.NewGuid(),
+                    cancellationToken: default
+                );
+            });
+    }
+
+    [Fact]
     public async Task ReorderDataFiles()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
@@ -231,6 +259,7 @@ public class ReleaseDataFileServicePermissionTests
         IDataImportService? dataImportService = null,
         IUserService? userService = null,
         IDataSetFileStorage? dataSetFileStorage = null,
+        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataBlockService? dataBlockService = null,
         IFootnoteRepository? footnoteRepository = null,
         IDataSetScreenerService? dataSetScreenerService = null,
@@ -251,6 +280,7 @@ public class ReleaseDataFileServicePermissionTests
             dataImportService ?? Mock.Of<IDataImportService>(MockBehavior.Strict),
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(MockBehavior.Strict),
+            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(MockBehavior.Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(MockBehavior.Strict),
