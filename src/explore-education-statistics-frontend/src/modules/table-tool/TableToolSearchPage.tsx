@@ -79,7 +79,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
     setError(null);
     logEvent({
       category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
-      action: `Search submitted in ${publicationSummary.title}}`,
+      action: 'Search submitted',
       label: trimmedSearchTerm,
     });
 
@@ -125,7 +125,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             ) {
               logEvent({
                 category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
-                action: `No results returned in ${publicationSummary.title}`,
+                action: 'No results returned',
                 label: trimmedSearchTerm,
                 value: 0,
               });
@@ -136,9 +136,9 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
               logEvent({
                 category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
                 action: message.data.datasets.length
-                  ? `Results returned in ${publicationSummary.title}`
-                  : `No results returned in ${publicationSummary.title}`,
-                label: `${trimmedSearchTerm}, Datasets: ${message.data.datasets.map(dataset => dataset.subjectId).join(', ')}`,
+                  ? 'Results returned.'
+                  : 'No results returned',
+                label: trimmedSearchTerm,
                 value: message.data.datasets.length,
               });
             }
@@ -321,8 +321,8 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
                               onClick={() => {
                                 logEvent({
                                   category: GOOGLE_ANALYTICS_EVENT_CATEGORY,
-                                  action: `View and edit table for ${searchedTerm?.trim()}`,
-                                  label: dataset.title,
+                                  action: 'View and edit table clicked',
+                                  label: `${dataset.title}. Search: ${searchedTerm}`,
                                 });
                               }}
                               releaseVersionSummary={latestReleaseVersion}
