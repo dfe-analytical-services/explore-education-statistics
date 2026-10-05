@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
@@ -409,7 +408,11 @@ public class ReleaseServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         timePeriodService
-            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .Setup(s => s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject1.SubjectId)))
+            .ReturnsAsync(new TimePeriodLabels());
+
+        timePeriodService
+            .Setup(s => s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject2.SubjectId)))
             .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -422,6 +425,8 @@ public class ReleaseServiceTests
             );
 
             var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(timePeriodService);
 
             var subjects = result.AssertRight();
 
@@ -504,7 +509,7 @@ public class ReleaseServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         timePeriodService
-            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .Setup(s => s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject2.SubjectId)))
             .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -517,6 +522,8 @@ public class ReleaseServiceTests
             );
 
             var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(timePeriodService);
 
             var subjects = result.AssertRight();
 
@@ -707,7 +714,7 @@ public class ReleaseServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         timePeriodService
-            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .Setup(s => s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject1.SubjectId)))
             .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -720,6 +727,9 @@ public class ReleaseServiceTests
             );
 
             var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(timePeriodService);
+
             var subjects = result.AssertRight();
             var subject = Assert.Single(subjects);
 
@@ -803,7 +813,7 @@ public class ReleaseServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         timePeriodService
-            .Setup(s => s.GetTimePeriodLabels(It.IsAny<IStorageDataSet>()))
+            .Setup(s => s.GetTimePeriodLabels(It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject1.SubjectId)))
             .ReturnsAsync(new TimePeriodLabels());
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -816,6 +826,9 @@ public class ReleaseServiceTests
             );
 
             var result = await service.ListSubjects(contentReleaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(timePeriodService);
+
             var subjects = result.AssertRight();
             var subject = Assert.Single(subjects);
 
