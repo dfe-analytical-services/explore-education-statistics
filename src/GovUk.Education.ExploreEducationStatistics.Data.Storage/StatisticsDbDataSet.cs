@@ -265,7 +265,8 @@ public class StatisticsDbDataSet(
         CancellationToken cancellationToken
     )
     {
-        var matchedObservationCount = await context.MatchedObservations.CountAsync(cancellationToken);
+        // use longs to prevent int wrapping to 0, if we have very large data sets in the future
+        var matchedObservationCount = await context.MatchedObservations.LongCountAsync(cancellationToken);
 
         // If no Observations have been matched, simply return no Filter Items.
         if (matchedObservationCount == 0)
@@ -274,7 +275,7 @@ public class StatisticsDbDataSet(
             return [];
         }
 
-        var fullObservationCount = await context.Observation.CountAsync(
+        var fullObservationCount = await context.Observation.LongCountAsync(
             o => o.SubjectId == SubjectId,
             cancellationToken
         );
@@ -296,7 +297,7 @@ public class StatisticsDbDataSet(
             return [.. allFilterItems];
         }
 
-        var percentageObservationsFound = matchedObservationCount * 100 / fullObservationCount;
+        var percentageObservationsFound = matchedObservationCount * 100L / fullObservationCount;
 
         logger.LogDebug(
             message: "Found {PercentageObservationsFound}% Observations so far.",
