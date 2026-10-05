@@ -8,13 +8,23 @@ user creates API data set and opens details
     [Arguments]    ${subject_name}
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${subject_name}
+    user chooses API data set candidate    ${subject_name}
     user clicks button    Confirm new API data set    ${modal}
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
     user waits until h3 is visible    Draft API data sets
     user clicks link in table cell    1    4    View details    testid:draft-api-data-sets
     user waits until h3 is visible    Draft version details
+
+user chooses API data set candidate
+    [Arguments]    ${subject_name}
+    # BAU users also see data files that failed the screener's API compatibility checks,
+    # which are labelled with a suffix, so match either label.
+    ${option}=    set variable
+    ...    xpath://select[@name="releaseFileId"]/option[normalize-space(.)="${subject_name}" or normalize-space(.)="${subject_name} (not API compatible)"]
+    user waits until page contains element    ${option}
+    ${value}=    get element attribute    ${option}    value
+    select from list by value    name:releaseFileId    ${value}
 
 user checks response status code
     [Arguments]    ${response}    ${expected_status}

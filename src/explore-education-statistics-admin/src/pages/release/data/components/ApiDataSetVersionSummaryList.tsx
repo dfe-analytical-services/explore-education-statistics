@@ -1,4 +1,5 @@
 import Link from '@admin/components/Link';
+import ApiCompatibilityTag from '@admin/pages/release/data/components/ApiCompatibilityTag';
 import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
 import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
 import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
@@ -55,6 +56,11 @@ export default function ApiDataSetVersionSummaryList({
       </SummaryListItem>
       <SummaryListItem term="Data set file">
         {dataSetVersion.file.title}
+      </SummaryListItem>
+      <SummaryListItem term="API compatible">
+        <ApiCompatibilityTag
+          isCompatible={dataSetVersion.publicApiCompatible ?? undefined}
+        />
       </SummaryListItem>
       {dataSetVersion.geographicLevels && (
         <SummaryListItem term="Geographic levels">

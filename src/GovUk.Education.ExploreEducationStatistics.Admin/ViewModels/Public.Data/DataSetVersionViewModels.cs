@@ -22,6 +22,8 @@ public abstract record DataSetVersionViewModel
 
     public Guid? OriginalFileId { get; set; }
 
+    public bool? PublicApiCompatible { get; init; }
+
     public required IdTitleViewModel ReleaseVersion { get; init; }
 
     public long TotalResults { get; init; }

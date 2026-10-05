@@ -43,6 +43,9 @@ describe('ApiDataSetVersionSummaryList', () => {
     expect(screen.getByTestId('Data set file')).toHaveTextContent(
       'Test data set file',
     );
+    expect(screen.getByTestId('API compatible')).toHaveTextContent(
+      'Not available',
+    );
 
     expect(screen.queryByTestId('Geographic levels')).not.toBeInTheDocument();
     expect(screen.queryByTestId('Time periods')).not.toBeInTheDocument();
@@ -51,6 +54,24 @@ describe('ApiDataSetVersionSummaryList', () => {
 
     expect(screen.queryByTestId('Actions')).not.toBeInTheDocument();
   });
+
+  test.each([
+    [true, 'Yes'],
+    [false, 'No'],
+  ])(
+    'renders API compatible as %s',
+    (publicApiCompatible: boolean, expected: string) => {
+      render(
+        <ApiDataSetVersionSummaryList
+          dataSetVersion={{ ...testBaseVersion, publicApiCompatible }}
+          id="version-details"
+          publicationId="publication-id"
+        />,
+      );
+
+      expect(screen.getByTestId('API compatible')).toHaveTextContent(expected);
+    },
+  );
 
   test('renders correctly when data set version has facets', () => {
     render(
