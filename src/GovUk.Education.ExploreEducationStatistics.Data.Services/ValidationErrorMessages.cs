@@ -4,7 +4,6 @@ public enum ValidationErrorMessages
 {
     // Table builder queries
     QueryExceedsMaxAllowableTableSize,
-    FilterItemsNotFound,
 
     // Updating Filters
     FiltersDifferFromSubject,
