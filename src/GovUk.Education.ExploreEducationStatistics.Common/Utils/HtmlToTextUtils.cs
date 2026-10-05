@@ -5,12 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class HtmlToTextUtils
 {
-    public static string HtmlToText(string html)
+    public static string HtmlToText(string html, bool includeLinkDestinations = true)
     {
         var parser = new HtmlParser();
         var document = parser.ParseDocument("");
 
-        var converter = new HtmlToTextConverter();
+        var converter = new HtmlToTextConverter(includeLinkDestinations);
         return converter.Convert(parser.ParseFragment(html, document.Body!));
     }
 }

@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html;
 
-internal class HtmlToTextTableRenderer
+internal class HtmlToTextTableRenderer(bool includeLinkDestinations = true)
 {
     private const string Separator = "  |  ";
     private const string EmptySeparator = "     ";
@@ -91,7 +91,7 @@ internal class HtmlToTextTableRenderer
 
         cellElements.ForEach(child =>
         {
-            var converter = new HtmlToTextConverter();
+            var converter = new HtmlToTextConverter(includeLinkDestinations);
             var text = converter.Convert(child);
 
             var cellIndex = cells.FindIndex(cell => cell == null);

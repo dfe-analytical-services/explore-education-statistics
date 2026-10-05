@@ -581,6 +581,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
         services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
+        services.AddTransient<IReleaseFileSummaryLinkCleanupRepository, ReleaseFileSummaryLinkCleanupRepository>();
         services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
 
         services.AddSingleton<IDbContextSupplier, DbContextSupplier>();

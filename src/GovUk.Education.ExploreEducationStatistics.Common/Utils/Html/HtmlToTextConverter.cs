@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html;
 
-internal class HtmlToTextConverter
+internal class HtmlToTextConverter(bool includeLinkDestinations = true)
 {
     private readonly StringBuilder _builder = new();
 
@@ -218,7 +218,7 @@ internal class HtmlToTextConverter
 
         var href = element.Attributes["href"]?.Value;
 
-        if (!href.IsNullOrWhitespace())
+        if (includeLinkDestinations && !href.IsNullOrWhitespace())
         {
             _builder.Append($" ({href})");
         }
@@ -239,7 +239,7 @@ internal class HtmlToTextConverter
 
                 var indent = string.Empty.PadRight(lineItemStart.Length);
 
-                var converter = new HtmlToTextConverter();
+                var converter = new HtmlToTextConverter(includeLinkDestinations);
                 var text = converter.Convert(item);
 
                 text.ToLines()
@@ -272,7 +272,7 @@ internal class HtmlToTextConverter
                         break;
 
                     case "dd":
-                        var converter = new HtmlToTextConverter();
+                        var converter = new HtmlToTextConverter(includeLinkDestinations);
                         var text = converter.Convert(item);
 
                         text.ToLines().ForEach(line => _builder.AppendLine(indentation + line));
@@ -288,7 +288,7 @@ internal class HtmlToTextConverter
         var headerRows = element.QuerySelectorAll<IElement>("thead tr");
         var bodyRows = element.QuerySelectorAll<IElement>("tbody tr");
 
-        var table = new HtmlToTextTableRenderer();
+        var table = new HtmlToTextTableRenderer(includeLinkDestinations);
 
         headerRows.ForEach(row => table.AddHeaderRow(row));
         bodyRows.ForEach(row => table.AddBodyRow(row));
