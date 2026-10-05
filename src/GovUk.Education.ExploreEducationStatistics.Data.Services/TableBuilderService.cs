@@ -207,26 +207,19 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken
     )
     {
-        return await _tableBuilderQueryOptimiser
-            .IsCroppingRequired(query)
-            .OnSuccess(
-                async Task<Either<ActionResult, PreparedObservationQuery>> (requiresCropping) =>
-                {
-                    if (!requiresCropping || query.IgnoreMaxTableSize)
-                    {
-                        return new PreparedObservationQuery(query, requiresCropping);
-                    }
+        var requiresCropping = await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
 
-                    if (!query.AllowCropping)
-                    {
-                        return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
-                    }
+        if (requiresCropping && !query.IgnoreMaxTableSize)
+        {
+            if (!query.AllowCropping)
+            {
+                return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
+            }
 
-                    return await _tableBuilderQueryOptimiser
-                        .CropQuery(query, cancellationToken)
-                        .OnSuccess(croppedQuery => new PreparedObservationQuery(croppedQuery, requiresCropping));
-                }
-            );
+            query = await _tableBuilderQueryOptimiser.CropQuery(query, cancellationToken);
+        }
+
+        return new PreparedObservationQuery(query, requiresCropping);
     }
 
     private record PreparedObservationQuery(FullTableQuery Query, bool RequiresCropping);
