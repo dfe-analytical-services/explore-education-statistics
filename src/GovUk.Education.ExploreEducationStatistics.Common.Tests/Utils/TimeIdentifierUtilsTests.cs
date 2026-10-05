@@ -7,58 +7,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 public class TimeIdentifierUtilTests
 {
     [Fact]
-    public void GetAcademicQuartersReturnsAcademicQuarters()
+    public void GetIdentifiersUsingAcademicQuartersReturnsAcademicQuarters()
     {
         Assert.Equal(
             new[] { AcademicYearQ1, AcademicYearQ2, AcademicYearQ3, AcademicYearQ4 },
-            TimeIdentifierUtils.GetAcademicQuarters()
+            TimeIdentifierUtils.GetIdentifiersUsingAcademicQuarters()
         );
     }
 
     [Fact]
-    public void GetCalendarQuartersReturnsCalendarQuarters()
+    public void GetIdentifiersUsingCalendarQuartersReturnsCalendarQuarters()
     {
         Assert.Equal(
             new[] { CalendarYearQ1, CalendarYearQ2, CalendarYearQ3, CalendarYearQ4 },
-            TimeIdentifierUtils.GetCalendarQuarters()
+            TimeIdentifierUtils.GetIdentifiersUsingCalendarQuarters()
         );
     }
 
     [Fact]
-    public void GetFinancialQuartersReturnsFinancialQuarters()
+    public void GetIdentifiersUsingFinancialQuartersReturnsFinancialQuarters()
     {
         Assert.Equal(
             new[] { FinancialYearQ1, FinancialYearQ2, FinancialYearQ3, FinancialYearQ4 },
-            TimeIdentifierUtils.GetFinancialQuarters()
+            TimeIdentifierUtils.GetIdentifiersUsingFinancialQuarters()
         );
     }
 
     [Fact]
-    public void GetTaxQuartersReturnsTaxQuarters()
+    public void GetIdentifiersUsingTaxQuartersReturnsTaxQuarters()
     {
-        Assert.Equal(new[] { TaxYearQ1, TaxYearQ2, TaxYearQ3, TaxYearQ4 }, TimeIdentifierUtils.GetTaxQuarters());
+        Assert.Equal(
+            new[] { TaxYearQ1, TaxYearQ2, TaxYearQ3, TaxYearQ4 },
+            TimeIdentifierUtils.GetIdentifiersUsingTaxQuarters()
+        );
     }
 
     [Fact]
-    public void GetMonthsReturnsMonths()
+    public void GetIdentifiersUsingMonthsReturnsMonths()
     {
         Assert.Equal(
             new[] { January, February, March, April, May, June, July, August, September, October, November, December },
-            TimeIdentifierUtils.GetMonths()
+            TimeIdentifierUtils.GetIdentifiersUsingMonths()
         );
     }
 
     [Fact]
-    public void GetYearsReturnsYears()
+    public void GetIdentifiersUsingYearsReturnsYears()
     {
         Assert.Equal(
             new[] { AcademicYear, CalendarYear, FinancialYear, TaxYear, ReportingYear },
-            TimeIdentifierUtils.GetYears()
+            TimeIdentifierUtils.GetIdentifiersUsingYears()
         );
     }
 
     [Fact]
-    public void GetWeeksReturnsWeeks()
+    public void GetIdentifiersUsingWeeksReturnsWeeks()
     {
         Assert.Equal(
             new[]
@@ -116,19 +119,25 @@ public class TimeIdentifierUtilTests
                 Week51,
                 Week52,
             },
-            TimeIdentifierUtils.GetWeeks()
+            TimeIdentifierUtils.GetIdentifiersUsingWeeks()
         );
     }
 
     [Fact]
-    public void GetTermsReturnsTerms()
+    public void GetIdentifiersUsingTermsReturnsTerms()
     {
-        Assert.Equal(new[] { AutumnTerm, SpringTerm, AutumnSpringTerm, SummerTerm }, TimeIdentifierUtils.GetTerms());
+        Assert.Equal(
+            new[] { AutumnTerm, SpringTerm, AutumnSpringTerm, SummerTerm },
+            TimeIdentifierUtils.GetIdentifiersUsingTerms()
+        );
     }
 
     [Fact]
-    public void GetFinancialYearPartsReturnsFinancialYearParts()
+    public void GetIdentifiersUsingFinancialYearPartsReturnsFinancialYearParts()
     {
-        Assert.Equal(new[] { FinancialYearPart1, FinancialYearPart2 }, TimeIdentifierUtils.GetFinancialYearParts());
+        Assert.Equal(
+            new[] { FinancialYearPart1, FinancialYearPart2 },
+            TimeIdentifierUtils.GetIdentifiersUsingFinancialYearParts()
+        );
     }
 }
