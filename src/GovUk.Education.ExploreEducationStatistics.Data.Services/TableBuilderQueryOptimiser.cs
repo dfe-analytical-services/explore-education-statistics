@@ -1,16 +1,13 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
@@ -21,7 +18,7 @@ public class TableBuilderQueryOptimiser(
 {
     private const int MaxSelections = 5;
 
-    private async Task<Either<ActionResult, int>> GetMaximumTableCellCount(FullTableQuery query)
+    private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
     {
         var filterItemIds = query.GetFilterItemIds();
 
@@ -36,10 +33,11 @@ public class TableBuilderQueryOptimiser(
             var dataSet = await storageDataSetResolver.Resolve(query.SubjectId);
             var filterItems = await dataSet.ListFilterItems(filterItemIds);
 
-            // The ids are distinct, so fewer filter items than ids means some ids don't exist in the data set
-            if (filterItems.Count != filterItemIds.Count)
+            var notFound = filterItemIds.Except(filterItems.Select(filterItem => filterItem.Id)).ToList();
+
+            if (notFound.Count > 0)
             {
-                return ValidationUtils.ValidationResult(FilterItemsNotFound);
+                throw new ArgumentException($"Could not find filter items: {notFound.JoinToString(", ")}");
             }
 
             countsOfFilterItemsByFilter = filterItems
@@ -56,16 +54,13 @@ public class TableBuilderQueryOptimiser(
         );
     }
 
-    public async Task<Either<ActionResult, bool>> IsCroppingRequired(FullTableQuery query)
+    public async Task<bool> IsCroppingRequired(FullTableQuery query)
     {
-        return await GetMaximumTableCellCount(query)
-            .OnSuccess(maxCells => maxCells > options.Value.MaxTableCellsAllowed);
+        var maxCells = await GetMaximumTableCellCount(query);
+        return maxCells > options.Value.MaxTableCellsAllowed;
     }
 
-    public async Task<Either<ActionResult, FullTableQuery>> CropQuery(
-        FullTableQuery query,
-        CancellationToken cancellationToken
-    )
+    public async Task<FullTableQuery> CropQuery(FullTableQuery query, CancellationToken cancellationToken)
     {
         if (query.TimePeriod is not null)
         {
@@ -73,16 +68,16 @@ public class TableBuilderQueryOptimiser(
 
             if (timePeriods.Count > MaxSelections)
             {
-                var croppedTimePeriods = timePeriods.TakeLast(MaxSelections);
+                var croppedTimePeriods = timePeriods.TakeLast(MaxSelections).ToList();
                 query.TimePeriod.StartYear = croppedTimePeriods.First().Year;
                 query.TimePeriod.StartCode = croppedTimePeriods.First().TimeIdentifier;
                 query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;
                 query.TimePeriod.EndCode = croppedTimePeriods.Last().TimeIdentifier;
 
-                return await IsCroppingRequired(query)
-                    .OnSuccess(async croppingRequired =>
-                        croppingRequired ? await CropLocations(query, cancellationToken) : query
-                    );
+                if (!await IsCroppingRequired(query))
+                {
+                    return query;
+                }
             }
         }
 

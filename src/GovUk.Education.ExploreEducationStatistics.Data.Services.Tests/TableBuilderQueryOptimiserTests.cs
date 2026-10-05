@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
@@ -44,7 +43,7 @@ public class TableBuilderQueryOptimiserTests
         var result = await _optimiser.IsCroppingRequired(query);
 
         // Assert
-        Assert.False(result.AssertRight());
+        Assert.False(result);
     }
 
     [Fact]
@@ -59,11 +58,11 @@ public class TableBuilderQueryOptimiserTests
         var result = await _optimiser.IsCroppingRequired(query);
 
         // Assert
-        Assert.True(result.AssertRight());
+        Assert.True(result);
     }
 
     [Fact]
-    public async Task IsCroppingRequired_FilterItemsNotFound_ReturnsValidationError()
+    public async Task IsCroppingRequired_FilterItemsNotFound_Throws()
     {
         // Arrange
         var query = new FullTableQueryBuilder().WithEndYear(2020).Build();
@@ -71,11 +70,8 @@ public class TableBuilderQueryOptimiserTests
         // The data set only knows about some of the filter items the query specifies
         SetupListFilterItems(query, BuildFilterItems(query.GetFilterItemIds().Skip(1)));
 
-        // Act
-        var result = await _optimiser.IsCroppingRequired(query);
-
-        // Assert
-        result.AssertBadRequest(FilterItemsNotFound);
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.IsCroppingRequired(query));
     }
 
     [Fact]
@@ -96,10 +92,9 @@ public class TableBuilderQueryOptimiserTests
         // Assert
         _dataSet.Verify();
 
-        var croppedQuery = result.AssertRight();
-        Assert.NotNull(croppedQuery.TimePeriod);
-        Assert.Equal(2016, croppedQuery.TimePeriod?.StartYear);
-        Assert.Equal(2020, croppedQuery.TimePeriod?.EndYear);
+        Assert.NotNull(result.TimePeriod);
+        Assert.Equal(2016, result.TimePeriod?.StartYear);
+        Assert.Equal(2020, result.TimePeriod?.EndYear);
     }
 
     [Fact]
@@ -129,26 +124,22 @@ public class TableBuilderQueryOptimiserTests
         // Assert
         _dataSet.Verify();
 
-        var croppedQuery = result.AssertRight();
-        Assert.NotNull(croppedQuery.TimePeriod);
-        Assert.Equal(2016, croppedQuery.TimePeriod?.StartYear);
-        Assert.Equal(2020, croppedQuery.TimePeriod?.EndYear);
-        Assert.Single(croppedQuery.LocationIds);
+        Assert.NotNull(result.TimePeriod);
+        Assert.Equal(2016, result.TimePeriod?.StartYear);
+        Assert.Equal(2020, result.TimePeriod?.EndYear);
+        Assert.Single(result.LocationIds);
     }
 
     [Fact]
-    public async Task CropQuery_FilterItemsNotFound_ReturnsValidationError()
+    public async Task CropQuery_FilterItemsNotFound_Throws()
     {
         // Arrange
         var query = new FullTableQueryBuilder().WithEndYear(2020).Build();
 
         SetupListFilterItems(query, BuildFilterItems(query.GetFilterItemIds().Skip(1)));
 
-        // Act
-        var result = await _optimiser.CropQuery(query, default);
-
-        // Assert
-        result.AssertBadRequest(FilterItemsNotFound);
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.CropQuery(query, default));
     }
 
     private TableBuilderQueryOptimiser BuildOptimiser(int maxTableCellsAllowed)
