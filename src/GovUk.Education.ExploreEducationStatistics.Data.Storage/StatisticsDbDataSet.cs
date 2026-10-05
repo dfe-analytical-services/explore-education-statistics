@@ -113,7 +113,7 @@ public class StatisticsDbDataSet(
     {
         var pairs = await context
             .FilterItem.AsNoTracking()
-            .Where(fi => fi.FilterGroup.Filter.SubjectId == SubjectId && fi.FilterGroup.FilterId == parentFilterId)
+            .Where(fi => fi.FilterGroup.FilterId == parentFilterId)
             .SelectMany(parentFilterItem =>
                 context
                     .ObservationFilterItem.AsNoTracking()
