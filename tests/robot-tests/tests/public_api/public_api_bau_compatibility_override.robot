@@ -26,11 +26,11 @@ Create publication and release
     ...    ${RELEASE_NAME}
 
 Upload an API compatible and an API incompatible data file
-    # absence_school.csv fails the screener's API compatibility checks
+    # dates.csv has column names over the screener's API character limit,
+    # so fails the API compatibility checks
     user uploads subject and waits until complete    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
     ...    ${PUBLIC_API_FILES_DIR}
-    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    absence_school.csv
-    ...    absence_school.meta.csv    ${PUBLIC_API_FILES_DIR}
+    user uploads subject and waits until complete    ${SUBJECT_NAME_2}    dates.csv    dates.meta.csv
 
 Check BAU user can choose from all data files when creating an API data set
     user scrolls to the top of the page
@@ -39,6 +39,7 @@ Check BAU user can choose from all data files when creating an API data set
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
+    user waits until page contains element    name:releaseFileId
     user waits until select contains option    name:releaseFileId    ${SUBJECT_NAME_1}
     user checks select contains option    name:releaseFileId    ${SUBJECT_NAME_2} (not API compatible)
     user clicks button    Cancel    ${modal}
@@ -46,7 +47,9 @@ Check BAU user can choose from all data files when creating an API data set
 
 Create API data set from the API incompatible data file
     user creates API data set and opens details    ${SUBJECT_NAME_2}
-    user waits until draft API data set status contains    Ready
+    # The override lets BAU create the data set, but the file's long column names
+    # still cause processing to fail.
+    user waits until draft API data set status contains    Failed
 
 Check the API incompatible data file is flagged on the API data set details page
     user checks page contains element    testid:api-incompatible-warning
