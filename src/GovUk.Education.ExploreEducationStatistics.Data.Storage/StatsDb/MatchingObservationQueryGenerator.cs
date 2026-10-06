@@ -4,12 +4,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 public class MatchingObservationsQueryGenerator(ITemporaryTableCreator tempTableCreator, ISqlStatementsHelper sqlHelper)
     : IMatchingObservationsQueryGenerator
