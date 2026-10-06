@@ -26,12 +26,10 @@ public class ServiceCollectionExtensionsTests
 
         var factory = scope.ServiceProvider.GetRequiredService<StatisticsDbDataSetFactory>();
 
-        // The data set is created per subject rather than registered, so its collaborators are only checked here
-        Assert.IsType<StatisticsDbDataSet>(factory.Create(Guid.NewGuid()));
+        var dataSet = factory.Create(Guid.NewGuid());
+        Assert.IsType<StatisticsDbDataSet>(dataSet);
     }
 
-    // Only the db contexts and logging are registered, so that resolving proves the extension registers every
-    // other collaborator a data set needs
     private static ServiceProvider BuildServiceProvider()
     {
         return new ServiceCollection()
