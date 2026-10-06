@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -1114,13 +1113,13 @@ public class ReleaseDataFileServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+        List<DataSetUploadViewModel> dataSetUploads = [DataSetUploadMockBuilder.BuildViewModel()];
 
         var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
 
         dataSetUploadRepository
-            .Setup(mock => mock.ListAll(releaseVersion.Id, default))
-            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+            .Setup(mock => mock.ListAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSetUploads);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
@@ -1129,12 +1128,12 @@ public class ReleaseDataFileServiceTests
                 dataSetUploadRepository: dataSetUploadRepository.Object
             );
 
-            var result = await service.ListDataSetUploads(releaseVersion.Id, cancellationToken: default);
+            var result = await service.ListDataSetUploads(releaseVersion.Id, cancellationToken: CancellationToken.None);
 
             MockUtils.VerifyAllMocks(dataSetUploadRepository);
 
             var uploads = result.AssertRight();
-            Assert.Equal(expectedVm, Assert.Single(uploads));
+            Assert.Same(dataSetUploads, uploads);
         }
     }
 
@@ -1145,7 +1144,7 @@ public class ReleaseDataFileServiceTests
 
         var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
 
-        var result = await service.ListDataSetUploads(Guid.NewGuid(), cancellationToken: default);
+        var result = await service.ListDataSetUploads(Guid.NewGuid(), cancellationToken: CancellationToken.None);
 
         result.AssertNotFound();
     }
@@ -1167,7 +1166,7 @@ public class ReleaseDataFileServiceTests
         var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
 
         dataSetUploadRepository
-            .Setup(mock => mock.Delete(releaseVersion.Id, dataSetUploadId, default))
+            .Setup(mock => mock.Delete(releaseVersion.Id, dataSetUploadId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1180,7 +1179,7 @@ public class ReleaseDataFileServiceTests
             var result = await service.DeleteDataSetUpload(
                 releaseVersion.Id,
                 dataSetUploadId,
-                cancellationToken: default
+                cancellationToken: CancellationToken.None
             );
 
             MockUtils.VerifyAllMocks(dataSetUploadRepository);
@@ -1196,7 +1195,11 @@ public class ReleaseDataFileServiceTests
 
         var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
 
-        var result = await service.DeleteDataSetUpload(Guid.NewGuid(), Guid.NewGuid(), cancellationToken: default);
+        var result = await service.DeleteDataSetUpload(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            cancellationToken: CancellationToken.None
+        );
 
         result.AssertNotFound();
     }
@@ -2021,7 +2024,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -2091,7 +2094,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -2163,7 +2166,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -2175,7 +2178,6 @@ public class ReleaseDataFileServiceTests
 
     private ReleaseDataFileService SetupReleaseDataFileService(
         ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IDataSetValidator? dataSetValidator = null,
         IFileRepository? fileRepository = null,
@@ -2197,7 +2199,6 @@ public class ReleaseDataFileServiceTests
 
         return new ReleaseDataFileService(
             contentDbContext,
-            contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             dataSetValidator ?? Mock.Of<IDataSetValidator>(Strict),
             fileRepository ?? new FileRepository(contentDbContext),
