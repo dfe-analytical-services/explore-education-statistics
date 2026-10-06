@@ -3,7 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.S
 using static Moq.MockBehavior;
 
 // ReSharper disable AccessToDisposedClosure
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public class ObservationServiceTests
 {

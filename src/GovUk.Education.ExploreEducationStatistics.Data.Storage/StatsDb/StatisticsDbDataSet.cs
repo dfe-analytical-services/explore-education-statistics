@@ -7,12 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 public class StatisticsDbDataSet(
     Guid subjectId,
@@ -33,8 +34,8 @@ public class StatisticsDbDataSet(
         CancellationToken cancellationToken = default
     )
     {
-        var observations = await BuildMatchedObservationsQuery(query, cancellationToken);
-        return await observations.ToListAsync(cancellationToken);
+        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
+        return await observationsQuery.ToListAsync(cancellationToken);
     }
 
     public async IAsyncEnumerable<IReadOnlyList<Observation>> ListObservationBatches(
@@ -43,11 +44,11 @@ public class StatisticsDbDataSet(
         [EnumeratorCancellation] CancellationToken cancellationToken = default
     )
     {
-        var observations = await BuildMatchedObservationsQuery(query, cancellationToken);
+        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
 
         var batch = new List<Observation>(batchSize);
 
-        await foreach (var observation in observations.AsAsyncEnumerable().WithCancellation(cancellationToken))
+        await foreach (var observation in observationsQuery.AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             batch.Add(observation);
 
