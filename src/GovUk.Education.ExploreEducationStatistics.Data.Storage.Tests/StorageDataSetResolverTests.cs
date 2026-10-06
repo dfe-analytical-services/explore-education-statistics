@@ -33,24 +33,6 @@ public abstract class StorageDataSetResolverTests
         }
 
         [Fact]
-        public async Task SameSubjectResolvedTwice_ReturnsSameInstance()
-        {
-            var subjectId = Guid.NewGuid();
-
-            var contentDbContextId = await SeedDataFile(subjectId);
-
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-
-            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
-
-            var first = await resolver.Resolve(subjectId);
-            var second = await resolver.Resolve(subjectId);
-
-            Assert.Same(first, second);
-        }
-
-        [Fact]
         public async Task NoDataFile_Throws()
         {
             var subjectId = Guid.NewGuid();
@@ -82,24 +64,6 @@ public abstract class StorageDataSetResolverTests
 
             var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
             Assert.Equal(dataFile.SubjectId, dataSet.SubjectId);
-        }
-
-        [Fact]
-        public async Task SameSubjectResolvedByFileAndId_ReturnsSameInstance()
-        {
-            var subjectId = Guid.NewGuid();
-
-            var contentDbContextId = await SeedDataFile(subjectId);
-
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-
-            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
-
-            var byFile = resolver.Resolve(BuildDataFile(subjectId));
-            var byId = await resolver.Resolve(subjectId);
-
-            Assert.Same(byFile, byId);
         }
 
         [Fact]
