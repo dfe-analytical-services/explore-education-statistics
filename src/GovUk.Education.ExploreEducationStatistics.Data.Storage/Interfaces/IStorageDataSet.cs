@@ -7,10 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
-/// Storage-agnostic read access to the content of a single data set (Subject): its observations, filters and
-/// filter items, indicators, locations and time periods.
+/// Storage-agnostic read access to a single data set: its observations, filters, indicators, locations and time periods
 ///
-/// All methods are scoped to <see cref="SubjectId" /> unless stated otherwise. Methods that accept a
+/// All methods are scoped to <see cref="SubjectId" />. Methods that accept a
 /// <see cref="FullTableQuery" /> require the query's SubjectId to match <see cref="SubjectId" />.
 /// </summary>
 public interface IStorageDataSet
