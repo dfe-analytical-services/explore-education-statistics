@@ -1,7 +1,7 @@
 #nullable enable
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 public class StatisticsDbDataSetFactory(IServiceProvider serviceProvider)
 {

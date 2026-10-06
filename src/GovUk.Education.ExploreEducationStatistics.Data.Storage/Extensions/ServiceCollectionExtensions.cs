@@ -5,6 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
@@ -19,7 +21,6 @@ public static class ServiceCollectionExtensions
         services
             .AddScoped<IStorageDataSetResolver, StorageDataSetResolver>()
             // StatsDB
-            // @MarkFix rename these so it's clear they're for the StatisticsDB data sets?
             .AddTransient<StatisticsDbDataSetFactory>()
             .AddTransient<IObservationService, ObservationService>()
             .AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>()

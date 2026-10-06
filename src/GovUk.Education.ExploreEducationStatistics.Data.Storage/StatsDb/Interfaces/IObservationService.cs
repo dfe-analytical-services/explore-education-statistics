@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 
 public interface IObservationService
 {
