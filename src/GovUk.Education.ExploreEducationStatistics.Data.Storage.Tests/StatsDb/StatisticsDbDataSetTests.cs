@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Thinktecture.EntityFrameworkCore.TempTables;
@@ -18,7 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public abstract class StatisticsDbDataSetTests
 {
