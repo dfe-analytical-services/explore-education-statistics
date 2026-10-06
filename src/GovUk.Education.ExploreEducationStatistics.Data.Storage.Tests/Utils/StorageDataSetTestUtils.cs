@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
@@ -16,10 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils;
 
 public static class StorageDataSetTestUtils
 {
-    /// <summary>
-    /// Builds a real <see cref="StorageDataSetResolver" /> over the given (typically in-memory) contexts, so that
-    /// the storage type is looked up from the seeded data <c>File</c> rows as it is in production.
-    /// </summary>
     public static StorageDataSetResolver BuildStorageDataSetResolver(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
@@ -41,11 +36,6 @@ public static class StorageDataSetTestUtils
         );
     }
 
-    /// <summary>
-    /// An <see cref="IStorageDataSetResolver" /> that resolves every subject to a <see cref="StatisticsDbDataSet" />
-    /// over the given (typically in-memory) context without consulting the content database, for tests that only
-    /// seed the statistics database.
-    /// </summary>
     public static IStorageDataSetResolver BuildStatisticsDbDataSetResolver(
         StatisticsDbContext statisticsDbContext,
         IObservationService? observationService = null,
@@ -65,11 +55,6 @@ public static class StorageDataSetTestUtils
         );
     }
 
-    /// <summary>
-    /// Builds a real <see cref="StatisticsDbDataSetFactory" /> over the given (typically in-memory) context.
-    /// The raw SQL temp table plumbing cannot run against the in-memory provider, so those collaborators default
-    /// to Strict mocks and tests seed <c>MatchedObservations</c> directly instead.
-    /// </summary>
     public static StatisticsDbDataSetFactory BuildStatisticsDbDataSetFactory(
         StatisticsDbContext statisticsDbContext,
         IObservationService? observationService = null,
@@ -97,10 +82,6 @@ public static class StorageDataSetTestUtils
         return new StatisticsDbDataSetFactory(services.BuildServiceProvider());
     }
 
-    /// <summary>
-    /// A Strict <see cref="IStorageDataSetResolver" /> mock that resolves <paramref name="subjectId" />, or a data
-    /// file linked to it, to the given data set.
-    /// </summary>
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)
     {
         var resolver = new Mock<IStorageDataSetResolver>(Strict);
