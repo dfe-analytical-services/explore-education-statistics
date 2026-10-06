@@ -419,14 +419,12 @@ export const AuthContextProvider = ({
       status = 'redirecting';
     } else if (state.user) {
       status = 'authenticated';
-    } else if (state.readyToRenderChildren) {
-      status = 'unauthenticated';
     }
     return {
       user: state.user,
       status,
     };
-  }, [state.user, state.readyToRenderChildren, state.redirect]);
+  }, [state.user, state.redirect]);
 
   return state.readyToRenderChildren ? (
     <AuthContext value={contextState}>{children}</AuthContext>
