@@ -3,7 +3,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public abstract class StatisticsDbDataSetFactoryTests
 {
