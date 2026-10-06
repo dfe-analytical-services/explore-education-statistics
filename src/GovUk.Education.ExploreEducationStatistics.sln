@@ -161,6 +161,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests", "GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests\GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.csproj", "{930D9C54-7E1A-4EB2-9EB6-4A2F4D58FD9E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data Storage", "Data Storage", "{FFCB3C3C-A5CF-4B33-B1EF-E70863F8FFA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -936,6 +938,8 @@ Global
 		{1F05CF39-DF99-4F87-BECC-F4641C1D19F6} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
 		{D62BF8A7-BD81-4831-8DF8-5A8458F7EBBD} = {A58A13A6-EA97-4CE1-A134-83045CC08C85}
 		{8863470B-6A83-402A-A0AD-F20CB178E25B} = {4C3EAB1C-11ED-43A7-A9FD-16B6CE336539}
+		{85D57103-CD9D-4BFE-A65B-43F648135E24} = {FFCB3C3C-A5CF-4B33-B1EF-E70863F8FFA9}
+		{930D9C54-7E1A-4EB2-9EB6-4A2F4D58FD9E} = {FFCB3C3C-A5CF-4B33-B1EF-E70863F8FFA9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0DABB090-F748-4529-95DA-80E640F824CE}
