@@ -12,6 +12,13 @@ parameters:
       - test
       - preprod
       - prod
+  - name: robotTestEnvironment
+    type: string
+    values:
+      - dev
+      - test
+      - pre-prod
+      - prod
   - name: condition
     type: string
   - name: dependsOn
@@ -94,3 +101,15 @@ stages:
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
               - DeployAdmin
+
+      # Run the public UI tests against the environment when all of the applications that support
+      # the front end are up and running.      
+      - template: ../jobs/run-robot-tests.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          testEnvironment: ${{ parameters.robotTestEnvironment }}
+          dependsOn:
+            - DeployContentApi
+            - DeployDataApi
+            - DeployNotifier
+            - DeployPublicSite
