@@ -18,8 +18,8 @@ jobs:
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     variables:
-      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/content-api-bicep-config.bicep
-      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/content-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/content-api/content-api-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/content-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
       bicepConfigDeployName: ContentApiBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
