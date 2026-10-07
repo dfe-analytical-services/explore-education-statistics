@@ -6,7 +6,7 @@ import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-config
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
 import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-configuration.bicep'
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
-import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
+import { PublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
 //
@@ -120,9 +120,6 @@ var publisherConfig = mergePublisherConfig(publisherConfigParam)
 //
 param publicApiConfigParam PublicApiConfig = {}
 
-// Merge default configuration with overridden configuration from params files.
-var publicApiConfig = mergePublicApiConfig(publicApiConfigParam)
-
 
 
 //
@@ -132,6 +129,10 @@ param publicSiteConfigParam PublicSiteConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
+
+@secure()
+@description('The existing appsettings for the Public Site App Service, fetched by the pipeline before deployment.')
+param publicSiteProdAppSettings object = {}
 
 
 
@@ -161,11 +162,6 @@ var baseAdminAllowedOrigins = [
 ]
 
 var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
-
-// TODO EES-7502 - use standardised hostname for the Content API .
-var contentApiPublicHostname = '${environmentConfig.environmentName! == 'Pre-Production' ? 'cont' : 'content'}.${environmentConfig.domain!}'
-
-var dataApiPublicHostname = 'data.${environmentConfig.domain!}'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
@@ -314,25 +310,16 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publicSiteConfig.appServiceSku!
-    environmentName: environmentConfig.environmentName!
-    googleAnalyticsTrackingId: publicSiteConfig.googleAnalyticsTrackingId!
-    defaultCacheMaxAgeSeconds: publicSiteConfig.defaultCacheMaxAgeSeconds!
-    publicApiPublicHostname: publicApiConfig.publicUrl!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
-    contentApiPublicHostname: contentApiPublicHostname
-    dataApiPublicHostname: dataApiPublicHostname
     dockerRegistryUrl: dockerRegistryUrl
     dockerPullUsername: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
     dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
-    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
-    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    existingProdAppSettings: publicSiteProdAppSettings
     tagValues: tags
   }
 }
