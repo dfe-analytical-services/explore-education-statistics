@@ -19,7 +19,9 @@ param roleAssignmentNameOverride string?
 
 var rolesToRoleIds = {
   'Secrets User': '4633458b-17de-408a-b874-0445c86b69e6'
+  'Secrets Officer': 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
   'Certificate User': 'db79e9a7-68ee-4b58-9aeb-b90e7c24fcba'
+  'Crypto User': '12338af0-0e69-4776-bea7-57ae8d297424'
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {

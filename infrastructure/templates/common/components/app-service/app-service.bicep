@@ -18,7 +18,9 @@ param kind 'app' | 'app,linux,container'
 param keyVaultRoles {
   keyVaultName: string
   secretsUser: bool?
+  secretsOfficer: bool?
   certificateUser: bool?
+  cryptoUser: bool?
 
   @description('Whether to use the default role assignment name generation or the legacy name generation scheme.')
   legacyKeyVaultRoleAssignmentName: bool
@@ -167,6 +169,30 @@ module appServiceCertificateUserRoleAssignmentModule '../../../common/components
       : null
     principalIds: [appService.identity.principalId]
     role: 'Certificate User'
+  }
+}
+
+module appServiceSecretsOfficerRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsOfficer ?? false) {
+  name: '${appServiceName}KeyVaultSecretsOfficerRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsOfficer), 'Microsoft.Web/sites/${appServiceName}')
+      : null
+    principalIds: [appService.identity.principalId]
+    role: 'Secrets Officer'
+  }
+}
+
+module appServiceCryptoUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?cryptoUser ?? false) {
+  name: '${appServiceName}KeyVaultCryptoUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+      ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCryptoUser), 'Microsoft.Web/sites/${appServiceName}')
+      : null
+    principalIds: [appService.identity.principalId]
+    role: 'Crypto User'
   }
 }
 
