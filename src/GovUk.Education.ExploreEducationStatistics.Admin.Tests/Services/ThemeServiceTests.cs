@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Repositories;
@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Enums;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
@@ -21,12 +22,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -387,6 +390,7 @@ public class ThemeServiceTests
         var adminEventRaiser = new AdminEventRaiserMockBuilder();
         var methodologyService = new Mock<IMethodologyService>(Strict);
         var publishingService = new Mock<IPublishingService>(Strict);
+        var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
         await using (var contentContext = fixture.CreateContext())
         {
@@ -395,16 +399,24 @@ public class ThemeServiceTests
                 adminEventRaiser: adminEventRaiser.Build(),
                 methodologyService: methodologyService.Object,
                 publishingService: publishingService.Object,
-                releaseVersionService: new TestReleaseVersionService(contentContext)
+                releaseVersionService: new TestReleaseVersionService(contentContext),
+                publicationCacheService: publicationCacheService.Object
             );
 
             methodologyService.Setup(s => s.DeleteMethodology(methodology.Id, true)).ReturnsAsync(Unit.Instance);
 
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
+            foreach (var publicationToDelete in publications)
+            {
+                publicationCacheService
+                    .Setup(s => s.RemovePublication(publicationToDelete.Slug))
+                    .Returns(Task.CompletedTask);
+            }
+
             var result = await service.DeleteThemes([theme.Id]);
 
-            VerifyAllMocks(methodologyService, publishingService);
+            VerifyAllMocks(methodologyService, publishingService, publicationCacheService);
 
             result.AssertRight();
 
@@ -419,7 +431,10 @@ public class ThemeServiceTests
                             LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
                             LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
                         }
-                        : null
+                        : null,
+                    // Every Release id has to travel on the event, as the searchable document for any of
+                    // them is unreachable once the Publication is gone.
+                    publication.Releases.Select(release => release.Id).ToList()
                 );
             }
         }
@@ -949,10 +964,17 @@ public class ThemeServiceTests
             var publishingService = new Mock<IPublishingService>(Strict);
             publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
 
-            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+            var redirectsCacheService = new RedirectsCacheServiceMockBuilder();
+
+            var service = SetupThemeService(
+                contentDbContext: context,
+                publishingService: publishingService.Object,
+                redirectsCacheService: redirectsCacheService.Build()
+            );
             var result = await service.DeleteThemes([theme1.Id, theme2.Id]);
 
             VerifyAllMocks(publishingService);
+            redirectsCacheService.Assert.UpdateRedirectsCalled();
             result.AssertRight();
         }
 
@@ -961,6 +983,140 @@ public class ThemeServiceTests
             var remainingThemes = await context.Themes.ToListAsync();
             Assert.Single(remainingThemes);
             Assert.Equal(otherTheme.Id, remainingThemes[0].Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_PublicationSupersededByDeletedPublication_SupersededByCleared()
+    {
+        Theme themeToDelete = _fixture.DefaultTheme();
+        Theme themeToRetain = _fixture.DefaultTheme();
+
+        Publication supersedingPublication = _fixture.DefaultPublication().WithTheme(themeToDelete);
+
+        Publication supersededPublication = _fixture
+            .DefaultPublication()
+            .WithTheme(themeToRetain)
+            .WithSupersededBy(supersedingPublication);
+
+        using var fixture = new SqliteContentDbContextFixture();
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Publications.AddRange(supersedingPublication, supersededPublication);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+
+            var result = await service.DeleteThemes([themeToDelete.Id]);
+
+            VerifyAllMocks(publishingService);
+            result.AssertRight();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            // The superseded Publication belongs to a Theme that was not deleted, so it must survive with its
+            // reference to the deleted Publication cleared. SQL Server cannot do this for us, as it rejects
+            // cascading actions on self-referencing foreign keys.
+            var remainingPublication = Assert.Single(await context.Publications.ToListAsync());
+            Assert.Equal(supersededPublication.Id, remainingPublication.Id);
+            Assert.Null(remainingPublication.SupersededById);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_ThemeNotFound_OthersDeleted_LogsWarningAndSucceeds()
+    {
+        var theme = new Theme { Id = Guid.NewGuid(), Title = "Theme to delete" };
+        var missingThemeId = Guid.NewGuid();
+
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Themes.Add(theme);
+            await context.SaveChangesAsync();
+        }
+
+        var logger = new Mock<ILogger<ThemeService>>();
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(
+                contentDbContext: context,
+                publishingService: publishingService.Object,
+                logger: logger.Object
+            );
+
+            var result = await service.DeleteThemes([missingThemeId, theme.Id]);
+
+            VerifyAllMocks(publishingService);
+
+            // A 404 alongside a successful deletion would misleadingly suggest that nothing was deleted,
+            // so the missing Theme is only logged
+            result.AssertRight();
+
+            VerifyLoggedWarningContaining(logger, missingThemeId.ToString());
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            Assert.Empty(await context.Themes.ToListAsync());
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_NoThemesFound_ReturnsNotFound()
+    {
+        var missingThemeId = Guid.NewGuid();
+        var otherTheme = new Theme { Id = Guid.NewGuid(), Title = "Theme to retain" };
+
+        using var fixture = new SqliteContentDbContextFixture(enforceForeignKeys: false);
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Themes.Add(otherTheme);
+            await context.SaveChangesAsync();
+        }
+
+        var logger = new Mock<ILogger<ThemeService>>();
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(
+                contentDbContext: context,
+                publishingService: publishingService.Object,
+                logger: logger.Object
+            );
+
+            var result = await service.DeleteThemes([missingThemeId]);
+
+            VerifyAllMocks(publishingService);
+
+            // Nothing was deleted, so the caller is told that the Theme they asked for doesn't exist
+            result
+                .AssertLeft()
+                .AssertNotFoundWithValidationProblem<Theme, Guid>(expectedId: missingThemeId, expectedPath: "themeIds");
+
+            VerifyLoggedWarningContaining(logger, missingThemeId.ToString());
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            Assert.Single(await context.Themes.ToListAsync());
         }
     }
 
@@ -1010,6 +1166,25 @@ public class ThemeServiceTests
             ContactName = "Contact name",
         };
 
+    /// <summary>
+    /// Asserts that a warning containing <paramref name="expectedText"/> was logged. The ILogger logging
+    /// methods are extension methods, so the underlying <see cref="ILogger.Log{TState}"/> call is verified.
+    /// </summary>
+    private static void VerifyLoggedWarningContaining<T>(Mock<ILogger<T>> logger, string expectedText)
+    {
+        logger.Verify(
+            l =>
+                l.Log(
+                    LogLevel.Warning,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((state, _) => state.ToString()!.Contains(expectedText)),
+                    null,
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+                ),
+            Times.Once
+        );
+    }
+
     private static ThemeService SetupThemeService(
         ContentDbContext? contentDbContext = null,
         PublicDataDbContext? publicDataDbContext = null,
@@ -1020,6 +1195,9 @@ public class ThemeServiceTests
         IReleaseVersionService? releaseVersionService = null,
         IAdminEventRaiser? adminEventRaiser = null,
         IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IRedirectsCacheService? redirectsCacheService = null,
+        IPublicationCacheService? publicationCacheService = null,
+        ILogger<ThemeService>? logger = null,
         bool enableThemeDeletion = true
     )
     {
@@ -1046,7 +1224,10 @@ public class ThemeServiceTests
             publishingService ?? Mock.Of<IPublishingService>(Strict),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             adminEventRaiser ?? new AdminEventRaiserMockBuilder().Build(),
-            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+            redirectsCacheService ?? new RedirectsCacheServiceMockBuilder().Build(),
+            publicationCacheService ?? Mock.Of<IPublicationCacheService>(),
+            logger ?? Mock.Of<ILogger<ThemeService>>()
         );
     }
 

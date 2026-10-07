@@ -5,7 +5,6 @@ import {
   releaseApiDataSetPreviewRoute,
   releaseApiDataSetPreviewTokenRoute,
   ReleaseDataSetPreviewTokenRouteParams,
-  ReleaseDataSetRouteParams,
 } from '@admin/routes/releaseRoutes';
 import previewTokenQueries from '@admin/queries/previewTokenQueries';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
@@ -24,7 +23,7 @@ import React from 'react';
 
 export default function ReleaseApiDataSetPreviewTokenLogPage() {
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetPreviewTokenRouteParams>();
+    useParams<ReleaseDataSetPreviewTokenRouteParams>() as ReleaseDataSetPreviewTokenRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -62,14 +61,11 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back to API data set details
       </Link>
@@ -129,8 +125,8 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
                           token.status === 'Pending') && (
                           <>
                             <Link
-                              to={generatePath<ReleaseDataSetPreviewTokenRouteParams>(
-                                releaseApiDataSetPreviewTokenRoute.path,
+                              to={generatePath(
+                                releaseApiDataSetPreviewTokenRoute.fullPath,
                                 {
                                   publicationId,
                                   releaseVersionId,
@@ -177,14 +173,11 @@ export default function ReleaseApiDataSetPreviewTokenLogPage() {
         )}
 
         <ButtonLink
-          to={generatePath<ReleaseDataSetRouteParams>(
-            releaseApiDataSetPreviewRoute.path,
-            {
-              publicationId,
-              releaseVersionId,
-              dataSetId,
-            },
-          )}
+          to={generatePath(releaseApiDataSetPreviewRoute.fullPath, {
+            publicationId,
+            releaseVersionId,
+            dataSetId,
+          })}
         >
           Generate preview token
         </ButtonLink>

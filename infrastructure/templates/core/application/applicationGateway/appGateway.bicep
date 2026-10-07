@@ -33,7 +33,7 @@ param publicSiteFqdn string
 @description('FQDN of the service hosting the public site, rather than the public URL as used by custom domains.')
 param publicSiteInternalServiceFqdn string
 
-@description('')
+@description('Name of the Action Group that receives alerts.')
 param alertsGroupName string
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')

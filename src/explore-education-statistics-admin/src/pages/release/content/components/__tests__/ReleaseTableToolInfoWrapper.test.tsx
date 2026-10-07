@@ -1,5 +1,6 @@
 import render from '@common-test/render';
 import ReleaseTableToolInfoWrapper from '@admin/pages/release/content/components/ReleaseTableToolInfoWrapper';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import _methodologyService from '@admin/services/methodologyService';
 import _publicationService from '@admin/services/publicationService';
 import {
@@ -49,6 +50,7 @@ describe('ReleaseTableToolInfoWrapper', () => {
     render(
       <ReleaseTableToolInfoWrapper
         publication={testPublication}
+        publishingOrganisations={[testOrganisation]}
         releaseType="OfficialStatistics"
       />,
     );

@@ -1,14 +1,12 @@
 import ReleaseDataFileReplacementCompletePage from '@admin/pages/release/data/ReleaseDataFileReplacementCompletePage';
-import {
-  releaseDataFileReplacementCompleteRoute,
-  ReleaseDataFileReplaceRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataFileReplacementCompleteRoute } from '@admin/routes/releaseRoutes';
 import _releaseDataFileService, {
   DataSetAccoutrements,
 } from '@admin/services/releaseDataFileService';
 import { act, render, screen } from '@testing-library/react';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import { generatePath, Route, Router } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -48,24 +46,28 @@ describe('ReleaseDataFileReplacementCompletePage', () => {
 
   async function renderPage(history: MemoryHistory = createMemoryHistory()) {
     history.push(
-      generatePath<ReleaseDataFileReplaceRouteParams>(
-        releaseDataFileReplacementCompleteRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-          fileId: 'file-1',
-        },
-      ),
+      generatePath(releaseDataFileReplacementCompleteRoute.path, {
+        publicationId: 'publication-1',
+        releaseVersionId: 'release-1',
+        fileId: 'file-1',
+      }),
     );
 
     await act(async () =>
       render(
-        <Router history={history}>
-          <Route
-            path={releaseDataFileReplacementCompleteRoute.path}
-            component={ReleaseDataFileReplacementCompletePage}
-          />
-        </Router>,
+        <TestRouterRenderer
+          initialUrl={generatePath(
+            releaseDataFileReplacementCompleteRoute.fullPath,
+            {
+              publicationId: 'publication-1',
+              releaseVersionId: 'release-1',
+              fileId: 'file-1',
+            },
+          )}
+          route={releaseDataFileReplacementCompleteRoute.fullPath}
+        >
+          <ReleaseDataFileReplacementCompletePage />
+        </TestRouterRenderer>,
       ),
     );
   }

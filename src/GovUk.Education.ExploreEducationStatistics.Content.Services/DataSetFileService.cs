@@ -97,14 +97,13 @@ public class DataSetFileService(
             );
         foreach (var result in results)
         {
-            // TODO EES-7584 update once CsvOnly isn't nullable
             result.Meta.GeographicLevels = geogLvlsDict[result.FileId]
-                .Where(gl => gl.CsvOnly != true)
+                .Where(gl => !gl.CsvOnly)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .Order()
                 .ToList();
             result.Meta.GeographicLevelsCsvOnly = geogLvlsDict[result.FileId]
-                .Where(gl => gl.CsvOnly == true)
+                .Where(gl => gl.CsvOnly)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .Order()
                 .ToList();
@@ -335,13 +334,12 @@ public class DataSetFileService(
         return new DataSetFileMetaViewModel
         {
             NumDataFileRows = meta.NumDataFileRows,
-            // TODO EES-7584 update once CsvOnly isn't nullable
             GeographicLevels = dataSetFileVersionGeographicLevels
-                .Where(gl => gl.CsvOnly != true)
+                .Where(gl => !gl.CsvOnly)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .ToList(),
             GeographicLevelsCsvOnly = dataSetFileVersionGeographicLevels
-                .Where(gl => gl.CsvOnly == true)
+                .Where(gl => gl.CsvOnly)
                 .Select(gl => gl.GeographicLevel.GetEnumLabel())
                 .Order()
                 .ToList(),

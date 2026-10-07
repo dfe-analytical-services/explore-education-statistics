@@ -2,6 +2,7 @@ export const searchDataFilters = [
   'dataSetType',
   'geographicLevel',
   'latestDataOnly',
+  'organisationId',
   'publicationId',
   'releaseType',
   'search',

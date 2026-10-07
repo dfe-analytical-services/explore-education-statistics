@@ -1,9 +1,6 @@
 import render from '@common-test/render';
 import PreReleaseTableToolPage from '@admin/pages/release/pre-release/PreReleaseTableToolPage';
-import {
-  preReleaseTableToolRoute,
-  PreReleaseTableToolRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseTableToolRoute } from '@admin/routes/preReleaseRoutes';
 import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
@@ -14,16 +11,16 @@ import _releaseVersionService, {
   ReleaseVersion,
 } from '@admin/services/releaseVersionService';
 import _tableBuilderService, {
-  SubjectMeta,
-  TableDataResponse,
   FeaturedTable,
   Subject,
+  SubjectMeta,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
@@ -215,6 +212,7 @@ describe('PreReleaseTableToolPage', () => {
     version: 0,
     type: 'AccreditedOfficialStatistics',
     preReleaseAccessList: 'test',
+    publishingOrganisations: [],
     year: 2023,
     yearTitle: '2023',
   };
@@ -248,6 +246,7 @@ describe('PreReleaseTableToolPage', () => {
         to: '2020',
       },
       geographicLevels: ['National'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-1',
         name: 'Test subject',
@@ -370,16 +369,13 @@ describe('PreReleaseTableToolPage', () => {
     tableBuilderService.getTableData.mockResolvedValue(testTableData);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
 
-    renderPage([
-      generatePath<PreReleaseTableToolRouteParams>(
-        preReleaseTableToolRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-          dataBlockVersionId: 'block-1',
-        },
-      ),
-    ]);
+    renderPage(
+      generatePath(preReleaseTableToolRoute.fullPath, {
+        publicationId: 'publication-1',
+        releaseVersionId: 'release-1',
+        dataBlockVersionId: 'block-1',
+      }),
+    );
 
     expect(await screen.findByText('Step 5')).toBeInTheDocument();
 
@@ -413,23 +409,18 @@ describe('PreReleaseTableToolPage', () => {
   });
 
   const renderPage = (
-    initialEntries: string[] = [
-      generatePath<PreReleaseTableToolRouteParams>(
-        preReleaseTableToolRoute.path,
-        {
-          publicationId: 'publication-1',
-          releaseVersionId: 'release-1',
-        },
-      ),
-    ],
+    path = generatePath(preReleaseTableToolRoute.fullPath, {
+      publicationId: 'publication-1',
+      releaseVersionId: 'release-1',
+    }),
   ) => {
     return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <Route
-          component={PreReleaseTableToolPage}
-          path={preReleaseTableToolRoute.path}
-        />
-      </MemoryRouter>,
+      <TestRouterRenderer
+        initialUrl={path}
+        route={preReleaseTableToolRoute.fullPath}
+      >
+        <PreReleaseTableToolPage />
+      </TestRouterRenderer>,
     );
   };
 });

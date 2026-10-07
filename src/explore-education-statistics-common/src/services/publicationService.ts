@@ -68,6 +68,7 @@ export interface PublicationListSummary {
   highlightContent?: string | null;
   highlightSummary?: string | null;
   highlightTitle?: string | null;
+  publishingOrganisationTitles?: string[];
   theme: string;
   title: string;
   type: ReleaseType;
@@ -146,7 +147,7 @@ export interface ReleaseVersionSummary {
     title: string;
   };
   published: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   slug: string;
   title: string;
   type: ReleaseType;

@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -346,11 +346,7 @@ public class ContentDbContext : DbContext
             .Property(n => n.Updated)
             .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-        modelBuilder
-            .Entity<Publication>()
-            .HasOne(p => p.Contact)
-            .WithMany() // Ideally this would be WithOne, but we would need to fix existing data to do this
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Publication>().HasOne(p => p.Contact).WithOne().OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder
             .Entity<Publication>()
@@ -366,6 +362,19 @@ public class ContentDbContext : DbContext
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<List<ReleaseSeriesItem>>(v)
             );
+
+        // SupersededById is a self-referencing foreign key, and SQL Server rejects any cascading
+        // action on one outright with "may cause cycles or multiple cascade paths", so the database
+        // cannot null this reference for us. ClientSetNull leaves the constraint as NO ACTION and has
+        // EF null the foreign key for dependents it is tracking; callers deleting a Publication must
+        // therefore load the Publications it supersedes so they are tracked. See
+        // ThemeService.DeletePublication.
+        modelBuilder
+            .Entity<Publication>()
+            .HasOne(p => p.SupersededBy)
+            .WithMany()
+            .HasForeignKey(p => p.SupersededById)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 
     private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)

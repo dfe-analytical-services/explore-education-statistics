@@ -66,6 +66,7 @@ describe('TableToolWizard', () => {
         to: '2020/21',
       },
       geographicLevels: ['National', 'Local Authority'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-1',
         name: 'Subject 1',
@@ -87,6 +88,7 @@ describe('TableToolWizard', () => {
         to: '2019/20',
       },
       geographicLevels: ['Local Authority District', 'Ward'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-2',
         name: 'Subject 2',
@@ -259,6 +261,7 @@ describe('TableToolWizard', () => {
             selectedRelease: {
               id: 'selected-release',
               latestData: false,
+              publishingOrganisations: [],
               slug: 'selected-release-slug',
               title: 'Selected release',
               type: 'AdHocStatistics',

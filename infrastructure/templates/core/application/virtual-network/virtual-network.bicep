@@ -1,4 +1,5 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
+import { VNetSubnets } from 'types.bicep'
 
 @description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string
@@ -253,6 +254,101 @@ module vNetModule '../../../common/components/virtual-network/virtual-network.bi
   }
 }
 
-output vNetName string = vNetName 
+output vNetName string = vNetName
 output eventGridCustomTopicPrivateEndpointsSubnetName string = eventGridCustomTopicPrivateEndpointsSubnetName
 output applicationGatewaySubnetName string = applicationGatewaySubnetName
+
+output subnets VNetSubnets = {
+  admin: {
+    name: adminSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, adminSubnetName)
+  }
+  importer: {
+    name: importerSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, importerSubnetName)
+  }
+  publisher: {
+    name: publisherSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, publisherSubnetName)
+  }
+  notify: {
+    name: notifySubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, notifySubnetName)
+  }
+  content: {
+    name: contentSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, contentSubnetName)
+  }
+  data: {
+    name: dataSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, dataSubnetName)
+  }
+  publicApiDataProcessor: {
+    name: publicApiDataProcessorSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, publicApiDataProcessorSubnetName)
+  }
+  publicApiDataProcessorPrivateEndpoints: {
+    name: publicApiDataProcessorPrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, publicApiDataProcessorPrivateEndpointsSubnetName)
+  }
+  containerAppEnvironment: {
+    name: containerAppEnvironmentSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, containerAppEnvironmentSubnetName)
+  }
+  applicationGateway: {
+    name: applicationGatewaySubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, applicationGatewaySubnetName)
+  }
+  publicApiStoragePrivateEndpoints: {
+    name: publicApiStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, publicApiStoragePrivateEndpointsSubnetName)
+  }
+  psqlFlexibleServer: {
+    name: psqlFlexibleServerSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, psqlFlexibleServerSubnetName)
+  }
+  searchStoragePrivateEndpoints: {
+    name: searchStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, searchStoragePrivateEndpointsSubnetName)
+  }
+  searchDocsFunctionApp: {
+    name: searchDocsFunctionAppSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, searchDocsFunctionAppSubnetName)
+  }
+  searchDocsFunctionAppPrivateEndpoints: {
+    name: searchDocsFunctionAppPrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, searchDocsFunctionAppPrivateEndpointsSubnetName)
+  }
+  analyticsStoragePrivateEndpoints: {
+    name: analyticsStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, analyticsStoragePrivateEndpointsSubnetName)
+  }
+  analyticsFunctionApp: {
+    name: analyticsFunctionAppSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, analyticsFunctionAppSubnetName)
+  }
+  screenerStoragePrivateEndpoints: {
+    name: screenerStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, screenerStoragePrivateEndpointsSubnetName)
+  }
+  screenerFunctionApp: {
+    name: screenerFunctionAppSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, screenerFunctionAppSubnetName)
+  }
+  eventGridCustomTopicPrivateEndpoints: {
+    name: eventGridCustomTopicPrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, eventGridCustomTopicPrivateEndpointsSubnetName)
+  }
+  nlSearchFunctionAppPrivateEndpoints: {
+    name: nlSearchFunctionAppPrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, nlSearchFunctionAppPrivateEndpointsSubnetName)
+  }
+  nlSearchFunctionApp: {
+    name: nlSearchFunctionAppSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, nlSearchFunctionAppSubnetName)
+  }
+  sqlServerPrivateEndpoints: {
+    name: sqlServerPrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, sqlServerPrivateEndpointsSubnetName)
+  }
+}

@@ -1,6 +1,7 @@
 using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
 
@@ -43,7 +44,7 @@ public record ReleaseSearchableDocumentDto
             PublishingOrganisations =
             [
                 .. releaseVersion
-                    .PublishingOrganisations.OrderBy(organisation => organisation.Title)
+                    .PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
                     .Select(SearchableDocumentPublishingOrganisationDto.FromOrganisation),
             ],
             HtmlContent = RenderSearchableHtmlContent(releaseVersion),

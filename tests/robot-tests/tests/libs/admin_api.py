@@ -55,6 +55,8 @@ class AdminClient:
 
 admin_client = AdminClient()
 
+DEPARTMENT_FOR_EDUCATION_ORGANISATION_ID = "5e089801-cf1a-b375-acd3-88e9d8aece66"
+
 
 def user_creates_theme_via_api(title: str, summary: str = "") -> str:
     assert title
@@ -183,6 +185,7 @@ def user_creates_test_release_via_api(
             "type": type,
             "label": label,
             "templateReleaseId": "",
+            "publishingOrganisations": [DEPARTMENT_FOR_EDUCATION_ORGANISATION_ID],
         },
     )
     assert (
@@ -211,6 +214,7 @@ def user_creates_test_release_with_legacy_summary_text_block_via_api(
             "type": type,
             "label": label,
             "templateReleaseId": "",
+            "publishingOrganisations": [DEPARTMENT_FOR_EDUCATION_ORGANISATION_ID],
         },
     )
     assert (

@@ -1,6 +1,6 @@
 import useQueryParams from '@admin/hooks/useQueryParams';
 import ThemePublications from '@admin/pages/admin-dashboard/components/ThemePublications';
-import { ThemeParams, dashboardRoute } from '@admin/routes/routes';
+import { dashboardRoute, ThemeParams } from '@admin/routes/routes';
 import { Theme } from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -8,7 +8,7 @@ import themeQueries from '@admin/queries/themeQueries';
 import useStorageItem from '@common/hooks/useStorageItem';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useMemo } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { FormSelect } from '@common/components/form';
 
@@ -19,7 +19,8 @@ interface Props {
 const PublicationsTab = ({ isBauUser }: Props) => {
   const { themeId } = useQueryParams<ThemeParams>();
   const location = useLocation();
-  const history = useHistory();
+
+  const navigate = useNavigate();
 
   const [savedTheme, setSavedTheme] = useStorageItem<ThemeParams>(
     'dashboardTheme',
@@ -66,19 +67,22 @@ const PublicationsTab = ({ isBauUser }: Props) => {
     // Update query params to reflect the chosen
     // theme if they haven't already been set.
     if (selectedTheme?.id !== themeId) {
-      history.replace(
+      navigate(
         appendQuery<ThemeParams>(location.pathname, {
           themeId: selectedTheme?.id,
         }),
+        {
+          replace: true,
+        },
       );
     }
   }, [
     isBauUser,
-    history,
     location.pathname,
     savedTheme,
     selectedTheme,
     themeId,
+    navigate,
   ]);
 
   return (
@@ -117,10 +121,11 @@ const PublicationsTab = ({ isBauUser }: Props) => {
                   themeId: e.target.value,
                 });
 
-                history.replace(
-                  appendQuery<ThemeParams>(dashboardRoute.path, {
+                navigate(
+                  appendQuery<ThemeParams>(dashboardRoute.fullPath, {
                     themeId: e.target.value,
                   }),
+                  { replace: true },
                 );
               }}
             />

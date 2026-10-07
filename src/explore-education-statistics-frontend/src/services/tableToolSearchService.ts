@@ -71,10 +71,16 @@ export interface FilterIndicatorItem {
   label: string;
 }
 
+interface ValidationItem {
+  code: string;
+  message: string;
+}
+
 export interface FinalDataset extends DatasetResultBase {
   filters: FilterIndicatorItem[];
   geographicLevels: Dictionary<GeographicLevelItem[]>;
   indicators: FilterIndicatorItem[];
+  isValidForTableGeneration: boolean;
   relevanceReason: string;
   timePeriod: {
     start: {
@@ -86,6 +92,8 @@ export interface FinalDataset extends DatasetResultBase {
       year: number;
     };
   } | null;
+  validationErrors: ValidationItem[];
+  validationWarnings: ValidationItem[];
 }
 
 export interface StageStarting {

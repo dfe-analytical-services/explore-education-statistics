@@ -1,10 +1,7 @@
 import Link from '@admin/components/Link';
 import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
 import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import {
   ApiDataSetDraftVersion,
   ApiDataSetLiveVersion,
@@ -48,7 +45,7 @@ export default function ApiDataSetVersionSummaryList({
       </SummaryListItem>
       <SummaryListItem term="Release">
         <Link
-          to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+          to={generatePath(releaseSummaryRoute.fullPath, {
             releaseVersionId: dataSetVersion.releaseVersion.id,
             publicationId,
           })}

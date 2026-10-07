@@ -143,6 +143,28 @@ public abstract class DeleteDataSetVersionFunctionTests(DeleteDataSetVersionFunc
                     .GetPublicDataDbContext()
                     .LocationOptionMetaLinks.AnyAsync(ml => dataSetVersion.LocationMetas.Contains(ml.Meta))
             );
+
+            // Assert that the option metas themselves are deleted, and not just their links. Option metas are
+            // a pool shared between DataSetVersions, so nothing cascades them away with the DataSetVersion.
+            var filterOptionIds = dataSetVersion
+                .FilterMetas.SelectMany(meta => meta.Options)
+                .Select(option => option.Id)
+                .ToList();
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => filterOptionIds.Contains(option.Id))
+            );
+
+            var locationOptionIds = dataSetVersion
+                .LocationMetas.SelectMany(meta => meta.Options)
+                .Select(option => option.Id)
+                .ToList();
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => locationOptionIds.Contains(option.Id))
+            );
             Assert.False(
                 await fixture
                     .GetPublicDataDbContext()
@@ -419,6 +441,231 @@ public abstract class DeleteDataSetVersionFunctionTests(DeleteDataSetVersionFunc
             Assert.Equal(dataSet.Id, updatedLiveReleaseFile.PublicApiDataSetId);
             Assert.Equal(liveDataSetVersion.SemVersion(), updatedLiveReleaseFile.PublicApiDataSetVersion);
         }
+
+        [Fact]
+        public async Task Success_OptionMetasSharedWithAnotherVersionAreRetained()
+        {
+            var releaseFiles = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture.DefaultReleaseVersion().WithPublication(DataFixture.DefaultPublication())
+                )
+                .WithFile(() => DataFixture.DefaultFile(FileType.Data))
+                .GenerateList(2);
+
+            var liveReleaseFile = releaseFiles[0];
+            var draftReleaseFile = releaseFiles[1];
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.AddRange(releaseFiles));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft()
+                .WithPublicationId(liveReleaseFile.ReleaseVersion.PublicationId);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            // These options are linked to both versions, so must survive the deletion of the draft one.
+            var sharedFilterOptions = DataFixture.DefaultFilterOptionMeta().GenerateList(2);
+            var sharedLocationOptions = DataFixture.DefaultLocationCodedOptionMeta().GenerateList(2);
+
+            // These options are linked to the draft version alone, so must be deleted along with it.
+            var draftOnlyFilterOptions = DataFixture.DefaultFilterOptionMeta().GenerateList(2);
+            var draftOnlyLocationOptions = DataFixture.DefaultLocationCodedOptionMeta().GenerateList(2);
+
+            DataSetVersion liveDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(liveReleaseFile.Id))
+                .WithFilterMetas(() => [DataFixture.DefaultFilterMeta().WithOptions(sharedFilterOptions).Generate()])
+                .WithLocationMetas(() =>
+                    [DataFixture.DefaultLocationMeta().WithOptions(sharedLocationOptions).Generate()]
+                )
+                .WithImports(() =>
+                    DataFixture
+                        .DefaultDataSetVersionImport()
+                        .WithStage(DataSetVersionImportStage.Completing)
+                        .Generate(1)
+                )
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion draftDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 2, minor: 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(draftReleaseFile.Id))
+                .WithFilterMetas(() =>
+                    [
+                        DataFixture
+                            .DefaultFilterMeta()
+                            .WithOptions([.. sharedFilterOptions, .. draftOnlyFilterOptions])
+                            .Generate(),
+                    ]
+                )
+                .WithLocationMetas(() =>
+                    [
+                        DataFixture
+                            .DefaultLocationMeta()
+                            .WithOptions([.. sharedLocationOptions, .. draftOnlyLocationOptions])
+                            .Generate(),
+                    ]
+                )
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(liveDataSetVersion, draftDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            liveReleaseFile.PublicApiDataSetId = dataSet.Id;
+            liveReleaseFile.PublicApiDataSetVersion = liveDataSetVersion.SemVersion();
+            draftReleaseFile.PublicApiDataSetId = dataSet.Id;
+            draftReleaseFile.PublicApiDataSetVersion = draftDataSetVersion.SemVersion();
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context => context.ReleaseFiles.UpdateRange(liveReleaseFile, draftReleaseFile));
+
+            var sharedFilterOptionIds = sharedFilterOptions.Select(option => option.Id).ToList();
+            var sharedLocationOptionIds = sharedLocationOptions.Select(option => option.Id).ToList();
+            var draftOnlyFilterOptionIds = draftOnlyFilterOptions.Select(option => option.Id).ToList();
+            var draftOnlyLocationOptionIds = draftOnlyLocationOptions.Select(option => option.Id).ToList();
+
+            await DeleteDataSetVersion(draftDataSetVersion.Id);
+
+            // Assert that the options still linked to the LIVE version have been left alone
+            Assert.Equal(
+                sharedFilterOptionIds.Count,
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.CountAsync(option => sharedFilterOptionIds.Contains(option.Id))
+            );
+            Assert.Equal(
+                sharedLocationOptionIds.Count,
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.CountAsync(option => sharedLocationOptionIds.Contains(option.Id))
+            );
+
+            // Assert that the options left unlinked by the deletion have been deleted
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => draftOnlyFilterOptionIds.Contains(option.Id))
+            );
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => draftOnlyLocationOptionIds.Contains(option.Id))
+            );
+
+            // Assert that the LIVE version keeps its links to the shared options
+            Assert.Equal(
+                sharedFilterOptionIds.Count,
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetaLinks.CountAsync(link => link.Meta.DataSetVersionId == liveDataSetVersion.Id)
+            );
+            Assert.Equal(
+                sharedLocationOptionIds.Count,
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetaLinks.CountAsync(link => link.Meta.DataSetVersionId == liveDataSetVersion.Id)
+            );
+        }
+
+        [Fact]
+        public async Task Success_EinTilesQueryingTheDeletedDataSetAreCleared()
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture.DefaultReleaseVersion().WithPublication(DataFixture.DefaultPublication())
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft()
+                .WithPublicationId(releaseFile.ReleaseVersion.PublicationId);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            releaseFile.PublicApiDataSetId = dataSet.Id;
+            releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Update(releaseFile));
+
+            // The second tile queries a DataSet that is not being deleted, so must be left alone.
+            var otherDataSetId = Guid.NewGuid();
+
+            var tiles = await EinTestData.AddApiQueryStatTiles(
+                fixture.GetContentDbContext(),
+                releaseId: releaseFile.ReleaseVersion.ReleaseId,
+                dataSetIds: [dataSet.Id, otherDataSetId]
+            );
+
+            var tileForDeletedDataSet = tiles[0];
+            var tileForOtherDataSet = tiles[1];
+
+            await DeleteDataSetVersion(dataSetVersion.Id);
+
+            // The tile survives so that the page keeps its layout, but every reference to the deleted
+            // DataSet - including the cached statistic derived from it - has been cleared.
+            var clearedTile = await GetEinApiQueryStatTile(tileForDeletedDataSet.Id);
+
+            Assert.Equal(tileForDeletedDataSet.Title, clearedTile.Title);
+            Assert.Equal(tileForDeletedDataSet.Order, clearedTile.Order);
+            Assert.Null(clearedTile.DataSetId);
+            Assert.Null(clearedTile.Version);
+            Assert.Null(clearedTile.DataSetVersionId);
+            Assert.Null(clearedTile.LatestDataSetVersionId);
+            Assert.Null(clearedTile.Query);
+            Assert.Null(clearedTile.Statistic);
+            Assert.Null(clearedTile.IndicatorUnit);
+            Assert.Null(clearedTile.DecimalPlaces);
+            Assert.Null(clearedTile.QueryResult);
+            Assert.Null(clearedTile.ReleaseId);
+
+            var untouchedTile = await GetEinApiQueryStatTile(tileForOtherDataSet.Id);
+
+            Assert.Equal(otherDataSetId, untouchedTile.DataSetId);
+            Assert.Equal(tileForOtherDataSet.Version, untouchedTile.Version);
+            Assert.Equal(tileForOtherDataSet.DataSetVersionId, untouchedTile.DataSetVersionId);
+            Assert.Equal(tileForOtherDataSet.Query, untouchedTile.Query);
+            Assert.Equal(tileForOtherDataSet.Statistic, untouchedTile.Statistic);
+            Assert.Equal(tileForOtherDataSet.QueryResult, untouchedTile.QueryResult);
+            Assert.Equal(tileForOtherDataSet.ReleaseId, untouchedTile.ReleaseId);
+        }
+
+        private async Task<EinApiQueryStatTile> GetEinApiQueryStatTile(Guid tileId) =>
+            await fixture.GetContentDbContext().EinTiles.OfType<EinApiQueryStatTile>().SingleAsync(t => t.Id == tileId);
 
         [Theory]
         [MemberData(

@@ -576,6 +576,72 @@ public abstract class ManageContentPageServiceTests
         }
 
         [Fact]
+        public async Task WhenPublishingOrganisationsExist_ReturnsDepartmentForEducationFirstThenOthersOrderedByTitle()
+        {
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithPublishingOrganisations(
+                    _dataFixture
+                        .DefaultOrganisation()
+                        .ForIndex(0, s => s.SetTitle("Organisation C"))
+                        .ForIndex(1, s => s.SetTitle(Organisation.DepartmentForEducationTitle))
+                        .ForIndex(2, s => s.SetTitle("Organisation A"))
+                        .ForIndex(3, s => s.SetTitle("Organisation B"))
+                        .Generate(4)
+                );
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease().WithVersions(_ => [releaseVersion])]);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
+            methodologyVersionRepository.Setup(s => s.GetLatestVersionByPublication(publication.Id)).ReturnsAsync([]);
+            releaseFileService
+                .Setup(s => s.ListAll(releaseVersion.Id, FileType.Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object
+                );
+
+                var outcome = await service.GetManageContentPageViewModel(releaseVersion.Id);
+                var result = outcome.AssertRight();
+                var contentRelease = result.Release;
+
+                string[] expectedTitles =
+                [
+                    Organisation.DepartmentForEducationTitle,
+                    "Organisation A",
+                    "Organisation B",
+                    "Organisation C",
+                ];
+
+                Assert.Equal(expectedTitles, contentRelease.PublishingOrganisations.Select(o => o.Title));
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
         public async Task WhenReleaseVersionIsPublished_DatePropertiesAreMappedCorrectly()
         {
             var releaseVersionPublishScheduledDate = new DateOnly(2026, 3, 1).GetUkStartOfDayUtc();

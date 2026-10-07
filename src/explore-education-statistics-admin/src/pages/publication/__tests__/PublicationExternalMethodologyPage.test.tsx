@@ -8,9 +8,11 @@ import _publicationService, {
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/publicationService');
 
@@ -76,12 +78,14 @@ describe('PublicationExternalMethodologyPage', () => {
   });
 
   test('handles successful form submission', async () => {
-    const history = createMemoryHistory();
-
     publicationService.getExternalMethodology.mockResolvedValue(undefined);
 
     render(
-      <Router history={history}>
+      <TestRouterRenderer
+        route="/"
+        initialUrl="/"
+        routes={[publicationMethodologiesRoute.fullPath]}
+      >
         <PublicationContextProvider
           publication={testPublication}
           onPublicationChange={noop}
@@ -89,7 +93,7 @@ describe('PublicationExternalMethodologyPage', () => {
         >
           <PublicationExternalMethodologyPage />
         </PublicationContextProvider>
-      </Router>,
+      </TestRouterRenderer>,
     );
 
     expect(
@@ -114,20 +118,20 @@ describe('PublicationExternalMethodologyPage', () => {
       );
     });
 
-    expect(history.location.pathname).toBe(
-      `/publication/publication-1/methodologies`,
-    );
+    await expectLocation(`/publication/publication-1/methodologies`);
   });
 
   test('handles clicking the cancel button', async () => {
-    const history = createMemoryHistory();
-
     publicationService.getExternalMethodology.mockResolvedValue(
       testExternalMethodology,
     );
 
     render(
-      <Router history={history}>
+      <TestRouterRenderer
+        route="/"
+        initialUrl="/"
+        routes={[publicationMethodologiesRoute.fullPath]}
+      >
         <PublicationContextProvider
           publication={testPublication}
           onPublicationChange={noop}
@@ -135,7 +139,7 @@ describe('PublicationExternalMethodologyPage', () => {
         >
           <PublicationExternalMethodologyPage />
         </PublicationContextProvider>
-      </Router>,
+      </TestRouterRenderer>,
     );
 
     expect(
@@ -148,9 +152,7 @@ describe('PublicationExternalMethodologyPage', () => {
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-    expect(history.location.pathname).toBe(
-      `/publication/publication-1/methodologies`,
-    );
+    await expectLocation(`/publication/publication-1/methodologies`);
   });
 });
 

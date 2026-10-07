@@ -2,20 +2,16 @@ import { screen, waitFor, within } from '@testing-library/react';
 import _methodologyService from '@admin/services/methodologyService';
 import _methodologyContentService from '@admin/services/methodologyContentService';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
-import {
-  MethodologyRouteParams,
-  methodologyContentRoute,
-} from '@admin/routes/methodologyRoutes';
-import { methodologyRoute } from '@admin/routes/routes';
+import { methodologyContentRoute } from '@admin/routes/methodologyRoutes';
 import _permissionService from '@admin/services/permissionService';
-import { generatePath, MemoryRouter } from 'react-router';
+import { generatePath } from 'react-router';
 import React from 'react';
-import { Route } from 'react-router-dom';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import testMethodologyVersion, {
   testMethodologyContent,
 } from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { methodologyRoute } from '@admin/routes/routes';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -82,19 +78,14 @@ describe('MethodologyContentPage', () => {
   });
 
   const renderPage = async () => {
-    const path = generatePath<MethodologyRouteParams>(
-      methodologyContentRoute.path,
-      {
-        methodologyId: 'm1',
-      },
-    );
+    const path = generatePath(methodologyContentRoute.fullPath, {
+      methodologyId: 'm1',
+    });
 
     render(
-      <MemoryRouter initialEntries={[path]}>
-        <TestConfigContextProvider>
-          <Route component={MethodologyPage} path={methodologyRoute.path} />
-        </TestConfigContextProvider>
-      </MemoryRouter>,
+      <TestRouterRenderer initialUrl={path} route={methodologyRoute.fullPath}>
+        <MethodologyPage />
+      </TestRouterRenderer>,
     );
 
     await waitFor(() => {

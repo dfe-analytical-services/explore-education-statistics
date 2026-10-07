@@ -166,7 +166,8 @@ Check that archive-publication subject appears correctly on Data catalogue page
 
     user wait for option to be available and select it    css:select[id="filters-form-theme"]    %{TEST_THEME_NAME}
 
-    user checks select contains option    css:select[id="filters-form-publication"]    ${PUBLICATION_NAME_ARCHIVE}
+    user waits until select contains option    css:select[id="filters-form-publication"]
+    ...    ${PUBLICATION_NAME_ARCHIVE}
     user checks select does not contain option
     ...    css:select[id="filters-form-publication"]
     ...    ${PUBLICATION_NAME_SUPERSEDE}

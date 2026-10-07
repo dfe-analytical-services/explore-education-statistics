@@ -15,6 +15,9 @@ const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
 
+const departmentForEducationOrganisationId =
+  '5e089801-cf1a-b375-acd3-88e9d8aece66';
+
 type DataFileImportHandler = (
   adminService: AdminService,
   releaseId: string,
@@ -191,7 +194,7 @@ export class AdminService {
     timePeriodCoverage: 'AY' | 'FY';
   }) {
     const { response, json } = this.client.post<{ id: string }>(
-      `/api/publications/${publicationId}/releases`,
+      '/api/releases',
       JSON.stringify({
         publicationId,
         year,
@@ -199,6 +202,7 @@ export class AdminService {
           value: timePeriodCoverage,
         },
         type: 'AccreditedOfficialStatistics',
+        publishingOrganisations: [departmentForEducationOrganisationId],
       }),
       applicationJsonHeaders,
     );

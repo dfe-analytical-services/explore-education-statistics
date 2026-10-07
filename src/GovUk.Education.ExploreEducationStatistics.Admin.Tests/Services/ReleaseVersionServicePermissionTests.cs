@@ -395,6 +395,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IDataSetVersionService>(),
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),
+            Mock.Of<IPublicBlobStorageService>(),
             new OrganisationsValidatorMockBuilder().Build(),
             userPreReleaseRoleRepository,
             userPublicationRoleRepository,

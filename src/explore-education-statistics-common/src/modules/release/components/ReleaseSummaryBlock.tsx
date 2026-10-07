@@ -46,7 +46,7 @@ const ListItem = ({ children, term, testId = term }: ListItemProps) => {
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;

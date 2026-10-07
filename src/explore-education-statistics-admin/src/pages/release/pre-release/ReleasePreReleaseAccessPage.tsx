@@ -2,7 +2,6 @@ import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseV
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseVersionService from '@admin/services/releaseVersionService';
 import permissionService from '@admin/services/permissionService';
 import InsetText from '@common/components/InsetText';
@@ -100,10 +99,8 @@ const ReleasePreReleaseAccessPage = () => {
                   <UrlContainer
                     className="govuk-!-margin-bottom-4"
                     id="prerelease-url"
-                    url={`${
-                      window.location.origin
-                    }${generatePath<ReleaseRouteParams>(
-                      preReleaseContentRoute.path,
+                    url={`${window.location.origin}${generatePath(
+                      preReleaseContentRoute.fullPath,
                       {
                         publicationId: release.publicationId,
                         releaseVersionId: release.id,

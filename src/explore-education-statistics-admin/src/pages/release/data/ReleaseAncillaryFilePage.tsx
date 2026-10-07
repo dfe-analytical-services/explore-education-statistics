@@ -6,21 +6,20 @@ import releaseAncillaryFileQueries from '@admin/queries/releaseAncillaryFileQuer
 import {
   ReleaseAncillaryFileRouteParams,
   releaseAncillaryFilesRoute,
-  ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
 import releaseAncillaryFileService from '@admin/services/releaseAncillaryFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-export default function ReleaseAncillaryFilePage({
-  history,
-  match: {
-    params: { publicationId, releaseVersionId, fileId },
-  },
-}: RouteComponentProps<ReleaseAncillaryFileRouteParams>) {
+export default function ReleaseAncillaryFilePage() {
+  const navigate = useNavigate();
+  const { publicationId, releaseVersionId, fileId } =
+    useParams<ReleaseAncillaryFileRouteParams>() as ReleaseAncillaryFileRouteParams;
+
   const { data: file, isLoading: isLoadingFile } = useQuery(
     releaseAncillaryFileQueries.get(releaseVersionId, fileId),
   );
@@ -31,13 +30,13 @@ export default function ReleaseAncillaryFilePage({
 
   const navigateBack = useCallback(
     () =>
-      history.push(
-        generatePath<ReleaseRouteParams>(releaseAncillaryFilesRoute.path, {
+      navigate(
+        generatePath(releaseAncillaryFilesRoute.fullPath, {
           publicationId,
           releaseVersionId,
         }),
       ),
-    [history, publicationId, releaseVersionId],
+    [navigate, publicationId, releaseVersionId],
   );
 
   const handleSubmit = useCallback(
@@ -58,7 +57,7 @@ export default function ReleaseAncillaryFilePage({
       <Link
         className="govuk-!-margin-bottom-6"
         back
-        to={generatePath<ReleaseRouteParams>(releaseAncillaryFilesRoute.path, {
+        to={generatePath(releaseAncillaryFilesRoute.fullPath, {
           publicationId,
           releaseVersionId,
         })}

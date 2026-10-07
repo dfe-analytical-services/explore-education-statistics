@@ -16,12 +16,12 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const ReleaseFootnotesPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseVersionId } = match.params;
+const ReleaseFootnotesPage = () => {
+  const { publicationId, releaseVersionId } =
+    useParams<ReleaseRouteParams>() as ReleaseRouteParams;
   const [isReordering, toggleIsReordering] = useToggle(false);
 
   const { value: canUpdateRelease = false, isLoading: isPermissionLoading } =
@@ -69,7 +69,7 @@ const ReleaseFootnotesPage = ({
           Before footnotes can be created, relevant data files need to be
           uploaded. That can be done in the{' '}
           <Link
-            to={generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+            to={generatePath(releaseDataRoute.fullPath, {
               publicationId,
               releaseVersionId,
             })}
@@ -92,13 +92,10 @@ const ReleaseFootnotesPage = ({
           >
             {!isReordering && (
               <ButtonLink
-                to={generatePath<ReleaseRouteParams>(
-                  releaseFootnotesCreateRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                  },
-                )}
+                to={generatePath(releaseFootnotesCreateRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                })}
               >
                 Create footnote
               </ButtonLink>

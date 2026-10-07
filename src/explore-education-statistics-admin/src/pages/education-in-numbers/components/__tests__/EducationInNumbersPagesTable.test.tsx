@@ -2,14 +2,15 @@ import _educationInNumbersService, {
   EinSummary,
   EinSummaryWithPrevVersion,
 } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import baseRender from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
-import EducationInNumbersPagesTable from '../EducationInNumbersPagesTable';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
+import EducationInNumbersPagesTable from '@admin/pages/education-in-numbers/components/EducationInNumbersPagesTable';
 
 // Mock the service and the react-query hook
 jest.mock('@admin/services/educationInNumbersService');
@@ -116,8 +117,7 @@ describe('EducationInNumbersPagesTable', () => {
   });
 
   test("'View currently published page' link navigates to the previous version's summary page", async () => {
-    const history = createMemoryHistory();
-    const { user } = render(history);
+    const { user } = render();
 
     const table = await screen.findByTestId('education-in-numbers-table');
     const row = within(table).getByRole('row', {
@@ -129,31 +129,26 @@ describe('EducationInNumbersPagesTable', () => {
 
     await user.click(link);
 
-    expect(history.location.pathname).toBe(
-      '/education-in-numbers/prev-version-id/summary',
-    );
+    await expectLocation('/education-in-numbers/prev-version-id/summary');
   });
 
   test('Edit/View link navigates to the correct summary page', async () => {
-    const history = createMemoryHistory();
-    const { user } = render(history);
+    const { user } = render();
 
     const table = await screen.findByTestId('education-in-numbers-table');
 
     // Test 'Edit' link
     const draftRow = within(table).getByRole('row', { name: /Draft page/ });
     await user.click(within(draftRow).getByRole('link', { name: 'Edit' }));
-    expect(history.location.pathname).toBe(
-      '/education-in-numbers/draft-page-id/summary',
-    );
+    await expectLocation('/education-in-numbers/draft-page-id/summary');
 
     // Test 'View' link
     const publishedRow = within(table).getByRole('row', {
       name: /Published page/,
     });
     await user.click(within(publishedRow).getByRole('link', { name: 'View' }));
-    expect(history.location.pathname).toBe(
-      '/education-in-numbers/published-page-id/summary',
+    await waitFor(async () =>
+      expectLocation('/education-in-numbers/published-page-id/summary'),
     );
   });
 
@@ -168,8 +163,7 @@ describe('EducationInNumbersPagesTable', () => {
     educationInNumbersService.createEducationInNumbersPageAmendment.mockResolvedValue(
       newAmendment,
     );
-    const history = createMemoryHistory();
-    const { user } = render(history);
+    const { user } = render();
 
     const table = await screen.findByTestId('education-in-numbers-table');
     const row = within(table).getByRole('row', { name: /Published page/ });
@@ -179,15 +173,17 @@ describe('EducationInNumbersPagesTable', () => {
     expect(
       educationInNumbersService.createEducationInNumbersPageAmendment,
     ).toHaveBeenCalledWith('published-page-id');
-    expect(history.location.pathname).toBe(
-      '/education-in-numbers/new-amendment-id/summary',
-    );
+    await expectLocation('/education-in-numbers/new-amendment-id/summary');
   });
 
   describe('reordering', () => {
     test('shows the reordering UI when `isReordering` is true', async () => {
       baseRender(
-        <TestConfigContextProvider>
+        <TestRouterRenderer
+          initialUrl={educationInNumbersListRoute.fullPath}
+          route={educationInNumbersListRoute.fullPath}
+          routes={[educationInNumbersSummaryRoute.fullPath]}
+        >
           <EducationInNumbersPagesTable
             onCancelReordering={noop}
             onConfirmReordering={noop}
@@ -195,7 +191,7 @@ describe('EducationInNumbersPagesTable', () => {
             pages={testPages}
             isReordering
           />
-        </TestConfigContextProvider>,
+        </TestRouterRenderer>,
       );
 
       expect(
@@ -214,19 +210,20 @@ describe('EducationInNumbersPagesTable', () => {
     });
   });
 
-  function render(history: MemoryHistory = createMemoryHistory()) {
+  function render() {
     return baseRender(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersPagesTable
-            onCancelReordering={noop}
-            onConfirmReordering={noop}
-            onDelete={noop}
-            pages={testPages}
-            isReordering={false}
-          />
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer
+        initialUrl={educationInNumbersSummaryRoute.fullPath}
+        route={educationInNumbersSummaryRoute.fullPath}
+      >
+        <EducationInNumbersPagesTable
+          onCancelReordering={noop}
+          onConfirmReordering={noop}
+          onDelete={noop}
+          pages={testPages}
+          isReordering={false}
+        />
+      </TestRouterRenderer>,
     );
   }
 });

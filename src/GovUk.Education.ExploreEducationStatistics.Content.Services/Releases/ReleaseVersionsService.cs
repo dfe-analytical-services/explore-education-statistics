@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
@@ -28,8 +29,8 @@ public class ReleaseVersionsService(ContentDbContext contentDbContext) : IReleas
                     releaseVersion.Id == releaseVersion.Release.Publication.LatestPublishedReleaseVersionId;
 
                 var publishingOrganisations = releaseVersion
-                    .PublishingOrganisations.Select(OrganisationDto.FromOrganisation)
-                    .OrderBy(o => o.Title)
+                    .PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
+                    .Select(OrganisationDto.FromOrganisation)
                     .ToArray();
 
                 var updateCount = await GetUpdateCount(releaseVersion.Id, cancellationToken);

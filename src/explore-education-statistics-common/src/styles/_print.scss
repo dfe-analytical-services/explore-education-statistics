@@ -45,3 +45,11 @@
     width: calc(100%) !important;
   }
 }
+
+// fix for recharts bug: https://github.com/recharts/recharts/issues/6112
+// just removing the above doesn't work when using ctrl-p
+.recharts-responsive-container > div {
+  @media print {
+    width: 100% !important;
+  }
+}

@@ -79,6 +79,7 @@ export interface DataSetFileSummary {
     title: string;
     slug: string;
   };
+  publishingOrganisationTitles?: string[];
   release: {
     id: string;
     title: string;
@@ -92,8 +93,7 @@ export interface DataSetFileSummary {
   meta: {
     numDataFileRows: number;
     geographicLevels: string[];
-    // Optional as not currently provided by the azure search index used by the search-data page
-    geographicLevelsCsvOnly?: string[];
+    geographicLevelsCsvOnly: string[];
     timePeriodRange: {
       from: string;
       to: string;

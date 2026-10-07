@@ -9,13 +9,15 @@ import _publicationService, {
   ExternalMethodology,
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 import { produce } from 'immer';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');
@@ -171,10 +173,12 @@ describe('PublicationMethodologiesPage', () => {
         createdMethodology,
       );
 
-      const history = createMemoryHistory();
-
       render(
-        <Router history={history}>
+        <TestRouterRenderer
+          route="/"
+          initialUrl="/"
+          routes={[methodologySummaryRoute.fullPath]}
+        >
           <PublicationContextProvider
             publication={testPublication}
             onPublicationChange={noop}
@@ -182,7 +186,7 @@ describe('PublicationMethodologiesPage', () => {
           >
             <PublicationMethodologiesPage />
           </PublicationContextProvider>
-        </Router>,
+        </TestRouterRenderer>,
       );
 
       await waitFor(() =>
@@ -193,13 +197,11 @@ describe('PublicationMethodologiesPage', () => {
         screen.getByRole('button', { name: 'Create new methodology' }),
       );
 
-      await waitFor(() => {
+      await waitFor(async () => {
         expect(methodologyService.createMethodology).toHaveBeenCalledWith(
           testPublication.id,
         );
-        expect(history.location.pathname).toBe(
-          `/methodology/${createdMethodology.id}/summary`,
-        );
+        await expectLocation(`/methodology/${createdMethodology.id}/summary`);
       });
     });
 
@@ -714,8 +716,6 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to amend the methodology when the confirm button is clicked', async () => {
-        const history = createMemoryHistory();
-
         const createdAmendment: MethodologyVersion = {
           amendment: true,
           id: 'methodology-v1',
@@ -748,7 +748,11 @@ describe('PublicationMethodologiesPage', () => {
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
         render(
-          <Router history={history}>
+          <TestRouterRenderer
+            initialUrl="/"
+            route="/"
+            routes={[methodologySummaryRoute.fullPath]}
+          >
             <PublicationContextProvider
               publication={testPublication}
               onPublicationChange={noop}
@@ -756,7 +760,7 @@ describe('PublicationMethodologiesPage', () => {
             >
               <PublicationMethodologiesPage />
             </PublicationContextProvider>
-          </Router>,
+          </TestRouterRenderer>,
         );
 
         await waitFor(() =>
@@ -769,13 +773,11 @@ describe('PublicationMethodologiesPage', () => {
         const modal = within(screen.getByRole('dialog'));
         await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
-        await waitFor(() => {
+        await waitFor(async () => {
           expect(
             methodologyService.createMethodologyAmendment,
           ).toHaveBeenCalledWith(testMethodology1.id);
-          expect(history.location.pathname).toBe(
-            `/methodology/${createdAmendment.id}/summary`,
-          );
+          await expectLocation(`/methodology/${createdAmendment.id}/summary`);
         });
       });
     });

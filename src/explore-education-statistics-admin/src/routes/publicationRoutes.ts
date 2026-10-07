@@ -16,54 +16,65 @@ export type PublicationTeamRouteParams = {
 export type PublicationRouteProps = NavRouteProps;
 
 export const publicationReleasesRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/releases',
+  fullPath: '/publication/:publicationId/releases',
+  path: 'releases',
   title: 'Releases',
 };
 
 export const publicationMethodologiesRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/methodologies',
+  fullPath: '/publication/:publicationId/methodologies',
+  path: 'methodologies',
   title: 'Methodologies',
 };
 
 export const publicationAdoptMethodologyRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/methodologies/adopt',
+  fullPath: '/publication/:publicationId/methodologies/adopt',
+  path: 'methodologies/adopt',
   title: 'Adopt a methodology',
 };
 
 export const publicationExternalMethodologyRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/methodologies/external',
+  fullPath: '/publication/:publicationId/methodologies/external',
+  path: 'methodologies/external',
   title: 'External methodology',
 };
 
 export const publicationDetailsRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/details',
+  fullPath: '/publication/:publicationId/details',
+  path: 'details',
   title: 'Details',
 };
 
 export const publicationContactRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/contact',
+  fullPath: '/publication/:publicationId/contact',
+  path: 'contact',
   title: 'Contact',
 };
 
 export const publicationTeamAccessRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team',
+  fullPath: '/publication/:publicationId/team',
+  path: 'team',
   title: 'Team access',
 };
 
 export const publicationReleaseSeriesRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/releases/order',
+  fullPath: '/publication/:publicationId/releases/order',
+  path: 'releases/order',
   title: 'Release order',
 };
 
 export const publicationCreateReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
   {
-    path: '/publication/:publicationId/releases/legacy/create',
+    fullPath: '/publication/:publicationId/releases/legacy/create',
+    path: 'releases/legacy/create',
     title: 'Create legacy release',
   };
 
 export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
   {
-    path: '/publication/:publicationId/releases/legacy/:releaseSeriesItemId/edit',
+    fullPath:
+      '/publication/:publicationId/releases/legacy/:releaseSeriesItemId/edit',
+    path: 'releases/legacy/:releaseSeriesItemId/edit',
     title: 'Edit legacy release',
   };
 

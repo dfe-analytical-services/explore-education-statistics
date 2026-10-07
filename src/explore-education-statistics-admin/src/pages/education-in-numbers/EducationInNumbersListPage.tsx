@@ -60,7 +60,7 @@ const EducationInNumbersListPage = () => {
 
       {!isReordering && (
         <ButtonGroup>
-          <ButtonLink to={educationInNumbersCreateRoute.path}>
+          <ButtonLink to={educationInNumbersCreateRoute.fullPath}>
             Add new page
           </ButtonLink>
           {/* Only show reorder button if there are at least two *subpages* */}

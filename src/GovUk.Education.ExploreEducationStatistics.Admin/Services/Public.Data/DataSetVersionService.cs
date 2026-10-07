@@ -127,8 +127,7 @@ public class DataSetVersionService(
     )
     {
         return await GetReleaseVersion(releaseFileId, cancellationToken)
-            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
-            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async () =>
                 await processorClient.CreateNextDataSetVersionMappings(
                     dataSetId: dataSetId,
@@ -186,8 +185,7 @@ public class DataSetVersionService(
     {
         return await GetVersion(dataSetVersionId, cancellationToken)
             .OnSuccess(dataSetVersion => GetReleaseVersion(dataSetVersion.Release.ReleaseFileId, cancellationToken))
-            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
-            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async () =>
                 await processorClient.DeleteDataSetVersion(
                     dataSetVersionId: dataSetVersionId,
@@ -466,7 +464,9 @@ public class DataSetVersionService(
     ) =>
         await contentDbContext
             .ReleaseFiles.AsNoTracking()
-            .Where(r => r.Id == releaseFileId)
+            .Where(rf => rf.Id == releaseFileId)
+            .Include(rf => rf.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
             .Select(rf => rf.ReleaseVersion)
             .SingleOrNotFoundAsync(cancellationToken);
 

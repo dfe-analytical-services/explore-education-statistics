@@ -1,18 +1,15 @@
 import PageMetaTitle from '@admin/components/PageMetaTitle';
 import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/components/AdoptMethodologyForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  PublicationRouteParams,
-  publicationMethodologiesRoute,
-} from '@admin/routes/publicationRoutes';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
 const PublicationAdoptMethodologyPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const { publicationId, publication } = usePublicationContext();
 
@@ -20,12 +17,9 @@ const PublicationAdoptMethodologyPage = () => {
     async () => publicationService.getAdoptableMethodologies(publicationId),
   );
 
-  const returnRoute = generatePath<PublicationRouteParams>(
-    publicationMethodologiesRoute.path,
-    {
-      publicationId,
-    },
-  );
+  const returnRoute = generatePath(publicationMethodologiesRoute.fullPath, {
+    publicationId,
+  });
 
   return (
     <>
@@ -35,13 +29,13 @@ const PublicationAdoptMethodologyPage = () => {
         {adoptableMethodologies && adoptableMethodologies.length > 0 ? (
           <AdoptMethodologyForm
             methodologies={adoptableMethodologies}
-            onCancel={() => history.push(returnRoute)}
+            onCancel={() => navigate(returnRoute)}
             onSubmit={async values => {
               await publicationService.adoptMethodology(
                 publicationId,
                 values.methodologyId,
               );
-              history.push(returnRoute);
+              navigate(returnRoute);
             }}
           />
         ) : (

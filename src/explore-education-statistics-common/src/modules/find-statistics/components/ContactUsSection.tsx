@@ -13,9 +13,9 @@ const ContactUsSection = ({
 }: {
   publicationContact: Contact;
   publicationTitle: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
 }) => {
-  const isSkillsEngland = !!publishingOrganisations?.find(
+  const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
   return (

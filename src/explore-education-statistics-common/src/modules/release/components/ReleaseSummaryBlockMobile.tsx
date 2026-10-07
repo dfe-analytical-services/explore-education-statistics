@@ -12,7 +12,7 @@ import React, { ReactNode } from 'react';
 interface Props {
   isEditing?: boolean;
   lastUpdated?: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   releaseDate?: string;
   releaseType: ReleaseType;
   renderProducerLink: ReactNode;
