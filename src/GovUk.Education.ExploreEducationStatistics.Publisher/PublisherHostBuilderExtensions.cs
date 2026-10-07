@@ -1,3 +1,5 @@
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -83,6 +85,8 @@ public static class PublisherHostBuilderExtensions
                 // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
                 var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
 
+                services.AddHttpClient<IFrontDoorCacheService, FrontDoorCacheService>();
+
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
                     .ConfigureFunctionsApplicationInsights()
@@ -95,6 +99,7 @@ public static class PublisherHostBuilderExtensions
                         )
                     )
                     .AddSingleton(TimeProvider.System)
+                    .AddSingleton<TokenCredential, DefaultAzureCredential>()
                     .AddSingleton<IFileStorageService, FileStorageService>(provider => new FileStorageService(
                         provider.GetRequiredService<IOptions<AppOptions>>().Value.PublisherStorageConnectionString
                     ))
@@ -132,7 +137,8 @@ public static class PublisherHostBuilderExtensions
                         ),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                        publicationsTreeService: provider.GetRequiredService<IPublicationsTreeService>()
+                        publicationsTreeService: provider.GetRequiredService<IPublicationsTreeService>(),
+                        frontDoorCacheService: provider.GetRequiredService<IFrontDoorCacheService>()
                     ))
                     .AddScoped<IReleaseService, ReleaseService>()
                     .AddTransient<IPublisherTableStorageService, PublisherTableStorageService>(
@@ -182,6 +188,7 @@ public static class PublisherHostBuilderExtensions
                     .AddSingleton<DateTimeProvider>()
                     .AddSingleton(TimeProvider.System)
                     .Configure<AppOptions>(configuration.GetSection(AppOptions.Section))
+                    .Configure<AzureFrontDoorOptions>(configuration.GetSection(AzureFrontDoorOptions.Section))
                     .Configure<NotifyOptions>(configuration.GetSection(NotifyOptions.Section));
 
                 // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.

@@ -6,6 +6,10 @@ param environmentConfigParam = {
   domain: 'explore-education-statistics.service.gov.uk'
 }
 
+param publisherConfigParam = {
+  frontDoorCachePurgeEnabled: true
+}
+
 param publicApiConfigParam = {
   publicUrl: 'api.education.gov.uk/statistics'
 }
