@@ -39,7 +39,7 @@ param analyticsEnabled bool
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
- @description('''
+@description('''
 Whether to restrict this App Service origin to requests routed through this environment's Azure Front Door
 profile. Enable only after the Content API custom domain has been cut over to Front Door, as enabling it
 beforehand will reject traffic still arriving directly.
