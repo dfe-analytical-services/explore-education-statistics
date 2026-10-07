@@ -1,5 +1,5 @@
-import { getResourceNamesForEnvironment } from '../../bicep-main-infrastructure-release/resource-names.bicep'
-import { secretRefsFromSecrets } from '../../common/functions.bicep'
+import { getResourceNamesForEnvironment } from '../../../bicep-main-infrastructure-release/resource-names.bicep'
+import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
 param environmentIdentifier string
@@ -13,8 +13,14 @@ param domain string
 @description('Whether or not to enable Swagger API pages in this environment.')
 param enableSwagger bool = false
 
+@description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+param basicAuthEnabled bool = false
+
 @description('Whether analytics is enabled.')
 param analyticsEnabled bool = true
+
+@description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
+param tableBuilderMaxTableCellsAllowed int = 1000000
 
 @description('''
 A deploy timestamp as an appsettings that is exposed via the health endpoint and allows us to determine
@@ -24,6 +30,10 @@ pre-existing instances that haven't shut down yet.
 ''')
 param deployedAt string = ''
 
+// getResourceNamesForEnvironment only actually reads environmentIdentifier/environmentName,
+// but still expects something shaped like the shared EnvironmentConfig type - this plain
+// object literal satisfies that structurally, without this file needing to import the type
+// itself just to pass these two values through.
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentIdentifier
   environmentName: environmentName
@@ -43,6 +53,8 @@ var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/
 
 var secretNames = [
   resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+  resourceNames.keyVault.secrets.publicSite.basicAuthUsername
+  resourceNames.keyVault.secrets.publicSite.basicAuthPassword
 ]
 
 resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
@@ -51,16 +63,20 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 
 // Maps each secret name above to a ready-to-use Key Vault reference pinned to that secret's
 // current version (rather than "latest"), so the resulting appsetting value changes whenever
-// the secret is rotated - see admin-bicep-config.bicep for why that matters.
+// the secret is rotated - see admin-appsettings.bicep for why that matters.
 var secretRefs = secretRefsFromSecrets(secrets)
 
-@description('Application-specific appsettings for the Content API, applied to its staging slot ahead of each code deploy.')
+@description('Application-specific appsettings for the Data API, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
   PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
   enableSwagger: enableSwagger
   PublicApp__Url: 'https://${domain}'
+  PublicApp__BasicAuth: basicAuthEnabled
+  PublicApp__BasicAuthUsername: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
+  PublicApp__BasicAuthPassword: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
   Analytics__Enabled: analyticsEnabled
   Analytics__BasePath: analyticsFileShareMountPath
+  TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri
   Deploy__DeployedAt: deployedAt

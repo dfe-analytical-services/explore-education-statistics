@@ -1,6 +1,5 @@
-import { getResourceNamesForEnvironment } from '../../bicep-main-infrastructure-release/resource-names.bicep'
-import { MemoryCacheConfig } from '../../bicep-main-infrastructure-release/types.bicep'
-import { secretRefsFromSecrets } from '../../common/functions.bicep'
+import { getResourceNamesForEnvironment } from '../../../bicep-main-infrastructure-release/resource-names.bicep'
+import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
 param environmentIdentifier string
@@ -24,7 +23,20 @@ param publishScheduledReleaseVersionsFunctionCronSchedule string = '0 30 9 * * *
 param tableBuilderMaxTableCellsAllowed int = 1000000
 
 @description('Global configuration for memory caches.')
-param memoryCacheConfig MemoryCacheConfig = {
+param memoryCacheConfig {
+
+  @description('The frequency of scans to evict expired entries from the in-memory cache.')
+  expirationScanFrequencySeconds: int
+  
+  @description('Max size of in-memory cache in MBs.  This is an approximation based on the size of the cached objects in JSON notation.')
+  maxCacheSizeMb: int
+  
+  @description('Override duration in seconds for all entities cached in memory')
+  overridesDurationInSeconds: int?
+
+  @description('Override cron expression for all entities cached in memory')
+  overridesExpirySchedule: string?
+} = {
   expirationScanFrequencySeconds: 60
   maxCacheSizeMb: 50
 }
