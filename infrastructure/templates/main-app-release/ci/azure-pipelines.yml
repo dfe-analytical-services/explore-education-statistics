@@ -60,7 +60,6 @@ stages:
       environment: Dev
       serviceConnection: $(serviceConnectionDev)
       bicepParamFile: dev
-      robotTestEnvironment: dev
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
       deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
@@ -71,7 +70,6 @@ stages:
       environment: Test
       serviceConnection: $(serviceConnectionTest)
       bicepParamFile: test
-      robotTestEnvironment: test
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
       deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
@@ -82,7 +80,6 @@ stages:
       environment: Pre-Prod
       serviceConnection: $(serviceConnectionPreProd)
       bicepParamFile: preprod
-      robotTestEnvironment: pre-prod
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
       deployAdminFirst: ${{ parameters.deployAdminFirst }}
 
@@ -94,6 +91,5 @@ stages:
       environment: Prod
       serviceConnection: $(serviceConnectionProd)
       bicepParamFile: prod
-      robotTestEnvironment: prod
       slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
       deployAdminFirst: ${{ parameters.deployAdminFirst }}

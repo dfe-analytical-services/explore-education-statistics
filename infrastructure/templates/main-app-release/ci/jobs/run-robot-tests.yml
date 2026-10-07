@@ -24,23 +24,58 @@ jobs:
 
       - template: ../../../../../azure-pipelines-install-python.yml
 
+      - task: CopyFiles@2
+        displayName: Copy Robot test environment config
+        inputs:
+          SourceFolder: infrastructure/templates/main-app-release/robot-tests/parameters
+          Contents: .env.${{ parameters.testEnvironment }}
+          TargetFolder: tests/robot-tests
+
       - task: AzureKeyVault@2
         displayName: Azure Key Vault - $(subscription)-kv-ees-01
         inputs:
           azureSubscription: ${{ parameters.serviceConnection }}
           KeyVaultName: $(subscription)-kv-ees-01
-          SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken
+          SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
           RunAsPreJob: true
 
-      - task: PythonScript@0
+      - task: Bash@3
         displayName: Public UI tests
         inputs:
-          pythonInterpreter: $(Agent.TempDirectory)/venv/bin/python
-          scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-          arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "${{ parameters.testEnvironment }}" --file "tests/general_public" --processes 4 --rerun-attempts 1
           workingDirectory: tests/robot-tests
+          targetType: inline
+          script: |
+            set -e
+            python -m pip install --upgrade pip
+            pip install pipenv
+            pipenv install
+            pipenv run python run_tests.py --env "${{ parameters.testEnvironment }}" --file "tests/general_public" --processes 4 --rerun-attempts 1 --ci --enable-slack-notifications
         env:
           SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
+          TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
+          PUBLIC_AUTH_USER: $(ees-public-site-basic-auth-username)
+          PUBLIC_AUTH_PASSWORD: $(ees-public-site-basic-auth-password)
+          TIMEOUT: 60
+          IMPLICIT_WAIT: 15
+          WAIT_MEDIUM: 45
+          WAIT_SMALL: 30
+          WAIT_LONG: 60
+          RELEASE_COMPLETE_WAIT: 280
+          WAIT_CACHE_EXPIRY: 30
+          WAIT_DATA_FILE_SCREEN: 180
+          WAIT_DATA_FILE_IMPORT: 180
+          ADMIN_EMAIL:
+          ADMIN_PASSWORD:
+          ANALYST_EMAIL:
+          ANALYST_PASSWORD:
+          EXPIRED_INVITE_USER_EMAIL:
+          EXPIRED_INVITE_USER_PASSWORD:
+          NO_INVITE_USER_EMAIL:
+          NO_INVITE_USER_PASSWORD:
+          PENDING_INVITE_USER_EMAIL:
+          PENDING_INVITE_USER_PASSWORD:
+          IDENTITY_PROVIDER:
+          PUBLISHER_FUNCTIONS_URL:
 
       - task: PublishTestResults@2
         displayName: Publish UI Public Test Results
