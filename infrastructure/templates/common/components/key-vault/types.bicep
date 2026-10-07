@@ -1,2 +1,2 @@
 @export()
-type KeyVaultRole = 'Secrets User' | 'Certificate User'
+type KeyVaultRole = 'Secrets User' | 'Secrets Officer' | 'Certificate User' | 'Crypto User'
