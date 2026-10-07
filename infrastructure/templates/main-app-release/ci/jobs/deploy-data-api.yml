@@ -18,8 +18,8 @@ jobs:
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
     variables:
-      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/data-api/data-api-bicep-config.bicep
-      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/data-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/data-api/data-api-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/data-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
       bicepConfigDeployName: DataApiBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:

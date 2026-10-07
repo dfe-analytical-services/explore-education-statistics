@@ -1,4 +1,4 @@
-using '../admin-bicep-config.bicep'
+using '../admin-appsettings.bicep'
 
 param environmentIdentifier = 's101p01'
 param environmentName = 'Production'
