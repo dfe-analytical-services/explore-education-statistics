@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -37,6 +39,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +61,28 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddHealthChecks();
+
+        // If operating within Azure, keys are stored centrally (rather than on local disk, the
+        // framework default) because local disk storage isn't safe to share across this App
+        // Service's deployment slots - see app-service.bicep for details.
+        if (hostEnvironment.IsProduction())
+        {
+            var dataProtectionSecretClient = new SecretClient(
+                new Uri(configuration.GetValue<string>("DataProtection:KeyVaultUri")!),
+                new DefaultAzureCredential()
+            );
+            services
+                .AddDataProtection()
+                .PersistKeysToAzureKeyVaultSecrets(dataProtectionSecretClient, "ees-data-api-dataprotection-")
+                .ProtectKeysWithAzureKeyVault(
+                    new Uri(configuration.GetValue<string>("DataProtection:KeyVaultKeyUri")!),
+                    new DefaultAzureCredential()
+                );
+        }
+        else
+        {
+            services.AddDataProtection();
+        }
 
         services
             .AddApplicationInsightsTelemetry()
