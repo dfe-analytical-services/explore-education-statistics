@@ -1,8 +1,6 @@
 using '../content-api-bicep-config.bicep'
 
-param environmentConfigParam = {
-  environmentIdentifier: 's101t01'
-  environmentName: 'Test'
-  domain: 'test.explore-education-statistics.service.gov.uk'
-  enableSwagger: true
-}
+param environmentIdentifier = 's101t01'
+param environmentName = 'Test'
+param domain = 'test.explore-education-statistics.service.gov.uk'
+param enableSwagger = true

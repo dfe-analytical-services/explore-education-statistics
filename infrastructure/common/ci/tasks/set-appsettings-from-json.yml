@@ -13,7 +13,8 @@ parameters:
   - name: appSettingsJson
     type: string
     default: '{}'
-  # Leave blank to target production. Set to apply to a named deployment slot instead.
+  # Leave blank to target production. Set to apply to a named deployment slot instead
+  # (e.g. deploy / staging).
   - name: slotName
     type: string
     default: ''
@@ -28,26 +29,25 @@ steps:
       inlineScript: |
         set -e
 
-        # Captured via a plain assignment (not a process substitution feeding the while-read
-        # loop below) so that a jq parse failure here actually trips `set -e` and fails the
-        # task. A process substitution's exit status isn't checked by `set -e`, so a malformed/
-        # truncated appSettingsJson value would otherwise silently look identical to a
-        # genuinely empty one, below.
+        # Generate key-value pairs from the appsettings JSON.
         parsedSettings=$(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"') || {
           echo "##vso[task.logissue type=error]Failed to parse appSettingsJson as JSON - see the jq error above. This most likely means the value was truncated or malformed somewhere upstream, not that it's genuinely empty."
           exit 1
         }
 
+        # Add each key-value pair to an array of args.
         settingsArgs=()
         while IFS= read -r kv; do
           [ -n "$kv" ] && settingsArgs+=("$kv")
         done <<< "$parsedSettings"
 
+        # Add a slot name if deploying appsettings to a slot.
         slotArgs=()
         if [ -n "${{ parameters.slotName }}" ]; then
           slotArgs=(--slot "${{ parameters.slotName }}")
         fi
 
+        # If there are appsettings to deploy, deploy them now.
         if [ ${#settingsArgs[@]} -gt 0 ]; then
           az webapp config appsettings set \
             --name ${{ parameters.appName }} \

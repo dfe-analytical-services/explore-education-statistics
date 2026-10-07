@@ -13,11 +13,12 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        # pipefail so that a failure anywhere in the `az ... | jq ...` pipeline (not just the
-        # last stage) is actually caught by `set -e`, rather than silently producing an empty
-        # $deploymentOutputs that the loop below would then just do nothing with.
+
+        # Include the pipefail option so that failures in any part of a pipe
+        # of commands will be surfaced.
         set -eo pipefail
 
+        # Get the outputs from the Bicep deploy.
         deploymentOutputs=$(az deployment group show \
         --resource-group $(resourceGroupName) \
         --name ${{ parameters.deploymentName }} \
@@ -35,6 +36,7 @@ steps:
           # so that multiline output values like JSON will all be assigned correctly to
           # outputValue.
           outputValue=$(echo "$c" | jq -rc '.[1]')
-          
+
+          # Set a pipeline variable for the Bicep output using the output name and value.           
           echo "##vso[task.setvariable variable=$outputName;]$outputValue"
         done <<< "$deploymentOutputs"

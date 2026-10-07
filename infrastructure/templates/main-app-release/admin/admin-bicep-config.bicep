@@ -1,29 +1,64 @@
 import { getResourceNamesForEnvironment } from '../../bicep-main-infrastructure-release/resource-names.bicep'
-import { EnvironmentConfig, mergeEnvironmentConfig } from '../../bicep-main-infrastructure-release/configuration/environment-configuration.bicep'
-import { AdminConfig, mergeAdminConfig } from '../../bicep-main-infrastructure-release/configuration/admin-configuration.bicep'
-import { PublicApiConfig, mergePublicApiConfig } from '../../bicep-main-infrastructure-release/configuration/public-api-configuration.bicep'
+import { MemoryCacheConfig } from '../../bicep-main-infrastructure-release/types.bicep'
 import { secretRefsFromSecrets } from '../../common/functions.bicep'
 
-@description('Environment-wide configuration values needed to compute this app\'s appsettings.')
-param environmentConfigParam EnvironmentConfig = {}
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
+param environmentIdentifier string
 
-@description('Admin-specific configuration values needed to compute this app\'s appsettings.')
-param adminConfigParam AdminConfig = {}
+@description('Name of this environment e.g. Development, Test.')
+param environmentName string
 
-@description('Public API configuration values needed to compute this app\'s appsettings.')
-param publicApiConfigParam PublicApiConfig = {}
+@description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
+param domain string
 
-@description('A marker unique to this deploy (the pipeline run\'s own timestamp), surfaced via the app\'s health/config endpoint so the pipeline can confirm the new appsettings and code have actually taken effect - see wait-for-app-service-restart.yml.')
+@description('Whether or not to enable Swagger API pages in this environment.')
+param enableSwagger bool = false
+
+@description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App.')
+param prepareScheduledReleaseVersionsFunctionCronSchedule string = '0 5 0 * * *'
+
+@description('Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App.')
+param publishScheduledReleaseVersionsFunctionCronSchedule string = '0 30 9 * * *'
+
+@description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
+param tableBuilderMaxTableCellsAllowed int = 1000000
+
+@description('Global configuration for memory caches.')
+param memoryCacheConfig MemoryCacheConfig = {
+  expirationScanFrequencySeconds: 60
+  maxCacheSizeMb: 50
+}
+
+@description('Whether or not to enable theme deletion in this environment (for test teardown).')
+param enableThemeDeletion bool = false
+
+@description('Whether or not to enable published Education In Numbers pages deletion in this environment.')
+param enableEinPublishedPageDeletion bool = false
+
+@description('Pre-release start time as number of minutes before a release is scheduled to be published.')
+param preReleaseMinutesBeforeStart int = 870
+
+@description('The public URL for the public API (excluding "https://").')
+param publicApiUrl string
+
+@description('''
+A deploy timestamp as an appsettings that is exposed via the health endpoint and allows us to determine
+which deploy the currently running instances belong to. This gives us assurances during deployment that
+the health check responses we are receiving are being served from newly-deployed instances, not
+pre-existing instances that haven't shut down yet.
+''')
 param deployedAt string = ''
 
-var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
-var adminConfig = mergeAdminConfig(adminConfigParam)
-var publicApiConfig = mergePublicApiConfig(publicApiConfigParam)
-var resourceNames = getResourceNamesForEnvironment(environmentConfig)
+// getResourceNamesForEnvironment only actually reads environmentIdentifier/environmentName,
+// but still expects something shaped like the shared EnvironmentConfig type - this plain
+// object literal satisfies that structurally, without this file needing to import the type
+// itself just to pass these two values through.
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: environmentIdentifier
+  environmentName: environmentName
+})
 
-var adminHostname = 'admin.${environmentConfig.domain!}'
-var publicApiUrl = publicApiConfig.publicUrl!
-var memoryCacheConfig = environmentConfig.memoryCacheConfig!
+var adminHostname = 'admin.${domain}'
 
 var keyVaultName = resourceNames.keyVault.keyVault
 
@@ -65,9 +100,9 @@ var secretRefs = secretRefsFromSecrets(secrets)
 @description('Application-specific appsettings for Admin, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
   App__Url: 'https://${adminHostname}'
-  App__EnableSwagger: environmentConfig.enableSwagger!
-  App__EnableThemeDeletion: adminConfig.enableThemeDeletion!
-  App__EnableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
+  App__EnableSwagger: enableSwagger
+  App__EnableThemeDeletion: enableThemeDeletion
+  App__EnableEinPublishedPageDeletion: enableEinPublishedPageDeletion
   Azure__SignalR__ConnectionString: secretRefs[resourceNames.keyVault.secrets.admin.adminSignalrConnectionString]
   EventGrid__EventTopics__0__Key: 'PublicationChangedEvent'
   EventGrid__EventTopics__0__TopicEndpoint: reference(
@@ -104,11 +139,11 @@ output appSettings object = {
   ImporterStorage: secretRefs[resourceNames.keyVault.secrets.importerStorageAccountConnectionString]
   PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
   PublisherStorage: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
-  PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: adminConfig.preReleaseMinutesBeforeStart!
-  ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-  ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-  TableBuilder__MaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
-  PublicApp__Url: 'https://${environmentConfig.domain!}'
+  PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: preReleaseMinutesBeforeStart
+  ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule: prepareScheduledReleaseVersionsFunctionCronSchedule
+  ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule: publishScheduledReleaseVersionsFunctionCronSchedule
+  TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
+  PublicApp__Url: 'https://${domain}'
   PublicDataDbExists: true
   PublicDataApi__PublicUrl: 'https://${publicApiUrl}'
   PublicDataApi__PrivateUrl: secretRefs[resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl]

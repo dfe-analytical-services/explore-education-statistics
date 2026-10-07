@@ -43,6 +43,9 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
 
+            # TODO EES-7734 - bring application-specific appsettings under the control of this
+            # pipeline rather than the infrastructure pipeline, for consistency. 
+
             - task: AzureCLI@2
               displayName: 'Deploy ${{ parameters.functionAppName }} Function App'
               retryCountOnTaskFailure: 1
@@ -57,6 +60,12 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --name ${{ parameters.functionAppName }} \
                     --src '$(Pipeline.Workspace)/${{ parameters.downloadPipeline }}/${{ parameters.artifactName }}/${{ parameters.artifactZipName }}'
+
+                  # TODO EES-7734 - provide deployedAt health check enhancement to this
+                  # app deploy to ensure we're receiving successful health checks from
+                  # correct version of this app.  In the meantime, sleep to give the
+                  # restart a chance to begin.
+                  sleep 30  
 
             - template: ../../../templates/public-api/ci/tasks/wait-for-endpoint-result.yml
               parameters:

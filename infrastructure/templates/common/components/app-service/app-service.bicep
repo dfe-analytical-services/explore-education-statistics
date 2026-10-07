@@ -154,8 +154,7 @@ var baseSettings = union(applicationAppSettings, {
   // file shares are available for this App Service.
   WEBSITE_CONTENTOVERVNET: length(azureFileShares ?? []) > 0 ? '1' : null
 }, swapSlotEnabled ? {
-  // Point the platform's own slot-swap warm-up check at our lightweight health endpoint,
-  // rather than the site root, so swap doesn't wait on a heavier page to judge readiness.
+  // Use the healthcheck endpoint to identify when a slot is warmed up.
   WEBSITE_SWAP_WARMUP_PING_PATH: healthCheckPath
   WEBSITE_SWAP_WARMUP_PING_STATUSES: '200'
 } : {})
@@ -170,9 +169,8 @@ var osSpecificSettings = union(baseSettings,
 )
 
 // Existing settings take precedence over settings computed in this Bicep file so that
-// infrastructure deploys do not reset application-specific appsettings back to their
-// bootstrap values, causing unwanted updates ahead of a slot swap deploy being ready to run.
-// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
+// infrastructure deploys do not reset application-specific appsettings that have been
+// deployed by the application deploy pipeline.
 var combinedProdSettings = union(osSpecificSettings, existingProdAppSettings)
 var combinedStagingSlotSettings = union(osSpecificSettings, existingStagingSlotAppSettings)
 

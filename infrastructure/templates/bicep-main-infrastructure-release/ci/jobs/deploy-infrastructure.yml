@@ -36,19 +36,23 @@ jobs:
             # staging slot, so that this infrastructure deploy can merge them with its own
             # infrastructure-specific appsettings rather than resetting them back to their
             # bootstrap values. See app-service.bicep for how these are merged.
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
               parameters:
                 displayName: Get existing production and staging app settings for slot-swapping app services
                 appType: webApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 slotName: deploy
-                apps: |
-                  [
-                    { "appName": "$(subscription)-as-ees-admin", "prodVariableName": "adminProdAppSettings", "stagingVariableName": "adminStagingSlotAppSettings" },
-                    { "appName": "$(subscription)-as-ees-content", "prodVariableName": "contentApiProdAppSettings", "stagingVariableName": "contentApiStagingSlotAppSettings" },
-                    { "appName": "$(subscription)-as-ees-data", "prodVariableName": "dataApiProdAppSettings", "stagingVariableName": "dataApiStagingSlotAppSettings" }
-                  ]
+                apps:
+                  - appName: $(subscription)-as-ees-admin
+                    stagingVariableName: adminStagingSlotAppSettings
+                    prodVariableName: adminProdAppSettings
+                  - appName: $(subscription)-as-ees-content
+                    stagingVariableName: contentApiStagingSlotAppSettings
+                    prodVariableName: contentApiProdAppSettings
+                  - appName: $(subscription)-as-ees-data
+                    stagingVariableName: dataApiStagingSlotAppSettings
+                    prodVariableName: dataApiProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

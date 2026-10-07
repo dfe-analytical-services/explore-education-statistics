@@ -3,20 +3,18 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class HealthCheckOptionsExtensions
 {
     /// <summary>
-    /// Has the health check response include the app's currently-applied
-    /// "Deploy:DeployedAt" appsetting value, as "deployedAt". Each deploy generates a
-    /// fresh marker for this (see deploy-admin.yml/deploy-content-api.yml/
-    /// deploy-data-api.yml), and the pipeline polls for it to appear here to confirm the
-    /// new appsettings and code have actually taken effect, rather than relying on a
-    /// transient 503 that the in-process hosting model doesn't guarantee - see
-    /// wait-for-app-service-restart.yml.
+    /// Causes health check endpoints to include a "deployedAt" field which allows us
+    /// to identify the time at which a given app instance was deployed. This is fed in
+    /// via the "Deploy:DeployedAt" appsetting in the code deployment pipeline, and
+    /// subsequently allows us to verify that health check responses that we are polling
+    /// for in the pipeline are being returned by the newly-started-up app instances
+    /// rather than the pre-existing ones that were running prior to the deployment.
     /// </summary>
     public static HealthCheckOptions IncludeDeployedAt(this HealthCheckOptions options)
     {

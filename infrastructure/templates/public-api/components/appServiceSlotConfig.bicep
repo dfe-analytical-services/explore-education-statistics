@@ -36,12 +36,10 @@ resource functionSlotConfig 'Microsoft.Web/sites/config@2023-12-01' = {
 }
 
 // Combine common settings, slot-specific settings and any existing settings together.
-// Existing settings take precedence over settings specified in the Bicep files so that
-// infrastructure deploys do not reset appsettings back to original values and cause
-// unwanted updates to production appsettings prior to a slot swap deploy process being
-// ready to run.
 //
-// See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
+// Existing settings take precedence over settings computed in this Bicep file so that
+// infrastructure deploys do not reset application-specific appsettings that have been
+// deployed by the application deploy pipeline.
 var combinedStagingSettings = union(commonSettings, stagingOnlySettings, processorStagingAppSettings)
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, processorProdAppSettings)
 

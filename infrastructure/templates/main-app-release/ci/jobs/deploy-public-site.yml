@@ -44,6 +44,12 @@ jobs:
                     --name $(subscription)-as-ees-public-site \
                     --resource-group $(resourceGroupName)
 
+                  # TODO EES-7734 - provide deployedAt health check enhancement to this
+                  # app deploy to ensure we're receiving successful health checks from
+                  # correct version of this app.  In the meantime, sleep to give the
+                  # restart a chance to begin.
+                  sleep 30  
+
             - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
