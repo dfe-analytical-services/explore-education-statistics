@@ -26,9 +26,17 @@ function getCandidateLabel({
 }: ApiDataSetCandidate): string {
   // Only BAU users are shown data files that failed the screener's API
   // compatibility checks, so flag these to make the override explicit.
-  return publicApiCompatible === false
-    ? `${title} (not API compatible)`
-    : title;
+  if (publicApiCompatible === false) {
+    return `${title} (not API compatible)`;
+  }
+
+  // Data files uploaded before the screener was introduced have no
+  // API compatibility result.
+  if (publicApiCompatible === null) {
+    return `${title} (API compatibility unknown)`;
+  }
+
+  return title;
 }
 
 export default function ApiDataSetCreateForm({
