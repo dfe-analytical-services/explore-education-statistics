@@ -50,7 +50,7 @@ describe('ApiDataSetCreateForm', () => {
     expect(options[3]).toHaveTextContent(testCandidates[2].title);
   });
 
-  test('renders incompatible data sets with a label suffix', () => {
+  test('renders incompatible and unscreened data sets with a label suffix', () => {
     render(
       <ApiDataSetCreateForm
         dataSetCandidates={[
@@ -84,7 +84,9 @@ describe('ApiDataSetCreateForm', () => {
     expect(options[2]).toHaveTextContent(
       'Test data set 2 (not API compatible)',
     );
-    expect(options[3]).toHaveTextContent(/^Test data set 3$/);
+    expect(options[3]).toHaveTextContent(
+      'Test data set 3 (API compatibility unknown)',
+    );
   });
 
   test('shows validation error when no data set selected', async () => {
