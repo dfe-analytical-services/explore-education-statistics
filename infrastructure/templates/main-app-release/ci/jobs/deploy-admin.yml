@@ -14,8 +14,8 @@ jobs:
     displayName: Deploy Admin
     environment: ${{ parameters.environment }}
     variables:
-      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/admin/admin-bicep-config.bicep
-      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/admin/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/admin/admin-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/admin/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
       bicepConfigDeployName: AdminBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
