@@ -37,17 +37,17 @@ jobs:
                 processorProdAppSettings: '{}'
                 processorStagingAppSettings: '{}'
 
-            - template: ../../../../common/ci/tasks/get-appsettings.yml
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
               parameters:
                 displayName: Get existing Data Processor app settings
                 appType: functionApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 slotName: staging
-                apps: |
-                  [
-                    { "appName": "$(dataProcessorFunctionAppName)", "prodVariableName": "processorProdAppSettings", "stagingVariableName": "processorStagingAppSettings" }
-                  ]
+                apps:
+                  - appName: $(dataProcessorFunctionAppName)
+                    stagingVariableName: processorStagingAppSettings
+                    prodVariableName: processorProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

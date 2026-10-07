@@ -1,15 +1,43 @@
 import { getResourceNamesForEnvironment } from '../../bicep-main-infrastructure-release/resource-names.bicep'
-import { EnvironmentConfig, mergeEnvironmentConfig } from '../../bicep-main-infrastructure-release/configuration/environment-configuration.bicep'
 import { secretRefsFromSecrets } from '../../common/functions.bicep'
 
-@description('Environment-wide configuration values needed to compute this app\'s appsettings.')
-param environmentConfigParam EnvironmentConfig = {}
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
+param environmentIdentifier string
 
-@description('A marker unique to this deploy (the pipeline run\'s own timestamp), surfaced via the app\'s health endpoint so the pipeline can confirm the new appsettings and code have actually taken effect - see wait-for-app-service-restart.yml.')
+@description('Name of this environment e.g. Development, Test.')
+param environmentName string
+
+@description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
+param domain string
+
+@description('Whether or not to enable Swagger API pages in this environment.')
+param enableSwagger bool = false
+
+@description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
+param basicAuthEnabled bool = false
+
+@description('Whether analytics is enabled.')
+param analyticsEnabled bool = true
+
+@description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
+param tableBuilderMaxTableCellsAllowed int = 1000000
+
+@description('''
+A deploy timestamp as an appsettings that is exposed via the health endpoint and allows us to determine
+which deploy the currently running instances belong to. This gives us assurances during deployment that
+the health check responses we are receiving are being served from newly-deployed instances, not
+pre-existing instances that haven't shut down yet.
+''')
 param deployedAt string = ''
 
-var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
-var resourceNames = getResourceNamesForEnvironment(environmentConfig)
+// getResourceNamesForEnvironment only actually reads environmentIdentifier/environmentName,
+// but still expects something shaped like the shared EnvironmentConfig type - this plain
+// object literal satisfies that structurally, without this file needing to import the type
+// itself just to pass these two values through.
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: environmentIdentifier
+  environmentName: environmentName
+})
 
 var analyticsFileShareMountPath = '\\mounts\\analytics'
 
@@ -41,14 +69,14 @@ var secretRefs = secretRefsFromSecrets(secrets)
 @description('Application-specific appsettings for the Data API, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
   PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
-  enableSwagger: environmentConfig.enableSwagger!
-  PublicApp__Url: 'https://${environmentConfig.domain!}'
-  PublicApp__BasicAuth: environmentConfig.basicAuthEnabled!
+  enableSwagger: enableSwagger
+  PublicApp__Url: 'https://${domain}'
+  PublicApp__BasicAuth: basicAuthEnabled
   PublicApp__BasicAuthUsername: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
   PublicApp__BasicAuthPassword: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
-  Analytics__Enabled: environmentConfig.analyticsEnabled!
+  Analytics__Enabled: analyticsEnabled
   Analytics__BasePath: analyticsFileShareMountPath
-  TableBuilder__MaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
+  TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri
   Deploy__DeployedAt: deployedAt
