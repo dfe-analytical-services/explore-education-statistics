@@ -29,6 +29,6 @@ steps:
   - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - waiting for the app service swapped into production to report healthy after swap.
+      displayName: ${{ parameters.displayNamePrefix }} - waiting for the app service swapped into production to report healthy after swap
       endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
       maxAttempts: 20

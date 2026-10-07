@@ -82,10 +82,11 @@ jobs:
                     healthCheckPath: /api/health
                     deployedAt: $(deployedAt)
 
-  # Only exists when slot swapping is actually in play for this run - see deploy-app-service.yml
-  # for the equivalent decision used by Content API/Data API. Kept as its own job (rather than
-  # more steps in DeployAdmin above) specifically so it does NOT block services that depend on
-  # Admin's migrations having run, not on the swap having completed.
+  # Only exists when slot swapping is actually in play for this run. Separating this out from
+  # the main Admin deploy flow into a separate job allows us to kick off the subsequent
+  # deploys of all other services in this pipeline as soon as Admin has started up successfully
+  # in the staging slot (and has therefore run any migrations it needed to run), rather than having
+  # to wait for Admin's deploy to fully complete before starting their own.
   - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
       - deployment: SwapAdminIntoProduction
         displayName: Swap Admin Into Production
@@ -95,6 +96,7 @@ jobs:
           runOnce:
             deploy:
               steps:
+                - download: none
                 - template: ../tasks/swap-staging-slot-into-production.yml
                   parameters:
                     serviceConnection: ${{ parameters.serviceConnection }}

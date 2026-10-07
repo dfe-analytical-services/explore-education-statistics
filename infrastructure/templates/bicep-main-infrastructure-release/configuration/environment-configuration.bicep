@@ -1,4 +1,3 @@
-import { MemoryCacheConfig } from '../types.bicep'
 import { IpRange } from '../../common/types.bicep'
 
 @export()
@@ -21,9 +20,6 @@ type EnvironmentConfig = {
 
   @description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
   tableBuilderMaxTableCellsAllowed: int?
-
-  @description('Global configuration for memory caches.')
-  memoryCacheConfig: MemoryCacheConfig?
 
   @description('Whether or not to enable autoscaling of App Services in this environment.')
   autoscaleAppServices: bool?

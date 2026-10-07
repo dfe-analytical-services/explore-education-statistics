@@ -1,3 +1,11 @@
+#
+# This Task takes an array of app names and variables for storing appsettings in.
+# It then grabs the existing appsettings for each (production and staging slots if
+# they have them) and stores them in the assigned variable names.
+#
+# It does these calls in parallel to save time, as individually each takes around
+# 10 seconds.
+#
 parameters:
   - name: serviceConnection
     type: string
@@ -14,13 +22,14 @@ parameters:
   - name: slotName
     type: string
     default: deploy
-  # A JSON array of apps to fetch existing appsettings for, e.g.:
-  #   [{"appName": "my-app", "prodVariableName": "myAppProdSettings", "stagingVariableName": "myAppStagingSettings"}]
-  # "stagingVariableName" is optional per entry - when it's omitted (or empty), no staging slot
-  # lookup is attempted for that app at all. Every lookup, across every app in the array, runs
-  # concurrently in the one task rather than needing one task per app/slot.
+  # The apps to fetch existing appsettings for and the variable names to store them in, e.g.:
+  #   apps:
+  #     - appName: my-app
+  #       stagingVariableName: myAppStagingSettings (optional)
+  #       prodVariableName: myAppProdSettings
   - name: apps
-    type: string
+    type: object
+    default: []
 
 steps:
   - task: AzureCLI@2
@@ -38,7 +47,7 @@ steps:
           cliCommand=functionapp
         fi
 
-        # Fetches appsettings for a single app/slot combination, writing the result (as flat
+        # Fetches appsettings for a single app / slot combination, writing the result (as flat
         # {name: value} JSON) to $outFile. Leave $slotName empty to target production.
         fetch_appsettings() {
           local appName=$1
@@ -106,7 +115,7 @@ steps:
             varNames+=("$stagingVariableName")
             varFiles+=("$stagingFile")
           fi
-        done < <(echo '${{ parameters.apps }}' | jq -c '.[]')
+        done < <(echo '${{ convertToJson(parameters.apps) }}' | jq -c '.[]')
 
         # set -e doesn't apply to background jobs, so failures are checked explicitly here -
         # this preserves the original behaviour of failing the task rather than risking an
