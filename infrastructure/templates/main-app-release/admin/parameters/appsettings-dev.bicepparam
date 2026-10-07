@@ -1,26 +1,20 @@
 using '../admin-bicep-config.bicep'
 
-param environmentConfigParam = {
-  environmentIdentifier: 's101d01'
-  environmentName: 'Development'
-  domain: 'dev.explore-education-statistics.service.gov.uk'
-  enableSwagger: true
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-    overridesDurationInSeconds: 10
-  }
-  tableBuilderMaxTableCellsAllowed: 25000
+param environmentIdentifier = 's101d01'
+param environmentName = 'Development'
+param domain = 'dev.explore-education-statistics.service.gov.uk'
+param enableSwagger = true
+param prepareScheduledReleaseVersionsFunctionCronSchedule = '0 0 * * * *'
+param publishScheduledReleaseVersionsFunctionCronSchedule = '0 30 * * * *'
+param memoryCacheConfig = {
+  expirationScanFrequencySeconds: 60
+  maxCacheSizeMb: 50
+  overridesDurationInSeconds: 10
 }
+param tableBuilderMaxTableCellsAllowed = 25000
 
-param adminConfigParam = {
-  preReleaseMinutesBeforeStart: 1440
-  enableThemeDeletion: true
-  enableEinPublishedPageDeletion: true
-}
+param preReleaseMinutesBeforeStart = 1440
+param enableThemeDeletion = true
+param enableEinPublishedPageDeletion = true
 
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-dev'
-}
+param publicApiUrl = 'pp-api.education.gov.uk/statistics-dev'

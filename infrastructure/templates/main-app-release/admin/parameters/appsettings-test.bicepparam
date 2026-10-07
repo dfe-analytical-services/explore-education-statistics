@@ -1,18 +1,12 @@
 using '../admin-bicep-config.bicep'
 
-param environmentConfigParam = {
-  environmentIdentifier: 's101t01'
-  environmentName: 'Test'
-  domain: 'test.explore-education-statistics.service.gov.uk'
-  enableSwagger: true
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-}
+param environmentIdentifier = 's101t01'
+param environmentName = 'Test'
+param domain = 'test.explore-education-statistics.service.gov.uk'
+param enableSwagger = true
+param prepareScheduledReleaseVersionsFunctionCronSchedule = '0 0 * * * *'
+param publishScheduledReleaseVersionsFunctionCronSchedule = '0 30 * * * *'
 
-param adminConfigParam = {
-  enableThemeDeletion: true
-}
+param enableThemeDeletion = true
 
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-test'
-}
+param publicApiUrl = 'pp-api.education.gov.uk/statistics-test'

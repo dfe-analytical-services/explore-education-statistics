@@ -1,17 +1,9 @@
 #
 # Polls the app's health endpoint for its "deployedAt" value (see
 # HealthCheckOptionsExtensions.IncludeDeployedAt in the Common project) to match the
-# deployedAt marker generated for this deploy (see deploy-admin.yml/deploy-content-api.yml/
-# deploy-data-api.yml), confirming the new appsettings and code have actually taken
-# effect. An equality check against a marker we chose in advance, rather than comparing
-# against a previously-observed value (e.g. a process start time), avoids false positives
-# from an unrelated restart on some other instance happening to look like a match - the
-# marker can only appear once this deploy's appsettings have actually been applied.
-#
-# This still only confirms *an* instance has it, not *all* instances (there's no session
-# affinity - see app-service.bicep's clientAffinityEnabled - so each call may land on a
-# different instance), but that's an acceptable gap for what's just a diagnostic aid, not
-# the real health gate (that's wait-for-endpoint-result.yml, downstream).
+# deployedAt marker generated for this deploy. This lets us confirm that the new 
+# appsettings and code have taken effect and that we're recording health checks against
+# newly deployed instances rather than polling an already-running instance.
 #
 parameters:
   - name: serviceConnection
