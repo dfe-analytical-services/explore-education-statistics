@@ -5,7 +5,7 @@ import _releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import { act, render, screen } from '@testing-library/react';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/releaseDataFileService');

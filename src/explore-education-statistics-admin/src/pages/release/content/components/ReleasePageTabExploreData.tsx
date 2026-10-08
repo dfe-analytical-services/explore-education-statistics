@@ -32,7 +32,7 @@ import ReleasePageLayout from '@common/modules/release/components/ReleasePageLay
 import pageSections from '@common/modules/release/data/releaseExploreDataPageSections';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 
 interface Props {
   isPra?: boolean;

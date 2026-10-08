@@ -19,7 +19,7 @@ import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { formatInTimeZone } from 'date-fns-tz';
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;

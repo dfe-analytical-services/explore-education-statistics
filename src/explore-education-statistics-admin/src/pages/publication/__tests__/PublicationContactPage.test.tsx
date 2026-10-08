@@ -8,7 +8,7 @@ import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import noop from 'lodash/noop';
 import React from 'react';
 import render from '@common-test/render';

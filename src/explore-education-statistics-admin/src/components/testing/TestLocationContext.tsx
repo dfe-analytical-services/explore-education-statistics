@@ -18,20 +18,31 @@ export default function TestLocationContext() {
   );
 }
 
+function exactMatchFromString(str: string) {
+  const escapedStr = str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${escapedStr}$`);
+}
+
 export async function expectLocation(url: string) {
   await waitFor(() => {
-    expect(screen.getByTestId('__current_pathname')).toHaveTextContent(url);
+    expect(screen.getByTestId('__current_pathname')).toHaveTextContent(
+      exactMatchFromString(url),
+    );
   });
 }
 
 export async function expectLocationHash(hash: string) {
   await waitFor(() => {
-    expect(screen.getByTestId('__current_hash')).toHaveTextContent(hash);
+    expect(screen.getByTestId('__current_hash')).toHaveTextContent(
+      exactMatchFromString(hash),
+    );
   });
 }
 
 export async function expectLocationSearch(search: string) {
   await waitFor(() => {
-    expect(screen.getByTestId('__current_search')).toHaveTextContent(search);
+    expect(screen.getByTestId('__current_search')).toHaveTextContent(
+      exactMatchFromString(search),
+    );
   });
 }

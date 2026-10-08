@@ -252,7 +252,7 @@ describe('ApiDataSetPreviewTokenCreateForm', () => {
 
     const { user } = render(
       <TestConfigContextProvider>
-        <AuthContext value={{ user: analyst }}>
+        <AuthContext value={{ user: analyst, status: 'authenticated' }}>
           <ApiDataSetPreviewTokenCreateForm
             onCancel={noop}
             onSubmit={handleSubmit}
@@ -294,7 +294,7 @@ async function renderWithCustomDatesSubmitted(
 ) {
   const { user } = render(
     <TestConfigContextProvider>
-      <AuthContext value={{ user: bau }}>
+      <AuthContext value={{ user: bau, status: 'authenticated' }}>
         <ApiDataSetPreviewTokenCreateForm
           onCancel={noop}
           onSubmit={handleSubmit}

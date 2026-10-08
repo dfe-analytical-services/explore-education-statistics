@@ -8,8 +8,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 export default function PublicationCreatePage() {
   const { themeId } = useParams<{ themeId: string }>() as { themeId: string };

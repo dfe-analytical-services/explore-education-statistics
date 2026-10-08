@@ -1618,7 +1618,9 @@ describe('DataReplacementPlan', () => {
         }}
       >
         <QueryClientProvider client={testQueryClient}>
-          <AuthContext value={{ user }}>{children}</AuthContext>
+          <AuthContext value={{ user, status: 'authenticated' }}>
+            {children}
+          </AuthContext>
         </QueryClientProvider>
       </TestConfigContextProvider>,
     );

@@ -376,6 +376,7 @@ describe('EditableContentForm', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <CommentsContextProvider
@@ -423,6 +424,7 @@ describe('EditableContentForm', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <CommentsContextProvider
@@ -478,6 +480,7 @@ describe('EditableContentForm', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <CommentsContextProvider
@@ -526,6 +529,7 @@ describe('EditableContentForm', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <CommentsContextProvider

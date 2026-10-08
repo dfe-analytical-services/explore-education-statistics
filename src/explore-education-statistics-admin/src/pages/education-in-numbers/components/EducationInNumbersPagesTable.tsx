@@ -11,8 +11,7 @@ import ReorderableList from '@common/components/ReorderableList';
 import reorder from '@common/utils/reorder';
 import { formatInTimeZone } from 'date-fns-tz';
 import React, { useEffect, useState } from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { generatePath, Link, useNavigate } from 'react-router';
 
 interface Props {
   pages: EinSummaryWithPrevVersion[];

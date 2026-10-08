@@ -6,7 +6,7 @@ import getApiDataSetIndicatorMappings, {
 } from '@admin/pages/release/data/utils/getApiDataSetIndicatorMappings';
 import React, { useCallback, useEffect, useState } from 'react';
 import { PendingMappingUpdate } from '@admin/pages/release/data/types/apiDataSetMappings';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import {
   releaseApiDataSetDetailsRoute,
   ReleaseDataSetRouteParams,
@@ -16,7 +16,6 @@ import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
 import PageNav, { NavItem } from '@common/components/PageNav';
 import Link from '@admin/components/Link';
-import { generatePath } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import InsetText from '@common/components/InsetText';
 import Tag from '@common/components/Tag';

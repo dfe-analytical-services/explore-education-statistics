@@ -3,6 +3,7 @@
 exports[`ButtonLink renders correctly with required props 1`] = `
 <a class="govuk-button"
    href="/"
+   data-discover="true"
 >
   Test button
 </a>

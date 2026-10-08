@@ -10,7 +10,7 @@ import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/Pu
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
