@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
@@ -113,10 +114,14 @@ public class DataSetFileStorage(
         CancellationToken cancellationToken
     )
     {
-        return await ValidateFileTypeForTemporaryDataSetUploadFile(fileType)
+        return await contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccess(_ => ValidateFileTypeForTemporaryDataSetUploadFile(fileType))
             .OnSuccess(async () =>
                 await contentDbContext.DataSetUploads.SingleOrNotFoundAsync(
-                    upload => upload.Id == dataSetUploadId,
+                    upload => upload.Id == dataSetUploadId && upload.ReleaseVersionId == releaseVersionId,
                     cancellationToken: cancellationToken
                 )
             )

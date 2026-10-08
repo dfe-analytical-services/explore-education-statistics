@@ -26,7 +26,6 @@ public class ReleaseVersionsController(
     IReleasePublishingStatusService releasePublishingStatusService,
     IReleaseChecklistService releaseChecklistService,
     IDataImportService dataImportService,
-    IDataSetUploadRepository dataSetUploadRepository,
     IDataSetFileStorage dataSetFileStorage,
     IDataSetScreenerService dataSetScreenerService
 ) : ControllerBase
@@ -93,7 +92,9 @@ public class ReleaseVersionsController(
         CancellationToken cancellationToken
     )
     {
-        return await dataSetUploadRepository.ListAll(releaseVersionId, cancellationToken).HandleFailuresOrOk();
+        return await releaseDataFileService
+            .ListDataSetUploads(releaseVersionId, cancellationToken)
+            .HandleFailuresOrOk();
     }
 
     [HttpDelete("releaseVersions/{releaseVersionId:guid}/upload/{dataSetUploadId:guid}")]
@@ -103,8 +104,8 @@ public class ReleaseVersionsController(
         CancellationToken cancellationToken
     )
     {
-        return await dataSetUploadRepository
-            .Delete(releaseVersionId, dataSetUploadId, cancellationToken)
+        return await releaseDataFileService
+            .DeleteDataSetUpload(releaseVersionId, dataSetUploadId, cancellationToken)
             .HandleFailuresOrNoContent();
     }
 

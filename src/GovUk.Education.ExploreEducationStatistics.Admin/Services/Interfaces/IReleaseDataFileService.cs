@@ -23,6 +23,17 @@ public interface IReleaseDataFileService
 
     Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
 
+    Task<Either<ActionResult, List<DataSetUploadViewModel>>> ListDataSetUploads(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken
+    );
+
+    Task<Either<ActionResult, Unit>> DeleteDataSetUpload(
+        Guid releaseVersionId,
+        Guid dataSetUploadId,
+        CancellationToken cancellationToken
+    );
+
     Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId, List<Guid> fileIds);
 
     Task<Either<ActionResult, List<DataSetUploadViewModel>>> Upload(
