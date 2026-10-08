@@ -58,13 +58,15 @@ jobs:
 
             - template: ../../../../common/ci/tasks/get-current-appsettings.yml
               parameters:
-                displayName: Get existing app settings for the Importer Function App
+                displayName: Get existing app settings for Function Apps
                 appType: functionApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 apps:
                   - appName: $(subscription)-fa-ees-importer
                     prodVariableName: importerProdAppSettings
+                  - appName: $(subscription)-fa-ees-publisher
+                    prodVariableName: publisherProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -82,3 +84,4 @@ jobs:
                 dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
                 publicSiteProdAppSettings: $(publicSiteProdAppSettings)
                 importerProdAppSettings: $(importerProdAppSettings)
+                publisherProdAppSettings: $(publisherProdAppSettings)

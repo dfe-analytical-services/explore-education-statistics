@@ -1,6 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -19,39 +18,6 @@ param logAnalyticsWorkspaceId string
 @description('''The database user's password.''')
 param databaseUserPassword string
 
-@description('Whether the PrepareScheduledReleaseVersionsNow HTTP-triggered function is enabled.')
-param prepareScheduledReleaseVersionsNowEnabled bool
-
-@description('Whether the PublishScheduledReleaseVersionsNow HTTP-triggered function is enabled.')
-param publishScheduledReleaseVersionsNowEnabled bool
-
-@description('The time zone used for evaluating Cron expressions of the functions running with Cron triggers.')
-param functionAppTimeZone string
-
-@description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs.')
-param prepareScheduledReleaseVersionsFunctionCronSchedule string
-
-@description('Cron expression that defines when the PublishScheduledReleaseVersions function runs.')
-param publishScheduledReleaseVersionsFunctionCronSchedule string
-
-@description('The public-facing URL of the Admin site.')
-param adminAppUrl string
-
-@description('The public-facing URL of the public site.')
-param publicAppUrl string
-
-@description('The public-facing host name of the Content API, used to build Front Door cache purge paths.')
-param contentApiHostName string
-
-@description('''
-Whether the Publisher is allowed to purge superseded all-files ZIPs from Azure Front Door. Requires the Front
-Door role assignment granting the Publisher purge permissions to have been deployed to this environment.
-''')
-param frontDoorCachePurgeEnabled bool
-
-@description('Resource id of the Azure Front Door endpoint that the Publisher purges cached ZIPs from.')
-param frontDoorEndpointResourceId string
-
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[]
 
@@ -64,11 +30,13 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that the code
+deployment pipeline has since applied - see publisher-appsettings.bicep.
+''')
+param existingAppSettings object = {}
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -129,7 +97,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageFirewallRules: maintenanceIpRanges
     deployQueueRoleAssignment: true
     functionAppFirewallRules: []
-    healthCheckPath: '/'
+    healthCheckPath: '/api/health'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
     outboundSubnetId: outboundVnetSubnet.id
     minTlsVersion: minTlsVersion
@@ -172,96 +140,11 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         mountPath: publicApiFileshareMountPath
       }
     ]
-    appSettings: [
-      {
-        name: 'WEBSITE_TIME_ZONE'
-        value: functionAppTimeZone
-      }
-      {
-        name: 'AzureWebJobs.PrepareScheduledReleaseVersionsNow.Disabled'
-        value: string(!prepareScheduledReleaseVersionsNowEnabled)
-      }
-      {
-        name: 'AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled'
-        value: string(!publishScheduledReleaseVersionsNowEnabled)
-      }
-      {
-        name: 'App__PrepareScheduledReleaseVersionsFunctionCronSchedule'
-        value: prepareScheduledReleaseVersionsFunctionCronSchedule
-      }
-      {
-        name: 'App__PublishScheduledReleaseVersionsFunctionCronSchedule'
-        value: publishScheduledReleaseVersionsFunctionCronSchedule
-      }
-      {
-        name: 'App__PrivateStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
-      }
-      {
-        name: 'App__NotifierStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifierStorageAccountConnectionString)
-      }
-      {
-        name: 'App__PublicStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publicStorageAccountConnectionString)
-      }
-      {
-        name: 'App__PublisherStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisherStorageAccountConnectionString)
-      }
-      {
-        name: 'App__BauEmail'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.bauEmail)
-      }
-      {
-        name: 'App__AdminAppUrl'
-        value: adminAppUrl
-      }
-      {
-        name: 'App__PublicAppUrl'
-        value: publicAppUrl
-      }
-      {
-        name: 'AzureFrontDoor__CachePurgeEnabled'
-        value: string(frontDoorCachePurgeEnabled)
-      }
-      {
-        name: 'AzureFrontDoor__EndpointResourceId'
-        value: frontDoorEndpointResourceId
-      }
-      {
-        name: 'AzureFrontDoor__ContentApiHostName'
-        value: contentApiHostName
-      }
-      {
-        name: 'Notify__ApiKey'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.publisher.notifyApiKey)
-      }
-      {
-        name: 'DataFiles__BasePath'
-        value: publicApiFileshareMountPath
-      }
-      {
-        name: 'EventGrid__EventTopics__0__Key'
-        value: 'PublicationChangedEvent'
-      }
-      {
-        name: 'EventGrid__EventTopics__0__TopicEndpoint'
-        value: reference(resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.publicationChanged), '2025-02-15').endpoint
-      }
-      {
-        name: 'EventGrid__EventTopics__1__Key'
-        value: 'ReleaseVersionChangedEvent'
-      }
-      {
-        name: 'EventGrid__EventTopics__1__TopicEndpoint'
-        value: reference(resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.releaseVersionChanged), '2025-02-15').endpoint
-      }
-      {
-        name: 'PublicDataDbExists'
-        value: 'true'
-      }
-    ]
+    // Application-specific appsettings are no longer seeded from here - the app-release
+    // pipeline applies them ahead of each code deploy via publisher-appsettings.bicep. See
+    // existingAppSettings above for how they're preserved across infrastructure deploys.
+    appSettings: []
+    existingAppSettings: existingAppSettings
     tagValues: tagValues
   }
 }
