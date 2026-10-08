@@ -155,9 +155,9 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
         IStorageDataSet replacementDataSet
     )
     {
-        var originalFilters = await originalDataSet.ListFilters();
+        var originalFilters = await originalDataSet.ListFilters(includeItems: true);
 
-        var replacementFilters = await replacementDataSet.ListFilters();
+        var replacementFilters = await replacementDataSet.ListFilters(includeItems: true);
 
         // Create dictionaries to speed up performance when matching originals to replacements
         var replacementFiltersMap = replacementFilters.ToDictionary(f => f.Name, f => f); // automap filters by column name

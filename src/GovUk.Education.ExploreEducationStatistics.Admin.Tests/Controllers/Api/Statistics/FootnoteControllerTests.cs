@@ -123,7 +123,7 @@ public class FootnoteControllerTests
             .Returns(dataSet.Object);
 
         dataSet
-            .Setup(s => s.ListFilters(It.IsAny<CancellationToken>()))
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new List<Filter>
                 {

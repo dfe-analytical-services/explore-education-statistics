@@ -297,7 +297,7 @@ public class FootnoteService : IFootnoteService
 
             if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
             {
-                var filters = await dataSet.ListFilters();
+                var filters = await dataSet.ListFilters(includeItems: true);
 
                 foreach (var filter in filters)
                 {
@@ -337,7 +337,7 @@ public class FootnoteService : IFootnoteService
             }
             else if (unlinkedFilterIds.Count > 0)
             {
-                var filters = await dataSet.ListFiltersExcludingItems();
+                var filters = await dataSet.ListFilters();
 
                 foreach (var filter in filters)
                 {

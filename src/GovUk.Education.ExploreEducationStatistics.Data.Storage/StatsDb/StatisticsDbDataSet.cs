@@ -96,14 +96,19 @@ public class StatisticsDbDataSet(
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default)
+    public async Task<List<Filter>> ListFilters(
+        bool includeItems = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context
-            .Filter.AsNoTracking()
-            .Include(filter => filter.FilterGroups)
-                .ThenInclude(group => group.FilterItems)
-            .Where(filter => filter.SubjectId == SubjectId)
-            .ToListAsync(cancellationToken);
+        var filters = context.Filter.AsNoTracking().Where(filter => filter.SubjectId == SubjectId);
+
+        if (includeItems)
+        {
+            filters = filters.Include(filter => filter.FilterGroups).ThenInclude(group => group.FilterItems);
+        }
+
+        return await filters.ToListAsync(cancellationToken);
     }
 
     public async Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
@@ -137,14 +142,6 @@ public class StatisticsDbDataSet(
             .ToListAsync(cancellationToken);
 
         return pairs.Select(pair => (pair.ParentFilterItemId, pair.ChildFilterItemId)).ToList();
-    }
-
-    public async Task<List<Filter>> ListFiltersExcludingItems(CancellationToken cancellationToken = default)
-    {
-        return await context
-            .Filter.AsNoTracking()
-            .Where(filter => filter.SubjectId == SubjectId)
-            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
@@ -195,6 +192,7 @@ public class StatisticsDbDataSet(
     {
         var locationIdList = locationIds.ToList();
 
+        // NOTE: Could try scoping this to SubjectId for security, but unsure of the performance hit
         return await context
             .Location.AsNoTracking()
             .Where(location => locationIdList.Contains(location.Id))
