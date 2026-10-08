@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -549,7 +550,7 @@ public abstract class StatisticsDbDataSetTests
     public class ListFiltersTests : StatisticsDbDataSetTests
     {
         [Fact]
-        public async Task FiltersForSubject_ReturnedWithFilterGroupsAndFilterItems()
+        public async Task FiltersForSubject_ReturnedWithoutFilterGroups()
         {
             Subject subject = Fixture
                 .DefaultSubject()
@@ -579,18 +580,14 @@ public abstract class StatisticsDbDataSetTests
                     filter =>
                     {
                         Assert.Contains(filter.Id, subject.Filters.Select(f => f.Id));
-                        Assert.Equal(2, filter.FilterGroups.Count);
-                        Assert.All(filter.FilterGroups, fg => Assert.Equal(2, fg.FilterItems.Count));
+                        Assert.Empty(filter.FilterGroups);
                     }
                 );
             }
         }
-    }
 
-    public class ListFiltersExcludingItemsTests : StatisticsDbDataSetTests
-    {
         [Fact]
-        public async Task FiltersForSubject_ReturnedWithoutFilterGroups()
+        public async Task IncludeItems_ReturnedWithFilterGroupsAndFilterItems()
         {
             Subject subject = Fixture
                 .DefaultSubject()
@@ -612,7 +609,7 @@ public abstract class StatisticsDbDataSetTests
             {
                 var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
 
-                var result = await dataSet.ListFiltersExcludingItems();
+                var result = await dataSet.ListFilters(includeItems: true);
 
                 Assert.Equal(2, result.Count);
                 Assert.All(
@@ -620,7 +617,8 @@ public abstract class StatisticsDbDataSetTests
                     filter =>
                     {
                         Assert.Contains(filter.Id, subject.Filters.Select(f => f.Id));
-                        Assert.Empty(filter.FilterGroups);
+                        Assert.Equal(2, filter.FilterGroups.Count);
+                        Assert.All(filter.FilterGroups, fg => Assert.Equal(2, fg.FilterItems.Count));
                     }
                 );
             }
