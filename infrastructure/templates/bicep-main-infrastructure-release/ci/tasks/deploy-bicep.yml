@@ -39,6 +39,9 @@ parameters:
   - name: importerProdAppSettings
     type: string
     default: '{}'
+  - name: publisherProdAppSettings
+    type: string
+    default: '{}'
 
 steps:
   - task: BicepDeploy@0
@@ -64,3 +67,4 @@ steps:
         dataApiStagingSlotAppSettings: ${{ parameters.dataApiStagingSlotAppSettings }}
         publicSiteProdAppSettings: ${{ parameters.publicSiteProdAppSettings }}
         importerProdAppSettings: ${{ parameters.importerProdAppSettings }}
+        publisherProdAppSettings: ${{ parameters.publisherProdAppSettings }}

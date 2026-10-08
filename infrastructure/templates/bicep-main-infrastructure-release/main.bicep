@@ -117,6 +117,10 @@ param publisherConfigParam PublisherConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var publisherConfig = mergePublisherConfig(publisherConfigParam)
 
+@secure()
+@description('The existing appsettings for the Publisher Function App, fetched by the pipeline before deployment.')
+param publisherProdAppSettings object = {}
+
 
 
 //
@@ -166,11 +170,6 @@ var baseAdminAllowedOrigins = [
 ]
 
 var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
-
-// TODO EES-7502 - use standardised hostname for the Content API.
-// Still needed for Publisher's frontDoorCachePurge below, even though Public Site no longer
-// takes it directly (it gets its own copy of this same logic in public-site-appsettings.bicep).
-var contentApiPublicHostname = '${environmentConfig.environmentName! == 'Pre-Production' ? 'cont' : 'content'}.${environmentConfig.domain!}'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
@@ -231,21 +230,12 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publisherConfig.appServiceSku!
-    prepareScheduledReleaseVersionsNowEnabled: publisherConfig.prepareScheduledReleaseVersionsNowEnabled!
-    publishScheduledReleaseVersionsNowEnabled: publisherConfig.publishScheduledReleaseVersionsNowEnabled!
-    functionAppTimeZone: publisherConfig.functionAppTimeZone!
-    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-    adminAppUrl: 'https://admin.${environmentConfig.domain!}'
-    publicAppUrl: 'https://${environmentConfig.domain!}'
-    contentApiHostName: contentApiPublicHostname
-    frontDoorCachePurgeEnabled: publisherConfig.frontDoorCachePurgeEnabled!
-    frontDoorEndpointResourceId: afdEndpointResourceId
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    existingAppSettings: publisherProdAppSettings
     deployAlerts: true
     tagValues: tags
   }
