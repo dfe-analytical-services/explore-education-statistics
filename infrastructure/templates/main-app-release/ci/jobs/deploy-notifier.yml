@@ -3,6 +3,8 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
   - name: dependsOn
     type: object
     default: []
@@ -12,6 +14,10 @@ jobs:
     displayName: Deploy Notifier
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/notifier/notifier-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/notifier/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: NotifierBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
@@ -20,6 +26,32 @@ jobs:
               displayName: Download Notifier artifact
               artifact: notifier
 
+            - task: AzureCLI@2
+              displayName: Notifier - Get new application-specific appsettings to deploy
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+
+                  # A marker unique to this deploy, baked in as the Deploy__DeployedAt
+                  # appsetting below - see wait-for-app-service-restart.yml.
+                  deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
+
+                  az deployment group create \
+                    --name $(bicepConfigDeployName) \
+                    --resource-group $(resourceGroupName) \
+                    --template-file $(templateFile) \
+                    --parameters $(paramFile) \
+                    --parameters deployedAt="$deployedAt"
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                deploymentName: $(bicepConfigDeployName)
+
             - template: ../tasks/deploy-function-app.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
@@ -27,3 +59,6 @@ jobs:
                 appName: $(subscription)-fa-ees-notify
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/notifier/GovUk.Education.ExploreEducationStatistics.Notifier.zip
+                appSettingsJson: $(appSettings)
+                healthCheckPath: /api/health
+                deployedAt: $(deployedAt)
