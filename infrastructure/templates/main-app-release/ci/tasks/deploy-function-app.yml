@@ -12,8 +12,26 @@ parameters:
   - name: healthCheckPath
     type: string
     default: '/'
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+  # A marker unique to this deploy, already baked into appSettingsJson's Deploy__DeployedAt entry
+  # - see deploy-importer.yml. Leave blank (the default) to fall back to a plain endpoint check
+  # with no deploy-identity confirmation, for callers with no deployedAt health check of their own.
+  - name: deployedAt
+    type: string
+    default: ''
 
 steps:
+  - template: ../../../../common/ci/tasks/set-appsettings-from-json.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - updating app settings
+      appType: functionApp
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      appSettingsJson: ${{ parameters.appSettingsJson }}
+
   - task: AzureCLI@2
     displayName: ${{ parameters.displayNamePrefix }} - Deploy
     retryCountOnTaskFailure: 3
@@ -28,9 +46,21 @@ steps:
           --resource-group ${{ parameters.resourceGroupName }} \
           --src "${{ parameters.artifactZipPath }}"
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
-    parameters:
-      serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
-      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
-      maxAttempts: 20
+  - ${{ if ne(parameters.deployedAt, '') }}:
+      - template: ../../../../common/ci/tasks/wait-for-app-service-restart.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          displayName: ${{ parameters.displayNamePrefix }} - confirming app has restarted and is healthy
+          appName: ${{ parameters.appName }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          healthCheckPath: ${{ parameters.healthCheckPath }}
+          deployedAt: ${{ parameters.deployedAt }}
+          pollingDelaySeconds: 1
+          maxAttempts: 60
+  - ${{ else }}:
+      - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
+          endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+          maxAttempts: 20

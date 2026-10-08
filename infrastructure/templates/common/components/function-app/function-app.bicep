@@ -79,6 +79,16 @@ param appSettings {
   value: string
 }[]
 
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that a code deploy
+pipeline has since applied back to the bootstrap values passed in via "appSettings" above. See
+"applicationAppSettings"/"existingProdAppSettings" in app-service.bicep for the App Service
+equivalent of this pattern (Function Apps have no deployment slot, so there's only one to track).
+''')
+param existingAppSettings object = {}
+
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string
 
@@ -255,6 +265,69 @@ module fileShareModule '../../components/storage/fileShare.bicep' = {
   }
 }
 
+var infraAppSettings = [
+  {
+    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+    value: applicationInsightsConnectionString
+  }
+  // Use managed identity to access the storage account rather than key based access with a connection string
+  {
+    name: 'AzureWebJobsStorage__accountName'
+    value: storageAccountModule.outputs.storageAccountName
+  }
+  {
+    name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+    value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName)
+  }
+  {
+    name: 'WEBSITE_CONTENTSHARE'
+    value: fileShareModule.outputs.fileShareName
+  }
+  {
+    name: 'FUNCTIONS_EXTENSION_VERSION'
+    value: '~4'
+  }
+  {
+    name: 'FUNCTIONS_WORKER_RUNTIME'
+    value: functionAppRuntime
+  }
+  {
+    name: 'WEBSITE_RUN_FROM_PACKAGE'
+    value: '1'
+  }
+  // Prevent the function app from building when performing deployment of an already-built site
+  {
+    name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+    value: 'false'
+  }
+  // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
+  // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
+  // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
+  // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+  {
+    name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+    value: '1'
+  }
+  // Enable the Function App to access file shares over the VNet if
+  // file shares are available for this Function App.
+  {
+    name: 'WEBSITE_CONTENTOVERVNET'
+    value: length(azureFileShares ?? []) > 0 ? '1' : null
+  }
+]
+
+// Flatten the array-based infra/application appsettings into object form so they can be merged
+// key-by-key with existingAppSettings, applied below via a separate "config/appsettings" child
+// resource (which takes a flat object directly) rather than inline on the site resource itself -
+// see "appSettings" in app-service.bicep for the identical App Service pattern, including why
+// existingAppSettings has to win on any key collision.
+var baseAppSettingsObject = reduce(
+  union(infraAppSettings, appSettings),
+  {},
+  (cur, next) => union(cur, { '${next.name}': next.value })
+)
+var combinedAppSettingsObject = union(baseAppSettingsObject, existingAppSettings)
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -273,56 +346,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       alwaysOn: alwaysOn
       vnetRouteAllEnabled: vnetRouteAllEnabled
       connectionStrings: connectionStrings
-      appSettings: union([
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: applicationInsightsConnectionString
-        }
-        // Use managed identity to access the storage account rather than key based access with a connection string
-        {
-          name: 'AzureWebJobsStorage__accountName'
-          value: storageAccountModule.outputs.storageAccountName
-        }
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName)
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: fileShareModule.outputs.fileShareName
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: functionAppRuntime
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-        // Prevent the function app from building when performing deployment of an already-built site
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
-        }
-        // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
-        // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
-        // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
-        // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
-        {
-          name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-          value: '1'
-        }
-        // Enable the Function App to access file shares over the VNet if
-        // file shares are available for this Function App. 
-        {
-          name: 'WEBSITE_CONTENTOVERVNET'
-          value: length(azureFileShares ?? []) > 0 ? '1' : null
-        }
-      ], appSettings)
       cors: {
         allowedOrigins: union(['https://portal.azure.com'], allowedOrigins)
         supportCredentials: false
@@ -351,6 +374,12 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
   }
   tags: tagValues
+}
+
+resource functionAppSettings 'Microsoft.Web/sites/config@2025-03-01' = {
+  parent: functionApp
+  name: 'appsettings'
+  properties: combinedAppSettingsObject
 }
 
 module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site.bicep' = {
