@@ -93,6 +93,10 @@ param importerConfigParam ImporterConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var importerConfig = mergeImporterConfig(importerConfigParam)
 
+@secure()
+@description('The existing appsettings for the Importer Function App, fetched by the pipeline before deployment.')
+param importerProdAppSettings object = {}
+
 
 
 //
@@ -199,6 +203,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
+    existingAppSettings: importerProdAppSettings
     tagValues: tags
   }
 }

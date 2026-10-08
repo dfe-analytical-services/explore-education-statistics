@@ -56,6 +56,18 @@ jobs:
                   - appName: $(subscription)-as-ees-public-site
                     prodVariableName: publicSiteProdAppSettings
 
+            # Importer is a Function App rather than an App Service, so it needs its own call
+            # with appType: functionApp - the task only supports one appType per invocation.
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
+              parameters:
+                displayName: Get existing app settings for the Importer Function App
+                appType: functionApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                apps:
+                  - appName: $(subscription)-fa-ees-importer
+                    prodVariableName: importerProdAppSettings
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Deploy Bicep template
@@ -71,3 +83,4 @@ jobs:
                 dataApiProdAppSettings: $(dataApiProdAppSettings)
                 dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
                 publicSiteProdAppSettings: $(publicSiteProdAppSettings)
+                importerProdAppSettings: $(importerProdAppSettings)
