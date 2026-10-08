@@ -86,7 +86,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
+        dataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Filter>());
 
         dataSet
             .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
@@ -172,7 +174,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
+        dataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Filter>());
 
         dataSet
             .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
@@ -303,7 +307,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
+        dataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Filter>());
 
         dataSet
             .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
@@ -481,7 +487,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(s => s.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Filter>());
+        dataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Filter>());
 
         dataSet
             .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
@@ -1067,7 +1075,9 @@ public class SubjectMetaServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1211,7 +1221,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1314,7 +1326,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1416,7 +1430,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1526,7 +1542,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1629,7 +1647,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1727,7 +1747,9 @@ public class SubjectMetaServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(filters);
+        dataSet
+            .Setup(mock => mock.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(filters);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

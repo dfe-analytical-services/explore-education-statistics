@@ -1,6 +1,7 @@
 #nullable enable
 using System.Runtime.CompilerServices;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -94,22 +95,19 @@ public class StatisticsDbDataSet(
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default)
+    public async Task<List<Filter>> ListFilters(
+        bool includeItems = false,
+        CancellationToken cancellationToken = default
+    )
     {
-        return await context
-            .Filter.AsNoTracking()
-            .Include(filter => filter.FilterGroups)
-                .ThenInclude(group => group.FilterItems)
-            .Where(filter => filter.SubjectId == SubjectId)
-            .ToListAsync(cancellationToken);
-    }
+        var filters = context.Filter.AsNoTracking().Where(filter => filter.SubjectId == SubjectId);
 
-    public async Task<List<Filter>> ListFiltersExcludingItems(CancellationToken cancellationToken = default)
-    {
-        return await context
-            .Filter.AsNoTracking()
-            .Where(filter => filter.SubjectId == SubjectId)
-            .ToListAsync(cancellationToken);
+        if (includeItems)
+        {
+            filters = filters.Include(filter => filter.FilterGroups).ThenInclude(group => group.FilterItems);
+        }
+
+        return await filters.ToListAsync(cancellationToken);
     }
 
     public async Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
@@ -160,6 +158,7 @@ public class StatisticsDbDataSet(
     {
         var locationIdList = locationIds.ToList();
 
+        // NOTE: Could try scoping this to SubjectId for security, but unsure of the performance hit
         return await context
             .Location.AsNoTracking()
             .Where(location => locationIdList.Contains(location.Id))
