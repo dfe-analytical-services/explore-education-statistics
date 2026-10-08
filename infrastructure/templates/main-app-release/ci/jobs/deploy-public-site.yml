@@ -3,6 +3,8 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
   - name: dependsOn
     type: object
     default: []
@@ -12,12 +14,54 @@ jobs:
     displayName: Deploy Public Site
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/public-site/public-site-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/public-site/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: PublicSiteBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
           steps:
             # No artifact download needed - the Public Site's build output is a Docker image,
             # already pushed to the container registry by the build pipeline.
+            - download: none
+
+            - task: AzureCLI@2
+              displayName: Public Site - Get new application-specific appsettings to deploy
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+
+                  # A marker unique to this deploy, baked in as the DEPLOYED_AT
+                  # appsetting below - see wait-for-app-service-restart.yml.
+                  deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
+
+                  az deployment group create \
+                    --name $(bicepConfigDeployName) \
+                    --resource-group $(resourceGroupName) \
+                    --template-file $(templateFile) \
+                    --parameters $(paramFile) \
+                    --parameters deployedAt="$deployedAt"
+
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                deploymentName: $(bicepConfigDeployName)
+
+            - template: ../../../../common/ci/tasks/set-appsettings-from-json.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Public Site - updating app settings
+                appName: $(subscription)-as-ees-public-site
+                resourceGroupName: $(resourceGroupName)
+                appSettingsJson: $(appSettings)
+
+            # Applying the new appsettings above and then updating the container image here means
+            # the restart below picks up both together, rather than risking two restarts in a row.
             - task: AzureCLI@2
               displayName: Public Site - Update container image
               inputs:
@@ -44,15 +88,15 @@ jobs:
                     --name $(subscription)-as-ees-public-site \
                     --resource-group $(resourceGroupName)
 
-                  # TODO EES-7734 - provide deployedAt health check enhancement to this
-                  # app deploy to ensure we're receiving successful health checks from
-                  # correct version of this app.  In the meantime, sleep to give the
-                  # restart a chance to begin.
-                  sleep 30  
-
-            - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+            # Confirm the app has actually restarted by waiting for it to report back this
+            # deploy's marker. A successful response here also signifies that the app is healthy.
+            - template: ../../../../common/ci/tasks/wait-for-app-service-restart.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                displayName: Public Site - Checking app is healthy after deploy
-                endpoint: https://$(subscription)-as-ees-public-site.azurewebsites.net/health
-                maxAttempts: 20
+                displayName: Public Site - confirming production has restarted and is healthy
+                appName: $(subscription)-as-ees-public-site
+                resourceGroupName: $(resourceGroupName)
+                healthCheckPath: /health
+                deployedAt: $(deployedAt)
+                pollingDelaySeconds: 1
+                maxAttempts: 60
