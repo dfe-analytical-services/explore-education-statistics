@@ -144,7 +144,10 @@ public class ReplacementPlanService(
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
 
-                var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
+                var replacementFilters = await replacementDataSet.ListFilters(
+                    includeItems: true,
+                    cancellationToken: cancellationToken
+                );
                 var replacementIndicators = await replacementDataSet.ListIndicators(cancellationToken);
                 var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
 

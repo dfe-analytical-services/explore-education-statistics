@@ -164,7 +164,7 @@ public class FootnoteController : ControllerBase
 
     private static async Task<Dictionary<Guid, FootnotesFilterMetaViewModel>> GetFilters(IStorageDataSet dataSet)
     {
-        return (await dataSet.ListFilters()).ToDictionary(
+        return (await dataSet.ListFilters(includeItems: true)).ToDictionary(
             filter => filter.Id,
             filter => new FootnotesFilterMetaViewModel
             {

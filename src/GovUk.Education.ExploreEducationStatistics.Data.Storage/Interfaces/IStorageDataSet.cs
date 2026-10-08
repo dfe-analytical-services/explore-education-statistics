@@ -48,9 +48,10 @@ public interface IStorageDataSet
     );
 
     /// <summary>
-    /// All filters for the data set, with their FilterGroups and FilterItems.
+    /// All filters for the data set. Their FilterGroups and FilterItems are only populated when
+    /// <paramref name="includeItems" /> is true, as filter items can be numerous.
     /// </summary>
-    Task<List<Filter>> ListFilters(CancellationToken cancellationToken = default);
+    Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
@@ -61,12 +62,6 @@ public interface IStorageDataSet
         Guid childFilterId,
         CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// All filters for the data set without their FilterGroups and FilterItems. Prefer this over
-    /// <see cref="ListFilters" /> when only the filters themselves are needed, as filter items can be numerous.
-    /// </summary>
-    Task<List<Filter>> ListFiltersExcludingItems(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// All indicators for the data set.
@@ -90,10 +85,8 @@ public interface IStorageDataSet
     Task<List<Location>> ListLocations(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Locations by id. Unknown ids are ignored.
-    ///
-    /// This is not restricted to the data set: locations are shared and immutable, and a permalink may reference
-    /// locations that are no longer linked to any data set.
+    /// Locations by id. Unknown ids are ignored. This is not necessarily restricted to those referenced by the data
+    /// set's observations.
     /// </summary>
     Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken = default);
 
@@ -111,6 +104,7 @@ public interface IStorageDataSet
 
     /// <summary>
     /// As <see cref="ListTimePeriods(CancellationToken)" />, but only over the observations at the given locations.
+    /// Location ids not referenced by the data set's observations are ignored.
     /// </summary>
     Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
         IEnumerable<Guid> locationIds,
