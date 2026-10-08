@@ -53,6 +53,8 @@ jobs:
                   - appName: $(subscription)-as-ees-data
                     stagingVariableName: dataApiStagingSlotAppSettings
                     prodVariableName: dataApiProdAppSettings
+                  - appName: $(subscription)-as-ees-public-site
+                    prodVariableName: publicSiteProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -68,3 +70,4 @@ jobs:
                 contentApiStagingSlotAppSettings: $(contentApiStagingSlotAppSettings)
                 dataApiProdAppSettings: $(dataApiProdAppSettings)
                 dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
+                publicSiteProdAppSettings: $(publicSiteProdAppSettings)
