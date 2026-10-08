@@ -569,18 +569,20 @@ public class FootnoteServiceTests
         );
 
         var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
         dataSet.Setup(ds => ds.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(indicatorGroup));
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
         storageDataSetResolver
-            .Setup(r => r.TryResolve(subject1.Id, It.IsAny<CancellationToken>()))
+            .Setup(r => r.Resolve(subject1.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet.Object);
+
+        // NOTE: subject2 shouldn't be resolved
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
-            // NOTE: subject2 shouldn't be resolved
-
             contextId,
             filterIds: SetOf(filter.Id),
             filterGroupIds: SetOf(filterGroup.Id),
@@ -595,58 +597,7 @@ public class FootnoteServiceTests
     }
 
     [Fact]
-    public async Task CreateFootnote_SubjectWithoutDataFile_IsSkipped()
-    {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
-        var filter = _fixture.DefaultFilter().Generate();
-        var subjectWithoutDataFile = _fixture.DefaultSubject().Generate();
-        var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubjectWithoutDataFile = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subjectWithoutDataFile)
-            .Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subjectWithoutDataFile, subject),
-            releaseSubjects: ListOf(releaseSubjectWithoutDataFile, releaseSubject)
-        );
-
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFiltersExcludingItems(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
-
-        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
-        storageDataSetResolver
-            .Setup(r => r.TryResolve(subjectWithoutDataFile.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((IStorageDataSet?)null);
-        storageDataSetResolver
-            .Setup(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(dataSet.Object);
-
-        var result = await CreateFootnoteWithConfiguration(
-            releaseVersion.Id,
-            contextId,
-            filterIds: SetOf(filter.Id),
-            storageDataSetResolver: storageDataSetResolver.Object
-        );
-
-        VerifyAllMocks(dataSet);
-        storageDataSetResolver.Verify(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()), Times.Once);
-
-        result.AssertRight();
-    }
-
-    [Fact]
-    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersExcludingItemsOnly()
+    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersWithoutItems()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
         var filter = _fixture.DefaultFilter().Generate();
@@ -667,11 +618,13 @@ public class FootnoteServiceTests
         );
 
         var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFiltersExcludingItems(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
         storageDataSetResolver
-            .Setup(r => r.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .Setup(r => r.Resolve(subject.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet.Object);
 
         var result = await CreateFootnoteWithConfiguration(
