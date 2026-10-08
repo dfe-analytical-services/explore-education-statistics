@@ -561,7 +561,9 @@ public class FootnoteServiceTests
         );
 
         var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFilters(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
         dataSet.Setup(ds => ds.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(indicatorGroup));
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
@@ -587,7 +589,7 @@ public class FootnoteServiceTests
     }
 
     [Fact]
-    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersExcludingItemsOnly()
+    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersWithoutItems()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
         var filter = _fixture.DefaultFilter().Generate();
@@ -608,7 +610,9 @@ public class FootnoteServiceTests
         );
 
         var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(ds => ds.ListFiltersExcludingItems(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(filter));
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
         storageDataSetResolver

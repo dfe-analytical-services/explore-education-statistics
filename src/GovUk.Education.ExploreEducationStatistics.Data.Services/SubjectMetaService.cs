@@ -234,7 +234,7 @@ public class SubjectMetaService(
         List<FilterSequenceEntry>? filterSequence
     )
     {
-        var filters = await dataSet.ListFilters();
+        var filters = await dataSet.ListFilters(includeItems: true);
         return FiltersMetaViewModelBuilder.BuildFilters(filters, filterSequence);
     }
 
@@ -306,7 +306,7 @@ public class SubjectMetaService(
         List<FilterUpdateViewModel> requestFilters
     )
     {
-        var filters = await dataSet.ListFilters();
+        var filters = await dataSet.ListFilters(includeItems: true);
         return AssertCollectionsAreSameIgnoringOrder(
                 filters,
                 requestFilters,

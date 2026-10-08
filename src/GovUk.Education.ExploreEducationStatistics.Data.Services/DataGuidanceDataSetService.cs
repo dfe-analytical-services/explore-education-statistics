@@ -84,7 +84,7 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
         CancellationToken cancellationToken = default
     )
     {
-        var filters = (await dataSet.ListFiltersExcludingItems(cancellationToken)).Select(filter => new LabelValue(
+        var filters = (await dataSet.ListFilters(cancellationToken: cancellationToken)).Select(filter => new LabelValue(
             string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
             filter.Name
         ));

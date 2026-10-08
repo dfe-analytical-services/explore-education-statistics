@@ -551,7 +551,7 @@ public abstract class StatisticsDbDataSetTests
     public class ListFiltersTests : StatisticsDbDataSetTests
     {
         [Fact]
-        public async Task FiltersForSubject_ReturnedWithFilterGroupsAndFilterItems()
+        public async Task FiltersForSubject_ReturnedWithoutFilterGroups()
         {
             Subject subject = Fixture
                 .DefaultSubject()
@@ -574,6 +574,43 @@ public abstract class StatisticsDbDataSetTests
                 var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
 
                 var result = await dataSet.ListFilters();
+
+                Assert.Equal(2, result.Count);
+                Assert.All(
+                    result,
+                    filter =>
+                    {
+                        Assert.Contains(filter.Id, subject.Filters.Select(f => f.Id));
+                        Assert.Empty(filter.FilterGroups);
+                    }
+                );
+            }
+        }
+
+        [Fact]
+        public async Task IncludeItems_ReturnedWithFilterGroupsAndFilterItems()
+        {
+            Subject subject = Fixture
+                .DefaultSubject()
+                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 2, filterItemCount: 2).Generate(2));
+
+            Subject otherSubject = Fixture
+                .DefaultSubject()
+                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1));
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Subject.AddRange(subject, otherSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
+
+                var result = await dataSet.ListFilters(includeItems: true);
 
                 Assert.Equal(2, result.Count);
                 Assert.All(
@@ -680,46 +717,6 @@ public abstract class StatisticsDbDataSetTests
                 );
 
                 Assert.Empty(result);
-            }
-        }
-    }
-
-    public class ListFiltersExcludingItemsTests : StatisticsDbDataSetTests
-    {
-        [Fact]
-        public async Task FiltersForSubject_ReturnedWithoutFilterGroups()
-        {
-            Subject subject = Fixture
-                .DefaultSubject()
-                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 2, filterItemCount: 2).Generate(2));
-
-            Subject otherSubject = Fixture
-                .DefaultSubject()
-                .WithFilters(Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1));
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                statisticsDbContext.Subject.AddRange(subject, otherSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
-
-                var result = await dataSet.ListFiltersExcludingItems();
-
-                Assert.Equal(2, result.Count);
-                Assert.All(
-                    result,
-                    filter =>
-                    {
-                        Assert.Contains(filter.Id, subject.Filters.Select(f => f.Id));
-                        Assert.Empty(filter.FilterGroups);
-                    }
-                );
             }
         }
     }

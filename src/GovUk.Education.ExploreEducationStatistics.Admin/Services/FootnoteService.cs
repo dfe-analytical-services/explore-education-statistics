@@ -380,7 +380,7 @@ public class FootnoteService : IFootnoteService
 
             if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
             {
-                var filters = await dataSet.ListFilters();
+                var filters = await dataSet.ListFilters(includeItems: true);
                 var filterGroups = filters.SelectMany(f => f.FilterGroups).ToList();
 
                 unlinkedFilterIds.ExceptWith(filters.Select(f => f.Id));
@@ -389,7 +389,7 @@ public class FootnoteService : IFootnoteService
             }
             else if (unlinkedFilterIds.Count > 0)
             {
-                var filters = await dataSet.ListFiltersExcludingItems();
+                var filters = await dataSet.ListFilters();
 
                 unlinkedFilterIds.ExceptWith(filters.Select(f => f.Id));
             }
