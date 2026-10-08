@@ -47,7 +47,10 @@ public class DataSetMappingService(
                 var (mapping, replacementReleaseFile) = validated;
 
                 var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
-                var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
+                var replacementFilters = await replacementDataSet.ListFilters(
+                    includeItems: true,
+                    cancellationToken: cancellationToken
+                );
 
                 // Filters
                 var updatedFilterMappings = request
