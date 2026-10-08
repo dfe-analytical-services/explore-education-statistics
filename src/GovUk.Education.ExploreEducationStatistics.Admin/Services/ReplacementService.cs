@@ -739,7 +739,10 @@ public class ReplacementService(
             return null;
         }
 
-        var replacementFilters = await replacementDataSet.ListFilters(cancellationToken);
+        var replacementFilters = await replacementDataSet.ListFilters(
+            includeItems: true,
+            cancellationToken: cancellationToken
+        );
 
         return ReplacementServiceHelper.ReplaceFilterSequence(
             originalSequence: originalReleaseFile.FilterSequence,
