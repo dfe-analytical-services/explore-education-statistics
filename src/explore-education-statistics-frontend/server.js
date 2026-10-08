@@ -80,7 +80,12 @@ async function startServer() {
 
   server.get('/health', (req, res) => {
     res.set('Cache-Control', 'public, max-age=0, s-maxage=30');
-    return res.status(200).send('OK');
+    // deployedAt lets the deploy pipeline confirm that the instance answering health checks
+    // is a newly-deployed one rather than a pre-existing one still shutting down - see
+    // wait-for-app-service-restart.yml and DEPLOYED_AT in public-site-appsettings.bicep.
+    return res
+      .status(200)
+      .json({ status: 'OK', deployedAt: process.env.DEPLOYED_AT });
   });
 
   function replaceLastOccurrence(input, pattern, replacement) {
