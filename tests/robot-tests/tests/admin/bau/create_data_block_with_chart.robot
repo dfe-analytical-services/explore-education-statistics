@@ -484,7 +484,7 @@ Configure line chart data sets
     user checks chart inline legend item contains    id:chartBuilderPreview
     ...    Admission Numbers(Nailsea Youngwood)
 
-    user clicks link    Legend
+    user clicks link    Legend and styling
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
 
     user clicks element    id:chartBuilderPreview
@@ -613,8 +613,8 @@ Configure basic vertical bar chart
     user configures basic chart    Vertical bar    500
 
 Change vertical bar chart legend
-    user clicks link    Legend
-    user waits until h3 is visible    Legend    %{WAIT_SMALL}
+    user clicks link    Legend and styling
+    user waits until h3 is visible    Legend and styling    %{WAIT_SMALL}
 
     user counts legend form item rows    1
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label
@@ -800,8 +800,8 @@ Configure basic geographic chart
     user clicks button    Add data set
 
 Change geographic chart legend
-    user clicks link    Legend
-    user waits until h3 is visible    Legend    %{WAIT_MEDIUM}
+    user clicks link    Legend and styling
+    user waits until h3 is visible    Legend and styling    %{WAIT_MEDIUM}
 
     user counts legend form item rows    5
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Admission Numbers (2014)
@@ -1048,8 +1048,8 @@ Validate geographic chart data groupings tab
     user checks table cell contains    2    2    5 equal intervals    testid:chart-data-groupings
 
 Validate geographic chart legend tab
-    user clicks link    Legend
-    user waits until h3 is visible    Legend
+    user clicks link    Legend and styling
+    user waits until h3 is visible    Legend and styling
 
     user counts legend form item rows    2
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Indicator one (2024/25)
