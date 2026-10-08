@@ -8,6 +8,12 @@ parameters:
     type: string
   - name: resourceGroupName
     type: string
+  - name: appType
+    type: string
+    default: webApp
+    values:
+      - functionApp
+      - webApp
   # A JSON object ({"SettingName": "value", ...}) of application-specific appsettings to apply.
   # Defaults to making no changes, relying on whatever the app/slot already has.
   - name: appSettingsJson
@@ -29,6 +35,12 @@ steps:
       inlineScript: |
         set -e
 
+        if [ "${{ parameters.appType }}" == "webApp" ]; then
+          cliCommand=webapp
+        else
+          cliCommand=functionapp
+        fi
+
         # Generate key-value pairs from the appsettings JSON.
         parsedSettings=$(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"') || {
           echo "##vso[task.logissue type=error]Failed to parse appSettingsJson as JSON - see the jq error above. This most likely means the value was truncated or malformed somewhere upstream, not that it's genuinely empty."
@@ -49,7 +61,7 @@ steps:
 
         # If there are appsettings to deploy, deploy them now.
         if [ ${#settingsArgs[@]} -gt 0 ]; then
-          az webapp config appsettings set \
+          az $cliCommand config appsettings set \
             --name ${{ parameters.appName }} \
             --resource-group ${{ parameters.resourceGroupName }} \
             "${slotArgs[@]}" \
