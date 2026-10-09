@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
@@ -17,15 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions;
 public class HealthCheckFunction(IConfiguration configuration)
 {
     [Function("Health")]
-    public HttpResponseData Run(
+    public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "health")] HttpRequestData req
     )
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json");
-        response.WriteString(
-            JsonSerializer.Serialize(new { status = "Healthy", deployedAt = configuration["Deploy:DeployedAt"] })
-        );
+        await response.WriteAsJsonAsync(new { status = "Healthy", deployedAt = configuration["Deploy:DeployedAt"] });
         return response;
     }
 }
