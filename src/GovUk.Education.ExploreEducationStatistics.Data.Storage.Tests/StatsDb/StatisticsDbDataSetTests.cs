@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -55,7 +56,9 @@ public abstract class StatisticsDbDataSetTests
                 .WithTimePeriod(2021, AcademicYear)
                 .GenerateList(2);
 
-            var query = new FullTableQuery { SubjectId = subject.Id };
+            List<Guid> filterItemIds = [Guid.NewGuid()];
+            List<Guid> locationIds = [location.Id];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -74,7 +77,7 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(query, default))
+                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -83,7 +86,7 @@ public abstract class StatisticsDbDataSetTests
                     observationService: observationService.Object
                 );
 
-                var result = await dataSet.ListObservations(query);
+                var result = await dataSet.ListObservations(filterItemIds, locationIds, timePeriod);
 
                 VerifyAllMocks(observationService);
 
@@ -99,18 +102,6 @@ public abstract class StatisticsDbDataSetTests
                 );
             }
         }
-
-        [Fact]
-        public async Task QuerySubjectIdDoesNotMatch_ThrowsArgumentException()
-        {
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-
-            var dataSet = BuildDataSet(statisticsDbContext, subjectId: Guid.NewGuid());
-
-            var query = new FullTableQuery { SubjectId = Guid.NewGuid() };
-
-            await Assert.ThrowsAsync<ArgumentException>(() => dataSet.ListObservations(query));
-        }
     }
 
     public class ListObservationBatchesTests : StatisticsDbDataSetTests
@@ -125,7 +116,9 @@ public abstract class StatisticsDbDataSetTests
 
             var observations = Fixture.DefaultObservation().WithSubject(subject).WithLocation(location).GenerateList(5);
 
-            var query = new FullTableQuery { SubjectId = subject.Id };
+            List<Guid> filterItemIds = [Guid.NewGuid()];
+            List<Guid> locationIds = [location.Id];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -143,7 +136,7 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(query, default))
+                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -154,7 +147,9 @@ public abstract class StatisticsDbDataSetTests
 
                 var batches = new List<IReadOnlyList<Observation>>();
 
-                await foreach (var batch in dataSet.ListObservationBatches(query, batchSize: 2))
+                await foreach (
+                    var batch in dataSet.ListObservationBatches(filterItemIds, locationIds, timePeriod, batchSize: 2)
+                )
                 {
                     batches.Add(batch);
                 }
@@ -181,7 +176,9 @@ public abstract class StatisticsDbDataSetTests
 
             var observations = Fixture.DefaultObservation().WithSubject(subject).WithLocation(location).GenerateList(2);
 
-            var query = new FullTableQuery { SubjectId = subject.Id };
+            List<Guid> filterItemIds = [Guid.NewGuid()];
+            List<Guid> locationIds = [location.Id];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -196,7 +193,7 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(query, default))
+                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -207,7 +204,9 @@ public abstract class StatisticsDbDataSetTests
 
                 var batches = new List<IReadOnlyList<Observation>>();
 
-                await foreach (var batch in dataSet.ListObservationBatches(query, batchSize: 2))
+                await foreach (
+                    var batch in dataSet.ListObservationBatches(filterItemIds, locationIds, timePeriod, batchSize: 2)
+                )
                 {
                     batches.Add(batch);
                 }
@@ -240,7 +239,8 @@ public abstract class StatisticsDbDataSetTests
             // Fill the #MatchedObservation temp table with matches for every Observation for the Subject.
             var matchedObservationIds = allObservationsForSubject.Select(o => new MatchedObservation(o.Id)).ToList();
 
-            var query = new FullTableQuery { SubjectId = subjectId };
+            List<Guid> locationIds = [Guid.NewGuid()];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -261,7 +261,15 @@ public abstract class StatisticsDbDataSetTests
             var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, default))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        subjectId,
+                        ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
+                        locationIds,
+                        timePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(Mock.Of<ITempTableReference>());
 
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
@@ -279,7 +287,7 @@ public abstract class StatisticsDbDataSetTests
                 denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
             );
 
-            var result = await dataSet.ListFilterItemsForQuery(query);
+            var result = await dataSet.ListFilterItemsForQuery(locationIds, timePeriod);
 
             VerifyAllMocks(observationService, allObservationsStrategy);
 
@@ -313,7 +321,8 @@ public abstract class StatisticsDbDataSetTests
                 .Select(o => new MatchedObservation(o.Id))
                 .ToList();
 
-            var query = new FullTableQuery { SubjectId = subjectId };
+            List<Guid> locationIds = [Guid.NewGuid()];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -335,7 +344,15 @@ public abstract class StatisticsDbDataSetTests
             var matchedObservationTempTable = Mock.Of<ITempTableReference>();
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, default))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        subjectId,
+                        ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
+                        locationIds,
+                        timePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationTempTable);
 
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
@@ -353,7 +370,7 @@ public abstract class StatisticsDbDataSetTests
                 denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
             );
 
-            var result = await dataSet.ListFilterItemsForQuery(query);
+            var result = await dataSet.ListFilterItemsForQuery(locationIds, timePeriod);
 
             VerifyAllMocks(observationService, denseObservationsStrategy);
 
@@ -387,7 +404,8 @@ public abstract class StatisticsDbDataSetTests
                 .Select(o => new MatchedObservation(o.Id))
                 .ToList();
 
-            var query = new FullTableQuery { SubjectId = subjectId };
+            List<Guid> locationIds = [Guid.NewGuid()];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -409,7 +427,15 @@ public abstract class StatisticsDbDataSetTests
             var matchedObservationTempTable = Mock.Of<ITempTableReference>();
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, default))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        subjectId,
+                        ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
+                        locationIds,
+                        timePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationTempTable);
 
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
@@ -427,7 +453,7 @@ public abstract class StatisticsDbDataSetTests
                 denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
             );
 
-            var result = await dataSet.ListFilterItemsForQuery(query);
+            var result = await dataSet.ListFilterItemsForQuery(locationIds, timePeriod);
 
             VerifyAllMocks(observationService, sparseObservationsStrategy);
 
@@ -445,7 +471,8 @@ public abstract class StatisticsDbDataSetTests
                 .WithSubject(new Subject { Id = subjectId })
                 .GenerateList(100);
 
-            var query = new FullTableQuery { SubjectId = subjectId };
+            List<Guid> locationIds = [Guid.NewGuid()];
+            var timePeriod = new TimePeriodQuery();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -464,7 +491,15 @@ public abstract class StatisticsDbDataSetTests
             var denseObservationsStrategy = new Mock<IDenseObservationsMatchedFilterItemsStrategy>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, default))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        subjectId,
+                        ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
+                        locationIds,
+                        timePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(Mock.Of<ITempTableReference>());
 
             var dataSet = BuildDataSet(
@@ -476,23 +511,11 @@ public abstract class StatisticsDbDataSetTests
                 denseObservationsMatchedFilterItemsStrategy: denseObservationsStrategy.Object
             );
 
-            var result = await dataSet.ListFilterItemsForQuery(query);
+            var result = await dataSet.ListFilterItemsForQuery(locationIds, timePeriod);
 
             VerifyAllMocks(observationService);
 
             Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task QuerySubjectIdDoesNotMatch_ThrowsArgumentException()
-        {
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-
-            var dataSet = BuildDataSet(statisticsDbContext, subjectId: Guid.NewGuid());
-
-            var query = new FullTableQuery { SubjectId = Guid.NewGuid() };
-
-            await Assert.ThrowsAsync<ArgumentException>(() => dataSet.ListFilterItemsForQuery(query));
         }
     }
 

@@ -30,21 +30,35 @@ public class StatisticsDbDataSet(
     public Guid SubjectId { get; } = subjectId;
 
     public async Task<List<Observation>> ListObservations(
-        FullTableQuery query,
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         CancellationToken cancellationToken = default
     )
     {
-        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
+        var observationsQuery = await BuildMatchedObservationsQuery(
+            filterItemIds,
+            locationIds,
+            timePeriod,
+            cancellationToken
+        );
         return await observationsQuery.ToListAsync(cancellationToken);
     }
 
     public async IAsyncEnumerable<IReadOnlyList<Observation>> ListObservationBatches(
-        FullTableQuery query,
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         int batchSize,
         [EnumeratorCancellation] CancellationToken cancellationToken = default
     )
     {
-        var observationsQuery = await BuildMatchedObservationsQuery(query, cancellationToken);
+        var observationsQuery = await BuildMatchedObservationsQuery(
+            filterItemIds,
+            locationIds,
+            timePeriod,
+            cancellationToken
+        );
 
         var batch = new List<Observation>(batchSize);
 
@@ -66,15 +80,17 @@ public class StatisticsDbDataSet(
     }
 
     public async Task<List<FilterItem>> ListFilterItemsForQuery(
-        FullTableQuery query,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         CancellationToken cancellationToken = default
     )
     {
-        ValidateQuery(query);
-
         var matchedObservationsTableReference = await observationService.GetMatchedObservations(
-            query,
-            cancellationToken
+            subjectId: SubjectId,
+            filterItemIds: [],
+            locationIds: locationIds,
+            timePeriod: timePeriod,
+            cancellationToken: cancellationToken
         );
 
         return await ListFilterItemsFromMatchedObservations(matchedObservationsTableReference, cancellationToken);
@@ -192,7 +208,6 @@ public class StatisticsDbDataSet(
     {
         var locationIdList = locationIds.ToList();
 
-        // NOTE: Could try scoping this to SubjectId for security, but unsure of the performance hit
         return await context
             .Location.AsNoTracking()
             .Where(location => locationIdList.Contains(location.Id))
@@ -233,18 +248,24 @@ public class StatisticsDbDataSet(
     }
 
     /// <summary>
-    /// Populates the #MatchedObservation temporary table with the ids of the observations matching the query and
-    /// returns a queryable over the corresponding observations. The query is not executed here, allowing callers
-    /// to either materialise it in full or stream it.
+    /// Populates the #MatchedObservation temporary table with the ids of the matching observations and returns a
+    /// queryable over the corresponding observations. The query is not executed here, allowing callers to either
+    /// materialise it in full or stream it.
     /// </summary>
     private async Task<IQueryable<Observation>> BuildMatchedObservationsQuery(
-        FullTableQuery query,
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         CancellationToken cancellationToken
     )
     {
-        ValidateQuery(query);
-
-        await observationService.GetMatchedObservations(query, cancellationToken);
+        await observationService.GetMatchedObservations(
+            subjectId: SubjectId,
+            filterItemIds: filterItemIds,
+            locationIds: locationIds,
+            timePeriod: timePeriod,
+            cancellationToken: cancellationToken
+        );
 
         var matchedObservationIds = context.MatchedObservations.Select(o => o.Id);
 
@@ -340,16 +361,5 @@ public class StatisticsDbDataSet(
             );
 
         return [.. sparseFilterItems];
-    }
-
-    private void ValidateQuery(FullTableQuery query)
-    {
-        if (query.SubjectId != SubjectId)
-        {
-            throw new ArgumentException(
-                $"Query SubjectId {query.SubjectId} does not match data set SubjectId {SubjectId}",
-                nameof(query)
-            );
-        }
     }
 }

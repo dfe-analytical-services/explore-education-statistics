@@ -713,12 +713,7 @@ public class SubjectMetaServiceTests
             var allFilterItems = filter1FilterItems.Concat(filter2FilterItems);
 
             dataSet
-                .Setup(s =>
-                    s.ListFilterItemsForQuery(
-                        It.Is<FullTableQuery>(ctx => ctx.Equals(request.AsFullTableQuery())),
-                        cancellationToken
-                    )
-                )
+                .Setup(s => s.ListFilterItemsForQuery(request.LocationIds, request.TimePeriod, cancellationToken))
                 .ReturnsAsync(allFilterItems.ToList());
 
             var indicatorGroups = ListOf(

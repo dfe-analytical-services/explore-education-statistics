@@ -9,34 +9,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 /// <summary>
 /// Storage-agnostic read access to a single data set: its observations, filters, indicators, locations and time periods
 ///
-/// All methods are scoped to <see cref="SubjectId" />. Methods that accept a
-/// <see cref="FullTableQuery" /> require the query's SubjectId to match <see cref="SubjectId" />.
+/// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
 public interface IStorageDataSet
 {
     Guid SubjectId { get; }
 
     /// <summary>
-    /// All observations matching the query, with their Location and FilterItems populated.
+    /// Observations at the given locations within the time period that have every one of the given filter items,
+    /// with their Location and FilterItems populated.
     /// </summary>
-    Task<List<Observation>> ListObservations(FullTableQuery query, CancellationToken cancellationToken = default);
+    Task<List<Observation>> ListObservations(
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
-    /// Streams the observations matching the query in batches of at most <paramref name="batchSize" />.
+    /// As <see cref="ListObservations" />, but streamed in batches of at most <paramref name="batchSize" />.
     /// Observations are read lazily so that callers only need to hold a single batch in memory at any one time.
     /// Callers must not issue other reads against this data set until enumeration completes.
     /// </summary>
     IAsyncEnumerable<IReadOnlyList<Observation>> ListObservationBatches(
-        FullTableQuery query,
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         int batchSize,
         CancellationToken cancellationToken = default
     );
 
     /// <summary>
-    /// Filter items (with their FilterGroup and Filter) that are present on the observations matching the
-    /// query's location and time period selections.
+    /// Filter items (with their FilterGroup and Filter) that are present on the observations at the given
+    /// locations within the time period.
     /// </summary>
-    Task<List<FilterItem>> ListFilterItemsForQuery(FullTableQuery query, CancellationToken cancellationToken = default);
+    Task<List<FilterItem>> ListFilterItemsForQuery(
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Filter items (with their FilterGroup and Filter) for the data set restricted to the given ids.
@@ -85,8 +96,8 @@ public interface IStorageDataSet
     Task<List<Location>> ListLocations(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Locations by id. Unknown ids are ignored. This is not necessarily restricted to those referenced by the data
-    /// set's observations.
+    /// Locations by id. Unknown ids are ignored. `locationIds` are expected to belong to the data set, but might be
+    /// returned even if they belong to a different data set.
     /// </summary>
     Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken = default);
 
