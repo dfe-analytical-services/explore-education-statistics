@@ -29,5 +29,20 @@ func removeMultiple(input string, removals string[]) string =>
   }))
 
 @export()
-func keyVaultRef(vaultUri string, secretName string) string => 
+func keyVaultRef(vaultUri string, secretName string) string =>
   '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/${secretName}/)'
+
+@export()
+@description('''
+Like keyVaultRef, but pins the reference to a specific secret version (e.g. a secret resource's
+properties.secretUriWithVersion) rather than "latest". This ensures the resulting appsetting value
+changes whenever the secret is rotated, because the appsettings update has a definite change
+in values.
+''')
+func keyVaultRefFromVersionedUri(secretUriWithVersion string) string =>
+  '@Microsoft.KeyVault(SecretUri=${secretUriWithVersion})'
+
+@export()
+@description('Builds a map of secret names to secret versioned URIs')
+func secretRefsFromSecrets(secrets object[]) object =>
+  toObject(secrets, s => last(split(s.id, '/')), s => keyVaultRefFromVersionedUri(s.properties.secretUriWithVersion))

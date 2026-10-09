@@ -40,6 +40,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -315,7 +316,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseResponseCompression();
 
         app.UseMvc();
-        app.UseHealthChecks("/api/health");
+        app.UseHealthChecks("/api/health", new HealthCheckOptions().IncludeDeployedAt());
 
         app.ServerFeatures.Get<IServerAddressesFeature>()
             ?.Addresses.ForEach(address => Console.WriteLine($"Server listening on address: {address}"));

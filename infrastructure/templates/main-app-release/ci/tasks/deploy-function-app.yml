@@ -1,0 +1,36 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: artifactZipPath
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: '/'
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Deploy
+    retryCountOnTaskFailure: 3
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        az functionapp deployment source config-zip \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          --src "${{ parameters.artifactZipPath }}"
+
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
+      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+      maxAttempts: 20

@@ -1,0 +1,59 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayName
+    type: string
+    default: Update app settings
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  # A JSON object ({"SettingName": "value", ...}) of application-specific appsettings to apply.
+  # Defaults to making no changes, relying on whatever the app/slot already has.
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+  # Leave blank to target production. Set to apply to a named deployment slot instead
+  # (e.g. deploy / staging).
+  - name: slotName
+    type: string
+    default: ''
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        # Generate key-value pairs from the appsettings JSON.
+        parsedSettings=$(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"') || {
+          echo "##vso[task.logissue type=error]Failed to parse appSettingsJson as JSON - see the jq error above. This most likely means the value was truncated or malformed somewhere upstream, not that it's genuinely empty."
+          exit 1
+        }
+
+        # Add each key-value pair to an array of args.
+        settingsArgs=()
+        while IFS= read -r kv; do
+          [ -n "$kv" ] && settingsArgs+=("$kv")
+        done <<< "$parsedSettings"
+
+        # Add a slot name if deploying appsettings to a slot.
+        slotArgs=()
+        if [ -n "${{ parameters.slotName }}" ]; then
+          slotArgs=(--slot "${{ parameters.slotName }}")
+        fi
+
+        # If there are appsettings to deploy, deploy them now.
+        if [ ${#settingsArgs[@]} -gt 0 ]; then
+          az webapp config appsettings set \
+            --name ${{ parameters.appName }} \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            "${slotArgs[@]}" \
+            --settings "${settingsArgs[@]}"
+        else
+          echo "No application-specific appsettings to apply - leaving the existing appsettings untouched."
+        fi

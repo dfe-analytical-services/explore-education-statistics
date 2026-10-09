@@ -1,6 +1,9 @@
 parameters:
   - name: serviceConnection
     type: string
+  - name: deploymentName
+    type: string
+    default: $(infraDeployName)
 
 steps:
   - task: AzureCLI@2
@@ -10,13 +13,30 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
+
+        # Include the pipefail option so that failures in any part of a pipe
+        # of commands will be surfaced.
+        set -eo pipefail
+
+        # Get the outputs from the Bicep deploy.
         deploymentOutputs=$(az deployment group show \
         --resource-group $(resourceGroupName) \
-        --name $(infraDeployName) \
+        --name ${{ parameters.deploymentName }} \
         --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
-        
-        echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
-          outputname=$(echo "$c" | jq -r '.[0]')
-          outputvalue=$(echo "$c" | jq -r '.[1]')
-          echo "##vso[task.setvariable variable=$outputname;]$outputvalue"
-        done
+
+        # Iterate over the outputs from the Bicep file.
+        while IFS=$'\n' read -r c; do
+
+          # For each output, get its name. The -r gets the raw string rather than a
+          # pretty-printed, quoted name.
+          outputName=$(echo "$c" | jq -r '.[0]')
+          
+          # For each output, get its value. The -r gets the raw string rather than a
+          # pretty-printed, quoted name, and the -c outputs it as a single-line value
+          # so that multiline output values like JSON will all be assigned correctly to
+          # outputValue.
+          outputValue=$(echo "$c" | jq -rc '.[1]')
+
+          # Set a pipeline variable for the Bicep output using the output name and value.           
+          echo "##vso[task.setvariable variable=$outputName;]$outputValue"
+        done <<< "$deploymentOutputs"

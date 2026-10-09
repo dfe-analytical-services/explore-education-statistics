@@ -41,8 +41,26 @@ param vnetLink {
 @description('Database connection strings.')
 param connectionStrings ConnectionString[]?
 
-@description('Application-specific appsettings. These will be merged with infrastructure appsettings.')
+@description('''
+Application-specific appsettings. These will be merged with infrastructure appsettings and applied
+to both the production and staging slots. This serves only as a bootstrap default for the very first
+deploy of this App Service - on every subsequent deploy, "existingProdAppSettings" / "existingStagingSlotAppSettings"
+take precedence over these values, so that infrastructure deploys do not reset application-specific
+appsettings back to these original values.
+''')
 param applicationAppSettings object
+
+@secure()
+@description('''
+The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings back to their original values.
+See https://blog.dotnetstudio.nl/posts/2021/04/merge-appsettings-with-bicep.
+''')
+param existingProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingSlotAppSettings object = {}
 
 @description('Whether or not to display detailed error messages in this environment.')
 param detailedErrors bool
@@ -52,6 +70,9 @@ param autoscaleEnabled bool
 
 @description('Whether or not to enable slot swapping. Deploys a swap slot if enabled.')
 param swapSlotEnabled bool = true
+
+@description('Path the platform should ping to judge the app healthy during its own slot-swap warm-up, when swapSlotEnabled is true.')
+param healthCheckPath string = '/api/health'
 
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]?
@@ -85,7 +106,7 @@ param alerts {
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var deploySlotName = 'deploy'
+var stagingSlotName = 'deploy'
 
 var vnetIntegrationSubnetRef = vnetLink != null 
   ? resourceId('Microsoft.Network/virtualNetworks/subnets', vnetLink!.vnetName, vnetLink!.subnetName)
@@ -131,6 +152,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
       requestTracingEnabled: true
       use32BitWorkerProcess: false
       connectionStrings: connectionStrings
+      healthCheckPath: healthCheckPath
       ipSecurityRestrictions: length(ipSecurityRestrictions) > 0 ? ipSecurityRestrictions : null
       ipSecurityRestrictionsDefaultAction: ipSecurityRestrictionsDefaultAction
       cors: {
@@ -152,11 +174,15 @@ var baseSettings = union(applicationAppSettings, {
   WEBSITE_NODE_DEFAULT_VERSION: '22.23.3'
   ASPNETCORE_DETAILEDERRORS: detailedErrors
   WEBSITES_PORT: websitePort
-  
+
   // Enable the App Service to access file shares over the VNet if
-  // file shares are available for this App Service. 
+  // file shares are available for this App Service.
   WEBSITE_CONTENTOVERVNET: length(azureFileShares ?? []) > 0 ? '1' : null
-})
+}, swapSlotEnabled ? {
+  // Use the healthcheck endpoint to identify when a slot is warmed up.
+  WEBSITE_SWAP_WARMUP_PING_PATH: healthCheckPath
+  WEBSITE_SWAP_WARMUP_PING_STATUSES: '200'
+} : {})
 
 var osSpecificSettings = union(baseSettings,
   kind != 'app,linux,container' ? {
@@ -167,10 +193,16 @@ var osSpecificSettings = union(baseSettings,
   } : {}
 )
 
+// Existing settings take precedence over settings computed in this Bicep file so that
+// infrastructure deploys do not reset application-specific appsettings that have been
+// deployed by the application deploy pipeline.
+var combinedProdSettings = union(osSpecificSettings, existingProdAppSettings)
+var combinedStagingSlotSettings = union(osSpecificSettings, existingStagingSlotAppSettings)
+
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
   name: 'appsettings'
-  properties: osSpecificSettings
+  properties: combinedProdSettings
 }
 
 module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (keyVaultRoles.?secretsUser ?? false) {
@@ -222,16 +254,44 @@ module appServiceCryptoUserRoleAssignmentModule '../../../common/components/key-
 }
 
 module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
-  name: '${appServiceName}${deploySlotName}Deploy'
+  name: '${appServiceName}${stagingSlotName}Deploy'
   params: {
     appServiceName: appService.name
     kind: kind
     operatingSystem: operatingSystem
-    slotName: deploySlotName
+    slotName: stagingSlotName
     appServicePlanId: appServicePlanId
     minTlsVersion: minTlsVersion
     vnetLink: vnetLink
     tagValues: tagValues
+    healthCheckPath: healthCheckPath
+    connectionStrings: connectionStrings
+  }
+}
+
+resource stagingSlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = if (swapSlotEnabled) {
+  name: '${appServiceName}/${stagingSlotName}/appsettings'
+  properties: combinedStagingSlotSettings
+  dependsOn: [
+    stagingSlotModule
+  ]
+}
+
+module stagingSlotSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?secretsUser ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultSecretsUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Secrets User'
+  }
+}
+
+module stagingSlotCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?certificateUser ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultCertificateUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Certificate User'
   }
 }
 

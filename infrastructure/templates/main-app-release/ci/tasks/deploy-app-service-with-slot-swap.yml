@@ -1,0 +1,39 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: artifactZipPath
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: /api/health
+  - name: appSettingsJson
+    type: string
+    default: '{}'
+  - name: deployedAt
+    type: string
+
+steps:
+  - template: deploy-app-service-to-staging-slot.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayNamePrefix: ${{ parameters.displayNamePrefix }}
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      artifactZipPath: ${{ parameters.artifactZipPath }}
+      healthCheckPath: ${{ parameters.healthCheckPath }}
+      appSettingsJson: ${{ parameters.appSettingsJson }}
+      deployedAt: ${{ parameters.deployedAt }}
+
+  - template: swap-staging-slot-into-production.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayNamePrefix: ${{ parameters.displayNamePrefix }}
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      healthCheckPath: ${{ parameters.healthCheckPath }}
