@@ -151,7 +151,15 @@ public class TableBuilderServiceTests
             var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, It.IsAny<CancellationToken>()))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        query.SubjectId,
+                        ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
+                        query.LocationIds,
+                        query.TimePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationsTable);
 
             subjectResultMetaService
@@ -161,9 +169,7 @@ public class TableBuilderServiceTests
                 .ReturnsAsync(subjectMeta);
 
             tableBuilderQueryOptimiser.Setup(mock => mock.IsCroppingRequired(query)).ReturnsAsync(true);
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(query);
+            tableBuilderQueryOptimiser.Setup(mock => mock.CropQuery(query, default)).ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
@@ -425,7 +431,15 @@ public class TableBuilderServiceTests
             var tableBuilderQueryOptimiser = new Mock<ITableBuilderQueryOptimiser>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, It.IsAny<CancellationToken>()))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        query.SubjectId,
+                        ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
+                        query.LocationIds,
+                        query.TimePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationsTable);
 
             subjectResultMetaService
@@ -440,9 +454,7 @@ public class TableBuilderServiceTests
                 .ReturnsAsync(subjectMeta);
 
             tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(true);
-            tableBuilderQueryOptimiser
-                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(query);
+            tableBuilderQueryOptimiser.Setup(mock => mock.CropQuery(query, default)).ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
@@ -718,7 +730,15 @@ public class TableBuilderServiceTests
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, It.IsAny<CancellationToken>()))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        query.SubjectId,
+                        ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
+                        query.LocationIds,
+                        query.TimePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
@@ -759,7 +779,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<CancellationToken>()
+                        default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
@@ -999,7 +1019,15 @@ public class TableBuilderServiceTests
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, It.IsAny<CancellationToken>()))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        query.SubjectId,
+                        ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
+                        query.LocationIds,
+                        query.TimePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
@@ -1037,7 +1065,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<CancellationToken>()
+                        default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
@@ -1138,7 +1166,15 @@ public class TableBuilderServiceTests
             var subjectCsvMetaService = new Mock<ISubjectCsvMetaService>(Strict);
 
             observationService
-                .Setup(s => s.GetMatchedObservations(query, It.IsAny<CancellationToken>()))
+                .Setup(s =>
+                    s.GetMatchedObservations(
+                        query.SubjectId,
+                        ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
+                        query.LocationIds,
+                        query.TimePeriod,
+                        default
+                    )
+                )
                 .ReturnsAsync(matchedObservationsTable);
 
             var subjectCsvMeta = new SubjectCsvMetaViewModel
@@ -1167,7 +1203,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        It.IsAny<CancellationToken>()
+                        default
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
