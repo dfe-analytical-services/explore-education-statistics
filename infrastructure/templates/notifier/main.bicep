@@ -98,6 +98,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountAllowedSubnetIds: [publisherSubnet.id]
     storageFirewallRules: maintenanceIpRanges
     storageAccountPublicNetworkAccessEnabled: true
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
     minTlsVersion: minTlsVersion
     connectionStrings: [
