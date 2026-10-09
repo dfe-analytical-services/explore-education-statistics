@@ -20,20 +20,6 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
 
-@description('Public URL of the public site.')
-param publicAppUrl string
-
-@description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthEnabled bool
-
-@secure()
-@description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthUsername string
-
-@secure()
-@description('Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthPassword string
-
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
 
@@ -42,18 +28,6 @@ param deployAlerts bool
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
-
-@description('Name fo the environment being deployed to e.g. Development, Test.')
-param environmentName string
-
-@description('Public hostname of the Content API.')
-param contentApiPublicHostname string
-
-@description('Public hostname of the Data API.')
-param dataApiPublicHostname string
-
-@description('Public hostname of the public API.')
-param publicApiPublicHostname string
 
 @description('URL for the ACR hosting Docker images for this App Service.')
 param dockerRegistryUrl string
@@ -66,11 +40,12 @@ param dockerPullUsername string
 @description('Password for the user pulling Docker images for this App Service.')
 param dockerPullPassword string
 
-@description('GA tracking ID.')
-param googleAnalyticsTrackingId string
-
-@description('The default max age in seconds for content to be cached by Azure Front Door.')
-param defaultCacheMaxAgeSeconds int
+@secure()
+@description('''
+The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings back to their original values.
+''')
+param existingProdAppSettings object = {}
 
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'publicSiteAppServicePlanModule'
@@ -103,14 +78,6 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
   }
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
-  name: resourceNames.search.service
-}
-
-resource nlSearchFunctionApp 'Microsoft.Web/sites@2025-03-01' existing = {
-  name: resourceNames.nlSearch.functionApp
-}
-
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'publicSiteAppServiceModuleDeploy'
   params: {
@@ -137,30 +104,22 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       alertsGroupName: resourceNames.alertsGroup
     } : null
     websitePort: 3000
+    // Application-specific appsettings (APP_ENV, AZURE_SEARCH_*, BASIC_AUTH*, *_API_BASE_URL,
+    // GA_TRACKING_ID, PUBLIC_URL, DEFAULT_CACHE_MAX_AGE_SECONDS) are no longer seeded from here
+    // - the app-release pipeline applies them ahead of each code deploy via
+    // public-site-appsettings.bicep. See existingProdAppSettings below for how they're
+    // preserved across infrastructure deploys. What remains here is deployment/platform
+    // plumbing (which registry/credentials to pull the image from, fixed container runtime
+    // mode) rather than application behaviour, so it stays infrastructure-controlled.
     applicationAppSettings: {
-      APP_ENV: environmentName
-      AZURE_SEARCH_ENDPOINT: searchService.properties.endpoint
-      AZURE_SEARCH_INDEX: 'index-1'
-      AZURE_DATASETS_SEARCH_INDEX: 'nl-search-dataset-index'
-      AZURE_TABLE_TOOL_SEARCH_ENDPOINT: 'https://${nlSearchFunctionApp.properties.defaultHostName}/api/natural_language_search_function'
-      BASIC_AUTH: publicAppBasicAuthEnabled
-      BASIC_AUTH_USERNAME: publicAppBasicAuthUsername
-      BASIC_AUTH_PASSWORD: publicAppBasicAuthPassword
-      CONTENT_API_BASE_URL: 'https://${contentApiPublicHostname}/api'
-      DATA_API_BASE_URL: 'https://${dataApiPublicHostname}/api'
       DOCKER_REGISTRY_SERVER_URL: dockerRegistryUrl
       DOCKER_REGISTRY_SERVER_USERNAME: dockerPullUsername
       DOCKER_REGISTRY_SERVER_PASSWORD: dockerPullPassword
-      NOTIFICATION_API_BASE_URL: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
-      GA_TRACKING_ID: googleAnalyticsTrackingId
       NEXT_CONFIG_MODE: 'server'
       NODE_ENV: 'production'
-      PUBLIC_URL: '${publicAppUrl}/'
-      PUBLIC_API_BASE_URL: 'https://${publicApiPublicHostname}'
-      PUBLIC_API_DOCS_URL: 'https://${publicApiPublicHostname}/docs'
-      DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
       WEBSITES_DISABLE_CONTENT_COMPRESSION: true
     }
+    existingProdAppSettings: existingProdAppSettings
     tagValues: tagValues
   }
 }

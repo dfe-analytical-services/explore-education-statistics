@@ -33,6 +33,9 @@ parameters:
   - name: dataApiStagingSlotAppSettings
     type: string
     default: '{}'
+  - name: publicSiteProdAppSettings
+    type: string
+    default: '{}'
 
 steps:
   - task: BicepDeploy@0
@@ -56,3 +59,4 @@ steps:
         contentApiStagingSlotAppSettings: ${{ parameters.contentApiStagingSlotAppSettings }}
         dataApiProdAppSettings: ${{ parameters.dataApiProdAppSettings }}
         dataApiStagingSlotAppSettings: ${{ parameters.dataApiStagingSlotAppSettings }}
+        publicSiteProdAppSettings: ${{ parameters.publicSiteProdAppSettings }}
