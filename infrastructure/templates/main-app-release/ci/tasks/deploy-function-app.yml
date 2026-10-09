@@ -46,6 +46,13 @@ steps:
           --resource-group ${{ parameters.resourceGroupName }} \
           --src "${{ parameters.artifactZipPath }}"
 
+        # WEBSITE_RUN_FROM_PACKAGE means config-zip just uploads the new package and updates a
+        # pointer to it - it doesn't reliably restart the already-running worker process to pick
+        # it up, so without this, the app can keep serving the previous deploy's code indefinitely.
+        az functionapp restart \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }}
+
   - ${{ if ne(parameters.deployedAt, '') }}:
       - template: ../../../../common/ci/tasks/wait-for-app-service-restart.yml
         parameters:
