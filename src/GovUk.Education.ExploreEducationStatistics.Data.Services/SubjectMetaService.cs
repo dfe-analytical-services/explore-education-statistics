@@ -203,7 +203,11 @@ public class SubjectMetaService(
                     )
                     .SingleAsync(cancellationToken: cancellationToken);
 
-                var filterItems = await dataSet.ListFilterItemsForQuery(request.AsFullTableQuery(), cancellationToken);
+                var filterItems = await dataSet.ListFilterItemsForQuery(
+                    locationIds: request.LocationIds,
+                    timePeriod: request.TimePeriod,
+                    cancellationToken: cancellationToken
+                );
                 var filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
                     filterItems,
                     releaseFile.FilterSequence
