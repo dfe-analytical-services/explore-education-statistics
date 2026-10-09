@@ -22,6 +22,8 @@ jobs:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             # No artifact download needed - the Public Site's build output is a Docker image,
             # already pushed to the container registry by the build pipeline.
             - download: none
