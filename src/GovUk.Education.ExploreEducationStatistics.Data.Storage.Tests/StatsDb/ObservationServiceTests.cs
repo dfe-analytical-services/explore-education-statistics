@@ -3,7 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.S
 using static Moq.MockBehavior;
 
 // ReSharper disable AccessToDisposedClosure
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public class ObservationServiceTests
 {
@@ -30,13 +31,10 @@ public class ObservationServiceTests
 
         var sqlParameters = ListOf(new SqlParameter("param1", "value"));
 
-        var fullTableQuery = new FullTableQuery
-        {
-            SubjectId = Guid.NewGuid(),
-            Filters = ListOf(Guid.NewGuid()),
-            LocationIds = ListOf(Guid.NewGuid()),
-            TimePeriod = new TimePeriodQuery(),
-        };
+        var subjectId = Guid.NewGuid();
+        var filterItemIds = ListOf(Guid.NewGuid());
+        var locationIds = ListOf(Guid.NewGuid());
+        var timePeriod = new TimePeriodQuery();
 
         var queryGenerator = new Mock<IMatchingObservationsQueryGenerator>(Strict);
 
@@ -47,10 +45,10 @@ public class ObservationServiceTests
             .Setup(s =>
                 s.GetMatchingObservationsQuery(
                     context,
-                    fullTableQuery.SubjectId,
-                    ItIs.ListSequenceEqualTo(fullTableQuery.GetFilterItemIds()),
-                    ItIs.ListSequenceEqualTo(fullTableQuery.LocationIds),
-                    fullTableQuery.TimePeriod,
+                    subjectId,
+                    ItIs.ListSequenceEqualTo(filterItemIds),
+                    ItIs.ListSequenceEqualTo(locationIds),
+                    timePeriod,
                     cancellationToken
                 )
             )
@@ -64,7 +62,13 @@ public class ObservationServiceTests
 
         var service = BuildService(context, queryGenerator.Object, sqlExecutor.Object);
 
-        await service.GetMatchedObservations(fullTableQuery, cancellationToken);
+        await service.GetMatchedObservations(
+            subjectId: subjectId,
+            filterItemIds: filterItemIds,
+            locationIds: locationIds,
+            timePeriod: timePeriod,
+            cancellationToken: cancellationToken
+        );
         VerifyAllMocks(queryGenerator, sqlExecutor);
     }
 

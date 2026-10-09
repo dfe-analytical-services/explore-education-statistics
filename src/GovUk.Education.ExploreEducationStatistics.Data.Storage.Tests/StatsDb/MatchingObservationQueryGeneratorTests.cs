@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.Data.SqlClient;
 using Moq;
 using Thinktecture.EntityFrameworkCore.TempTables;
@@ -18,7 +19,7 @@ using static Moq.MockBehavior;
 
 // ReSharper disable AccessToDisposedClosure
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public class MatchingObservationQueryGeneratorTests
 {

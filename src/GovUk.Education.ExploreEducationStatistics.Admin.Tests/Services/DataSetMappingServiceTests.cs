@@ -10,9 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -42,7 +42,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -52,6 +52,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -327,7 +328,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -337,6 +338,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -433,7 +435,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -481,7 +483,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -491,6 +493,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -564,7 +567,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -574,6 +577,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -654,7 +658,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -664,6 +668,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -845,7 +850,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -855,6 +860,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -954,7 +960,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -964,6 +970,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1157,7 +1164,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1209,7 +1216,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1219,6 +1226,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1265,7 +1273,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1275,6 +1283,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1334,7 +1343,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1344,6 +1353,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1445,7 +1455,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1455,6 +1465,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1686,7 +1697,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1696,6 +1707,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1908,7 +1920,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1918,6 +1930,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -1967,7 +1980,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -1977,6 +1990,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2033,7 +2047,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2043,6 +2057,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2109,7 +2124,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2119,6 +2134,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2197,7 +2213,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2207,6 +2223,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2311,7 +2328,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2321,6 +2338,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2517,7 +2535,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2527,6 +2545,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2698,7 +2717,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2708,6 +2727,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2764,7 +2784,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2774,6 +2794,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -2863,7 +2884,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -2873,6 +2894,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -3043,7 +3065,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -3053,6 +3075,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -3210,7 +3233,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -3220,6 +3243,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -3276,7 +3300,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -3286,6 +3310,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -3382,7 +3407,7 @@ public class DataSetMappingServiceTests
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
-            File = new Content.Model.File { Id = originalDataFileId },
+            File = new Content.Model.File { Id = originalDataFileId, DataStorageVersion = DataStorageVersion.StatsDB },
         };
         var replacementReleaseFile = new ReleaseFile
         {
@@ -3392,6 +3417,7 @@ public class DataSetMappingServiceTests
                 Id = replacementDataFileId,
                 Type = FileType.Data,
                 SubjectId = replacementSubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -3551,8 +3577,7 @@ public class DataSetMappingServiceTests
 
         return new DataSetMappingService(
             contentDbContext,
-            statisticsDbContext,
-            new LocationRepository(statisticsDbContext),
+            BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             userService ?? MockUtils.AlwaysTrueUserService().Object
         );
     }

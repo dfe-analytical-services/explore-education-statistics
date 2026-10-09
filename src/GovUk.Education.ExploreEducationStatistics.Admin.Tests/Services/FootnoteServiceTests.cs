@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -23,7 +25,10 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
+using DataStorageVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.DataStorageVersion;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -40,13 +45,17 @@ public class FootnoteServiceTests
 
         await SeedDatabase(contextId, releaseVersion);
 
+        var unlinkedSubjectId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            subjectIds: SetOf(Guid.NewGuid())
+            subjectIds: SetOf(unlinkedSubjectId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedSubjectId]),
+        ]);
     }
 
     [Fact]
@@ -96,13 +105,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterIds: SetOf(Guid.NewGuid())
+            filterIds: SetOf(unlinkedFilterId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [unlinkedFilterId],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -154,13 +173,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterGroupId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterGroupIds: SetOf(Guid.NewGuid())
+            filterGroupIds: SetOf(unlinkedFilterGroupId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [unlinkedFilterGroupId],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -218,13 +247,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterItemId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterItemIds: SetOf(Guid.NewGuid())
+            filterItemIds: SetOf(unlinkedFilterItemId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [unlinkedFilterItemId],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -281,13 +320,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedIndicatorId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            indicatorIds: SetOf(Guid.NewGuid())
+            indicatorIds: SetOf(unlinkedIndicatorId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: [unlinkedIndicatorId]
+            ),
+        ]);
     }
 
     [Fact]
@@ -441,17 +490,145 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
         );
 
+        var unlinkedId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-            filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-            filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-            indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-            subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id)
+            filterIds: SetOf(filterMissing ? unlinkedId : filter.Id),
+            filterGroupIds: SetOf(filterGroupMissing ? unlinkedId : filterGroup.Id),
+            filterItemIds: SetOf(filterItemMissing ? unlinkedId : filterItem.Id),
+            indicatorIds: SetOf(indicatorMissing ? unlinkedId : indicator.Id),
+            subjectIds: SetOf(subjectMissing ? unlinkedId : subject2.Id)
         );
 
-        result.AssertInternalServerError();
+        if (subjectMissing)
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedId]),
+            ]);
+        }
+        else
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersion.Id,
+                    unlinkedFilterIds: filterMissing ? [unlinkedId] : [],
+                    unlinkedFilterGroupIds: filterGroupMissing ? [unlinkedId] : [],
+                    unlinkedFilterItemIds: filterItemMissing ? [unlinkedId] : [],
+                    unlinkedIndicatorIds: indicatorMissing ? [unlinkedId] : []
+                ),
+            ]);
+        }
+    }
+
+    [Fact]
+    public async Task CreateFootnote_AllIdsLinkedToFirstSubject_DoesNotReadRemainingSubjects()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var filterItem = _fixture.DefaultFilterItem().Generate();
+        var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
+        var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
+        var indicator = _fixture.DefaultIndicator().Generate();
+        var indicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { indicator })
+            .Generate();
+        var subject1 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
+            .Generate();
+        var subject2 = _fixture.DefaultSubject().Generate();
+        var releaseSubject1 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject1)
+            .Generate();
+        var releaseSubject2 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject2)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject1, subject2),
+            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
+        );
+
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
+        dataSet.Setup(ds => ds.ListIndicatorGroups(It.IsAny<CancellationToken>())).ReturnsAsync(ListOf(indicatorGroup));
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.Resolve(subject1.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
+
+        // NOTE: subject2 shouldn't be resolved
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(filter.Id),
+            filterGroupIds: SetOf(filterGroup.Id),
+            filterItemIds: SetOf(filterItem.Id),
+            indicatorIds: SetOf(indicator.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(dataSet, storageDataSetResolver);
+
+        result.AssertRight();
+    }
+
+    [Fact]
+    public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersWithoutItems()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var filter = _fixture.DefaultFilter().Generate();
+        var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject),
+            releaseSubjects: ListOf(releaseSubject)
+        );
+
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        dataSet
+            .Setup(ds => ds.ListFilters(includeItems: false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(filter));
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.Resolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(filter.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(dataSet, storageDataSetResolver);
+
+        result.AssertRight();
     }
 
     [Fact]
@@ -464,14 +641,18 @@ public class FootnoteServiceTests
 
         await SeedDatabase(contextId, releaseVersion, footnotes: ListOf(footnote));
 
+        var unlinkedSubjectId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            subjectIds: SetOf(Guid.NewGuid())
+            subjectIds: SetOf(unlinkedSubjectId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedSubjectId]),
+        ]);
     }
 
     [Fact]
@@ -530,14 +711,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterIds: SetOf(Guid.NewGuid())
+            filterIds: SetOf(unlinkedFilterId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [unlinkedFilterId],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -598,14 +789,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterGroupId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterGroupIds: SetOf(Guid.NewGuid())
+            filterGroupIds: SetOf(unlinkedFilterGroupId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [unlinkedFilterGroupId],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -668,14 +869,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterItemId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterItemIds: SetOf(Guid.NewGuid())
+            filterItemIds: SetOf(unlinkedFilterItemId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [unlinkedFilterItemId],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -737,14 +948,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedIndicatorId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            indicatorIds: SetOf(Guid.NewGuid())
+            indicatorIds: SetOf(unlinkedIndicatorId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: [unlinkedIndicatorId]
+            ),
+        ]);
     }
 
     [Fact]
@@ -904,18 +1125,37 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-            filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-            filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-            indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-            subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id)
+            filterIds: SetOf(filterMissing ? unlinkedId : filter.Id),
+            filterGroupIds: SetOf(filterGroupMissing ? unlinkedId : filterGroup.Id),
+            filterItemIds: SetOf(filterItemMissing ? unlinkedId : filterItem.Id),
+            indicatorIds: SetOf(indicatorMissing ? unlinkedId : indicator.Id),
+            subjectIds: SetOf(subjectMissing ? unlinkedId : subject2.Id)
         );
 
-        result.AssertInternalServerError();
+        if (subjectMissing)
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedId]),
+            ]);
+        }
+        else
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersion.Id,
+                    unlinkedFilterIds: filterMissing ? [unlinkedId] : [],
+                    unlinkedFilterGroupIds: filterGroupMissing ? [unlinkedId] : [],
+                    unlinkedFilterItemIds: filterItemMissing ? [unlinkedId] : [],
+                    unlinkedIndicatorIds: indicatorMissing ? [unlinkedId] : []
+                ),
+            ]);
+        }
     }
 
     [Fact]
@@ -1399,6 +1639,17 @@ public class FootnoteServiceTests
                     .WithId(releaseVersion.Id)
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
+            );
+            contentDbContext.Files.Add(
+                new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject.SubjectId,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
+                }
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -1901,6 +2152,22 @@ public class FootnoteServiceTests
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
             );
+
+            if (!subjects.IsNullOrEmpty())
+            {
+                contentDbContext.Files.AddRange(
+                    subjects!.Select(subject => new File
+                    {
+                        Id = Guid.NewGuid(),
+                        RootPath = Guid.NewGuid(),
+                        Filename = "data.csv",
+                        Type = FileType.Data,
+                        SubjectId = subject.Id,
+                        DataStorageVersion = DataStorageVersion.StatsDB,
+                    })
+                );
+            }
+
             await contentDbContext.SaveChangesAsync();
         }
     }
@@ -1913,7 +2180,8 @@ public class FootnoteServiceTests
         IReadOnlySet<Guid>? filterGroupIds = null,
         IReadOnlySet<Guid>? filterItemIds = null,
         IReadOnlySet<Guid>? indicatorIds = null,
-        IReadOnlySet<Guid>? subjectIds = null
+        IReadOnlySet<Guid>? subjectIds = null,
+        IStorageDataSetResolver? storageDataSetResolver = null
     )
     {
         filterIds ??= SetOf<Guid>();
@@ -1931,7 +2199,8 @@ public class FootnoteServiceTests
             var footnoteService = SetupFootnoteService(
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
-                dataBlockService: dataBlockService.Object
+                dataBlockService: dataBlockService.Object,
+                storageDataSetResolver: storageDataSetResolver
             );
 
             return await footnoteService.CreateFootnote(
@@ -1996,7 +2265,8 @@ public class FootnoteServiceTests
         IUserService? userService = null,
         IDataBlockService? dataBlockService = null,
         IReleaseSubjectRepository? releaseSubjectRepository = null,
-        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null
+        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+        IStorageDataSetResolver? storageDataSetResolver = null
     )
     {
         var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
@@ -2010,7 +2280,8 @@ public class FootnoteServiceTests
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository,
             releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext, footnoteRepository),
-            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
+            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentContext, statisticsDbContext)
         );
     }
 }

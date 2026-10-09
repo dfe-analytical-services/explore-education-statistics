@@ -9,9 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
@@ -217,6 +219,7 @@ public class DataGuidanceDataSetServiceTests
                     new() { GeographicLevel = GeographicLevel.LocalAuthorityDistrict },
                     new() { GeographicLevel = GeographicLevel.School, CsvOnly = true },
                 ],
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Summary = "Data set 1 guidance",
         };
@@ -235,6 +238,7 @@ public class DataGuidanceDataSetServiceTests
                     new() { GeographicLevel = GeographicLevel.Country },
                     new() { GeographicLevel = GeographicLevel.Region },
                 ],
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Summary = "Data set 2 guidance",
         };
@@ -336,6 +340,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject1.SubjectId,
                 Filename = "file1.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Name = "Data set 1",
         };
@@ -347,6 +352,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject2.SubjectId,
                 Filename = "file2.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Name = "Data set 2",
         };
@@ -358,6 +364,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject3.SubjectId,
                 Filename = "file3.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             Name = "Data set 3",
         };
@@ -423,6 +430,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject1.SubjectId,
                 Filename = "file1.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -435,6 +443,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject2.SubjectId,
                 Filename = "file2.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -447,6 +456,7 @@ public class DataGuidanceDataSetServiceTests
                 SubjectId = releaseSubject3.SubjectId,
                 Filename = "file3.csv",
                 Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -504,6 +514,7 @@ public class DataGuidanceDataSetServiceTests
                 Filename = "file1.csv",
                 Type = FileType.Data,
                 SubjectId = originalSubject.SubjectId,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -516,6 +527,7 @@ public class DataGuidanceDataSetServiceTests
                 Type = FileType.Data,
                 SubjectId = replacementSubject.SubjectId,
                 Replacing = originalFile.File,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
         };
 
@@ -615,6 +627,7 @@ public class DataGuidanceDataSetServiceTests
             SubjectId = subject1.Id,
             Filename = "file1.csv",
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var file2 = new File
@@ -622,6 +635,7 @@ public class DataGuidanceDataSetServiceTests
             SubjectId = subject2.Id,
             Filename = "file2.csv",
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentReleaseVersion1 = new Content.Model.ReleaseVersion
@@ -717,7 +731,7 @@ public class DataGuidanceDataSetServiceTests
     private static DataGuidanceDataSetService SetupService(
         StatisticsDbContext? statisticsDbContext = null,
         ContentDbContext? contentDbContext = null,
-        IIndicatorRepository? indicatorRepository = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IFootnoteRepository? footnoteRepository = null,
         ITimePeriodService? timePeriodService = null
     )
@@ -726,11 +740,10 @@ public class DataGuidanceDataSetServiceTests
         contentDbContext ??= InMemoryContentDbContext();
 
         return new(
-            statisticsDbContext,
             contentDbContext,
-            indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
-            timePeriodService ?? new TimePeriodService(statisticsDbContext)
+            timePeriodService ?? new TimePeriodService()
         );
     }
 }

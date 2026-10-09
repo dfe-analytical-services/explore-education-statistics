@@ -6,10 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -39,8 +41,8 @@ public class FootnoteControllerTests
             Subjects = new List<SubjectFootnote>(),
         };
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
         var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
         var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
@@ -115,8 +117,12 @@ public class FootnoteControllerTests
                     .ToList()
             );
 
-        filterRepository
-            .Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
+        storageDataSetResolver
+            .Setup(s => s.Resolve(It.Is<File>(f => subjectIds.Contains(f.SubjectId!.Value))))
+            .Returns(dataSet.Object);
+
+        dataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new List<Filter>
                 {
@@ -142,8 +148,8 @@ public class FootnoteControllerTests
                 }
             );
 
-        indicatorGroupRepository
-            .Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
+        dataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 new List<IndicatorGroup>
                 {
@@ -167,9 +173,8 @@ public class FootnoteControllerTests
             );
 
         _controller = new FootnoteController(
-            filterRepository.Object,
             footnoteService.Object,
-            indicatorGroupRepository.Object,
+            storageDataSetResolver.Object,
             releaseService.Object,
             releaseDataFileRepository.Object
         );

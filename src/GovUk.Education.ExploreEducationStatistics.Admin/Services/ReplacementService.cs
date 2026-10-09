@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReplacementService(
     ContentDbContext contentDbContext,
     StatisticsDbContext statisticsDbContext,
+    IStorageDataSetResolver storageDataSetResolver,
     IReleaseVersionService releaseVersionService,
     IReleaseFileRepository releaseFileRepository,
     IReplacementPlanService replacementPlanService,
@@ -118,15 +120,17 @@ public class ReplacementService(
                     && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
 
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
+
                 replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
                     originalReleaseFile,
-                    replacementSubjectId,
+                    replacementDataSet,
                     mapping,
                     cancellationToken
                 );
                 replacementReleaseFile.IndicatorSequence = await ReplaceIndicatorSequence(
                     originalReleaseFile,
-                    replacementSubjectId,
+                    replacementDataSet,
                     mapping,
                     cancellationToken
                 );
@@ -670,9 +674,9 @@ public class ReplacementService(
         );
     }
 
-    private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(
+    private static async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(
         ReleaseFile originalReleaseFile,
-        Guid replacementSubjectId,
+        IStorageDataSet replacementDataSet,
         DataSetMapping mapping,
         CancellationToken cancellationToken
     )
@@ -683,12 +687,10 @@ public class ReplacementService(
             return null;
         }
 
-        var replacementFilters = await statisticsDbContext
-            .Filter.AsNoTracking()
-            .Include(f => f.FilterGroups)
-                .ThenInclude(g => g.FilterItems)
-            .Where(f => f.SubjectId == replacementSubjectId)
-            .ToListAsync(cancellationToken);
+        var replacementFilters = await replacementDataSet.ListFilters(
+            includeItems: true,
+            cancellationToken: cancellationToken
+        );
 
         return ReplacementServiceHelper.ReplaceFilterSequence(
             originalSequence: originalReleaseFile.FilterSequence,
@@ -697,9 +699,9 @@ public class ReplacementService(
         );
     }
 
-    private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
+    private static async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
         ReleaseFile originalReleaseFile,
-        Guid replacementSubjectId,
+        IStorageDataSet replacementDataSet,
         DataSetMapping mapping,
         CancellationToken cancellationToken
     )
@@ -710,11 +712,7 @@ public class ReplacementService(
             return null;
         }
 
-        var replacementIndicatorGroups = await statisticsDbContext
-            .IndicatorGroup.AsNoTracking()
-            .Include(ig => ig.Indicators)
-            .Where(ig => ig.SubjectId == replacementSubjectId)
-            .ToListAsync(cancellationToken);
+        var replacementIndicatorGroups = await replacementDataSet.ListIndicatorGroups(cancellationToken);
 
         var originalGroupIdToLabelMap = mapping
             .IndicatorMappings.Values.Select(i => new { Id = i.OriginalGroupId, Label = i.OriginalGroupLabel })

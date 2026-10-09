@@ -1,0 +1,365 @@
+#nullable enable
+using System.Runtime.CompilerServices;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Thinktecture.EntityFrameworkCore.TempTables;
+
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+
+public class StatisticsDbDataSet(
+    Guid subjectId,
+    StatisticsDbContext context,
+    IObservationService observationService,
+    IAllObservationsMatchedFilterItemsStrategy allObservationsMatchedFilterItemsStrategy,
+    ISparseObservationsMatchedFilterItemsStrategy sparseObservationsMatchedFilterItemsStrategy,
+    IDenseObservationsMatchedFilterItemsStrategy denseObservationsMatchedFilterItemsStrategy,
+    ILogger<StatisticsDbDataSet> logger
+) : IStorageDataSet
+{
+    private const int PercentageObservationsFoundToUseDenseStrategy = 75;
+
+    public Guid SubjectId { get; } = subjectId;
+
+    public async Task<List<Observation>> ListObservations(
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var observationsQuery = await BuildMatchedObservationsQuery(
+            filterItemIds,
+            locationIds,
+            timePeriod,
+            cancellationToken
+        );
+        return await observationsQuery.ToListAsync(cancellationToken);
+    }
+
+    public async IAsyncEnumerable<IReadOnlyList<Observation>> ListObservationBatches(
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        int batchSize,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
+    {
+        var observationsQuery = await BuildMatchedObservationsQuery(
+            filterItemIds,
+            locationIds,
+            timePeriod,
+            cancellationToken
+        );
+
+        var batch = new List<Observation>(batchSize);
+
+        await foreach (var observation in observationsQuery.AsAsyncEnumerable().WithCancellation(cancellationToken))
+        {
+            batch.Add(observation);
+
+            if (batch.Count == batchSize)
+            {
+                yield return batch;
+                batch = new List<Observation>(batchSize);
+            }
+        }
+
+        if (batch.Count > 0)
+        {
+            yield return batch;
+        }
+    }
+
+    public async Task<List<FilterItem>> ListFilterItemsForQuery(
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var matchedObservationsTableReference = await observationService.GetMatchedObservations(
+            subjectId: SubjectId,
+            filterItemIds: [],
+            locationIds: locationIds,
+            timePeriod: timePeriod,
+            cancellationToken: cancellationToken
+        );
+
+        return await ListFilterItemsFromMatchedObservations(matchedObservationsTableReference, cancellationToken);
+    }
+
+    public async Task<List<FilterItem>> ListFilterItems(
+        IEnumerable<Guid> filterItemIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var filterItemIdList = filterItemIds.ToList();
+
+        return await context
+            .FilterItem.AsNoTracking()
+            .Include(fi => fi.FilterGroup)
+                .ThenInclude(fg => fg.Filter)
+            .Where(fi => fi.FilterGroup.Filter.SubjectId == SubjectId)
+            .Where(fi => filterItemIdList.Contains(fi.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Filter>> ListFilters(
+        bool includeItems = false,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var filters = context.Filter.AsNoTracking().Where(filter => filter.SubjectId == SubjectId);
+
+        if (includeItems)
+        {
+            filters = filters.Include(filter => filter.FilterGroups).ThenInclude(group => group.FilterItems);
+        }
+
+        return await filters.ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
+        Guid parentFilterId,
+        Guid childFilterId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var pairs = await context
+            .FilterItem.AsNoTracking()
+            .Where(fi => fi.FilterGroup.Filter.SubjectId == SubjectId)
+            .Where(fi => fi.FilterGroup.FilterId == parentFilterId)
+            .SelectMany(parentFilterItem =>
+                context
+                    .ObservationFilterItem.AsNoTracking()
+                    .Where(childOfi =>
+                        childOfi.FilterId == childFilterId
+                        && context.ObservationFilterItem.Any(parentOfi =>
+                            childOfi.ObservationId == parentOfi.ObservationId
+                            && parentOfi.FilterItemId == parentFilterItem.Id
+                        )
+                    )
+                    .Select(childOfi => new
+                    {
+                        ParentFilterItemId = parentFilterItem.Id,
+                        ChildFilterItemId = childOfi.FilterItem.Id,
+                    })
+                    .ToList()
+            )
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        return pairs.Select(pair => (pair.ParentFilterItemId, pair.ChildFilterItemId)).ToList();
+    }
+
+    public async Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Indicator.AsNoTracking()
+            .Where(indicator => indicator.IndicatorGroup.SubjectId == SubjectId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Indicator>> ListIndicators(
+        IEnumerable<Guid> indicatorIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var indicatorIdList = indicatorIds.ToList();
+
+        return await context
+            .Indicator.AsNoTracking()
+            .Where(indicator => indicator.IndicatorGroup.SubjectId == SubjectId)
+            .Where(indicator => indicatorIdList.Contains(indicator.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .IndicatorGroup.AsNoTracking()
+            .Include(group => group.Indicators)
+            .Where(indicatorGroup => indicatorGroup.SubjectId == SubjectId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Location>> ListLocations(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == SubjectId)
+            .Select(observation => observation.Location)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Location>> ListLocations(
+        IEnumerable<Guid> locationIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var locationIdList = locationIds.ToList();
+
+        return await context
+            .Location.AsNoTracking()
+            .Where(location => locationIdList.Contains(location.Id))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == SubjectId)
+            .Select(observation => observation.Location.GeographicLevel)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+        CancellationToken cancellationToken = default
+    )
+    {
+        var observations = context.Observation.AsNoTracking().Where(o => o.SubjectId == SubjectId);
+
+        return TimePeriodQueryUtils.ListDistinctTimePeriods(observations, cancellationToken);
+    }
+
+    public Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+        IEnumerable<Guid> locationIds,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var locationIdList = locationIds.ToList();
+
+        var observations = context
+            .Observation.AsNoTracking()
+            .Where(o => o.SubjectId == SubjectId && EF.Constant(locationIdList).Contains(o.LocationId));
+
+        return TimePeriodQueryUtils.ListDistinctTimePeriods(observations, cancellationToken);
+    }
+
+    /// <summary>
+    /// Populates the #MatchedObservation temporary table with the ids of the matching observations and returns a
+    /// queryable over the corresponding observations. The query is not executed here, allowing callers to either
+    /// materialise it in full or stream it.
+    /// </summary>
+    private async Task<IQueryable<Observation>> BuildMatchedObservationsQuery(
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
+        CancellationToken cancellationToken
+    )
+    {
+        await observationService.GetMatchedObservations(
+            subjectId: SubjectId,
+            filterItemIds: filterItemIds,
+            locationIds: locationIds,
+            timePeriod: timePeriod,
+            cancellationToken: cancellationToken
+        );
+
+        var matchedObservationIds = context.MatchedObservations.Select(o => o.Id);
+
+        return context
+            .Observation.AsNoTracking()
+            .Include(o => o.Location)
+            .Include(o => o.FilterItems)
+            .Where(o => matchedObservationIds.Contains(o.Id));
+    }
+
+    /// <summary>
+    /// Retrieves the filter items present on the observations whose ids have already been stored in the
+    /// #MatchedObservation temporary table, choosing the best strategy based on how many observations were
+    /// matched relative to the total number of observations for the data set.
+    /// </summary>
+    private async Task<List<FilterItem>> ListFilterItemsFromMatchedObservations(
+        ITempTableReference matchedObservationsTableReference,
+        CancellationToken cancellationToken
+    )
+    {
+        // use longs to prevent int wrapping to 0, if we have very large data sets in the future
+        var matchedObservationCount = await context.MatchedObservations.LongCountAsync(cancellationToken);
+
+        // If no Observations have been matched, simply return no Filter Items.
+        if (matchedObservationCount == 0)
+        {
+            logger.LogDebug(message: "No Observations matched. Returning no Filter Items.");
+            return [];
+        }
+
+        var fullObservationCount = await context.Observation.LongCountAsync(
+            o => o.SubjectId == SubjectId,
+            cancellationToken
+        );
+
+        // If all Observations have been matched so far, return all Filter Items.
+        if (matchedObservationCount == fullObservationCount)
+        {
+            logger.LogDebug(
+                message: "Using {Strategy} to find FilterItems.",
+                nameof(allObservationsMatchedFilterItemsStrategy)
+            );
+
+            var allFilterItems =
+                await allObservationsMatchedFilterItemsStrategy.GetFilterItemsFromMatchedObservationIds(
+                    SubjectId,
+                    cancellationToken
+                );
+
+            return [.. allFilterItems];
+        }
+
+        var percentageObservationsFound = matchedObservationCount * 100L / fullObservationCount;
+
+        logger.LogDebug(
+            message: "Found {PercentageObservationsFound}% Observations so far.",
+            percentageObservationsFound
+        );
+
+        // If we've matched a particular percentage threshold or more Observations so far,
+        // favour the approach that matches Filter Items quickest against a large set of
+        // Observations.
+        if (percentageObservationsFound >= PercentageObservationsFoundToUseDenseStrategy)
+        {
+            logger.LogDebug(
+                message: "Using {Strategy} to find FilterItems.",
+                nameof(denseObservationsMatchedFilterItemsStrategy)
+            );
+
+            var denseFilterItems =
+                await denseObservationsMatchedFilterItemsStrategy.GetFilterItemsFromMatchedObservationIds(
+                    subjectId: SubjectId,
+                    matchedObservationsTableReference: matchedObservationsTableReference,
+                    cancellationToken: cancellationToken
+                );
+
+            return [.. denseFilterItems];
+        }
+
+        logger.LogDebug(
+            message: "Using {Strategy} to find FilterItems.",
+            nameof(sparseObservationsMatchedFilterItemsStrategy)
+        );
+
+        // If we've matched less than the percentage threshold of the Observations so far,
+        // favour the approach that matches Filter Items quickest against a smaller set of
+        // Observations.
+        var sparseFilterItems =
+            await sparseObservationsMatchedFilterItemsStrategy.GetFilterItemsFromMatchedObservationIds(
+                subjectId: SubjectId,
+                matchedObservationsTableReference: matchedObservationsTableReference,
+                cancellationToken: cancellationToken
+            );
+
+        return [.. sparseFilterItems];
+    }
+}

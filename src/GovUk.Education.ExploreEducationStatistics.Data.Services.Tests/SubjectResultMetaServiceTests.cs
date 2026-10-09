@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -24,6 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
@@ -89,7 +92,9 @@ public class SubjectResultMetaServiceTests
             )
             .WithSubject(subject);
 
-        ReleaseFile releaseFile = _dataFixture.DefaultReleaseFile();
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var observations = new List<Observation>();
 
@@ -111,17 +116,17 @@ public class SubjectResultMetaServiceTests
         }
 
         var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
-        var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+        var dataSet = new Mock<IStorageDataSet>(Strict);
         var locationService = new Mock<ILocationService>(Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-        var indicatorRepository = new Mock<IIndicatorRepository>(Strict);
-        var locationRepository = new Mock<ILocationRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>())).Returns([]);
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
+        dataSet
+            .Setup(s => s.ListFilterItems(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         locationService
             .Setup(s =>
@@ -137,7 +142,7 @@ public class SubjectResultMetaServiceTests
             .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
+        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
 
@@ -150,10 +155,9 @@ public class SubjectResultMetaServiceTests
                 contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 boundaryLevelRepository: boundaryLevelRepository.Object,
-                filterItemRepository: filterItemRepository.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(subject.Id, dataSet.Object).Object,
                 locationService: locationService.Object,
                 footnoteRepository: footnoteRepository.Object,
-                indicatorRepository: indicatorRepository.Object,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
                 timePeriodService: timePeriodService.Object
             );
@@ -162,10 +166,8 @@ public class SubjectResultMetaServiceTests
 
             VerifyAllMocks(
                 boundaryLevelRepository,
-                filterItemRepository,
+                dataSet,
                 footnoteRepository,
-                indicatorRepository,
-                locationRepository,
                 releaseDataFileRepository,
                 timePeriodService
             );
@@ -181,6 +183,151 @@ public class SubjectResultMetaServiceTests
             Assert.Equal(publication.Title, viewModel.PublicationName);
             Assert.Equal(releaseFile.Name, viewModel.SubjectName);
             Assert.False(viewModel.GeoJsonAvailable);
+        }
+    }
+
+    [Fact]
+    public async Task GetSubjectMeta_FilterItemsFromObservationsReturnedForSubject()
+    {
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var releaseVersion = publication.ReleaseVersions[0];
+
+        Subject subject = _dataFixture.DefaultSubject();
+
+        ReleaseSubject releaseSubject = _dataFixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            )
+            .WithSubject(subject);
+
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
+
+        Filter filter = _dataFixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 3).WithSubject(subject);
+        var filterItems = filter.FilterGroups[0].FilterItems;
+
+        Location location = _dataFixture.DefaultLocation().WithPresetRegion();
+
+        // The first filter item appears on two observations and the third on none, so the service should
+        // request only the distinct filter items that appear on the observations
+        var observations = ListOf(
+            new Observation
+            {
+                Location = location,
+                FilterItems = [new ObservationFilterItem { FilterItemId = filterItems[0].Id }],
+            },
+            new Observation
+            {
+                Location = location,
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItemId = filterItems[0].Id },
+                    new ObservationFilterItem { FilterItemId = filterItems[1].Id },
+                ],
+            },
+            new Observation { Location = location, FilterItems = [] }
+        );
+
+        var expectedFilterItemIds = ListOf(filterItems[0].Id, filterItems[1].Id);
+
+        var query = new FullTableQuery { Indicators = new List<Guid>(), SubjectId = subject.Id };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        var locationService = new Mock<ILocationService>(Strict);
+        var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+        boundaryLevelRepository
+            .Setup(s => s.FindByGeographicLevels(new List<GeographicLevel> { location.GeographicLevel }))
+            .Returns([]);
+
+        dataSet
+            .Setup(s =>
+                s.ListFilterItems(
+                    It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync([filterItems[0], filterItems[1]]);
+
+        locationService
+            .Setup(s =>
+                s.GetLocationViewModels(
+                    It.IsAny<List<Location>>(),
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null
+                )
+            )
+            .ReturnsAsync([]);
+
+        footnoteRepository
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
+                    query.Indicators
+                )
+            )
+            .ReturnsAsync([]);
+
+        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+
+        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
+
+        timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                boundaryLevelRepository: boundaryLevelRepository.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(subject.Id, dataSet.Object).Object,
+                locationService: locationService.Object,
+                footnoteRepository: footnoteRepository.Object,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                timePeriodService: timePeriodService.Object
+            );
+
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations, isCroppedTable: false);
+
+            VerifyAllMocks(
+                boundaryLevelRepository,
+                dataSet,
+                footnoteRepository,
+                releaseDataFileRepository,
+                timePeriodService
+            );
+
+            var viewModel = result.AssertRight();
+
+            var filterViewModel = Assert.Single(viewModel.Filters).Value;
+            var filterGroupViewModel = Assert.Single(filterViewModel.Options).Value;
+            Assert.Equal(expectedFilterItemIds, filterGroupViewModel.Options.Select(o => o.Value).ToList());
         }
     }
 
@@ -262,11 +409,9 @@ public class SubjectResultMetaServiceTests
         }
 
         var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
-        var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+        var dataSet = new Mock<IStorageDataSet>(Strict);
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
-        var indicatorRepository = new Mock<IIndicatorRepository>(Strict);
         var locationService = new Mock<ILocationService>(Strict);
-        var locationRepository = new Mock<ILocationRepository>(Strict);
         var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
@@ -286,17 +431,23 @@ public class SubjectResultMetaServiceTests
             )
             .Returns(new List<BoundaryLevel> { _countriesBoundaryLevel, _regionsBoundaryLevel });
 
-        filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
+        dataSet
+            .Setup(s => s.ListFilterItems(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         footnoteRepository
             .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
             .ReturnsAsync([]);
 
-        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
+        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository
             .Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
-            .ReturnsAsync(new ReleaseFile());
+            .ReturnsAsync(
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
+            );
 
         timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
 
@@ -308,9 +459,8 @@ public class SubjectResultMetaServiceTests
                 contentDbContext: contentDbContext,
                 boundaryLevelRepository: boundaryLevelRepository.Object,
                 locationService: locationService.Object,
-                filterItemRepository: filterItemRepository.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(subject.Id, dataSet.Object).Object,
                 footnoteRepository: footnoteRepository.Object,
-                indicatorRepository: indicatorRepository.Object,
                 releaseDataFileRepository: releaseDataFileRepository.Object,
                 timePeriodService: timePeriodService.Object,
                 options: options
@@ -320,10 +470,8 @@ public class SubjectResultMetaServiceTests
 
             VerifyAllMocks(
                 boundaryLevelRepository,
-                filterItemRepository,
+                dataSet,
                 footnoteRepository,
-                indicatorRepository,
-                locationRepository,
                 releaseDataFileRepository,
                 timePeriodService
             );
@@ -350,11 +498,10 @@ public class SubjectResultMetaServiceTests
         StatisticsDbContext statisticsDbContext,
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
-        IFilterItemRepository? filterItemRepository = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         ILocationService? locationService = null,
         IBoundaryLevelRepository? boundaryLevelRepository = null,
         IFootnoteRepository? footnoteRepository = null,
-        IIndicatorRepository? indicatorRepository = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
         ISubjectRepository? subjectRepository = null,
@@ -366,9 +513,8 @@ public class SubjectResultMetaServiceTests
             contentDbContext ?? InMemoryContentDbContext(),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             boundaryLevelRepository ?? Mock.Of<IBoundaryLevelRepository>(Strict),
-            filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
-            indicatorRepository ?? Mock.Of<IIndicatorRepository>(Strict),
+            storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(Strict),
             locationService ?? Mock.Of<ILocationService>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService ?? AlwaysTrueUserService().Object,

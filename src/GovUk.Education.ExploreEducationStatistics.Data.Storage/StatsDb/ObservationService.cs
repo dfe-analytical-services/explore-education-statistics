@@ -3,11 +3,11 @@ using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 public class ObservationService(
     StatisticsDbContext context,
@@ -17,7 +17,10 @@ public class ObservationService(
 ) : IObservationService
 {
     public async Task<ITempTableReference> GetMatchedObservations(
-        FullTableQuery query,
+        Guid subjectId,
+        IEnumerable<Guid> filterItemIds,
+        IEnumerable<Guid> locationIds,
+        TimePeriodQuery? timePeriod,
         CancellationToken cancellationToken = default
     )
     {
@@ -25,10 +28,10 @@ public class ObservationService(
 
         var (sql, sqlParameters, matchingObservationTable) = await queryGenerator.GetMatchingObservationsQuery(
             context,
-            query.SubjectId,
-            query.GetFilterItemIds(),
-            query.LocationIds,
-            query.TimePeriod,
+            subjectId,
+            filterItemIds.ToList(),
+            locationIds.ToList(),
+            timePeriod,
             cancellationToken
         );
 
