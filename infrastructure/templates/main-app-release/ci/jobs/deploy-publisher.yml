@@ -22,6 +22,8 @@ jobs:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - download: MainBuild
               displayName: Download Publisher artifact
               artifact: publisher
