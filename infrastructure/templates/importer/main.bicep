@@ -1,6 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -28,11 +27,13 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that the code
+deployment pipeline has since applied - see importer-appsettings.bicep.
+''')
+param existingAppSettings object = {}
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -82,7 +83,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     netFrameworkVersion: 'v10.0'
     alwaysOn: true
     deployQueueRoleAssignment: true
-    healthCheckPath: '/'
+    healthCheckPath: '/api/health'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
     outboundSubnetId: outboundVnetSubnet.id
     storageAccountAllowedSubnetIds: [adminSubnet.id]
@@ -115,20 +116,12 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       alertsGroupName: resourceNames.alertsGroup
     } : null
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    appSettings: [
-      {
-        name: 'App__RowsPerBatch'
-        value: '3000'
-      }
-      {
-        name: 'App__PrivateStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
-      }
-      {
-        name: 'App__ImporterStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
-      }
-    ]
+    // Application-specific appsettings (App__RowsPerBatch, App__PrivateStorageConnectionString,
+    // App__ImporterStorageConnectionString) are no longer seeded from here - the app-release
+    // pipeline applies them ahead of each code deploy via importer-appsettings.bicep. See
+    // existingAppSettings above for how they're preserved across infrastructure deploys.
+    appSettings: []
+    existingAppSettings: existingAppSettings
     tagValues: tagValues
   }
 }
