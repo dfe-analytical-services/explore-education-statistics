@@ -179,3 +179,4 @@ var resourceNames = {
 }
 
 output screenerFunctionAppUrl string = screenerFunctionAppModule.outputs.functionAppUrl
+output keyVaultName string = resourceNames.existingResources.keyVault
