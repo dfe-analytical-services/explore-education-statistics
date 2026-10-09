@@ -448,8 +448,8 @@ export default function ChartBuilder({
                 )}
               {forms.legend && axes.major && legend && (
                 <TabsSection
-                  title="Legend"
-                  headingTitle="Legend"
+                  title="Legend and styling"
+                  headingTitle="Legend and styling"
                   id={forms.legend.id}
                 >
                   <ChartLegendConfiguration

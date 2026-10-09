@@ -98,7 +98,7 @@ describe('ChartBuilder', () => {
     expect(tabs[1]).toHaveTextContent('Data sets');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
-    expect(tabs[2]).toHaveTextContent('Legend');
+    expect(tabs[2]).toHaveTextContent('Legend and styling');
     expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
 
     expect(tabs[3]).toHaveTextContent('X Axis (major axis)');
