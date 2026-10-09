@@ -21,7 +21,7 @@ public class TableBuilderQueryOptimiserTests
     public TableBuilderQueryOptimiserTests()
     {
         _dataSet = new Mock<IStorageDataSet>(Strict);
-        _optimiser = BuildOptimiser(maxTableCellsAllowed: 20);
+        _optimiser = BuildTableBuilderQueryOptimiser(maxTableCellsAllowed: 20);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class TableBuilderQueryOptimiserTests
 
         // Cropping the time periods alone should bring the query within the limit:
         // 2 indicators x 2 locations x 5 time periods x 10 filter items
-        var optimiser = BuildOptimiser(maxTableCellsAllowed: 200);
+        var optimiser = BuildTableBuilderQueryOptimiser(maxTableCellsAllowed: 200);
 
         // Act
         var result = await optimiser.CropQuery(query, default);
@@ -142,7 +142,7 @@ public class TableBuilderQueryOptimiserTests
         await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.CropQuery(query, default));
     }
 
-    private TableBuilderQueryOptimiser BuildOptimiser(int maxTableCellsAllowed)
+    private TableBuilderQueryOptimiser BuildTableBuilderQueryOptimiser(int maxTableCellsAllowed)
     {
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
         storageDataSetResolver
