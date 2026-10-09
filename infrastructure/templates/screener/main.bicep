@@ -24,9 +24,6 @@ param resourceTags {
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
-@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
-param screenerAppRegistrationClientId string = ''
-
 @description('Specifies the principal id of the Azure DevOps SPN.')
 @secure()
 param devopsServicePrincipalId string = ''
@@ -110,7 +107,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     functionAppImageName: 'ees-screener-api'
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
     acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
-    screenerAppRegistrationClientId: screenerAppRegistrationClientId
+    screenerAppRegistrationClientId: keyVault.getSecret('ees-screener-app-registration-client-id')
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
     logScreeningResults: logScreeningResults
@@ -182,3 +179,4 @@ var resourceNames = {
 }
 
 output screenerFunctionAppUrl string = screenerFunctionAppModule.outputs.functionAppUrl
+output keyVaultName string = resourceNames.existingResources.keyVault

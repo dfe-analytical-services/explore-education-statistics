@@ -24,7 +24,14 @@ jobs:
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                
+
+            - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                keyVaultName: $(keyVaultName)
+                secretName: ees-public-api-data-processor-app-registration-client-id
+                variableName: dataProcessorAppRegistrationClientId
+
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.

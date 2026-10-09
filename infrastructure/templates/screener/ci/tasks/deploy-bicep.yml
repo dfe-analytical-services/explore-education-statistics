@@ -33,6 +33,5 @@ steps:
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               screenerDockerImageTag='$(screenerDockerImageTag)' \
-              screenerAppRegistrationClientId='$(screenerAppRegistrationClientId)' \
               devopsServicePrincipalId="$servicePrincipalId" \
               deployAlerts="$(deployAlerts)"
