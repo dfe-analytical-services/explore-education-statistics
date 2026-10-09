@@ -95,6 +95,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       resourceId('Microsoft.Network/virtualNetworks/subnets', vNet.name, outboundVnetSubnet.name)
     ]
     storageFirewallRules: maintenanceIpRanges
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
     functionAppFirewallRules: []
     healthCheckPath: '/api/health'

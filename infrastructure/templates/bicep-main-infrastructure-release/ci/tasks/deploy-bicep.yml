@@ -42,6 +42,9 @@ parameters:
   - name: publisherProdAppSettings
     type: string
     default: '{}'
+  - name: notifierProdAppSettings
+    type: string
+    default: '{}'
 
 steps:
   - task: BicepDeploy@0
@@ -68,3 +71,4 @@ steps:
         publicSiteProdAppSettings: ${{ parameters.publicSiteProdAppSettings }}
         importerProdAppSettings: ${{ parameters.importerProdAppSettings }}
         publisherProdAppSettings: ${{ parameters.publisherProdAppSettings }}
+        notifierProdAppSettings: ${{ parameters.notifierProdAppSettings }}

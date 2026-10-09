@@ -1,6 +1,5 @@
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -25,12 +24,6 @@ param maintenanceIpRanges IpRange[]
 @description('Number of days to retain blobs after delete.')
 param blobDeleteRetentionDays int
 
-@description('Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key.')
-param suppressExceptionsForTeamOnlyApiKeyErrors bool
-
-@description('The public-facing URL of the public site.')
-param publicAppUrl string
-
 @description('The origins supported for CORS calls to this Function App.')
 param allowedOrigins string[]
 
@@ -40,11 +33,13 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that the code
+deployment pipeline has since applied - see notifier-appsettings.bicep.
+''')
+param existingAppSettings object = {}
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -103,6 +98,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountAllowedSubnetIds: [publisherSubnet.id]
     storageFirewallRules: maintenanceIpRanges
     storageAccountPublicNetworkAccessEnabled: true
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
     minTlsVersion: minTlsVersion
     connectionStrings: [
@@ -124,38 +120,13 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       fileServiceCapacity: false
       alertsGroupName: resourceNames.alertsGroup
     } : null
-    healthCheckPath: '/'
+    healthCheckPath: '/api/health'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    appSettings: [
-      {
-        name: 'App__EmailEnabled'
-        value: 'true'
-      }
-      {
-        name: 'App__SuppressExceptionsForTeamOnlyApiKeyErrors'
-        value: string(suppressExceptionsForTeamOnlyApiKeyErrors)
-      }
-      {
-        name: 'App__Url'
-        value: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
-      }
-      {
-        name: 'App__PublicAppUrl'
-        value: publicAppUrl
-      }
-      {
-        name: 'App__NotifierStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifierStorageAccountConnectionString)
-      }
-      {
-        name: 'App__TokenSecretKey'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifier.tokenSecretKey)
-      }
-      {
-        name: 'GovUkNotify__ApiKey'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifier.govUkNotifyApiKey)
-      }
-    ]
+    // Application-specific appsettings are no longer seeded from here - the app-release
+    // pipeline applies them ahead of each code deploy via notifier-appsettings.bicep. See
+    // existingAppSettings above for how they're preserved across infrastructure deploys.
+    appSettings: []
+    existingAppSettings: existingAppSettings
     tagValues: tagValues
   }
 }

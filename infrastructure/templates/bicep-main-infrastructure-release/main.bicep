@@ -107,6 +107,10 @@ param notifierConfigParam NotifierConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var notifierConfig = mergeNotifierConfig(notifierConfigParam)
 
+@secure()
+@description('The existing appsettings for the Notifier Function App, fetched by the pipeline before deployment.')
+param notifierProdAppSettings object = {}
+
 
 
 //
@@ -212,14 +216,13 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: notifierConfig.appServiceSku!
-    suppressExceptionsForTeamOnlyApiKeyErrors: notifierConfig.suppressExceptionsForTeamOnlyApiKeyErrors!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     allowedOrigins: publicSiteAllowedOrigins
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.notifier.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    existingAppSettings: notifierProdAppSettings
     deployAlerts: true
     tagValues: tags
   }

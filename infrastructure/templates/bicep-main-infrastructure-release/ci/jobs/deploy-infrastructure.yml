@@ -70,6 +70,8 @@ jobs:
                     prodVariableName: importerProdAppSettings
                   - appName: $(subscription)-fa-ees-publisher
                     prodVariableName: publisherProdAppSettings
+                  - appName: $(subscription)-fa-ees-notify
+                    prodVariableName: notifierProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -88,3 +90,4 @@ jobs:
                 publicSiteProdAppSettings: $(publicSiteProdAppSettings)
                 importerProdAppSettings: $(importerProdAppSettings)
                 publisherProdAppSettings: $(publisherProdAppSettings)
+                notifierProdAppSettings: $(notifierProdAppSettings)
