@@ -163,6 +163,21 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
 }
 
+// Used to encrypt the ASP.NET Core Data Protection key ring for Windows App Services, as the key ring
+// can't safely live on local disk when shared across deployment slots.
+resource dataProtectionKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
+  parent: keyVault
+  name: resourceNames.keyVault.keys.dataProtection
+  properties: {
+    kty: 'RSA'
+    keySize: 2048
+    keyOps: [
+      'wrapKey'
+      'unwrapKey'
+    ]
+  }
+}
+
 var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
 
 module importerModuleDeploy '../importer/main.bicep' = {

@@ -55,6 +55,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 var vaultUri = keyVault.properties.vaultUri
 
+// Used to encrypt the ASP.NET Core Data Protection key ring - see app-service.bicep /
+// bicep-main-infrastructure-release/main.bicep's dataProtectionKey resource for why this is
+// needed (the key ring can't safely live on local disk when shared across deployment slots).
+var dataProtectionKeyUri = '${vaultUri}keys/${resourceNames.keyVault.keys.dataProtection}'
+
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.publicSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -124,6 +129,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     keyVaultRoles: {
       keyVaultName: resourceNames.keyVault.keyVault
       secretsUser: true
+      secretsOfficer: true
+      cryptoUser: true
       legacyKeyVaultRoleAssignmentName: true
     }
     connectionStrings: [
@@ -168,6 +175,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       PublicApp__Url: publicAppUrl
       Analytics__Enabled: analyticsEnabled
       Analytics__BasePath: analyticsFileShareMountPath
+      DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
+      DataProtection__KeyVaultUri: vaultUri
     }
     tagValues: tagValues
   }
