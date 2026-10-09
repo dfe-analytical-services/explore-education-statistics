@@ -23,7 +23,7 @@ parameters:
   - name: deployAdminFirst
     type: boolean
     default: true
-d
+
 stages:
   - stage: ${{ parameters.stageName }}
     displayName: Deploy ${{ parameters.environment }}
@@ -75,6 +75,7 @@ stages:
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
               - DeployAdmin
