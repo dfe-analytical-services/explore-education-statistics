@@ -11,6 +11,8 @@ param publicApiPublicUrl = 'https://pp-api.education.gov.uk/statistics-preprod'
 
 param recoveryServicesVaultImmutable = true
 
+param sqlServerPublicNetworkAccess = 'Disabled'
+
 param contentDbConfig = {
   sku: {
     name: 'Standard'
