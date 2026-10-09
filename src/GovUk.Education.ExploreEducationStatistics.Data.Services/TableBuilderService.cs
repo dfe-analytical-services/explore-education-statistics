@@ -174,7 +174,13 @@ public class TableBuilderService : ITableBuilderService
 
                         await WriteCsvHeaderRow(csv, meta);
                         await foreach (
-                            var batch in dataSet.ListObservationBatches(query, ObservationBatchSize, cancellationToken)
+                            var batch in dataSet.ListObservationBatches(
+                                filterItemIds: query.GetFilterItemIds(),
+                                locationIds: query.LocationIds,
+                                timePeriod: query.TimePeriod,
+                                batchSize: ObservationBatchSize,
+                                cancellationToken: cancellationToken
+                            )
                         )
                         {
                             await WriteCsvRows(csv, batch, meta, cancellationToken);
@@ -192,7 +198,12 @@ public class TableBuilderService : ITableBuilderService
             .OnSuccess(async preparedQuery =>
             {
                 var dataSet = await _storageDataSetResolver.Resolve(preparedQuery.Query.SubjectId, cancellationToken);
-                var observations = await dataSet.ListObservations(preparedQuery.Query, cancellationToken);
+                var observations = await dataSet.ListObservations(
+                    filterItemIds: preparedQuery.Query.GetFilterItemIds(),
+                    locationIds: preparedQuery.Query.LocationIds,
+                    timePeriod: preparedQuery.Query.TimePeriod,
+                    cancellationToken: cancellationToken
+                );
 
                 return (observations, preparedQuery.RequiresCropping);
             });
