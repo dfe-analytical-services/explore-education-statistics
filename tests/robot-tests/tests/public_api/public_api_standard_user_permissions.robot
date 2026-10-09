@@ -156,7 +156,7 @@ Create a new minor version of the API data set as bau1
     ...    testid:live-api-data-sets
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    name:releaseFileId    ${SUBJECT_2_NAME}
+    user chooses API data set candidate    ${SUBJECT_2_NAME}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading

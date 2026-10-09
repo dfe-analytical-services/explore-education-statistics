@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -132,6 +134,7 @@ internal class DataSetService(
         return await GetReleaseVersion(releaseFileId, cancellationToken)
             .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
             .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccess(_ => ValidateReleaseFileIsApiCompatible(releaseFileId, cancellationToken))
             .OnSuccess(async _ =>
                 await processorClient.CreateDataSet(releaseFileId: releaseFileId, cancellationToken: cancellationToken)
             )
@@ -306,6 +309,7 @@ internal class DataSetService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
+            PublicApiCompatible = releaseFile.PublicApiCompatible,
             OriginalFileId = originalReleaseFile?.FileId,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
@@ -329,6 +333,7 @@ internal class DataSetService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
+            PublicApiCompatible = releaseFile.PublicApiCompatible,
             Published = dataSetVersion.Published!.Value,
             TotalResults = dataSetVersion.TotalResults,
             Notes = dataSetVersion.Notes,
@@ -395,6 +400,30 @@ internal class DataSetService(
         }
 
         return Unit.Instance;
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseFileIsApiCompatible(
+        Guid releaseFileId,
+        CancellationToken cancellationToken
+    )
+    {
+        // BAU users can override the screener's API compatibility result.
+        if ((await userService.CheckIsBauUser()).IsRight)
+        {
+            return Unit.Instance;
+        }
+
+        var publicApiCompatible = await contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Where(rf => rf.Id == releaseFileId)
+            .Select(rf => rf.PublicApiCompatible)
+            .SingleAsync(cancellationToken);
+
+        return publicApiCompatible == false
+            ? ValidationUtils.ValidationResult(
+                ValidationMessages.GenerateErrorReleaseFileNotApiCompatible(releaseFileId)
+            )
+            : Unit.Instance;
     }
 
     private record DataSetReleaseVersions

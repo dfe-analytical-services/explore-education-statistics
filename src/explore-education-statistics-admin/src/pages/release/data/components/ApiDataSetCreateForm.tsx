@@ -20,6 +20,25 @@ export interface ApiDataSetCreateFormProps {
   onSubmit: (values: ApiDataSetCreateFormValues) => void;
 }
 
+function getCandidateLabel({
+  title,
+  publicApiCompatible,
+}: ApiDataSetCandidate): string {
+  // Only BAU users are shown data files that failed the screener's API
+  // compatibility checks, so flag these to make the override explicit.
+  if (publicApiCompatible === false) {
+    return `${title} (not API compatible)`;
+  }
+
+  // Data files uploaded before the screener was introduced have no
+  // API compatibility result.
+  if (publicApiCompatible === null) {
+    return `${title} (API compatibility unknown)`;
+  }
+
+  return title;
+}
+
 export default function ApiDataSetCreateForm({
   dataSetCandidates,
   submitText = 'Confirm new API data set',
@@ -43,7 +62,7 @@ export default function ApiDataSetCreateForm({
               name="releaseFileId"
               label="Data set"
               options={dataSetCandidates.map(candidate => ({
-                label: candidate.title,
+                label: getCandidateLabel(candidate),
                 value: candidate.releaseFileId,
               }))}
               placeholder="Choose a data set"

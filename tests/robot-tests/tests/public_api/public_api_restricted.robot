@@ -66,7 +66,7 @@ Create multiple API data sets and refresh the page
 
     user clicks button    Create API data set
     ${modal}=    user waits until modal is visible    Create a new API data set
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_1}
+    user chooses API data set candidate    ${SUBJECT_NAME_1}
     user clicks button    Confirm new API data set    ${modal}
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
@@ -74,7 +74,7 @@ Create multiple API data sets and refresh the page
     ${modal}=    user waits until modal is visible    Create a new API data set
     user checks select does not contain option    name:releaseFileId    ${SUBJECT_NAME_1}
     user checks select contains option    name:releaseFileId    ${SUBJECT_NAME_2}
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_2}
+    user chooses API data set candidate    ${SUBJECT_NAME_2}
     user clicks button    Confirm new API data set    ${modal}
     user waits until modal is not visible    Create a new API data set    %{WAIT_LONG}
 
@@ -194,7 +194,7 @@ Create a different version of an API data set (minor version)
     user clicks button in table cell    1    3    Create new version    testid:live-api-data-sets
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_4}
+    user chooses API data set candidate    ${SUBJECT_NAME_4}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading
@@ -244,7 +244,7 @@ Create a different version of API data set (major version) for the third release
 
     ${modal}=    user waits until modal is visible    Create a new API data set version
 
-    user chooses select option    name:releaseFileId    ${SUBJECT_NAME_5}
+    user chooses API data set candidate    ${SUBJECT_NAME_5}
     user clicks button    Confirm new data set version
 
     user waits until page finishes loading

@@ -245,6 +245,7 @@ public class ReleaseAmendmentServiceTests
                 Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 PublicApiDataSetId = Guid.NewGuid(),
                 PublicApiDataSetVersion = SemVersion.Parse("1.0.0", SemVersionStyles.Any),
+                PublicApiCompatible = false,
             },
             new()
             {
@@ -1025,6 +1026,7 @@ public class ReleaseAmendmentServiceTests
 
         Assert.Equal(originalFile.PublicApiDataSetId, amendmentDataFile.PublicApiDataSetId);
         Assert.Equal(originalFile.PublicApiDataSetVersion, amendmentDataFile.PublicApiDataSetVersion);
+        Assert.Equal(originalFile.PublicApiCompatible, amendmentDataFile.PublicApiCompatible);
 
         // And assert that the file referenced is the SAME file reference as linked from the original Release's
         // link table entry

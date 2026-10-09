@@ -3,6 +3,7 @@ import client from '@admin/services/utils/service';
 export interface ApiDataSetCandidate {
   releaseFileId: string;
   title: string;
+  publicApiCompatible?: boolean | null;
 }
 
 const apiDataSetCandidateService = {
