@@ -15,8 +15,9 @@ public interface IStorageDataSet
     Guid SubjectId { get; }
 
     /// <summary>
-    /// Observations at the given locations within the time period that have every one of the given filter items,
-    /// with their Location and FilterItems populated.
+    /// Observations at the given locations within the time period that have at least one of the given filter items
+    /// for each filter, with their Location and FilterItems populated. If no arguments are provided, all observations
+    /// for the data set are returned.
     /// </summary>
     Task<List<Observation>> ListObservations(
         IEnumerable<Guid> filterItemIds,
@@ -59,20 +60,18 @@ public interface IStorageDataSet
 
     /// <summary>
     /// All filters for the data set. Their FilterGroups and FilterItems are only populated when
-    /// <paramref name="includeItems" /> is true, as filter items can be numerous.
+    /// <paramref name="includeItems" /> is true.
     /// </summary>
     Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// All indicators for the data set.
+    /// Indicators for the data set restricted to the given ids, or all indicators for the data set if
+    /// <paramref name="indicatorIds" /> is null.
     /// </summary>
-    Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Indicators for the data set restricted to the given ids. Ids belonging to other data sets are excluded,
-    /// and an empty set of ids yields no indicators.
-    /// </summary>
-    Task<List<Indicator>> ListIndicators(IEnumerable<Guid> indicatorIds, CancellationToken cancellationToken = default);
+    Task<List<Indicator>> ListIndicators(
+        IEnumerable<Guid>? indicatorIds = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// All indicator groups for the data set, with their Indicators.
@@ -80,29 +79,19 @@ public interface IStorageDataSet
     Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The distinct locations referenced by the data set's observations.
+    /// Locations by id, or all locations if <paramref name="locationIds" /> is null. Unknown ids are ignored.
     /// </summary>
-    Task<List<Location>> ListLocations(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Locations by id. Unknown ids are ignored. `locationIds` are expected to belong to the data set, but might be
-    /// returned even if they belong to a different data set.
-    /// </summary>
-    Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// The distinct time periods across the data set's observations, ordered by year and then time identifier.
-    /// </summary>
-    Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+    Task<List<Location>> ListLocations(
+        IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     );
 
     /// <summary>
-    /// As <see cref="ListTimePeriods(CancellationToken)" />, but only over the observations at the given locations.
-    /// Location ids not referenced by the data set's observations are ignored.
+    /// The time periods across the data set's observations at the given locations, or across all the data
+    /// set's observations if <paramref name="locationIds" /> is null, ordered by year and then time identifier.
     /// </summary>
     Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
-        IEnumerable<Guid> locationIds,
+        IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     );
 }
