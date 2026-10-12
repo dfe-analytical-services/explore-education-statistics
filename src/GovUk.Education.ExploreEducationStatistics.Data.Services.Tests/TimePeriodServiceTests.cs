@@ -62,7 +62,9 @@ public abstract class TimePeriodServiceTests
         {
             var dataSet = new Mock<IStorageDataSet>(Strict);
 
-            dataSet.Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>())).ReturnsAsync(timePeriods);
+            dataSet
+                .Setup(s => s.ListTimePeriods(locationIds: null, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(timePeriods);
 
             return dataSet;
         }
