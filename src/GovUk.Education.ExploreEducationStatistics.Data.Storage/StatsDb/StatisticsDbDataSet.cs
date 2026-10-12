@@ -160,26 +160,22 @@ public class StatisticsDbDataSet(
         return pairs.Select(pair => (pair.ParentFilterItemId, pair.ChildFilterItemId)).ToList();
     }
 
-    public async Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default)
-    {
-        return await context
-            .Indicator.AsNoTracking()
-            .Where(indicator => indicator.IndicatorGroup.SubjectId == SubjectId)
-            .ToListAsync(cancellationToken);
-    }
-
     public async Task<List<Indicator>> ListIndicators(
-        IEnumerable<Guid> indicatorIds,
+        IEnumerable<Guid>? indicatorIds = null,
         CancellationToken cancellationToken = default
     )
     {
-        var indicatorIdList = indicatorIds.ToList();
-
-        return await context
+        var indicators = context
             .Indicator.AsNoTracking()
-            .Where(indicator => indicator.IndicatorGroup.SubjectId == SubjectId)
-            .Where(indicator => indicatorIdList.Contains(indicator.Id))
-            .ToListAsync(cancellationToken);
+            .Where(indicator => indicator.IndicatorGroup.SubjectId == SubjectId);
+
+        if (indicatorIds is not null)
+        {
+            var indicatorIdList = indicatorIds.ToList();
+            indicators = indicators.Where(indicator => indicatorIdList.Contains(indicator.Id));
+        }
+
+        return await indicators.ToListAsync(cancellationToken);
     }
 
     public async Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
@@ -191,21 +187,21 @@ public class StatisticsDbDataSet(
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Location>> ListLocations(CancellationToken cancellationToken = default)
-    {
-        return await context
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == SubjectId)
-            .Select(observation => observation.Location)
-            .Distinct()
-            .ToListAsync(cancellationToken);
-    }
-
     public async Task<List<Location>> ListLocations(
-        IEnumerable<Guid> locationIds,
+        IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     )
     {
+        if (locationIds is null)
+        {
+            return await context
+                .Observation.AsNoTracking()
+                .Where(o => o.SubjectId == SubjectId)
+                .Select(observation => observation.Location)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+        }
+
         var locationIdList = locationIds.ToList();
 
         return await context
@@ -225,24 +221,17 @@ public class StatisticsDbDataSet(
     }
 
     public Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
+        IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     )
     {
         var observations = context.Observation.AsNoTracking().Where(o => o.SubjectId == SubjectId);
 
-        return TimePeriodQueryUtils.ListDistinctTimePeriods(observations, cancellationToken);
-    }
-
-    public Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
-        IEnumerable<Guid> locationIds,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var locationIdList = locationIds.ToList();
-
-        var observations = context
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == SubjectId && EF.Constant(locationIdList).Contains(o.LocationId));
+        if (locationIds is not null)
+        {
+            var locationIdList = locationIds.ToList();
+            observations = observations.Where(o => EF.Constant(locationIdList).Contains(o.LocationId));
+        }
 
         return TimePeriodQueryUtils.ListDistinctTimePeriods(observations, cancellationToken);
     }

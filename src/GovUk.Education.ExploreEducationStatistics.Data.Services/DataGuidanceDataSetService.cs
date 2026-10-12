@@ -89,10 +89,9 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             filter.Name
         ));
 
-        var indicators = (await dataSet.ListIndicators(cancellationToken)).Select(indicator => new LabelValue(
-            indicator.Label,
-            indicator.Name
-        ));
+        var indicators = (await dataSet.ListIndicators(cancellationToken: cancellationToken)).Select(
+            indicator => new LabelValue(indicator.Label, indicator.Name)
+        );
 
         return filters.Concat(indicators).OrderBy(labelValue => labelValue.Value).ToList();
     }

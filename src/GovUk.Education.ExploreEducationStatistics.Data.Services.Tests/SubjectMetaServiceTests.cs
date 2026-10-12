@@ -95,10 +95,12 @@ public class SubjectMetaServiceTests
             .ReturnsAsync(new List<IndicatorGroup>());
 
         dataSet
-            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
+            .Setup(s => s.ListTimePeriods(locationIds: null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Location>());
+        dataSet
+            .Setup(s => s.ListLocations(locationIds: null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Location>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -228,10 +230,10 @@ public class SubjectMetaServiceTests
             .ReturnsAsync(new List<IndicatorGroup>());
 
         dataSet
-            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
+            .Setup(s => s.ListTimePeriods(locationIds: null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync(locations);
+        dataSet.Setup(s => s.ListLocations(locationIds: null, It.IsAny<CancellationToken>())).ReturnsAsync(locations);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -408,10 +410,10 @@ public class SubjectMetaServiceTests
             .ReturnsAsync(new List<IndicatorGroup>());
 
         dataSet
-            .Setup(s => s.ListTimePeriods(It.IsAny<CancellationToken>()))
+            .Setup(s => s.ListTimePeriods(locationIds: null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
-        dataSet.Setup(s => s.ListLocations(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListLocations(locationIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
