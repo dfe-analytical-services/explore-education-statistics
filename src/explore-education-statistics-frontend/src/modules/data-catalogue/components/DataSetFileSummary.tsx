@@ -209,7 +209,6 @@ export default function DataSetFileSummary({
               itemNamePlural="indicators"
               listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
               testId="indicators"
-              renderAllItems
             >
               {indicators.map((indicator, index) => (
                 <li key={`indicator-${index.toString()}`}>{indicator}</li>
@@ -233,7 +232,6 @@ export default function DataSetFileSummary({
               itemNamePlural="filters"
               listClassName="govuk-!-margin-top-0 govuk-!-margin-bottom-1"
               testId="filters"
-              renderAllItems
             >
               {filters.map((filter, index) => (
                 <li key={`filter-${index.toString()}`}>{filter}</li>
