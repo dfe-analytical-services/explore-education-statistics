@@ -77,7 +77,15 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
+                    .Setup(s =>
+                        s.GetMatchedObservations(
+                            subject.Id,
+                            filterItemIds,
+                            locationIds,
+                            timePeriod,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -136,7 +144,15 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
+                    .Setup(s =>
+                        s.GetMatchedObservations(
+                            subject.Id,
+                            filterItemIds,
+                            locationIds,
+                            timePeriod,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -193,7 +209,15 @@ public abstract class StatisticsDbDataSetTests
                 var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
-                    .Setup(s => s.GetMatchedObservations(subject.Id, filterItemIds, locationIds, timePeriod, default))
+                    .Setup(s =>
+                        s.GetMatchedObservations(
+                            subject.Id,
+                            filterItemIds,
+                            locationIds,
+                            timePeriod,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(Mock.Of<ITempTableReference>());
 
                 var dataSet = BuildDataSet(
@@ -267,7 +291,7 @@ public abstract class StatisticsDbDataSetTests
                         ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
                         locationIds,
                         timePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Mock.Of<ITempTableReference>());
@@ -275,7 +299,7 @@ public abstract class StatisticsDbDataSetTests
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
 
             allObservationsStrategy
-                .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, default))
+                .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(filterItemsToReturn);
 
             var dataSet = BuildDataSet(
@@ -350,7 +374,7 @@ public abstract class StatisticsDbDataSetTests
                         ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
                         locationIds,
                         timePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationTempTable);
@@ -358,7 +382,13 @@ public abstract class StatisticsDbDataSetTests
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
 
             denseObservationsStrategy
-                .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, matchedObservationTempTable, default))
+                .Setup(s =>
+                    s.GetFilterItemsFromMatchedObservationIds(
+                        subjectId,
+                        matchedObservationTempTable,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(filterItemsToReturn);
 
             var dataSet = BuildDataSet(
@@ -433,7 +463,7 @@ public abstract class StatisticsDbDataSetTests
                         ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
                         locationIds,
                         timePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationTempTable);
@@ -441,7 +471,13 @@ public abstract class StatisticsDbDataSetTests
             var filterItemsToReturn = Fixture.DefaultFilterItem().GenerateList(2);
 
             sparseObservationsStrategy
-                .Setup(s => s.GetFilterItemsFromMatchedObservationIds(subjectId, matchedObservationTempTable, default))
+                .Setup(s =>
+                    s.GetFilterItemsFromMatchedObservationIds(
+                        subjectId,
+                        matchedObservationTempTable,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(filterItemsToReturn);
 
             var dataSet = BuildDataSet(
@@ -497,7 +533,7 @@ public abstract class StatisticsDbDataSetTests
                         ItIs.EnumerableSequenceEqualTo(Enumerable.Empty<Guid>()),
                         locationIds,
                         timePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Mock.Of<ITempTableReference>());
