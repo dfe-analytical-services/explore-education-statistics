@@ -70,10 +70,16 @@ public class SubjectMetaService(
 
                 var dataSet = storageDataSetResolver.Resolve(releaseFile.File);
 
+                var filters = await dataSet.ListFilters(includeItems: true);
+                var indicators = await dataSet.ListIndicatorGroups();
+
                 return new SubjectMetaViewModel
                 {
-                    Filters = await GetFilters(dataSet, releaseFile.FilterSequence),
-                    Indicators = await GetIndicators(dataSet, releaseFile.IndicatorSequence),
+                    Filters = FiltersMetaViewModelBuilder.BuildFilters(filters, releaseFile.FilterSequence),
+                    Indicators = IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(
+                        indicators,
+                        releaseFile.IndicatorSequence
+                    ),
                     Locations = await GetLocations(dataSet),
                     TimePeriod = BuildTimePeriodsViewModels(await dataSet.ListTimePeriods()),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
@@ -109,8 +115,10 @@ public class SubjectMetaService(
                 && rf.File.Type == FileType.Data
             )
             .OnSuccessDo(releaseFile =>
-                ValidateFiltersForSubject(storageDataSetResolver.Resolve(releaseFile.File), request)
-            )
+            {
+                var dataSet = storageDataSetResolver.Resolve(releaseFile.File);
+                return ValidateFiltersForSubject(dataSet, request);
+            })
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of filters, filter groups and indicators observed
@@ -145,8 +153,10 @@ public class SubjectMetaService(
                 && rf.File.Type == FileType.Data
             )
             .OnSuccessDo(releaseFile =>
-                ValidateIndicatorGroupsForSubject(storageDataSetResolver.Resolve(releaseFile.File), request)
-            )
+            {
+                var dataSet = storageDataSetResolver.Resolve(releaseFile.File);
+                return ValidateIndicatorGroupsForSubject(dataSet, request);
+            })
             .OnSuccessVoid(async releaseFile =>
             {
                 // Set the sequence based on the order of indicator groups and indicators observed
@@ -208,20 +218,22 @@ public class SubjectMetaService(
                     timePeriod: request.TimePeriod,
                     cancellationToken: cancellationToken
                 );
-                var filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
-                    filterItems,
-                    releaseFile.FilterSequence
-                );
                 logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                var indicators = await GetIndicators(dataSet, releaseFile.IndicatorSequence);
+                var indicators = await dataSet.ListIndicatorGroups();
                 logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                 return new SubjectMetaViewModel
                 {
-                    Filters = filters,
-                    Indicators = indicators,
+                    Filters = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
+                        filterItems,
+                        releaseFile.FilterSequence
+                    ),
+                    Indicators = IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(
+                        indicators,
+                        releaseFile.IndicatorSequence
+                    ),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                 };
             }
@@ -231,15 +243,6 @@ public class SubjectMetaService(
                     "Unable to determine which SubjectMeta information has requested"
                 );
         }
-    }
-
-    private static async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(
-        IStorageDataSet dataSet,
-        List<FilterSequenceEntry>? filterSequence
-    )
-    {
-        var filters = await dataSet.ListFilters(includeItems: true);
-        return FiltersMetaViewModelBuilder.BuildFilters(filters, filterSequence);
     }
 
     private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(IStorageDataSet dataSet)
@@ -276,15 +279,6 @@ public class SubjectMetaService(
                     .ToList()
             )
             .ToList();
-    }
-
-    private static async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(
-        IStorageDataSet dataSet,
-        List<IndicatorGroupSequenceEntry>? indicatorSequence
-    )
-    {
-        var indicators = await dataSet.ListIndicatorGroups();
-        return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators, indicatorSequence);
     }
 
     private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(
