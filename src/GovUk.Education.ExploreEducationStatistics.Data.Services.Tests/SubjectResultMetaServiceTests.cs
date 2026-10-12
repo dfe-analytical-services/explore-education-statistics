@@ -144,7 +144,7 @@ public class SubjectResultMetaServiceTests
             )
             .ReturnsAsync([]);
 
-        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListIndicators(indicatorIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
 
@@ -295,7 +295,7 @@ public class SubjectResultMetaServiceTests
             )
             .ReturnsAsync([]);
 
-        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListIndicators(indicatorIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
 
@@ -443,7 +443,7 @@ public class SubjectResultMetaServiceTests
             )
             .ReturnsAsync([]);
 
-        dataSet.Setup(s => s.ListIndicators(It.IsAny<CancellationToken>())).ReturnsAsync([]);
+        dataSet.Setup(s => s.ListIndicators(indicatorIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         releaseDataFileRepository
             .Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
