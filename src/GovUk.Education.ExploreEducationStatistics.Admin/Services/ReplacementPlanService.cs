@@ -117,7 +117,9 @@ public class ReplacementPlanService(
                 var replacementSubjectId = replacementReleaseFile.File.SubjectId!.Value;
                 var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
 
-                var replacementTimePeriods = await replacementDataSet.ListTimePeriods(cancellationToken);
+                var replacementTimePeriods = await replacementDataSet.ListTimePeriods(
+                    cancellationToken: cancellationToken
+                );
 
                 var mapping = await contentDbContext.DataSetMappings.SingleAsync(
                     map =>
@@ -148,8 +150,10 @@ public class ReplacementPlanService(
                     includeItems: true,
                     cancellationToken: cancellationToken
                 );
-                var replacementIndicators = await replacementDataSet.ListIndicators(cancellationToken);
-                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
+                var replacementIndicators = await replacementDataSet.ListIndicators(
+                    cancellationToken: cancellationToken
+                );
+                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken: cancellationToken);
 
                 var mappingPlan = ReplacementPlanMappingViewModel.FromModel(
                     mapping,

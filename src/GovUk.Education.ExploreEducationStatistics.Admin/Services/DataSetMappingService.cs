@@ -212,7 +212,7 @@ public class DataSetMappingService(
                 var (mapping, replacementReleaseFile) = validated;
 
                 var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
-                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken);
+                var replacementLocations = await replacementDataSet.ListLocations(cancellationToken: cancellationToken);
 
                 var updatedMappings = request
                     .Updates.Select(update =>
