@@ -1,5 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
+import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
+import classNames from 'classnames';
 import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
 import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import { DataSetVariable } from '@frontend/services/dataSetFileService';
@@ -17,18 +19,19 @@ export default function DataSetFileVariables({ variables }: Props) {
   const totalVariables = variables.length;
   const expandable = totalVariables > defaultVisible;
   const [showAll, toggleShowAll] = useToggle(!expandable);
-  const displayVariables = showAll
-    ? variables
-    : variables.slice(0, defaultVisible);
+  const { isMounted } = useMounted();
+
+  // Without JS every row is visible, so only describe the table as
+  // truncated once JS is running and actually hiding rows.
+  const isShowingAll = showAll || !isMounted;
 
   return (
     <DataSetFilePageSection heading={pageSections[sectionId]} id={sectionId}>
       <table id={tableId} data-testid={tableId}>
         <caption className="govuk-!-margin-bottom-3">
-          {showAll
+          {isShowingAll
             ? `Table showing all ${totalVariables} variables`
-            : `Table showing first 
-          ${defaultVisible} of ${totalVariables} variables`}
+            : `Table showing first ${defaultVisible} of ${totalVariables} variables`}
         </caption>
         <thead>
           <tr>
@@ -37,8 +40,13 @@ export default function DataSetFileVariables({ variables }: Props) {
           </tr>
         </thead>
         <tbody>
-          {displayVariables.map(({ value, label }) => (
-            <tr key={value}>
+          {variables.map(({ value, label }, index) => (
+            <tr
+              key={value}
+              className={classNames({
+                'dfe-js-hidden': !showAll && index >= defaultVisible,
+              })}
+            >
               <td className="dfe-word-break--break-word">{value}</td>
               <td>{label}</td>
             </tr>
@@ -48,7 +56,7 @@ export default function DataSetFileVariables({ variables }: Props) {
       {expandable && (
         <ButtonText
           ariaControls={tableId}
-          ariaExpanded={!showAll}
+          ariaExpanded={showAll}
           onClick={toggleShowAll}
         >
           {showAll
