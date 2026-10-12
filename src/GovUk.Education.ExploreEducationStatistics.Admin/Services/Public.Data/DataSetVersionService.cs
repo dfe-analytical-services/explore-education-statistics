@@ -148,6 +148,7 @@ public class DataSetVersionService(
 
     public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
+        bool allowMajorVersionUpdate = false,
         CancellationToken cancellationToken = default
     )
     {
@@ -163,7 +164,7 @@ public class DataSetVersionService(
                     .OnSuccess(_ => dataSetVersion);
             })
             .OnSuccessDo(_ => userService.CheckCanManagePublicApiDataSets())
-            .OnSuccessDo(CheckCanUpdatePatchVersion)
+            .OnSuccessDo(dataSetVersion => CheckCanUpdatePatchVersion(dataSetVersion, allowMajorVersionUpdate))
             .OnSuccess(async _ =>
                 await processorClient.CompleteNextDataSetVersionImport(
                     dataSetVersionId: dataSetVersionId,
@@ -369,7 +370,10 @@ public class DataSetVersionService(
         return Unit.Instance;
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckCanUpdatePatchVersion(DataSetVersion dataSetVersion)
+    private async Task<Either<ActionResult, Unit>> CheckCanUpdatePatchVersion(
+        DataSetVersion dataSetVersion,
+        bool allowMajorVersionUpdate
+    )
     {
         if (dataSetVersion.VersionPatch == 0)
         {
@@ -378,7 +382,17 @@ public class DataSetVersionService(
         // If the version is a patch version, we need to check that the mapping status is not major.
         var mappingStatus = await dataSetVersionMappingService.GetMappingStatus(dataSetVersion.Id);
 
-        return mappingStatus.IsMajorVersionUpdate
+        if (mappingStatus is not { IsMajorVersionUpdate: true })
+        {
+            return Unit.Instance;
+        }
+
+        // Only BAU users can override the block on major changes in a patch version.
+        // This is checked explicitly so that the block remains for other users who
+        // may be permitted to manage public API data sets in future.
+        var isBauUser = allowMajorVersionUpdate && (await userService.CheckIsBauUser()).IsRight;
+
+        return !isBauUser
             ? ValidationUtils.ValidationResult(
                 new ErrorViewModel
                 {

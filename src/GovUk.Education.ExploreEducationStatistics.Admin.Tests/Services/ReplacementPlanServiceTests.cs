@@ -1651,7 +1651,8 @@ public class ReplacementPlanServiceTests
     // When user has uploaded major version data set
     [InlineData(DataSetVersionStatus.Published, true, false)]
     [InlineData(DataSetVersionStatus.Mapping, true, false)]
-    [InlineData(DataSetVersionStatus.Draft, true, false)]
+    // Draft (finalised) patch with major changes is only possible via a BAU override
+    [InlineData(DataSetVersionStatus.Draft, true, true)]
     // When user has uploaded minor version
     [InlineData(DataSetVersionStatus.Published, false, false)]
     [InlineData(DataSetVersionStatus.Mapping, false, false)]

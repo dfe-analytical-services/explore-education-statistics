@@ -1151,11 +1151,12 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     });
   });
 
-  test('renders error summary for when draft version has a major version update', async () => {
+  test('renders error summary for non-BAU user when draft version has a major version update', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
       draftVersion: {
         ...testDraftVersion,
+        status: 'Mapping',
         version: '2.0.1',
         mappingStatus: {
           isMajorVersionUpdate: true,
@@ -1169,7 +1170,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       },
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
@@ -1550,6 +1551,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     const testOriginalFileId = 'original-file-123';
     const testDraftVersionWithOriginalFileId = {
       ...testDraftVersion,
+      status: 'Mapping' as const,
       originalFileId: testOriginalFileId,
       version: '2.0.1',
       mappingStatus: {
@@ -1568,7 +1570,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftVersion: testDraftVersionWithOriginalFileId,
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
@@ -1797,6 +1799,121 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         name: 'Unfinalise this data set version',
       }),
     ).not.toBeInTheDocument();
+  });
+
+  describe('BAU override of major changes in a patch version', () => {
+    const majorMappingStatus = {
+      isMajorVersionUpdate: true,
+      locationsComplete: true,
+      filtersComplete: true,
+      indicatorsComplete: true,
+      filtersHaveMajorChange: true,
+      locationsHaveMajorChange: false,
+      indicatorsHaveMajorChange: false,
+    };
+
+    test('BAU user must acknowledge major changes before finalising', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testPatchDraftVersion,
+          status: 'Mapping',
+          mappingStatus: majorMappingStatus,
+        },
+      });
+
+      const { user } = renderPage();
+
+      expect(
+        await screen.findByTestId('major-version-override-warning'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published because it has major changes that are not allowed.',
+        }),
+      ).not.toBeInTheDocument();
+
+      const finaliseButton = screen.getByRole('button', {
+        name: 'Finalise this data set version',
+      });
+      expect(finaliseButton).toBeDisabled();
+
+      await user.click(
+        screen.getByLabelText(
+          'I understand this patch version contains major (breaking) changes',
+        ),
+      );
+      expect(finaliseButton).toBeEnabled();
+
+      await user.click(finaliseButton);
+
+      await waitFor(() => {
+        expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledWith({
+          dataSetVersionId: testPatchDraftVersion.id,
+          allowMajorVersionUpdate: true,
+        });
+      });
+    });
+
+    test('non-BAU user cannot override major changes', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testPatchDraftVersion,
+          status: 'Mapping',
+          mappingStatus: majorMappingStatus,
+        },
+      });
+
+      renderPage({ user: testAnalystUser });
+
+      expect(
+        await screen.findByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published because it has major changes that are not allowed.',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('major-version-override-warning'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText(
+          'I understand this patch version contains major (breaking) changes',
+        ),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', {
+          name: 'Finalise this data set version',
+        }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('renders overridden warning when patch version with major changes has been finalised', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testPatchDraftVersion,
+          status: 'Draft',
+          mappingStatus: majorMappingStatus,
+        },
+      });
+
+      renderPage();
+
+      expect(
+        await screen.findByTestId('major-version-overridden-warning'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Draft API data set version is ready to be published'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published because it has major changes that are not allowed.',
+        }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   function renderPage(options?: {

@@ -145,7 +145,10 @@ const apiDataSetVersionService = {
   }): Promise<ApiDataSet> {
     return client.post('/public-data/data-set-versions', data);
   },
-  completeVersion(data: { dataSetVersionId: string }): Promise<ApiDataSet> {
+  completeVersion(data: {
+    dataSetVersionId: string;
+    allowMajorVersionUpdate?: boolean;
+  }): Promise<ApiDataSet> {
     return client.post('/public-data/data-set-versions/complete', data);
   },
   deleteVersion(dataSetVersionId: string): Promise<void> {

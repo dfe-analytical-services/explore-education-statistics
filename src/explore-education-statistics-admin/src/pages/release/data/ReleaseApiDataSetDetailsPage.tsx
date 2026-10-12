@@ -34,6 +34,8 @@ import React, { useEffect, useState } from 'react';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import isPatchVersion from '@common/utils/isPatchVersion';
 import InsetText from '@common/components/InsetText';
+import WarningMessage from '@common/components/WarningMessage';
+import FormCheckbox from '@common/components/form/FormCheckbox';
 import shouldShowDraftActions from '@admin/pages/release/data/utils/shouldShowDraftActions';
 import ApiDataSetMappingTaskListItem from '@admin/pages/release/data/components/ApiDataSetMappingTaskListItem';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -52,6 +54,8 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const [finalisingStatus, setFinalisingStatus] =
     useState<DataSetFinalisingStatus>(undefined);
+  const [majorChangesAcknowledged, setMajorChangesAcknowledged] =
+    useState(false);
 
   const {
     data: dataSet,
@@ -79,7 +83,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const isPatch = isPatchVersion(dataSet?.draftVersion?.version);
 
-  const isMajorVersionRejected = (
+  const hasMajorPatchChanges = (
     apiDataSet: ApiDataSet | undefined,
     isPatchDataSetVersion: boolean,
   ): boolean => {
@@ -96,6 +100,7 @@ export default function ReleaseApiDataSetDetailsPage() {
       setFinalisingStatus('finalising');
       await apiDataSetVersionService.completeVersion({
         dataSetVersionId: dataSet?.draftVersion?.id,
+        ...(majorChangesAcknowledged && { allowMajorVersionUpdate: true }),
       });
     }
   };
@@ -283,13 +288,33 @@ export default function ReleaseApiDataSetDetailsPage() {
     />
   ) : null;
 
-  const majorVersionRejected = isMajorVersionRejected(dataSet, isPatch);
-
   const mappingComplete =
     dataSet?.draftVersion?.mappingStatus &&
     dataSet.draftVersion.mappingStatus.filtersComplete &&
     dataSet.draftVersion.mappingStatus.locationsComplete &&
     dataSet.draftVersion.mappingStatus.indicatorsComplete;
+
+  const majorPatchChanges = hasMajorPatchChanges(dataSet, isPatch);
+
+  // A patch version with major changes can only have been finalised
+  // if a BAU user has overridden the block on major changes.
+  const majorVersionOverridden =
+    majorPatchChanges &&
+    !!mappingComplete &&
+    (finalisingStatus === 'finalising' ||
+      dataSet?.draftVersion?.status === 'Finalising' ||
+      dataSet?.draftVersion?.status === 'Draft');
+
+  // Only BAU users can override the block on major changes in a patch version.
+  const canOverrideMajorVersion =
+    majorPatchChanges &&
+    !majorVersionOverridden &&
+    !!mappingComplete &&
+    !!user?.permissions.isBauUser &&
+    !!user?.permissions.canManagePublicApiDataSets;
+
+  const majorVersionRejected =
+    majorPatchChanges && !majorVersionOverridden && !canOverrideMajorVersion;
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
@@ -350,6 +375,34 @@ export default function ReleaseApiDataSetDetailsPage() {
     </InsetText>
   );
 
+  const majorVersionOverrideWarning = (
+    <WarningMessage testId="major-version-override-warning">
+      This data file has resulted in a major version update which is not
+      normally allowed in release amendments. As a BAU user you can override
+      this, but this patch version will contain breaking changes for users of
+      this API data set.
+    </WarningMessage>
+  );
+
+  const majorVersionOverriddenWarning = (
+    <WarningMessage testId="major-version-overridden-warning">
+      This patch version contains major changes which have been approved by a
+      BAU user. These are breaking changes for users of this API data set.
+    </WarningMessage>
+  );
+
+  const majorChangesAcknowledgement = (
+    <div className="govuk-checkboxes govuk-checkboxes--small govuk-!-margin-bottom-6">
+      <FormCheckbox
+        id="majorChangesAcknowledged"
+        name="majorChangesAcknowledged"
+        label="I understand this patch version contains major (breaking) changes"
+        checked={majorChangesAcknowledged}
+        onChange={event => setMajorChangesAcknowledged(event.target.checked)}
+      />
+    </div>
+  );
+
   const contactEesTeamText = (
     <>
       Please contact the EES team for support at{' '}
@@ -396,21 +449,34 @@ export default function ReleaseApiDataSetDetailsPage() {
       return (
         mappingComplete &&
         dataSet?.draftVersion && (
-          <ApiDataSetFinaliseBanner
-            dataSetId={dataSetId}
-            dataSetVersionId={dataSet.draftVersion.id}
-            draftVersionStatus={dataSet.draftVersion.status}
-            finalisingStatus={finalisingStatus}
-            publicationId={releaseVersion.publicationId}
-            releaseVersionId={releaseVersion.id}
-            onFinalise={handleFinalise}
-          />
+          <>
+            {canOverrideMajorVersion && majorVersionOverrideWarning}
+            {majorVersionOverridden && majorVersionOverriddenWarning}
+            <ApiDataSetFinaliseBanner
+              dataSetId={dataSetId}
+              dataSetVersionId={dataSet.draftVersion.id}
+              draftVersionStatus={dataSet.draftVersion.status}
+              finalisingStatus={finalisingStatus}
+              publicationId={releaseVersion.publicationId}
+              releaseVersionId={releaseVersion.id}
+              finaliseAcknowledgement={
+                canOverrideMajorVersion
+                  ? majorChangesAcknowledgement
+                  : undefined
+              }
+              finaliseDisabled={
+                canOverrideMajorVersion && !majorChangesAcknowledged
+              }
+              onFinalise={handleFinalise}
+            />
+          </>
         )
       );
     }
 
     return (
       <>
+        {majorVersionOverridden && majorVersionOverriddenWarning}
         {mappingActionsRequired && standardUserMappingActionsRequiredBanner}
         {readyToFinalise && standardUserFinaliseRequiredBanner}
       </>
