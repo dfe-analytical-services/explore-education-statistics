@@ -75,15 +75,14 @@ public interface IStorageDataSet
     );
 
     /// <summary>
-    /// All indicators for the data set.
+    /// Indicators for the data set restricted to the given ids, or all indicators for the data set if
+    /// <paramref name="indicatorIds" /> is null. Ids belonging to other data sets are excluded, and an empty set of
+    /// ids yields no indicators.
     /// </summary>
-    Task<List<Indicator>> ListIndicators(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Indicators for the data set restricted to the given ids. Ids belonging to other data sets are excluded,
-    /// and an empty set of ids yields no indicators.
-    /// </summary>
-    Task<List<Indicator>> ListIndicators(IEnumerable<Guid> indicatorIds, CancellationToken cancellationToken = default);
+    Task<List<Indicator>> ListIndicators(
+        IEnumerable<Guid>? indicatorIds = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// All indicator groups for the data set, with their Indicators.
@@ -91,15 +90,14 @@ public interface IStorageDataSet
     Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The distinct locations referenced by the data set's observations.
+    /// Locations by id, or all locations for the data set (the distinct locations referenced by its observations) if
+    /// <paramref name="locationIds" /> is null. Unknown ids are ignored. `locationIds` are expected to belong to the
+    /// data set, but might be returned even if they belong to a different data set.
     /// </summary>
-    Task<List<Location>> ListLocations(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Locations by id. Unknown ids are ignored. `locationIds` are expected to belong to the data set, but might be
-    /// returned even if they belong to a different data set.
-    /// </summary>
-    Task<List<Location>> ListLocations(IEnumerable<Guid> locationIds, CancellationToken cancellationToken = default);
+    Task<List<Location>> ListLocations(
+        IEnumerable<Guid>? locationIds = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// The distinct geographic levels of the locations referenced by the data set's observations.
@@ -107,18 +105,12 @@ public interface IStorageDataSet
     Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The distinct time periods across the data set's observations, ordered by year and then time identifier.
-    /// </summary>
-    Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
-        CancellationToken cancellationToken = default
-    );
-
-    /// <summary>
-    /// As <see cref="ListTimePeriods(CancellationToken)" />, but only over the observations at the given locations.
+    /// The distinct time periods across the data set's observations at the given locations, or across all the data
+    /// set's observations if <paramref name="locationIds" /> is null, ordered by year and then time identifier.
     /// Location ids not referenced by the data set's observations are ignored.
     /// </summary>
     Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
-        IEnumerable<Guid> locationIds,
+        IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     );
 }
