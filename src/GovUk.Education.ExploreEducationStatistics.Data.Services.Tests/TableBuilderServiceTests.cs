@@ -157,7 +157,7 @@ public class TableBuilderServiceTests
                         ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
                         query.LocationIds,
                         query.TimePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationsTable);
@@ -169,7 +169,9 @@ public class TableBuilderServiceTests
                 .ReturnsAsync(subjectMeta);
 
             tableBuilderQueryOptimiser.Setup(mock => mock.IsCroppingRequired(query)).ReturnsAsync(true);
-            tableBuilderQueryOptimiser.Setup(mock => mock.CropQuery(query, default)).ReturnsAsync(query);
+            tableBuilderQueryOptimiser
+                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
@@ -437,7 +439,7 @@ public class TableBuilderServiceTests
                         ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
                         query.LocationIds,
                         query.TimePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationsTable);
@@ -454,7 +456,9 @@ public class TableBuilderServiceTests
                 .ReturnsAsync(subjectMeta);
 
             tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(true);
-            tableBuilderQueryOptimiser.Setup(mock => mock.CropQuery(query, default)).ReturnsAsync(query);
+            tableBuilderQueryOptimiser
+                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
@@ -736,7 +740,7 @@ public class TableBuilderServiceTests
                         ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
                         query.LocationIds,
                         query.TimePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationsTable);
@@ -779,7 +783,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
@@ -1025,7 +1029,7 @@ public class TableBuilderServiceTests
                         ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
                         query.LocationIds,
                         query.TimePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationsTable);
@@ -1065,7 +1069,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
@@ -1172,7 +1176,7 @@ public class TableBuilderServiceTests
                         ItIs.EnumerableSequenceEqualTo(query.GetFilterItemIds()),
                         query.LocationIds,
                         query.TimePeriod,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(matchedObservationsTable);
@@ -1203,7 +1207,7 @@ public class TableBuilderServiceTests
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
                         query,
-                        default
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(subjectCsvMeta);
