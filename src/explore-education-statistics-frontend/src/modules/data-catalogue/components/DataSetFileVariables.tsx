@@ -57,6 +57,7 @@ export default function DataSetFileVariables({ variables }: Props) {
         <ButtonText
           ariaControls={tableId}
           ariaExpanded={showAll}
+          className="dfe-js-only"
           onClick={toggleShowAll}
         >
           {showAll

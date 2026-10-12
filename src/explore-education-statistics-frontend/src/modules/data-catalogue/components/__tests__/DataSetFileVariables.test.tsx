@@ -27,6 +27,11 @@ describe('DataSetFileVariables', () => {
     // Present in the HTML, but hidden once JS has loaded.
     expect(rows[5]).not.toHaveClass('dfe-js-hidden');
     expect(rows[6]).toHaveClass('dfe-js-hidden');
+
+    // The toggle can't work without JS, so it's hidden when JS isn't available.
+    expect(
+      within(container).getByRole('button', { name: 'Show all 6 variables' }),
+    ).toHaveClass('dfe-js-only');
   });
 
   test('hides the overflow and describes the table as truncated once mounted', () => {

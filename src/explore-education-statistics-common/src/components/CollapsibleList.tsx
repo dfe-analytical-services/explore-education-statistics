@@ -143,6 +143,9 @@ const CollapsibleList = ({
           ariaExpanded={!collapsed}
           className={classNames('govuk-!-display-none-print', buttonClassName, {
             'govuk-!-margin-bottom-4': !buttonClassName,
+            // Without JS every item is already shown, so the button would
+            // be inert and its label untrue.
+            'dfe-js-only': renderAllItems,
           })}
           onClick={() => {
             if (collapsed) {

@@ -23,9 +23,11 @@ describe('CollapsibleList', () => {
     expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
     expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
+    // Without `renderAllItems` the button stays visible without JS, as it
+    // is the only sign that there are more items.
     expect(
       screen.getByRole('button', { name: 'Show 2 more items' }),
-    ).toBeInTheDocument();
+    ).not.toHaveClass('dfe-js-only');
   });
 
   test('renders 4 of 5 items when collapseAfter is 4', () => {
@@ -315,9 +317,10 @@ describe('CollapsibleList', () => {
       expect(listItems[3]).toHaveClass('dfe-js-hidden');
       expect(listItems[4]).toHaveClass('dfe-js-hidden');
 
+      // Every item is already shown without JS, so the button is hidden then.
       expect(
         screen.getByRole('button', { name: 'Show 2 more items' }),
-      ).toBeInTheDocument();
+      ).toHaveClass('dfe-js-only');
     });
 
     test('clears the js-hidden class once expanded', async () => {
