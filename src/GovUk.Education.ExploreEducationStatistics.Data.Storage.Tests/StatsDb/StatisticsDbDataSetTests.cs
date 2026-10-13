@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
