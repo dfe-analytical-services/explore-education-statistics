@@ -554,6 +554,34 @@ public abstract class StatisticsDbDataSetTests
         }
     }
 
+    public class CountObservationsTests : StatisticsDbDataSetTests
+    {
+        [Fact]
+        public async Task ObservationsForSubjectOnlyCounted()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Observation.AddRange(
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = Guid.NewGuid() }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId);
+
+                Assert.Equal(2, await dataSet.CountObservations());
+            }
+        }
+    }
+
     public class ListFilterItemsTests : StatisticsDbDataSetTests
     {
         [Fact]
