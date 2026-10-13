@@ -236,6 +236,7 @@ Confirm data replacement details on replacement page
     user checks table cell contains    1    3    Ready    testid:Data file replacements table
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
 
+    user waits until page contains element    testid:Replacement Title
     user checks headed table body row cell contains    Title    1    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
