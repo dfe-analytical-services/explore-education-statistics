@@ -58,9 +58,10 @@ describe('ApiDataSetVersionSummaryList', () => {
   test.each([
     [true, 'Yes'],
     [false, 'No'],
+    [null, 'Not available'],
   ])(
     'renders API compatible as %s',
-    (publicApiCompatible: boolean, expected: string) => {
+    (publicApiCompatible: boolean | null, expected: string) => {
       render(
         <ApiDataSetVersionSummaryList
           dataSetVersion={{ ...testBaseVersion, publicApiCompatible }}

@@ -294,6 +294,29 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('does not render warning when draft version file API compatibility is unknown', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: { ...testDraftVersion, publicApiCompatible: null },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('api-incompatible-warning'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(screen.getByTestId('draft-version-summary')).getByTestId(
+        'API compatible',
+      ),
+    ).toHaveTextContent('Not available');
+  });
+
   test('does not render the `Remove draft version` button for a user without permission to manage public API data sets', async () => {
     apiDataSetService.getDataSet.mockResolvedValue({
       ...testDataSet,
