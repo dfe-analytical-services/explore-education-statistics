@@ -1,4 +1,6 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
@@ -79,6 +81,26 @@ public static class StorageDataSetTestUtils
             .AddSingleton(Mock.Of<ILogger<StatisticsDbDataSet>>());
 
         return new StatisticsDbDataSetFactory(services.BuildServiceProvider());
+    }
+
+    public static StorageDataSetWriterResolver BuildStorageDataSetWriterResolver(
+        StatisticsDbContext statisticsDbContext,
+        IDatabaseHelper databaseHelper,
+        IImporterLocationCache? importerLocationCache = null,
+        IGuidGenerator? guidGenerator = null,
+        IObservationBatchImporter? observationBatchImporter = null
+    )
+    {
+        var services = new ServiceCollection()
+            .AddSingleton(statisticsDbContext)
+            .AddSingleton(databaseHelper)
+            .AddSingleton(importerLocationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>()))
+            .AddSingleton(guidGenerator ?? new SequentialGuidGenerator())
+            .AddSingleton(observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict))
+            .AddTransient<ImporterLocationService>()
+            .AddSingleton(Mock.Of<ILogger<ImporterLocationCache>>());
+
+        return new StorageDataSetWriterResolver(new StatisticsDbDataSetWriterFactory(services.BuildServiceProvider()));
     }
 
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)
