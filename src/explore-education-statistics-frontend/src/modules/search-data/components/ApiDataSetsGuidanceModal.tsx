@@ -2,12 +2,15 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import React from 'react';
 
+const triggerText = 'What are API data sets?';
+
 export default function ApiDataSetsGuidanceModal() {
   return (
     <Modal
+      noJsFallbackSummary={triggerText}
       showClose
       title="API data sets guidance"
-      triggerButton={<ButtonText>What are API data sets?</ButtonText>}
+      triggerButton={<ButtonText>{triggerText}</ButtonText>}
     >
       <h3>API data sets</h3>
       <p>

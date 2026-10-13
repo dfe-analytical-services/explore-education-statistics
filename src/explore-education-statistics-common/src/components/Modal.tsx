@@ -17,6 +17,12 @@ export interface ModalProps {
   description?: string;
   fullScreen?: boolean;
   hideTitle?: boolean;
+  /**
+   * Also render the content in a native `<details>` with this summary, so it
+   * is available without JS (including to crawlers). It is hidden when JS is
+   * available, and the modal trigger is hidden when it isn't.
+   */
+  noJsFallbackSummary?: string;
   open?: boolean;
   showClose?: boolean;
   title: string;
@@ -37,6 +43,7 @@ const Modal = ({
   description,
   fullScreen = false,
   hideTitle = false,
+  noJsFallbackSummary,
   open: initialOpen = false,
   showClose = false,
   title,
@@ -67,7 +74,29 @@ const Modal = ({
       }}
     >
       {triggerButton && (
-        <Dialog.Trigger asChild>{triggerButton}</Dialog.Trigger>
+        <Dialog.Trigger
+          asChild
+          // The trigger can't work without JS, where the fallback is shown instead.
+          className={noJsFallbackSummary ? 'dfe-js-only' : undefined}
+        >
+          {triggerButton}
+        </Dialog.Trigger>
+      )}
+      {noJsFallbackSummary && (
+        <details
+          className="govuk-details dfe-js-hidden"
+          data-testid="modal-no-js-fallback"
+        >
+          <summary className="govuk-details__summary">
+            <span className="govuk-details__summary-text">
+              {noJsFallbackSummary}
+            </span>
+          </summary>
+          <div className="govuk-details__text">
+            {description && <p>{description}</p>}
+            {children}
+          </div>
+        </details>
       )}
       <Dialog.Portal>
         <Dialog.Overlay
