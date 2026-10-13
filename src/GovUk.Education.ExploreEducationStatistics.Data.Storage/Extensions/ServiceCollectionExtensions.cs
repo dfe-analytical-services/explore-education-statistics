@@ -28,4 +28,18 @@ public static class ServiceCollectionExtensions
             .AddTransient<ISqlStatementsHelper, SqlStatementsHelper>()
             .AddTransient<IRawSqlExecutor, RawSqlExecutor>()
             .AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
+
+    /// <summary>
+    /// Registers <see cref="IStorageDataSetWriterResolver" /> together with everything needed to write data sets to
+    /// each supported storage when importing them. Hosts must also register <see cref="IDatabaseHelper" />,
+    /// <see cref="IGuidGenerator" /> and the StatisticsDbContext.
+    /// </summary>
+    public static IServiceCollection AddStorageDataSetWriters(this IServiceCollection services) =>
+        services
+            .AddScoped<IStorageDataSetWriterResolver, StorageDataSetWriterResolver>()
+            // StatsDB
+            .AddTransient<StatisticsDbDataSetWriterFactory>()
+            .AddTransient<ImporterLocationService>()
+            .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
+            .AddTransient<IObservationBatchImporter, StoredProcedureObservationBatchImporter>();
 }
