@@ -40,6 +40,11 @@ public interface IStorageDataSet
     );
 
     /// <summary>
+    /// The number of observations in the data set.
+    /// </summary>
+    Task<long> CountObservations(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Filter items (with their FilterGroup and Filter) that are present on the observations at the given
     /// locations within the time period.
     /// </summary>
