@@ -5,7 +5,6 @@
 }
 
 .sectionContent {
-  display: none;
   padding: 0 0 govuk-spacing(3) govuk-spacing(4);
 
   .sectionContent {
@@ -30,6 +29,10 @@
   :global(.govuk-accordion-nav__chevron) {
     flex-shrink: 0;
   }
+}
+
+:global(.js-enabled) .sectionContent {
+  display: none;
 }
 
 .expanded > .sectionContent {

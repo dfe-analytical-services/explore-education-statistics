@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import DataSymbolsModal from '../DataSymbolsModal';
 
-describe('ReleaseTypesModal', () => {
+describe('DataSymbolsModal', () => {
   test('renders with default trigger button', () => {
     render(<DataSymbolsModal />);
 
