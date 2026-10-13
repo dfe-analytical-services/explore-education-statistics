@@ -3,13 +3,12 @@ import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
 import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useId, useRef, useState } from 'react';
 import styles from './Details.module.scss';
 import ButtonText from './ButtonText';
 import VisuallyHidden from './VisuallyHidden';
 
 let hasNativeDetails: boolean;
-let idCounter = 0;
 
 export type DetailsToggleHandler = (isOpen: boolean) => void;
 
@@ -43,7 +42,7 @@ export interface DetailsProps {
 const Details = ({
   className,
   children,
-  id: propId = `details-content-${(idCounter += 1)}`,
+  id: propId,
   detailsId,
   jsRequired = false,
   open: defaultOpen = false,
@@ -55,7 +54,10 @@ const Details = ({
   preventToggle = false,
   testId,
 }: DetailsProps) => {
-  const [id] = useState(propId);
+  // `useId` matches between the server and client renders, unlike a
+  // module-level counter (which lives for the whole server process).
+  const generatedId = useId();
+  const [id] = useState(propId ?? `details-content-${generatedId}`);
   const ref = useRef<HTMLDetailsElement>(null);
 
   const { onMounted } = useMounted(undefined, jsRequired);

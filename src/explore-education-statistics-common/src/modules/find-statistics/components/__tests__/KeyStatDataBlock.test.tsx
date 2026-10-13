@@ -1,9 +1,18 @@
+import flushPromises from '@common-test/flushPromises';
 import render from '@common-test/render';
+import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
-import { screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  render as baseRender,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 jest.mock('@common/services/tableBuilderService');
@@ -258,5 +267,88 @@ describe('KeyStatDataBlock', () => {
     expect(
       screen.queryByTestId('keyStat-guidanceText'),
     ).not.toBeInTheDocument();
+  });
+
+  // As the frontend does when the key stat was fetched server-side.
+  describe('with a pre-populated query cache', () => {
+    function createPopulatedQueryClient() {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+
+      queryClient.setQueryData(
+        tableBuilderQueries.getKeyStat('release-1', 'block-1').queryKey,
+        { title: 'Number of applications received', value: '608,180' },
+      );
+
+      return queryClient;
+    }
+
+    test('server-renders the key stat', () => {
+      const container = document.createElement('div');
+      container.innerHTML = renderToStaticMarkup(
+        <QueryClientProvider client={createPopulatedQueryClient()}>
+          <KeyStatDataBlock
+            releaseVersionId="release-1"
+            dataBlockId="block-1"
+            guidanceTitle="What is the number of applications received?"
+            guidanceText="Total number of applications received."
+          />
+        </QueryClientProvider>,
+      );
+
+      expect(within(container).getByTestId('keyStat-title')).toHaveTextContent(
+        'Number of applications received',
+      );
+      expect(
+        within(container).getByTestId('keyStat-statistic'),
+      ).toHaveTextContent('608,180');
+      expect(
+        within(container).getByTestId('keyStat-guidanceText'),
+      ).toHaveTextContent('Total number of applications received.');
+
+      expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
+    });
+
+    test('does not refetch when `dataBlockStaleTime` is Infinity', async () => {
+      baseRender(
+        <QueryClientProvider client={createPopulatedQueryClient()}>
+          <KeyStatDataBlock
+            releaseVersionId="release-1"
+            dataBlockId="block-1"
+            dataBlockStaleTime={Infinity}
+          />
+        </QueryClientProvider>,
+      );
+
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
+
+      await flushPromises();
+
+      expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
+    });
+
+    test('refetches on mount by default', async () => {
+      tableBuilderService.getDataBlockTableData.mockResolvedValue(
+        testTableDataResponse,
+      );
+
+      baseRender(
+        <QueryClientProvider client={createPopulatedQueryClient()}>
+          <KeyStatDataBlock
+            releaseVersionId="release-1"
+            dataBlockId="block-1"
+          />
+        </QueryClientProvider>,
+      );
+
+      await waitFor(() => {
+        expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+          1,
+        );
+      });
+    });
   });
 });
