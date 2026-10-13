@@ -9,7 +9,7 @@ import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import noop from 'lodash/noop';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';

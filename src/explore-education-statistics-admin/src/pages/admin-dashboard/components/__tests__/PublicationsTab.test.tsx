@@ -195,10 +195,12 @@ describe('PublicationsTab', () => {
       permissionService.canCreatePublicationForTheme.mockResolvedValue(true);
 
       render(
-        <MemoryRouter>
+        <TestRouterRenderer initialUrl="/" route="/">
           <PublicationsTab isBauUser />
-        </MemoryRouter>,
+        </TestRouterRenderer>,
       );
+
+      await waitFor(async () => expectLocationSearch('?themeId=theme-2'));
 
       await waitFor(() => {
         expect(

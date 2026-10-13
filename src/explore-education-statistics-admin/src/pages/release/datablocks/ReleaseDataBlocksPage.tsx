@@ -24,9 +24,8 @@ import SortedTableHeader, {
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import React, { useCallback, useMemo, useState } from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
 import orderBy from 'lodash/orderBy';
 
 type DataBlockSortColumn =

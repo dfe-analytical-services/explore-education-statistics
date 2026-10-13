@@ -5,8 +5,7 @@ import { educationInNumbersListRoute } from '@admin/routes/routes';
 import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 import educationInNumbersService from '@admin/services/educationInNumbersService';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
-import { useNavigate } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
 const EducationInNumbersCreatePage = () => {
   const navigate = useNavigate();

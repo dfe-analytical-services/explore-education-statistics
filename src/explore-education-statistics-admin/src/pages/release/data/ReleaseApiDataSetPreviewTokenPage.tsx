@@ -21,9 +21,8 @@ import ApiDataSetQuickStart from '@common/modules/data-catalogue/components/ApiD
 import UkTimeHelper from '@common/utils/date/ukTimeHelper';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import React from 'react';
-import { useNavigate } from 'react-router';
 
 export default function ReleaseApiDataSetPreviewTokenPage() {
   const navigate = useNavigate();

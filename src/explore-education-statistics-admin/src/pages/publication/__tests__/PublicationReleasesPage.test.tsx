@@ -9,7 +9,7 @@ import _releaseVersionService from '@admin/services/releaseVersionService';
 import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<

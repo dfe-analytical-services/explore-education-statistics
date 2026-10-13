@@ -38,7 +38,7 @@ import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useQuery } from '@tanstack/react-query';
 import camelCase from 'lodash/camelCase';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 import sumBy from 'lodash/sumBy';

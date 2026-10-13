@@ -40,7 +40,7 @@ import { useQuery } from '@tanstack/react-query';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import { useImmer } from 'use-immer';
 
 export const sectionIds = {

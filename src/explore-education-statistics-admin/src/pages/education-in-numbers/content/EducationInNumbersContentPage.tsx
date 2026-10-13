@@ -9,7 +9,7 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
 import { EducationInNumbersPageContentProvider } from '@admin/pages/education-in-numbers/content/context/EducationInNumbersPageContentContext';
 import EducationInNumbersContent from '@admin/pages/education-in-numbers/content/components/EducationInNumbersContent';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 const EducationInNumbersContentPage = () => {
   const { educationInNumbersPageId } =

@@ -71,7 +71,7 @@ describe('PendingDataReplacementSection', () => {
     render(
       <MemoryRouter>
         <TestConfigContextProvider>
-          <AuthContext value={{ user: bau }}>
+          <AuthContext value={{ user: bau, status: 'authenticated' }}>
             <PendingDataReplacementSection {...defaultProps} />
           </AuthContext>
         </TestConfigContextProvider>

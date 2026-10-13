@@ -14,9 +14,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 import PendingDataReplacementSection from '@admin/pages/release/data/components/PendingDataReplacementSection';
-import { useParams } from 'react-router-dom';
 
 const ReleaseDataFileReplacePage = () => {
   const { publicationId, releaseVersionId, fileId } =

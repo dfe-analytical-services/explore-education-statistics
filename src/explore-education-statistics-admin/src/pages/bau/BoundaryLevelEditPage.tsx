@@ -12,10 +12,9 @@ import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Page from '@admin/components/Page';
 import { useQuery } from '@tanstack/react-query';
 import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
-import { useParams } from 'react-router-dom';
 import Yup from '@common/validation/yup';
 import { ObjectSchema } from 'yup';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 export default function BoundaryLevelEditPage() {
   interface FormValues {

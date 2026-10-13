@@ -11,7 +11,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 
 interface Props {

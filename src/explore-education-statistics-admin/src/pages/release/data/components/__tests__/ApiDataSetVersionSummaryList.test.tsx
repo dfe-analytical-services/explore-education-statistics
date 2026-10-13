@@ -2,7 +2,7 @@ import ApiDataSetVersionSummaryList from '@admin/pages/release/data/components/A
 import { ApiDataSetDraftVersion } from '@admin/services/apiDataSetService';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 describe('ApiDataSetVersionSummaryList', () => {
   const testBaseVersion: ApiDataSetDraftVersion = {

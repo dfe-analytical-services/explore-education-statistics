@@ -74,7 +74,6 @@ export const publicationCreateRoute: ProtectedRouteProps = {
 export const publicationRoute: ProtectedRouteProps = {
   fullPath: '/publication/:publicationId/*',
   path: 'publication/:publicationId/*',
-
   protectionAction: permissions => permissions.canAccessAnalystPages,
 };
 
