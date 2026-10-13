@@ -9,12 +9,16 @@ import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import EducationInNumbersSummaryEditPage from '@admin/pages/education-in-numbers/summary/EducationInNumbersSummaryEditPage';
-import * as router from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 import { expectLocation } from '@admin/components/testing/TestLocationContext';
 
+// mocks are hoisted to top, no visibility of declared variables
 jest.mock('@admin/services/educationInNumbersService');
+// deconstruct react-router into a mocked version, as the import doesn't like being spied on
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
+}));
 
 const educationInNumbersService = _educationInNumbersService as jest.Mocked<
   typeof _educationInNumbersService
@@ -70,6 +74,9 @@ describe('EducationInNumbersSummaryEditPage', () => {
 
   test('clicking cancel calls useNavigate(-1)', async () => {
     const mockNavigate = jest.fn();
+
+    // importing 'react-router' doesn't import the mocked version (ESM problems?) so get the mock directly
+    const router = jest.requireMock('react-router');
 
     jest.spyOn(router, 'useNavigate').mockImplementation(() => mockNavigate);
 
