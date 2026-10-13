@@ -77,11 +77,11 @@ public class FootnoteController : ControllerBase
     }
 
     [HttpGet("releases/{releaseVersionId:guid}/footnotes")]
-    public async Task<ActionResult<IEnumerable<FootnoteViewModel>>> GetFootnotes(Guid releaseVersionId)
+    public async Task<ActionResult<List<FootnoteViewModel>>> GetFootnotes(Guid releaseVersionId)
     {
         return await _footnoteService
             .GetFootnotes(releaseVersionId)
-            .OnSuccess(footnotes => footnotes.Select(GatherAndBuildFootnoteViewModel))
+            .OnSuccess(GatherAndBuildFootnoteViewModels)
             .HandleFailuresOrOk();
     }
 
@@ -195,69 +195,142 @@ public class FootnoteController : ControllerBase
         };
     }
 
-    private static FootnoteViewModel GatherAndBuildFootnoteViewModel(Footnote footnote)
+    private async Task<FootnoteViewModel> GatherAndBuildFootnoteViewModel(Footnote footnote)
     {
-        var filterItemsGroupByFilterGroup = footnote
+        return (await GatherAndBuildFootnoteViewModels([footnote])).Single();
+    }
+
+    private async Task<List<FootnoteViewModel>> GatherAndBuildFootnoteViewModels(List<Footnote> footnotes)
+    {
+        var hierarchy = await GetDataSetHierarchy(footnotes);
+
+        return footnotes.Select(footnote => GatherAndBuildFootnoteViewModel(footnote, hierarchy)).ToList();
+    }
+
+    /// <summary>
+    /// Looks up the parents of the filter groups, filter items and indicators linked to the footnotes in their
+    /// data sets.
+    /// </summary>
+    private async Task<DataSetHierarchy> GetDataSetHierarchy(List<Footnote> footnotes)
+    {
+        var hierarchy = new DataSetHierarchy(
+            FilterIdsByFilterGroupId: new Dictionary<Guid, Guid>(),
+            FilterGroupIdsByFilterItemId: new Dictionary<Guid, Guid>(),
+            IndicatorGroupIdsByIndicatorId: new Dictionary<Guid, Guid>()
+        );
+
+        var filterSubjectIds = footnotes
+            .SelectMany(footnote =>
+                footnote
+                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.SubjectId)
+                    .Concat(footnote.FilterItems.Select(filterItemFootnote => filterItemFootnote.SubjectId))
+            )
+            .ToHashSet();
+
+        var indicatorIdsBySubject = footnotes
+            .SelectMany(footnote => footnote.Indicators)
+            .GroupBy(
+                indicatorFootnote => indicatorFootnote.SubjectId,
+                indicatorFootnote => indicatorFootnote.IndicatorId
+            )
+            .ToDictionary(grouping => grouping.Key, grouping => grouping.Distinct().ToList());
+
+        foreach (var subjectId in filterSubjectIds.Union(indicatorIdsBySubject.Keys))
+        {
+            var dataSet = await _storageDataSetResolver.Resolve(subjectId);
+
+            if (filterSubjectIds.Contains(subjectId))
+            {
+                var filterGroups = (await dataSet.ListFilters(includeItems: true)).SelectMany(filter =>
+                    filter.FilterGroups
+                );
+
+                foreach (var filterGroup in filterGroups)
+                {
+                    hierarchy.FilterIdsByFilterGroupId[filterGroup.Id] = filterGroup.FilterId;
+
+                    foreach (var filterItem in filterGroup.FilterItems)
+                    {
+                        hierarchy.FilterGroupIdsByFilterItemId[filterItem.Id] = filterItem.FilterGroupId;
+                    }
+                }
+            }
+
+            if (indicatorIdsBySubject.TryGetValue(subjectId, out var indicatorIds))
+            {
+                foreach (var indicator in await dataSet.ListIndicators(indicatorIds))
+                {
+                    hierarchy.IndicatorGroupIdsByIndicatorId[indicator.Id] = indicator.IndicatorGroupId;
+                }
+            }
+        }
+
+        return hierarchy;
+    }
+
+    private static FootnoteViewModel GatherAndBuildFootnoteViewModel(Footnote footnote, DataSetHierarchy hierarchy)
+    {
+        var filterItemsByFilterGroup = footnote
             .FilterItems.GroupBy(
-                filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup,
+                filterItemFootnote => hierarchy.FilterGroupIdsByFilterItemId[filterItemFootnote.FilterItemId],
                 filterItemFootnote => filterItemFootnote.FilterItemId
             )
-            .ToList();
+            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
-        var filterItemsGroupByFilter = footnote
-            .FilterItems.GroupBy(
-                filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup.Filter,
-                filterItemFootnote => filterItemFootnote.FilterItemId
-            )
-            .ToList();
-
-        var filterGroupsGroupByFilter = footnote
+        var filterGroupsByFilter = footnote
             .FilterGroups.GroupBy(
-                filterGroupFootnote => filterGroupFootnote.FilterGroup.Filter,
+                filterGroupFootnote => hierarchy.FilterIdsByFilterGroupId[filterGroupFootnote.FilterGroupId],
                 filterGroupFootnote => filterGroupFootnote.FilterGroupId
             )
-            .ToList();
-
-        var filterItemsByFilterGroup = filterItemsGroupByFilterGroup.ToDictionary(
-            grouping => grouping.Key.Id,
-            grouping => grouping.ToList()
-        );
-
-        var filterGroupsByFilter = filterGroupsGroupByFilter.ToDictionary(
-            grouping => grouping.Key.Id,
-            grouping => grouping.ToList()
-        );
+            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
         // There can be more than one indicator belonging to the same subject in each group so we add Distinct here.
         var indicatorGroupsBySubject = footnote
             .Indicators.GroupBy(
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId,
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId
+                indicatorFootnote => indicatorFootnote.SubjectId,
+                indicatorFootnote => hierarchy.IndicatorGroupIdsByIndicatorId[indicatorFootnote.IndicatorId]
             )
             .ToDictionary(grouping => grouping.Key, grouping => grouping.Distinct().ToList());
 
         var indicatorsByIndicatorGroup = footnote
             .Indicators.GroupBy(
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId,
+                indicatorFootnote => hierarchy.IndicatorGroupIdsByIndicatorId[indicatorFootnote.IndicatorId],
                 indicatorFootnote => indicatorFootnote.IndicatorId
             )
             .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
         var filtersBySubject = footnote
-            .Filters.GroupBy(
-                filterFootnote => filterFootnote.Filter.SubjectId,
-                filterFootnote => filterFootnote.FilterId
-            )
+            .Filters.GroupBy(filterFootnote => filterFootnote.SubjectId, filterFootnote => filterFootnote.FilterId)
             .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
         // Index filter groups related to the filter items
-        AppendFilterGroups(filterItemsGroupByFilterGroup.Select(group => group.Key), filterGroupsByFilter);
+        Append(
+            filterItemsByFilterGroup.Keys.Select(filterGroupId =>
+                (hierarchy.FilterIdsByFilterGroupId[filterGroupId], filterGroupId)
+            ),
+            filterGroupsByFilter
+        );
 
         // Index filters related to the filter groups
-        AppendFilters(filterGroupsGroupByFilter.Select(group => group.Key), filtersBySubject);
+        Append(
+            footnote.FilterGroups.Select(filterGroupFootnote =>
+                (filterGroupFootnote.SubjectId, hierarchy.FilterIdsByFilterGroupId[filterGroupFootnote.FilterGroupId])
+            ),
+            filtersBySubject
+        );
 
         // Index filters related to the filter items
-        AppendFilters(filterItemsGroupByFilter.Select(group => group.Key), filtersBySubject);
+        Append(
+            footnote.FilterItems.Select(filterItemFootnote =>
+                (
+                    filterItemFootnote.SubjectId,
+                    hierarchy.FilterIdsByFilterGroupId[
+                        hierarchy.FilterGroupIdsByFilterItemId[filterItemFootnote.FilterItemId]
+                    ]
+                )
+            ),
+            filtersBySubject
+        );
 
         var selectedSubjects = footnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
         var selectedFilters = footnote.Filters.Select(filterFootnote => filterFootnote.FilterId);
@@ -282,39 +355,19 @@ public class FootnoteController : ControllerBase
         );
     }
 
-    private static void AppendFilterGroups(
-        IEnumerable<FilterGroup> filterGroups,
-        IDictionary<Guid, List<Guid>> filterGroupsByFilter
-    )
+    private static void Append(IEnumerable<(Guid ParentId, Guid Id)> pairs, IDictionary<Guid, List<Guid>> idsByParent)
     {
-        foreach (var filterGroup in filterGroups)
+        foreach (var (parentId, id) in pairs)
         {
-            if (!filterGroupsByFilter.TryGetValue(filterGroup.FilterId, out var idList))
+            if (!idsByParent.TryGetValue(parentId, out var idList))
             {
                 idList = new List<Guid>();
-                filterGroupsByFilter.Add(filterGroup.FilterId, idList);
+                idsByParent.Add(parentId, idList);
             }
 
-            if (!idList.Contains(filterGroup.Id))
+            if (!idList.Contains(id))
             {
-                idList.Add(filterGroup.Id);
-            }
-        }
-    }
-
-    private static void AppendFilters(IEnumerable<Filter> filters, IDictionary<Guid, List<Guid>> filtersBySubject)
-    {
-        foreach (var filter in filters)
-        {
-            if (!filtersBySubject.TryGetValue(filter.SubjectId, out var idList))
-            {
-                idList = new List<Guid>();
-                filtersBySubject.Add(filter.SubjectId, idList);
-            }
-
-            if (!idList.Contains(filter.Id))
-            {
-                idList.Add(filter.Id);
+                idList.Add(id);
             }
         }
     }
@@ -387,4 +440,10 @@ public class FootnoteController : ControllerBase
             ),
         };
     }
+
+    private record DataSetHierarchy(
+        Dictionary<Guid, Guid> FilterIdsByFilterGroupId,
+        Dictionary<Guid, Guid> FilterGroupIdsByFilterItemId,
+        Dictionary<Guid, Guid> IndicatorGroupIdsByIndicatorId
+    );
 }

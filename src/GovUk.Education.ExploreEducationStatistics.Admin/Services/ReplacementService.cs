@@ -586,17 +586,17 @@ public class ReplacementService(
 
         await foreach (var plan in replacementPlan.Filters.ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await ReplaceFootnoteFilter(replacementPlan.Id, plan);
+            await ReplaceFootnoteFilter(replacementPlan.Id, plan, replacementSubjectId);
         }
 
         await foreach (var plan in replacementPlan.FilterGroups.ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan);
+            await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan, replacementSubjectId);
         }
 
         await foreach (var plan in replacementPlan.FilterItems.ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await ReplaceFootnoteFilterItem(replacementPlan.Id, plan);
+            await ReplaceFootnoteFilterItem(replacementPlan.Id, plan, replacementSubjectId);
         }
 
         await foreach (
@@ -606,7 +606,7 @@ public class ReplacementService(
                 .WithCancellation(cancellationToken)
         )
         {
-            await ReplaceIndicatorFootnote(replacementPlan.Id, plan);
+            await ReplaceIndicatorFootnote(replacementPlan.Id, plan, replacementSubjectId);
         }
     }
 
@@ -626,7 +626,11 @@ public class ReplacementService(
         }
     }
 
-    private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
+    private async Task ReplaceFootnoteFilter(
+        Guid footnoteId,
+        TargetableReplacementViewModel plan,
+        Guid replacementSubjectId
+    )
     {
         var filterFootnote = await statisticsDbContext
             .FilterFootnote.AsQueryable()
@@ -634,11 +638,20 @@ public class ReplacementService(
 
         statisticsDbContext.Remove(filterFootnote);
         await statisticsDbContext.FilterFootnote.AddAsync(
-            new FilterFootnote { FootnoteId = footnoteId, FilterId = plan.TargetValue }
+            new FilterFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterId = plan.TargetValue,
+                SubjectId = replacementSubjectId,
+            }
         );
     }
 
-    private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
+    private async Task ReplaceFootnoteFilterGroup(
+        Guid footnoteId,
+        TargetableReplacementViewModel plan,
+        Guid replacementSubjectId
+    )
     {
         var filterGroupFootnote = await statisticsDbContext
             .FilterGroupFootnote.AsQueryable()
@@ -646,11 +659,20 @@ public class ReplacementService(
 
         statisticsDbContext.Remove(filterGroupFootnote);
         await statisticsDbContext.FilterGroupFootnote.AddAsync(
-            new FilterGroupFootnote { FootnoteId = footnoteId, FilterGroupId = plan.TargetValue }
+            new FilterGroupFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterGroupId = plan.TargetValue,
+                SubjectId = replacementSubjectId,
+            }
         );
     }
 
-    private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
+    private async Task ReplaceFootnoteFilterItem(
+        Guid footnoteId,
+        TargetableReplacementViewModel plan,
+        Guid replacementSubjectId
+    )
     {
         var filterItemFootnote = await statisticsDbContext
             .FilterItemFootnote.AsQueryable()
@@ -658,11 +680,20 @@ public class ReplacementService(
 
         statisticsDbContext.Remove(filterItemFootnote);
         await statisticsDbContext.FilterItemFootnote.AddAsync(
-            new FilterItemFootnote { FootnoteId = footnoteId, FilterItemId = plan.TargetValue }
+            new FilterItemFootnote
+            {
+                FootnoteId = footnoteId,
+                FilterItemId = plan.TargetValue,
+                SubjectId = replacementSubjectId,
+            }
         );
     }
 
-    private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
+    private async Task ReplaceIndicatorFootnote(
+        Guid footnoteId,
+        TargetableReplacementViewModel plan,
+        Guid replacementSubjectId
+    )
     {
         var indicatorFootnote = await statisticsDbContext
             .IndicatorFootnote.AsQueryable()
@@ -670,7 +701,12 @@ public class ReplacementService(
 
         statisticsDbContext.Remove(indicatorFootnote);
         await statisticsDbContext.IndicatorFootnote.AddAsync(
-            new IndicatorFootnote { FootnoteId = footnoteId, IndicatorId = plan.TargetValue }
+            new IndicatorFootnote
+            {
+                FootnoteId = footnoteId,
+                IndicatorId = plan.TargetValue,
+                SubjectId = replacementSubjectId,
+            }
         );
     }
 

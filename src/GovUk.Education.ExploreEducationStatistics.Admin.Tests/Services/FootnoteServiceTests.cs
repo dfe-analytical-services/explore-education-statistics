@@ -1317,38 +1317,29 @@ public class FootnoteServiceTests
             Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Subjects.First().SubjectId);
 
             Assert.Single(retrievedFootnote.Filters);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Filters.First().SubjectId);
 
             Assert.Single(retrievedFootnote.FilterGroups);
             Assert.Equal(
                 releaseSubject.Subject.Filters[0].FilterGroups[0].Id,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Id
+                retrievedFootnote.FilterGroups.First().FilterGroupId
             );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Label,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Label
-            );
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.FilterGroups.First().SubjectId);
 
             Assert.Single(retrievedFootnote.FilterItems);
             Assert.Equal(
                 releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
-                retrievedFootnote.FilterItems.First().FilterItem.Id
+                retrievedFootnote.FilterItems.First().FilterItemId
             );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Label,
-                retrievedFootnote.FilterItems.First().FilterItem.Label
-            );
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.FilterItems.First().SubjectId);
 
             Assert.Single(retrievedFootnote.Indicators);
             Assert.Equal(
                 releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id,
-                retrievedFootnote.Indicators.First().Indicator.Id
+                retrievedFootnote.Indicators.First().IndicatorId
             );
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Label,
-                retrievedFootnote.Indicators.First().Indicator.Label
-            );
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Indicators.First().SubjectId);
         }
     }
 

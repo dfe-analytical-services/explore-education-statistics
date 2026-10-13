@@ -139,7 +139,16 @@ public class SubjectResultMetaServiceTests
             .ReturnsAsync([]);
 
         footnoteRepository
-            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>()
+                )
+            )
             .ReturnsAsync([]);
 
         dataSet.Setup(s => s.ListIndicators(indicatorIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);
@@ -287,8 +296,10 @@ public class SubjectResultMetaServiceTests
                 s.GetFilteredFootnotes(
                     releaseVersion.Id,
                     subject.Id,
-                    It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
-                    query.Indicators
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.Id))),
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.FilterGroups[0].Id))),
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
+                    new List<Guid>()
                 )
             )
             .ReturnsAsync([]);
@@ -436,7 +447,16 @@ public class SubjectResultMetaServiceTests
             .ReturnsAsync([]);
 
         footnoteRepository
-            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>()
+                )
+            )
             .ReturnsAsync([]);
 
         dataSet.Setup(s => s.ListIndicators(indicatorIds: null, It.IsAny<CancellationToken>())).ReturnsAsync([]);

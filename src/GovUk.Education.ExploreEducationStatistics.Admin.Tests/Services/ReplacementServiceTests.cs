@@ -445,25 +445,37 @@ public class ReplacementServiceTests
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter",
-            filterFootnotes: new List<FilterFootnote> { new() { Filter = originalFilter1 } }
+            filterFootnotes: new List<FilterFootnote>
+            {
+                new() { FilterId = originalFilter1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterGroup = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter group",
-            filterGroupFootnotes: new List<FilterGroupFootnote> { new() { FilterGroup = originalFilterGroup1 } }
+            filterGroupFootnotes: new List<FilterGroupFootnote>
+            {
+                new() { FilterGroupId = originalFilterGroup1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterItem = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            filterItemFootnotes: new List<FilterItemFootnote> { new() { FilterItem = originalFilterItem1 } }
+            filterItemFootnotes: new List<FilterItemFootnote>
+            {
+                new() { FilterItemId = originalFilterItem1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForSubject = CreateFootnote(
@@ -1061,25 +1073,37 @@ public class ReplacementServiceTests
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter",
-            filterFootnotes: new List<FilterFootnote> { new() { Filter = originalFilter1 } }
+            filterFootnotes: new List<FilterFootnote>
+            {
+                new() { FilterId = originalFilter1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterGroup = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter group",
-            filterGroupFootnotes: new List<FilterGroupFootnote> { new() { FilterGroup = originalFilterGroup1 } }
+            filterGroupFootnotes: new List<FilterGroupFootnote>
+            {
+                new() { FilterGroupId = originalFilterGroup1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterItem = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            filterItemFootnotes: new List<FilterItemFootnote> { new() { FilterItem = originalFilterItem1 } }
+            filterItemFootnotes: new List<FilterItemFootnote>
+            {
+                new() { FilterItemId = originalFilterItem1.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForSubject = CreateFootnote(
@@ -1362,9 +1386,8 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilter.Indicators);
             Assert.Empty(replacedFootnoteForFilter.Subjects);
 
-            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilter.Filters.First().Filter.Id);
-            Assert.Equal(replacementFilter1.Label, replacedFootnoteForFilter.Filters.First().Filter.Label);
-            Assert.Equal(replacementFilter1.Name, replacedFootnoteForFilter.Filters.First().Filter.Name);
+            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilter.Filters.First().FilterId);
+            Assert.Equal(replacementReleaseSubject.SubjectId, replacedFootnoteForFilter.Filters.First().SubjectId);
 
             var replacedFootnoteForFilterGroup = await GetFootnoteById(statisticsDbContext, footnoteForFilterGroup.Id);
             Assert.NotNull(replacedFootnoteForFilterGroup);
@@ -1376,13 +1399,10 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilterGroup.Indicators);
             Assert.Empty(replacedFootnoteForFilterGroup.Subjects);
 
+            Assert.Equal(replacementFilterGroup1.Id, replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroupId);
             Assert.Equal(
-                replacementFilterGroup1.Id,
-                replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroup.Id
-            );
-            Assert.Equal(
-                replacementFilterGroup1.Label,
-                replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroup.Label
+                replacementReleaseSubject.SubjectId,
+                replacedFootnoteForFilterGroup.FilterGroups.First().SubjectId
             );
 
             var replacedFootnoteForFilterItem = await GetFootnoteById(statisticsDbContext, footnoteForFilterItem.Id);
@@ -1394,10 +1414,10 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilterItem.Indicators);
             Assert.Empty(replacedFootnoteForFilterItem.Subjects);
 
-            Assert.Equal(replacementFilterItem1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterItem.Id);
+            Assert.Equal(replacementFilterItem1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterItemId);
             Assert.Equal(
-                replacementFilterItem1.Label,
-                replacedFootnoteForFilterItem.FilterItems.First().FilterItem.Label
+                replacementReleaseSubject.SubjectId,
+                replacedFootnoteForFilterItem.FilterItems.First().SubjectId
             );
 
             var replacedFootnoteForIndicator = await GetFootnoteById(statisticsDbContext, footnoteForIndicator.Id);
@@ -1409,9 +1429,11 @@ public class ReplacementServiceTests
             Assert.Single(replacedFootnoteForIndicator.Indicators);
             Assert.Empty(replacedFootnoteForIndicator.Subjects);
 
-            Assert.Equal(replacementIndicator.Id, replacedFootnoteForIndicator.Indicators.First().Indicator.Id);
-            Assert.Equal(replacementIndicator.Label, replacedFootnoteForIndicator.Indicators.First().Indicator.Label);
-            Assert.Equal(replacementIndicator.Name, replacedFootnoteForIndicator.Indicators.First().Indicator.Name);
+            Assert.Equal(replacementIndicator.Id, replacedFootnoteForIndicator.Indicators.First().IndicatorId);
+            Assert.Equal(
+                replacementReleaseSubject.SubjectId,
+                replacedFootnoteForIndicator.Indicators.First().SubjectId
+            );
 
             var replacedFootnoteForSubject = await GetFootnoteById(statisticsDbContext, footnoteForSubject.Id);
             Assert.NotNull(replacedFootnoteForSubject);
@@ -3147,13 +3169,9 @@ public class ReplacementServiceTests
     {
         return await context
             .Footnote.Include(footnote => footnote.Filters)
-                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
             .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
             .Include(footnote => footnote.Subjects)
                 .ThenInclude(subjectFootnote => subjectFootnote.Subject)
             .SingleAsync(footnote => footnote.Id == id);
