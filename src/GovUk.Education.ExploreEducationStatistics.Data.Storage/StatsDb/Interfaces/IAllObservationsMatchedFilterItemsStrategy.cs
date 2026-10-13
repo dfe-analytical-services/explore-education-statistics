@@ -1,6 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 
 public interface IAllObservationsMatchedFilterItemsStrategy
 {

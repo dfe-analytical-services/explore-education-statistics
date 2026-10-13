@@ -2,13 +2,14 @@ using System.Diagnostics;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 /// <summary>
 /// The purpose of this strategy is to find candidate Filter Items for the table
@@ -16,32 +17,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 /// so far from Location and Time Period choices.
 ///
 /// This strategy is optimised to find candidate FilterItems based on there being
-/// a lower percentage of Observation rows matched so far from a Subject's available
+/// a high percentage of Observation rows matched so far from a Subject's available
 /// Observations.
 ///
-/// In this strategy, we use #MatchedObservations as the driving set for the query,
-/// because it has a lower percentage of a Subject's Observations matched, and is thus
-/// a smaller set.
+/// For each FilterItemId, we scan down its ObservationFilterItem ObservationIds
+/// (using the IX_ObservationFilterItem_FilterItemId_ObservationId index), and for
+/// each ObservationId, we check for the existence of a matching ObservationId in the
+/// #MatchedObservation temp table. As soon as we find a hit, we move on to the next
+/// FilterItem in the list, and if we don't find a matching ObservationId, then this
+/// FilterItem is not a candidate for the "Choose filters" step.
 ///
-/// For each ObservationId, we join the ObservationFilterItem table and find all
-/// distinct FilterItemIds that appear for that ObservationId, using the
-/// IX_ObservationFilterItem_FilterItemId_ObservationId index for extra speed.
-/// The query executor will generally pick a good strategy for applying this, making
-/// use of parallelism to break the job into batches of ObservationIds and eventually
-/// combining and de-duping the FilterItemIds found.
+/// The reason that this strategy works well is that:
 ///
-/// The reason that this strategy works well is that the #MatchedObservation temp table
-/// (which is the driving set for this query) is a smaller set because we only use this
-/// strategy at lower percentages of matched Observations.  The query executor can also
-/// make use of parallelism to execute the job quicker.
+/// 1) The FilterItem set (which is the driving set for this query) is generally a much
+/// smaller set than the Subject's Observation rows or ObservationFilterItem rows, so
+/// will create much fewer top-level loops.
+///
+/// 2) The fact that we choose this strategy only when there are a high percentage of
+/// ObservationIds in the #MatchedObservation means that generally we quickly find a
+/// matching ObservationId in #MatchedObservations for each FilterItem (i.e. there's a
+/// much higher chance to find a match quickly if there are lots of Ids to match against),
+/// meaning that we don't have to do much work for the most part to find matches for each
+/// FilterItem and thus can break early.  As the percentage drops, the duration of this
+/// query increases dramatically, which is when we switch to using
+/// <see cref="SparseObservationsMatchedFilterItemsStrategy"/> instead.
 /// </summary>
-public class SparseObservationsMatchedFilterItemsStrategy(
+public class DenseObservationsMatchedFilterItemsStrategy(
     IRawSqlExecutor sqlExecutor,
     ITemporaryTableCreator temporaryTableCreator,
     ISqlStatementsHelper sqlHelper,
     StatisticsDbContext context,
-    ILogger<SparseObservationsMatchedFilterItemsStrategy> logger
-) : ISparseObservationsMatchedFilterItemsStrategy
+    ILogger<DenseObservationsMatchedFilterItemsStrategy> logger
+) : IDenseObservationsMatchedFilterItemsStrategy
 {
     public async Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
         Guid subjectId,
@@ -51,12 +58,21 @@ public class SparseObservationsMatchedFilterItemsStrategy(
     {
         var sw = Stopwatch.StartNew();
 
-        // Generate a keyless temp table to allow quick inserting of
-        // matching FilterItems Ids into a heap in parallel.
+        var allFilterItemIds = await context
+            .FilterItem.Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId)
+            .Select(fi => fi.Id)
+            .ToListAsync(cancellationToken);
+
+        var candidateFilterItemIdTable = await temporaryTableCreator.CreateAndPopulateTemporaryTable(
+            context,
+            allFilterItemIds.Select(fi => new IdTempTable(fi)),
+            cancellationToken
+        );
+
         var matchedFilterItemIdTable = await temporaryTableCreator.CreateTemporaryTable<
             MatchedFilterItem,
             StatisticsDbContext
-        >(context: context, cancellationToken: cancellationToken);
+        >(context, cancellationToken);
 
         // Insert matching FilterItem Ids into the heap.
         // Use TABLOCK to allow fast and safe parallel inserts into the table
@@ -67,12 +83,18 @@ public class SparseObservationsMatchedFilterItemsStrategy(
         // on fresh statistics.
         var matchedFilterItemsSql =
             $@"
-                INSERT INTO {matchedFilterItemIdTable.Name} WITH (TABLOCK)
-                SELECT DISTINCT o.FilterItemId
-                FROM {matchedObservationsTableReference.Name} AS mo
-                JOIN ObservationFilterItem AS o
-                  ON o.ObservationId = mo.Id
-                OPTION(RECOMPILE, MAXDOP 4);";
+            INSERT INTO {matchedFilterItemIdTable.Name} WITH (TABLOCK)
+            SELECT CandidateFilterItem.Id
+            FROM {candidateFilterItemIdTable.Name} AS CandidateFilterItem
+            WHERE EXISTS
+            (
+                SELECT 1
+                FROM dbo.ObservationFilterItem AS OFI
+                JOIN {matchedObservationsTableReference.Name} AS Observation
+                    ON Observation.Id = ofi.ObservationId
+                WHERE OFI.FilterItemId = CandidateFilterItem.Id
+            )
+            OPTION (RECOMPILE, MAXDOP 4);";
 
         // Execute the query to find matching FilterItem Ids and insert them into
         // the #MatchedFilterItem temp table.
