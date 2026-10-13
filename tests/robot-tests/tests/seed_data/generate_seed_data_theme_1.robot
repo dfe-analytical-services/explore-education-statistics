@@ -216,7 +216,7 @@ Add line chart to ${RELEASE_1_NAME}
     user clicks edit data block link    Key Stats aggregate table
     user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
-    user clicks link    Legend
+    user clicks link    Legend and styling
     user chooses select option    id:chartLegendConfigurationForm-position    Top
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
     user chooses select option    id:chartLegendConfigurationForm-items-1-symbol    Circle
@@ -653,7 +653,7 @@ Add line chart 1 to ${RELEASE_2_NAME}
     user clicks edit data block link    Generic data block 1
     user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
-    user clicks link    Legend
+    user clicks link    Legend and styling
     user chooses select option    id:chartLegendConfigurationForm-position    Top
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
     user chooses select option    id:chartLegendConfigurationForm-items-1-symbol    Circle
@@ -667,7 +667,7 @@ Add line chart 2 to ${RELEASE_2_NAME}
     user clicks edit data block link    Generic data block 2
     user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
-    user clicks link    Legend
+    user clicks link    Legend and styling
     user chooses select option    id:chartLegendConfigurationForm-position    Top
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
     user chooses select option    id:chartLegendConfigurationForm-items-1-symbol    Circle
@@ -681,7 +681,7 @@ Add line chart 3 to ${RELEASE_2_NAME}
     user clicks edit data block link    Key Stats aggregate table
     user configures basic chart    Line    500    Some alt text    A subtitle
     user selects all data sets for chart
-    user clicks link    Legend
+    user clicks link    Legend and styling
     user chooses select option    id:chartLegendConfigurationForm-position    Top
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
     user chooses select option    id:chartLegendConfigurationForm-items-1-symbol    Circle
