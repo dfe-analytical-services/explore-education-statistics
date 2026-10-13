@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -59,6 +60,9 @@ public class ContentDbContext : DbContext
     public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
     public virtual DbSet<File> Files { get; set; }
     public virtual DbSet<DataSetFileVersionGeographicLevel> DataSetFileVersionGeographicLevels { get; set; }
+    public virtual DbSet<DataSetFile> DataSetFiles { get; set; }
+    public virtual DbSet<DataSetFileVersion> DataSetFileVersions { get; set; }
+    public virtual DbSet<ReleaseVersionDataSetFileVersion> ReleaseVersionDataSetFileVersions { get; set; }
     public virtual DbSet<ContentSection> ContentSections { get; set; }
     public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
     public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
@@ -99,6 +103,19 @@ public class ContentDbContext : DbContext
     [DbFunction]
     public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>
         FromExpression(() => ReleaseFilesFreeTextTable(searchTerm));
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // TODO EES-5105 Remove once the DataSetFile tables are the source of truth.
+        // Registered here rather than with each AddDbContext so that it applies to every ContentDbContext,
+        // including those constructed directly and those whose options are replaced in tests.
+        var interceptors = optionsBuilder.Options.FindExtension<CoreOptionsExtension>()?.Interceptors ?? [];
+
+        if (!interceptors.Contains(DataSetFileDualWriteInterceptor.Instance))
+        {
+            optionsBuilder.AddInterceptors(DataSetFileDualWriteInterceptor.Instance);
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

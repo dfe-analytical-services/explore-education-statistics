@@ -221,14 +221,20 @@ public class ReleaseAmendmentServiceTests
         {
             Id = Guid.NewGuid(),
             Filename = "Filename 1",
+            Type = FileType.Data,
             SubjectId = Guid.NewGuid(),
+            DataSetFileId = Guid.NewGuid(),
+            DataSetFileVersion = 0,
         };
 
         var dataFile2 = new File
         {
             Id = Guid.NewGuid(),
             Filename = "Filename 2",
+            Type = FileType.Data,
             SubjectId = Guid.NewGuid(),
+            DataSetFileId = Guid.NewGuid(),
+            DataSetFileVersion = 0,
         };
 
         var releaseFiles = new List<ReleaseFile>
@@ -548,6 +554,16 @@ public class ReleaseAmendmentServiceTests
             var amendmentDataFile2 = amendmentDataFiles[1];
             var originalFile2 = releaseFiles.First(f => f.File.Filename == amendmentDataFile2.File.Filename);
             AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
+
+            // Check the DataSetFile tables mirror the copied Release Files.
+            var amendmentLinks = await contentDbContext
+                .ReleaseVersionDataSetFileVersions.Where(link => link.ReleaseVersionId == amendment.Id)
+                .ToListAsync();
+
+            Assert.Equal(
+                amendmentDataFiles.Select(rf => (rf.Id, rf.FileId)).Order(),
+                amendmentLinks.Select(link => (link.Id, link.DataSetFileVersionId)).Order()
+            );
 
             // Check Featured Tables have been copied over OK.
             Assert.Equal(2, amendment.FeaturedTables.Count);

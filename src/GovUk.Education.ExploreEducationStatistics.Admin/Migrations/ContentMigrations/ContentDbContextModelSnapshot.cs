@@ -339,6 +339,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("DataImportErrors");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DataSetFiles");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("ContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DataSetFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DataSetFileMeta")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Filename")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilterHierarchies")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("MetaContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("MetaContentType")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Guid?>("MetaFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MetaFilename")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReplacedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ReplacingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RootPath")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("MetaFileId")
+                        .IsUnique()
+                        .HasFilter("[MetaFileId] IS NOT NULL");
+
+                    b.HasIndex("ReplacedById")
+                        .IsUnique()
+                        .HasFilter("[ReplacedById] IS NOT NULL");
+
+                    b.HasIndex("ReplacingId")
+                        .IsUnique()
+                        .HasFilter("[ReplacingId] IS NOT NULL");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("DataSetFileId", "Version");
+
+                    b.ToTable("DataSetFileVersions");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
                 {
                     b.Property<Guid>("DataSetFileVersionId")
@@ -1530,6 +1628,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("ReleaseVersions");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersionDataSetFileVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DataSetFileVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FilterSequence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IndicatorSequence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("PublicApiCompatible")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("PublicApiDataSetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PublicApiDataSetVersion")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("Published")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ReleaseVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetFileVersionId");
+
+                    b.HasIndex("ReleaseVersionId", "DataSetFileVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("ReleaseVersionId", "PublicApiDataSetId", "PublicApiDataSetVersion")
+                        .IsUnique()
+                        .HasFilter("[PublicApiDataSetId] IS NOT NULL AND [PublicApiDataSetVersion] IS NOT NULL");
+
+                    b.ToTable("ReleaseVersionDataSetFileVersions");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2023,6 +2175,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataImport");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFile", "DataSetFile")
+                        .WithMany("Versions")
+                        .HasForeignKey("DataSetFileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", "ReplacedBy")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", "ReplacedById");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", "Replacing")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", "ReplacingId");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DataSetFile");
+
+                    b.Navigation("ReplacedBy");
+
+                    b.Navigation("Replacing");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersionGeographicLevel", b =>
@@ -2520,6 +2701,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("Release");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersionDataSetFileVersion", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFileVersion", "DataSetFileVersion")
+                        .WithMany()
+                        .HasForeignKey("DataSetFileVersionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion", "ReleaseVersion")
+                        .WithMany()
+                        .HasForeignKey("ReleaseVersionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("DataSetFileVersion");
+
+                    b.Navigation("ReleaseVersion");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "CreatedBy")
@@ -2710,6 +2910,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
                 {
                     b.Navigation("Errors");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataSetFile", b =>
+                {
+                    b.Navigation("Versions");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EinContentSection", b =>

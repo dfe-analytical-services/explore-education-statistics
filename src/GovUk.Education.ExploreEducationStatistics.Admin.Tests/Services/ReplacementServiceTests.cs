@@ -818,11 +818,15 @@ public class ReplacementServiceTests
             .WithSubjects(_fixture.DefaultSubject().Generate(2))
             .GenerateTuple2();
 
+        var dataSetFileId = Guid.NewGuid();
+
         var originalFile = new File
         {
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataSetFileId = dataSetFileId,
+            DataSetFileVersion = 0,
         };
 
         var replacementFile = new File
@@ -830,6 +834,8 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
+            DataSetFileId = dataSetFileId,
+            DataSetFileVersion = 1,
             Replacing = originalFile,
         };
 
@@ -1305,6 +1311,20 @@ public class ReplacementServiceTests
             var replacementFileUpdated = await contentDbContext.Files.FindAsync(replacementFile.Id);
             Assert.NotNull(replacementFileUpdated);
             Assert.Null(replacementFileUpdated.ReplacingId);
+
+            // Check that the DataSetFile tables mirror the unlinking and the copied data guidance.
+            var versions = await contentDbContext.DataSetFileVersions.ToListAsync();
+            Assert.Equal(2, versions.Count);
+            Assert.All(versions, version => Assert.Null(version.ReplacedById));
+            Assert.All(versions, version => Assert.Null(version.ReplacingId));
+
+            var replacementReleaseFileUpdated = await contentDbContext.ReleaseFiles.SingleAsync(rf =>
+                rf.Id == replacementReleaseFile.Id
+            );
+            var replacementLink = await contentDbContext.ReleaseVersionDataSetFileVersions.SingleAsync(link =>
+                link.Id == replacementReleaseFile.Id
+            );
+            Assert.Equal(replacementReleaseFileUpdated.Summary, replacementLink.Summary);
 
             var replacedDataBlock = await contentDbContext.DataBlockVersions.FirstAsync(db =>
                 db.Id == dataBlockVersion.Id

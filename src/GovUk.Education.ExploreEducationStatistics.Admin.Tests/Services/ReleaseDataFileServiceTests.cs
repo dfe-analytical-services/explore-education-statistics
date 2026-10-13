@@ -185,11 +185,15 @@ public class ReleaseDataFileServiceTests
 
         var replacementSubject = new Subject { Id = Guid.NewGuid() };
 
+        var dataSetFileId = Guid.NewGuid();
+
         var dataFile = new File
         {
             Filename = "data.csv",
             Type = FileType.Data,
             SubjectId = subject.Id,
+            DataSetFileId = dataSetFileId,
+            DataSetFileVersion = 0,
         };
 
         var metaFile = new File
@@ -205,6 +209,8 @@ public class ReleaseDataFileServiceTests
             Filename = "replacement.csv",
             Type = FileType.Data,
             SubjectId = replacementSubject.Id,
+            DataSetFileId = dataSetFileId,
+            DataSetFileVersion = 1,
             Replacing = dataFile,
         };
 
@@ -309,6 +315,16 @@ public class ReleaseDataFileServiceTests
 
             // Check that the reference to the replacement is removed
             Assert.Null((await contentDbContext.Files.FindAsync(dataFile.Id))?.ReplacedById);
+
+            // Check that the DataSetFile tables mirror the deletion
+            var dataSetFile = await contentDbContext.DataSetFiles.Include(dsf => dsf.Versions).SingleAsync();
+            var version = Assert.Single(dataSetFile.Versions);
+            Assert.Equal(dataFile.Id, version.Id);
+            Assert.Equal(metaFile.Id, version.MetaFileId);
+            Assert.Null(version.ReplacedById);
+
+            var link = Assert.Single(await contentDbContext.ReleaseVersionDataSetFileVersions.ToListAsync());
+            Assert.Equal(releaseDataFile.Id, link.Id);
         }
     }
 
