@@ -22,6 +22,14 @@ interface BaseProps {
   isCollapsed?: boolean;
   listClassName?: string;
   listStyle?: 'none' | 'number' | 'bullet';
+  /**
+   * Render every item, hiding the collapsed overflow with `dfe-js-hidden`
+   * rather than omitting it from the output.
+   *
+   * This keeps the full list in the server-rendered HTML, so it is readable
+   * without JS and visible to crawlers.
+   */
+  renderAllItems?: boolean;
   testId?: string;
 }
 
@@ -48,6 +56,7 @@ const CollapsibleList = ({
   isCollapsed = true,
   listClassName,
   listStyle = 'none',
+  renderAllItems = false,
   testId,
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
@@ -84,9 +93,29 @@ const CollapsibleList = ({
     );
   });
 
-  const renderedListItems = collapsed
-    ? listItems.slice(0, collapseAfter > 0 ? collapseAfter : 0)
-    : listItems;
+  const collapseFrom = collapseAfter > 0 ? collapseAfter : 0;
+
+  let renderedListItems = listItems;
+
+  if (collapsed) {
+    renderedListItems = renderAllItems
+      ? // If we want to render all items (instead of just hiding them with JS),
+        // add `dfe-js-hidden` class to later items
+        listItems.map((item, index) => {
+          if (index < collapseFrom || !React.isValidElement(item)) {
+            return item;
+          }
+
+          return cloneElement(
+            item as ReactElement<HTMLAttributes<HTMLLIElement>>,
+            {
+              className: classNames(item.props.className, 'dfe-js-hidden'),
+            },
+          );
+        })
+      : // otherwise, just remove the later items
+        listItems.slice(0, collapseFrom);
+  }
 
   const listTag = listStyle === 'number' ? 'ol' : 'ul';
 
@@ -114,6 +143,9 @@ const CollapsibleList = ({
           ariaExpanded={!collapsed}
           className={classNames('govuk-!-display-none-print', buttonClassName, {
             'govuk-!-margin-bottom-4': !buttonClassName,
+            // Without JS every item is already shown, so the button would
+            // be inert and its label untrue.
+            'dfe-js-only': renderAllItems,
           })}
           onClick={() => {
             if (collapsed) {
