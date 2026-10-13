@@ -1,16 +1,13 @@
 #nullable enable
-using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static System.StringComparison;
@@ -21,44 +18,35 @@ public class ImporterService : IImporterService
 {
     private readonly AppOptions _appOptions;
     private readonly IGuidGenerator _guidGenerator;
-    private readonly ImporterLocationService _importerLocationService;
     private readonly IImporterMetaService _importerMetaService;
     private readonly IDataImportService _dataImportService;
     private readonly ILogger<ImporterService> _logger;
-    private readonly IDatabaseHelper _databaseHelper;
-    private readonly IObservationBatchImporter _observationBatchImporter;
 
     private const int Stage2RowCheck = 1000;
 
     public ImporterService(
         IOptions<AppOptions> appOptions,
         IGuidGenerator guidGenerator,
-        ImporterLocationService importerLocationService,
         IImporterMetaService importerMetaService,
         IDataImportService dataImportService,
-        ILogger<ImporterService> logger,
-        IDatabaseHelper databaseHelper,
-        IObservationBatchImporter? observationBatchImporter = null
+        ILogger<ImporterService> logger
     )
     {
         _appOptions = appOptions.Value;
         _guidGenerator = guidGenerator;
-        _importerLocationService = importerLocationService;
         _importerMetaService = importerMetaService;
         _dataImportService = dataImportService;
         _logger = logger;
-        _databaseHelper = databaseHelper;
-        _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
     }
 
     public Task<SubjectMeta> ImportMeta(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        Subject subject,
-        StatisticsDbContext context
+        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter
     )
     {
-        return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, subject, context);
+        return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, dataSet, dataSetWriter);
     }
 
     private record FilterItemMeta(Guid FilterId, string FilterGroupLabel, string FilterItemLabel)
@@ -102,7 +90,7 @@ public class ImporterService : IImporterService
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
         SubjectMeta subjectMeta,
-        StatisticsDbContext context
+        IStorageDataSetWriter dataSetWriter
     )
     {
         var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
@@ -185,16 +173,16 @@ public class ImporterService : IImporterService
 
         var filterIds = filterGroups.Select(group => group.FilterId).Distinct().ToList();
 
+        var autoSelectFilterItemLabels = subjectMeta.Filters.ToDictionary(
+            filterMeta => filterMeta.Filter.Id,
+            filterMeta => filterMeta.Filter.AutoSelectFilterItemLabel
+        );
+
         var filterIdToAutoSelectFilterItem = filterIds.ToDictionary(
             filterId => filterId,
             filterId =>
             {
-                var autoSelectFilterItemLabel =
-                    context
-                        .Filter.Where(f => f.Id == filterId)
-                        .Select(f => f.AutoSelectFilterItemLabel)
-                        .SingleOrDefault()
-                    ?? "Total"; // If meta file didn't specify a default, look for "Total"
+                var autoSelectFilterItemLabel = autoSelectFilterItemLabels.GetValueOrDefault(filterId) ?? "Total"; // If meta file didn't specify a default, look for "Total"
 
                 var filterItemsWithAutoSelectLabel = filterItems
                     .Where(item =>
@@ -210,59 +198,27 @@ public class ImporterService : IImporterService
                     // If it does, this is the auto select filter item
                     return filterItemsWithAutoSelectLabel
                         .Where(fi => fi.FilterGroup.Label == "Total")
-                        .Select(fi => new { fi.Id, fi.Label })
                         .SingleOrDefault(); // is the default "null", or does it break?
 
                     // NB. This implementation does not currently support filter hierarchies.
                     // TODO (EES-5884): Fix auto-select filter items for filter hierarchies
                 }
 
-                return filterItemsWithAutoSelectLabel.Select(fi => new { fi.Id, fi.Label }).FirstOrDefault();
+                return filterItemsWithAutoSelectLabel.FirstOrDefault();
             }
         );
 
-        await _databaseHelper.DoInTransaction(
-            context,
-            async ctxDelegate =>
-            {
-                // We don't add filter groups explicitly, as they are included in `filterItems`
-                await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
+        await dataSetWriter.WriteFilterItems(filterItems, filterIdToAutoSelectFilterItem);
 
-                var filters = ctxDelegate.Filter.Where(f => filterIds.Contains(f.Id)).ToList();
-                foreach (var filter in filters)
-                {
-                    var filterItem = filterIdToAutoSelectFilterItem[filter.Id];
-                    filter.AutoSelectFilterItemId = filterItem?.Id;
-                    // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
-                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
-                }
-
-                await ctxDelegate.SaveChangesAsync();
-            }
-        );
-
-        // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent
-        // import processes reaching this stage will wait before adding their own new Locations, if any.
-        //
-        // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one
-        // process continue on to the next stage of import before all Locations that it relies on have been
-        // persisted successfully by whichever import process introduced it first.
-        //
-        // This also lets us take advantage of the performance gains of saving new Locations in a single batch
-        // rather than in separate SaveChanges() calls, which introduces quite a penalty.
-        await _databaseHelper.ExecuteWithExclusiveLock(
-            context,
-            "Importer_AddNewLocations",
-            ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList())
-        );
+        await dataSetWriter.WriteLocations(locations);
     }
 
     public async Task ImportObservations(
         DataImport import,
         Func<Task<Stream>> dataFileStreamProvider,
         Func<Task<Stream>> metaFileStreamProvider,
-        Subject subject,
-        StatisticsDbContext context
+        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter
     )
     {
         var importObservationsBatchSize = _appOptions.RowsPerBatch;
@@ -277,12 +233,7 @@ public class ImporterService : IImporterService
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerMetaService.GetSubjectMeta(
-            metaFileCsvHeaders,
-            metaFileCsvRows,
-            subject,
-            context
-        );
+        var subjectMeta = await _importerMetaService.GetSubjectMeta(metaFileCsvHeaders, metaFileCsvRows, dataSet);
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
@@ -344,10 +295,11 @@ public class ImporterService : IImporterService
 
                                 return ObservationFromCsv(
                                     cells,
-                                    subject,
+                                    dataSet.SubjectId,
                                     subjectMeta.Filters.Select(meta => meta.Filter).ToList(),
                                     fixedInformationReader,
                                     filterAndIndicatorReader,
+                                    dataSetWriter,
                                     csvRow
                                 );
                             }
@@ -355,15 +307,12 @@ public class ImporterService : IImporterService
                             return null;
                         }
                     )
-                    .WhereNotNull();
+                    .WhereNotNull()
+                    .ToList();
 
-                await _databaseHelper.DoInTransaction(
-                    context,
-                    async contextDelegate =>
-                        await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
-                );
+                await dataSetWriter.WriteObservations(allowedRows);
 
-                importedRowsSoFar += allowedRows.Count();
+                importedRowsSoFar += allowedRows.Count;
                 lastProcessedRowIndex += unprocessedRows.Count;
 
                 await _dataImportService.Update(
@@ -397,10 +346,11 @@ public class ImporterService : IImporterService
 
     private Observation ObservationFromCsv(
         List<string> rowValues,
-        Subject subject,
+        Guid subjectId,
         List<Filter> filters,
         FixedInformationDataFileReader fixedInformationReader,
         FilterAndIndicatorValuesReader filterAndIndicatorReader,
+        IStorageDataSetWriter dataSetWriter,
         int csvRowNum
     )
     {
@@ -410,9 +360,9 @@ public class ImporterService : IImporterService
         {
             Id = observationId,
             FilterItems = GetFilterItems(rowValues, filters, filterAndIndicatorReader, observationId),
-            LocationId = GetLocationId(rowValues, fixedInformationReader),
+            LocationId = dataSetWriter.GetLocationId(fixedInformationReader.GetLocation(rowValues)),
             Measures = filterAndIndicatorReader.GetMeasures(rowValues),
-            SubjectId = subject.Id,
+            SubjectId = subjectId,
             TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
             Year = fixedInformationReader.GetYear(rowValues),
             CsvRow = csvRowNum,
@@ -440,72 +390,4 @@ public class ImporterService : IImporterService
             })
             .ToList();
     }
-
-    private Guid GetLocationId(IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
-    {
-        var location = fixedInformationReader.GetLocation(rowValues);
-        return _importerLocationService.Get(location).Id;
-    }
-}
-
-public class StoredProcedureObservationBatchImporter : IObservationBatchImporter
-{
-    public async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
-    {
-        var observationsTable = new DataTable();
-        observationsTable.Columns.Add("Id", typeof(Guid));
-        observationsTable.Columns.Add("SubjectId", typeof(Guid));
-        observationsTable.Columns.Add("LocationId", typeof(Guid));
-        observationsTable.Columns.Add("Year", typeof(int));
-        observationsTable.Columns.Add("TimeIdentifier", typeof(string));
-        observationsTable.Columns.Add("Measures", typeof(string));
-        observationsTable.Columns.Add("CsvRow", typeof(long));
-
-        var observationsFilterItemsTable = new DataTable();
-        observationsFilterItemsTable.Columns.Add("ObservationId", typeof(Guid));
-        observationsFilterItemsTable.Columns.Add("FilterItemId", typeof(Guid));
-        observationsFilterItemsTable.Columns.Add("FilterId", typeof(Guid));
-
-        foreach (var o in observations)
-        {
-            observationsTable.Rows.Add(
-                o.Id,
-                o.SubjectId,
-                o.LocationId,
-                o.Year,
-                o.TimeIdentifier.GetEnumValue(),
-                "{" + string.Join(",", o.Measures.Select(x => $"\"{x.Key}\":\"{x.Value}\"")) + "}",
-                o.CsvRow
-            );
-
-            foreach (var item in o.FilterItems)
-            {
-                observationsFilterItemsTable.Rows.Add(item.ObservationId, item.FilterItemId, item.FilterId);
-            }
-        }
-
-        var parameter = new SqlParameter("@Observations", SqlDbType.Structured)
-        {
-            Value = observationsTable,
-            TypeName = "[dbo].[ObservationType]",
-        };
-
-        await context.Database.ExecuteSqlRawAsync("EXEC [dbo].[InsertObservations] @Observations", parameter);
-
-        parameter = new SqlParameter("@ObservationFilterItems", SqlDbType.Structured)
-        {
-            Value = observationsFilterItemsTable,
-            TypeName = "[dbo].[ObservationFilterItemType]",
-        };
-
-        await context.Database.ExecuteSqlRawAsync(
-            "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems",
-            parameter
-        );
-    }
-}
-
-public interface IObservationBatchImporter
-{
-    Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations);
 }
