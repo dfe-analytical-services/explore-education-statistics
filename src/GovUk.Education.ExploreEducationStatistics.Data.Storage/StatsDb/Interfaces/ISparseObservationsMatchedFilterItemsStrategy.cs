@@ -1,6 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Thinktecture.EntityFrameworkCore.TempTables;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 
 public interface ISparseObservationsMatchedFilterItemsStrategy
 {
