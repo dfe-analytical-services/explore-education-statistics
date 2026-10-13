@@ -1,6 +1,7 @@
 import Button from '@common/components/Button';
 import styles from '@common/components/Modal.module.scss';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
 import * as Dialog from '@radix-ui/react-dialog';
 import classNames from 'classnames';
@@ -18,9 +19,9 @@ export interface ModalProps {
   fullScreen?: boolean;
   hideTitle?: boolean;
   /**
-   * Also render the content in a native `<details>` with this summary, so it
-   * is available without JS (including to crawlers). It is hidden when JS is
-   * available, and the modal trigger is hidden when it isn't.
+   * Until JS has loaded, render the content in a native `<details>` with this
+   * summary instead of the modal, so it is available without JS (including to
+   * crawlers). Once mounted, it is swapped for the modal and its trigger.
    */
   noJsFallbackSummary?: string;
   open?: boolean;
@@ -57,9 +58,32 @@ const Modal = ({
   const dialogRef = useRef<HTMLDivElement>(null);
   const [open, toggleOpen] = useToggle(initialOpen);
 
+  const { isMounted } = useMounted();
+
   useEffect(() => {
     toggleOpen(initialOpen);
   }, [initialOpen, toggleOpen]);
+
+  // Server-rendered and on the first client render, so they match; swapped
+  // for the modal once mounted.
+  if (noJsFallbackSummary && !isMounted) {
+    return (
+      <details
+        className="govuk-details govuk-!-margin-bottom-0"
+        data-testid="modal-no-js-fallback"
+      >
+        <summary className="govuk-details__summary">
+          <span className="govuk-details__summary-text">
+            {noJsFallbackSummary}
+          </span>
+        </summary>
+        <div className="govuk-details__text">
+          {description && <p>{description}</p>}
+          {children}
+        </div>
+      </details>
+    );
+  }
 
   return (
     <Dialog.Root
@@ -74,29 +98,7 @@ const Modal = ({
       }}
     >
       {triggerButton && (
-        <Dialog.Trigger
-          asChild
-          // The trigger can't work without JS, where the fallback is shown instead.
-          className={noJsFallbackSummary ? 'dfe-js-only' : undefined}
-        >
-          {triggerButton}
-        </Dialog.Trigger>
-      )}
-      {noJsFallbackSummary && (
-        <details
-          className="govuk-details dfe-js-hidden"
-          data-testid="modal-no-js-fallback"
-        >
-          <summary className="govuk-details__summary">
-            <span className="govuk-details__summary-text">
-              {noJsFallbackSummary}
-            </span>
-          </summary>
-          <div className="govuk-details__text">
-            {description && <p>{description}</p>}
-            {children}
-          </div>
-        </details>
+        <Dialog.Trigger asChild>{triggerButton}</Dialog.Trigger>
       )}
       <Dialog.Portal>
         <Dialog.Overlay
