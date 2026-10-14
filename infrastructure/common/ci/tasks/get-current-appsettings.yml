@@ -91,7 +91,7 @@ steps:
 
           # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
           # which is the shape the Bicep template's appsettings params expect.
-          echo "$rawAppSettings" | jq -c 'from_entries' > "$outFile"
+          echo "$rawAppSettings" | jq -c 'map({key: .name, value: .value}) | from_entries' > "$outFile"
         }
 
         tmpDir=$(mktemp -d)
