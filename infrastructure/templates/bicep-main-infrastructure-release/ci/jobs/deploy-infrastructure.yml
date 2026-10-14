@@ -56,8 +56,6 @@ jobs:
                   - appName: $(subscription)-as-ees-public-site
                     prodVariableName: publicSiteProdAppSettings
 
-            # Importer is a Function App rather than an App Service, so it needs its own call
-            # with appType: functionApp - the task only supports one appType per invocation.
             - template: ../../../../common/ci/tasks/get-current-appsettings.yml
               parameters:
                 displayName: Get existing app settings for the Importer Function App
