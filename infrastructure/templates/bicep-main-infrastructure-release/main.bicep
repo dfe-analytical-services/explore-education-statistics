@@ -1,4 +1,5 @@
 import { getResourceNames } from 'resource-names.bicep'
+import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
@@ -14,7 +15,17 @@ import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-si
 //
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
-param tags object
+param tags Tags = {
+  CostCentre: ''
+  Department: ''
+  Solution: ''
+  ServiceOwner: ''
+  CreatedBy: ''
+  DeploymentRepoUrl: ''
+}
+
+@description('Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
+param dateProvisioned string = utcNow('u')
 
 
 
@@ -25,6 +36,12 @@ param environmentConfigParam EnvironmentConfig = {}
 
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+
+// Pipeline-supplied tags, plus those that vary by environment and deployment.
+var tagValues = union(tags, {
+  Environment: environmentConfig.environmentName!
+  DateProvisioned: dateProvisioned
+})
 
 // These values are all supplied specifically by pipeline variables.
 param environmentPipelineVariables EnvironmentPipelineVariables = {}
@@ -175,7 +192,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -193,7 +210,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -218,7 +235,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
-    tagValues: tags
+    tagValues: tagValues
   }
   dependsOn: [
     // Publisher is dependent on Notifier's storage account being available
@@ -255,7 +272,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
   dependsOn: [
     // Admin is dependent on Importer's storage account being available
@@ -280,7 +297,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -303,7 +320,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -331,6 +348,6 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    tagValues: tags
+    tagValues: tagValues
   }
 }
