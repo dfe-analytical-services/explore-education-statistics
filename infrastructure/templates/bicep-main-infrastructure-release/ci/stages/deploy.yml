@@ -36,8 +36,6 @@ stages:
     condition: ${{ parameters.condition }}
     variables:
       - group: Common - ${{ parameters.environment }}
-      - name: infraDeployName
-        value: MainInfrastructure$(Build.BuildNumber)
     jobs:
       - template: ../jobs/deploy-infrastructure.yml
         parameters:
