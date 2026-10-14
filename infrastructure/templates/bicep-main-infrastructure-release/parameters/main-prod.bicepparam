@@ -6,14 +6,6 @@ param environmentConfigParam = {
   domain: 'explore-education-statistics.service.gov.uk'
 }
 
-param publisherConfigParam = {
-  frontDoorCachePurgeEnabled: true
-}
-
 param publicApiConfigParam = {
   publicUrl: 'api.education.gov.uk/statistics'
-}
-
-param publicSiteConfigParam = {
-  googleAnalyticsTrackingId: 'G-9YG8ESXR5Y'
 }
