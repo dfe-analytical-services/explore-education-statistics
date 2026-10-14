@@ -115,9 +115,13 @@ export function handleLogin(returnUrl?: string) {
 }
 
 export function handleLogout() {
+  const account = getMsalInstance().getAllAccounts()[0];
+
   getMsalInstance()
     .logoutRedirect({
-      account: getMsalInstance().getAllAccounts()[0],
+      account,
+      // Keycloak 18+ requires id_token_hint when post_logout_redirect_uri is set.
+      idTokenHint: account?.idToken,
       postLogoutRedirectUri: signedOutRoute.fullPath,
     })
     .catch(error => {
