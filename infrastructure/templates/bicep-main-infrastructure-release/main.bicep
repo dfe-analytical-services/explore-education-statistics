@@ -7,7 +7,6 @@ import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-config
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
 import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-configuration.bicep'
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
-import { PublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
 
 //
@@ -129,13 +128,6 @@ param publisherConfigParam PublisherConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var publisherConfig = mergePublisherConfig(publisherConfigParam)
-
-
-
-//
-// Public API-specific config.
-//
-param publicApiConfigParam PublicApiConfig = {}
 
 
 
