@@ -24,7 +24,6 @@ param notifierConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
 }
 
 param publisherConfigParam = {
