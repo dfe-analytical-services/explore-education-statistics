@@ -37,10 +37,6 @@ param publisherConfigParam = {
   frontDoorCachePurgeEnabled: true
 }
 
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-dev'
-}
-
 param publicSiteConfigParam = {
   appServiceSku: {
     tier: 'Basic'
