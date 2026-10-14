@@ -18,12 +18,6 @@ param notifierConfigParam = {
   suppressExceptionsForTeamOnlyApiKeyErrors: true
 }
 
-param publisherConfigParam = {
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
-}
-
 param publicSiteConfigParam = {
   appServiceSku: {
     tier: 'PremiumV2'
