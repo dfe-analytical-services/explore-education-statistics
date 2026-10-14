@@ -23,7 +23,7 @@ parameters:
   - name: deployAdminFirst
     type: boolean
     default: true
-d
+
 stages:
   - stage: ${{ parameters.stageName }}
     displayName: Deploy ${{ parameters.environment }}

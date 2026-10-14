@@ -116,10 +116,6 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       alertsGroupName: resourceNames.alertsGroup
     } : null
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    // Application-specific appsettings (App__RowsPerBatch, App__PrivateStorageConnectionString,
-    // App__ImporterStorageConnectionString) are no longer seeded from here - the app-release
-    // pipeline applies them ahead of each code deploy via importer-appsettings.bicep. See
-    // existingAppSettings above for how they're preserved across infrastructure deploys.
     appSettings: []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
