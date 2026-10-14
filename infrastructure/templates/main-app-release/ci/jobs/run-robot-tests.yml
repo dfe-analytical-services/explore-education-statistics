@@ -11,6 +11,7 @@ jobs:
   - job: RunRobotTests
     displayName: Run Robot UI tests
     dependsOn: ${{ parameters.dependsOn }}
+    continueOnError: true
     timeoutInMinutes: 160
     cancelTimeoutInMinutes: 10
     pool: ees-ubuntu2604-large-v2
@@ -84,3 +85,10 @@ jobs:
           testResultsFiles: tests/robot-tests/test-results/xunit.xml
           failTaskOnFailedTests: true
           testRunTitle: Public UI Tests
+
+      - task: PublishPipelineArtifact@1
+        displayName: Publish pipeline artifact
+        condition: succeededOrFailed()
+        inputs:
+          path: tests/robot-tests/test-results/
+          artifactName: public-ui-tests-${{ parameters.testEnvironment }}
