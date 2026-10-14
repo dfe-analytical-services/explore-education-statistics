@@ -37,8 +37,9 @@ jobs:
                 inlineScript: |
                   set -e
 
-                  # A marker unique to this deploy, baked in as the DEPLOYED_AT
-                  # appsetting below - see wait-for-app-service-restart.yml.
+                  # A marker unique to this deploy, provided via an appsetting to the service
+                  # so that we can tell when a newly deployed service has fired up - see
+                  # wait-for-app-service-restart.yml.
                   deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
 
