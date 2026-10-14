@@ -105,13 +105,6 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       alertsGroupName: resourceNames.alertsGroup
     } : null
     websitePort: 3000
-    // Application-specific appsettings (APP_ENV, AZURE_SEARCH_*, BASIC_AUTH*, *_API_BASE_URL,
-    // GA_TRACKING_ID, PUBLIC_URL, DEFAULT_CACHE_MAX_AGE_SECONDS) are no longer seeded from here
-    // - the app-release pipeline applies them ahead of each code deploy via
-    // public-site-appsettings.bicep. See existingProdAppSettings below for how they're
-    // preserved across infrastructure deploys. What remains here is deployment/platform
-    // plumbing (which registry/credentials to pull the image from, fixed container runtime
-    // mode) rather than application behaviour, so it stays infrastructure-controlled.
     applicationAppSettings: {
       DOCKER_REGISTRY_SERVER_URL: dockerRegistryUrl
       DOCKER_REGISTRY_SERVER_USERNAME: dockerPullUsername
