@@ -140,9 +140,6 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         mountPath: publicApiFileshareMountPath
       }
     ]
-    // Application-specific appsettings are no longer seeded from here - the app-release
-    // pipeline applies them ahead of each code deploy via publisher-appsettings.bicep. See
-    // existingAppSettings above for how they're preserved across infrastructure deploys.
     appSettings: []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
