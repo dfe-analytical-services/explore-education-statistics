@@ -46,6 +46,4 @@ param publicSiteConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  googleAnalyticsTrackingId: 'G-GRPHH2FN0L'
-  defaultCacheMaxAgeSeconds: 10
 }

@@ -33,5 +33,4 @@ param publicSiteConfigParam = {
     tier: 'PremiumV2'
     name: 'P1V2'
   }
-  googleAnalyticsTrackingId: 'G-8FSLWXTV2W'
 }

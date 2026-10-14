@@ -70,5 +70,4 @@ param publicSiteConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  googleAnalyticsTrackingId: 'G-ZQ5V7CBWMJ'
 }
