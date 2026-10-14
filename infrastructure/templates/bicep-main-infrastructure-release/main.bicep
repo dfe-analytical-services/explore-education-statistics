@@ -301,6 +301,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
+    restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)

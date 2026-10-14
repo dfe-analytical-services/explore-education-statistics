@@ -162,7 +162,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
   }
 }
 
-var baseSettings = union(applicationAppSettings, {
+var infraAppSettings = union({
   APPINSIGHTS_INSTRUMENTATIONKEY: reference(
     resourceId('Microsoft.Insights/components', appInsightsName),
     '2020-02-02'
@@ -182,22 +182,19 @@ var baseSettings = union(applicationAppSettings, {
   // Use the healthcheck endpoint to identify when a slot is warmed up.
   WEBSITE_SWAP_WARMUP_PING_PATH: healthCheckPath
   WEBSITE_SWAP_WARMUP_PING_STATUSES: '200'
+} : {}, kind != 'app,linux,container' ? {
+  WEBSITE_RUN_FROM_PACKAGE: '1'
+} : {}, operatingSystem == 'Windows' ? {
+  WEBSITE_LOAD_CERTIFICATES: '*'
 } : {})
 
-var osSpecificSettings = union(baseSettings,
-  kind != 'app,linux,container' ? {
-    WEBSITE_RUN_FROM_PACKAGE: '1'
-  } : {},
-  operatingSystem == 'Windows' ? {
-    WEBSITE_LOAD_CERTIFICATES: '*'
-  } : {}
-)
-
-// Existing settings take precedence over settings computed in this Bicep file so that
-// infrastructure deploys do not reset application-specific appsettings that have been
-// deployed by the application deploy pipeline.
-var combinedProdSettings = union(osSpecificSettings, existingProdAppSettings)
-var combinedStagingSlotSettings = union(osSpecificSettings, existingStagingSlotAppSettings)
+// Combine any appsettings supplied by the caller of this template along with any appsettings
+// under the control of the application deploy pipeline, and finally with the infrastructure
+// appsettings from this template.  This ensures all appsettings are considered and retained,
+// and allows this infrastructure deploy to update its infrastructure appsetting changes,
+// winning over any conflicts.
+var combinedProdSettings = union(union(applicationAppSettings, existingProdAppSettings), infraAppSettings)
+var combinedStagingSlotSettings = union(union(applicationAppSettings, existingStagingSlotAppSettings), infraAppSettings)
 
 resource appSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: appService
