@@ -129,6 +129,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     swapSlotEnabled: false
+    healthCheckPath: '/health'
     allowedOrigins: allowedOrigins
     alerts: deployAlerts ? {
       appServiceHealth: true
