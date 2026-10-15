@@ -8,8 +8,6 @@ import styles from './Details.module.scss';
 import ButtonText from './ButtonText';
 import VisuallyHidden from './VisuallyHidden';
 
-let hasNativeDetails: boolean;
-
 export type DetailsToggleHandler = (isOpen: boolean) => void;
 
 export interface DetailsProps {
@@ -54,8 +52,6 @@ const Details = ({
   preventToggle = false,
   testId,
 }: DetailsProps) => {
-  // `useId` matches between the server and client renders, unlike a
-  // module-level counter (which lives for the whole server process).
   const generatedId = useId();
   const [id] = useState(propId ?? `details-content-${generatedId}`);
   const ref = useRef<HTMLDetailsElement>(null);
@@ -64,35 +60,12 @@ const Details = ({
   const [open, toggleOpen] = useToggle(defaultOpen);
 
   useEffect(() => {
-    if (typeof hasNativeDetails === 'undefined') {
-      hasNativeDetails =
-        typeof document.createElement('details').open === 'boolean';
-    }
-  }, []);
-
-  useEffect(() => {
     if (preventToggle) {
       toggleOpen(true);
       return;
     }
     toggleOpen(defaultOpen);
   }, [defaultOpen, preventToggle, toggleOpen]);
-
-  useEffect(() => {
-    if (hasNativeDetails) {
-      return;
-    }
-
-    if (ref.current) {
-      // Don't really need to include this, but just
-      // polyfills DOM behaviour for IE/Edge
-      if (open) {
-        ref.current.setAttribute('open', '');
-      } else {
-        ref.current.removeAttribute('open');
-      }
-    }
-  }, [open]);
 
   return (
     <details
@@ -143,17 +116,7 @@ const Details = ({
         </span>
         {summaryAfter}
       </summary>
-      <div
-        className="govuk-details__text"
-        id={onMounted(id)}
-        style={onMounted(
-          !hasNativeDetails
-            ? {
-                display: !open ? 'none' : undefined,
-              }
-            : undefined,
-        )}
-      >
+      <div className="govuk-details__text" id={onMounted(id)}>
         {children}
 
         {showCloseButton && (
