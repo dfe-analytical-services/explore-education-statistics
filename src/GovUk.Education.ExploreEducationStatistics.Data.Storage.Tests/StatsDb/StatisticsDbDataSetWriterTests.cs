@@ -14,6 +14,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
@@ -371,7 +372,10 @@ public abstract class StatisticsDbDataSetWriterTests
                 importerLocationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>()),
                 Mock.Of<ILogger<ImporterLocationCache>>()
             ),
-            observationBatchImporter: observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict)
+            observationBatchImporter: observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict),
+            statisticsDbDataSetFactory: BuildStatisticsDbDataSetFactory(
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            )
         );
     }
 }

@@ -23,4 +23,13 @@ public class DataProcessorClient(string connectionString) : IDataProcessorClient
             cancellationToken
         );
     }
+
+    public async Task ExportParquet(Guid fileId, CancellationToken cancellationToken = default)
+    {
+        await _queueServiceClient.SendMessageAsJson(
+            ProcessorQueues.ParquetExportPendingQueue,
+            new ExportParquetMessage(fileId),
+            cancellationToken
+        );
+    }
 }
