@@ -435,6 +435,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("School_Code")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("School_LaEstab")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("School_Name")
                         .HasColumnType("nvarchar(max)");
 
