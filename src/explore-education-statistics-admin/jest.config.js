@@ -17,7 +17,19 @@ const config = {
       {
         jsc: {
           parser: { syntax: 'typescript', tsx: true },
-          transform: { react: { runtime: 'automatic' } },
+          transform: {
+            react: { runtime: 'automatic' },
+            optimizer: {
+              globals: {
+                vars: {
+                  'import.meta.hot': 'undefined',
+                },
+              },
+            },
+          },
+        },
+        module: {
+          type: 'commonjs',
         },
       },
     ],
