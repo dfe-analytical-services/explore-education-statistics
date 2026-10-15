@@ -1,3 +1,4 @@
+import { Http5xxAlertConfig } from '../common/components/alerts/http5xxAlertConfig.bicep'
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
@@ -24,6 +25,9 @@ param maintenanceIpRanges IpRange[]
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
+
+@description('Optional override of the existing Http5xx rule. Omit to preserve current behaviour.')
+param http5xxAlert Http5xxAlertConfig?
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -106,6 +110,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       cpuPercentage: true
       functionAppHealth: true
       httpErrors: true
+      http5xx: http5xxAlert
       memoryPercentage: true
       storageAccountAvailability: false
       storageLatency: false

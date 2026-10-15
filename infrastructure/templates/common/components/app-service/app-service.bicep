@@ -1,3 +1,4 @@
+import { Http5xxAlertConfig } from '../alerts/http5xxAlertConfig.bicep'
 import { ConnectionString, FirewallRule } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
@@ -76,6 +77,7 @@ param websitePort int?
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  http5xx: Http5xxAlertConfig?
   responseTimeSeconds: int?
   alertsGroupName: string
 }?

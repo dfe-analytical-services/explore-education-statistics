@@ -1,3 +1,4 @@
+import { Http5xxAlertConfig } from '../alerts/http5xxAlertConfig.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 
@@ -8,6 +9,7 @@ param appServiceName string
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  http5xx: Http5xxAlertConfig?
   responseTimeSeconds: int?
   alertsGroupName: string
 }
@@ -45,6 +47,13 @@ module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
       }
       config: {
         ...staticMinGreaterThanZero
+        ...(httpStatusCode == 'Http5xx' && alerts!.?http5xx != null ? {
+          aggregation: alerts!.http5xx!.aggregation
+          threshold: string(alerts!.http5xx!.threshold)
+          windowSize: alerts!.http5xx!.windowSize
+          evaluationFrequency: alerts!.http5xx!.evaluationFrequency
+          severity: alerts!.http5xx!.severity
+        } : {})
         nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName

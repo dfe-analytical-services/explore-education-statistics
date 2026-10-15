@@ -1,3 +1,5 @@
+import { JourneyAlertPolicy } from '../common/components/alerts/journeyAlertTypes.bicep'
+import { ServiceHttp5xxAlerts } from '../common/components/alerts/http5xxAlertConfig.bicep'
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
@@ -9,6 +11,12 @@ import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-conf
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
+
+@description('Per-service overrides. Empty preserves all existing Http5xx rules.')
+param http5xxAlerts ServiceHttp5xxAlerts = {}
+
+@description('Opt-in request/journey policies. Includes Public Data API or other services by explicit App Insights resource id. No new rules by default.')
+param journeyAlerts JourneyAlertPolicy[] = []
 
 //
 // Tagging config.
@@ -196,6 +204,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?importer
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
@@ -218,6 +227,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?notifier
     tagValues: tags
   }
 }
@@ -243,6 +253,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?publisher
     tagValues: tags
   }
   dependsOn: [
@@ -263,6 +274,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?admin
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
@@ -299,6 +311,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?contentApi
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
@@ -322,6 +335,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
     publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?dataApi
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
@@ -353,9 +367,20 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
     publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http5xxAlert: http5xxAlerts.?publicSite
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     tagValues: tags
   }
 }
+
+module journeyAlertRules '../common/components/alerts/journeyAlert.bicep' = [for policy in journeyAlerts: {
+  name: 'journey-${uniqueString(policy.name)}'
+  params: {
+    policy: policy
+    workspaceId: logAnalyticsWorkspaceId
+    alertsGroupName: resourceNames.alertsGroup
+    tagValues: tags
+  }
+}]

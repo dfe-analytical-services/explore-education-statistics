@@ -82,3 +82,10 @@ More low-level tests can be run from the Logic App itself using custom JSON payl
 5. Check in Teams and Slack for the generated messages.
 
 Some example JSON payloads are available in the [test data folder](test-data).
+
+`journey-alert-fired.json` and `journey-alert-resolved.json` exercise Log Alerts V2
+payloads. These provide `metricMeasureColumn` instead of `metricName`. For journey
+rules, `Breach` is a 0/1 policy result, not a failed-request count; the rule
+description explains the thresholds and the alert's query results show the counts.
+See [service and journey threshold configuration](../../../common/components/alerts/README.md)
+for rollout and validation requirements.

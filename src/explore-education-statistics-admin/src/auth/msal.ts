@@ -1,3 +1,4 @@
+import createSignInAttempt from '@admin/auth/signInTelemetry';
 import {
   AuthenticationResult,
   Configuration,
@@ -94,6 +95,9 @@ export function getMsalInstance() {
 }
 
 export function handleLogin(returnUrl?: string) {
+  const attempt = createSignInAttempt(
+    getMsalInstance().getAllAccounts()[0]?.homeAccountId,
+  );
   const postLoginState: PostLoginState = {
     returnUrl,
   };
@@ -106,6 +110,7 @@ export function handleLogin(returnUrl?: string) {
       state: JSON.stringify(postLoginState),
     })
     .catch(error => {
+      attempt.fail('identityProvider', error);
       logger.info(
         `Error encountered when redirecting to Identity Provider login - ${error}`,
       );

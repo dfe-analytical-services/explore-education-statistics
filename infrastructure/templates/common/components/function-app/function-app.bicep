@@ -1,3 +1,4 @@
+import { Http5xxAlertConfig } from '../alerts/http5xxAlertConfig.bicep'
 import { IpRange, FirewallRule } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
@@ -155,6 +156,7 @@ param alerts {
   cpuPercentage: bool
   functionAppHealth: bool
   httpErrors: bool
+  http5xx: Http5xxAlertConfig?
   memoryPercentage: bool
   storageAccountAvailability: bool
   storageLatency: bool
@@ -446,6 +448,13 @@ module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
       }
       config: {
         ...staticMinGreaterThanZero
+        ...(httpStatusCode == 'Http5xx' && alerts!.?http5xx != null ? {
+          aggregation: alerts!.http5xx!.aggregation
+          threshold: string(alerts!.http5xx!.threshold)
+          windowSize: alerts!.http5xx!.windowSize
+          evaluationFrequency: alerts!.http5xx!.evaluationFrequency
+          severity: alerts!.http5xx!.severity
+        } : {})
         nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName
