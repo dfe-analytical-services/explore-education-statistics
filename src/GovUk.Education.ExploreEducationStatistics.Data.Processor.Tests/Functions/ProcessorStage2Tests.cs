@@ -264,13 +264,11 @@ public class ProcessorStage2Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = BuildProcessorService(
-            storageDataSetResolver: BuildStatisticsDbDataSetResolver(
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             storageDataSetWriterResolver: BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 transactionHelper,
@@ -477,7 +475,6 @@ public class ProcessorStage2Tests
     }
 
     private static ProcessorService BuildProcessorService(
-        IStorageDataSetResolver storageDataSetResolver,
         IStorageDataSetWriterResolver storageDataSetWriterResolver,
         IDataImportService? dataImportService = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
@@ -492,7 +489,6 @@ public class ProcessorStage2Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             Mock.Of<IValidatorService>(Strict),
-            storageDataSetResolver,
             storageDataSetWriterResolver
         );
     }

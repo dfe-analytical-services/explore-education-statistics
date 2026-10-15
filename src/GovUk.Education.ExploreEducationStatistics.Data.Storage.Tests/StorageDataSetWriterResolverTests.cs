@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Moq;
 using Xunit;
@@ -25,6 +26,20 @@ public class StorageDataSetWriterResolverTests
         var result = BuildResolver(statisticsDbContext).Resolve(dataFile);
 
         var writer = Assert.IsType<StatisticsDbDataSetWriter>(result);
+        Assert.Equal(dataFile.SubjectId, writer.SubjectId);
+    }
+
+    [Fact]
+    public async Task DataFileIsParquetV1_ReturnsParquetV1DataSetWriter()
+    {
+        var dataFile = BuildDataFile(Guid.NewGuid());
+        dataFile.DataStorageVersion = DataStorageVersion.ParquetV1;
+
+        await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+        var result = BuildResolver(statisticsDbContext).Resolve(dataFile);
+
+        var writer = Assert.IsType<ParquetV1DataSetWriter>(result);
         Assert.Equal(dataFile.SubjectId, writer.SubjectId);
     }
 

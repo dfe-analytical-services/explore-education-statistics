@@ -78,11 +78,6 @@ public class StatisticsDbDataSet(
         }
     }
 
-    public Task<long> CountObservations(CancellationToken cancellationToken = default)
-    {
-        return context.Observation.LongCountAsync(o => o.SubjectId == SubjectId, cancellationToken);
-    }
-
     public async Task<List<FilterItem>> ListFilterItemsForQuery(
         IEnumerable<Guid> locationIds,
         TimePeriodQuery? timePeriod,

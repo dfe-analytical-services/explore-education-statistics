@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -19,8 +20,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -215,7 +219,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -225,10 +230,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -443,7 +444,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -453,10 +455,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -591,7 +589,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -601,10 +600,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -754,7 +749,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -764,10 +760,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -906,7 +898,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -916,10 +909,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1088,7 +1077,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -1098,10 +1088,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1244,7 +1230,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -1254,10 +1241,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1372,7 +1355,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -1382,10 +1366,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1540,7 +1520,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -1550,10 +1531,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1727,7 +1704,8 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var processorService = new ProcessorService(
@@ -1737,10 +1715,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1800,6 +1774,282 @@ public class ProcessorStage3Tests
 
     // ReSharper disable once MemberCanBePrivate.Global
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+    [Fact]
+    public async Task ProcessStage3_ParquetV1()
+    {
+        var import = _fixture
+            .DefaultDataImport()
+            .WithSubjectId(_subject.Id)
+            .WithDefaultFiles("small-csv", metaSet: false)
+            .WithStatus(STAGE_3)
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
+            .Generate();
+
+        import.File.DataStorageVersion = DataStorageVersion.ParquetV1;
+
+        IParquetDataSetPathResolver pathResolver = new TestParquetDataSetPathResolver(
+            Path.Combine(Path.GetTempPath(), $"processor-stage-3-tests-{Guid.NewGuid()}")
+        );
+
+        try
+        {
+            await RunParquetV1Import(import, pathResolver);
+
+            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
+
+            var dataImport = await contentDbContext.DataImports.SingleAsync();
+
+            Assert.Equal(16, dataImport.ImportedRows);
+            Assert.Equal(15, dataImport.LastProcessedRowIndex);
+            Assert.Equal(COMPLETE, dataImport.Status);
+
+            // Observations are written to parquet files rather than StatsDB.
+            Assert.Empty(statisticsDbContext.Observation);
+            Assert.False(System.IO.File.Exists(pathResolver.StagingDbPath(_subject.Id)));
+
+            var dataSet = new ParquetV1DataSet(_subject.Id, pathResolver);
+            var observations = (await dataSet.ListObservations([], [], null)).OrderBy(o => o.CsvRow).ToList();
+
+            Assert.Equal(16, observations.Count);
+            Enumerable.Range(0, 16).ForEach(i => Assert.Equal(i + 2, observations[i].CsvRow));
+
+            var firstObservation = observations.First();
+            var expectedLocation = _locations.Single(l => l.LocalAuthority!.Name == "Birmingham");
+            Assert.Equal(expectedLocation.Id, firstObservation.LocationId);
+            Assert.Equal(expectedLocation.Id, firstObservation.Location.Id);
+            Assert.Equal(2018, firstObservation.Year);
+            Assert.Equal(TimeIdentifier.CalendarYear, firstObservation.TimeIdentifier);
+            Assert.True(
+                SequencesAreEqualIgnoringOrder(
+                    [
+                        _subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
+                        _subject.Filters[1].FilterGroups[0].FilterItems[0].Id,
+                    ],
+                    firstObservation.FilterItems.Select(item => item.FilterItemId)
+                )
+            );
+            Assert.Equal("1", firstObservation.Measures[_subject.IndicatorGroups[0].Indicators[0].Id]);
+            Assert.Equal("2", firstObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
+
+            var file = contentDbContext
+                .Files.Include(f => f.DataSetFileVersionGeographicLevels)
+                .Single(f => f.Type == FileType.Data && f.SubjectId == import.File.SubjectId);
+
+            Assert.True(file.HasParquet);
+            Assert.Equal(DataStorageVersion.ParquetV1, file.DataStorageVersion);
+
+            // The data set file meta is read from the parquet files.
+            var geographicLevel = Assert.Single(file.DataSetFileVersionGeographicLevels);
+            Assert.Equal(GeographicLevel.LocalAuthority, geographicLevel.GeographicLevel);
+            Assert.False(geographicLevel.CsvOnly);
+
+            Assert.NotNull(file.DataSetFileMeta);
+            Assert.Equal("2018", file.DataSetFileMeta.TimePeriodRange.Start.Period);
+            Assert.Equal("2025", file.DataSetFileMeta.TimePeriodRange.End.Period);
+
+            file.DataSetFileMeta.Filters.Select(f => (f.Label, f.Hint, f.ColumnName))
+                .ToList()
+                .AssertDeepEqualTo([("Filter one", "Hint 1", "filter_one"), ("Filter two", null, "filter_two")]);
+
+            file.DataSetFileMeta.Indicators.Select(i => (i.Label, i.ColumnName))
+                .ToList()
+                .AssertDeepEqualTo([("Indicator one", "indicator_one"), ("Indicator two", "indicator_two")]);
+        }
+        finally
+        {
+            Directory.Delete(pathResolver.BasePath(), recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task ProcessStage3_ParquetV1_PartiallyImportedAlready()
+    {
+        // This import has already imported 8 rows (CSV rows 2 to 9) and is now being restarted.
+        var import = _fixture
+            .DefaultDataImport()
+            .WithSubjectId(_subject.Id)
+            .WithDefaultFiles("small-csv", metaSet: false)
+            .WithStatus(STAGE_3)
+            .WithTotalRows(16)
+            .WithExpectedImportedRows(16)
+            .WithImportedRows(8)
+            .WithLastProcessedRowIndex(7)
+            .WithGeographicLevels([GeographicLevel.LocalAuthority])
+            .Generate();
+
+        import.File.DataStorageVersion = DataStorageVersion.ParquetV1;
+
+        IParquetDataSetPathResolver pathResolver = new TestParquetDataSetPathResolver(
+            Path.Combine(Path.GetTempPath(), $"processor-stage-3-tests-{Guid.NewGuid()}")
+        );
+
+        var filters = _subject.Filters;
+        var indicators = _subject.IndicatorGroups.SelectMany(group => group.Indicators).ToList();
+
+        // Rows 2 to 11 were staged before the import stopped, but the import was only updated
+        // after processing row 9, so rows 10 and 11 need to be staged again.
+        var previouslyStagedObservations = _fixture
+            .DefaultObservation()
+            .WithSubject(_subject)
+            .WithLocation(_locations[0])
+            .WithFilterItems([filters[0].FilterGroups[0].FilterItems[0], filters[1].FilterGroups[0].FilterItems[0]])
+            .WithMeasures(indicators)
+            .ForInstance(s => s.Set(o => o.CsvRow, (_, _, context) => context.Index + 2))
+            .GenerateList(10);
+
+        // The fixture's filter groups aren't linked to their filters by id until they're saved.
+        previouslyStagedObservations.ForEach(observation =>
+        {
+            observation.FilterItems[0].FilterId = filters[0].Id;
+            observation.FilterItems[1].FilterId = filters[1].Id;
+        });
+
+        var writer = new ParquetDataSetWriter(pathResolver, Mock.Of<ILogger<ParquetDataSetWriter>>());
+        await writer.StartStaging(_subject.Id, filters, indicators, resumeFromCsvRow: null);
+        await writer.AppendObservations(_subject.Id, filters, indicators, previouslyStagedObservations);
+
+        try
+        {
+            await RunParquetV1Import(import, pathResolver);
+
+            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
+
+            var dataImport = await contentDbContext.DataImports.SingleAsync();
+            Assert.Equal(16, dataImport.ImportedRows);
+            Assert.Equal(COMPLETE, dataImport.Status);
+
+            var dataSet = new ParquetV1DataSet(_subject.Id, pathResolver);
+            var observations = (await dataSet.ListObservations([], [], null)).OrderBy(o => o.CsvRow).ToList();
+
+            Assert.Equal(16, observations.Count);
+            Enumerable.Range(0, 16).ForEach(i => Assert.Equal(i + 2, observations[i].CsvRow));
+
+            // Rows up to the last processed row are kept, and the rest were imported again.
+            Assert.Equal(
+                previouslyStagedObservations.Take(8).Select(o => o.Id),
+                observations.Take(8).Select(o => o.Id)
+            );
+            Assert.DoesNotContain(observations, o => previouslyStagedObservations.Skip(8).Any(p => p.Id == o.Id));
+        }
+        finally
+        {
+            Directory.Delete(pathResolver.BasePath(), recursive: true);
+        }
+    }
+
+    private async Task RunParquetV1Import(DataImport import, IParquetDataSetPathResolver pathResolver)
+    {
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            await contentDbContext.DataImports.AddAsync(import);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.Subject.AddAsync(_subject);
+            await statisticsDbContext.Location.AddRangeAsync(_locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
+        var resourcesPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Resources");
+
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
+            PrivateReleaseFiles,
+            import.File.Path(),
+            Path.Combine(resourcesPath, import.File.Filename)
+        );
+
+        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
+            Path.Combine(resourcesPath, import.MetaFile.Filename)
+        );
+
+        var dbContextSupplier = new InMemoryDbContextSupplier(
+            contentDbContextId: _contentDbContextId,
+            statisticsDbContextId: _statisticsDbContextId
+        );
+
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
+
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                parquetDataSetPathResolver: pathResolver
+            ),
+            Mock.Of<ILogger<DataImportService>>()
+        );
+
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
+
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+
+        var guidGenerator = new SequentialGuidGenerator();
+
+        var parquetDataSetWriter = new ParquetDataSetWriter(pathResolver, Mock.Of<ILogger<ParquetDataSetWriter>>());
+
+        var importerService = new ImporterService(
+            new AppOptions { RowsPerBatch = 5 }.ToOptionsWrapper(),
+            guidGenerator,
+            new ImporterMetaService(guidGenerator),
+            dataImportService,
+            Mock.Of<ILogger<ImporterService>>()
+        );
+
+        var fileImportService = new FileImportService(
+            Mock.Of<ILogger<FileImportService>>(),
+            privateBlobStorageService.Object,
+            dataImportService,
+            dataSetMappingService,
+            importerService,
+            new ParquetDataSetService(
+                dbContextSupplier,
+                new ParquetV1DataSetWriterFactory(Mock.Of<IServiceProvider>(Strict)),
+                Mock.Of<ILogger<ParquetDataSetService>>()
+            )
+        );
+
+        var processorService = new ProcessorService(
+            Mock.Of<ILogger<ProcessorService>>(Strict),
+            privateBlobStorageService.Object,
+            fileImportService,
+            importerService,
+            dataImportService,
+            Mock.Of<IValidatorService>(Strict),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                // Observations shouldn't be written to StatsDB.
+                Mock.Of<IObservationBatchImporter>(Strict),
+                parquetDataSetWriter
+            )
+        );
+
+        var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
+
+        var outputMessages = await function.ProcessUploads(new ImportMessage(import.Id), new TestFunctionContext());
+
+        VerifyAllMocks(privateBlobStorageService);
+
+        Assert.Empty(outputMessages);
+    }
+
     public class TestObservationBatchImporter : IObservationBatchImporter
     {
         public virtual async Task ImportObservationBatch(

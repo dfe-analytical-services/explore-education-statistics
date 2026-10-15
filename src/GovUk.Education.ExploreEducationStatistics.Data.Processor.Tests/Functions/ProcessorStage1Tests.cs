@@ -137,7 +137,8 @@ public class ProcessorStage1Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var validatorService = new ValidatorService(
@@ -195,7 +196,6 @@ public class ProcessorStage1Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IStorageDataSetResolver>(Strict),
             Mock.Of<IStorageDataSetWriterResolver>(Strict)
         );
     }

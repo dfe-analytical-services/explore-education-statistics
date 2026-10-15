@@ -44,6 +44,7 @@ public interface IDataSetFileStorage
     Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
         List<DataSetUpload> dataSetUploads,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 
