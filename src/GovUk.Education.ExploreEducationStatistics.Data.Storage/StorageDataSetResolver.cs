@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.EntityFrameworkCore;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
@@ -11,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
 
 public class StorageDataSetResolver(
     ContentDbContext contentDbContext,
-    StatisticsDbDataSetFactory statisticsDbDataSetFactory
+    StatisticsDbDataSetFactory statisticsDbDataSetFactory,
+    ParquetV1DataSetFactory parquetV1DataSetFactory
 ) : IStorageDataSetResolver
 {
     public async Task<IStorageDataSet> Resolve(Guid subjectId, CancellationToken cancellationToken = default)
@@ -48,6 +50,7 @@ public class StorageDataSetResolver(
         return dataStorageVersion switch
         {
             DataStorageVersion.StatsDB => statisticsDbDataSetFactory.Create(subjectId),
+            DataStorageVersion.ParquetV1 => parquetV1DataSetFactory.Create(subjectId),
             null => null,
             _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
         };

@@ -268,6 +268,7 @@ public class ReleaseVersionsControllerUnitTests
                 service.SaveDataSetsFromTemporaryBlobStorage(
                     _releaseVersionId,
                     new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )

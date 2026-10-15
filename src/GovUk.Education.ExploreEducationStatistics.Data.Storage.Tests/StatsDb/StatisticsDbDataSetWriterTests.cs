@@ -12,6 +12,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
@@ -199,6 +200,27 @@ public abstract class StatisticsDbDataSetWriterTests
         }
     }
 
+    public class CountObservationsTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task ObservationsForSubjectOnlyCounted()
+        {
+            var subjectId = Guid.NewGuid();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.Observation.AddRange(
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = Guid.NewGuid() }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Assert.Equal(2, await BuildWriter(subjectId).CountObservations());
+        }
+    }
+
     private StatisticsDbDataSetWriter BuildWriter(
         Guid subjectId,
         IImporterLocationCache? importerLocationCache = null,
@@ -219,7 +241,10 @@ public abstract class StatisticsDbDataSetWriterTests
                 importerLocationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>()),
                 Mock.Of<ILogger<ImporterLocationCache>>()
             ),
-            observationBatchImporter: observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict)
+            observationBatchImporter: observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict),
+            statisticsDbDataSetFactory: BuildStatisticsDbDataSetFactory(
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            )
         );
     }
 }

@@ -55,16 +55,67 @@ public class FileImportServiceTests
             .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
             .Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        dataSetWriter.Setup(s => s.Complete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var service = BuildFileImportService(
             dataImportService: dataImportService.Object,
             dataSetMappingService: dataSetMappingService.Object
         );
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
+    }
+
+    [Fact]
+    public async Task CompleteImport_ParquetV1_SetsHasParquet()
+    {
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            Filename = "my_data_file.csv",
+            DataStorageVersion = DataStorageVersion.ParquetV1,
+        };
+
+        var import = new DataImport
+        {
+            Id = Guid.NewGuid(),
+            Errors = new List<DataImportError>(),
+            FileId = file.Id,
+            File = file,
+            SubjectId = Guid.NewGuid(),
+            Status = STAGE_3,
+            ExpectedImportedRows = 2,
+            TotalRows = 2,
+        };
+
+        var dataImportService = new Mock<IDataImportService>(Strict);
+        dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.WriteDataSetFileMeta(import)).Returns(Task.CompletedTask);
+
+        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
+        dataSetMappingService
+            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
+            .Returns(Task.CompletedTask);
+
+        var parquetDataSetService = new Mock<IParquetDataSetService>(Strict);
+        parquetDataSetService
+            .Setup(s => s.SetHasParquet(file.Id, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        dataSetWriter.Setup(s => s.Complete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var service = BuildFileImportService(
+            dataImportService: dataImportService.Object,
+            dataSetMappingService: dataSetMappingService.Object,
+            parquetDataSetService: parquetDataSetService.Object
+        );
+        await service.CompleteImport(import, dataSetWriter.Object);
+
+        VerifyAllMocks(dataImportService, dataSetMappingService, parquetDataSetService, dataSetWriter);
     }
 
     [Fact]
@@ -87,13 +138,13 @@ public class FileImportServiceTests
 
         dataImportService.Setup(s => s.UpdateStatus(import.Id, FAILED, 100)).Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -123,13 +174,13 @@ public class FileImportServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -156,7 +207,7 @@ public class FileImportServiceTests
                 };
 
                 var service = BuildFileImportService();
-                await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict));
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
             });
     }
 
@@ -190,7 +241,7 @@ public class FileImportServiceTests
                     .Returns(Task.CompletedTask);
 
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict));
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
 
                 VerifyAllMocks(dataImportService);
             });
@@ -201,7 +252,8 @@ public class FileImportServiceTests
         IImporterService importerService = null,
         ILogger<FileImportService> logger = null,
         IDataImportService dataImportService = null,
-        IDataSetMappingService dataSetMappingService = null
+        IDataSetMappingService dataSetMappingService = null,
+        IParquetDataSetService parquetDataSetService = null
     )
     {
         return new FileImportService(
@@ -209,7 +261,8 @@ public class FileImportServiceTests
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             dataSetMappingService ?? Mock.Of<IDataSetMappingService>(Strict),
-            importerService ?? Mock.Of<IImporterService>(Strict)
+            importerService ?? Mock.Of<IImporterService>(Strict),
+            parquetDataSetService ?? Mock.Of<IParquetDataSetService>(Strict)
         );
     }
 }

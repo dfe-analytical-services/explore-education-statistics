@@ -15,7 +15,8 @@ public class FileImportService(
     IPrivateBlobStorageService privateBlobStorageService,
     IDataImportService dataImportService,
     IDataSetMappingService dataSetMappingService,
-    IImporterService importerService
+    IImporterService importerService,
+    IParquetDataSetService parquetDataSetService
 ) : IFileImportService
 {
     public async Task ImportObservations(
@@ -74,7 +75,7 @@ public class FileImportService(
         await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, dataSetWriter);
     }
 
-    public async Task CompleteImport(DataImport import, IStorageDataSet dataSet)
+    public async Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         if (import.Status.IsFinished())
         {
@@ -102,7 +103,7 @@ public class FileImportService(
             return;
         }
 
-        var observationCount = await dataSet.CountObservations();
+        var observationCount = await dataSetWriter.CountObservations();
         if (observationCount != import.ExpectedImportedRows)
         {
             await dataImportService.FailImport(
@@ -119,14 +120,21 @@ public class FileImportService(
             return;
         }
 
-        await FinalImportTasks(import);
+        await FinalImportTasks(import, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
-    private async Task FinalImportTasks(DataImport import)
+    private async Task FinalImportTasks(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         try
         {
+            await dataSetWriter.Complete();
+
+            if (import.File.DataStorageVersion == DataStorageVersion.ParquetV1)
+            {
+                await parquetDataSetService.SetHasParquet(import.FileId);
+            }
+
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
             await dataImportService.WriteDataSetFileMeta(import);
         }

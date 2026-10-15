@@ -182,7 +182,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
-        services.AddStorageDataSets();
+        services.AddStorageDataSets(configuration);
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
