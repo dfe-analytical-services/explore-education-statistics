@@ -1222,6 +1222,24 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
+        public async Task PatchVersionWithMajorChanges_NonBauUserAllowsMajorVersionUpdate_Returns403()
+        {
+            // CanManagePublicApiDataSets is currently BAU-only, so requesting a major version update
+            // does not bypass the authorisation check for non-BAU users.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+
+            var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: true);
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: nextDataSetVersion.Id,
+                allowMajorVersionUpdate: true,
+                user: identityUser
+            );
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
         public async Task PatchVersionWithoutMajorChanges_Success()
         {
             var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: false);

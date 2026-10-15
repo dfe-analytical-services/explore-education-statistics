@@ -145,7 +145,7 @@ function DataSetMappingProgressTag({
   hasIncompleteMapping,
   hasMajorMapping,
   isPatch,
-  majorVersionOverridden,
+  majorPatchVersionOverride,
   apiDataSetsTabRoute,
   user,
 }: {
@@ -153,13 +153,13 @@ function DataSetMappingProgressTag({
   hasIncompleteMapping: boolean;
   hasMajorMapping: boolean | undefined;
   isPatch: boolean;
-  majorVersionOverridden: boolean;
+  majorPatchVersionOverride: boolean;
   apiDataSetsTabRoute: string | undefined;
   user?: User;
 }) {
   const mappingRequired =
     hasIncompleteMapping ||
-    (!!hasMajorMapping && isPatch && !majorVersionOverridden);
+    (!!hasMajorMapping && isPatch && !majorPatchVersionOverride);
 
   return (
     <>
@@ -225,7 +225,7 @@ function Plan({
     hasMajorLocationMapping,
     isNotReadyToPublish,
     isPatch,
-    majorVersionOverridden,
+    majorPatchVersionOverride,
   } = useMemo(() => {
     return {
       hasInvalidDataBlocks:
@@ -249,7 +249,7 @@ function Plan({
       isPatch: isPatchVersion(plan.apiDataSetVersionPlan?.version),
       // A patch version with major changes can only be ready to publish
       // if a BAU user has overridden the block on major changes.
-      majorVersionOverridden:
+      majorPatchVersionOverride:
         isPatchVersion(plan.apiDataSetVersionPlan?.version) &&
         !!plan.apiDataSetVersionPlan?.readyToPublish &&
         !!plan.apiDataSetVersionPlan?.mappingStatus?.isMajorVersionUpdate,
@@ -292,7 +292,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteLocationMapping}
             hasMajorMapping={hasMajorLocationMapping}
             isPatch={isPatch}
-            majorVersionOverridden={majorVersionOverridden}
+            majorPatchVersionOverride={majorPatchVersionOverride}
             apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
@@ -301,7 +301,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteFilterMapping}
             hasMajorMapping={hasMajorFilterMapping}
             isPatch={isPatch}
-            majorVersionOverridden={majorVersionOverridden}
+            majorPatchVersionOverride={majorPatchVersionOverride}
             apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
@@ -310,7 +310,7 @@ function Plan({
             hasIncompleteMapping={hasIncompleteIndicatorMapping}
             hasMajorMapping={hasMajorIndicatorMapping}
             isPatch={isPatch}
-            majorVersionOverridden={majorVersionOverridden}
+            majorPatchVersionOverride={majorPatchVersionOverride}
             apiDataSetsTabRoute={apiDataSetsTabRoute}
             user={user}
           />
@@ -336,7 +336,7 @@ function Plan({
           {!isNotReadyToPublish && (
             <p>No actions required for API data set version mapping.</p>
           )}
-          {majorVersionOverridden && (
+          {majorPatchVersionOverride && (
             <WarningMessage testId="major-version-overridden-warning">
               This API data set patch version contains major changes which have
               been approved by a BAU user. These are breaking changes for users

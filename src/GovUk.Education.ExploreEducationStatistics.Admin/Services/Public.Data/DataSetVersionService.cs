@@ -390,9 +390,10 @@ public class DataSetVersionService(
         // Only BAU users can override the block on major changes in a patch version.
         // This is checked explicitly so that the block remains for other users who
         // may be permitted to manage public API data sets in future.
-        var isBauUser = allowMajorVersionUpdate && (await userService.CheckIsBauUser()).IsRight;
+        var isBauUser = (await userService.CheckIsBauUser()).IsRight;
+        var majorVersionUpdateIsAllowed = allowMajorVersionUpdate && isBauUser;
 
-        return !isBauUser
+        return !majorVersionUpdateIsAllowed
             ? ValidationUtils.ValidationResult(
                 new ErrorViewModel
                 {

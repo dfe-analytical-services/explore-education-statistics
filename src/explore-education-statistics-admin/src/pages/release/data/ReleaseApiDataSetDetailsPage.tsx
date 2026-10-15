@@ -83,24 +83,12 @@ export default function ReleaseApiDataSetDetailsPage() {
 
   const isPatch = isPatchVersion(dataSet?.draftVersion?.version);
 
-  const hasMajorPatchChanges = (
-    apiDataSet: ApiDataSet | undefined,
-    isPatchDataSetVersion: boolean,
-  ): boolean => {
-    return isPatchDataSetVersion
-      ? !!(
-          apiDataSet?.draftVersion?.mappingStatus &&
-          apiDataSet.draftVersion.mappingStatus.isMajorVersionUpdate
-        )
-      : false;
-  };
-
   const handleFinalise = async () => {
     if (dataSet?.draftVersion) {
       setFinalisingStatus('finalising');
       await apiDataSetVersionService.completeVersion({
-        dataSetVersionId: dataSet?.draftVersion?.id,
-        ...(majorChangesAcknowledged && { allowMajorVersionUpdate: true }),
+        dataSetVersionId: dataSet.draftVersion.id,
+        allowMajorVersionUpdate: majorChangesAcknowledged,
       });
     }
   };
@@ -294,27 +282,26 @@ export default function ReleaseApiDataSetDetailsPage() {
     dataSet.draftVersion.mappingStatus.locationsComplete &&
     dataSet.draftVersion.mappingStatus.indicatorsComplete;
 
-  const majorPatchChanges = hasMajorPatchChanges(dataSet, isPatch);
+  const hasMajorPatchChanges =
+    isPatch && !!dataSet?.draftVersion?.mappingStatus?.isMajorVersionUpdate;
 
   // A patch version with major changes can only have been finalised
   // if a BAU user has overridden the block on major changes.
-  const majorVersionOverridden =
-    majorPatchChanges &&
-    !!mappingComplete &&
+  const majorPatchVersionOverridden =
+    hasMajorPatchChanges &&
     (finalisingStatus === 'finalising' ||
       dataSet?.draftVersion?.status === 'Finalising' ||
       dataSet?.draftVersion?.status === 'Draft');
 
+  const majorVersionOverrideRequired =
+    hasMajorPatchChanges && !majorPatchVersionOverridden;
+
   // Only BAU users can override the block on major changes in a patch version.
   const canOverrideMajorVersion =
-    majorPatchChanges &&
-    !majorVersionOverridden &&
-    !!mappingComplete &&
-    !!user?.permissions.isBauUser &&
-    !!user?.permissions.canManagePublicApiDataSets;
+    majorVersionOverrideRequired && !!user?.permissions.isBauUser;
 
   const majorVersionRejected =
-    majorPatchChanges && !majorVersionOverridden && !canOverrideMajorVersion;
+    majorVersionOverrideRequired && !user?.permissions.isBauUser;
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
@@ -451,7 +438,7 @@ export default function ReleaseApiDataSetDetailsPage() {
         dataSet?.draftVersion && (
           <>
             {canOverrideMajorVersion && majorVersionOverrideWarning}
-            {majorVersionOverridden && majorVersionOverriddenWarning}
+            {majorPatchVersionOverridden && majorVersionOverriddenWarning}
             <ApiDataSetFinaliseBanner
               dataSetId={dataSetId}
               dataSetVersionId={dataSet.draftVersion.id}
@@ -476,7 +463,7 @@ export default function ReleaseApiDataSetDetailsPage() {
 
     return (
       <>
-        {majorVersionOverridden && majorVersionOverriddenWarning}
+        {majorPatchVersionOverridden && majorVersionOverriddenWarning}
         {mappingActionsRequired && standardUserMappingActionsRequiredBanner}
         {readyToFinalise && standardUserFinaliseRequiredBanner}
       </>
