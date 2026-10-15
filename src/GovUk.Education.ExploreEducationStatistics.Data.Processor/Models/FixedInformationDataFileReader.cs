@@ -107,6 +107,9 @@ public class FixedInformationDataFileReader
         [EnumLabelValue("school_urn")]
         SchoolCode,
 
+        [EnumLabelValue("school_laestab")]
+        SchoolLaEstab,
+
         [EnumLabelValue("school_name")]
         SchoolName,
 
@@ -324,8 +327,9 @@ public class FixedInformationDataFileReader
     private School? GetSchool(IReadOnlyList<string> rowValues)
     {
         var code = GetLocationAttributeValue(LocationColumn.SchoolCode, rowValues);
+        var laEstab = GetLocationAttributeValue(LocationColumn.SchoolLaEstab, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.SchoolName, rowValues);
-        return GetLocationAttributeOrDefault(() => new School(code, name), code, name);
+        return GetLocationAttributeOrDefault(() => new School(code, name, laEstab), code, laEstab, name);
     }
 
     private Sponsor? GetSponsor(IReadOnlyList<string> rowValues)
