@@ -265,15 +265,20 @@ public class Location
     }
 
     public string? School_Code { get; set; }
+    public string? School_LaEstab { get; set; }
     public string? School_Name { get; set; }
 
     [NotMapped]
     public School? School
     {
-        get => School_Code == null && School_Name == null ? null : new School(School_Code, School_Name);
+        get =>
+            School_Code == null && School_LaEstab == null && School_Name == null
+                ? null
+                : new School(School_Code, School_Name, School_LaEstab);
         init
         {
             School_Code = value?.Code;
+            School_LaEstab = value?.LaEstab;
             School_Name = value?.Name;
         }
     }
@@ -358,6 +363,7 @@ public class Location
             && Region_Name == other.Region_Name
             && RscRegion_Code == other.RscRegion_Code
             && School_Code == other.School_Code
+            && School_LaEstab == other.School_LaEstab
             && School_Name == other.School_Name
             && Sponsor_Code == other.Sponsor_Code
             && Sponsor_Name == other.Sponsor_Name
@@ -414,6 +420,7 @@ public class Location
         hashCode.Add(Region_Name);
         hashCode.Add(RscRegion_Code);
         hashCode.Add(School_Code);
+        hashCode.Add(School_LaEstab);
         hashCode.Add(School_Name);
         hashCode.Add(Sponsor_Code);
         hashCode.Add(Sponsor_Name);
