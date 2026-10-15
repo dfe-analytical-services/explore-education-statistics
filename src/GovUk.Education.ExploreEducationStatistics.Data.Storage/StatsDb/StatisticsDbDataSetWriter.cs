@@ -14,10 +14,13 @@ public class StatisticsDbDataSetWriter(
     StatisticsDbContext context,
     IDatabaseHelper databaseHelper,
     ImporterLocationService importerLocationService,
-    IObservationBatchImporter observationBatchImporter
+    IObservationBatchImporter observationBatchImporter,
+    StatisticsDbDataSetFactory statisticsDbDataSetFactory
 ) : IStorageDataSetWriter
 {
     public Guid SubjectId { get; } = subjectId;
+
+    public IStorageDataSet DataSet { get; } = statisticsDbDataSetFactory.Create(subjectId);
 
     public Task WriteFiltersAndIndicators(
         IReadOnlyList<Filter> filters,
@@ -88,6 +91,16 @@ public class StatisticsDbDataSetWriter(
         return importerLocationService.Get(location).Id;
     }
 
+    public Task StartObservations(
+        IReadOnlyList<Filter> filters,
+        IReadOnlyList<Indicator> indicators,
+        long? resumeFromCsvRow,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.CompletedTask;
+    }
+
     public Task WriteObservations(
         IReadOnlyList<Observation> observations,
         CancellationToken cancellationToken = default
@@ -145,5 +158,10 @@ public class StatisticsDbDataSetWriter(
             .Select(observation => observation.Location.GeographicLevel)
             .Distinct()
             .ToListAsync(cancellationToken);
+    }
+
+    public Task Complete(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
     }
 }

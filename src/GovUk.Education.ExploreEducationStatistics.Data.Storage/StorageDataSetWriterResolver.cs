@@ -2,13 +2,16 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage;
 
-public class StorageDataSetWriterResolver(StatisticsDbDataSetWriterFactory statisticsDbDataSetWriterFactory)
-    : IStorageDataSetWriterResolver
+public class StorageDataSetWriterResolver(
+    StatisticsDbDataSetWriterFactory statisticsDbDataSetWriterFactory,
+    ParquetV1DataSetWriterFactory parquetV1DataSetWriterFactory
+) : IStorageDataSetWriterResolver
 {
     public IStorageDataSetWriter Resolve(File dataFile)
     {
@@ -22,6 +25,7 @@ public class StorageDataSetWriterResolver(StatisticsDbDataSetWriterFactory stati
         return dataFile.DataStorageVersion switch
         {
             DataStorageVersion.StatsDB => statisticsDbDataSetWriterFactory.Create(subjectId),
+            DataStorageVersion.ParquetV1 => parquetV1DataSetWriterFactory.Create(subjectId),
             null => throw new InvalidOperationException(
                 $"No data storage version recorded for data file {dataFile.Id}"
             ),

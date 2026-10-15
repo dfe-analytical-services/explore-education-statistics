@@ -28,7 +28,8 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
         bool? apiCompatible = null,
         string? name = null,
         File? replacingDataFile = null,
-        int order = 0
+        int order = 0,
+        DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
     )
     {
         if (!SupportedFileTypes.Contains(type))
@@ -58,7 +59,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 ContentLength = contentLength,
                 ContentType = "text/csv",
                 Type = type,
-                DataStorageVersion = type == Data ? DataStorageVersion.StatsDB : null,
+                DataStorageVersion = type == Data ? dataStorageVersion : null,
                 Replacing = replacingDataFile,
             },
             PublicApiCompatible = apiCompatible,

@@ -5,3 +5,5 @@ public record ImportMessage(Guid Id);
 public record CancelImportMessage(Guid Id);
 
 public record RestartImportsMessage;
+
+public record ExportParquetMessage(Guid FileId);
