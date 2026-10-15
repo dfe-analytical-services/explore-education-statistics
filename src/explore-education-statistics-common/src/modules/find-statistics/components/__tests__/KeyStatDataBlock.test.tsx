@@ -17,9 +17,7 @@ import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStat
 
 jest.mock('@common/services/tableBuilderService');
 
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
+const tableBuilderService = jest.mocked(_tableBuilderService);
 
 describe('KeyStatDataBlock', () => {
   const testTableDataResponse: TableDataResponse = {

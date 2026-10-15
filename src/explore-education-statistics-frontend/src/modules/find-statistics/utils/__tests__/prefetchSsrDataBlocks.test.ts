@@ -9,9 +9,7 @@ import noop from 'lodash/noop';
 
 jest.mock('@common/services/tableBuilderService');
 
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
+const tableBuilderService = jest.mocked(_tableBuilderService);
 
 describe('prefetchSsrDataBlocks', () => {
   const releaseVersionId = 'release-version-1';
