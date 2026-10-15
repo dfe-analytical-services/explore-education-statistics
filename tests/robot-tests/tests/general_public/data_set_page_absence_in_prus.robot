@@ -61,7 +61,8 @@ Validate data set variables
     user checks table column heading contains    1    1    Variable name    testid:variables-table
     user checks table column heading contains    1    2    Variable description    testid:variables-table
 
-    user checks table body has x rows    5    testid:variables-table
+    user checks table body has x rows    27    testid:variables-table
+    user checks element contains    testid:variables-table    Table showing first 5 of 27 variables
     user checks table cell contains    1    1    enrolments    testid:variables-table
     user checks table cell contains    1    2    Number of pupil enrolments    testid:variables-table
 
