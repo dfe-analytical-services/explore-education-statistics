@@ -15,7 +15,8 @@ public interface IReleaseDataFileRepository
         bool? apiCompatible = null,
         string? name = null,
         File? replacingDataFile = null,
-        int order = 0
+        int order = 0,
+        DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
     );
 
     public Task<IList<File>> ListDataFiles(Guid releaseVersionId);

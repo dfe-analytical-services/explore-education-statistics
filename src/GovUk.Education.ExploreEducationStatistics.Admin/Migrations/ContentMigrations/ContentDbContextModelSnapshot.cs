@@ -729,6 +729,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("FilterHierarchies")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasParquet")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");
 

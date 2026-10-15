@@ -46,8 +46,8 @@ public class ProcessorService(
     {
         var import = await dataImportService.GetImport(importId);
 
-        var dataSet = storageDataSetResolver.Resolve(import.File);
         var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
+        var dataSet = dataSetWriter.DataSet;
 
         var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
@@ -64,11 +64,11 @@ public class ProcessorService(
 
         try
         {
-            var dataSet = storageDataSetResolver.Resolve(import.File);
             var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
-            await fileImportService.ImportObservations(import, dataSet, dataSetWriter);
+            await fileImportService.ImportObservations(import, dataSetWriter.DataSet, dataSetWriter);
 
             var completedImport = await dataImportService.GetImport(import.Id);
+            var dataSet = storageDataSetResolver.Resolve(import.File);
             await fileImportService.CompleteImport(completedImport, dataSet, dataSetWriter);
         }
         catch (Exception e)

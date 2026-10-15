@@ -15,6 +15,11 @@ public interface IStorageDataSetWriter
     Guid SubjectId { get; }
 
     /// <summary>
+    /// Read access to what has been written so far, for use while the import is in progress.
+    /// </summary>
+    IStorageDataSet DataSet { get; }
+
+    /// <summary>
     /// Writes the data set's filters (not their groups and items), and its indicators together with their
     /// IndicatorGroups.
     /// </summary>
@@ -46,12 +51,29 @@ public interface IStorageDataSetWriter
     Guid GetLocationId(Location location);
 
     /// <summary>
+    /// Prepares for observations to be written by <see cref="WriteObservations" />.
+    /// </summary>
+    /// <param name="filters">All filters for the data set.</param>
+    /// <param name="indicators">All indicators for the data set.</param>
+    /// <param name="resumeFromCsvRow">
+    /// Null if no observations have been written yet. Otherwise, the CSV row that the import is resuming from, so
+    /// that any observations already written from this row onwards can be discarded and written again.
+    /// </param>
+    /// <param name="cancellationToken"></param>
+    Task StartObservations(
+        IReadOnlyList<Filter> filters,
+        IReadOnlyList<Indicator> indicators,
+        long? resumeFromCsvRow,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Writes a batch of observations together with their ObservationFilterItems.
     /// </summary>
     Task WriteObservations(IReadOnlyList<Observation> observations, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The number of observations in the data set.
+    /// The number of observations written.
     /// </summary>
     Task<long> CountObservations(CancellationToken cancellationToken = default);
 
@@ -70,4 +92,9 @@ public interface IStorageDataSetWriter
     /// set's DataSetFileVersionGeographicLevels. Once imported, read them from there instead.
     /// </summary>
     Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finishes writing the data set once all of its observations have been written.
+    /// </summary>
+    Task Complete(CancellationToken cancellationToken = default);
 }

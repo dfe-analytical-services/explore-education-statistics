@@ -618,6 +618,7 @@ public class ReleaseDataFileService(
     public async Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
         Guid releaseVersionId,
         List<Guid> dataSetUploadIds,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     )
     {
@@ -625,6 +626,7 @@ public class ReleaseDataFileService(
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessDo(_ => CheckCanImportWithDataStorageVersion(dataStorageVersion))
             .OnSuccess(_ =>
                 dataSetUploadIds
                     .Select(dataSetUploadId =>
@@ -638,6 +640,7 @@ public class ReleaseDataFileService(
                 await dataSetFileStorage.MoveDataSetsToPermanentStorage(
                     releaseVersionId,
                     dataSetUploads,
+                    dataStorageVersion,
                     cancellationToken
                 );
 
@@ -646,6 +649,16 @@ public class ReleaseDataFileService(
                 await contentDbContext.SaveChangesAsync(cancellationToken);
             })
             .OnSuccessVoid();
+    }
+
+    /// <summary>
+    /// Storage other than StatsDB is still being trialled, so is restricted to BAU users.
+    /// </summary>
+    private async Task<Either<ActionResult, Unit>> CheckCanImportWithDataStorageVersion(
+        DataStorageVersion dataStorageVersion
+    )
+    {
+        return dataStorageVersion == DataStorageVersion.StatsDB ? Unit.Instance : await userService.CheckIsBauUser();
     }
 
     private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(
