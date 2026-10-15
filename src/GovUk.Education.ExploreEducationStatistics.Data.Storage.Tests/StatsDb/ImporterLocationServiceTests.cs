@@ -461,6 +461,84 @@ public class ImporterLocationServiceTests
     }
 
     [Fact]
+    public async Task CreateAndCache_UniqueBySchoolLaEstab()
+    {
+        var result1Id = Guid.NewGuid();
+        var result2Id = Guid.NewGuid();
+
+        var guidGenerator = new Mock<IGuidGenerator>();
+        guidGenerator.SetupSequence(mock => mock.NewGuid()).Returns(result1Id).Returns(result2Id);
+
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
+
+        var service = BuildService(guidGenerator.Object, importerLocationCache);
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            // Test creating two Schools which are identical except for different LAESTABs
+            var result1 = await service.CreateIfNotExistsAndCache(
+                statisticsDbContext,
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.School,
+                    Country = _england,
+                    School = new School("100001", "Westminster School", "2011001"),
+                }
+            );
+
+            var result2 = await service.CreateIfNotExistsAndCache(
+                statisticsDbContext,
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.School,
+                    Country = _england,
+                    School = new School("100001", "Westminster School", "2011002"),
+                }
+            );
+
+            MockUtils.VerifyAllMocks(guidGenerator);
+
+            await statisticsDbContext.SaveChangesAsync();
+
+            Assert.Equal(result1Id, result1.Id);
+            Assert.NotNull(result1.School);
+            Assert.Equal("100001", result1.School!.Code);
+            Assert.Equal("2011001", result1.School!.LaEstab);
+            Assert.Equal("Westminster School", result1.School!.Name);
+
+            Assert.Equal(result2Id, result2.Id);
+            Assert.NotNull(result2.School);
+            Assert.Equal("100001", result2.School!.Code);
+            Assert.Equal("2011002", result2.School!.LaEstab);
+            Assert.Equal("Westminster School", result2.School!.Name);
+
+            Assert.Same(result1, importerLocationCache.Get(result1));
+            Assert.Same(result2, importerLocationCache.Get(result2));
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var locations = await statisticsDbContext.Location.ToListAsync();
+
+            Assert.Equal(2, locations.Count);
+
+            Assert.Equal(result1Id, locations[0].Id);
+            Assert.NotNull(locations[0].School);
+            Assert.Equal("100001", locations[0].School!.Code);
+            Assert.Equal("2011001", locations[0].School!.LaEstab);
+            Assert.Equal("Westminster School", locations[0].School!.Name);
+
+            Assert.Equal(result2Id, locations[1].Id);
+            Assert.NotNull(locations[1].School);
+            Assert.Equal("100001", locations[1].School!.Code);
+            Assert.Equal("2011002", locations[1].School!.LaEstab);
+            Assert.Equal("Westminster School", locations[1].School!.Name);
+        }
+    }
+
+    [Fact]
     public async Task CreateAndCache_UniqueByGeographicLevel()
     {
         var result1Id = Guid.NewGuid();

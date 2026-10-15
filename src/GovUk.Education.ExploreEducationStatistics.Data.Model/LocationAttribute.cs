@@ -221,8 +221,15 @@ public record RscRegion(string? Code) : LocationAttribute(Code, Code)
     public override int CsvPriority => 4;
 }
 
-public record School(string? Code, string? Name) : LocationAttribute(Code, Name)
+public record School(string? Code, string? Name, string? LaEstab = null) : LocationAttribute(Code, Name)
 {
+    public string? LaEstab { get; } = LaEstab;
+
+    public override string GetCacheKey()
+    {
+        return $"{GetType().Name}:{Code ?? string.Empty}:{LaEstab ?? string.Empty}:{Name ?? string.Empty}";
+    }
+
     public override KeyValuePair<string, string>[] CsvValues =>
         new KeyValuePair<string, string>[]
         {
