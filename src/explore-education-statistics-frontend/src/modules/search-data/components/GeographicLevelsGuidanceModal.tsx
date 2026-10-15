@@ -2,12 +2,15 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import React from 'react';
 
+const triggerText = 'What are Geographic Levels?';
+
 export default function GeographicLevelsGuidanceModal() {
   return (
     <Modal
+      noJsFallbackSummary={triggerText}
       showClose
-      title="What are Geographic Levels?"
-      triggerButton={<ButtonText>What are Geographic Levels?</ButtonText>}
+      title={triggerText}
+      triggerButton={<ButtonText>{triggerText}</ButtonText>}
     >
       <p>
         Geographic levels represent the different scales of administrative and
