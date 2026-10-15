@@ -1,8 +1,8 @@
 [
   {
-    "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-18 study in England. Includes disadvantage, ethnicity and other breakdowns.",
-    "publication_title": "16-18 destination measures",
-    "published": "23 Apr 2026",
+    "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-19 study in England. Includes disadvantage, ethnicity and other breakdowns.",
+    "publication_title": "16-19 destination measures",
+    "published": "15 Oct 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -366,14 +366,14 @@
   {
     "publication_summary": "Pupils sustaining an education, apprenticeship or employment destination after GCSEs in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "Key stage 4 destination measures",
-    "published": "23 Apr 2026",
+    "published": "15 Oct 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "GCSE results of pupils at the end of KS4 attending state-funded schools in England at national & LA level. This release includes pupil characteristic breakdowns",
     "publication_title": "Key stage 4 performance",
-    "published": "23 Apr 2026",
+    "published": "15 Oct 2026",
     "release_type": "Accredited official statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -506,7 +506,7 @@
   {
     "publication_summary": "Rates and value-added scores of level 3 (e.g., A level) students that sustain a higher education or apprenticeship destination. Includes various breakdowns.",
     "publication_title": "Progression to higher education or training",
-    "published": "23 Apr 2026",
+    "published": "15 Oct 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -520,7 +520,7 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "6 Aug 2026",
+    "published": "15 Oct 2026",
     "release_type": "Accredited official statistics",
     "theme": "Pupils and schools"
   },
