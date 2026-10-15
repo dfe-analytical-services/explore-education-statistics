@@ -4,6 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +24,8 @@ public static class StorageDataSetTestUtils
         IObservationService? observationService = null,
         IAllObservationsMatchedFilterItemsStrategy? allObservationsMatchedFilterItemsStrategy = null,
         ISparseObservationsMatchedFilterItemsStrategy? sparseObservationsMatchedFilterItemsStrategy = null,
-        IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null
+        IDenseObservationsMatchedFilterItemsStrategy? denseObservationsMatchedFilterItemsStrategy = null,
+        IParquetDataSetPathResolver? parquetDataSetPathResolver = null
     )
     {
         return new StorageDataSetResolver(
@@ -33,6 +36,9 @@ public static class StorageDataSetTestUtils
                 allObservationsMatchedFilterItemsStrategy,
                 sparseObservationsMatchedFilterItemsStrategy,
                 denseObservationsMatchedFilterItemsStrategy
+            ),
+            parquetV1DataSetFactory: BuildParquetV1DataSetFactory(
+                parquetDataSetPathResolver ?? new TestParquetDataSetPathResolver(Path.GetTempPath())
             )
         );
     }
@@ -88,17 +94,24 @@ public static class StorageDataSetTestUtils
         IDatabaseHelper databaseHelper,
         IImporterLocationCache? importerLocationCache = null,
         IGuidGenerator? guidGenerator = null,
-        IObservationBatchImporter? observationBatchImporter = null
+        IObservationBatchImporter? observationBatchImporter = null,
+        IParquetDataSetWriter? parquetDataSetWriter = null,
+        IParquetDataSetPathResolver? parquetDataSetPathResolver = null
     )
     {
+        var serviceProvider = BuildDataSetWriterServiceProvider(
+            statisticsDbContext,
+            databaseHelper,
+            importerLocationCache,
+            guidGenerator,
+            observationBatchImporter,
+            parquetDataSetWriter,
+            parquetDataSetPathResolver
+        );
+
         return new StorageDataSetWriterResolver(
-            BuildStatisticsDbDataSetWriterFactory(
-                statisticsDbContext,
-                databaseHelper,
-                importerLocationCache,
-                guidGenerator,
-                observationBatchImporter
-            )
+            new StatisticsDbDataSetWriterFactory(serviceProvider),
+            new ParquetV1DataSetWriterFactory(serviceProvider)
         );
     }
 
@@ -110,16 +123,66 @@ public static class StorageDataSetTestUtils
         IObservationBatchImporter? observationBatchImporter = null
     )
     {
-        var services = new ServiceCollection()
+        return new StatisticsDbDataSetWriterFactory(
+            BuildDataSetWriterServiceProvider(
+                statisticsDbContext,
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
+        );
+    }
+
+    public static ParquetV1DataSetWriterFactory BuildParquetV1DataSetWriterFactory(
+        StatisticsDbContext statisticsDbContext,
+        IDatabaseHelper databaseHelper,
+        IParquetDataSetWriter parquetDataSetWriter,
+        IParquetDataSetPathResolver? parquetDataSetPathResolver = null
+    )
+    {
+        return new ParquetV1DataSetWriterFactory(
+            BuildDataSetWriterServiceProvider(
+                statisticsDbContext,
+                databaseHelper,
+                parquetDataSetWriter: parquetDataSetWriter,
+                parquetDataSetPathResolver: parquetDataSetPathResolver
+            )
+        );
+    }
+
+    private static ServiceProvider BuildDataSetWriterServiceProvider(
+        StatisticsDbContext statisticsDbContext,
+        IDatabaseHelper databaseHelper,
+        IImporterLocationCache? importerLocationCache = null,
+        IGuidGenerator? guidGenerator = null,
+        IObservationBatchImporter? observationBatchImporter = null,
+        IParquetDataSetWriter? parquetDataSetWriter = null,
+        IParquetDataSetPathResolver? parquetDataSetPathResolver = null
+    )
+    {
+        return new ServiceCollection()
             .AddSingleton(statisticsDbContext)
             .AddSingleton(databaseHelper)
             .AddSingleton(importerLocationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>()))
             .AddSingleton(guidGenerator ?? new SequentialGuidGenerator())
             .AddSingleton(observationBatchImporter ?? Mock.Of<IObservationBatchImporter>(Strict))
+            .AddSingleton(parquetDataSetWriter ?? Mock.Of<IParquetDataSetWriter>(Strict))
+            .AddSingleton(BuildStatisticsDbDataSetFactory(statisticsDbContext))
+            .AddSingleton(
+                BuildParquetV1DataSetFactory(parquetDataSetPathResolver ?? Mock.Of<IParquetDataSetPathResolver>(Strict))
+            )
             .AddTransient<ImporterLocationService>()
-            .AddSingleton(Mock.Of<ILogger<ImporterLocationCache>>());
+            .AddTransient<StatisticsDbDataSetWriterFactory>()
+            .AddSingleton(Mock.Of<ILogger<ImporterLocationCache>>())
+            .BuildServiceProvider();
+    }
 
-        return new StatisticsDbDataSetWriterFactory(services.BuildServiceProvider());
+    public static ParquetV1DataSetFactory BuildParquetV1DataSetFactory(IParquetDataSetPathResolver pathResolver)
+    {
+        var services = new ServiceCollection().AddSingleton(pathResolver);
+
+        return new ParquetV1DataSetFactory(services.BuildServiceProvider());
     }
 
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)

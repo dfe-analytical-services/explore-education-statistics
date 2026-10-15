@@ -362,6 +362,7 @@ public class DataSetFileStorageTests
             var uploadSummaries = await service.MoveDataSetsToPermanentStorage(
                 releaseVersion.Id,
                 [dataSet],
+                dataStorageVersion: DataStorageVersion.StatsDB,
                 cancellationToken: CancellationToken.None
             );
 
@@ -682,6 +683,7 @@ public class DataSetFileStorageTests
         var uploadSummaries = await service.MoveDataSetsToPermanentStorage(
             testFixture.ReleaseVersion.Id,
             [dataSet],
+            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -749,6 +751,7 @@ public class DataSetFileStorageTests
         var uploadSummaries = await service.MoveDataSetsToPermanentStorage(
             testFixture.ReleaseVersion.Id,
             [.. dataSets],
+            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 

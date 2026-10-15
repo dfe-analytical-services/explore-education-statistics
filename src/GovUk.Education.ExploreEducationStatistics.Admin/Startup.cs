@@ -617,7 +617,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
-        services.AddStorageDataSets();
+        services.AddStorageDataSets(configuration);
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();

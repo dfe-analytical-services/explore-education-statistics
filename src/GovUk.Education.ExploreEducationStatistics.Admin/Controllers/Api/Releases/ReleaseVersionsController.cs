@@ -178,11 +178,17 @@ public class ReleaseVersionsController(
     public async Task<ActionResult> ImportDataSetsFromTempStorage(
         Guid releaseVersionId,
         List<Guid> dataSetUploadIds,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        [FromQuery] DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
     )
     {
         return await releaseDataFileService
-            .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
+            .SaveDataSetsFromTemporaryBlobStorage(
+                releaseVersionId,
+                dataSetUploadIds,
+                dataStorageVersion,
+                cancellationToken
+            )
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
 
