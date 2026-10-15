@@ -245,14 +245,20 @@ public class ImporterService : IImporterService
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerMetaService.GetSubjectMeta(
-            metaFileCsvHeaders,
-            metaFileCsvRows,
-            dataSetWriter.DataSet
-        );
+        var subjectMeta = await _importerMetaService.GetSubjectMeta(metaFileCsvHeaders, metaFileCsvRows, dataSetWriter);
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+
+        var filters = subjectMeta.Filters.Select(meta => meta.Filter).ToList();
+        var indicators = subjectMeta.Indicators.Select(meta => meta.Indicator).ToList();
+
+        // Rows are numbered from 2 in the CSV, after the header row.
+        await dataSetWriter.StartObservations(
+            filters,
+            indicators,
+            resumeFromCsvRow: lastProcessedRowIndex >= 0 ? lastProcessedRowIndex + 3 : null
+        );
 
         await CsvUtils.Batch(
             dataFileStreamProvider,
@@ -312,7 +318,7 @@ public class ImporterService : IImporterService
                                 return ObservationFromCsv(
                                     cells,
                                     dataSetWriter.SubjectId,
-                                    subjectMeta.Filters.Select(meta => meta.Filter).ToList(),
+                                    filters,
                                     fixedInformationReader,
                                     filterAndIndicatorReader,
                                     dataSetWriter,

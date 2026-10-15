@@ -32,7 +32,10 @@ public class ImporterMetaServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var dataSet = BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId))
+        var dataSetWriter = BuildStatisticsDbDataSetWriterFactory(
+                InMemoryStatisticsDbContext(statisticsDbContextId),
+                Mock.Of<IDatabaseHelper>(Strict)
+            )
             .Create(subjectId);
 
         var service = new ImporterMetaService(Mock.Of<IGuidGenerator>(Strict));
@@ -43,7 +46,7 @@ public class ImporterMetaServiceTests
             [
                 ["indicator_column", "Indicator", "INDICATOR LABEL", "INDICATOR GROUP", ""],
             ],
-            dataSet
+            dataSetWriter
         );
 
         Assert.Empty(subjectMeta.Filters);

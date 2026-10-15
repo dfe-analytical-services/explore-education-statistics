@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
 /// Storage-agnostic methods used to write, or to support the writing of, a single data set's data while it is being
-/// imported. Other reads go through <see cref="DataSet" />.
+/// imported. Reads of the imported data set go through <see cref="DataSet" />.
 ///
 /// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
@@ -15,7 +15,8 @@ public interface IStorageDataSetWriter
     Guid SubjectId { get; }
 
     /// <summary>
-    /// The data set being written to, for reads made while it is being imported.
+    /// The data set being written to. Its data may only be readable once <see cref="Complete" /> has run, so reads
+    /// made while importing go through this writer instead.
     /// </summary>
     IStorageDataSet DataSet { get; }
 
@@ -52,14 +53,43 @@ public interface IStorageDataSetWriter
     Guid GetLocationId(Location location);
 
     /// <summary>
+    /// Prepares for observations to be written by <see cref="WriteObservations" />.
+    /// </summary>
+    /// <param name="filters">All filters for the data set.</param>
+    /// <param name="indicators">All indicators for the data set.</param>
+    /// <param name="resumeFromCsvRow">
+    /// Null if no observations have been written yet. Otherwise, the CSV row that the import is resuming from, so
+    /// that any observations already written from this row onwards can be discarded and written again.
+    /// </param>
+    /// <param name="cancellationToken"></param>
+    Task StartObservations(
+        IReadOnlyList<Filter> filters,
+        IReadOnlyList<Indicator> indicators,
+        long? resumeFromCsvRow,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
     /// Writes a batch of observations together with their ObservationFilterItems.
     /// </summary>
     Task WriteObservations(IReadOnlyList<Observation> observations, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The number of observations in the data set.
+    /// The number of observations written.
     /// </summary>
     Task<long> CountObservations(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The filters written by <see cref="WriteFilters" />, with their FilterGroups and FilterItems if
+    /// <paramref name="includeItems" /> is true. Once imported, read them from <see cref="DataSet" /> instead.
+    /// </summary>
+    Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The IndicatorGroups written by <see cref="WriteIndicators" />, with their Indicators. Once
+    /// imported, read them from <see cref="DataSet" /> instead.
+    /// </summary>
+    Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
@@ -76,4 +106,9 @@ public interface IStorageDataSetWriter
     /// set's DataSetFileVersionGeographicLevels. Once imported, read them from there instead.
     /// </summary>
     Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finishes writing the data set once all of its observations have been written.
+    /// </summary>
+    Task Complete(CancellationToken cancellationToken = default);
 }

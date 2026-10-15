@@ -48,5 +48,7 @@ public partial class File : ICreatedTimestamp<DateTime?>
 
     public DataStorageVersion? DataStorageVersion { get; set; }
 
+    public bool HasParquet { get; set; }
+
     public string Extension => Path.GetExtension(Filename).TrimStart('.');
 }

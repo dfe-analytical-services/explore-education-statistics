@@ -63,31 +63,31 @@ public class ImporterMetaService : IImporterMetaService
         var filters = metaFileReader.ReadFiltersFromCsv(metaRows, dataSetWriter.SubjectId);
         filters.ForEach(filter => filter.Filter.Id = _guidGenerator.NewGuid());
 
-        return new SubjectMeta { Filters = filters, Indicators = await GetIndicators(metaRows, dataSetWriter.DataSet) };
+        return new SubjectMeta { Filters = filters, Indicators = await GetIndicators(metaRows, dataSetWriter) };
     }
 
     public async Task<SubjectMeta> GetSubjectMeta(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSet dataSet
+        IStorageDataSetWriter dataSetWriter
     )
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
 
-        var filters = await GetFilters(metaRows, dataSet);
-        var indicators = await GetIndicators(metaRows, dataSet);
+        var filters = await GetFilters(metaRows, dataSetWriter);
+        var indicators = await GetIndicators(metaRows, dataSetWriter);
 
         return new SubjectMeta { Filters = filters, Indicators = indicators };
     }
 
     private static async Task<List<(Filter Filter, string Column)>> GetFilters(
         IEnumerable<MetaRow> metaRows,
-        IStorageDataSet dataSet
+        IStorageDataSetWriter dataSetWriter
     )
     {
-        var filters = await dataSet.ListFilters(includeItems: true);
+        var filters = await dataSetWriter.ListFilters(includeItems: true);
 
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
@@ -106,7 +106,7 @@ public class ImporterMetaService : IImporterMetaService
 
     private static async Task<List<(Indicator Indicator, string Column)>> GetIndicators(
         IEnumerable<MetaRow> metaRows,
-        IStorageDataSet dataSet
+        IStorageDataSetWriter dataSetWriter
     )
     {
         var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
@@ -119,7 +119,7 @@ public class ImporterMetaService : IImporterMetaService
             }
         });
 
-        var dataSetIndicatorGroups = await dataSet.ListIndicatorGroups();
+        var dataSetIndicatorGroups = await dataSetWriter.ListIndicatorGroups();
 
         var indicatorGroups = indicatorRows
             .GroupBy(row => row.IndicatorGrouping!)

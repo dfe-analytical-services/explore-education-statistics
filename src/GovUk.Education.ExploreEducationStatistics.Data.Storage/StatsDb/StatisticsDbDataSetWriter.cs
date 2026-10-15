@@ -81,6 +81,16 @@ public class StatisticsDbDataSetWriter(
         return importerLocationService.Get(location).Id;
     }
 
+    public Task StartObservations(
+        IReadOnlyList<Filter> filters,
+        IReadOnlyList<Indicator> indicators,
+        long? resumeFromCsvRow,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.CompletedTask;
+    }
+
     public Task WriteObservations(
         IReadOnlyList<Observation> observations,
         CancellationToken cancellationToken = default
@@ -95,6 +105,16 @@ public class StatisticsDbDataSetWriter(
     public Task<long> CountObservations(CancellationToken cancellationToken = default)
     {
         return context.Observation.LongCountAsync(o => o.SubjectId == SubjectId, cancellationToken);
+    }
+
+    public Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default)
+    {
+        return dataSet.ListFilters(includeItems, cancellationToken);
+    }
+
+    public Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
+    {
+        return dataSet.ListIndicatorGroups(cancellationToken);
     }
 
     public async Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
@@ -138,5 +158,10 @@ public class StatisticsDbDataSetWriter(
             .Select(observation => observation.Location.GeographicLevel)
             .Distinct()
             .ToListAsync(cancellationToken);
+    }
+
+    public Task Complete(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
     }
 }
