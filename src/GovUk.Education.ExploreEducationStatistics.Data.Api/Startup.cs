@@ -184,7 +184,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>();
         services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-        services.AddStorageDataSets();
+        services.AddStorageDataSets(Configuration);
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IFrontendService, FrontendService>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();

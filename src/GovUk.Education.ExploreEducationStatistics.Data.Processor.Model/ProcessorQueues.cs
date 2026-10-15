@@ -6,4 +6,5 @@ public static class ProcessorQueues
     public const string ImportsPendingQueue = "imports-pending";
     public const string ImportsPendingPoisonQueue = "imports-pending-poison";
     public const string RestartImportsQueue = "restart-imports";
+    public const string ParquetExportPendingQueue = "parquet-export-pending";
 }

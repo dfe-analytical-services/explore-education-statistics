@@ -2009,6 +2009,7 @@ public class ReleaseDataFileServiceTests
                 mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
                     It.IsAny<List<DataSetUpload>>(),
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -2024,6 +2025,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
+            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -2094,6 +2096,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
+            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -2151,6 +2154,7 @@ public class ReleaseDataFileServiceTests
                 mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
                     It.IsAny<List<DataSetUpload>>(),
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -2166,6 +2170,7 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
+            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
