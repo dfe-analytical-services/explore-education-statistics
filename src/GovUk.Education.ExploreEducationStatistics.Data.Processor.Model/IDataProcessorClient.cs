@@ -5,4 +5,6 @@ public interface IDataProcessorClient
     public Task Import(Guid importId, CancellationToken cancellationToken = default);
 
     public Task CancelImport(Guid importId, CancellationToken cancellationToken = default);
+
+    public Task ExportParquet(Guid fileId, CancellationToken cancellationToken = default);
 }

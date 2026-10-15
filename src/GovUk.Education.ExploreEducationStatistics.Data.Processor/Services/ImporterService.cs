@@ -228,6 +228,13 @@ public class ImporterService : IImporterService
         var filterValuesReader = new FilterValuesReader(csvHeaders, filters);
         var indicatorValuesReader = new IndicatorValuesReader(csvHeaders, indicators);
 
+        // Rows are numbered from 2 in the CSV, after the header row.
+        await dataSetWriter.StartObservations(
+            filters,
+            indicators,
+            resumeFromCsvRow: lastProcessedRowIndex >= 0 ? lastProcessedRowIndex + 3 : null
+        );
+
         await CsvUtils.Batch(
             dataFileStreamProvider,
             importObservationsBatchSize,

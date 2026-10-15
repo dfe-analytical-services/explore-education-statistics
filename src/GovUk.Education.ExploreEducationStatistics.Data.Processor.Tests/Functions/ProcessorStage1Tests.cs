@@ -132,7 +132,8 @@ public class ProcessorStage1Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService
+            importerService,
+            Mock.Of<IParquetDataSetService>(Strict)
         );
 
         var validatorService = new ValidatorService(

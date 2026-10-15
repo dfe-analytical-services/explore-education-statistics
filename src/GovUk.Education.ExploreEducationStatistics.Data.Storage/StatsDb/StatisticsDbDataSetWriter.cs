@@ -101,6 +101,16 @@ public class StatisticsDbDataSetWriter(
         return importerLocationService.Get(location).Id;
     }
 
+    public Task StartObservations(
+        IReadOnlyList<Filter> filters,
+        IReadOnlyList<Indicator> indicators,
+        long? resumeFromCsvRow,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return Task.CompletedTask;
+    }
+
     public Task AppendObservations(IReadOnlyList<Observation> observations)
     {
         return databaseHelper.DoInTransaction(
@@ -155,5 +165,10 @@ public class StatisticsDbDataSetWriter(
             .Select(observation => observation.Location.GeographicLevel)
             .Distinct()
             .ToListAsync(cancellationToken);
+    }
+
+    public Task Complete(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
     }
 }
