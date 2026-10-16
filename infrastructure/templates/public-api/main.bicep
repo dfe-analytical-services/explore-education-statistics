@@ -189,13 +189,6 @@ module vNetModule 'application/shared/virtualNetwork.bicep' = {
   }
 }
 
-module coreStorage 'application/shared/coreStorage.bicep' = {
-  name: 'coreStorageApplicationModuleDeploy'
-  params: {
-    resourceNames: resourceNames
-  }
-}
-
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
@@ -363,7 +356,6 @@ output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   ? dataProcessorModule!.outputs.publicApiDataFileShareMountPath
   : ''
 
-output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
 
 output enableThemeDeletion bool = enableThemeDeletion
 
