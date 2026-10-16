@@ -25,6 +25,11 @@ jobs:
               displayName: Download Public API docs artifact
               artifact: public-api-docs
 
+            # Provides the docs app name, amongst other outputs of the infrastructure deploy.
+            - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+
             - task: UseNode@1
               displayName: Install Node.js $(nodeVersion)
               inputs:
