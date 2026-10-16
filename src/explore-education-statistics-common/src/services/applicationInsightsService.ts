@@ -8,6 +8,37 @@ export { ApplicationInsights, SeverityLevel };
 
 let isInitialised = false;
 
+interface PendingEvent {
+  name: string;
+  properties: Record<string, string>;
+  flush: boolean;
+}
+
+// Authentication can finish before the async telemetry provider initialises.
+// Bound the queue when telemetry is disabled or configuration never arrives.
+const pendingEvents: PendingEvent[] = [];
+
+export function trackApplicationEvent(
+  name: string,
+  properties: Record<string, string>,
+  flush = false,
+): void {
+  if (!isInitialised) {
+    if (pendingEvents.length < 100) {
+      pendingEvents.push({ name, properties, flush });
+    }
+    return;
+  }
+  try {
+    appInsights.trackEvent({ name }, properties);
+    if (flush) {
+      appInsights.flush();
+    }
+  } catch {
+    // Telemetry must not break the calling user journey.
+  }
+}
+
 const appInsights = new ApplicationInsights({
   config: {
     autoTrackPageVisitTime: true,
@@ -32,6 +63,9 @@ export function initApplicationInsights(
       appInsights.addTelemetryInitializer(filterSensitiveData);
 
       isInitialised = true;
+      pendingEvents.splice(0).forEach(event => {
+        trackApplicationEvent(event.name, event.properties, event.flush);
+      });
 
       // eslint-disable-next-line no-console
       console.log('Application Insights initialised');

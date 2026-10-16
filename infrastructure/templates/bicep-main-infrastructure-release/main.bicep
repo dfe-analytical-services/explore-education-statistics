@@ -1,3 +1,4 @@
+import { JourneyAlertPolicy } from '../common/components/alerts/journeyAlertTypes.bicep'
 import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
@@ -16,6 +17,9 @@ param http401Alerts ServiceHttpStatusAlerts = {}
 
 @description('Per-service overrides. Empty preserves all existing Http5xx rules.')
 param http5xxAlerts ServiceHttpStatusAlerts = {}
+
+@description('Opt-in request/journey policies. Includes Public Data API or other services by explicit App Insights resource id. No new rules by default.')
+param journeyAlerts JourneyAlertPolicy[] = []
 
 //
 // Tagging config.
@@ -380,3 +384,13 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     tagValues: tags
   }
 }
+
+module journeyAlertRules '../common/components/alerts/journeyAlert.bicep' = [for policy in journeyAlerts: {
+  name: 'journey-${uniqueString(policy.name)}'
+  params: {
+    policy: policy
+    workspaceId: logAnalyticsWorkspaceId
+    alertsGroupName: resourceNames.alertsGroup
+    tagValues: tags
+  }
+}]
