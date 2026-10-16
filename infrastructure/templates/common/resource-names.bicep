@@ -1,5 +1,14 @@
-import { abbreviations } from '../common/abbreviations.bicep'
-import { EnvironmentConfig } from 'configuration/environment-configuration.bicep'
+import { abbreviations } from 'abbreviations.bicep'
+
+@export()
+@description('Identifies the environment that resource names are being generated for.')
+type ResourceNamingContext = {
+  @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
+  environmentIdentifier: string
+
+  @description('Name of this environment e.g. Development, Test.')
+  environmentName: string
+}
 
 @export()
 type ResourceNames = {
@@ -166,12 +175,12 @@ type ResourceNames = {
 
 // TODO EES-7502 - use standardised naming convention for Notifier storage.
 @export()
-func getResourceNamesForEnvironment(environmentConfig EnvironmentConfig) ResourceNames => getResourceNames(
-  environmentConfig.environmentIdentifier!,
-  '${environmentConfig.environmentIdentifier!}-ees-papi',
-  '${environmentConfig.environmentIdentifier!}-ees-sapi',
-  '${environmentConfig.environmentIdentifier!}-ees',
-  (environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production') ? 'storage' : 'sa'
+func getResourceNamesForEnvironment(context ResourceNamingContext) ResourceNames => getResourceNames(
+  context.environmentIdentifier,
+  '${context.environmentIdentifier}-ees-papi',
+  '${context.environmentIdentifier}-ees-sapi',
+  '${context.environmentIdentifier}-ees',
+  (context.environmentName == 'Test' || context.environmentName == 'Pre-Production') ? 'storage' : 'sa'
 )
 
 func getResourceNames(
