@@ -334,4 +334,58 @@ public abstract class ReplacementServiceHelper
 
         return replacementSequence;
     }
+
+    public static List<PairedIndicatorEntry>? ReplacePairedIndicators(
+        List<PairedIndicatorEntry>? originalPairedIndicators,
+        DataSetMapping mapping
+    )
+    {
+        if (originalPairedIndicators is null)
+        {
+            return null;
+        }
+
+        var replacementIdsByOriginalId = mapping
+            .IndicatorMappings.Values.Where(map => map.ReplacementId != null)
+            .ToDictionary(map => map.OriginalId, map => map.ReplacementId!.Value);
+
+        // A pair is only carried forward if both its parent and child indicators are mapped to the replacement.
+        // Otherwise it's dropped, and any surviving indicator from the pair becomes independently selectable.
+        var mappedPairs = originalPairedIndicators
+            .Where(pair =>
+                replacementIdsByOriginalId.ContainsKey(pair.ParentIndicatorId)
+                && replacementIdsByOriginalId.ContainsKey(pair.ChildIndicatorId)
+            )
+            .Select(pair => new PairedIndicatorEntry(
+                ParentIndicatorId: replacementIdsByOriginalId[pair.ParentIndicatorId],
+                ChildIndicatorId: replacementIdsByOriginalId[pair.ChildIndicatorId]
+            ))
+            .ToList();
+
+        // Mappings should be one-to-one, but guard against saving pairs that break the paired indicator rules
+        // i.e. no self-links, a single parent per child, a single child per parent, and no chains.
+        var parentIds = new HashSet<Guid>();
+        var childIds = new HashSet<Guid>();
+        var replacementPairs = new List<PairedIndicatorEntry>();
+
+        foreach (var pair in mappedPairs)
+        {
+            if (
+                pair.ParentIndicatorId == pair.ChildIndicatorId
+                || parentIds.Contains(pair.ParentIndicatorId)
+                || childIds.Contains(pair.ChildIndicatorId)
+                || childIds.Contains(pair.ParentIndicatorId)
+                || parentIds.Contains(pair.ChildIndicatorId)
+            )
+            {
+                continue;
+            }
+
+            parentIds.Add(pair.ParentIndicatorId);
+            childIds.Add(pair.ChildIndicatorId);
+            replacementPairs.Add(pair);
+        }
+
+        return replacementPairs.Count == 0 ? null : replacementPairs;
+    }
 }
