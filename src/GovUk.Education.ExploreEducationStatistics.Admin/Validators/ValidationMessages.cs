@@ -541,4 +541,34 @@ public static class ValidationMessages
             Message = string.Format(ReplacementError.Message, originalFileId),
         };
     }
+
+    public static readonly LocalizableMessage PairedIndicatorsImportNotComplete = new(
+        Code: nameof(PairedIndicatorsImportNotComplete),
+        Message: "Paired indicators cannot be changed until the data set import is complete."
+    );
+
+    public static readonly LocalizableMessage PairedIndicatorsIndicatorNotForSubject = new(
+        Code: nameof(PairedIndicatorsIndicatorNotForSubject),
+        Message: "All paired indicators must belong to the data set."
+    );
+
+    public static readonly LocalizableMessage PairedIndicatorCannotPairWithItself = new(
+        Code: nameof(PairedIndicatorCannotPairWithItself),
+        Message: "An indicator cannot be paired with itself."
+    );
+
+    public static readonly LocalizableMessage PairedIndicatorChildHasMultipleParents = new(
+        Code: nameof(PairedIndicatorChildHasMultipleParents),
+        Message: "A child indicator can only have one parent indicator."
+    );
+
+    public static readonly LocalizableMessage PairedIndicatorParentHasMultipleChildren = new(
+        Code: nameof(PairedIndicatorParentHasMultipleChildren),
+        Message: "A parent indicator can only have one child indicator."
+    );
+
+    public static readonly LocalizableMessage PairedIndicatorsCannotBeChained = new(
+        Code: nameof(PairedIndicatorsCannotBeChained),
+        Message: "An indicator cannot be both a parent and a child indicator."
+    );
 }
