@@ -37,7 +37,6 @@ steps:
   # Call the health endpoint that will contain our expected "deployedAt" marker if the restart is successful.
   - task: AzureCLI@2
     displayName: ${{ parameters.displayName }}
-    continueOnError: true
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
