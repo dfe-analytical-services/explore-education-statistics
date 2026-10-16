@@ -24,6 +24,10 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             # No artifact download needed - the Public Site's build output is a Docker image,
             # already pushed to the container registry by the build pipeline.
             - download: none
@@ -59,7 +63,7 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Public Site - updating app settings
-                appName: $(subscription)-as-ees-public-site
+                appName: $(resourceNames.publicSite.appService)
                 resourceGroupName: $(resourceGroupName)
                 appSettingsJson: $(appSettings)
 
@@ -74,10 +78,10 @@ jobs:
                 inlineScript: |
                   set -e
                   az webapp config container set \
-                    --name $(subscription)-as-ees-public-site \
+                    --name $(resourceNames.publicSite.appService) \
                     --resource-group $(resourceGroupName) \
-                    --container-image-name eesacr.azurecr.io/ees-public-frontend:$(resources.pipeline.MainBuild.runName) \
-                    --container-registry-url https://eesacr.azurecr.io
+                    --container-image-name $(resourceNames.acr.serverName).azurecr.io/ees-public-frontend:$(resources.pipeline.MainBuild.runName) \
+                    --container-registry-url https://$(resourceNames.acr.serverName).azurecr.io
 
             - task: AzureCLI@2
               displayName: Public Site - Restart app to pull new image
@@ -88,7 +92,7 @@ jobs:
                 inlineScript: |
                   set -e
                   az webapp restart \
-                    --name $(subscription)-as-ees-public-site \
+                    --name $(resourceNames.publicSite.appService) \
                     --resource-group $(resourceGroupName)
 
             # Confirm the app has actually restarted by waiting for it to report back this
@@ -97,7 +101,7 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Public Site - confirming production has restarted and is healthy
-                appName: $(subscription)-as-ees-public-site
+                appName: $(resourceNames.publicSite.appService)
                 resourceGroupName: $(resourceGroupName)
                 healthCheckPath: /health
                 deployedAt: $(deployedAt)

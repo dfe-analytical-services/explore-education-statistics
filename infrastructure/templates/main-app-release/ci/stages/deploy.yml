@@ -105,6 +105,7 @@ stages:
           - template: ../jobs/run-robot-tests.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
+              environment: ${{ parameters.environment }}
               testEnvironment: ${{ parameters.bicepParamFile }}
               dependsOn:
                 - DeployContentApi
