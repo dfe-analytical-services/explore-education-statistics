@@ -1,9 +1,6 @@
 import Link from '@admin/components/Link';
 import styles from '@admin/pages/publication/PublicationReleasesPage.module.scss';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
@@ -111,13 +108,10 @@ export default function PublicationPublishedReleasesTable({
                     <div className={styles.actionsColumn}>
                       {release.permissions.canViewReleaseVersion ? (
                         <Link
-                          to={generatePath<ReleaseRouteParams>(
-                            releaseSummaryRoute.path,
-                            {
-                              publicationId: publication.id,
-                              releaseVersionId: release.id,
-                            },
-                          )}
+                          to={generatePath(releaseSummaryRoute.fullPath, {
+                            publicationId: publication.id,
+                            releaseVersionId: release.id,
+                          })}
                         >
                           View<VisuallyHidden> {release.title}</VisuallyHidden>
                         </Link>

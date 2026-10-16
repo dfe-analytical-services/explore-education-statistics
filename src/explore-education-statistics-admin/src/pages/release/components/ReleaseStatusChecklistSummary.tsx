@@ -1,15 +1,11 @@
 import releaseVersionQueries from '@admin/queries/releaseVersionQueries';
-import {
-  ReleaseRouteParams,
-  releaseChecklistRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseChecklistRoute } from '@admin/routes/releaseRoutes';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 interface Props {
   publicationId: string;
@@ -66,7 +62,7 @@ export default function ReleaseStatusChecklistSummary({
       <LoadingSpinner inline loading={isFetching} size="sm">
         {totalIssues > 0 ? (
           <Link
-            to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+            to={generatePath(releaseChecklistRoute.fullPath, {
               publicationId,
               releaseVersionId,
             })}
@@ -90,7 +86,7 @@ export default function ReleaseStatusChecklistSummary({
         <InsetText variant={getColour()}>
           {totalIssues > 0 ? (
             <Link
-              to={generatePath<ReleaseRouteParams>(releaseChecklistRoute.path, {
+              to={generatePath(releaseChecklistRoute.fullPath, {
                 publicationId,
                 releaseVersionId,
               })}

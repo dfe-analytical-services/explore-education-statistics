@@ -22,6 +22,8 @@ export interface AzureDataSetIndexItem {
   publicationId: string;
   publicationSlug: string;
   publicationTitle: string;
+  publishingOrganisationIds: string[];
+  publishingOrganisationTitles: string[];
   releaseId: string;
   releaseTitle: string;
   releaseSlug: string;
@@ -31,8 +33,7 @@ export interface AzureDataSetIndexItem {
   lastUpdated: string;
   api: DataSetFileApi;
   numDataFileRows: number;
-  geographicLevels: GeographicLevelCode[];
-  geographicLevelsLabels: string[];
+  geographicLevelDetails: AzureGeographicLevel[];
   indicators: string[];
   filters: string[];
   releaseType: string;
@@ -40,6 +41,12 @@ export interface AzureDataSetIndexItem {
     from: string;
     to: string;
   };
+}
+
+export interface AzureGeographicLevel {
+  code: GeographicLevelCode;
+  label: string;
+  csvOnly: boolean;
 }
 
 export interface AzureDataSetListRequest {

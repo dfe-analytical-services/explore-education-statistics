@@ -396,13 +396,6 @@ public class PublicationService(
             .OnSuccessDo(userService.CheckCanUpdateContact)
             .OnSuccess(async publication =>
             {
-                // Replace existing contact that is shared with another publication with a new
-                // contact, as we want each publication to have its own contact.
-                if (context.Publications.Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
-                {
-                    publication.Contact = new Contact();
-                }
-
                 publication.Contact.ContactName = updatedContact.ContactName;
                 publication.Contact.ContactTelNo = string.IsNullOrWhiteSpace(updatedContact.ContactTelNo)
                     ? null

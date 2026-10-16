@@ -1,5 +1,4 @@
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContentEdit from '@admin/pages/release/content/components/ReleaseContentEdit';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
@@ -12,7 +11,7 @@ import {
   within,
 } from '@testing-library/react';
 import React, { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router';
+import { TestRouterWithProvider } from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
@@ -76,7 +75,7 @@ describe('ReleaseContentEdit', () => {
     releaseContent: ReleaseContentType = testReleaseContent,
   ): RenderResult {
     return baseRender(
-      <TestConfigContextProvider>
+      <TestRouterWithProvider initialUrl="/" route="/">
         unattachedDataBlocks: [], unattachedDataBlocks: [],
         <ReleaseContentHubContextProvider
           releaseVersionId={releaseContent.release.id}
@@ -88,11 +87,11 @@ describe('ReleaseContentEdit', () => {
             }}
           >
             <EditingContextProvider editingMode="edit">
-              <MemoryRouter>{child}</MemoryRouter>
+              {child}
             </EditingContextProvider>
           </ReleaseContentProvider>
         </ReleaseContentHubContextProvider>
-      </TestConfigContextProvider>,
+      </TestRouterWithProvider>,
     );
   }
 });

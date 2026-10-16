@@ -14,7 +14,7 @@ Verify public page loads
     user waits until page contains    Explore education statistics
 
 Verify can accept cookie banner
-    user checks page contains    We use some essential cookies to make this service work.
+    user waits until page contains    We use some essential cookies to make this service work.
 
     cookie should not exist    ees_banner_seen
     cookie should not exist    ees_disable_google_analytics

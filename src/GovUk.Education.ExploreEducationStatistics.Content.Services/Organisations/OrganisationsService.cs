@@ -1,4 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ public class OrganisationsService(ContentDbContext contentDbContext) : IOrganisa
     public async Task<OrganisationDto[]> GetAllOrganisations(CancellationToken cancellationToken = default) =>
         await contentDbContext
             .Organisations.AsNoTracking()
-            .OrderBy(o => o.Title)
+            .OrderByTitleWithDepartmentForEducationFirst()
             .Select(o => OrganisationDto.FromOrganisation(o))
             .ToArrayAsync(cancellationToken);
 }

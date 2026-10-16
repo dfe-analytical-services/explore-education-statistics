@@ -835,6 +835,11 @@ user checks select contains option
     ${options}=    get list items    ${locator}
     list should contain value    ${options}    ${label}
 
+user waits until select contains option
+    [Arguments]    ${locator}    ${label}    ${wait}=${timeout}
+    wait until keyword succeeds    ${wait}    1s
+    ...    user checks select contains option    ${locator}    ${label}
+
 user checks select does not contain option
     [Arguments]    ${locator}    ${label}
     ${options}=    get list items    ${locator}
@@ -903,6 +908,10 @@ user checks url contains
     [Arguments]    ${text}
     ${current_url}=    get location
     should contain    ${current_url}    ${text}
+
+user waits until url contains
+    [Arguments]    ${text}    ${wait}=${timeout}
+    wait until location contains    ${text}    timeout=${wait}
 
 user checks url equals
     [Arguments]    ${expected}
@@ -1083,7 +1092,9 @@ user checks list has x items
     # Use xpath to more precisely get the direct child items underneath the
     # parent list and ignore any nested lists and their children.
     # CSS selector shouldn't be used here as child selector `>` doesn't seem to work.
-    user waits until parent contains element    ${list}    xpath:./li    count=${count}
+    user waits until parent contains element    ${list}
+    ...    xpath:./li[not(contains(concat(" ", normalize-space(@class), " "), " dfe-js-hidden "))]
+    ...    count=${count}
 
 user checks definition list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body

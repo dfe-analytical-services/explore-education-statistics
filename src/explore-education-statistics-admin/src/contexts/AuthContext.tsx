@@ -16,10 +16,11 @@ import logger from '@common/services/logger';
 import { acquireTokenSilent, PostLoginState } from '@admin/auth/msal';
 import {
   expiredInviteRoute,
+  homeRoute,
   noInvitationRoute,
   signInRoute,
 } from '@admin/routes/routes';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import permissionService from '@admin/services/permissionService';
 
 export interface User {
@@ -28,8 +29,11 @@ export interface User {
   permissions: GlobalPermissions;
 }
 
+export type AuthStatus = 'authenticated' | 'unauthenticated' | 'redirecting';
+
 export interface AuthContextState {
   user?: User;
+  status: AuthStatus;
 }
 
 export const AuthContext = createContext<AuthContextState | undefined>(
@@ -43,42 +47,42 @@ interface Props {
 
 interface State {
   /**
-  This "readyToRenderChildren" flag controls whether this component is ready to render its children
-  or not. This will be set to true only when this component has established
-  that it is dealing with one of the following cases:
+   This "readyToRenderChildren" flag controls whether this component is ready to render its children
+   or not. This will be set to true only when this component has established
+   that it is dealing with one of the following cases:
 
-  1) No logged-in user at all (i.e. a user with no tokens in local storage),
-  in which case the unauthenticated user can view pages that are visible to
-  unauthenticated users and any children of this AuthContext that use
-  "useAuth()" will be provided with a null "user". Any attempt to view a
-  component within a ProtectedRoute after this will be redirected to the
-  login page (by the ProtectedRoute itself).
+   1) No logged-in user at all (i.e. a user with no tokens in local storage),
+   in which case the unauthenticated user can view pages that are visible to
+   unauthenticated users and any children of this AuthContext that use
+   "useAuth()" will be provided with a null "user". Any attempt to view a
+   component within a ProtectedRoute after this will be redirected to the
+   login page (by the ProtectedRoute itself).
 
-  2) An authenticated user (i.e. a user with tokens in local storage) who has
-  returned from a successful post-login redirect from the Identity Provider,
-  has logged in or registered successfully with our local login /
-  registration endpoint, and who has been redirected to the desired
-  post-IdP-login page (as provided by the response from the Identity Provider
-  if one was requested).
+   2) An authenticated user (i.e. a user with tokens in local storage) who has
+   returned from a successful post-login redirect from the Identity Provider,
+   has logged in or registered successfully with our local login /
+   registration endpoint, and who has been redirected to the desired
+   post-IdP-login page (as provided by the response from the Identity Provider
+   if one was requested).
 
-  3) An authenticated user (i.e. a user with tokens in local storage) who has
-  loaded the SPA but not via a post-login redirect from the Identity
-  Provider, and has logged in or registered successfully with our local login
-  / registration endpoint. At this point, this flag is set to true, the user
-  remains on the current route and will see the current page.
+   3) An authenticated user (i.e. a user with tokens in local storage) who has
+   loaded the SPA but not via a post-login redirect from the Identity
+   Provider, and has logged in or registered successfully with our local login
+   / registration endpoint. At this point, this flag is set to true, the user
+   remains on the current route and will see the current page.
 
-  4) An authenticated user (i.e. a user with tokens in local storage) who is
-  unable to request a valid access token (generally as a result of the local
-  access token expiring and the refresh token also expiring), and so is
-  redirected to the login page, at which point this flag is set to true so
-  that they can see the login page successfully.
+   4) An authenticated user (i.e. a user with tokens in local storage) who is
+   unable to request a valid access token (generally as a result of the local
+   access token expiring and the refresh token also expiring), and so is
+   redirected to the login page, at which point this flag is set to true so
+   that they can see the login page successfully.
 
-  5) An authenticated user (i.e. a user with tokens in local storage) who is
-  unable to successfully call the local login / registration endpoint, by not
-  having a local user record and having either no invites or only expired
-  invites. At this point they will be redirected to either the "No Invites"
-  page or the "Expired Invites" page, and this flag will be set to true so
-  that they can successfully see the page. */
+   5) An authenticated user (i.e. a user with tokens in local storage) who is
+   unable to successfully call the local login / registration endpoint, by not
+   having a local user record and having either no invites or only expired
+   invites. At this point they will be redirected to either the "No Invites"
+   page or the "Expired Invites" page, and this flag will be set to true so
+   that they can successfully see the page. */
   readyToRenderChildren: boolean;
 
   /**
@@ -107,6 +111,10 @@ export const AuthContextProvider = ({
   children,
   verboseLogging = false,
 }: Props) => {
+  const location = useLocation();
+
+  const currentPath = `${location.pathname}${location.search}`;
+
   const [state, setState] = useState<State>({
     readyToRenderChildren: false,
   });
@@ -119,8 +127,7 @@ export const AuthContextProvider = ({
 
   const loginInProgress = authenticationInProgress !== 'none';
 
-  const history = useHistory();
-  const location = useLocation();
+  const navigate = useNavigate();
 
   const log = useCallback(
     (message: string) => {
@@ -157,19 +164,37 @@ export const AuthContextProvider = ({
   // route. This can occur if a login failure occurs or if login is successful
   // and an explicit redirect URL has been specified post-login.
   useEffect(() => {
-    if (state.redirect) {
+    if (!state.redirect) {
+      return;
+    }
+
+    if (currentPath === state.redirect) {
       log(
-        `AuthContext: redirect to ${state.redirect} requested. Setting user ` +
+        `AuthContext: redirect to ${state.redirect} complete. Setting user ` +
           'ready to use service.',
       );
+
       setState(previousState => ({
         ...previousState,
+        redirect: undefined,
         readyToRenderChildren: true,
       }));
-      log(`AuthContext: redirecting to ${state.redirect}.`);
-      history.push(state.redirect);
+
+      return;
     }
-  }, [history, state.redirect, log]);
+
+    log(
+      `AuthContext: redirect to ${state.redirect} requested. Setting user ` +
+        'ready to use service.',
+    );
+
+    navigate(state.redirect, { replace: true });
+
+    setState(previousState => ({
+      ...previousState,
+      readyToRenderChildren: true,
+    }));
+  }, [state.redirect, currentPath, log, navigate]);
 
   useEffect(() => {
     (async () => {
@@ -181,15 +206,24 @@ export const AuthContextProvider = ({
       }
 
       function requestRedirect(path: string) {
+        let targetPath = path;
         log(`AuthContext: Requesting that user is redirected to ${path}.`);
+
+        if (!path.startsWith('/')) {
+          log(
+            'AuthContext: Invalid redirect URL provided, redirecting user to home route',
+          );
+          targetPath = homeRoute.fullPath;
+        }
+
         setState(previousState => ({
           ...previousState,
-          redirect: path,
+          redirect: targetPath,
         }));
       }
 
       function forceSignIn() {
-        requestRedirect(signInRoute.path as string);
+        requestRedirect(signInRoute.fullPath as string);
       }
 
       // If we're ready to allow the user (or no user) to continue to see pages
@@ -306,14 +340,14 @@ export const AuthContextProvider = ({
             'AuthContext: User has no invites to use the service. Redirecting ' +
               'to "No Invites" page.',
           );
-          requestRedirect(noInvitationRoute.path as string);
+          requestRedirect(noInvitationRoute.fullPath as string);
           return;
         case 'ExpiredInvite':
           log(
             'AuthContext: User has expired invite for the service. Redirecting ' +
               'to "Expired Invite" page.',
           );
-          requestRedirect(expiredInviteRoute.path as string);
+          requestRedirect(expiredInviteRoute.fullPath as string);
           return;
         // If we're here, the logged-in user is known to the service and is
         // ready to use it. Set the user details so that child components can
@@ -371,7 +405,7 @@ export const AuthContextProvider = ({
     msalInstance,
     accounts,
     loginInProgress,
-    history,
+    navigate,
     location,
     state.readyToRenderChildren,
     state.loginRedirectState,
@@ -379,10 +413,18 @@ export const AuthContextProvider = ({
   ]);
 
   const contextState: AuthContextState = useMemo(() => {
+    let status: AuthStatus = 'unauthenticated';
+
+    if (state.redirect) {
+      status = 'redirecting';
+    } else if (state.user) {
+      status = 'authenticated';
+    }
     return {
       user: state.user,
+      status,
     };
-  }, [state.user]);
+  }, [state.user, state.redirect]);
 
   return state.readyToRenderChildren ? (
     <AuthContext value={contextState}>{children}</AuthContext>
@@ -391,7 +433,7 @@ export const AuthContextProvider = ({
 
 export function useAuthContext(): AuthContextState {
   const context = useContext(AuthContext);
-  return context ?? {};
+  return context ?? { status: 'unauthenticated' };
 }
 
 interface AuthContextTestProviderProps {
@@ -404,7 +446,14 @@ export function AuthContextTestProvider({
   user,
 }: AuthContextTestProviderProps) {
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <AuthContext value={{ user }}>{children}</AuthContext>
+    <AuthContext
+      // eslint-disable-next-line react/jsx-no-constructed-context-values
+      value={{
+        user,
+        status: user ? 'authenticated' : 'unauthenticated',
+      }}
+    >
+      {children}
+    </AuthContext>
   );
 }

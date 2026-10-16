@@ -159,6 +159,7 @@ Create new release
     user enters text into element    name:timePeriodCoverageStartYear    2025
     user enters text into element    name:releaseLabel    provisional
     user clicks radio    Accredited official statistics
+    user checks checkbox is checked    Department for Education
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring term 2025/26 provisional
     user waits until h1 is visible    ${PUBLICATION_NAME}

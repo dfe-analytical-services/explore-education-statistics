@@ -3,10 +3,7 @@ import ApiDataSetCreateForm, {
   ApiDataSetCreateFormValues,
 } from '@admin/pages/release/data/components/ApiDataSetCreateForm';
 import apiDataSetCandidateQueries from '@admin/queries/apiDataSetCandidateQueries';
-import {
-  releaseDataRoute,
-  ReleaseRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataRoute } from '@admin/routes/releaseRoutes';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Modal from '@common/components/Modal';
@@ -14,7 +11,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import releaseDataPageTabs from '@admin/pages/release/data/utils/releaseDataPageTabs';
 
 interface Props {
@@ -74,7 +71,7 @@ export default function ApiDataSetCreateModal({
               No API data sets can be created as there are no candidate data
               files available. New candidate data files can be uploaded in the{' '}
               <Link
-                to={`${generatePath<ReleaseRouteParams>(releaseDataRoute.path, {
+                to={`${generatePath(releaseDataRoute.fullPath, {
                   publicationId,
                   releaseVersionId,
                 })}#${releaseDataPageTabs.dataUploads.id}`}

@@ -106,29 +106,16 @@ const ReleaseContent = ({
           releaseDate={release.publishedDisplayDate}
           releaseType={release.type}
           renderProducerLink={
-            publishingOrganisations?.length ? (
-              <span>
-                {publishingOrganisations.map((org, index) => (
-                  <Fragment key={org.id}>
-                    {getListStringSeparator(
-                      release.publishingOrganisations ?? [],
-                      index,
-                    )}
-                    <Link unvisited to={org.url}>
-                      {org.title}
-                    </Link>
-                  </Fragment>
-                ))}
-              </span>
-            ) : (
-              <Link
-                unvisited
-                className="govuk-link--no-underline"
-                to="https://www.gov.uk/government/organisations/department-for-education"
-              >
-                Department for Education
-              </Link>
-            )
+            <span>
+              {publishingOrganisations.map((org, index) => (
+                <Fragment key={org.id}>
+                  {getListStringSeparator(publishingOrganisations, index)}
+                  <Link unvisited to={org.url}>
+                    {org.title}
+                  </Link>
+                </Fragment>
+              ))}
+            </span>
           }
           renderUpdatesLink={
             updates.length > 0 ? (

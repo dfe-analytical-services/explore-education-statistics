@@ -1,10 +1,7 @@
 import React from 'react';
 import { generatePath } from 'react-router';
 import { useEducationInNumbersPageContext } from '@admin/pages/education-in-numbers/contexts/EducationInNumbersContext';
-import {
-  educationInNumbersSummaryEditRoute,
-  EducationInNumbersRouteParams,
-} from '@admin/routes/educationInNumbersRoutes';
+import { educationInNumbersSummaryEditRoute } from '@admin/routes/educationInNumbersRoutes';
 import WarningMessage from '@common/components/WarningMessage';
 import ButtonLink from '@admin/components/ButtonLink';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -48,12 +45,9 @@ const EducationInNumbersSummaryPage = () => {
 
           {isEditable && (
             <ButtonLink
-              to={generatePath<EducationInNumbersRouteParams>(
-                educationInNumbersSummaryEditRoute.path,
-                {
-                  educationInNumbersPageId: page.id,
-                },
-              )}
+              to={generatePath(educationInNumbersSummaryEditRoute.fullPath, {
+                educationInNumbersPageId: page.id,
+              })}
             >
               Edit summary
             </ButtonLink>

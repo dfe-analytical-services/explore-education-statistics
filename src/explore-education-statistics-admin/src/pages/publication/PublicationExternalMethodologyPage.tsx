@@ -1,20 +1,17 @@
 import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  PublicationRouteParams,
-  publicationMethodologiesRoute,
-} from '@admin/routes/publicationRoutes';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import publicationService, {
   ExternalMethodology,
 } from '@admin/services/publicationService';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageMetaTitle from '@admin/components/PageMetaTitle';
 
 const PublicationExternalMethodologyPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { publicationId, publication, onReload } = usePublicationContext();
   const { value: externalMethodology, isLoading } = useAsyncHandledRetry<
     ExternalMethodology | undefined
@@ -23,12 +20,9 @@ const PublicationExternalMethodologyPage = () => {
     [publicationId],
   );
 
-  const returnRoute = generatePath<PublicationRouteParams>(
-    publicationMethodologiesRoute.path,
-    {
-      publicationId,
-    },
-  );
+  const returnRoute = generatePath(publicationMethodologiesRoute.fullPath, {
+    publicationId,
+  });
 
   const handleExternalMethodologySubmit = async (
     values: ExternalMethodology,
@@ -46,7 +40,7 @@ const PublicationExternalMethodologyPage = () => {
       updatedExternalMethodology,
     );
     onReload();
-    history.push(returnRoute);
+    navigate(returnRoute);
   };
 
   if (isLoading) {
@@ -63,7 +57,7 @@ const PublicationExternalMethodologyPage = () => {
       <h2>{title}</h2>
       <ExternalMethodologyForm
         initialValues={externalMethodology}
-        onCancel={() => history.push(returnRoute)}
+        onCancel={() => navigate(returnRoute)}
         onSubmit={handleExternalMethodologySubmit}
       />
     </>

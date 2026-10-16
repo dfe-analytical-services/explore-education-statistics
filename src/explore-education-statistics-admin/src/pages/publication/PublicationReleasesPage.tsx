@@ -2,7 +2,6 @@ import ButtonLink from '@admin/components/ButtonLink';
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import PublicationUnpublishedReleases from '@admin/pages/publication/components/PublicationUnpublishedReleases';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import { PublicationRouteParams } from '@admin/routes/publicationRoutes';
 import { releaseCreateRoute } from '@admin/routes/routes';
 import releaseService from '@admin/services/releaseService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -46,7 +45,7 @@ const PublicationReleasesPage = () => {
 
       {publication?.permissions.canCreateReleases && (
         <ButtonLink
-          to={generatePath<PublicationRouteParams>(releaseCreateRoute.path, {
+          to={generatePath(releaseCreateRoute.fullPath, {
             publicationId,
           })}
         >

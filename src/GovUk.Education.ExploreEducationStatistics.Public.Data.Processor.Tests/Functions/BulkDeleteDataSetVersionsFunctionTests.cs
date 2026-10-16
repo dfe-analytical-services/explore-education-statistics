@@ -630,6 +630,12 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
             );
         }
 
+        private static List<int> FilterOptionIds(DataSetVersion dataSetVersion) =>
+            dataSetVersion.FilterMetas.SelectMany(meta => meta.Options).Select(option => option.Id).ToList();
+
+        private static List<int> LocationOptionIds(DataSetVersion dataSetVersion) =>
+            dataSetVersion.LocationMetas.SelectMany(meta => meta.Options).Select(option => option.Id).ToList();
+
         private async Task AssertMetadataIsDeleted(DataSetVersion dataSetVersion)
         {
             Assert.False(
@@ -652,6 +658,21 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
                     .GetPublicDataDbContext()
                     .LocationOptionMetaLinks.AnyAsync(loml => dataSetVersion.LocationMetas.Contains(loml.Meta))
             );
+
+            // Option metas are a pool shared between DataSetVersions, reachable only through the link tables,
+            // so nothing cascades them away with the DataSetVersion. They have to be reaped explicitly once
+            // their last link is gone.
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => FilterOptionIds(dataSetVersion).Contains(option.Id))
+            );
+            Assert.False(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => LocationOptionIds(dataSetVersion).Contains(option.Id))
+            );
+
             Assert.False(
                 await fixture
                     .GetPublicDataDbContext()
@@ -694,6 +715,16 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
             Assert.True(
                 await fixture
                     .GetPublicDataDbContext()
+                    .FilterOptionMetas.AnyAsync(option => FilterOptionIds(dataSetVersion).Contains(option.Id))
+            );
+            Assert.True(
+                await fixture
+                    .GetPublicDataDbContext()
+                    .LocationOptionMetas.AnyAsync(option => LocationOptionIds(dataSetVersion).Contains(option.Id))
+            );
+            Assert.True(
+                await fixture
+                    .GetPublicDataDbContext()
                     .IndicatorMetas.AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id)
             );
             Assert.True(
@@ -706,6 +737,85 @@ public abstract class BulkDeleteDataSetVersionsFunctionTests(BulkDeleteDataSetVe
                     .GetPublicDataDbContext()
                     .TimePeriodMetas.AnyAsync(fm => fm.DataSetVersionId == dataSetVersion.Id)
             );
+        }
+
+        [Fact]
+        public async Task EinTilesQueryingTheDeletedDataSetAreCleared()
+        {
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion()
+                .WithPublication(DataFixture.DefaultPublication());
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft()
+                .WithPublicationId(releaseVersion.PublicationId);
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .WithImports(() => DataFixture.DefaultDataSetVersionImport().Generate(1))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+            releaseFile.PublicApiDataSetId = dataSet.Id;
+            releaseFile.PublicApiDataSetVersion = dataSetVersion.SemVersion();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Update(releaseFile));
+
+            var tiles = await EinTestData.AddApiQueryStatTiles(
+                fixture.GetContentDbContext(),
+                releaseId: releaseVersion.ReleaseId,
+                dataSetIds: dataSet.Id
+            );
+
+            var tile = tiles.Single();
+
+            var response = await BulkDeleteDataSetVersions(releaseVersion.Id);
+
+            response.AssertNoContent();
+
+            Assert.Null(
+                await fixture.GetPublicDataDbContext().DataSets.SingleOrDefaultAsync(ds => ds.Id == dataSet.Id)
+            );
+
+            // The tile survives so that the page keeps its layout, but every reference to the deleted
+            // DataSet - including the cached statistic derived from it - has been cleared.
+            var clearedTile = await fixture
+                .GetContentDbContext()
+                .EinTiles.OfType<EinApiQueryStatTile>()
+                .SingleAsync(t => t.Id == tile.Id);
+
+            Assert.Equal(tile.Title, clearedTile.Title);
+            Assert.Null(clearedTile.DataSetId);
+            Assert.Null(clearedTile.Version);
+            Assert.Null(clearedTile.DataSetVersionId);
+            Assert.Null(clearedTile.LatestDataSetVersionId);
+            Assert.Null(clearedTile.Query);
+            Assert.Null(clearedTile.Statistic);
+            Assert.Null(clearedTile.IndicatorUnit);
+            Assert.Null(clearedTile.DecimalPlaces);
+            Assert.Null(clearedTile.QueryResult);
+            Assert.Null(clearedTile.ReleaseId);
         }
 
         [Theory]

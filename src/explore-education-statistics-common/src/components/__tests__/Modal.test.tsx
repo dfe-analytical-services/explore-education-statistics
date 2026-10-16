@@ -1,7 +1,8 @@
 import render from '@common-test/render';
 import Modal from '@common/components/Modal';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 describe('Modal', () => {
   test('clicking the trigger button opens the modal', async () => {
@@ -227,5 +228,78 @@ describe('Modal', () => {
     );
 
     expect(container).not.toHaveAttribute('aria-hidden');
+  });
+
+  // Note: jsdom does not load the `js-enabled` stylesheet, so these assert on
+  // the `dfe-js-hidden` / `dfe-js-only` classes rather than on visibility.
+  // `renderToStaticMarkup` gives the server HTML (no effects run), while
+  // `render` mounts the component. Static markup goes into a detached
+  // container, so it is asserted on directly rather than with
+  // `toBeInTheDocument`.
+  describe('noJsFallbackSummary', () => {
+    test('server-renders the content in a details fallback instead of the modal', () => {
+      const container = document.createElement('div');
+      container.innerHTML = renderToStaticMarkup(
+        <Modal
+          description="Test description"
+          noJsFallbackSummary="What is this?"
+          title="Test modal"
+          triggerButton={<button type="button">Open</button>}
+        >
+          <p>Content</p>
+        </Modal>,
+      );
+
+      const fallback = within(container).getByTestId('modal-no-js-fallback');
+      expect(fallback.tagName).toBe('DETAILS');
+      expect(fallback).toHaveTextContent('What is this?');
+      expect(fallback).toHaveTextContent('Test description');
+      expect(fallback).toHaveTextContent('Content');
+
+      // No trigger, as it can't work without JS.
+      expect(within(container).queryByRole('button')).toBeNull();
+      expect(within(container).queryByRole('dialog')).toBeNull();
+    });
+
+    test('swaps the fallback for the modal once mounted', async () => {
+      const { user } = render(
+        <Modal
+          noJsFallbackSummary="What is this?"
+          title="Test modal"
+          triggerButton={<button type="button">Open</button>}
+        >
+          <p>Content</p>
+        </Modal>,
+      );
+
+      expect(
+        screen.queryByTestId('modal-no-js-fallback'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Content')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+
+    test('server-renders the trigger, not a fallback, by default', () => {
+      const container = document.createElement('div');
+      container.innerHTML = renderToStaticMarkup(
+        <Modal
+          title="Test modal"
+          triggerButton={<button type="button">Open</button>}
+        >
+          <p>Content</p>
+        </Modal>,
+      );
+
+      expect(
+        within(container).queryByTestId('modal-no-js-fallback'),
+      ).toBeNull();
+      expect(
+        within(container).getByRole('button', { name: 'Open' }),
+      ).toHaveTextContent('Open');
+    });
   });
 });

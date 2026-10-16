@@ -45,6 +45,14 @@ param importerConfigParam = {
   }
 }
 
+param notifierConfigParam = {
+  appServiceSku: {
+    tier: 'Basic'
+    name: 'B1'
+  }
+  suppressExceptionsForTeamOnlyApiKeyErrors: true
+}
+
 param publisherConfigParam = {
   appServiceSku: {
     tier: 'Basic'
@@ -52,6 +60,7 @@ param publisherConfigParam = {
   }
   prepareScheduledReleaseVersionsNowEnabled: true
   publishScheduledReleaseVersionsNowEnabled: true
+  frontDoorCachePurgeEnabled: true
 }
 
 param publicApiConfigParam = {
@@ -65,4 +74,3 @@ param publicSiteConfigParam = {
   }
   googleAnalyticsTrackingId: 'G-ZQ5V7CBWMJ'
 }
-

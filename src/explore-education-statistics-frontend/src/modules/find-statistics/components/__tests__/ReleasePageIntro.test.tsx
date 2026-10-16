@@ -1,4 +1,5 @@
 import render from '@common-test/render';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
 import {
   testPublicationSummary,
@@ -246,7 +247,7 @@ describe('ReleasePageIntro', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders default publishing organisation text', () => {
+  test('renders publishing organisation', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
@@ -256,26 +257,24 @@ describe('ReleasePageIntro', () => {
     const producedBy = screen.getByTestId('Produced by-value');
 
     expect(producedBy).toHaveTextContent('Department for Education');
-    expect(producedBy).toHaveAttribute(
+    expect(
+      within(producedBy).getByRole('link', {
+        name: 'Department for Education',
+      }),
+    ).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/organisations/department-for-education',
     );
   });
 
-  test('renders custom publishing organisation text correctly if set', () => {
+  test('renders multiple publishing organisations', () => {
     render(
       <ReleasePageIntro
         publicationSummary={testPublicationSummary}
         releaseVersionSummary={{
           ...testReleaseVersionSummary,
           publishingOrganisations: [
-            {
-              id: 'org-id-1',
-              title: 'Department for Education',
-              url: 'https://www.gov.uk/government/organisations/department-for-education',
-              useGISLogo: true,
-              logoFileName: 'logo.png',
-            },
+            testOrganisation,
             {
               id: 'org-id-2',
               title: 'Ofsted',

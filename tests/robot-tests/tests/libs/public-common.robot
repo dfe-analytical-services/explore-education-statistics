@@ -213,7 +213,8 @@ user checks 'On this page section' for this tab contains
     FOR    ${link_text}    IN    @{expected_link_texts}
         ${button_xpath}=    Set Variable
         ...    //h2[normalize-space(.)='On this page']/parent::div//a[text()="${link_text}"]
-        Page Should Contain Element
+        wait until page contains element
         ...    xpath=${button_xpath}
-        ...    Page is missing "${button_xpath}" button
+        ...    timeout=${timeout}
+        ...    error=Page is missing "${button_xpath}" button
     END

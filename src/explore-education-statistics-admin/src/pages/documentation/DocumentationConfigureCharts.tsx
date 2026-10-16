@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from '@admin/components/Link';
-import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
@@ -41,7 +40,7 @@ import imageInfographicSelect from './images/guidance/guidance-infographic-selec
 import imageInfographicLarge from './images/guidance/guidance-infographic-image-large.png';
 import imageInfographicResized from './images/guidance/guidance-infographic-image-resized.png';
 
-const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
+const DocumentationManageDataBlock = () => {
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

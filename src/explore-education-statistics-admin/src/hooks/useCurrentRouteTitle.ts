@@ -1,14 +1,15 @@
 import { matchPath, useLocation } from 'react-router';
 
 export default function useCurrentRouteTitle(
-  routes: { title: string; path: string }[],
+  routes: { title: string; path: string; fullPath: string }[],
 ): string | undefined {
   const { pathname } = useLocation();
 
-  const pathPattern = matchPath(
-    pathname,
-    routes.map(route => route.path),
-  )?.path;
+  const foundMatch = routes.find(
+    route =>
+      matchPath({ path: route.fullPath, end: false }, pathname)?.pattern
+        .path === route.fullPath,
+  );
 
-  return routes.find(route => route.path === pathPattern)?.title;
+  return foundMatch?.title;
 }

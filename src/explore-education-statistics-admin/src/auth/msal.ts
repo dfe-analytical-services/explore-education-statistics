@@ -29,8 +29,8 @@ export async function createMsalInstance(
     auth: {
       clientId: config.clientId,
       authority: config.authority,
-      redirectUri: dashboardRoute.path,
-      postLogoutRedirectUri: signedOutRoute.path,
+      redirectUri: dashboardRoute.fullPath,
+      postLogoutRedirectUri: signedOutRoute.fullPath,
       knownAuthorities: config.knownAuthorities,
       protocolMode: ProtocolMode.OIDC,
       authorityMetadata:
@@ -101,8 +101,8 @@ export function handleLogin(returnUrl?: string) {
   getMsalInstance()
     .loginRedirect({
       scopes: [adminApiScope],
-      redirectUri: dashboardRoute.path,
-      redirectStartPage: dashboardRoute.path,
+      redirectUri: dashboardRoute.fullPath,
+      redirectStartPage: dashboardRoute.fullPath,
       state: JSON.stringify(postLoginState),
     })
     .catch(error => {
@@ -110,7 +110,7 @@ export function handleLogin(returnUrl?: string) {
         `Error encountered when redirecting to Identity Provider login - ${error}`,
       );
       logger.info('Returning to login page.');
-      window.location.href = signInRoute.path;
+      window.location.href = signInRoute.fullPath;
     });
 }
 
@@ -118,7 +118,7 @@ export function handleLogout() {
   getMsalInstance()
     .logoutRedirect({
       account: getMsalInstance().getAllAccounts()[0],
-      postLogoutRedirectUri: signedOutRoute.path,
+      postLogoutRedirectUri: signedOutRoute.fullPath,
     })
     .catch(error => {
       logger.info(
@@ -126,7 +126,7 @@ export function handleLogout() {
         Provider login - ${error}`,
       );
       logger.info('Returning to login page.');
-      window.location.href = signInRoute.path;
+      window.location.href = signInRoute.fullPath;
     });
 }
 

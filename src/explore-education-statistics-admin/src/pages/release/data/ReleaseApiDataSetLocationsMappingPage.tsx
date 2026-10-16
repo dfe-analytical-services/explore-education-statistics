@@ -40,7 +40,7 @@ import { useQuery } from '@tanstack/react-query';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import { useImmer } from 'use-immer';
 
 export const sectionIds = {
@@ -83,7 +83,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
   );
 
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetRouteParams>();
+    useParams<ReleaseDataSetRouteParams>() as ReleaseDataSetRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -305,14 +305,11 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back
       </Link>
@@ -598,14 +595,11 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
             {dataSet && (
               <ButtonLink
                 className="govuk-!-margin-top-4"
-                to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataSetId: dataSet.id,
-                  },
-                )}
+                to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                  dataSetId: dataSet.id,
+                })}
               >
                 Continue
               </ButtonLink>

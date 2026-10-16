@@ -22,10 +22,10 @@ const ReleaseContactUsSection = ({
   includeSectionBreak?: boolean;
   publicationContact: Contact;
   publicationTitle: string;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   sectionTitle?: string;
 }) => {
-  const isSkillsEngland = !!publishingOrganisations?.find(
+  const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
   return (

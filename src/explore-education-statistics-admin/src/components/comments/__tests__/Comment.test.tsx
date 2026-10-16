@@ -43,6 +43,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser2,
+            status: 'authenticated',
           }}
         >
           <Comment type="inline" comment={testComments[2]} />,
@@ -60,6 +61,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <Comment type="inline" comment={testComments[2]} />,
@@ -92,6 +94,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <Comment type="inline" comment={testComments[0]} />
@@ -143,6 +146,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser2,
+            status: 'authenticated',
           }}
         >
           <Comment type="block" comment={testComments[2]} />,
@@ -160,6 +164,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <Comment type="block" comment={testComments[2]} />,
@@ -192,6 +197,7 @@ describe('Comment', () => {
         <AuthContext
           value={{
             user: testUser1,
+            status: 'authenticated',
           }}
         >
           <Comment type="block" comment={testComments[0]} />

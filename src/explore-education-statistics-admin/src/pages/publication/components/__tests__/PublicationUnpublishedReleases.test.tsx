@@ -9,7 +9,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React, { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<

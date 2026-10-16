@@ -443,24 +443,11 @@ User verifies 'Data set details' section
     ...    Lower quartile annualised earnings
     ...    Median annualised earnings
     ...    Number of learners with earnings
-    ...    parent=id:dataSetDetails
-
-    user clicks button    Show 1 more indicator    css:#dataSetDetails [data-testid="Indicators"]
-
-    user checks list contains exact items in order    id:indicators
-    ...    Lower quartile annualised earnings
-    ...    Median annualised earnings
-    ...    Number of learners with earnings
     ...    Upper quartile annualised earnings
     ...    parent=id:dataSetDetails
 
-    user checks list contains exact items in order    id:filters
-    ...    Cheese
-    ...    Colour
-    ...    Ethnicity group
-    ...    parent=id:dataSetDetails
-
-    user clicks button    Show 4 more filters    css:#dataSetDetails [data-testid="Filters"]
+    # All items are already shown, just leaving this to assert button renders correctly
+    user clicks button    Show 1 more indicator    css:#dataSetDetails [data-testid="Indicators"]
 
     user checks list contains exact items in order    id:filters
     ...    Cheese
@@ -471,6 +458,9 @@ User verifies 'Data set details' section
     ...    Number of years after achievement of learning aim
     ...    Provision
     ...    parent=id:dataSetDetails
+
+    # All items are already shown, just leaving this to assert button renders correctly
+    user clicks button    Show 4 more filters    css:#dataSetDetails [data-testid="Filters"]
 
     user checks summary list contains    Time period    2012/13    id:dataSetDetails
 

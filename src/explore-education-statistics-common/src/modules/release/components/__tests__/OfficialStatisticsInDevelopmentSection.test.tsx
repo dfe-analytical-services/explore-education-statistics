@@ -1,10 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import OfficialStatisticsInDevelopmentSection from '@common/modules/release/components/OfficialStatisticsInDevelopmentSection';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 
 describe('OfficialStatisticsInDevelopmentSection', () => {
   test('renders correctly with default settings', () => {
-    render(<OfficialStatisticsInDevelopmentSection />);
+    render(
+      <OfficialStatisticsInDevelopmentSection
+        publishingOrganisations={[testOrganisation]}
+      />,
+    );
 
     expect(
       screen.getByText(
@@ -68,7 +73,12 @@ describe('OfficialStatisticsInDevelopmentSection', () => {
   });
 
   test('shows the heading if showHeading is true', () => {
-    render(<OfficialStatisticsInDevelopmentSection showHeading />);
+    render(
+      <OfficialStatisticsInDevelopmentSection
+        publishingOrganisations={[testOrganisation]}
+        showHeading
+      />,
+    );
 
     expect(
       screen.getByRole('heading', {
@@ -78,7 +88,12 @@ describe('OfficialStatisticsInDevelopmentSection', () => {
   });
 
   test('hides the heading if showHeading is false', () => {
-    render(<OfficialStatisticsInDevelopmentSection showHeading={false} />);
+    render(
+      <OfficialStatisticsInDevelopmentSection
+        publishingOrganisations={[testOrganisation]}
+        showHeading={false}
+      />,
+    );
 
     expect(
       screen.queryByRole('heading', {

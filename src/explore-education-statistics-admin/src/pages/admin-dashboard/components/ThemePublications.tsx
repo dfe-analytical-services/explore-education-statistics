@@ -1,11 +1,8 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import styles from '@admin/pages/admin-dashboard/components/ThemePublications.module.scss';
-import { publicationCreateRoute, ThemeParams } from '@admin/routes/routes';
+import { publicationCreateRoute } from '@admin/routes/routes';
 import Link from '@admin/components/Link';
-import {
-  publicationReleasesRoute,
-  PublicationRouteParams,
-} from '@admin/routes/publicationRoutes';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import permissionService from '@admin/services/permissionService';
 import publicationService from '@admin/services/publicationService';
 import { Theme } from '@admin/services/themeService';
@@ -46,12 +43,9 @@ const ThemePublications = ({ theme }: Props) => {
               {orderBy(publications, 'title')?.map(publication => (
                 <li key={publication.id}>
                   <Link
-                    to={generatePath<PublicationRouteParams>(
-                      publicationReleasesRoute.path,
-                      {
-                        publicationId: publication.id,
-                      },
-                    )}
+                    to={generatePath(publicationReleasesRoute.fullPath, {
+                      publicationId: publication.id,
+                    })}
                   >
                     {publication.title}
                   </Link>
@@ -65,7 +59,7 @@ const ThemePublications = ({ theme }: Props) => {
       </div>
       {canCreatePublication && (
         <ButtonLink
-          to={generatePath<ThemeParams>(publicationCreateRoute.path, {
+          to={generatePath(publicationCreateRoute.fullPath, {
             themeId: theme.id,
           })}
         >

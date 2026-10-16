@@ -4,10 +4,7 @@ import { useAuthContext } from '@admin/contexts/AuthContext';
 import DeleteDraftVersionButton from '@admin/pages/release/data/components/DeleteDraftVersionButton';
 import getDataSetVersionStatusTagColour from '@admin/pages/release/data/components/utils/getDataSetVersionStatusColour';
 import getDataSetVersionStatusText from '@admin/pages/release/data/components/utils/getDataSetVersionStatusText';
-import {
-  releaseApiDataSetDetailsRoute,
-  ReleaseDataSetRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseApiDataSetDetailsRoute } from '@admin/routes/releaseRoutes';
 import {
   ApiDataSetDraftVersionSummary,
   ApiDataSetSummary,
@@ -19,7 +16,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import styles from './DraftApiDataSetsTable.module.scss';
 
 export const columnWidth = 90;
@@ -134,8 +131,8 @@ export default function DraftApiDataSetsTable({
                       horizontalSpacing="m"
                     >
                       <Link
-                        to={generatePath<ReleaseDataSetRouteParams>(
-                          releaseApiDataSetDetailsRoute.path,
+                        to={generatePath(
+                          releaseApiDataSetDetailsRoute.fullPath,
                           {
                             publicationId,
                             releaseVersionId,

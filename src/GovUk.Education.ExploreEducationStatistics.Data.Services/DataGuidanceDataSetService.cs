@@ -122,12 +122,12 @@ public class DataGuidanceDataSetService : IDataGuidanceDataSetService
             Order = releaseFile.Order,
             Name = releaseFile.Name ?? "",
             GeographicLevels = releaseFile
-                .File.DataSetFileVersionGeographicLevels.Where(level => level.CsvOnly != true) // TODO EES-7584 update once CsvOnly isn't nullable
+                .File.DataSetFileVersionGeographicLevels.Where(level => !level.CsvOnly)
                 .Select(level => level.GeographicLevel.GetEnumLabel())
                 .Order()
                 .ToList(),
             GeographicLevelsCsvOnly = releaseFile
-                .File.DataSetFileVersionGeographicLevels.Where(level => level.CsvOnly == true) // TODO EES-7584 update once CsvOnly isn't nullable
+                .File.DataSetFileVersionGeographicLevels.Where(level => level.CsvOnly)
                 .Select(level => level.GeographicLevel.GetEnumLabel())
                 .Order()
                 .ToList(),

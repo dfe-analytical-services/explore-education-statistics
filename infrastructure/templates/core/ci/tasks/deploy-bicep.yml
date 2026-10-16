@@ -47,6 +47,11 @@ steps:
           --parameters \
               subscription='$(subscription)' \
               publicSiteUrl='$(publicSiteUrl)' \
+              maintenanceIpRanges='$(maintenanceFirewallRules)' \
+              sqlAdministratorLogin='$(sqlAdministratorLogin)' \
+              sqlAzureAdministratorLogin='$(sqlAzureAdministratorLogin)' \
+              sqlAzureAdministratorSid='$(sqlAzureAdministratorSid)' \
+              teamEmailAddresses='$(teamEmailAddresses)' \
               deploySubnets=${{ parameters.deploySubnets }} \
               deployPrivateDnsZones=${{ parameters.deployPrivateDnsZones }} \
               deployAzureFrontDoor=${{ parameters.deployAzureFrontDoor }} \

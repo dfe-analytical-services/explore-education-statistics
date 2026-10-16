@@ -297,6 +297,15 @@ export default function createMockSseStream({
                     },
                     relevanceReason:
                       'This dataset also contains apprenticeship type and level of learning filters, enabling detailed breakdowns of advanced apprenticeships by level of learning for England.',
+                    isValidForTableGeneration: false,
+                    validationErrors: [
+                      {
+                        code: 'no_time_period',
+                        message:
+                          'No relevant time period range was found for this dataset matching the query.',
+                      },
+                    ],
+                    validationWarnings: [],
                   },
                   {
                     dataSetFileId: 'a207f2ef-0261-46af-a267-5c3c2249c03f',
@@ -349,6 +358,20 @@ export default function createMockSseStream({
                     },
                     relevanceReason:
                       'This dataset includes data on apprenticeship type and level of learning, which directly supports analysis of advanced apprenticeships by level of learning in England.',
+                    isValidForTableGeneration: true,
+                    validationErrors: [],
+                    validationWarnings: [
+                      {
+                        code: 'auto_selected_filter_items',
+                        message:
+                          "No relevant filter items were found matching the query for the filter 'Age Group', so its auto-select fallback filter item was selected instead.",
+                      },
+                      {
+                        code: 'unfiltered_filters',
+                        message:
+                          "No relevant filter items were found matching the query for the filter 'Sex', and no auto-select fallback was configured, so every filter item was selected instead.",
+                      },
+                    ],
                   },
                   {
                     dataSetFileId: 'a207f2ef-0261-46af-a267-5c3c2249c03f',
@@ -382,6 +405,20 @@ export default function createMockSseStream({
                     },
                     relevanceReason:
                       'This dataset includes data on apprenticeship type and level of learning, which directly supports analysis of advanced apprenticeships by level of learning in England.',
+                    isValidForTableGeneration: false,
+                    validationErrors: [
+                      {
+                        code: 'invalid_indicator',
+                        message:
+                          "No indicator 'Advanced apprenticeships' was found for this dataset in the subject meta.",
+                      },
+                      {
+                        code: 'no_time_period',
+                        message:
+                          'No relevant time period range was found for this dataset matching the query.',
+                      },
+                    ],
+                    validationWarnings: [],
                   },
                   {
                     dataSetFileId: 'b967e496-16cd-4699-b591-584c40299cf5',
@@ -429,6 +466,9 @@ export default function createMockSseStream({
                     },
                     relevanceReason:
                       'This dataset also contains apprenticeship type and level of learning filters, enabling detailed breakdowns of advanced apprenticeships by level of learning for England.',
+                    isValidForTableGeneration: true,
+                    validationErrors: [],
+                    validationWarnings: [],
                   },
                 ],
                 tokenUsage: { input: 6077, output: 6007 },

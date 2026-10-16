@@ -1,4 +1,18 @@
-import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
+import { GlobalPermissions } from '@admin/services/authService';
+import React from 'react';
+
+/**
+ * Removed the explicit React Router type and only defining the required properties
+ */
+export type PublicRouteProps = {
+  path: string;
+  fullPath: string;
+  element?: React.ReactNode;
+};
+
+export type ProtectedRouteProps = PublicRouteProps & {
+  protectionAction?: (permissions: GlobalPermissions) => boolean;
+};
 
 /**
  * A route within a feature area's page container.
@@ -8,7 +22,6 @@ import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
  * {@see ProtectedRouteProps} and is only used by feature areas that render
  * their routes with `<RouteSwitch protect />`.
  */
-export interface NavRouteProps extends ProtectedRouteProps {
-  path: string;
+export type NavRouteProps = ProtectedRouteProps & {
   title: string;
-}
+};

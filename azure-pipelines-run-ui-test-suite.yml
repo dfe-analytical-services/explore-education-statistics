@@ -14,7 +14,7 @@ jobs:
     timeoutInMinutes: 160
     cancelTimeoutInMinutes: 10
     condition: succeededOrFailed()
-    pool: ees-ubuntu2204-large
+    pool: ees-ubuntu2604-large-v2
     workspace:
       clean: all
     steps:

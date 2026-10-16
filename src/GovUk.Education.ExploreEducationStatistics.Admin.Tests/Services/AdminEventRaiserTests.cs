@@ -163,13 +163,20 @@ public class AdminEventRaiserTests
             }
             : null;
 
+        List<Guid> releaseIds = [Guid.NewGuid(), Guid.NewGuid()];
+
         var sut = GetSut();
 
         // ACT
-        await sut.OnPublicationDeleted(publicationId, publicationSlug, latestPublishedRelease);
+        await sut.OnPublicationDeleted(publicationId, publicationSlug, latestPublishedRelease, releaseIds);
 
         // ASSERT
-        var expectedEvent = new PublicationDeletedEvent(publicationId, publicationSlug, latestPublishedRelease);
+        var expectedEvent = new PublicationDeletedEvent(
+            publicationId,
+            publicationSlug,
+            latestPublishedRelease,
+            releaseIds
+        );
         _eventRaiserMockBuilder.Assert.EventRaised(expectedEvent);
     }
 

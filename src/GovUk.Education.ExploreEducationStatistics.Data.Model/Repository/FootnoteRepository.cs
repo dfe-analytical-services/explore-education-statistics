@@ -259,6 +259,31 @@ public class FootnoteRepository : IFootnoteRepository
             });
     }
 
+    /// <summary>
+    /// Deletes every Footnote linked to a ReleaseVersion, regardless of whether it is reachable through
+    /// any Subject, Filter or Indicator link.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="DeleteFootnotesBySubject"/> only finds Footnotes that are linked to the Subject being
+    /// deleted, so it cannot see a Footnote whose only remaining link is its ReleaseFootnote, and it is not
+    /// called at all for a ReleaseVersion that has no ReleaseSubjects. Deleting the statistics ReleaseVersion
+    /// cascades those ReleaseFootnotes away, which would leave the Footnote rows behind with nothing
+    /// referencing them, so this sweeps up whatever is left before that happens.
+    /// </remarks>
+    public async Task DeleteFootnotesByReleaseVersion(Guid releaseVersionId)
+    {
+        var footnoteIds = await _context
+            .ReleaseFootnote.Where(releaseFootnote => releaseFootnote.ReleaseVersionId == releaseVersionId)
+            .Select(releaseFootnote => releaseFootnote.FootnoteId)
+            .ToListAsync();
+
+        foreach (var footnoteId in footnoteIds)
+        {
+            // Footnotes shared with another ReleaseVersion only lose their link to this one.
+            await DeleteFootnote(releaseVersionId: releaseVersionId, footnoteId: footnoteId);
+        }
+    }
+
     public async Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId)
     {
         if (await IsFootnoteExclusiveToRelease(releaseVersionId: releaseVersionId, footnoteId: footnoteId))

@@ -2,6 +2,7 @@ import React from 'react';
 import { Matcher, render, screen } from '@testing-library/react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 
 describe('ContactUsSection', () => {
   test('renders', () => {
@@ -9,6 +10,7 @@ describe('ContactUsSection', () => {
       <ContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[]}
       />,
     );
 
@@ -34,6 +36,7 @@ describe('ContactUsSection', () => {
         <ContactUsSection
           publicationContact={testContact}
           publicationTitle={publicationTitle}
+          publishingOrganisations={[testOrganisation]}
         />,
       );
 
@@ -48,6 +51,7 @@ describe('ContactUsSection', () => {
       <ContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
@@ -65,6 +69,7 @@ describe('ContactUsSection', () => {
       <ContactUsSection
         publicationContact={testContact}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 
@@ -78,6 +83,7 @@ describe('ContactUsSection', () => {
       <ContactUsSection
         publicationContact={{ ...testContact, contactTelNo: undefined }}
         publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
       />,
     );
 

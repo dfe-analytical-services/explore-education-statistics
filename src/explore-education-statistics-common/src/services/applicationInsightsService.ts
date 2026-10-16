@@ -11,6 +11,13 @@ let isInitialised = false;
 const appInsights = new ApplicationInsights({
   config: {
     autoTrackPageVisitTime: true,
+    // Google Analytics sends its hits with `fetch` in `no-cors` mode, so the
+    // browser gives back an opaque response with a status of 0.
+    excludeRequestFromAutoTrackingPatterns: [
+      /google-analytics\.com/,
+      /analytics\.google\.com/,
+      /googletagmanager\.com/,
+    ],
   },
 });
 

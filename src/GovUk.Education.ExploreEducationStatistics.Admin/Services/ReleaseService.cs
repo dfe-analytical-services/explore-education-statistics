@@ -55,9 +55,8 @@ public partial class ReleaseService(
 
     public async Task<Either<ActionResult, ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
-        return await ReleaseCreateRequestValidator
-            .Validate(request)
-            .OnSuccess(async () => await context.Publications.SingleOrNotFoundAsync(p => p.Id == request.PublicationId))
+        return await context
+            .Publications.SingleOrNotFoundAsync(p => p.Id == request.PublicationId)
             .OnSuccess(userService.CheckCanCreateReleaseForPublication)
             .OnSuccessDo(async _ =>
                 await releaseSlugValidator.ValidateNewSlug(

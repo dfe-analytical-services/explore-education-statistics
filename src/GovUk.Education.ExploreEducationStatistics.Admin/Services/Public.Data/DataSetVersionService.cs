@@ -127,8 +127,8 @@ public class DataSetVersionService(
     )
     {
         return await GetReleaseVersion(releaseFileId, cancellationToken)
-            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
-            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessDo(_ => ValidateReleaseFileIsApiCompatible(releaseFileId, cancellationToken))
             .OnSuccess(async () =>
                 await processorClient.CreateNextDataSetVersionMappings(
                     dataSetId: dataSetId,
@@ -186,8 +186,7 @@ public class DataSetVersionService(
     {
         return await GetVersion(dataSetVersionId, cancellationToken)
             .OnSuccess(dataSetVersion => GetReleaseVersion(dataSetVersion.Release.ReleaseFileId, cancellationToken))
-            .OnSuccess(releaseVersion => ValidateReleaseVersionIsNotApproved(releaseVersion, cancellationToken))
-            .OnSuccess(_ => userService.CheckCanManagePublicApiDataSets())
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async () =>
                 await processorClient.DeleteDataSetVersion(
                     dataSetVersionId: dataSetVersionId,
@@ -423,6 +422,7 @@ public class DataSetVersionService(
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
             File = MapVersionFile(releaseFile),
+            PublicApiCompatible = releaseFile.PublicApiCompatible,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
             TotalResults = dataSetVersion.TotalResults,
             Notes = dataSetVersion.Notes,
@@ -460,13 +460,39 @@ public class DataSetVersionService(
         return new IdTitleViewModel { Id = releaseVersion.Id, Title = releaseVersion.Release.Title };
     }
 
+    private async Task<Either<ActionResult, Unit>> ValidateReleaseFileIsApiCompatible(
+        Guid releaseFileId,
+        CancellationToken cancellationToken
+    )
+    {
+        // BAU users can override the screener's API compatibility result.
+        if ((await userService.CheckIsBauUser()).IsRight)
+        {
+            return Unit.Instance;
+        }
+
+        var publicApiCompatible = await contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Where(rf => rf.Id == releaseFileId)
+            .Select(rf => rf.PublicApiCompatible)
+            .SingleAsync(cancellationToken);
+
+        return publicApiCompatible == false
+            ? ValidationUtils.ValidationResult(
+                ValidationMessages.GenerateErrorReleaseFileNotApiCompatible(releaseFileId)
+            )
+            : Unit.Instance;
+    }
+
     private async Task<Either<ActionResult, ReleaseVersion>> GetReleaseVersion(
         Guid releaseFileId,
         CancellationToken cancellationToken
     ) =>
         await contentDbContext
             .ReleaseFiles.AsNoTracking()
-            .Where(r => r.Id == releaseFileId)
+            .Where(rf => rf.Id == releaseFileId)
+            .Include(rf => rf.ReleaseVersion)
+                .ThenInclude(rv => rv.Release)
             .Select(rf => rf.ReleaseVersion)
             .SingleOrNotFoundAsync(cancellationToken);
 

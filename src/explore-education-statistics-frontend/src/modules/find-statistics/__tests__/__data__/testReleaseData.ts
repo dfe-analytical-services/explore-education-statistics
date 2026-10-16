@@ -1,3 +1,4 @@
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import {
   PublicationSummary,
   ReleaseVersionDataContent,
@@ -46,6 +47,7 @@ export const testReleaseVersionSummary: ReleaseVersionSummary = {
     slug: 'publication-slug',
   },
   published: '2025-08-10T09:30:00+01:00',
+  publishingOrganisations: [testOrganisation],
   lastUpdated: '2025-08-11T14:30:00+01:00',
   isLatestRelease: true,
   preReleaseAccessList: '<p>Pre-release access list content</p>',

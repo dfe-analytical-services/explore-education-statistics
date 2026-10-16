@@ -21,4 +21,27 @@ public class ReleaseVersionExtensionTests
             releaseVersion.AllFilesZipPath()
         );
     }
+
+    [Fact]
+    public void AllFilesZipPath_Version1UsesExistingPath()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+        Assert.Equal(releaseVersion.AllFilesZipPath(), releaseVersion.AllFilesZipPath(formatVersion: 1));
+    }
+
+    [Fact]
+    public void AllFilesZipPath_LaterVersionUsesNewPath()
+    {
+        ReleaseVersion releaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease().WithPublication(_dataFixture.DefaultPublication()));
+
+        Assert.Equal(
+            $"{releaseVersion.Id}/zip/v2/{releaseVersion.Release.Publication.Slug}_{releaseVersion.Release.Slug}.zip",
+            releaseVersion.AllFilesZipPath(formatVersion: 2)
+        );
+    }
 }

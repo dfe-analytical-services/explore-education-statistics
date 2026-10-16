@@ -152,6 +152,7 @@ describe('TableToolPage', () => {
       content: '<p>ryt</p>',
       timePeriods: { from: '2020 Week 13', to: '2021 Week 24' },
       geographicLevels: ['National'],
+      geographicLevelsCsvOnly: [],
       file: {
         id: 'file-1',
         name: 'Test subject',
@@ -327,6 +328,7 @@ describe('TableToolPage', () => {
     selectedRelease: {
       id: 'latest-release-id',
       latestData: true,
+      publishingOrganisations: [],
       slug: 'latest-release-slug',
       title: 'Latest Release Title',
       type: 'OfficialStatistics',
@@ -351,6 +353,7 @@ describe('TableToolPage', () => {
     selectedRelease: {
       id: 'selected-release-id',
       latestData: false,
+      publishingOrganisations: [],
       slug: 'selected-release-slug',
       title: 'Selected Release Title',
       type: 'OfficialStatistics',

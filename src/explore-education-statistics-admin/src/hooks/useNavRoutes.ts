@@ -38,11 +38,12 @@ export default function useNavRoutes<Params extends Record<string, string>>(
   params: Params,
 ): UseNavRoutes {
   const { pathname } = useLocation();
+
   const currentRouteTitle = useCurrentRouteTitle(navRoutes);
 
   const navBarRoutes = navRoutes.map(route => ({
     title: route.title,
-    to: generatePath<Params>(route.path, params),
+    to: generatePath(route.fullPath, params),
   }));
 
   const currentRouteIndex = navBarRoutes.findIndex(

@@ -4,14 +4,14 @@ import usePublicationContext from '@admin/pages/publication/contexts/Publication
 import { publicationReleaseSeriesRoute } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 
 export default function PublicationCreateReleaseSeriesLegacyLinkPage() {
   const { publicationId } = usePublicationContext();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const publicationReleaseSeriesPath = generatePath(
-    publicationReleaseSeriesRoute.path,
+    publicationReleaseSeriesRoute.fullPath,
     {
       publicationId,
     },
@@ -32,7 +32,7 @@ export default function PublicationCreateReleaseSeriesLegacyLinkPage() {
             url: values.url,
           });
 
-          history.push(publicationReleaseSeriesPath);
+          navigate(publicationReleaseSeriesPath);
         }}
       />
     </>

@@ -64,7 +64,7 @@ export default function App({ Component, pageProps, cookies }: Props) {
       );
     }
 
-    document.body.classList.add('js-enabled', 'govuk-frontend-supported');
+    document.body.classList.add('govuk-frontend-supported');
   });
 
   return (

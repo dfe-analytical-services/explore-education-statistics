@@ -115,7 +115,7 @@ public class ReleaseService : IReleaseService
             .Files.AsNoTracking()
             .Where(file => file.SubjectId == subjectId && file.Type == FileType.Data)
             .SelectMany(file => file.DataSetFileVersionGeographicLevels)
-            .Where(gl => (gl.CsvOnly == true) == csvOnly) // TODO EES-7584 update once CsvOnly isn't nullable
+            .Where(gl => gl.CsvOnly == csvOnly)
             .Select(gl => gl.GeographicLevel)
             .ToListAsync();
 

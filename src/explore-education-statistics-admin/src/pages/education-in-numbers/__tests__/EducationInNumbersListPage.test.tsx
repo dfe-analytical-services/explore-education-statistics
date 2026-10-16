@@ -1,14 +1,14 @@
 import _educationInNumbersService, {
   EinSummaryWithPrevVersion,
 } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import EducationInNumbersListPage from '@admin/pages/education-in-numbers/EducationInNumbersListPage';
 import { useQuery } from '@tanstack/react-query';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 // Mock the service and the react-query hook
 jest.mock('@admin/services/educationInNumbersService');
@@ -146,13 +146,15 @@ describe('EducationInNumbersListPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  function renderPage(history: MemoryHistory = createMemoryHistory()) {
+  function renderPage() {
     return render(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersListPage />
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer
+        initialUrl={educationInNumbersListRoute.fullPath}
+        route={educationInNumbersListRoute.fullPath}
+        routes={[educationInNumbersSummaryRoute.fullPath]}
+      >
+        <EducationInNumbersListPage />
+      </TestRouterRenderer>,
     );
   }
 });

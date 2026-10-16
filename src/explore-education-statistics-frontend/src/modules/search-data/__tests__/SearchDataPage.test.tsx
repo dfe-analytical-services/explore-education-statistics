@@ -7,10 +7,12 @@ import _publicationService, {
 } from '@common/services/publicationService';
 import _azureDataSetService from '@frontend/services/azureDataSetService';
 import _azurePublicationService from '@frontend/services/azurePublicationService';
+import _organisationService from '@frontend/services/organisationService';
 import { testPublicationTree } from '@frontend/modules/search-data/__tests__/__data__/testPublicationTree';
 import { PaginatedList } from '@common/services/types/pagination';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { testDataSetFileSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import { testOrganisations } from '@frontend/modules/search-data/__tests__/__data__/testOrganisations';
 
 jest.mock('@azure/search-documents', () => ({
   SearchClient: jest.fn(),
@@ -21,10 +23,12 @@ jest.mock('@azure/search-documents', () => ({
 jest.mock('@common/services/publicationService');
 jest.mock('@frontend/services/azureDataSetService');
 jest.mock('@frontend/services/azurePublicationService');
+jest.mock('@frontend/services/organisationService');
 
 const publicationService = jest.mocked(_publicationService);
 const azureDataSetService = jest.mocked(_azureDataSetService);
 const azurePublicationService = jest.mocked(_azurePublicationService);
+const organisationService = jest.mocked(_organisationService);
 
 const mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -78,6 +82,7 @@ describe('SearchDataPage', () => {
     publicationService.getPublicationTree.mockResolvedValue(
       testPublicationTree,
     );
+    organisationService.list.mockResolvedValue(testOrganisations);
   });
 
   afterEach(() => {
@@ -157,6 +162,10 @@ describe('SearchDataPage', () => {
 
       expect(
         await screen.findByRole('heading', { name: 'Filter and sort' }),
+      ).toBeInTheDocument();
+
+      expect(
+        await screen.findByRole('group', { name: 'Filter by Organisation' }),
       ).toBeInTheDocument();
 
       expect(
@@ -268,6 +277,26 @@ describe('SearchDataPage', () => {
       ).toBeInTheDocument();
       const resetButtons = screen.getAllByTestId('filter-reset');
       expect(resetButtons).toHaveLength(3);
+    });
+
+    test('renders correct text and reset button when organisations are selected', async () => {
+      mockRouter.query = {
+        organisationId: ['organisation-id-1', 'organisation-id-2'],
+      };
+
+      render(<SearchDataPage />);
+
+      expect(await screen.findByText(/filtered by:/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Department for Education, Ofsted/),
+      ).toBeInTheDocument();
+
+      const resetButtons = screen.getAllByTestId('filter-reset');
+      expect(resetButtons).toHaveLength(2);
+      expect(resetButtons[0]).toHaveTextContent(
+        'Organisation:Department for Education',
+      );
+      expect(resetButtons[1]).toHaveTextContent('Organisation:Ofsted');
     });
 
     test('does not render filter text for data filters on release search page', async () => {

@@ -8,9 +8,6 @@ param resourceNames ResourceNames
 @description('Resource prefix for all resources.')
 param resourcePrefix string
 
-@description('Specifies the location for all resources.')
-param location string
-
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
 
@@ -42,10 +39,9 @@ var storageAccountConfig = {
 
 var fileShareName = '${resourcePrefix}-${abbreviations.fileShare}-anlyt'
 
-module analyticsStorageAccountModule '../../common/components/storage/storageAccount.bicep' = {
+module analyticsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'analyticsStorageAccountDeploy'
   params: {
-    location: location
     storageAccountName: storageAccountName
     publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules

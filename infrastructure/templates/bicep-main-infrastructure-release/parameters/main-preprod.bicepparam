@@ -18,9 +18,14 @@ param importerConfigParam = {
   }
 }
 
+param notifierConfigParam = {
+  suppressExceptionsForTeamOnlyApiKeyErrors: true
+}
+
 param publisherConfigParam = {
   prepareScheduledReleaseVersionsNowEnabled: true
   publishScheduledReleaseVersionsNowEnabled: true
+  frontDoorCachePurgeEnabled: true
 }
 
 param publicApiConfigParam = {

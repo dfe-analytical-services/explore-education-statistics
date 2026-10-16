@@ -134,7 +134,7 @@ describe('ChartAxisConfiguration', () => {
       await screen.findByRole('group', { name: 'General' }),
     );
     expect(
-      generalSection.getByLabelText('Size of axis (pixels)'),
+      generalSection.getByLabelText('Axis margin (pixels)'),
     ).toHaveNumericValue(50);
     expect(generalSection.getByLabelText('Show grid lines')).toBeChecked();
     expect(generalSection.getByLabelText('Show axis')).toBeChecked();
@@ -229,7 +229,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const sizeInput = screen.getByLabelText('Size of axis (pixels)');
+    const sizeInput = screen.getByLabelText('Axis margin (pixels)');
 
     expect(handleChange).not.toHaveBeenCalled();
 
@@ -335,8 +335,8 @@ describe('ChartAxisConfiguration', () => {
         />
       </ChartBuilderFormsContextProvider>,
     );
-    await user.clear(screen.getByLabelText('Size of axis (pixels)'));
-    await user.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
+    await user.clear(screen.getByLabelText('Axis margin (pixels)'));
+    await user.type(screen.getByLabelText('Axis margin (pixels)'), '-1');
     await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
@@ -397,8 +397,8 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await user.clear(screen.getByLabelText('Size of axis (pixels)'));
-    await user.type(screen.getByLabelText('Size of axis (pixels)'), '100');
+    await user.clear(screen.getByLabelText('Axis margin (pixels)'));
+    await user.type(screen.getByLabelText('Axis margin (pixels)'), '100');
 
     await user.click(screen.getByRole('checkbox', { name: 'Sort ascending' }));
 

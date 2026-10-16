@@ -12,6 +12,8 @@ export interface AzurePublicationSearchResult {
   releaseVersionId: string;
   publicationId: string;
   publicationSlug: string;
+  publishingOrganisationIds: string[];
+  publishingOrganisationTitles: string[];
   published: Date;
   releaseId: string;
   summary: string;

@@ -7,17 +7,20 @@ import methodologyQueries from '@admin/queries/methodologyQueries';
 import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
+import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
 import React, { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   publication: Publication | ContentPublication;
+  publishingOrganisations: Organisation[];
   releaseType: ReleaseType;
 }
 
 export default function ReleaseTableToolInfoWrapper({
   publication,
+  publishingOrganisations,
   releaseType,
 }: Props) {
   const { data: methodologies, isLoading: isLoadingMethodologies } = useQuery({
@@ -63,6 +66,7 @@ export default function ReleaseTableToolInfoWrapper({
       <TableToolInfo
         contactDetails={contact}
         methodologyLinks={getMethodologyLinks()}
+        publishingOrganisations={publishingOrganisations}
         releaseLink={<span>{publication.title}</span>}
         releaseType={releaseType}
       />

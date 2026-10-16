@@ -1,3 +1,4 @@
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import {
   CategoryFilter,
   Indicator,
@@ -216,6 +217,7 @@ export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
   selectedRelease: {
     id: 'latest-release-id',
     latestData: true,
+    publishingOrganisations: [testOrganisation],
     slug: 'latest-release-slug',
     title: 'Latest Release Title',
     type: 'OfficialStatistics',
@@ -241,6 +243,7 @@ export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
     selectedRelease: {
       id: 'selected-release-id',
       latestData: false,
+      publishingOrganisations: [testOrganisation],
       slug: 'selected-release-slug',
       title: 'Selected Release Title',
       type: 'OfficialStatistics',
@@ -286,6 +289,9 @@ export const testFinalResult: FinalDataset = {
     end: { code: 'AY', year: 2016 },
   },
   indicators: [],
+  isValidForTableGeneration: true,
+  validationErrors: [],
+  validationWarnings: [],
 };
 
 export const testTableDataResponse: TableDataResponse = {

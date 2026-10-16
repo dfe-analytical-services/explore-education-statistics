@@ -18,7 +18,7 @@ const releaseTypeComponents = {
 };
 
 export interface ReleaseTypeSectionProps {
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   showHeading?: boolean;
 }
 

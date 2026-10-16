@@ -1,8 +1,8 @@
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
+import createDeferredHandler from '@common-test/createDeferredHandler';
 import FormProvider from '@common/components/form/FormProvider';
 import Form from '@common/components/form/Form';
 import SubmitError from '@common/components/form/util/SubmitError';
-import delay from '@common/utils/delay';
 import Yup from '@common/validation/yup';
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
@@ -200,7 +200,8 @@ describe('Form', () => {
   });
 
   test('prevents multiple `onSubmit` calls until submission completes', async () => {
-    const handleSubmit = jest.fn(() => delay(200));
+    const { handler: handleSubmit, resolveHandler: resolveSubmit } =
+      createDeferredHandler();
 
     const { user } = render(
       <FormProvider
@@ -226,6 +227,8 @@ describe('Form', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(handleSubmit).toHaveBeenCalledTimes(1);
+
+    await resolveSubmit();
 
     expect(await screen.findByText('Submitted')).toBeInTheDocument();
 

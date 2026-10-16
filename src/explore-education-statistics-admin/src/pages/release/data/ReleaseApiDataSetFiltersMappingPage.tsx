@@ -38,7 +38,7 @@ import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { useQuery } from '@tanstack/react-query';
 import camelCase from 'lodash/camelCase';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 import sumBy from 'lodash/sumBy';
@@ -77,7 +77,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
   >([]);
 
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetRouteParams>();
+    useParams<ReleaseDataSetRouteParams>() as ReleaseDataSetRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -316,14 +316,11 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back
       </Link>
@@ -572,14 +569,11 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             {dataSet && (
               <ButtonLink
                 className="govuk-!-margin-top-4"
-                to={generatePath<ReleaseDataSetRouteParams>(
-                  releaseApiDataSetDetailsRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    dataSetId: dataSet.id,
-                  },
-                )}
+                to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                  dataSetId: dataSet.id,
+                })}
               >
                 Continue
               </ButtonLink>

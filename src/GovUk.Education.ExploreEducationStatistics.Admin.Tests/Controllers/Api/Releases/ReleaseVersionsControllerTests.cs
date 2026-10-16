@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -63,7 +62,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
@@ -79,7 +78,7 @@ public class ReleaseVersionsControllerUnitTests
                 DataFile = dataFile,
                 MetaFile = metaFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -105,7 +104,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
@@ -121,7 +120,7 @@ public class ReleaseVersionsControllerUnitTests
                 DataFile = dataFile,
                 MetaFile = metaFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -141,7 +140,12 @@ public class ReleaseVersionsControllerUnitTests
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
             .Setup(service =>
-                service.UploadFromZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), "Data set title", default)
+                service.UploadFromZip(
+                    _releaseVersionId,
+                    It.IsAny<IManagedStreamZipFile>(),
+                    "Data set title",
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
@@ -155,7 +159,7 @@ public class ReleaseVersionsControllerUnitTests
                 Title = "Data set title",
                 ZipFile = dataSetZipFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -176,7 +180,13 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.UploadFromBulkZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), default))
+            .Setup(service =>
+                service.UploadFromBulkZip(
+                    _releaseVersionId,
+                    It.IsAny<IManagedStreamZipFile>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
@@ -184,7 +194,7 @@ public class ReleaseVersionsControllerUnitTests
 
         var response = await controller.UploadDataSetAsBulkZip(
             new() { ReleaseVersionId = _releaseVersionId, ZipFile = dataSetBulkZipFile },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -196,28 +206,51 @@ public class ReleaseVersionsControllerUnitTests
     }
 
     [Fact]
+    public async Task GetDataSetUploads_Success_ReturnsOk()
+    {
+        // Arrange
+        List<DataSetUploadViewModel> dataSetUploads = [DataSetUploadMockBuilder.BuildViewModel()];
+
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+        releaseDataFileService
+            .Setup(mock => mock.ListDataSetUploads(_releaseVersionId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSetUploads);
+
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+        // Act
+        var response = await controller.GetDataSetUploads(_releaseVersionId, cancellationToken: CancellationToken.None);
+
+        // Assert
+        VerifyAllMocks(releaseDataFileService);
+
+        Assert.Same(dataSetUploads, response.AssertOkResult());
+    }
+
+    [Fact]
     public async Task DeleteDataSetUpload_Success_ReturnsNoContent()
     {
         // Arrange
         var dataSetUploadId = Guid.NewGuid();
 
-        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
-        dataSetUploadRepository
-            .Setup(mock => mock.Delete(_releaseVersionId, dataSetUploadId, default))
+        releaseDataFileService
+            .Setup(mock => mock.DeleteDataSetUpload(_releaseVersionId, dataSetUploadId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
 
-        var controller = BuildController(dataSetUploadRepository: dataSetUploadRepository.Object);
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
         // Act
         var response = await controller.DeleteDataSetUpload(
             _releaseVersionId,
             dataSetUploadId,
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
-        VerifyAllMocks(dataSetUploadRepository);
+        VerifyAllMocks(releaseDataFileService);
         response.AssertNoContent();
     }
 
@@ -235,7 +268,7 @@ public class ReleaseVersionsControllerUnitTests
                 service.SaveDataSetsFromTemporaryBlobStorage(
                     _releaseVersionId,
                     new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(Unit.Instance);
@@ -246,7 +279,7 @@ public class ReleaseVersionsControllerUnitTests
         var response = await controller.ImportDataSetsFromTempStorage(
             _releaseVersionId,
             [expectedVm1.Id, expectedVm2.Id, expectedVm3.Id],
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -496,7 +529,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>());
+        var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -511,13 +544,13 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -532,13 +565,13 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -553,7 +586,7 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 ValidationUtils.ValidationResult(new ErrorViewModel { Code = "error code", Path = "error path" })
             );
@@ -561,7 +594,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -718,7 +751,6 @@ public class ReleaseVersionsControllerUnitTests
         IReleasePublishingStatusService? releaseStatusService = null,
         IReleaseChecklistService? releaseChecklistService = null,
         IDataImportService? importService = null,
-        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataSetFileStorage? dataSetFileStorage = null,
         IDataSetScreenerService? dataSetScreenerService = null
     )
@@ -731,7 +763,6 @@ public class ReleaseVersionsControllerUnitTests
             releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
             importService ?? Mock.Of<IDataImportService>(Strict),
-            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict)
         );
@@ -900,7 +931,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -932,7 +963,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -964,7 +995,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(UpdateRequestForPublishedReleaseVersionInvalid.ToString(), error.Code);
+            Assert.Equal(nameof(UpdateRequestForPublishedReleaseVersionInvalid), error.Code);
         }
 
         [Fact]
@@ -1049,9 +1080,73 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEqualError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.Type).ToLowerFirst(),
+                comparisonValue: ReleaseType.ExperimentalStatistics
+            );
+        }
 
-            Assert.Equal(ValidationErrorMessages.ReleaseTypeInvalid.ToString(), error.Code);
+        [Fact]
+        public async Task NoPublishingOrganisations()
+        {
+            // Arrange
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Publications.Add(publication));
+
+            // Act
+            var response = await UpdateRelease(
+                releaseVersionId: publication.Releases[0].Versions[0].Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: []
+            );
+
+            // Assert
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasNotEmptyError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst()
+            );
+        }
+
+        [Fact]
+        public async Task TooManyPublishingOrganisations()
+        {
+            // Arrange
+            Publication publication = DataFixture
+                .DefaultPublication()
+                .WithReleases([DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+            var organisations = DataFixture.DefaultOrganisation().GenerateArray(4);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.Publications.Add(publication);
+                    context.Organisations.AddRange(organisations);
+                });
+
+            // Act
+            var response = await UpdateRelease(
+                releaseVersionId: publication.Releases[0].Versions[0].Id,
+                year: 2020,
+                timePeriodCoverage: TimeIdentifier.AcademicYear,
+                publishingOrganisations: [.. organisations.Select(o => o.Id)]
+            );
+
+            // Assert
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasLessThanOrEqualError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.PublishingOrganisations).ToLowerFirst(),
+                comparisonValue: 3
+            );
         }
 
         [Theory]
@@ -1095,7 +1190,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(SlugNotUnique.ToString(), error.Code);
+            Assert.Equal(nameof(SlugNotUnique), error.Code);
         }
 
         [Fact]
@@ -1135,7 +1230,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
 
             var error = Assert.Single(validationProblem.Errors);
 
-            Assert.Equal(ReleaseSlugUsedByRedirect.ToString(), error.Code);
+            Assert.Equal(nameof(ReleaseSlugUsedByRedirect), error.Code);
         }
 
         [Fact]
@@ -1195,13 +1290,20 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             // Assert
             var validationProblem = response.AssertValidationProblem();
 
-            var error = Assert.Single(validationProblem.Errors);
-
-            Assert.Equal(
-                $"The field {nameof(ReleaseCreateRequest.Label)} must be a string or array type with a maximum length of '50'.",
-                error.Message
+            Assert.Single(validationProblem.Errors);
+            validationProblem.AssertHasMaximumLengthError(
+                expectedPath: nameof(ReleaseVersionUpdateRequest.Label).ToLowerFirst(),
+                maxLength: 50
             );
-            Assert.Equal(nameof(ReleaseCreateRequest.Label), error.Path);
+        }
+
+        private async Task<Guid[]> CreateDefaultPublishingOrganisations()
+        {
+            Organisation organisation = DataFixture.DefaultOrganisation();
+
+            await fixture.GetContentDbContext().AddTestData(context => context.Organisations.Add(organisation));
+
+            return [organisation.Id];
         }
 
         private async Task<HttpResponseMessage> UpdateRelease(
@@ -1211,6 +1313,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
             string? label = null,
             ReleaseType? type = ReleaseType.OfficialStatistics,
             string? preReleaseAccessList = "",
+            Guid[]? publishingOrganisations = null,
             ClaimsPrincipal? user = null
         )
         {
@@ -1223,6 +1326,7 @@ public abstract class ReleaseVersionsControllerIntegrationTests(
                 TimePeriodCoverage = new { Value = timePeriodCoverage.GetEnumValue() },
                 Label = label,
                 PreReleaseAccessList = preReleaseAccessList,
+                PublishingOrganisations = publishingOrganisations ?? await CreateDefaultPublishingOrganisations(),
             };
 
             return await client.PatchAsJsonAsync($"api/releaseVersions/{releaseVersionId}", request);

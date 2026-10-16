@@ -660,8 +660,10 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
     public class CreateNextVersionTests(DataSetVersionsControllerTestsFixture fixture)
         : DataSetVersionsControllerTests(fixture)
     {
-        [Fact]
-        public async Task Success()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)] // BAU users can override the API compatibility result
+        public async Task BauUser_Success(bool publicApiCompatible)
         {
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -670,7 +672,8 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                         .DefaultReleaseVersion()
                         .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
                 )
-                .WithFile(DataFixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithApiCompatibility(publicApiCompatible);
 
             await fixture
                 .GetContentDbContext()
@@ -750,7 +753,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
         {
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -777,30 +780,30 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             response.AssertForbidden();
         }
 
-        // This behaviour is intentional for now - a publication role does not yet satisfy
-        // CanManagePublicApiDataSets, which is currently BAU-only. Revisit this test once
-        // ManagePublicApiDataSetsAuthorizationHandler gains publication-role support (see the
-        // TODO comment in that handler).
-        [Fact]
-        public async Task UserOnPublicationTeam_Returns403()
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_Success(PublicationRole publicationRole)
         {
             ClaimsPrincipal identityUser = DataFixture.StandardUser();
             User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
 
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(
                     DataFixture
                         .DefaultReleaseVersion()
-                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
                 )
                 .WithFile(DataFixture.DefaultFile(FileType.Data));
 
             UserPublicationRole userPublicationRole = DataFixture
                 .DefaultUserPublicationRole()
                 .WithUser(user)
-                .WithPublication(releaseFile.ReleaseVersion.Release.Publication)
-                .WithRole(PublicationRole.Approver);
+                .WithPublication(publication)
+                .WithRole(publicationRole);
 
             await fixture
                 .GetContentDbContext()
@@ -810,13 +813,105 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                     context.UserPublicationRoles.Add(userPublicationRole);
                 });
 
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
+                .Setup(c =>
+                    c.CreateNextDataSetVersionMappings(dataSet.Id, releaseFile.Id, null, It.IsAny<CancellationToken>())
+                )
+                .Returns(async () =>
+                {
+                    var savedDataSet = await fixture
+                        .GetPublicDataDbContext()
+                        .DataSets.SingleAsync(ds => ds.Id == dataSet.Id);
+
+                    DataSetVersion nextVersion = DataFixture
+                        .DefaultDataSetVersion()
+                        .WithStatusMapping()
+                        .WithVersionNumber(major: 1, minor: 0)
+                        .WithDataSet(savedDataSet)
+                        .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                        .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+                    await fixture
+                        .GetPublicDataDbContext()
+                        .AddTestData(context =>
+                        {
+                            context.DataSetVersions.Add(nextVersion);
+                            context.DataSets.Update(savedDataSet);
+                        });
+
+                    return new ProcessDataSetVersionResponseViewModel
+                    {
+                        DataSetId = dataSet.Id,
+                        DataSetVersionId = nextVersion.Id,
+                        InstanceId = Guid.NewGuid(),
+                    };
+                });
+
+            var response = await CreateNextVersion(
+                dataSetId: dataSet.Id,
+                releaseFileId: releaseFile.Id,
+                user: identityUser
+            );
+
+            response.AssertOk<DataSetVersionSummaryViewModel>();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_ReleaseFileNotApiCompatible_Returns400(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithApiCompatibility(false);
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var processorClientMock = fixture.GetProcessorClientMock();
+
             var response = await CreateNextVersion(
                 dataSetId: Guid.NewGuid(),
                 releaseFileId: releaseFile.Id,
                 user: identityUser
             );
 
-            response.AssertForbidden();
+            MockUtils.VerifyAllMocks(processorClientMock);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "releaseFileId",
+                expectedCode: nameof(ValidationMessages.ReleaseFileNotApiCompatible)
+            );
         }
 
         [Fact]
@@ -1123,7 +1218,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         : DataSetVersionsControllerTests(fixture)
     {
         [Fact]
-        public async Task Success()
+        public async Task BauUser_Success()
         {
             var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
@@ -1143,7 +1238,7 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
-        public async Task NotBauUser_Returns403()
+        public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
         {
             var dataSetVersion = await SetupDataSetVersionForDeletionData();
 
@@ -1155,10 +1250,8 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         [Theory]
         [InlineData(PublicationRole.Approver)]
         [InlineData(PublicationRole.Drafter)]
-        public async Task UserOnPublicationTeam_Returns403(PublicationRole publicationRole)
+        public async Task UserOnPublicationTeam_Success(PublicationRole publicationRole)
         {
-            // CanManagePublicApiDataSets is currently BAU-only - having a role on the publication does
-            // not (yet) satisfy this policy.
             ClaimsPrincipal identityUser = DataFixture.StandardUser();
             User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
 
@@ -1210,9 +1303,15 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                     context.DataSets.Update(dataSet);
                 });
 
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
+                .Setup(c => c.DeleteDataSetVersion(dataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
+
             var response = await DeleteVersion(dataSetVersion.Id, user: identityUser);
 
-            response.AssertForbidden();
+            response.AssertNoContent();
         }
 
         [Fact]

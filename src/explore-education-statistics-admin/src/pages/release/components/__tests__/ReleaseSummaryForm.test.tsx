@@ -36,7 +36,7 @@ describe('ReleaseSummaryForm', () => {
   ];
   const testOrganisations: Organisation[] = [
     {
-      id: '466a14bf-4c77-4fb4-beb0-a09065d9ced8',
+      id: '5e089801-cf1a-b375-acd3-88e9d8aece66',
       title: 'Department for Education',
       url: 'https://www.gov.uk/government/organisations/department-for-education',
       useGISLogo: true,
@@ -55,7 +55,7 @@ describe('ReleaseSummaryForm', () => {
     organisationService.listOrganisations.mockResolvedValue(testOrganisations);
   });
 
-  test('renders correctly with empty initial values and without the template field when `templateRelease` is not provided', async () => {
+  test('renders correctly with default initial values and without the template field when `templateRelease` is not provided', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -68,7 +68,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
-          publishingOrganisations: undefined,
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -128,7 +128,8 @@ describe('ReleaseSummaryForm', () => {
     expect(publishingOrganisationCheckboxes[0]).toEqual(
       screen.getByLabelText('Department for Education'),
     );
-    expect(publishingOrganisationCheckboxes[0]).not.toBeChecked();
+    expect(publishingOrganisationCheckboxes[0]).toBeChecked();
+    expect(publishingOrganisationCheckboxes[1]).not.toBeChecked();
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
@@ -153,6 +154,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         templateRelease={{
@@ -236,6 +238,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -266,6 +269,57 @@ describe('ReleaseSummaryForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  test('validation error when no publishing organisations selected', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    const onSubmit = jest.fn();
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: 'AY',
+          timePeriodCoverageStartYear: '2022',
+          releaseType: 'OfficialStatistics',
+          releaseLabel: '',
+          publishingOrganisations: [],
+        }}
+        releaseVersion={0}
+        onSubmit={onSubmit}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    // DfE is pre-selected by default, so deselect it
+    const dfeCheckbox = screen.getByLabelText('Department for Education');
+    expect(dfeCheckbox).toBeChecked();
+    await userEvent.click(dfeCheckbox);
+    expect(dfeCheckbox).not.toBeChecked();
+
+    const buttonCreate = screen.getByRole('button', {
+      name: 'Create new release',
+    });
+
+    await userEvent.click(buttonCreate);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select at least one publishing organisation', {
+          selector: 'a',
+        }),
+      ).toBeInTheDocument();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   test('validation error when year "2"', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
@@ -281,6 +335,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -335,6 +390,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -389,6 +445,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -440,7 +497,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
-          publishingOrganisations: ['466a14bf-4c77-4fb4-beb0-a09065d9ced8'],
+          publishingOrganisations: ['8d26bfaa-44b8-461e-9260-2b0eed9631e0'],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -482,8 +539,8 @@ describe('ReleaseSummaryForm', () => {
     expect(publishingOrganisationCheckboxes[0]).toEqual(
       screen.getByLabelText('Department for Education'),
     );
-    expect(publishingOrganisationCheckboxes[0]).toBeChecked();
-    expect(publishingOrganisationCheckboxes[1]).not.toBeChecked();
+    expect(publishingOrganisationCheckboxes[0]).not.toBeChecked();
+    expect(publishingOrganisationCheckboxes[1]).toBeChecked();
   });
 
   test('renders with provided initial values with multiple publishing organisations', async () => {
@@ -500,7 +557,7 @@ describe('ReleaseSummaryForm', () => {
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
           publishingOrganisations: [
-            '466a14bf-4c77-4fb4-beb0-a09065d9ced8',
+            '5e089801-cf1a-b375-acd3-88e9d8aece66',
             '8d26bfaa-44b8-461e-9260-2b0eed9631e0',
           ],
         }}
@@ -538,7 +595,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
-          publishingOrganisations: undefined,
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -596,6 +653,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}
@@ -655,6 +713,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '',
           releaseType: undefined,
           releaseLabel: '',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -692,6 +751,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'AccreditedOfficialStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -729,6 +789,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'ExperimentalStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={noop}
@@ -768,6 +829,7 @@ describe('ReleaseSummaryForm', () => {
             timePeriodCoverageStartYear: '1966',
             releaseType: 'AccreditedOfficialStatistics',
             releaseLabel: 'initial',
+            publishingOrganisations: [],
           }}
           releaseVersion={releaseVersion}
           onSubmit={noop}
@@ -821,6 +883,7 @@ describe('ReleaseSummaryForm', () => {
           timePeriodCoverageStartYear: '1966',
           releaseType: 'ExperimentalStatistics',
           releaseLabel: 'initial',
+          publishingOrganisations: [],
         }}
         releaseVersion={0}
         onSubmit={onSubmit}

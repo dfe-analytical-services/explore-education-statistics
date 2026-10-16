@@ -1,8 +1,5 @@
 import Link from '@admin/components/Link';
-import {
-  releaseAncillaryFileRoute,
-  ReleaseAncillaryFileRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseAncillaryFileRoute } from '@admin/routes/releaseRoutes';
 import { AncillaryFile } from '@admin/services/releaseAncillaryFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
@@ -11,7 +8,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
 
 interface Props {
@@ -74,14 +71,11 @@ export default function AncillaryFileSummaryList({
             <>
               <Link
                 className="govuk-!-margin-right-4"
-                to={generatePath<ReleaseAncillaryFileRouteParams>(
-                  releaseAncillaryFileRoute.path,
-                  {
-                    publicationId,
-                    releaseVersionId,
-                    fileId: file.id,
-                  },
-                )}
+                to={generatePath(releaseAncillaryFileRoute.fullPath, {
+                  publicationId,
+                  releaseVersionId,
+                  fileId: file.id,
+                })}
               >
                 Edit file<VisuallyHidden> {file.title}</VisuallyHidden>
               </Link>

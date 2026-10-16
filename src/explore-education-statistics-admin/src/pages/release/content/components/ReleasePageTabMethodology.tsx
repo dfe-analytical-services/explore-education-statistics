@@ -1,10 +1,7 @@
 import Link from '@admin/components/Link';
 import ReleasePageTabPanel from '@admin/pages/release/content/components/ReleasePageTabPanel';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import {
-  preReleaseMethodologyRoute,
-  PreReleaseMethodologyRouteParams,
-} from '@admin/routes/preReleaseRoutes';
+import { preReleaseMethodologyRoute } from '@admin/routes/preReleaseRoutes';
 import ContactUsSection, {
   contactUsNavItem,
 } from '@common/modules/release/components/ReleaseContactUsSection';
@@ -36,14 +33,11 @@ const ReleasePageTabMethodology = ({ isPra = false }: Props) => {
       key: methodology.id,
       title: methodology.title,
       url: isPra
-        ? generatePath<PreReleaseMethodologyRouteParams>(
-            preReleaseMethodologyRoute.path,
-            {
-              publicationId: publication.id,
-              releaseVersionId,
-              methodologyId: methodology.id,
-            },
-          )
+        ? generatePath(preReleaseMethodologyRoute.fullPath, {
+            publicationId: publication.id,
+            releaseVersionId,
+            methodologyId: methodology.id,
+          })
         : `/methodology/${methodology.id}/summary`,
       external: false,
     }));

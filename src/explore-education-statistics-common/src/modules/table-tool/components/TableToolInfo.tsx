@@ -10,7 +10,7 @@ import { Organisation } from '@common/services/types/organisation';
 interface Props {
   contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   releaseLink?: ReactNode;
   releaseType?: ReleaseType;
 }

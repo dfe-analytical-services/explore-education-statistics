@@ -76,7 +76,7 @@ public class PublishingCompletionService(
 
         await HandleArchivedPublications(publishedPublicationInfos, cancellationToken);
 
-        await contentService.DeletePreviousVersionsDownloadFiles(releaseVersionIdsToUpdate);
+        await contentService.InvalidatePreviousVersionsDownloadFiles(releaseVersionIdsToUpdate);
         await contentService.DeletePreviousVersionsContent(releaseVersionIdsToUpdate);
 
         await notificationsService.NotifySubscribersIfApplicable(releaseVersionIdsToUpdate);

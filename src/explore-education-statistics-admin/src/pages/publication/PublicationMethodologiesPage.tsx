@@ -4,12 +4,8 @@ import {
   MethodologyTypeGuidanceModal,
 } from '@admin/pages/publication/components/PublicationMethodologyGuidance';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
+import { methodologySummaryRoute } from '@admin/routes/methodologyRoutes';
 import {
-  MethodologyRouteParams,
-  methodologySummaryRoute,
-} from '@admin/routes/methodologyRoutes';
-import {
-  PublicationRouteParams,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
 } from '@admin/routes/publicationRoutes';
@@ -29,7 +25,7 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 interface Model {
@@ -38,7 +34,7 @@ interface Model {
 }
 
 const PublicationMethodologiesPage = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { publication, onReload } = usePublicationContext();
   const { permissions } = publication;
 
@@ -87,13 +83,10 @@ const PublicationMethodologiesPage = () => {
                 const { id: methodologyId } =
                   await methodologyService.createMethodology(publication.id);
 
-                history.push(
-                  generatePath<MethodologyRouteParams>(
-                    methodologySummaryRoute.path,
-                    {
-                      methodologyId,
-                    },
-                  ),
+                navigate(
+                  generatePath(methodologySummaryRoute.fullPath, {
+                    methodologyId,
+                  }),
                 );
               }}
             >
@@ -163,12 +156,9 @@ const PublicationMethodologiesPage = () => {
                         <Link
                           className="govuk-!-margin-right-4 dfe-inline-block"
                           data-testid={canEdit ? 'edit' : 'view'}
-                          to={generatePath<MethodologyRouteParams>(
-                            methodologySummaryRoute.path,
-                            {
-                              methodologyId: methodology.id,
-                            },
-                          )}
+                          to={generatePath(methodologySummaryRoute.fullPath, {
+                            methodologyId: methodology.id,
+                          })}
                           unvisited
                         >
                           {canEdit ? 'Edit' : 'View'}
@@ -182,8 +172,8 @@ const PublicationMethodologiesPage = () => {
                                 <Link
                                   className="govuk-!-margin-right-4 dfe-inline-block"
                                   data-testid="view-existing-version"
-                                  to={generatePath<MethodologyRouteParams>(
-                                    methodologySummaryRoute.path,
+                                  to={generatePath(
+                                    methodologySummaryRoute.fullPath,
                                     {
                                       methodologyId:
                                         methodology.previousVersionId,
@@ -216,9 +206,9 @@ const PublicationMethodologiesPage = () => {
                                       await methodologyService.createMethodologyAmendment(
                                         methodology.id,
                                       );
-                                    history.push(
-                                      generatePath<MethodologyRouteParams>(
-                                        methodologySummaryRoute.path,
+                                    navigate(
+                                      generatePath(
+                                        methodologySummaryRoute.fullPath,
                                         {
                                           methodologyId: amendment.id,
                                         },
@@ -333,8 +323,8 @@ const PublicationMethodologiesPage = () => {
                       {permissions.canManageExternalMethodology && (
                         <Link
                           className="govuk-!-margin-right-4"
-                          to={generatePath<PublicationRouteParams>(
-                            publicationExternalMethodologyRoute.path,
+                          to={generatePath(
+                            publicationExternalMethodologyRoute.fullPath,
                             {
                               publicationId: publication.id,
                             },
@@ -403,12 +393,9 @@ const PublicationMethodologiesPage = () => {
           {permissions.canManageExternalMethodology && !externalMethodology && (
             <>
               <Link
-                to={generatePath<PublicationRouteParams>(
-                  publicationExternalMethodologyRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                )}
+                to={generatePath(publicationExternalMethodologyRoute.fullPath, {
+                  publicationId: publication.id,
+                })}
               >
                 Add external methodology
               </Link>
@@ -422,12 +409,9 @@ const PublicationMethodologiesPage = () => {
           {permissions.canAdoptMethodologies && (
             <>
               <Link
-                to={generatePath<PublicationRouteParams>(
-                  publicationAdoptMethodologyRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                )}
+                to={generatePath(publicationAdoptMethodologyRoute.fullPath, {
+                  publicationId: publication.id,
+                })}
               >
                 Adopt an existing methodology
               </Link>

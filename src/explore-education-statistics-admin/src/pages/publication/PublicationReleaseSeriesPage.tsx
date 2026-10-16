@@ -1,10 +1,7 @@
 import ReleaseSeriesTable from '@admin/pages/publication/components/ReleaseSeriesTable';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationQueries from '@admin/queries/publicationQueries';
-import {
-  PublicationRouteParams,
-  publicationCreateReleaseSeriesLegacyLinkRoute,
-} from '@admin/routes/publicationRoutes';
+import { publicationCreateReleaseSeriesLegacyLinkRoute } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
 import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -13,12 +10,12 @@ import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 export default function PublicationReleaseSeriesPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { publicationId, publication } = usePublicationContext();
   const [isReordering, toggleReordering] = useToggle(false);
 
@@ -58,9 +55,9 @@ export default function PublicationReleaseSeriesPage() {
             title="Create legacy release"
             triggerButton={<Button>Create legacy release</Button>}
             onConfirm={() => {
-              history.push(
-                generatePath<PublicationRouteParams>(
-                  publicationCreateReleaseSeriesLegacyLinkRoute.path,
+              navigate(
+                generatePath(
+                  publicationCreateReleaseSeriesLegacyLinkRoute.fullPath,
                   {
                     publicationId,
                   },

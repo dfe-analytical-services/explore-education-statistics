@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -136,7 +137,7 @@ public class ManageContentPageService(
                         .Select(KeyStatisticViewModel.FromKeyStatistic)
                         .ToList(),
                     PublishingOrganisations = releaseVersion
-                        .PublishingOrganisations.OrderBy(o => o.Title)
+                        .PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
                         .Select(OrganisationViewModel.FromOrganisation)
                         .ToList(),
                     NextReleaseDate = releaseVersion.NextReleaseDate,

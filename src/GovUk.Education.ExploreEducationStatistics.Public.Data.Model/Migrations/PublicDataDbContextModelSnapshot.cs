@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -811,7 +811,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
                         .WithMany()
-                        .HasForeignKey("SupersedingDataSetId");
+                        .HasForeignKey("SupersedingDataSetId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("LatestDraftVersion");
 

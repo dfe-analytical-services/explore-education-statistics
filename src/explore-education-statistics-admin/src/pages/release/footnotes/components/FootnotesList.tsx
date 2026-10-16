@@ -2,10 +2,7 @@ import Link from '@admin/components/Link';
 import generateFootnoteMetaMap from '@admin/pages/release/footnotes/utils/generateFootnoteMetaMap';
 import styles from '@admin/pages/release/footnotes/components/FootnotesList.module.scss';
 import FootnoteSubjectSelection from '@admin/pages/release/footnotes/components/FootnoteSubjectSelection';
-import {
-  ReleaseFootnoteRouteParams,
-  releaseFootnotesEditRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseFootnotesEditRoute } from '@admin/routes/releaseRoutes';
 import { Footnote, FootnoteMeta } from '@admin/services/footnoteService';
 import ReorderableList from '@common/components/ReorderableList';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -89,14 +86,11 @@ const FootnotesList = ({
               {canUpdateRelease && (
                 <ButtonGroup className={styles.rowActions}>
                   <Link
-                    to={generatePath<ReleaseFootnoteRouteParams>(
-                      releaseFootnotesEditRoute.path,
-                      {
-                        publicationId,
-                        releaseVersionId,
-                        footnoteId: id,
-                      },
-                    )}
+                    to={generatePath(releaseFootnotesEditRoute.fullPath, {
+                      publicationId,
+                      releaseVersionId,
+                      footnoteId: id,
+                    })}
                   >
                     Edit footnote
                   </Link>

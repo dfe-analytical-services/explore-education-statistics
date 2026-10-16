@@ -44,6 +44,9 @@ type ResourceNames = {
   }
   notifier: {
     functionApp: string
+    appServicePlan: string
+    appInsights: string
+    storageAccount: string
   }
   publicApi: {
     processor: {
@@ -78,6 +81,7 @@ type ResourceNames = {
       contentApi: string
       dataApi: string
       importer: string
+      notifier: string
       publisher: string
     }
   }
@@ -108,6 +112,11 @@ type ResourceNames = {
       importer: {
         databaseUserPassword: string
       }
+      notifier: {
+        databaseUserPassword: string
+        govUkNotifyApiKey: string
+        tokenSecretKey: string
+      }
       publisher: {
         databaseUserPassword: string
         notifyApiKey: string
@@ -131,8 +140,9 @@ type ResourceNames = {
   }
   eventGrid: {
     topics: {
-      releaseChanged: string
       publicationChanged: string
+      releaseChanged: string
+      releaseVersionChanged: string
       themeChanged: string
     }
   }
@@ -144,7 +154,8 @@ func getResourceNames(
   legacyResourcePrefix string,
   publicApiResourcePrefix string,
   screenerResourcePrefix string,
-  newResourcePrefix string) ResourceNames => {
+  newResourcePrefix string,
+  notifierStorageAccountPrefix string) ResourceNames => {
 
     acr: {
       serverName: 'eesacr'
@@ -188,6 +199,9 @@ func getResourceNames(
   }
   notifier: {
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
+    appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-notify'
+    appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-notify'
+    storageAccount: '${legacyResourcePrefix}${notifierStorageAccountPrefix}eesnotify'
   }
   publicApi: {
     processor: {
@@ -222,6 +236,7 @@ func getResourceNames(
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
       importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
+      notifier: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-notify'
       publisher: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-publisher'
     }
   }
@@ -252,6 +267,11 @@ func getResourceNames(
       importer: {
         databaseUserPassword: 'ees-sql-password-importer'
       }
+      notifier: {
+        databaseUserPassword: 'ees-sql-password-notifier'
+        govUkNotifyApiKey: 'ees-notifier-govuknotify-api-key'
+        tokenSecretKey: 'ees-notifier-token-secret-key'
+      }
       publisher: {
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
@@ -261,7 +281,7 @@ func getResourceNames(
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
-      notifierStorageAccountConnectionString: 'ees-storage-notifications'
+      notifierStorageAccountConnectionString: '${legacyResourcePrefix}${notifierStorageAccountPrefix}eesnotify-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
     }
@@ -275,8 +295,9 @@ func getResourceNames(
   }
   eventGrid: {
     topics: {
-      releaseChanged: '${newResourcePrefix}-evgt-release-changed'
       publicationChanged: '${newResourcePrefix}-evgt-publication-changed'
+      releaseChanged: '${newResourcePrefix}-evgt-release-changed'
+      releaseVersionChanged: '${newResourcePrefix}-evgt-release-version-changed'
       themeChanged: '${newResourcePrefix}-evgt-theme-changed'
     }
   }

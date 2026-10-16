@@ -13,13 +13,10 @@ import { ContentSectionKeys } from '@admin/pages/release/content/contexts/Releas
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
-import {
-  releaseDataBlockEditRoute,
-  ReleaseDataBlockRouteParams,
-} from '@admin/routes/releaseRoutes';
+import { releaseDataBlockEditRoute } from '@admin/routes/releaseRoutes';
 import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
-import { ToolbarOption, ToolbarGroup } from '@admin/types/ckeditor';
+import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
 import Gate from '@common/components/Gate';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
@@ -360,8 +357,8 @@ const ReleaseEditableBlock = ({
           >
             <EditableBlockWrapper
               editButtonLabel={editButtonLabel}
-              dataBlockEditLink={generatePath<ReleaseDataBlockRouteParams>(
-                releaseDataBlockEditRoute.path,
+              dataBlockEditLink={generatePath(
+                releaseDataBlockEditRoute.fullPath,
                 {
                   publicationId,
                   releaseVersionId,

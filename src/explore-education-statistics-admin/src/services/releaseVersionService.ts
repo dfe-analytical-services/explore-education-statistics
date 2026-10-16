@@ -38,7 +38,7 @@ export interface ReleaseVersion {
   timePeriodCoverage: ValueLabelPair;
   title: string;
   type: ReleaseType;
-  publishingOrganisations?: Organisation[];
+  publishingOrganisations: Organisation[];
   publishScheduled?: string;
   published?: string;
   nextReleaseDate?: PartialDate;

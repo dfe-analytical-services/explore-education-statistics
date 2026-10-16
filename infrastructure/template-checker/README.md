@@ -1,1 +1,0 @@
-Skips the listed controls during the scan

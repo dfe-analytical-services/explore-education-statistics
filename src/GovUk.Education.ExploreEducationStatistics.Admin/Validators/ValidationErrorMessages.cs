@@ -68,10 +68,6 @@ public enum ValidationErrorMessages
     ReplacementMustBeValid,
     ReplacementImportMustBeComplete,
 
-    // Release
-    ReleaseTypeInvalid,
-    PublishingOrganisationsLimitExceeded,
-
     // Release approval
     PublishedReleaseCannotBeUnapproved,
     PublishDateCannotBeEmpty,

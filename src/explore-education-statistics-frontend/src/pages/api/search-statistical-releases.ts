@@ -1,20 +1,21 @@
 /* eslint-disable no-restricted-syntax */
-import withMethods from '@frontend/middleware/api/withMethods';
-import logger from '@common/services/logger';
-import { PublicationListSummary } from '@common/services/publicationService';
-import { PaginatedList } from '@common/services/types/pagination';
-import { ReleaseType } from '@common/services/types/releaseType';
 import {
   SearchOptions,
   SearchRequestQueryTypeOptions,
 } from '@azure/search-documents';
-import { NextApiRequest, NextApiResponse } from 'next';
+import logger from '@common/services/logger';
+import { PublicationListSummary } from '@common/services/publicationService';
+import { PaginatedList } from '@common/services/types/pagination';
+import { ReleaseType } from '@common/services/types/releaseType';
+import withMethods from '@frontend/middleware/api/withMethods';
 import { initialiseAzurePublicationsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
 import { ErrorBody } from '@frontend/modules/api/types/error';
+import sortPublishingOrganisationTitles from '@frontend/modules/search-data/utils/sortPublishingOrganisationTitles';
 import {
   AzurePublicationListRequest,
   AzurePublicationSearchResult,
 } from '@frontend/services/azurePublicationService';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 interface Request extends NextApiRequest {
   body: {
@@ -72,6 +73,7 @@ export default withMethods({
           'releaseVersionId',
           'publicationSlug',
           'published',
+          'publishingOrganisationTitles',
           'summary',
           'themeTitle',
           'title',
@@ -99,6 +101,7 @@ export default withMethods({
           summary,
           publicationSlug: slug,
           published,
+          publishingOrganisationTitles,
           releaseVersionId: id,
           releaseSlug: latestReleaseSlug,
           releaseType: type,
@@ -112,6 +115,9 @@ export default withMethods({
           highlightSummary: result.highlights?.summary?.join(' ... ') || null,
           highlightTitle: result.highlights?.title?.join(' ... ') || null,
           published: published.toString(),
+          publishingOrganisationTitles: sortPublishingOrganisationTitles(
+            publishingOrganisationTitles,
+          ),
           id,
           rank: result.score,
           slug,

@@ -1,4 +1,5 @@
 import { ReleaseVersion } from '@admin/services/releaseVersionService';
+import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 
 // eslint-disable-next-line import/prefer-default-export
 export const testRelease: ReleaseVersion = {
@@ -21,5 +22,6 @@ export const testRelease: ReleaseVersion = {
   type: 'OfficialStatistics',
   previousVersionId: '',
   preReleaseAccessList: '',
+  publishingOrganisations: [testOrganisation],
   updatePublishedDisplayDate: false,
 };

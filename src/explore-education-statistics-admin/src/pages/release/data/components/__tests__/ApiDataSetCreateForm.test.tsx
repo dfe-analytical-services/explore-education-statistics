@@ -50,6 +50,45 @@ describe('ApiDataSetCreateForm', () => {
     expect(options[3]).toHaveTextContent(testCandidates[2].title);
   });
 
+  test('renders incompatible and unscreened data sets with a label suffix', () => {
+    render(
+      <ApiDataSetCreateForm
+        dataSetCandidates={[
+          {
+            releaseFileId: 'release-file-id-1',
+            title: 'Test data set 1',
+            publicApiCompatible: true,
+          },
+          {
+            releaseFileId: 'release-file-id-2',
+            title: 'Test data set 2',
+            publicApiCompatible: false,
+          },
+          {
+            releaseFileId: 'release-file-id-3',
+            title: 'Test data set 3',
+            publicApiCompatible: null,
+          },
+        ]}
+        onCancel={noop}
+        onSubmit={noop}
+      />,
+    );
+
+    const options = within(screen.getByLabelText('Data set')).getAllByRole(
+      'option',
+    );
+
+    expect(options).toHaveLength(4);
+    expect(options[1]).toHaveTextContent(/^Test data set 1$/);
+    expect(options[2]).toHaveTextContent(
+      'Test data set 2 (not API compatible)',
+    );
+    expect(options[3]).toHaveTextContent(
+      'Test data set 3 (API compatibility unknown)',
+    );
+  });
+
   test('shows validation error when no data set selected', async () => {
     const { user } = render(
       <ApiDataSetCreateForm

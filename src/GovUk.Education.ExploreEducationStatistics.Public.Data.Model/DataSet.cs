@@ -58,6 +58,12 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
                 .WithOne()
                 .HasForeignKey<DataSet>(ds => ds.LatestLiveVersionId)
                 .IsRequired(false);
+
+            builder
+                .HasOne(ds => ds.SupersedingDataSet)
+                .WithMany()
+                .HasForeignKey(ds => ds.SupersedingDataSetId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

@@ -1,13 +1,14 @@
 import _educationInNumbersService, {
   EinSummary,
 } from '@admin/services/educationInNumbersService';
-import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { createMemoryHistory, MemoryHistory } from 'history';
-import { Router } from 'react-router-dom';
 import EducationInNumbersCreatePage from '@admin/pages/education-in-numbers/EducationInNumbersCreatePage';
+import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
+import { expectLocation } from '@admin/components/testing/TestLocationContext';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
+import { educationInNumbersSummaryRoute } from '@admin/routes/educationInNumbersRoutes';
 
 jest.mock('@admin/services/educationInNumbersService');
 
@@ -44,8 +45,7 @@ describe('EducationInNumbersCreatePage', () => {
     educationInNumbersService.createEducationInNumbersPage.mockResolvedValue(
       newPage,
     );
-    const history = createMemoryHistory();
-    const { user } = renderPage(history);
+    const { user } = renderPage();
 
     await user.type(screen.getByLabelText('Title'), 'New page title');
     await user.type(
@@ -62,19 +62,17 @@ describe('EducationInNumbersCreatePage', () => {
         title: 'New page title',
         description: 'New page description',
       });
-      expect(history.location.pathname).toBe(
-        '/education-in-numbers/new-page-id/summary',
-      );
     });
+
+    await expectLocation('/education-in-numbers/new-page-id/summary');
   });
 
   test('clicking cancel navigates back to the list page', async () => {
-    const history = createMemoryHistory();
-    const { user } = renderPage(history);
+    const { user } = renderPage();
 
     await user.click(screen.getByRole('link', { name: 'Cancel' }));
 
-    expect(history.location.pathname).toBe('/education-in-numbers');
+    await expectLocation('/education-in-numbers');
   });
 
   test('shows validation error if no title is provided', async () => {
@@ -100,13 +98,15 @@ describe('EducationInNumbersCreatePage', () => {
     expect(error).toHaveTextContent('Enter a description');
   });
 
-  function renderPage(history: MemoryHistory = createMemoryHistory()) {
+  function renderPage() {
     return render(
-      <Router history={history}>
-        <TestConfigContextProvider>
-          <EducationInNumbersCreatePage />
-        </TestConfigContextProvider>
-      </Router>,
+      <TestRouterRenderer
+        initialUrl={educationInNumbersListRoute.fullPath}
+        route={educationInNumbersListRoute.fullPath}
+        routes={[educationInNumbersSummaryRoute.fullPath]}
+      >
+        <EducationInNumbersCreatePage />
+      </TestRouterRenderer>,
     );
   }
 });

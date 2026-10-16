@@ -2,14 +2,11 @@ import Link from '@admin/components/Link';
 import ReleaseStatusChecklistSummary from '@admin/pages/release/components/ReleaseStatusChecklistSummary';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseVersionService, {
-  ReleaseVersionSummaryWithPermissions,
   DashboardReleaseVersionSummary,
   DeleteReleasePlan,
+  ReleaseVersionSummaryWithPermissions,
 } from '@admin/services/releaseVersionService';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
@@ -53,7 +50,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
       <td>
         <Link
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-          to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+          to={generatePath(releaseSummaryRoute.fullPath, {
             publicationId: release.publication.id,
             releaseVersionId: release.id,
           })}
@@ -65,7 +62,7 @@ const DraftReleaseRow = ({ isBauUser, release, onChangeRelease }: Props) => {
         {release.previousVersionId && (
           <Link
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
-            to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+            to={generatePath(releaseSummaryRoute.fullPath, {
               publicationId: release.publication.id,
               releaseVersionId: release.previousVersionId,
             })}

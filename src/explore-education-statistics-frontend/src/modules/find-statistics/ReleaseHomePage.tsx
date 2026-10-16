@@ -72,35 +72,25 @@ const ReleaseHomePage = ({
             }
             releaseType={releaseVersionSummary.type}
             renderProducerLink={
-              releaseVersionSummary.publishingOrganisations?.length ? (
-                <span>
-                  {releaseVersionSummary.publishingOrganisations.map(
-                    (org, index) => (
-                      <Fragment key={org.id}>
-                        {getListStringSeparator(
-                          releaseVersionSummary.publishingOrganisations ?? [],
-                          index,
-                        )}
-                        <Link
-                          unvisited
-                          to={org.url}
-                          className="govuk-link--no-underline"
-                        >
-                          {org.title}
-                        </Link>
-                      </Fragment>
-                    ),
-                  )}
-                </span>
-              ) : (
-                <Link
-                  unvisited
-                  className="govuk-link--no-underline"
-                  to="https://www.gov.uk/government/organisations/department-for-education"
-                >
-                  Department for Education
-                </Link>
-              )
+              <span>
+                {releaseVersionSummary.publishingOrganisations.map(
+                  (org, index) => (
+                    <Fragment key={org.id}>
+                      {getListStringSeparator(
+                        releaseVersionSummary.publishingOrganisations,
+                        index,
+                      )}
+                      <Link
+                        unvisited
+                        to={org.url}
+                        className="govuk-link--no-underline"
+                      >
+                        {org.title}
+                      </Link>
+                    </Fragment>
+                  ),
+                )}
+              </span>
             }
             renderSubscribeLink={
               <Link

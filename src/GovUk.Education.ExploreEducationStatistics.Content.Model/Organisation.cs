@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 [Equatable]
 public partial class Organisation : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
+    public const string DepartmentForEducationTitle = "Department for Education";
+
     public Guid Id { get; set; }
 
     public required string Title { get; set; }

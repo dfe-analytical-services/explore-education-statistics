@@ -24,6 +24,7 @@ export default function MethodologyHelpAndSupportSection({
       <ContactUsSection
         publicationContact={owningPublication.contact}
         publicationTitle={owningPublication.title}
+        publishingOrganisations={[]}
       />
     </div>
   );

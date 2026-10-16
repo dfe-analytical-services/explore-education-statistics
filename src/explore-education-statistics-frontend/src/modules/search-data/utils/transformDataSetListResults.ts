@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { SearchIterator } from '@azure/search-documents';
+import sortPublishingOrganisationTitles from '@frontend/modules/search-data/utils/sortPublishingOrganisationTitles';
 import { AzureDataSetIndexItem } from '@frontend/services/azureDataSetService';
 import { DataSetFileSummary } from '@frontend/services/dataSetFileService';
 
@@ -18,6 +19,7 @@ export default async function transformDataSetListResults(
     | 'publicationId'
     | 'publicationTitle'
     | 'publicationSlug'
+    | 'publishingOrganisationTitles'
     | 'releaseId'
     | 'releaseTitle'
     | 'releaseSlug'
@@ -27,7 +29,7 @@ export default async function transformDataSetListResults(
     | 'lastUpdated'
     | 'api'
     | 'numDataFileRows'
-    | 'geographicLevelsLabels'
+    | 'geographicLevelDetails'
     | 'indicators'
     | 'filters'
     | 'releaseType'
@@ -51,6 +53,7 @@ export default async function transformDataSetListResults(
       publicationId,
       publicationTitle,
       publicationSlug,
+      publishingOrganisationTitles,
       releaseId,
       releaseTitle,
       releaseSlug,
@@ -60,7 +63,7 @@ export default async function transformDataSetListResults(
       lastUpdated,
       api,
       numDataFileRows,
-      geographicLevelsLabels: geographicLevels,
+      geographicLevelDetails,
       indicators,
       filters,
       timePeriodRange,
@@ -83,6 +86,9 @@ export default async function transformDataSetListResults(
         title: publicationTitle,
         slug: publicationSlug,
       },
+      publishingOrganisationTitles: sortPublishingOrganisationTitles(
+        publishingOrganisationTitles,
+      ),
       release: {
         id: releaseId,
         title: releaseTitle,
@@ -95,7 +101,12 @@ export default async function transformDataSetListResults(
       api: api && api.id && api.id.length > 0 ? api : undefined,
       meta: {
         numDataFileRows,
-        geographicLevels,
+        geographicLevels: geographicLevelDetails
+          .filter(level => !level.csvOnly)
+          .map(level => level.label),
+        geographicLevelsCsvOnly: geographicLevelDetails
+          .filter(level => level.csvOnly)
+          .map(level => level.label),
         timePeriodRange,
         filters,
         indicators,

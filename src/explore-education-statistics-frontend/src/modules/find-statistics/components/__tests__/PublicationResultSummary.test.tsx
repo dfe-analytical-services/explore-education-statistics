@@ -20,6 +20,9 @@ describe('PublicationSummary', () => {
       'Ad hoc statistics',
     );
     expect(screen.getByTestId('Published')).toHaveTextContent('8 Jun 2021');
+    expect(screen.getByTestId('Published by')).toHaveTextContent(
+      'Department for Education',
+    );
     expect(screen.getByTestId('Theme')).toHaveTextContent('Theme 1');
   });
 

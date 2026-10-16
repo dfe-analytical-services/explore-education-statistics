@@ -88,14 +88,6 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountAllowedSubnetIds: [adminSubnet.id]
     storageAccountPublicNetworkAccessEnabled: true
     publicNetworkAccessEnabled: true
-    functionAppFirewallRules: [
-      {
-        cidr: 'AzureCloud'
-        tag: 'ServiceTag'
-        priority: 101
-        name: 'AzureCloud'
-      }
-    ]
     storageFirewallRules: maintenanceIpRanges
     minTlsVersion: minTlsVersion
     connectionStrings: [

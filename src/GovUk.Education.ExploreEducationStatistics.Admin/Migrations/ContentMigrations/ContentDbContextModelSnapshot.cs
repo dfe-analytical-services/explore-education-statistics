@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.11")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasMaxLength(6)
                         .HasColumnType("nvarchar(6)");
 
-                    b.Property<bool?>("CsvOnly")
+                    b.Property<bool>("CsvOnly")
                         .HasColumnType("bit");
 
                     b.HasKey("DataSetFileVersionId", "GeographicLevel");
@@ -1210,7 +1210,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactId");
+                    b.HasIndex("ContactId")
+                        .IsUnique();
 
                     b.HasIndex("LatestPublishedReleaseVersionId")
                         .IsUnique()
@@ -2334,9 +2335,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Common.Model.Contact", "Contact")
-                        .WithMany()
-                        .HasForeignKey("ContactId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion", "LatestPublishedReleaseVersion")
@@ -2656,7 +2657,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany()
-                        .HasForeignKey("ReleaseId");
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Release");
                 });

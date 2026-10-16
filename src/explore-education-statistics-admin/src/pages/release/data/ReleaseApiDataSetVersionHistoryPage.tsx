@@ -3,10 +3,7 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import {
   releaseApiDataSetChangelogRoute,
   releaseApiDataSetDetailsRoute,
-  ReleaseDataSetChangelogRouteParams,
   ReleaseDataSetPreviewTokenRouteParams,
-  ReleaseDataSetRouteParams,
-  ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
@@ -19,7 +16,7 @@ import useQueryParams from '@admin/hooks/useQueryParams';
 import parseNumber from '@common/utils/number/parseNumber';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import React, { useState } from 'react';
 
 export default function ReleaseApiDataSetVersionHistoryPage() {
@@ -30,7 +27,7 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
   );
 
   const { dataSetId, releaseVersionId, publicationId } =
-    useParams<ReleaseDataSetPreviewTokenRouteParams>();
+    useParams<ReleaseDataSetPreviewTokenRouteParams>() as ReleaseDataSetPreviewTokenRouteParams;
 
   const { data: dataSet, isLoading: isLoadingDataSet } = useQuery(
     apiDataSetQueries.get(dataSetId),
@@ -51,14 +48,11 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
       <Link
         back
         className="govuk-!-margin-bottom-6"
-        to={generatePath<ReleaseDataSetRouteParams>(
-          releaseApiDataSetDetailsRoute.path,
-          {
-            publicationId,
-            releaseVersionId,
-            dataSetId,
-          },
-        )}
+        to={generatePath(releaseApiDataSetDetailsRoute.fullPath, {
+          publicationId,
+          releaseVersionId,
+          dataSetId,
+        })}
       >
         Back to API data set details
       </Link>
@@ -92,14 +86,11 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
                         <td>{dataSetVersion.version}</td>
                         <td>
                           <Link
-                            to={generatePath<ReleaseRouteParams>(
-                              releaseSummaryRoute.path,
-                              {
-                                publicationId,
-                                releaseVersionId:
-                                  dataSetVersion.releaseVersion.id,
-                              },
-                            )}
+                            to={generatePath(releaseSummaryRoute.fullPath, {
+                              publicationId,
+                              releaseVersionId:
+                                dataSetVersion.releaseVersion.id,
+                            })}
                           >
                             {dataSetVersion.releaseVersion.title}
                           </Link>
@@ -117,8 +108,8 @@ export default function ReleaseApiDataSetVersionHistoryPage() {
                         <td className="govuk-!-text-align-right">
                           {dataSetVersion.version !== '1.0' && (
                             <Link
-                              to={generatePath<ReleaseDataSetChangelogRouteParams>(
-                                releaseApiDataSetChangelogRoute.path,
+                              to={generatePath(
+                                releaseApiDataSetChangelogRoute.fullPath,
                                 {
                                   publicationId,
                                   releaseVersionId:

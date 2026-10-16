@@ -96,11 +96,11 @@ module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible
   }
 }
 
-module backupInstanceModule '../../../common/components/data-protection/backupVaultInstance.bicep' = if (deployBackupVaultRegistration) {
+module backupInstanceModule '../../../common/components/data-protection/postgresql-backup-vault-instance.bicep' = if (deployBackupVaultRegistration) {
   name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}BackupInstanceDeploy'
   params: {
     vaultName: resourceNames.existingResources.backupVault.vault
-    dataSourceType: 'psqlFlexibleServer'
+    instanceName: 'PostgreSQLBackupInstance'
     resourceId: postgreSqlServerModule.outputs.databaseRef
     resourceLocation: location
     backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy

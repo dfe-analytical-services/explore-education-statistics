@@ -25,8 +25,8 @@ import DataSetFileSummary from '@frontend/modules/data-catalogue/components/Data
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
-import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
 import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
+import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
 import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import {
   SearchDataFilter,
@@ -34,6 +34,7 @@ import {
 } from '@frontend/modules/search-data/utils/searchDataFilters';
 import azureDataSetQueries from '@frontend/queries/azureDataSetQueries';
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
+import organisationQueries from '@frontend/queries/organisationQueries';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
@@ -44,7 +45,7 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
 import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
 
@@ -56,6 +57,7 @@ export interface SearchDataPageQuery {
   dataSetType?: DataSetType;
   geographicLevel?: GeographicLevelCode | GeographicLevelCode[];
   latestDataOnly?: string;
+  organisationId?: string | string[];
   page?: number;
   publicationId?: string | string[];
   releaseType?: ReleaseType | ReleaseType[];
@@ -98,6 +100,11 @@ const SearchDataPage: NextPage = () => {
     enabled: isPublicationsSearch,
   });
 
+  const { data: organisations = [] } = useQuery({
+    ...organisationQueries.list(),
+    staleTime: Infinity,
+  });
+
   const { data: themes = [] } = useQuery({
     ...themeQueries.list(),
     staleTime: Infinity,
@@ -125,12 +132,20 @@ const SearchDataPage: NextPage = () => {
     dataSetType,
     geographicLevels,
     latestDataOnly,
+    organisationIds,
     publicationIds,
     releaseTypes,
     search,
     sortBy,
     themeIds,
   } = getParamsFromQuery(router.query);
+
+  const organisationOptions = organisations.map(organisation => {
+    return {
+      label: organisation.title,
+      value: organisation.id,
+    };
+  });
 
   const themeOptions = themes.map(theme => {
     return {
@@ -155,6 +170,9 @@ const SearchDataPage: NextPage = () => {
     },
   );
 
+  const selectedOrganisations = organisations.filter(organisation =>
+    organisationIds?.includes(organisation.id),
+  );
   const selectedThemes = themes.filter(theme => themeIds?.includes(theme.id));
   const selectedReleaseTypes = releaseTypes
     ? getAsArray(releaseTypes)!.map(type => ({
@@ -184,6 +202,7 @@ const SearchDataPage: NextPage = () => {
 
   const isFiltered =
     !!search ||
+    selectedOrganisations.length > 0 ||
     selectedReleaseTypes.length > 0 ||
     selectedThemes.length > 0 ||
     isFilteredByDataSetType ||
@@ -194,6 +213,7 @@ const SearchDataPage: NextPage = () => {
   const filteredByString = compact(
     [
       search,
+      ...selectedOrganisations.map(t => t.title),
       ...selectedThemes.map(t => t.title),
       ...selectedReleaseTypes.map(rt => rt.title),
       isFilteredByGeographicLevel
@@ -253,6 +273,7 @@ const SearchDataPage: NextPage = () => {
   };
 
   const multiValueFilters: string[] = [
+    'organisationId',
     'themeId',
     'releaseType',
     'geographicLevel',
@@ -483,6 +504,8 @@ const SearchDataPage: NextPage = () => {
               geographicLevelOptions={geographicLevelOptions}
               includeDataFilters={!isPublicationsSearch}
               latestDataOnly={latestDataOnly}
+              organisationIds={organisationIds}
+              organisationOptions={organisationOptions}
               publicationIds={publicationIds}
               publicationTree={publicationTree}
               releaseTypes={releaseTypes}
@@ -507,6 +530,8 @@ const SearchDataPage: NextPage = () => {
                 geographicLevelOptions={geographicLevelOptions}
                 includeDataFilters={!isPublicationsSearch}
                 latestDataOnly={latestDataOnly}
+                organisationIds={organisationIds}
+                organisationOptions={organisationOptions}
                 publicationIds={publicationIds}
                 publicationTree={publicationTree}
                 releaseTypeOptions={releaseTypeOptions}
@@ -556,6 +581,20 @@ const SearchDataPage: NextPage = () => {
                     handleChangeFilter({
                       filterType: 'themeId',
                       nextValue: theme.id,
+                    })
+                  }
+                />
+              ))}
+
+              {selectedOrganisations.map(organisation => (
+                <FilterResetButton
+                  key={organisation.id}
+                  filterType="Organisation"
+                  name={organisation.title}
+                  onClick={() =>
+                    handleChangeFilter({
+                      filterType: 'organisationId',
+                      nextValue: organisation.id,
                     })
                   }
                 />
@@ -754,6 +793,7 @@ export const getServerSideProps: GetServerSideProps = async ({
             filter: 'DataCatalogue',
           }),
         ),
+    queryClient.prefetchQuery(organisationQueries.list()),
   ]);
 
   return {

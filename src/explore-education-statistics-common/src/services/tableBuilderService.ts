@@ -88,8 +88,7 @@ export interface Subject {
     to?: string;
   };
   geographicLevels: string[];
-  // Optional as subject responses cached before this field was added won't include it - will be made nonoptional in EES-7625
-  geographicLevelsCsvOnly?: string[];
+  geographicLevelsCsvOnly: string[];
   file: FileInfo;
   filters: string[];
   indicators: string[];
