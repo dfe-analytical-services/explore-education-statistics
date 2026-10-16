@@ -48,6 +48,9 @@ var searchDocsFunctionAppSubnetName = vnetNames.subnets.searchDocsFunctionApp
 var searchDocsFunctionAppPrivateEndpointsSubnetName = vnetNames.subnets.searchDocsFunctionAppPrivateEndpoints
 var searchStoragePrivateEndpointsSubnetName = vnetNames.subnets.searchStoragePrivateEndpoints
 
+// Data files subnets.
+var dataFilesStoragePrivateEndpointsSubnetName = vnetNames.subnets.dataFilesStoragePrivateEndpoints
+
 // Analytics subnets.
 var analyticsFunctionAppSubnetName = vnetNames.subnets.analyticsFunctionApp
 var analyticsStoragePrivateEndpointsSubnetName = vnetNames.subnets.analyticsStoragePrivateEndpoints
@@ -234,6 +237,12 @@ var subnets = deploySubnets ? [{
   properties: {
     addressPrefix: addressRanges.subnets.sqlServerPrivateEndpoints
   }
+}
+{
+  name: dataFilesStoragePrivateEndpointsSubnetName
+  properties: {
+    addressPrefix: addressRanges.subnets.dataFilesStoragePrivateEndpoints
+  }
 }] : null
 
 module vNetModule '../../../common/components/virtual-network/virtual-network.bicep' = {
@@ -342,5 +351,9 @@ output subnets VNetSubnets = {
   sqlServerPrivateEndpoints: {
     name: sqlServerPrivateEndpointsSubnetName
     id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, sqlServerPrivateEndpointsSubnetName)
+  }
+  dataFilesStoragePrivateEndpoints: {
+    name: dataFilesStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, dataFilesStoragePrivateEndpointsSubnetName)
   }
 }

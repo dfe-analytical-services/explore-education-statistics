@@ -70,5 +70,8 @@ param vNetAddressRanges = {
     // Analytics subnets.
     analyticsFunctionApp: '10.0.17.0/24'
     analyticsStoragePrivateEndpoints: '10.0.16.0/24'
+
+    // Data files subnets.
+    dataFilesStoragePrivateEndpoints: '10.0.24.0/24'
   }
 }

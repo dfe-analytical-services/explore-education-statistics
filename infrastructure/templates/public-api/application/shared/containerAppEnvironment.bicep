@@ -24,6 +24,10 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' 
   name: resourceNames.publicApi.storage.storageAccount
 }
 
+resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: resourceNames.dataFiles.storage.storageAccountName
+}
+
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: resourceNames.vnet.vnet
 }
@@ -55,6 +59,13 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
         storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
         fileShareName: resourceNames.publicApi.storage.fileShare
         accessMode: 'ReadWrite'
+      }
+      {
+        storageName: resourceNames.dataFiles.storage.fileShareName
+        storageAccountName: resourceNames.dataFiles.storage.storageAccountName
+        storageAccountKey: dataFilesStorageAccount.listKeys().keys[0].value
+        fileShareName: resourceNames.dataFiles.storage.fileShareName
+        accessMode: 'ReadOnly'
       }
     ]
     workloadProfiles: workloadProfiles

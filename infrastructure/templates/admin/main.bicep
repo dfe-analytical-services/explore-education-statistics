@@ -55,6 +55,12 @@ param tagValues object
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
+var dataFilesFileShareMountPath string = '\\mounts\\data-files'
+
+resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
+  name: resourceNames.dataFiles.storage.storageAccountName
+}
+
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'adminAppServicePlanModule'
   params: {
@@ -125,6 +131,15 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
+    azureFileShares: [
+      {
+        storageName: dataFilesStorageAccount.name
+        storageAccountKey: dataFilesStorageAccount.listKeys().keys[0].value
+        storageAccountName: dataFilesStorageAccount.name
+        fileShareName: resourceNames.dataFiles.storage.fileShareName
+        mountPath: dataFilesFileShareMountPath
+      }
+    ]
     alerts: deployAlerts ? {
       appServiceHealth: true
       httpErrors: true
