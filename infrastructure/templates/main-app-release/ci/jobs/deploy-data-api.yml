@@ -27,6 +27,10 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - download: MainBuild
               displayName: Download Data API artifact
               artifact: data-api
@@ -43,7 +47,7 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayNamePrefix: Data API
-                appName: $(subscription)-as-ees-data
+                appName: $(resourceNames.dataApi.appService)
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/data-api/GovUk.Education.ExploreEducationStatistics.Data.Api.zip
                 appSettingsJson: $(appSettings)

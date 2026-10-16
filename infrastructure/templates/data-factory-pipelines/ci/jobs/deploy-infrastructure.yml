@@ -27,6 +27,10 @@ jobs:
 
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Validate Bicep template
@@ -40,7 +44,7 @@ jobs:
               parameters:
                 action: stop
                 serviceConnection: ${{ parameters.serviceConnection }}
-                dataFactoryName: $(dataFactoryName)
+                dataFactoryName: $(resourceNames.dataFactory)
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -54,4 +58,4 @@ jobs:
                 action: start
                 condition: succeededOrFailed()
                 serviceConnection: ${{ parameters.serviceConnection }}
-                dataFactoryName: '$(dataFactoryName)'
+                dataFactoryName: $(resourceNames.dataFactory)

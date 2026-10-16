@@ -25,6 +25,15 @@ steps:
         deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
         echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
 
+        # TODO EES-7502 - consider using bicep snapshot as per usage in
+        # infrastructure/common/ci/tasks/get-resource-names.yml to speed up
+        # this task by 40 seconds or so.
+        #
+        # This would mean not versioning the secrets in any of the Bicep files
+        # that we snapshot, and so we'll need to ensure that restarts occur
+        # successfully on every deployed app service and function app regardless
+        # of Azure seeing no changes in appsettings. This will allow us to update
+        # secrets and be sure they are used on the next deployment.
         az deployment group create \
           --name ${{ parameters.bicepConfigDeployName }} \
           --resource-group $(resourceGroupName) \
