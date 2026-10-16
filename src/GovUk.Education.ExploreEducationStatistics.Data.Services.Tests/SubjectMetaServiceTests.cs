@@ -136,6 +136,102 @@ public class SubjectMetaServiceTests
     }
 
     [Fact]
+    public async Task GetSubjectMeta_PairedIndicators()
+    {
+        var subject = new Subject { Id = Guid.NewGuid() };
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            SubjectId = subject.Id,
+        };
+
+        var parentIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator 1" };
+        var childIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator 2" };
+        var unpairedIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator 3" };
+
+        var indicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator group",
+            Indicators = [parentIndicator, childIndicator, unpairedIndicator],
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
+            File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data },
+            PairedIndicators =
+            [
+                new PairedIndicatorEntry(ParentIndicatorId: parentIndicator.Id, ChildIndicatorId: childIndicator.Id),
+            ],
+        };
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+        var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+        var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+
+        filterRepository
+            .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
+            .ReturnsAsync(new List<Filter>());
+
+        indicatorGroupRepository
+            .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
+            .ReturnsAsync([indicatorGroup]);
+
+        timePeriodService
+            .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
+            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+        locationRepository
+            .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
+            .ReturnsAsync(new List<Location>());
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildSubjectMetaService(
+                statisticsDbContext,
+                contentDbContext,
+                filterRepository: filterRepository.Object,
+                indicatorGroupRepository: indicatorGroupRepository.Object,
+                locationRepository: locationRepository.Object,
+                timePeriodService: timePeriodService.Object
+            );
+
+            var viewModel = (
+                await service.GetSubjectMeta(
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
+                    subjectId: releaseSubject.SubjectId
+                )
+            ).AssertRight();
+
+            VerifyAllMocks(filterRepository, indicatorGroupRepository, locationRepository, timePeriodService);
+
+            var options = Assert.Single(viewModel.Indicators).Value.Options;
+
+            Assert.Equal(3, options.Count);
+            Assert.Null(options.Single(o => o.Value == parentIndicator.Id).ParentIndicatorId);
+            Assert.Equal(parentIndicator.Id, options.Single(o => o.Value == childIndicator.Id).ParentIndicatorId);
+            Assert.Null(options.Single(o => o.Value == unpairedIndicator.Id).ParentIndicatorId);
+        }
+    }
+
+    [Fact]
     public async Task GetSubjectMeta_LocationsForSubject()
     {
         var subject = new Subject { Id = Guid.NewGuid() };
@@ -723,8 +819,15 @@ public class SubjectMetaServiceTests
             SubjectId = subject.Id,
         };
 
+        var indicator1Id = Guid.NewGuid();
+        var indicator2Id = Guid.NewGuid();
+
         var releaseFile = new ReleaseFile
         {
+            PairedIndicators =
+            [
+                new PairedIndicatorEntry(ParentIndicatorId: indicator1Id, ChildIndicatorId: indicator2Id),
+            ],
             ReleaseVersion = new Content.Model.ReleaseVersion
             {
                 Id = releaseSubject.ReleaseVersion.Id,
@@ -833,7 +936,7 @@ public class SubjectMetaServiceTests
                     Indicators = ListOf(
                         new Indicator
                         {
-                            Id = Guid.NewGuid(),
+                            Id = indicator2Id,
                             Unit = IndicatorUnit.None,
                             Label = "Indicator 2",
                         }
@@ -846,7 +949,7 @@ public class SubjectMetaServiceTests
                     Indicators = ListOf(
                         new Indicator
                         {
-                            Id = Guid.NewGuid(),
+                            Id = indicator1Id,
                             Unit = IndicatorUnit.Percent,
                             Label = "Indicator 1",
                         }
@@ -978,6 +1081,7 @@ public class SubjectMetaServiceTests
                                     Label = "Indicator 2",
                                     Unit = IndicatorUnit.None,
                                     Value = indicatorGroups[0].Indicators[0].Id,
+                                    ParentIndicatorId = indicator1Id,
                                 }
                             ),
                             Order = 1,
