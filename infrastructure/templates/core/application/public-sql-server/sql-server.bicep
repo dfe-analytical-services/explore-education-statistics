@@ -2,8 +2,8 @@ import { VNetSubnets } from '../virtual-network/types.bicep'
 import { AzureSqlDatabaseConfig } from '../../../common/components/azure-sql/types.bicep'
 import { IpRange } from '../../../common/types.bicep'
 
-@description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Name of the Public SQL Server.')
+param serverName string
 
 @description('Specifies the location for all resources.')
 param location string = resourceGroup().location
@@ -56,8 +56,6 @@ param deployAlerts bool
 @description('Tags for the resources')
 param tagValues object
 
-var publicSqlServerName = '${subscription}-sqlsvr-ees-02'
-
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
@@ -72,7 +70,7 @@ var allowedSubnets = [
 module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' = {
   name: 'publicSqlServerDeploy'
   params: {
-    serverName: publicSqlServerName
+    serverName: serverName
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorLoginPassword: keyVault.getSecret('ees-sql-admin-password')
@@ -82,7 +80,7 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     allowedSubnets: allowedSubnets
     privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
     // TODO EES-7502 - use standardised name for private endpoint connections.
-    privateLinkServiceConnectionNameOverride: '${publicSqlServerName}-pep-conn'
+    privateLinkServiceConnectionNameOverride: '${serverName}-pep-conn'
     firewallRules: firewallRules
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
