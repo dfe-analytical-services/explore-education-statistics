@@ -431,6 +431,12 @@ public class ContentDbContext : DbContext
                     v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v)
                 );
             entity
+                .Property(rf => rf.PairedIndicators)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<PairedIndicatorEntry>>(v)
+                );
+            entity
                 .Property(rf => rf.Published)
                 .HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
             entity
