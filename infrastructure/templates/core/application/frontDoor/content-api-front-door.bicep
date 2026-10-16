@@ -1,7 +1,7 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
-@description('Environment subscription prefix.')
-param subscription string
+@description('Names of the Content API Front Door child resources.')
+param names ResourceNames.frontDoor.contentApi
 
 @description('Name of the existing Azure Front Door profile.')
 param frontDoorProfileName string
@@ -12,6 +12,9 @@ param frontDoorEndpointName string
 @description('Name of the Key Vault containing the Content API certificate.')
 param keyVaultName string
 
+@description('Name of the Content API certificate in Key Vault.')
+param certificateName string
+
 @description('Public hostname of the Content API.')
 param contentApiHostName string
 
@@ -20,10 +23,6 @@ param contentApiOriginHostName string
 
 @description('Name of the existing Publisher Function App granted permission to purge cached ZIPs.')
 param publisherFunctionName string
-
-var contentApiResourcePrefix = '${subscription}-ees-content'
-var customDomainName = '${contentApiResourcePrefix}-${abbreviations.frontDoorDomains}'
-var certificateName = '${subscription}-as-ees-content-afd-certificate'
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
@@ -39,7 +38,7 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
 }
 
 module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = {
-  name: '${contentApiResourcePrefix}PublisherRoleAssignmentModuleDeploy'
+  name: 'contentApiPublisherRoleAssignmentModuleDeploy'
   params: {
     frontDoorProfileName: frontDoorProfileName
     frontDoorEndpointName: frontDoorEndpointName
@@ -50,7 +49,7 @@ module publisherFrontDoorRoleAssignment '../../../common/components/front-door/a
 
 resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
   parent: frontDoor
-  name: '${contentApiResourcePrefix}-${abbreviations.frontDoorOriginGroups}'
+  name: names.originGroup
   properties: {
     loadBalancingSettings: {
       sampleSize: 4
@@ -63,7 +62,7 @@ resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
 
 resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
   parent: originGroup
-  name: '${contentApiResourcePrefix}-${abbreviations.frontDoorOrigins}'
+  name: names.origin
   properties: {
     hostName: contentApiOriginHostName
     httpPort: 80
@@ -77,7 +76,7 @@ resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
 }
 
 module certificateModule '../../../common/components/front-door/byoCertificate.bicep' = {
-  name: '${contentApiResourcePrefix}CertificateModuleDeploy'
+  name: 'contentApiCertificateModuleDeploy'
   params: {
     keyVaultName: keyVaultName
     frontDoorName: frontDoorProfileName
@@ -88,7 +87,7 @@ module certificateModule '../../../common/components/front-door/byoCertificate.b
 
 resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
   parent: frontDoor
-  name: customDomainName
+  name: names.customDomain
   properties: {
     hostName: contentApiHostName
     tlsSettings: {
@@ -104,7 +103,7 @@ resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-
 
 resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
-  name: '${contentApiResourcePrefix}-${abbreviations.frontDoorRoutes}'
+  name: names.route
   properties: {
     customDomains: [
       {
@@ -134,7 +133,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
 
 resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
-  name: '${contentApiResourcePrefix}-all-files-cache-${abbreviations.frontDoorRoutes}'
+  name: names.allFilesCacheRoute
   properties: {
     customDomains: [
       {

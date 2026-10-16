@@ -1,8 +1,8 @@
-import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 import { IpRange } from '../common/types.bicep'
 import { AzureSqlDatabaseConfig } from '../common/components/azure-sql/types.bicep'
 import { VNetAddressRanges } from 'application/virtual-network/types.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -131,23 +131,15 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-var commonResourcePrefix = '${subscription}-ees'
-var publicApiResourcePrefix = '${subscription}-ees-papi'
-
-var resourceNames = {
-  existingResources: {
-    adminApp: '${subscription}-as-ees-admin'
-    publicApiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
-    publicApiDocsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicSiteApp: '${subscription}-as-ees-public-site'
-    publisherFunction: '${subscription}-${abbreviations.webSitesFunctions}-ees-publisher'
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+})
 
 module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   name: 'vNetModuleDeploy'
   params: {
-    subscription: subscription
+    names: resourceNames.vnet
     deploySubnets: deploySubnets
     addressRanges: vNetAddressRanges
     tagValues: tagValues
@@ -165,7 +157,7 @@ module privateDnsZonesModule 'application/virtual-network/private-dns-zones.bice
 module keyVaultModule 'application/keyVault/keyVault.bicep' = {
   name: 'keyVaultModuleDeploy'
   params: {
-    subscription: subscription
+    keyVaultName: resourceNames.keyVault.keyVault
     tagValues: tagValues
   }
 }
@@ -173,7 +165,7 @@ module keyVaultModule 'application/keyVault/keyVault.bicep' = {
 module logAnalyticsWorkspaceModule 'application/log-analytics-workspace/log-analytics-workspace.bicep' = {
   name: 'logAnalyticsWorkspaceApplicationModuleDeploy'
   params: {
-    resourcePrefix: commonResourcePrefix
+    workspaceName: resourceNames.logAnalyticsWorkspace
     location: location
     tagValues: tagValues
   }
@@ -183,6 +175,8 @@ module alertsModule 'application/alerts/alerts.bicep' = {
   name: 'alertsModuleDeploy'
   params: {
     subscription: subscription
+    actionGroupName: resourceNames.alertsGroup
+    alertsLogicAppName: resourceNames.alertsLogicApp
     keyVaultName: keyVaultModule.outputs.keyVaultName
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
   }
@@ -192,7 +186,7 @@ module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
     location: location
-    resourcePrefix: commonResourcePrefix
+    names: resourceNames.backups
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     deployRecoveryServicesVault: deployRecoveryServicesVault
     recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
@@ -204,11 +198,11 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    resourcePrefix: commonResourcePrefix
+    names: resourceNames.eventGrid
     resourceNames: {
-      adminApp: resourceNames.existingResources.adminApp
+      adminApp: resourceNames.admin.appService
       alertsGroup: alertsModule.outputs.actionGroupName
-      publisherFunction: resourceNames.existingResources.publisherFunction
+      publisherFunction: resourceNames.publisher.functionApp
       vNet: vNetModule.outputs.vNetName
       subnets: {
         eventGridCustomTopicPrivateEndpoints: vNetModule.outputs.eventGridCustomTopicPrivateEndpointsSubnetName
@@ -222,12 +216,16 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
 module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzureFrontDoor) {
   name: 'frontDoorModuleDeploy'
   params: {
-    subscription: subscription
+    names: resourceNames.frontDoor
+    publicSiteCertificateName: resourceNames.keyVault.certificates.publicSite
+    contentApiCertificateName: resourceNames.keyVault.certificates.contentApiFrontDoor
+    publicSiteAppServiceName: resourceNames.publicSite.appService
+    contentApiAppServiceName: resourceNames.contentApi.appService
+    alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    resourcePrefix: commonResourcePrefix
     publicSiteUrl: publicSiteUrl
     contentApiUrl: contentApiUrl
-    publisherFunctionName: resourceNames.existingResources.publisherFunction
+    publisherFunctionName: resourceNames.publisher.functionApp
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
@@ -240,12 +238,15 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
   name: 'appGatewayModuleDeploy'
   params: {
     location: location
-    subscription: subscription
+    names: resourceNames.applicationGateway
+    subnetName: resourceNames.vnet.subnets.applicationGateway
+    publicApiCertificateName: resourceNames.keyVault.certificates.publicApiAppGateway
+    publicSiteCertificateName: resourceNames.keyVault.certificates.publicSite
     alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    publicApiAppName: resourceNames.existingResources.publicApiApp
-    publicApiDocsAppName: resourceNames.existingResources.publicApiDocsApp
-    publicSiteAppServiceName: resourceNames.existingResources.publicSiteApp
+    publicApiAppName: resourceNames.publicApi.apiApp
+    publicApiDocsAppName: resourceNames.publicApi.docsApp
+    publicSiteAppServiceName: resourceNames.publicSite.appService
     vnetName: vNetModule.outputs.vNetName
     publicApiAppGatewayFqdn: publicApiApplicationGatewayFqdn
     publicApiPublicUrl: publicApiPublicUrl
@@ -259,7 +260,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
 module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (deployDataFactory) {
   name: 'dataFactoryModuleDeploy'
   params: {
-    subscription: subscription
+    dataFactoryName: resourceNames.dataFactory
     alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
     deployAlerts: deployAlerts
@@ -270,6 +271,7 @@ module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (dep
 module containerRegistryModule 'application/container-registry/container-registry.bicep' = if (deployContainerRegistry && environmentName == 'Development') {
   name: 'containerRegistryModuleDeploy'
   params: {
+    containerRegistryName: resourceNames.acr.serverName
     tagValues: tagValues
   }
 }
@@ -277,7 +279,7 @@ module containerRegistryModule 'application/container-registry/container-registr
 module loggingStorageAccountModule 'application/logging-storage-account/logging-storage-account.bicep' = {
   name: 'loggingStorageAccountModuleDeploy'
   params: {
-    subscription: subscription
+    storageAccountName: resourceNames.storageAccounts.logging
     alertsGroupName: alertsModule.outputs.actionGroupName
     blobDeleteRetentionDays: blobDeleteRetentionDays
     deployAlerts: deployAlerts
@@ -288,8 +290,7 @@ module loggingStorageAccountModule 'application/logging-storage-account/logging-
 module coreStorageAccountModule 'application/core-storage-account/core-storage-account.bicep' = {
   name: 'coreStorageAccountModuleDeploy'
   params: {
-    subscription: subscription
-    environmentName: environmentName
+    storageAccountName: resourceNames.storageAccounts.core
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -305,7 +306,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
 module publicStorageAccountModule 'application/public-storage-account/public-storage-account.bicep' = {
   name: 'publicStorageAccountModuleDeploy'
   params: {
-    subscription: subscription
+    storageAccountName: resourceNames.storageAccounts.public
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -321,7 +322,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
 module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
   name: 'coreSqlServerModuleDeploy'
   params: {
-    subscription: subscription
+    serverName: resourceNames.databases.coreSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
     keyVaultName: keyVaultModule.outputs.keyVaultName
@@ -345,7 +346,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
 module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
   name: 'publicSqlServerModuleDeploy'
   params: {
-    subscription: subscription
+    serverName: resourceNames.databases.publicSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
     keyVaultName: keyVaultModule.outputs.keyVaultName

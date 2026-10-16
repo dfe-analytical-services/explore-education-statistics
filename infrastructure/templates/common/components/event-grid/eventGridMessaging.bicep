@@ -1,8 +1,4 @@
-import { buildFullyQualifiedTopicName } from '../../functions.bicep'
 import { IpRange } from '../../types.bicep'
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
 
 @description('Location for all resources.')
 param location string
@@ -15,7 +11,7 @@ param publicNetworkAccessEnabled bool = false
 
 @description('Specifies a set of custom topics and configuration associated with them.')
 param customTopics {
-  @description('A list of custom topic names to create.')
+  @description('A list of fully-qualified custom topic names to create.')
   @minLength(1)
   names: string[]
   @description('The resource id of the subnet to be used for creating private endpoints for custom topics.')
@@ -40,7 +36,7 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
   for (topicName, index) in customTopicNames: {
     name: 'eventGridCustomTopicModuleDeploy-${index}'
     params: {
-      name: buildFullyQualifiedTopicName(resourcePrefix, topicName)
+      name: topicName
       location: location
       ipRules: ipRules
       privateEndpointSubnetId: customTopics.?privateEndpointSubnetId

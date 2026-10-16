@@ -4,8 +4,7 @@ Publisher Function App have the necessary permissions to send events to the Even
 '''
 
 import { builtInRoleDefinitionIds } from '../../../common/builtInRoles.bicep'
-import { eventTopics } from '../../../common/eventTopics.bicep'
-import { buildFullyQualifiedTopicName } from '../../../common/functions.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 import { IpRange } from '../../../common/types.bicep'
 
 @description('Location for all resources.')
@@ -29,8 +28,8 @@ param resourceNames {
   }
 }
 
-@description('Resource prefix for all resources.')
-param resourcePrefix string
+@description('Names of the Event Grid resources.')
+param names ResourceNames.eventGrid
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
@@ -38,7 +37,7 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var topicNames = map(items(eventTopics), item => item.value)
+var topicNamesList = map(items(names.topics), item => item.value)
 
 resource adminAppService 'Microsoft.Web/sites@2024-04-01' existing = {
   name: resourceNames.adminApp
@@ -63,9 +62,8 @@ module eventGridMessagingModule '../../../common/components/event-grid/eventGrid
     location: location
     ipRules: ipRules
     publicNetworkAccessEnabled: publicNetworkAccessEnabled
-    resourcePrefix: resourcePrefix
     customTopics: {
-      names: topicNames
+      names: topicNamesList
       privateEndpointSubnetId: eventGridCustomTopicPrivateEndpointsSubnet.id
       alerts: deployAlerts ? {
         deadLetteredCount: true
@@ -82,12 +80,12 @@ module eventGridMessagingModule '../../../common/components/event-grid/eventGrid
 
 // Allow the Admin App Service to send events to Event Grid topics
 module adminTopicRoleAssignmentModuleDeploy '../../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
-  for (topicName, index) in topicNames: {
+  for (topicName, index) in topicNamesList: {
     name: 'adminTopicRoleAssignmentModuleDeploy-${index}'
     params: {
       principalId: adminAppService.identity.principalId
       roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
-      topicName: buildFullyQualifiedTopicName(resourcePrefix, topicName)
+      topicName: topicName
     }
     dependsOn: [
       eventGridMessagingModule
@@ -97,12 +95,12 @@ module adminTopicRoleAssignmentModuleDeploy '../../../common/components/event-gr
 
 // Allow the Publisher Function App to send events to Event Grid topics
 module publisherTopicRoleAssignmentModuleDeploy '../../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
-  for (topicName, index) in topicNames: {
+  for (topicName, index) in topicNamesList: {
     name: 'publisherTopicRoleAssignmentModuleDeploy-${index}'
     params: {
       principalId: publisherFunction.identity.principalId
       roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
-      topicName: buildFullyQualifiedTopicName(resourcePrefix, topicName)
+      topicName: topicName
     }
     dependsOn: [
       eventGridMessagingModule
