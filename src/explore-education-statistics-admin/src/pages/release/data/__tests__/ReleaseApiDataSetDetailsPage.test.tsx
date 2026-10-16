@@ -1010,6 +1010,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           1,
         );
         expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledWith({
+          allowMajorVersionUpdate: false,
           dataSetVersionId: 'draft-version-id',
         });
       });
@@ -1117,6 +1118,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
           1,
         );
         expect(apiDataSetVersionService.completeVersion).toHaveBeenCalledWith({
+          allowMajorVersionUpdate: false,
           dataSetVersionId: 'draft-version-id',
         });
       });
@@ -1200,6 +1202,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftVersion: {
         ...testDraftVersion,
         version: '2.0.1',
+        status: 'Mapping',
         mappingStatus: {
           isMajorVersionUpdate: true,
           locationsComplete: false,
@@ -1212,7 +1215,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       },
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
@@ -1256,7 +1259,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
         },
       });
 
-      renderPage();
+      renderPage({ user: testAnalystUser });
 
       expect(
         await screen.findByRole('heading', {
@@ -1300,6 +1303,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftVersion: {
         ...testDraftVersion,
         version: '2.0.1',
+        status: 'Mapping',
         mappingStatus: {
           isMajorVersionUpdate: true,
           locationsComplete: false,
@@ -1312,7 +1316,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       },
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
@@ -1358,6 +1362,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftVersion: {
         ...testDraftVersion,
         version: '2.0.1',
+        status: 'Mapping',
         mappingStatus: {
           isMajorVersionUpdate: true,
           locationsComplete: true,
@@ -1370,7 +1375,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       },
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
@@ -1416,6 +1421,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       draftVersion: {
         ...testDraftVersion,
         version: '2.0.1',
+        status: 'Mapping',
         mappingStatus: {
           isMajorVersionUpdate: true,
           locationsComplete: false,
@@ -1428,7 +1434,7 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       },
     });
 
-    renderPage();
+    renderPage({ user: testAnalystUser });
 
     await waitFor(() => {
       expect(
