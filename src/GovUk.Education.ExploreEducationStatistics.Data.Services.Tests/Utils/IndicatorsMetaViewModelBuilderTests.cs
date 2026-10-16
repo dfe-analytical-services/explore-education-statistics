@@ -415,4 +415,71 @@ public class IndicatorsMetaViewModelBuilderTests
         Assert.Equal("Indicator a", result[1].Label);
         Assert.Equal("Indicator b", result[2].Label);
     }
+
+    [Fact]
+    public void BuildIndicatorGroups_SetsParentIndicatorIdOnChildren()
+    {
+        var parentIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator a" };
+        var childIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator b" };
+        var unpairedIndicator = new Indicator { Id = Guid.NewGuid(), Label = "Indicator c" };
+
+        var indicatorGroups = new List<IndicatorGroup>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Label = "Group a",
+                Indicators = [parentIndicator, unpairedIndicator],
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Label = "Group b",
+                Indicators = [childIndicator],
+            },
+        };
+
+        var pairedIndicators = new List<PairedIndicatorEntry>
+        {
+            new(ParentIndicatorId: parentIndicator.Id, ChildIndicatorId: childIndicator.Id),
+            // A pair whose child is not in the subject is ignored
+            new(ParentIndicatorId: parentIndicator.Id, ChildIndicatorId: Guid.NewGuid()),
+        };
+
+        var result = BuildIndicatorGroups(indicatorGroups, pairedIndicators: pairedIndicators);
+
+        var options = result.Values.SelectMany(group => group.Options).ToList();
+
+        Assert.Equal(3, options.Count);
+        Assert.Null(options.Single(o => o.Value == parentIndicator.Id).ParentIndicatorId);
+        Assert.Equal(parentIndicator.Id, options.Single(o => o.Value == childIndicator.Id).ParentIndicatorId);
+        Assert.Null(options.Single(o => o.Value == unpairedIndicator.Id).ParentIndicatorId);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void BuildIndicatorGroups_NoPairedIndicators(bool pairedIndicatorsIsNull)
+    {
+        var indicatorGroups = new List<IndicatorGroup>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Label = "Group a",
+                Indicators =
+                [
+                    new Indicator { Id = Guid.NewGuid(), Label = "Indicator a" },
+                    new Indicator { Id = Guid.NewGuid(), Label = "Indicator b" },
+                ],
+            },
+        };
+
+        var result = BuildIndicatorGroups(
+            indicatorGroups,
+            pairedIndicators: pairedIndicatorsIsNull ? null : new List<PairedIndicatorEntry>()
+        );
+
+        Assert.All(result.Values.SelectMany(group => group.Options), option => Assert.Null(option.ParentIndicatorId));
+    }
 }
