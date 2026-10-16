@@ -242,6 +242,7 @@ public class ReleaseAmendmentServiceTests
                 FileId = dataFile1.Id,
                 FilterSequence = [new FilterSequenceEntry(Guid.NewGuid(), [new(Guid.NewGuid(), [Guid.NewGuid()])])],
                 IndicatorSequence = [new IndicatorGroupSequenceEntry(Guid.NewGuid(), [Guid.NewGuid()])],
+                PairedIndicators = [new PairedIndicatorEntry(Guid.NewGuid(), Guid.NewGuid())],
                 Published = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 PublicApiDataSetId = Guid.NewGuid(),
                 PublicApiDataSetVersion = SemVersion.Parse("1.0.0", SemVersionStyles.Any),
@@ -1023,6 +1024,7 @@ public class ReleaseAmendmentServiceTests
         Assert.Equal(originalFile.Published!.Value, amendmentDataFile.Published!.Value, TimeSpan.FromMinutes(1));
         originalFile.FilterSequence.AssertDeepEqualTo(amendmentDataFile.FilterSequence);
         originalFile.IndicatorSequence.AssertDeepEqualTo(amendmentDataFile.IndicatorSequence);
+        originalFile.PairedIndicators.AssertDeepEqualTo(amendmentDataFile.PairedIndicators);
 
         Assert.Equal(originalFile.PublicApiDataSetId, amendmentDataFile.PublicApiDataSetId);
         Assert.Equal(originalFile.PublicApiDataSetVersion, amendmentDataFile.PublicApiDataSetVersion);

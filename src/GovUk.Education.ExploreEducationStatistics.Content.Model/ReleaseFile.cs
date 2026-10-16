@@ -38,6 +38,8 @@ public class ReleaseFile
 
     public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
 
+    public List<PairedIndicatorEntry>? PairedIndicators { get; set; }
+
     public DateTime? Published { get; set; }
 }
 
@@ -46,3 +48,5 @@ public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> Filter
 public record FilterGroupSequenceEntry(Guid Id, List<Guid> FilterItemSequence);
 
 public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence);
+
+public record PairedIndicatorEntry(Guid ParentIndicatorId, Guid ChildIndicatorId);
