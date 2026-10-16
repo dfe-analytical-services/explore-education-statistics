@@ -364,9 +364,6 @@ output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   : ''
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
-output keyVaultName string = resourceNames.keyVault.keyVault
-output dataProcessorFunctionAppName string = resourceNames.publicApi.processor.functionApp
-output docsAppName string = resourceNames.publicApi.docsApp
 
 output enableThemeDeletion bool = enableThemeDeletion
 
