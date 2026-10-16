@@ -1,5 +1,5 @@
 import { IpRange } from '../../../common/types.bicep'
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 import { StorageAccountConfig } from '../../../common/components/storage/types.bicep'
 
 @description('Specifies common resource naming variables.')
@@ -18,27 +18,27 @@ param tagValues object
 param deployAlerts bool
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.storagePrivateEndpoints
+  name: resourceNames.vnet.subnets.publicApiStoragePrivateEndpoints
   parent: vNet
 }
 
 module publicApiStorageAccountModule '../../../common/components/storage/storage-account.bicep' = {
   name: 'publicApiStorageAccountDeploy'
   params: {
-    storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+    storageAccountName: resourceNames.publicApi.storage.storageAccount
     publicNetworkAccessEnabled: false
     firewallRules: storageFirewallRules
     sku: config.sku
     kind: config.kind
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     privateEndpointSubnetIds: {
       file: storagePrivateEndpointSubnet.id
@@ -50,7 +50,7 @@ module publicApiStorageAccountModule '../../../common/components/storage/storage
 module dataFilesFileShareModule '../../../common/components/storage/fileShare.bicep' = {
   name: 'publicApiFileShareDeploy'
   params: {
-    fileShareName: resourceNames.publicApi.publicApiFileShare
+    fileShareName: resourceNames.publicApi.storage.fileShare
     fileShareQuotaGbs: config.fileShare.quotaGbs
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareAccessTier: config.fileShare.accessTier
@@ -58,7 +58,7 @@ module dataFilesFileShareModule '../../../common/components/storage/fileShare.bi
       availability: true
       latency: true
       capacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
   }
@@ -67,7 +67,7 @@ module dataFilesFileShareModule '../../../common/components/storage/fileShare.bi
 module publicApiStorageBackupModule '../../../common/components/recovery-services-vault/file-share-registration.bicep' = {
   name: 'publicApiStorageBackupModuleDeploy'
   params: {
-    vaultName: resourceNames.sharedResources.recoveryVault
+    vaultName: resourceNames.backups.recoveryServicesVault
     backupPolicyName: 'DailyPolicy'
     storageAccountName: publicApiStorageAccountModule.outputs.storageAccountName
     fileShareName: dataFilesFileShareModule.outputs.fileShareName
@@ -78,5 +78,5 @@ module publicApiStorageBackupModule '../../../common/components/recovery-service
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
 output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
 output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
-output publicApiDataFileShareName string = resourceNames.publicApi.publicApiFileShare
-output publicApiStorageAccountName string = resourceNames.publicApi.publicApiStorageAccount
+output publicApiDataFileShareName string = resourceNames.publicApi.storage.fileShare
+output publicApiStorageAccountName string = resourceNames.publicApi.storage.storageAccount

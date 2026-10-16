@@ -1,5 +1,5 @@
 import { IpRange, FirewallRule } from '../../../common/types.bicep'
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -41,7 +41,7 @@ param tagValues object
 var publicApiDataFileShareMountPath = '/data/public-api-data'
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: resourceNames.existingResources.adminApp
+  name: resourceNames.admin.appService
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -52,25 +52,25 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: resourceNames.publicApi.publicApiStorageAccount
+  name: resourceNames.publicApi.storage.storageAccount
 }
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: resourceNames.publicApi.dataProcessorIdentity
+  name: resourceNames.publicApi.processor.identity
   location: location
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.dataProcessor
+  name: resourceNames.vnet.subnets.publicApiDataProcessor
   parent: vNet
 }
 
 resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.dataProcessorPrivateEndpoints
+  name: resourceNames.vnet.subnets.publicApiDataProcessorPrivateEndpoints
   parent: vNet
 }
 
@@ -78,10 +78,9 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-
 module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    functionAppName: resourceNames.publicApi.dataProcessor
-    // Note that appServicePlan should be resourceNames.publicApi.dataProcessorPlan.
-    appServicePlanName: resourceNames.publicApi.dataProcessor
-    storageAccountsNamePrefix: resourceNames.publicApi.dataProcessorStorageAccountsPrefix
+    functionAppName: resourceNames.publicApi.processor.functionApp
+    appServicePlanName: resourceNames.publicApi.processor.appServicePlan
+    storageAccountsNamePrefix: resourceNames.publicApi.processor.storageAccountsPrefix
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
@@ -107,7 +106,7 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
     }
     processorProdAppSettings: processorProdAppSettings
     processorStagingAppSettings: processorStagingAppSettings
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: resourceNames.keyVault.keyVault
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
@@ -119,10 +118,10 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
     preWarmedInstanceCount: 1
     healthCheckPath: '/api/HealthCheck'
     azureFileShares: [{
-      storageName: resourceNames.publicApi.publicApiFileShare
+      storageName: resourceNames.publicApi.storage.fileShare
       storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
-      storageAccountName: resourceNames.publicApi.publicApiStorageAccount
-      fileShareName: resourceNames.publicApi.publicApiFileShare
+      storageAccountName: resourceNames.publicApi.storage.storageAccount
+      fileShareName: resourceNames.publicApi.storage.fileShare
       mountPath: publicApiDataFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
@@ -136,7 +135,7 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       fileServiceLatency: false
       fileServiceCapacity: true
       httpErrors: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
   }

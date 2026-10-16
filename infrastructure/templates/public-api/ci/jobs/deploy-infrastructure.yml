@@ -23,6 +23,10 @@ jobs:
 
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Validate Bicep template
@@ -45,7 +49,7 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 slotName: staging
                 apps:
-                  - appName: $(dataProcessorFunctionAppName)
+                  - appName: $(resourceNames.publicApi.processor.functionApp)
                     stagingVariableName: processorStagingAppSettings
                     prodVariableName: processorProdAppSettings
 

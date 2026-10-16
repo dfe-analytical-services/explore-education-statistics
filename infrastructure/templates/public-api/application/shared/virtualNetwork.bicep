@@ -1,31 +1,31 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
-@description('Specifies common resource naming variables.')
-param resourceNames ResourceNames
+@description('Names of the VNet and its subnets.')
+param names ResourceNames.vnet
 
-var subnets = resourceNames.existingResources.subnets
+var subnets = names.subnets
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: names.vnet
 }
 
 resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: subnets.adminApp
+  name: subnets.admin
   parent: vNet
 }
 
 resource publisherSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: subnets.publisherFunction
+  name: subnets.publisher
   parent: vNet
 }
 
 resource dataProcessorSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: subnets.dataProcessor
+  name: subnets.publicApiDataProcessor
   parent: vNet
 }
 
 resource dataProcessorPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: subnets.dataProcessorPrivateEndpoints
+  name: subnets.publicApiDataProcessorPrivateEndpoints
   parent: vNet
 }
 
@@ -40,12 +40,12 @@ resource psqlFlexibleServerSubnet 'Microsoft.Network/virtualNetworks/subnets@202
 }
 
 resource storageAccountPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: subnets.storagePrivateEndpoints
+  name: subnets.publicApiStoragePrivateEndpoints
   parent: vNet
 }
 
 @description('The fully qualified Azure resource ID of the virtual network')
-output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', resourceNames.existingResources.vNet)
+output vnetId string = resourceId('Microsoft.Network/VirtualNetworks', names.vnet)
 
 @description('The name of the virtual network')
 output vnetName string = vNet.name
