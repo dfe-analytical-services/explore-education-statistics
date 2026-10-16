@@ -6,11 +6,11 @@ parameters:
       - master
       - dev
       - test
-  - name: includeTests
+  - name: IncludeTests
     displayName: Run test steps
     type: boolean
     default: true
-  - name: includeFormattingAndLinting
+  - name: IncludeFormattingAndLinting
     displayName: Run formatting and linting checks
     type: boolean
     default: true
@@ -78,7 +78,7 @@ jobs:
           performMultiLevelLookup: true
 
       # Check code formatting
-      - ${{ if eq(parameters.includeFormattingAndLinting, true) }}:
+      - ${{ if eq(parameters.IncludeFormattingAndLinting, true) }}:
           - task: DotNetCoreCLI@2
             displayName: Restore .NET tools
             inputs:
@@ -113,7 +113,7 @@ jobs:
               tufin/oasdiff \
               /scripts/public-api-openapi-diff.sh
 
-  - ${{ if eq(parameters.includeTests, true) }}:
+  - ${{ if eq(parameters.IncludeTests, true) }}:
       - job: BackendTest
         pool: ees-ubuntu2604-xlarge-v2
         workspace:
@@ -336,7 +336,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: --configuration $(BuildConfiguration)
 
-      - ${{ if eq(parameters.includeTests, true) }}:
+      - ${{ if eq(parameters.IncludeTests, true) }}:
           - task: DotNetCoreCLI@2
             displayName: Test
             inputs:
@@ -416,7 +416,7 @@ jobs:
           targetType: inline
           script: pnpm tsc
 
-      - ${{ if eq(parameters.includeFormattingAndLinting, true) }}:
+      - ${{ if eq(parameters.IncludeFormattingAndLinting, true) }}:
           - task: Bash@3
             displayName: pnpm lint
             inputs:
@@ -431,7 +431,7 @@ jobs:
               targetType: inline
               script: pnpm format:check
 
-      - ${{ if eq(parameters.includeTests, true) }}:
+      - ${{ if eq(parameters.IncludeTests, true) }}:
           - task: Bash@3
             displayName: pnpm test:ci
             inputs:
