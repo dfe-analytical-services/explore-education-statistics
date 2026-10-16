@@ -1,8 +1,8 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 import { VNetAddressRanges, VNetSubnets } from 'types.bicep'
 
-@description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Names of the VNet and its subnets.')
+param names ResourceNames.vnet
 
 @description('Whether or not to deploy the subnets.')
 param deploySubnets bool
@@ -13,55 +13,44 @@ param addressRanges VNetAddressRanges
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var vNetName = '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
-
-var environment = 'ees'
-var subnetAbbreviation = abbreviations.networkVirtualNetworksSubnets
-
-// TODO EES-7502 - we have a number of different naming conventions for subnets.
-// Handle as part of the overall naming convention alignment.
-var generalSubnetNamePrefix = '${subscription}-${environment}-${subnetAbbreviation}-'
-var legacySubnetNamePrefix = '${subscription}-${subnetAbbreviation}-${environment}-'
-var publicApiSubnetNamePrefix = '${subscription}-${environment}-papi-${subnetAbbreviation}-'
-var screenerSubnetNamePrefix = '${subscription}-${environment}-sapi-${subnetAbbreviation}-'
+var vNetName = names.vnet
 
 // Core shared infrastructure subnets.
-var applicationGatewaySubnetName = '${generalSubnetNamePrefix}agw-01'
-var eventGridCustomTopicPrivateEndpointsSubnetName = '${generalSubnetNamePrefix}evgt-pep'
+var applicationGatewaySubnetName = names.subnets.applicationGateway
+var eventGridCustomTopicPrivateEndpointsSubnetName = names.subnets.eventGridCustomTopicPrivateEndpoints
 
-// Core application subnets. 
-var adminSubnetName = '${legacySubnetNamePrefix}admin'
-var importerSubnetName = '${legacySubnetNamePrefix}importer'
-var publisherSubnetName = '${legacySubnetNamePrefix}publisher'
-var notifySubnetName = '${legacySubnetNamePrefix}notify'
-var contentSubnetName = '${legacySubnetNamePrefix}content'
-var dataSubnetName = '${legacySubnetNamePrefix}data'
-var sqlServerPrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sqlsvr-pep'
+// Core application subnets.
+var adminSubnetName = names.subnets.admin
+var importerSubnetName = names.subnets.importer
+var publisherSubnetName = names.subnets.publisher
+var notifySubnetName = names.subnets.notifier
+var contentSubnetName = names.subnets.contentApi
+var dataSubnetName = names.subnets.dataApi
+var sqlServerPrivateEndpointsSubnetName = names.subnets.sqlServerPrivateEndpoints
 
-// Screener subnets. 
-var screenerFunctionAppSubnetName = '${screenerSubnetNamePrefix}fa-screener'
-var screenerStoragePrivateEndpointsSubnetName = '${screenerSubnetNamePrefix}sa-screener-pep'
+// Screener subnets.
+var screenerFunctionAppSubnetName = names.subnets.screenerFunctionApp
+var screenerStoragePrivateEndpointsSubnetName = names.subnets.screenerStoragePrivateEndpoints
 
-// Public API subnets. 
-var publicApiDataProcessorSubnetName = '${publicApiSubnetNamePrefix}fa-processor'
-var publicApiDataProcessorPrivateEndpointsSubnetName = '${publicApiSubnetNamePrefix}fa-processor-pep'
-var publicApiStoragePrivateEndpointsSubnetName = '${publicApiSubnetNamePrefix}sa-pep'
-var containerAppEnvironmentSubnetName = '${generalSubnetNamePrefix}cae-01'
-var psqlFlexibleServerSubnetName = '${generalSubnetNamePrefix}psql-flexibleserver'
+// Public API subnets.
+var publicApiDataProcessorSubnetName = names.subnets.publicApiDataProcessor
+var publicApiDataProcessorPrivateEndpointsSubnetName = names.subnets.publicApiDataProcessorPrivateEndpoints
+var publicApiStoragePrivateEndpointsSubnetName = names.subnets.publicApiStoragePrivateEndpoints
+var containerAppEnvironmentSubnetName = names.subnets.containerAppEnvironment
+var psqlFlexibleServerSubnetName = names.subnets.psqlFlexibleServer
 
-// NL Search subnets. 
-var nlSearchFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-nlsearch'
-var nlSearchFunctionAppPrivateEndpointsSubnetName = '${generalSubnetNamePrefix}fa-nlsearch-pep'
+// NL Search subnets.
+var nlSearchFunctionAppSubnetName = names.subnets.nlSearchFunctionApp
+var nlSearchFunctionAppPrivateEndpointsSubnetName = names.subnets.nlSearchFunctionAppPrivateEndpoints
 
-// Search subnets. 
-var searchDocsFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-searchdocs'
-var searchDocsFunctionAppPrivateEndpointsSubnetName = '${generalSubnetNamePrefix}fa-searchdocs-pep'
-var searchStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-search-pep'
+// Search subnets.
+var searchDocsFunctionAppSubnetName = names.subnets.searchDocsFunctionApp
+var searchDocsFunctionAppPrivateEndpointsSubnetName = names.subnets.searchDocsFunctionAppPrivateEndpoints
+var searchStoragePrivateEndpointsSubnetName = names.subnets.searchStoragePrivateEndpoints
 
-// Analytics subnets. 
-var analyticsFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-analytics'
-var analyticsStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-anlyt-pep'
-    
+// Analytics subnets.
+var analyticsFunctionAppSubnetName = names.subnets.analyticsFunctionApp
+var analyticsStoragePrivateEndpointsSubnetName = names.subnets.analyticsStoragePrivateEndpoints
 
 var subnets = deploySubnets ? [{
   name: adminSubnetName

@@ -1,4 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
+import { eventTopics } from 'eventTopics.bicep'
 
 @export()
 @description('Identifies the environment that resource names are being generated for.')
@@ -27,6 +28,22 @@ type ResourceNames = {
       fileShareName: string
     }
   }
+  applicationGateway: {
+    applicationGateway: string
+    managedIdentity: string
+    publicIpAddress: string
+    frontendIpConfig: string
+    globalWafPolicy: string
+    publicApiWafPolicy: string
+    publicApiSite: string
+    publicApiDocsRewriteSet: string
+  }
+  backups: {
+    backupVault: string
+    backupVaultBlobsPolicy: string
+    backupVaultPsqlFlexibleServerPolicy: string
+    recoveryServicesVault: string
+  }
   contentApi: {
     appService: string
     appServicePlan: string
@@ -37,10 +54,26 @@ type ResourceNames = {
     appServicePlan: string
     appInsights: string
   }
+  dataFactory: string
   frontDoor: {
     frontDoorName: string
     defaultEndpoint: {
       endpointName: string
+    }
+    wafPolicy: string
+    wafSecurityPolicy: string
+    publicSite: {
+      customDomain: string
+      originGroup: string
+      origin: string
+      route: string
+    }
+    contentApi: {
+      customDomain: string
+      originGroup: string
+      origin: string
+      route: string
+      allFilesCacheRoute: string
     }
   }
   importer: {
@@ -59,6 +92,8 @@ type ResourceNames = {
     storageAccount: string
   }
   publicApi: {
+    apiApp: string
+    docsApp: string
     processor: {
       functionApp: string
     }
@@ -84,21 +119,61 @@ type ResourceNames = {
   search: {
     service: string
   }
+  storageAccounts: {
+    core: string
+    public: string
+    logging: string
+  }
   vnet: {
     vnet: string
     subnets: {
+      // Core shared infrastructure subnets.
+      applicationGateway: string
+      eventGridCustomTopicPrivateEndpoints: string
+
+      // Core application subnets.
       admin: string
       contentApi: string
       dataApi: string
       importer: string
       notifier: string
       publisher: string
+      sqlServerPrivateEndpoints: string
+
+      // Screener subnets.
+      screenerFunctionApp: string
+      screenerStoragePrivateEndpoints: string
+
+      // Public API subnets.
+      publicApiDataProcessor: string
+      publicApiDataProcessorPrivateEndpoints: string
+      publicApiStoragePrivateEndpoints: string
+      containerAppEnvironment: string
+      psqlFlexibleServer: string
+
+      // NL Search subnets.
+      nlSearchFunctionApp: string
+      nlSearchFunctionAppPrivateEndpoints: string
+
+      // Search subnets.
+      searchDocsFunctionApp: string
+      searchDocsFunctionAppPrivateEndpoints: string
+      searchStoragePrivateEndpoints: string
+
+      // Analytics subnets.
+      analyticsFunctionApp: string
+      analyticsStoragePrivateEndpoints: string
     }
   }
   keyVault: {
     keyVault: string
     keys: {
       dataProtection: string
+    }
+    certificates: {
+      publicSite: string
+      contentApiFrontDoor: string
+      publicApiAppGateway: string
     }
     secrets: {
       acr: {
@@ -156,6 +231,7 @@ type ResourceNames = {
     }
   }
   alertsGroup: string
+  alertsLogicApp: string
   databases: {
     coreSqlServer: string
     publicSqlServer: string
@@ -173,14 +249,15 @@ type ResourceNames = {
   logAnalyticsWorkspace: string
 }
 
-// TODO EES-7502 - use standardised naming convention for Notifier storage.
+// TODO EES-7502 - use standardised naming convention for Core and Notifier storage, which use
+// "storage" rather than "sa" in Test and Pre-Production.
 @export()
 func getResourceNamesForEnvironment(context ResourceNamingContext) ResourceNames => getResourceNames(
   context.environmentIdentifier,
   '${context.environmentIdentifier}-ees-papi',
   '${context.environmentIdentifier}-ees-sapi',
   '${context.environmentIdentifier}-ees',
-  (context.environmentName == 'Test' || context.environmentName == 'Pre-Production') ? 'storage' : 'sa'
+  (context.environmentName == 'Test' || context.environmentName == 'Pre-Production') ? 'storage' : abbreviations.storageStorageAccounts
 )
 
 func getResourceNames(
@@ -188,7 +265,7 @@ func getResourceNames(
   publicApiResourcePrefix string,
   screenerResourcePrefix string,
   newResourcePrefix string,
-  notifierStorageAccountPrefix string) ResourceNames => {
+  legacyStorageAccountAbbreviation string) ResourceNames => {
 
     acr: {
       serverName: 'eesacr'
@@ -205,6 +282,22 @@ func getResourceNames(
       fileShareName: '${newResourcePrefix}-share-anlyt'
     }
   }
+  applicationGateway: {
+    applicationGateway: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
+    managedIdentity: '${newResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
+    publicIpAddress: '${publicApiResourcePrefix}-pip'
+    frontendIpConfig: '${publicApiResourcePrefix}-public-frontend-ip-config'
+    globalWafPolicy: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01-global-afwp'
+    publicApiWafPolicy: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01-public-api-afwp'
+    publicApiSite: publicApiResourcePrefix
+    publicApiDocsRewriteSet: '${publicApiResourcePrefix}-docs-rewrites'
+  }
+  backups: {
+    backupVault: '${newResourcePrefix}-${abbreviations.backupVaults}'
+    backupVaultBlobsPolicy: '${newResourcePrefix}-blob-${abbreviations.backupVaultPolicies}'
+    backupVaultPsqlFlexibleServerPolicy: '${newResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
+    recoveryServicesVault: '${newResourcePrefix}-${abbreviations.recoveryServicesVaults}'
+  }
   contentApi: {
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-content'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-content'
@@ -215,10 +308,29 @@ func getResourceNames(
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
   }
+  dataFactory: '${legacyResourcePrefix}-${abbreviations.dataFactoryFactories}-ees-release'
   frontDoor: {
     frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
     defaultEndpoint: {
       endpointName: '${newResourcePrefix}-${abbreviations.frontDoorEndpoints}'
+    }
+    wafPolicy: '${replace(newResourcePrefix, '-', '')}${abbreviations.frontDoorProfiles}${abbreviations.frontDoorWafPolicies}'
+    wafSecurityPolicy: '${replace(newResourcePrefix, '-', '')}${abbreviations.frontDoorProfiles}${abbreviations.frontDoorWafSecurityPolicies}'
+    // TODO EES-7502 - the public site's origin group, origin and route were the first Front Door
+    // resources added and have generic names, whereas later ones (e.g. the Content API's) name their
+    // purpose. Name these after the public site under the ELZ naming convention.
+    publicSite: {
+      customDomain: '${newResourcePrefix}-public-site-${abbreviations.frontDoorDomains}'
+      originGroup: '${newResourcePrefix}-${abbreviations.frontDoorOriginGroups}'
+      origin: '${newResourcePrefix}-${abbreviations.frontDoorOrigins}'
+      route: '${newResourcePrefix}-${abbreviations.frontDoorRoutes}'
+    }
+    contentApi: {
+      customDomain: '${newResourcePrefix}-content-${abbreviations.frontDoorDomains}'
+      originGroup: '${newResourcePrefix}-content-${abbreviations.frontDoorOriginGroups}'
+      origin: '${newResourcePrefix}-content-${abbreviations.frontDoorOrigins}'
+      route: '${newResourcePrefix}-content-${abbreviations.frontDoorRoutes}'
+      allFilesCacheRoute: '${newResourcePrefix}-content-all-files-cache-${abbreviations.frontDoorRoutes}'
     }
   }
   importer: {
@@ -234,9 +346,11 @@ func getResourceNames(
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-notify'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-notify'
-    storageAccount: '${legacyResourcePrefix}${notifierStorageAccountPrefix}eesnotify'
+    storageAccount: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eesnotify'
   }
   publicApi: {
+    apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
+    docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     processor: {
       functionApp: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
     }
@@ -262,21 +376,62 @@ func getResourceNames(
   search: {
     service: '${newResourcePrefix}-srch'
   }
+  storageAccounts: {
+    core: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eescore'
+    public: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublic'
+    logging: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eeslogging'
+  }
+  // TODO EES-7502 - we have a number of different naming conventions for subnets.
   vnet: {
     vnet: '${legacyResourcePrefix}-vnet-ees'
     subnets: {
+      // Core shared infrastructure subnets.
+      applicationGateway: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-agw-01'
+      eventGridCustomTopicPrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-evgt-pep'
+
+      // Core application subnets.
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
       importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
       notifier: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-notify'
       publisher: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-publisher'
+      sqlServerPrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sqlsvr-pep'
+
+      // Screener subnets.
+      screenerFunctionApp: '${screenerResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-screener'
+      screenerStoragePrivateEndpoints: '${screenerResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sa-screener-pep'
+
+      // Public API subnets.
+      publicApiDataProcessor: '${publicApiResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-processor'
+      publicApiDataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-processor-pep'
+      publicApiStoragePrivateEndpoints: '${publicApiResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sa-pep'
+      containerAppEnvironment: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-cae-01'
+      psqlFlexibleServer: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-psql-flexibleserver'
+
+      // NL Search subnets.
+      nlSearchFunctionApp: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-nlsearch'
+      nlSearchFunctionAppPrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-nlsearch-pep'
+
+      // Search subnets.
+      searchDocsFunctionApp: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-searchdocs'
+      searchDocsFunctionAppPrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-searchdocs-pep'
+      searchStoragePrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sa-search-pep'
+
+      // Analytics subnets.
+      analyticsFunctionApp: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-fa-analytics'
+      analyticsStoragePrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sa-anlyt-pep'
     }
   }
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
     keys: {
       dataProtection: 'ees-dataprotection-key'
+    }
+    certificates: {
+      publicSite: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site-certificate'
+      contentApiFrontDoor: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-content-afd-certificate'
+      publicApiAppGateway: '${publicApiResourcePrefix}-certificate'
     }
     secrets: {
       acr: {
@@ -328,12 +483,13 @@ func getResourceNames(
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
-      notifierStorageAccountConnectionString: '${legacyResourcePrefix}${notifierStorageAccountPrefix}eesnotify-connection-string'
+      notifierStorageAccountConnectionString: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eesnotify-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+  alertsLogicApp: '${legacyResourcePrefix}-${abbreviations.logicWorkflows}-ees-slackwebhook'
     databases: {
     coreSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-01'
     publicSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-02'
@@ -342,10 +498,10 @@ func getResourceNames(
   }
   eventGrid: {
     topics: {
-      publicationChanged: '${newResourcePrefix}-evgt-publication-changed'
-      releaseChanged: '${newResourcePrefix}-evgt-release-changed'
-      releaseVersionChanged: '${newResourcePrefix}-evgt-release-version-changed'
-      themeChanged: '${newResourcePrefix}-evgt-theme-changed'
+      publicationChanged: '${newResourcePrefix}-${abbreviations.eventGridTopics}-${eventTopics.publicationChanged}'
+      releaseChanged: '${newResourcePrefix}-${abbreviations.eventGridTopics}-${eventTopics.releaseChanged}'
+      releaseVersionChanged: '${newResourcePrefix}-${abbreviations.eventGridTopics}-${eventTopics.releaseVersionChanged}'
+      themeChanged: '${newResourcePrefix}-${abbreviations.eventGridTopics}-${eventTopics.themeChanged}'
     }
   }
   logAnalyticsWorkspace: '${newResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'

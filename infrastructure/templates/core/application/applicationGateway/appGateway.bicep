@@ -1,7 +1,16 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
-@description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Names of the Application Gateway and its associated resources.')
+param names ResourceNames.applicationGateway
+
+@description('Name of the subnet that the Application Gateway is deployed into.')
+param subnetName string
+
+@description('Name of the Key Vault certificate used by the public API listener.')
+param publicApiCertificateName string
+
+@description('Name of the Key Vault certificate used by the public site listener.')
+param publicSiteCertificateName string
 
 @description('The location to create resources in')
 param location string
@@ -42,24 +51,16 @@ param deployAlerts bool
 @description('Tags for the resources')
 param tagValues object
 
-var commonResourcePrefix = '${subscription}-ees'
+var appGatewayName = names.applicationGateway
 
-var publicApiResourcePrefix = '${subscription}-ees-papi'
-
-var appGatewayName = '${commonResourcePrefix}-${abbreviations.networkApplicationGateways}-01'
-    
-var appGatewayIdentityName = '${commonResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.networkApplicationGateways}-01'
-
-var appGatewaySubnetName = '${commonResourcePrefix}-snet-${abbreviations.networkApplicationGateways}-01'
-
-var docsRewriteSetName = '${publicApiResourcePrefix}-docs-rewrites'
+var docsRewriteSetName = names.publicApiDocsRewriteSet
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vnetName
 }
 
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: appGatewaySubnetName
+  name: subnetName
   parent: vNet
 }
 
@@ -74,7 +75,7 @@ resource apiDocsSite 'Microsoft.Web/staticSites@2023-12-01' existing = {
 module globalWafPolicyModule '../../../common/components/application-gateway/appGatewayWafPolicy.bicep' = {
   name: 'globalWafPolicyModuleDeploy'
   params: {
-    name: '${appGatewayName}-global-afwp'
+    name: names.globalWafPolicy
     location: location
     mode: 'Detection'
     tagValues: tagValues
@@ -89,7 +90,7 @@ module publicApiWafPolicyModule 'publicApiWafPolicy.bicep' = {
   name: 'publicApiWafPolicyModuleDeploy'
   params: {
     location: location
-    appGatewayName: appGatewayName
+    policyName: names.publicApiWafPolicy
     fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
     tagValues: tagValues
   }
@@ -100,25 +101,25 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
   params: {
     location: location
     appGatewayName: appGatewayName
-    managedIdentityName: appGatewayIdentityName
+    managedIdentityName: names.managedIdentity
     keyVaultName: keyVaultName
     subnetId: subnet.id
     frontendConfig: {
-      name: '${publicApiResourcePrefix}-public-frontend-ip-config'
-      publicIpAddressName: '${publicApiResourcePrefix}-pip'
+      name: names.frontendIpConfig
+      publicIpAddressName: names.publicIpAddress
     }
     sites: [
       {
-        name: publicApiResourcePrefix
-        certificateName: '${publicApiResourcePrefix}-certificate'
+        name: names.publicApiSite
+        certificateName: publicApiCertificateName
         fqdn: replace(publicApiAppGatewayFqdn, 'https://', '')
         wafPolicyName: publicApiWafPolicyModule.outputs.name
       }
       {
         name: '${publicSiteAppServiceName}-site'
-        certificateName: '${publicSiteAppServiceName}-certificate'
+        certificateName: publicSiteCertificateName
         fqdn: publicSiteFqdn
-        wafPolicyName: '${appGatewayName}-global-afwp'
+        wafPolicyName: names.globalWafPolicy
       }
     ]
     backends: [
@@ -142,8 +143,8 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
     ]
     routes: [
       {
-        name: publicApiResourcePrefix
-        siteName: publicApiResourcePrefix
+        name: names.publicApiSite
+        siteName: names.publicApiSite
         defaultBackendName: publicApiAppName
         pathRules: [
           {
