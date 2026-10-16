@@ -94,3 +94,16 @@ stages:
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
               - DeployAdmin
+
+      # Run the public UI tests against the environment when all of the applications that support
+      # the front end are up and running. Skipped for Test as it is nit yet seesded with test data.
+      - ${{ if ne(parameters.environment, 'Test') }}:
+          - template: ../jobs/run-robot-tests.yml
+            parameters:
+              serviceConnection: ${{ parameters.serviceConnection }}
+              testEnvironment: ${{ parameters.bicepParamFile }}
+              dependsOn:
+                - DeployContentApi
+                - DeployDataApi
+                - DeployNotifier
+                - DeployPublicSite
