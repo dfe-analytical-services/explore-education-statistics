@@ -1,3 +1,4 @@
+import createSignInAttempt from '@admin/auth/signInTelemetry';
 import React, {
   createContext,
   ReactNode,
@@ -5,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useMsal } from '@azure/msal-react';
@@ -125,6 +127,10 @@ export const AuthContextProvider = ({
     inProgress: authenticationInProgress,
   } = useMsal();
 
+  const signInAttempt = useRef<
+    ReturnType<typeof createSignInAttempt> | undefined
+  >(undefined);
+
   const loginInProgress = authenticationInProgress !== 'none';
 
   const navigate = useNavigate();
@@ -143,19 +149,31 @@ export const AuthContextProvider = ({
   // "state" object from the post-login response and extract the returnUrl (if
   // any) that we set during the loginRedirect() call in msal.ts.
   useEffect(() => {
-    msalInstance.handleRedirectPromise().then(loginResult => {
-      if (loginResult) {
-        const loginRedirectState = loginResult.state
-          ? (JSON.parse(loginResult.state) as PostLoginState)
-          : undefined;
-        if (loginRedirectState) {
-          setState(previousState => ({
-            ...previousState,
-            loginRedirectState,
-          }));
+    msalInstance
+      .handleRedirectPromise()
+      .then(loginResult => {
+        if (loginResult) {
+          const loginRedirectState = loginResult.state
+            ? (JSON.parse(loginResult.state) as PostLoginState)
+            : undefined;
+          if (loginRedirectState) {
+            setState(previousState => ({
+              ...previousState,
+              loginRedirectState,
+            }));
+          }
         }
-      }
-    });
+      })
+      .catch(error => {
+        signInAttempt.current ??= createSignInAttempt(
+          accounts[0]?.homeAccountId,
+        );
+        signInAttempt.current.fail('identityProvider', error);
+        setState({
+          readyToRenderChildren: false,
+          redirect: signInRoute.fullPath,
+        });
+      });
     // We want to register this callback handler once and only once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -271,6 +289,8 @@ export const AuthContextProvider = ({
       // acquire a valid access token using the details in local storage.
       log('AuthContext: Acquiring access token silently for current user.');
 
+      signInAttempt.current ??= createSignInAttempt(accounts[0].homeAccountId);
+      const attempt = signInAttempt.current;
       let authenticationResult;
 
       try {
@@ -279,6 +299,7 @@ export const AuthContextProvider = ({
           'AuthContext: Successfully retrieved access tokens for current user.',
         );
       } catch (error) {
+        attempt.fail('token', error);
         log(
           `AuthContext: Error whilst acquiring valid access token - ${error}` +
             'Redirecting to login page.',
@@ -298,6 +319,7 @@ export const AuthContextProvider = ({
           'AuthContext: Unable to acquire a valid access token silently for ' +
             'current user.',
         );
+        attempt.fail('token');
         forceSignIn();
         return;
       }
@@ -316,6 +338,7 @@ export const AuthContextProvider = ({
 
         signInResponse = await authService.signIn();
       } catch (error) {
+        attempt.fail('adminApi', error);
         log(
           'AuthContext: Error whilst calling internal login / registration ' +
             `endpoint - ${error}`,
@@ -336,6 +359,7 @@ export const AuthContextProvider = ({
         // If the person logged in is not an existing user and has no invites,
         // redirect them to the "No Invite" page.
         case 'NoInvite':
+          attempt.accessDenied();
           log(
             'AuthContext: User has no invites to use the service. Redirecting ' +
               'to "No Invites" page.',
@@ -343,6 +367,7 @@ export const AuthContextProvider = ({
           requestRedirect(noInvitationRoute.fullPath as string);
           return;
         case 'ExpiredInvite':
+          attempt.accessDenied();
           log(
             'AuthContext: User has expired invite for the service. Redirecting ' +
               'to "Expired Invite" page.',
@@ -358,7 +383,16 @@ export const AuthContextProvider = ({
               'user details to the AuthContext state.',
           );
           const { userProfile } = signInResponse;
-          const permissions = await permissionService.getGlobalPermissions();
+          attempt.authorise();
+          let permissions: GlobalPermissions;
+          try {
+            permissions = await permissionService.getGlobalPermissions();
+          } catch (error) {
+            attempt.fail('permissions', error);
+            forceSignIn();
+            return;
+          }
+          attempt.succeed();
 
           setState(previousState => ({
             ...previousState,

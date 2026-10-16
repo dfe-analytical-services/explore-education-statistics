@@ -1,0 +1,13 @@
+let policy = dynamic(__POLICY__);
+AppEvents
+| where _ResourceId =~ tostring(policy.appInsightsResourceId)
+| where AppRoleName == tostring(policy.roleName)
+| where Name == 'AdminSignInOutcome'
+| extend AttemptId = tostring(Properties.attemptId), Outcome = tostring(Properties.outcome), UserContext = tostring(Properties.userContext)
+// Only accounts previously accepted by Admin, or accepted during this attempt.
+// Identity-provider authentication alone does not establish permission to use Admin.
+| where UserContext in ('previouslyAuthorised', 'authorised')
+| where Outcome in ('success', 'failure') and isnotempty(AttemptId)
+// Browser retries/duplicate delivery must not inflate the count. Failures take precedence.
+| summarize Failed = max(iff(Outcome == 'failure', 1, 0)) by AttemptId
+| summarize Requests = count(), Errors = countif(Failed == 1)

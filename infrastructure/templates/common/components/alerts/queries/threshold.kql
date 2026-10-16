@@ -1,0 +1,4 @@
+| extend ErrorRateBasisPoints = iff(Requests > 0, 10000.0 * Errors / Requests, 0.0)
+| extend CountBreach = Errors >= tolong(policy.errorCountThreshold), RateBreach = Requests >= tolong(policy.minimumRequests) and Errors >= tolong(policy.minimumErrors) and ErrorRateBasisPoints >= tolong(policy.errorRateBasisPoints)
+| extend Breach = iff(case(tostring(policy.trigger) == 'count', CountBreach, tostring(policy.trigger) == 'rate', RateBreach, CountBreach or RateBreach), 1, 0)
+| project Breach, Requests, Errors, ErrorRateBasisPoints

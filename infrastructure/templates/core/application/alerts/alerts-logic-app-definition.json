@@ -129,7 +129,7 @@
         "alertName": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
         "severity": "@{triggerBody()?['data']?['essentials']?['severity']}",
         "operator": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator']}",
-        "metricName": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName']}",
+        "metricName": "@{coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName'], triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricMeasureColumn'], 'query result')}",
         "timeAggregation": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation']}",
         "metricValue": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue']}",
         "threshold": "@{triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold']}",

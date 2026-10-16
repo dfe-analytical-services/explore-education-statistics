@@ -1,0 +1,10 @@
+let policy = dynamic(__POLICY__);
+AppRequests
+| where _ResourceId =~ tostring(policy.appInsightsResourceId)
+| where AppRoleName == tostring(policy.roleName)
+| extend RequestPath = tostring(parse_url(Url).Path)
+| where array_length(policy.paths) == 0 or set_has_element(policy.paths, RequestPath)
+| where array_length(policy.requestNames) == 0 or set_has_element(policy.requestNames, Name)
+// A sampling weight is applied to both sides of the rate, never just the errors.
+| extend Weight = coalesce(ItemCount, 1), IsServerError = toint(ResultCode) between (500 .. 599)
+| summarize Requests = sum(Weight), Errors = sumif(Weight, IsServerError)
