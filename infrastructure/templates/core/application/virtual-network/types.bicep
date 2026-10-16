@@ -25,6 +25,7 @@ type VNetSubnets = {
   nlSearchFunctionAppPrivateEndpoints: SubnetReference
   nlSearchFunctionApp: SubnetReference
   sqlServerPrivateEndpoints: SubnetReference
+  dataFilesStoragePrivateEndpoints: SubnetReference
 }
 
 @export()
@@ -71,5 +72,8 @@ type VNetAddressRanges = {
     // Analytics subnets.
     analyticsFunctionApp: string
     analyticsStoragePrivateEndpoints: string
+
+    // Data files subnets.
+    dataFilesStoragePrivateEndpoints: string
   }
 }
