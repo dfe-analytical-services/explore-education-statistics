@@ -22,6 +22,7 @@ param storageFirewallRules IpRange[]
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
+@secure()
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
 param screenerAppRegistrationClientId string
 

@@ -23,6 +23,13 @@ jobs:
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
 
+          - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
+            parameters:
+              serviceConnection: ${{ parameters.serviceConnection }}
+              keyVaultName: $(keyVaultName)
+              secretName: ees-screener-app-registration-client-id
+              variableName: screenerAppRegistrationClientId
+
           - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
