@@ -364,6 +364,10 @@ output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   ? dataProcessorModule!.outputs.publicApiDataFileShareMountPath
   : ''
 
+output dataProcessorDataFilesFileShareMountPath string = deployDataProcessor
+  ? dataProcessorModule!.outputs.dataFilesFileShareMountPath
+  : ''
+
 
 output enableThemeDeletion bool = enableThemeDeletion
 

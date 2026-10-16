@@ -74,6 +74,8 @@ var resourceNames = getResourceNamesForEnvironment({
 
 var adminHostname = 'admin.${domain}'
 
+var dataFilesFileShareMountPath = '\\mounts\\data-files'
+
 var keyVaultName = resourceNames.keyVault.keyVault
 
 // Used to encrypt the ASP.NET Core Data Protection key ring - see app-service.bicep /
@@ -121,6 +123,7 @@ output appSettings object = {
   App__EnableThemeDeletion: enableThemeDeletion
   App__EnableEinPublishedPageDeletion: enableEinPublishedPageDeletion
   Azure__SignalR__ConnectionString: secretRefs[resourceNames.keyVault.secrets.admin.adminSignalrConnectionString]
+  DataFiles__BasePath: dataFilesFileShareMountPath
   EventGrid__EventTopics__0__Key: 'PublicationChangedEvent'
   EventGrid__EventTopics__0__TopicEndpoint: reference(
     resourceId('Microsoft.EventGrid/topics', resourceNames.eventGrid.topics.publicationChanged),

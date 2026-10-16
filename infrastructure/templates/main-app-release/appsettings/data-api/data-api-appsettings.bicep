@@ -43,6 +43,8 @@ var resourceNames = getResourceNamesForEnvironment({
 
 var analyticsFileShareMountPath = '\\mounts\\analytics'
 
+var dataFilesFileShareMountPath = '\\mounts\\data-files'
+
 var keyVaultName = resourceNames.keyVault.keyVault
 
 // Used to encrypt the ASP.NET Core Data Protection key ring - see app-service.bicep /
@@ -84,6 +86,7 @@ output appSettings object = union({
   PublicApp__BasicAuth: basicAuthEnabled
   Analytics__Enabled: analyticsEnabled
   Analytics__BasePath: analyticsFileShareMountPath
+  DataFiles__BasePath: dataFilesFileShareMountPath
   TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri

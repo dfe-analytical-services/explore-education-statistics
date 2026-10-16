@@ -65,7 +65,8 @@ jobs:
                       "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(resourceNames.keyVault.keyVault); SecretName=$(resourceNames.keyVault.secrets.coreStorageAccountConnectionString))" \
                       "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                       "AzureWebJobs.TriggerLongRunningOrchestration.Disabled=true" \
-                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
+                      "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)" \
+                      "ParquetV1DataFiles__BasePath=$(dataProcessorDataFilesFileShareMountPath)"
                   
                   az webapp config connection-string set \
                     --name $(resourceNames.publicApi.processor.functionApp) \
