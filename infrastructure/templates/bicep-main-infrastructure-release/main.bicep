@@ -1,4 +1,4 @@
-import { getResourceNames } from 'resource-names.bicep'
+import { getResourceNamesForEnvironment } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
@@ -56,6 +56,14 @@ param adminConfigParam AdminConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
 
+@secure()
+@description('The existing appsettings for the Admin App Service production slot, fetched by the pipeline before deployment.')
+param adminProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Admin App Service staging slot, fetched by the pipeline before deployment.')
+param adminStagingSlotAppSettings object = {}
+
 
 
 //
@@ -66,6 +74,14 @@ param contentApiConfigParam ContentApiConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var contentApiConfig = mergeContentApiConfig(contentApiConfigParam)
 
+@secure()
+@description('The existing appsettings for the Content API App Service production slot, fetched by the pipeline before deployment.')
+param contentApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Content API App Service staging slot, fetched by the pipeline before deployment.')
+param contentApiStagingSlotAppSettings object = {}
+
 
 
 //
@@ -75,6 +91,14 @@ param dataApiConfigParam DataApiConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
+
+@secure()
+@description('The existing appsettings for the Data API App Service production slot, fetched by the pipeline before deployment.')
+param dataApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Data API App Service staging slot, fetched by the pipeline before deployment.')
+param dataApiStagingSlotAppSettings object = {}
 
 
 
@@ -132,23 +156,7 @@ var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 // Resource provisioning.
 //
 
-var legacyResourcePrefix = environmentConfig.environmentIdentifier!
-var newResourcePrefix = '${environmentConfig.environmentIdentifier!}-ees'
-var publicApiResourcePrefix = '${newResourcePrefix}-papi'
-var screenerResourcePrefix = '${newResourcePrefix}-sapi'
-
-// TODO EES-7502 - use standardised naming convention for Notifier storage.
-var notifierStorageAccountPrefix = environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production' 
-  ? 'storage'
-  : 'sa'
-
-var resourceNames = getResourceNames(
-  legacyResourcePrefix,
-  publicApiResourcePrefix,
-  screenerResourcePrefix,
-  newResourcePrefix,
-  notifierStorageAccountPrefix
-)
+var resourceNames = getResourceNamesForEnvironment(environmentConfig)
 
 var minTlsVersion = '1.2'
 
@@ -264,29 +272,16 @@ module adminModuleDeploy '../admin/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: adminConfig.appServiceSku!
-    adminHostname: 'admin.${environmentConfig.domain!}'
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     signalRAllowedOrigins: adminSiteAllowedOrigins
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    enableThemeDeletion: adminConfig.enableThemeDeletion!
-    enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
-    publicDataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
-    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
-    publicApiUrl: publicApiConfig.publicUrl!
-    publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
-    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-    preReleaseMinutesBeforeStart: adminConfig.preReleaseMinutesBeforeStart!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
-    memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
+    existingProdAppSettings: adminProdAppSettings
+    existingStagingSlotAppSettings: adminStagingSlotAppSettings
     tagValues: tagValues
   }
   dependsOn: [
@@ -301,17 +296,17 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: contentApiConfig.appServiceSku!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
     restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
+    existingProdAppSettings: contentApiProdAppSettings
+    existingStagingSlotAppSettings: contentApiStagingSlotAppSettings
     tagValues: tagValues
   }
 }
@@ -321,20 +316,16 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: dataApiConfig.appServiceSku!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
-    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
+    existingProdAppSettings: dataApiProdAppSettings
+    existingStagingSlotAppSettings: dataApiStagingSlotAppSettings
     tagValues: tagValues
   }
 }

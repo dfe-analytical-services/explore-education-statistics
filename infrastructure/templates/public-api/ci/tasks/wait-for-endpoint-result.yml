@@ -7,20 +7,29 @@ parameters:
   - name: condition
     type: string
     default: succeeded()
+  # Optional. Only set this if the endpoint is protected by EasyAuth and requires
+  # a bearer token to call. Leave unset to call an unauthenticated endpoint.
   - name: accessTokenScope
     type: string
-    default: null
+    default: ''
   - name: pollingDelaySeconds
     type: number
     default: 5
   - name: maxAttempts
     type: number
-    default: 20
+    default: 50
   - name: endpoint
     type: string
   - name: allow404s
     type: boolean
     default: false
+  # Control which endpoint result we are expecting to see (currently 200 or 503).
+  - name: expectedResult
+    type: string
+    default: success
+    values:
+      - success
+      - unavailable
 
 steps:
   - task: AzureCLI@2
@@ -31,7 +40,7 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        
+
         if [ -n "${{ parameters.accessTokenScope }}" ]; then
           accessToken=`az account get-access-token \
             --resource ${{ parameters.accessTokenScope }} \
@@ -44,28 +53,35 @@ steps:
         for attempt in $(seq 1 ${{ parameters.maxAttempts }});
         do
 
-          echo "Attempt number $attempt of ${{ parameters.maxAttempts }} - calling ${{ parameters.endpoint }} to check for successful response."
+          echo "Attempt number $attempt of ${{ parameters.maxAttempts }} - calling ${{ parameters.endpoint }} to check for ${{ parameters.expectedResult }} response."
 
           if [ -n "$accessToken" ]; then
             httpStatusCode=`curl --write-out '%{http_code}' -H "Authorization: Bearer $accessToken" -s --output /dev/null ${{ parameters.endpoint }}`
-          else 
+          else
             httpStatusCode=`curl --write-out '%{http_code}' -s --output /dev/null ${{ parameters.endpoint }}`
-          fi 
-
-          if (( $httpStatusCode >= 200 && $httpStatusCode <= 204 )); then
-            echo "Received successful response with status code $httpStatusCode."
-            exit 0
           fi
 
-          if [[ "${allow404s,,}" == "true" && "$httpStatusCode" == "404" ]]; then
-            echo "Received allowed 404 status code."
-            exit 0
+          if [ "${{ parameters.expectedResult }}" == "unavailable" ]; then
+            if [ "$httpStatusCode" == "503" ]; then
+              echo "Received 503 - endpoint is unavailable."
+              exit 0
+            fi
+          else
+            if (( $httpStatusCode >= 200 && $httpStatusCode <= 204 )); then
+              echo "Received successful response with status code $httpStatusCode."
+              exit 0
+            fi
+
+            if [[ "${allow404s,,}" == "true" && "$httpStatusCode" == "404" ]]; then
+              echo "Received allowed 404 status code."
+              exit 0
+            fi
           fi
 
           echo "Received response with status code $httpStatusCode. Retrying in ${{ parameters.pollingDelaySeconds }} seconds."
           sleep ${{ parameters.pollingDelaySeconds }}
-        
+
         done
 
-        echo "Timed out waiting for successful response."
+        echo "Timed out waiting for ${{ parameters.expectedResult }} response."
         exit 1

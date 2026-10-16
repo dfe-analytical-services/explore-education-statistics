@@ -1,0 +1,135 @@
+#
+# This Task takes an array of app names and variables for storing appsettings in.
+# It then grabs the existing appsettings for each (production and staging slots if
+# they have them) and stores them in the assigned variable names.
+#
+# It does these calls in parallel to save time, as individually each takes around
+# 10 seconds.
+#
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: appType
+    type: string
+    values:
+      - functionApp
+      - webApp
+  - name: displayName
+    type: string
+    default: Get existing app settings
+  - name: slotName
+    type: string
+    default: deploy
+  # The apps to fetch existing appsettings for and the variable names to store them in, e.g.:
+  #   apps:
+  #     - appName: my-app
+  #       stagingVariableName: myAppStagingSettings (optional)
+  #       prodVariableName: myAppProdSettings
+  - name: apps
+    type: object
+    default: []
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        if [ "${{ parameters.appType }}" == "webApp" ]; then
+          cliCommand=webapp
+        else
+          cliCommand=functionapp
+        fi
+
+        # Fetches appsettings for a single app / slot combination, writing the result (as flat
+        # {name: value} JSON) to $outFile. Leave $slotName empty to target production.
+        fetch_appsettings() {
+          local appName=$1
+          local slotName=$2
+          local outFile=$3
+
+          local slotArgs=()
+          if [ -n "$slotName" ]; then
+            slotArgs=(--slot "$slotName")
+          fi
+
+          # Check whether or not the target App or slot exists yet.
+          local exists
+          if [ -n "$slotName" ]; then
+            exists=$(az $cliCommand deployment slot list \
+              --name "$appName" \
+              --resource-group ${{ parameters.resourceGroupName }} \
+              --query "[?name=='$slotName']" | jq '. != []')
+          else
+            exists=$(az $cliCommand list \
+              --resource-group ${{ parameters.resourceGroupName }} \
+              --query "[?name=='$appName']" | jq '. != []')
+          fi
+
+          # If the App or slot doesn't exist yet, return an empty set of appsettings.
+          if [ "$exists" != "true" ]; then
+            echo "$appName (slot: '$slotName') does not exist yet - defaulting to no existing app settings."
+            echo '{}' > "$outFile"
+            return 0
+          fi
+
+          # If the App exists, we should be able to get its appsettings without issue. If we run
+          # into any errors, they will not be caught here and so will fail the task (see the
+          # exit-status handling below). This prevents us from risking applying empty appsettings
+          # against a running App or slot.
+          local rawAppSettings
+          rawAppSettings=$(az $cliCommand config appsettings list \
+            --name "$appName" \
+            --resource-group ${{ parameters.resourceGroupName }} \
+            "${slotArgs[@]}")
+
+          # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
+          # which is the shape the Bicep template's appsettings params expect.
+          echo "$rawAppSettings" | jq -c 'from_entries' > "$outFile"
+        }
+
+        tmpDir=$(mktemp -d)
+        pids=()
+        varNames=()
+        varFiles=()
+
+        while IFS= read -r app; do
+          appName=$(echo "$app" | jq -r '.appName')
+          prodVariableName=$(echo "$app" | jq -r '.prodVariableName')
+          stagingVariableName=$(echo "$app" | jq -r '.stagingVariableName // empty')
+
+          prodFile="$tmpDir/$prodVariableName"
+          fetch_appsettings "$appName" '' "$prodFile" & pids+=($!)
+          varNames+=("$prodVariableName")
+          varFiles+=("$prodFile")
+
+          if [ -n "$stagingVariableName" ]; then
+            stagingFile="$tmpDir/$stagingVariableName"
+            fetch_appsettings "$appName" "${{ parameters.slotName }}" "$stagingFile" & pids+=($!)
+            varNames+=("$stagingVariableName")
+            varFiles+=("$stagingFile")
+          fi
+        done < <(echo '${{ convertToJson(parameters.apps) }}' | jq -c '.[]')
+
+        # set -e doesn't apply to background jobs, so failures are checked explicitly here -
+        # this preserves the original behaviour of failing the task rather than risking an
+        # infrastructure deploy with incomplete app settings.
+        status=0
+        for pid in "${pids[@]}"; do
+          wait "$pid" || status=1
+        done
+
+        if [ "$status" -ne 0 ]; then
+          echo "One or more app settings lookups failed."
+          exit 1
+        fi
+
+        for i in "${!varNames[@]}"; do
+          echo "##vso[task.setvariable variable=${varNames[$i]};issecret=true]$(cat "${varFiles[$i]}")"
+        done
