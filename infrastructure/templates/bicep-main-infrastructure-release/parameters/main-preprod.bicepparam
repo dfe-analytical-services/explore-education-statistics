@@ -14,10 +14,6 @@ param importerConfigParam = {
   }
 }
 
-param notifierConfigParam = {
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
-}
-
 param publicSiteConfigParam = {
   appServiceSku: {
     tier: 'PremiumV2'
