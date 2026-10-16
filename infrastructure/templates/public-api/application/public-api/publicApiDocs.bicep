@@ -1,7 +1,8 @@
-import { ResourceNames, StaticWebAppSku } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
+import { StaticWebAppSku } from '../../types.bicep'
 
-@description('Common resource naming variables')
-param resourceNames ResourceNames
+@description('Names of the Public API resources.')
+param names ResourceNames.publicApi
 
 @description('Static Web App SKU to use')
 param appSku StaticWebAppSku = 'Free'
@@ -12,7 +13,7 @@ param tagValues object
 module publicApiDocsApp  '../../components/staticWebApp.bicep' = {
   name: 'publicApiDocsAppDeploy'
   params: {
-    name: resourceNames.publicApi.docsApp
+    name: names.docsApp
     tagValues: tagValues
     sku: appSku
   }
