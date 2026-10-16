@@ -16,8 +16,7 @@ import { IdTitlePair } from '@admin/services/types/common';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;

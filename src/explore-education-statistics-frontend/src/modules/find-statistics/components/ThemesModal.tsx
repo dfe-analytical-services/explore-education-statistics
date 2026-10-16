@@ -6,6 +6,8 @@ import { Theme } from '@common/services/publicationService';
 import { ThemeSummary } from '@common/services/themeService';
 import React from 'react';
 
+const triggerText = 'What are themes?';
+
 export default function ThemesModal({
   themes,
 }: {
@@ -15,9 +17,10 @@ export default function ThemesModal({
     <Modal
       className="govuk-!-width-one-half"
       description="This is a description list of our different publication themes."
+      noJsFallbackSummary={triggerText}
       showClose
       title="Themes guidance"
-      triggerButton={<ButtonText>What are themes?</ButtonText>}
+      triggerButton={<ButtonText>{triggerText}</ButtonText>}
     >
       <SummaryList>
         {themes.map(theme => (

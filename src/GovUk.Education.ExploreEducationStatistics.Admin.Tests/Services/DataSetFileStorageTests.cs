@@ -384,10 +384,12 @@ public class DataSetFileStorageTests
     public async Task GetTemporaryFileDownloadToken_Success_ReturnsBlobDownloadToken()
     {
         // Arrange
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
         var dataSetUpload = new DataSetUpload
         {
             Id = Guid.NewGuid(),
-            ReleaseVersionId = Guid.NewGuid(),
+            ReleaseVersionId = releaseVersion.Id,
             DataSetTitle = "Test Data Set",
             DataFileId = Guid.NewGuid(),
             DataFileName = "data.csv",
@@ -401,6 +403,7 @@ public class DataSetFileStorageTests
 
         await using var contentDbContext = InMemoryApplicationDbContext();
 
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
         contentDbContext.DataSetUploads.Add(dataSetUpload);
 
         await contentDbContext.SaveChangesAsync();
@@ -443,21 +446,63 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task GetTemporaryFileDownloadToken_UploadNotFound_ReturnsNotFound()
+    public async Task GetTemporaryFileDownloadToken_ReleaseVersionNotFound_ReturnsNotFound()
     {
         // Arrange
+        var releaseVersionId = Guid.NewGuid();
+
+        var dataSetUpload = new DataSetUpload
+        {
+            Id = Guid.NewGuid(),
+            ReleaseVersionId = releaseVersionId,
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 123,
+            MetaFileName = "meta.csv",
+            MetaFileSizeInBytes = 456,
+            MetaFileId = Guid.NewGuid(),
+            UploadedBy = _user.Email,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
+        };
+
         await using var contentDbContext = InMemoryApplicationDbContext();
 
-        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        contentDbContext.DataSetUploads.Add(dataSetUpload);
 
-        var service = SetupReleaseDataFileService(
-            privateBlobStorageService: privateBlobStorageService.Object,
-            contentDbContext: contentDbContext
-        );
+        await contentDbContext.SaveChangesAsync();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
 
         // Act
         var result = await service.GetTemporaryFileDownloadToken(
-            releaseVersionId: Guid.NewGuid(),
+            releaseVersionId: releaseVersionId,
+            dataSetUploadId: dataSetUpload.Id,
+            FileType.Data,
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        result.AssertLeft().AssertNotFoundResult();
+    }
+
+    [Fact]
+    public async Task GetTemporaryFileDownloadToken_UploadNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+
+        await contentDbContext.SaveChangesAsync();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        // Act
+        var result = await service.GetTemporaryFileDownloadToken(
+            releaseVersionId: releaseVersion.Id,
             dataSetUploadId: Guid.NewGuid(),
             FileType.Data,
             cancellationToken: CancellationToken.None
@@ -468,9 +513,11 @@ public class DataSetFileStorageTests
     }
 
     [Fact]
-    public async Task GetTemporaryFileDownloadToken_InvalidFileType_ThrowsBadResult()
+    public async Task GetTemporaryFileDownloadToken_UploadForDifferentReleaseVersion_ReturnsNotFound()
     {
         // Arrange
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
         var dataSetUpload = new DataSetUpload
         {
             Id = Guid.NewGuid(),
@@ -488,6 +535,49 @@ public class DataSetFileStorageTests
 
         await using var contentDbContext = InMemoryApplicationDbContext();
 
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        contentDbContext.DataSetUploads.Add(dataSetUpload);
+
+        await contentDbContext.SaveChangesAsync();
+
+        var service = SetupReleaseDataFileService(contentDbContext: contentDbContext);
+
+        // Act
+        var result = await service.GetTemporaryFileDownloadToken(
+            releaseVersionId: releaseVersion.Id,
+            dataSetUploadId: dataSetUpload.Id,
+            FileType.Data,
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        result.AssertLeft().AssertNotFoundResult();
+    }
+
+    [Fact]
+    public async Task GetTemporaryFileDownloadToken_InvalidFileType_ReturnsBadResult()
+    {
+        // Arrange
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var dataSetUpload = new DataSetUpload
+        {
+            Id = Guid.NewGuid(),
+            ReleaseVersionId = releaseVersion.Id,
+            DataSetTitle = "Test Data Set",
+            DataFileId = Guid.NewGuid(),
+            DataFileName = "data.csv",
+            DataFileSizeInBytes = 123,
+            MetaFileName = "meta.csv",
+            MetaFileSizeInBytes = 456,
+            MetaFileId = Guid.NewGuid(),
+            UploadedBy = _user.Email,
+            ScreeningStatus = DataSetUploadScreeningStatus.Screening,
+        };
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
         contentDbContext.DataSetUploads.Add(dataSetUpload);
 
         await contentDbContext.SaveChangesAsync();

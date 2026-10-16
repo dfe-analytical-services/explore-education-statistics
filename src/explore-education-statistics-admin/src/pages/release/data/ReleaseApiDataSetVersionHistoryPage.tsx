@@ -16,7 +16,7 @@ import useQueryParams from '@admin/hooks/useQueryParams';
 import parseNumber from '@common/utils/number/parseNumber';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import React, { useState } from 'react';
 
 export default function ReleaseApiDataSetVersionHistoryPage() {

@@ -47,6 +47,7 @@ param publisherConfigParam = {
   }
   prepareScheduledReleaseVersionsNowEnabled: true
   publishScheduledReleaseVersionsNowEnabled: true
+  frontDoorCachePurgeEnabled: true
 }
 
 param publicApiConfigParam = {

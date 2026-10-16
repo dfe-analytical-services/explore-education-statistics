@@ -19,7 +19,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 import { ReactNode } from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/dataBlockService');

@@ -3,14 +3,17 @@ import Modal from '@common/components/Modal';
 import InfoIcon from '@common/components/InfoIcon';
 import React from 'react';
 
+const triggerText = 'What are statistical releases?';
+
 export default function StatisticalReleasesGuidanceModal() {
   return (
     <Modal
+      noJsFallbackSummary={triggerText}
       showClose
-      title="What are statistical releases?"
+      title={triggerText}
       triggerButton={
         <ButtonText>
-          What are statistical releases?{' '}
+          {triggerText}{' '}
           <InfoIcon description="Information on statistical releases" />
         </ButtonText>
       }

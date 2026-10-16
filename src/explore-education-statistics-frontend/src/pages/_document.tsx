@@ -36,6 +36,19 @@ class Document extends BaseDocument {
         </Head>
 
         <body className="govuk-template__body app-body-class">
+          {/*
+            Add `js-enabled` before first paint, as the GOV.UK Frontend page
+            template does. Content using `dfe-js-hidden` is rendered on the
+            server so it works without JS; adding the class here hides it
+            immediately for JS users, instead of after hydration (which made
+            the page visibly jump).
+          */}
+          <script
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: "document.body.classList.add('js-enabled');",
+            }}
+          />
           <Main />
           <NextScript />
         </body>

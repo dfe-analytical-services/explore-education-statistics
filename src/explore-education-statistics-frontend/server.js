@@ -126,7 +126,7 @@ async function startServer() {
   server.use((req, res, nextFunc) => {
     // Return early for speed if redirect definitely isn't required
     if (
-      (req.url === '/' && !req.hostname.startsWith('www')) ||
+      (req.path === '/' && !req.hostname.startsWith('www')) ||
       req.url.startsWith('/assets') ||
       req.url.startsWith('/_next')
     ) {

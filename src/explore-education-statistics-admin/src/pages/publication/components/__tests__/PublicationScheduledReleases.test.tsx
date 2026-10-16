@@ -9,7 +9,7 @@ import {
   within,
 } from '@testing-library/react';
 import React, { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseVersionService');
 const releaseVersionService = _releaseVersionService as jest.Mocked<

@@ -22,15 +22,17 @@ const ProtectedRoute = ({
   protectionAction = permissions => permissions.canAccessSystem,
   children,
 }: ProtectedRouteComponentProps) => {
-  const { user } = useAuthContext();
+  const { user, status } = useAuthContext();
   const location = useLocation();
 
   if (!user) {
+    if (status === 'redirecting') return null;
+
     return (
       <Navigate
         replace
         to={appendQuery(signInRoute.fullPath, {
-          returnUrl: encodeURI(`${location.pathname}${location.search}`),
+          returnUrl: `${location.pathname}${location.search}`,
         })}
       />
     );

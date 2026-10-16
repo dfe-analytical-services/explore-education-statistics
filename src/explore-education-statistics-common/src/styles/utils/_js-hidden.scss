@@ -3,3 +3,9 @@
     display: none;
   }
 }
+
+// Hidden when JS isn't available, e.g. controls that need JS to work.
+// stylelint-disable-next-line selector-no-qualifying-type
+body:not(.js-enabled) .dfe-js-only {
+  display: none;
+}

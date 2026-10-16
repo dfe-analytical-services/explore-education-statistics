@@ -18,7 +18,7 @@ import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import React from 'react';
 
 export default function ReleaseApiDataSetPreviewTokenLogPage() {

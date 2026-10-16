@@ -3,14 +3,17 @@ import Modal from '@common/components/Modal';
 import InfoIcon from '@common/components/InfoIcon';
 import React from 'react';
 
+const triggerText = 'What is data?';
+
 export default function DataSetsGuidanceModal() {
   return (
     <Modal
+      noJsFallbackSummary={triggerText}
       showClose
-      title="What is data?"
+      title={triggerText}
       triggerButton={
         <ButtonText>
-          What is data? <InfoIcon description="Information on data" />
+          {triggerText} <InfoIcon description="Information on data" />
         </ButtonText>
       }
     >

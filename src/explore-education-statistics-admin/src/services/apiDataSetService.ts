@@ -56,6 +56,7 @@ export interface ApiDataSetVersion {
   type: DataSetVersionType;
   file: IdTitlePair;
   originalFileId?: string | null;
+  publicApiCompatible?: boolean | null;
   notes?: string;
   releaseVersion: IdTitlePair;
   totalResults: number;

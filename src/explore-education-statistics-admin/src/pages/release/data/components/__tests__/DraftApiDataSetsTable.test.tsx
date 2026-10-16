@@ -7,7 +7,7 @@ import { GlobalPermissions } from '@admin/services/authService';
 import baseRender from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 describe('DraftApiDataSetsTable', () => {
   const testBauUser: User = {

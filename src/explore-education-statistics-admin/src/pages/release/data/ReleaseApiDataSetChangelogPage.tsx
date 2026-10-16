@@ -17,7 +17,7 @@ import Button from '@common/components/Button';
 import ApiDataSetChangelog from '@common/modules/data-catalogue/components/ApiDataSetChangelog';
 import Tag from '@common/components/Tag';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 import React, { useCallback, useEffect } from 'react';
 import WarningMessage from '@common/components/WarningMessage';
 import { DataSetVersionStatus } from '@admin/services/apiDataSetService';
