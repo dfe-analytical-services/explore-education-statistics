@@ -51,22 +51,18 @@ steps:
           "Prod")     environmentName="Production" ;;
         esac
 
-        # "az bicep snapshot" requires Bicep CLI v0.41.2 or later.
-        minimumBicepVersion="0.41.2"
-        bicepVersion=$(az bicep version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-        if [ "$(printf '%s\n' "$minimumBicepVersion" "$bicepVersion" | sort -V | head -1)" != "$minimumBicepVersion" ]; then
-          echo "Upgrading Bicep CLI from $bicepVersion to the latest version."
-          az bicep upgrade
-        fi
+        # Log which Bicep CLI "az bicep" is using. "az bicep snapshot" requires Bicep CLI v0.41.2 or later.
+        az bicep version
 
         # Evaluate the names. The .bicepparam file reads its parameters from these environment variables, and
         # the snapshot is written alongside it.
         paramFile="$(Build.SourcesDirectory)/infrastructure/templates/common/resource-names-outputs.bicepparam"
         snapshotFile="${paramFile%.bicepparam}.snapshot.json"
 
-        RESOURCE_NAMES_ENVIRONMENT_IDENTIFIER='${{ parameters.environmentIdentifier }}' \
-        RESOURCE_NAMES_ENVIRONMENT_NAME="$environmentName" \
-          az bicep snapshot --file "$paramFile"
+        export RESOURCE_NAMES_ENVIRONMENT_IDENTIFIER='${{ parameters.environmentIdentifier }}'
+        export RESOURCE_NAMES_ENVIRONMENT_NAME="$environmentName"
+
+        az bicep snapshot --file "$paramFile"
 
         resourceNames=$(jq -c '.outputs.resourceNames' "$snapshotFile")
         rm "$snapshotFile"

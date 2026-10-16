@@ -1,7 +1,7 @@
 metadata description = '''
 Evaluates the resource names for an environment and returns them as an output, so that
 pipelines can use the same names as the Bicep templates rather than building them again
-manually. It is evaluated locally with "az bicep snapshot" rather than deployed, so that
+manually. It is evaluated locally with "bicep snapshot" rather than deployed, so that
 we don't have to wait 40 seconds for it to spin up a service connection it doesn't need.
 '''
 
