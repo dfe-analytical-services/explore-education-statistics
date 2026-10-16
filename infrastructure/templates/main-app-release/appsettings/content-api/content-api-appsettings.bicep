@@ -1,4 +1,4 @@
-import { getResourceNamesForEnvironment } from '../../../bicep-main-infrastructure-release/resource-names.bicep'
+import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
 import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
