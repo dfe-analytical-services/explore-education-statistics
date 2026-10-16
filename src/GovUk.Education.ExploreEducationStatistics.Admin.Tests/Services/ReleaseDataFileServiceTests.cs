@@ -672,11 +672,23 @@ public class ReleaseDataFileServiceTests
             SubjectId = subject.Id,
         };
 
-        var dataReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = dataFile };
+        List<PairedIndicatorEntry> pairedIndicators = [new(Guid.NewGuid(), Guid.NewGuid())];
+
+        var dataReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = dataFile,
+            PairedIndicators = pairedIndicators,
+        };
 
         var metaReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = metaFile };
 
-        var amendmentReleaseDataFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = dataFile };
+        var amendmentReleaseDataFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            File = dataFile,
+            PairedIndicators = [new PairedIndicatorEntry(Guid.NewGuid(), Guid.NewGuid())],
+        };
 
         var amendmentReleaseMetaFile = new ReleaseFile { ReleaseVersion = amendmentReleaseVersion, File = metaFile };
 
@@ -726,7 +738,9 @@ public class ReleaseDataFileServiceTests
             Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(amendmentReleaseMetaFile.Id));
 
             // Check that the data and meta files linked to the previous version remain untouched
-            Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataReleaseFile.Id));
+            var previousDataReleaseFile = await contentDbContext.ReleaseFiles.FindAsync(dataReleaseFile.Id);
+            Assert.NotNull(previousDataReleaseFile);
+            previousDataReleaseFile.PairedIndicators.AssertDeepEqualTo(pairedIndicators);
             Assert.NotNull(await contentDbContext.Files.FindAsync(dataReleaseFile.File.Id));
 
             Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(metaReleaseFile.Id));
