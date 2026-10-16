@@ -1,0 +1,79 @@
+#
+# This Task evaluates the resource names for an environment from the shared resource-names.bicep file and
+# stores each one in a pipeline variable, so that pipelines use the same names as the Bicep templates rather
+# than building them by hand.
+#
+# Each name is stored in a variable named after its path in the ResourceNames type, prefixed with
+# "resourceNames", e.g. $(resourceNames.dataFactory) or $(resourceNames.admin.appService).
+#
+# The names are evaluated locally on the agent using "az bicep snapshot" against
+# resource-names-outputs.bicepparam, which deploys no resources and simply returns the names as an output.
+# This takes a few seconds and needs no Azure connection, unlike a real deployment.
+#
+# Pipeline variables are scoped to the job that sets them, so any job needing resource names should include
+# this Task.
+#
+parameters:
+  # The Azure DevOps environment being deployed to.
+  - name: environment
+    type: string
+    values:
+      - Dev
+      - Test
+      - Pre-Prod
+      - Prod
+  - name: environmentIdentifier
+    type: string
+    default: $(subscription)
+
+steps:
+  - task: Bash@3
+    displayName: Get resource names
+    inputs:
+      targetType: inline
+      script: |
+
+        # Include the pipefail option so that failures in any part of a pipe
+        # of commands will be surfaced.
+        set -eo pipefail
+
+        # Create environment variables to help look up correct resource names for the target environment.
+        # The infrastructure/templates/common/resource-names-outputs.bicepparam file reads these environment variables and
+        # supplies them as params to
+        # infrastructure/templates/common/resource-names-outputs.bicep, that can then use them to identify the correct
+        # set of resource names for that environment.
+        #
+        # We need to take this approach because "az bicep snapshot" doesn't take params as an input.
+        case "${{ parameters.environment }}" in
+          "Dev")      environmentName="Development" ;;
+          "Test")     environmentName="Test" ;;
+          "Pre-Prod") environmentName="Pre-Production" ;;
+          "Prod")     environmentName="Production" ;;
+        esac
+
+        # "az bicep snapshot" requires Bicep CLI v0.41.2 or later.
+        minimumBicepVersion="0.41.2"
+        bicepVersion=$(az bicep version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        if [ "$(printf '%s\n' "$minimumBicepVersion" "$bicepVersion" | sort -V | head -1)" != "$minimumBicepVersion" ]; then
+          echo "Upgrading Bicep CLI from $bicepVersion to the latest version."
+          az bicep upgrade
+        fi
+
+        # Evaluate the names. The .bicepparam file reads its parameters from these environment variables, and
+        # the snapshot is written alongside it.
+        paramFile="$(Build.SourcesDirectory)/infrastructure/templates/common/resource-names-outputs.bicepparam"
+        snapshotFile="${paramFile%.bicepparam}.snapshot.json"
+
+        RESOURCE_NAMES_ENVIRONMENT_IDENTIFIER='${{ parameters.environmentIdentifier }}' \
+        RESOURCE_NAMES_ENVIRONMENT_NAME="$environmentName" \
+          az bicep snapshot --file "$paramFile"
+
+        resourceNames=$(jq -c '.outputs.resourceNames' "$snapshotFile")
+        rm "$snapshotFile"
+
+        # Flatten the nested names into "path.to.name=value" pairs and set a pipeline variable for each
+        # e.g. keyVault.secrets.bauEmail.
+        while IFS='=' read -r path value; do
+          echo "Setting resourceNames.$path to $value"
+          echo "##vso[task.setvariable variable=resourceNames.$path;]$value"
+        done < <(echo "$resourceNames" | jq -r 'paths(scalars) as $p | "\($p | map(tostring) | join("."))=\(getpath($p))"')
