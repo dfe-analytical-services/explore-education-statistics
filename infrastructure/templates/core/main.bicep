@@ -2,6 +2,7 @@ import { abbreviations } from '../common/abbreviations.bicep'
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 import { IpRange } from '../common/types.bicep'
 import { AzureSqlDatabaseConfig } from '../common/components/azure-sql/types.bicep'
+import { VNetAddressRanges } from 'application/virtual-network/types.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
@@ -47,6 +48,9 @@ param deployBackupVaultReaderRoleAssignment bool = true
 
 @description('Whether or not to deploy subnets.')
 param deploySubnets bool = false
+
+@description('CIDR address ranges for the VNet and each of its subnets.')
+param vNetAddressRanges VNetAddressRanges
 
 @description('Whether or not to deploy Private DNS Zones.')
 param deployPrivateDnsZones bool = false
@@ -145,6 +149,7 @@ module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   params: {
     subscription: subscription
     deploySubnets: deploySubnets
+    addressRanges: vNetAddressRanges
     tagValues: tagValues
   }
 }
