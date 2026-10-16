@@ -19,6 +19,14 @@ jobs:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+            fetchDepth: 1
+            sparseCheckoutDirectories: infrastructure/templates/common
+
+          - template: ../../../../common/ci/tasks/get-resource-names.yml
+            parameters:
+              environment: ${{ parameters.environment }}
+
           - template: ../../../../common/ci/tasks/bicep-output-variables.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
@@ -26,7 +34,7 @@ jobs:
           - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
-              keyVaultName: $(keyVaultName)
+              keyVaultName: $(resourceNames.keyVault.keyVault)
               secretName: ees-screener-app-registration-client-id
               variableName: screenerAppRegistrationClientId
 

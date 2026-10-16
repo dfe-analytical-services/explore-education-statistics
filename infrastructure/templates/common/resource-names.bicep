@@ -121,6 +121,11 @@ type ResourceNames = {
   }
   screener: {
     functionApp: string
+    appServicePlan: string
+    appInsights: string
+    functionStorageAccount: string
+    logsStorageAccount: string
+    logsFileShare: string
   }
   search: {
     service: string
@@ -387,6 +392,13 @@ func getResourceNames(
   }
   screener: {
     functionApp: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+    // TODO EES-7502 - the Screener's App Service Plan was given the same name as the Function App itself,
+    // rather than a name using the App Service Plan abbreviation.
+    appServicePlan: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
+    appInsights: '${screenerResourcePrefix}-${abbreviations.insightsComponents}-screener'
+    functionStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
+    logsStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}logs'
+    logsFileShare: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener-logs-${abbreviations.fileShare}'
   }
   search: {
     service: '${newResourcePrefix}-srch'
