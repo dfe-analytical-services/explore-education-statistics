@@ -1,13 +1,18 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
 
@@ -17,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 public class TableBuilderMetaController(
     ISubjectMetaService subjectMetaService,
     IPrivateBlobCacheService privateBlobCacheService,
+    ContentDbContext contentDbContext,
+    IUserService userService,
     ILogger<TableBuilderMetaController> logger
 ) : ControllerBase
 {
@@ -44,26 +51,46 @@ public class TableBuilderMetaController(
     }
 
     [HttpPatch("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}/filters")]
-    public Task<ActionResult<Unit>> UpdateFilters(
+    public async Task<ActionResult<Unit>> UpdateFilters(
         Guid releaseVersionId,
         Guid subjectId,
         List<FilterUpdateViewModel> request
     )
     {
-        return subjectMetaService
-            .UpdateSubjectFilters(releaseVersionId: releaseVersionId, subjectId: subjectId, request)
+        return await CheckCanUpdateReleaseVersion(releaseVersionId)
+            .OnSuccess(_ =>
+                subjectMetaService.UpdateSubjectFilters(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: subjectId,
+                    request
+                )
+            )
             .HandleFailuresOrOk();
     }
 
     [HttpPatch("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}/indicators")]
-    public Task<ActionResult<Unit>> UpdateIndicators(
+    public async Task<ActionResult<Unit>> UpdateIndicators(
         Guid releaseVersionId,
         Guid subjectId,
         List<IndicatorGroupUpdateViewModel> request
     )
     {
-        return subjectMetaService
-            .UpdateSubjectIndicators(releaseVersionId: releaseVersionId, subjectId: subjectId, request)
+        return await CheckCanUpdateReleaseVersion(releaseVersionId)
+            .OnSuccess(_ =>
+                subjectMetaService.UpdateSubjectIndicators(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: subjectId,
+                    request
+                )
+            )
             .HandleFailuresOrOk();
+    }
+
+    private Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(Guid releaseVersionId)
+    {
+        return contentDbContext
+            .ReleaseVersions.Include(rv => rv.Release)
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+            .OnSuccess(releaseVersion => userService.CheckCanUpdateReleaseVersion(releaseVersion));
     }
 }
