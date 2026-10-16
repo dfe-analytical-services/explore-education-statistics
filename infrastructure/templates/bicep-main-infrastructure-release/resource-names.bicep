@@ -27,6 +27,12 @@ type ResourceNames = {
     appServicePlan: string
     appInsights: string
   }
+  dataFiles: {
+    storage: {
+      storageAccountName: string
+      fileShareName: string
+    }
+  }
   frontDoor: {
     frontDoorName: string
     defaultEndpoint: {
@@ -80,6 +86,7 @@ type ResourceNames = {
       admin: string
       contentApi: string
       dataApi: string
+      dataFilesStoragePrivateEndpoints: string
       importer: string
       notifier: string
       publisher: string
@@ -132,6 +139,7 @@ type ResourceNames = {
     }
   }
   alertsGroup: string
+  recoveryVault: string
   databases: {
     coreSqlServer: string
     publicSqlServer: string
@@ -181,6 +189,12 @@ func getResourceNames(
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-data'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
+  }
+  dataFiles: {
+    storage: {
+      storageAccountName: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}datafiles'
+      fileShareName: '${newResourcePrefix}-${abbreviations.fileShare}-datafiles'
+    }
   }
   frontDoor: {
     frontDoorName: '${newResourcePrefix}-${abbreviations.frontDoorProfiles}'
@@ -235,6 +249,7 @@ func getResourceNames(
       admin: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-admin'
       contentApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-content'
       dataApi: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-data'
+      dataFilesStoragePrivateEndpoints: '${newResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-sa-datafiles-pep'
       importer: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-importer'
       notifier: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-notify'
       publisher: '${legacyResourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-ees-publisher'
@@ -287,6 +302,7 @@ func getResourceNames(
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+  recoveryVault: '${newResourcePrefix}-${abbreviations.recoveryServicesVaults}'
     databases: {
     coreSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-01'
     publicSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-02'

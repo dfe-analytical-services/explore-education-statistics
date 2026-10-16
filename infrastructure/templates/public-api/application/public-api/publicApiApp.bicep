@@ -49,6 +49,8 @@ var analyticsFileShareMountPath = '/data/analytics'
 
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
+var parquetV1DataFilesFileShareMountPath = '/data/data-files'
+
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
   name: resourceNames.existingResources.adminApp
 }
@@ -99,6 +101,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         volumeName: 'public-api-file-share-mount'
         mountPath: dataFilesFileShareMountPath
       }
+      {
+        volumeName: 'data-files-file-share-mount'
+        mountPath: parquetV1DataFilesFileShareMountPath
+      }
     ]
     volumes: [
       {
@@ -110,6 +116,11 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         name: 'public-api-file-share-mount'
         storageType: 'AzureFile'
         storageName: resourceNames.publicApi.publicApiFileShare
+      }
+      {
+        name: 'data-files-file-share-mount'
+        storageType: 'AzureFile'
+        storageName: resourceNames.existingResources.dataFilesFileShare
       }
     ]
     appSettings: [
@@ -165,6 +176,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'DataFiles__BasePath'
         value: dataFilesFileShareMountPath
+      }
+      {
+        name: 'ParquetV1DataFiles__BasePath'
+        value: parquetV1DataFilesFileShareMountPath
       }
       {
         name: 'OpenIdConnect__TenantId'

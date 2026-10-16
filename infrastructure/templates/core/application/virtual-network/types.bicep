@@ -25,4 +25,5 @@ type VNetSubnets = {
   nlSearchFunctionAppPrivateEndpoints: SubnetReference
   nlSearchFunctionApp: SubnetReference
   sqlServerPrivateEndpoints: SubnetReference
+  dataFilesStoragePrivateEndpoints: SubnetReference
 }

@@ -66,6 +66,12 @@ var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.datab
 
 var analyticsFileShareMountPath string = '\\mounts\\analytics'
 
+var dataFilesFileShareMountPath string = '\\mounts\\data-files'
+
+resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
+  name: resourceNames.dataFiles.storage.storageAccountName
+}
+
 resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
   name: resourceNames.analytics.storage.storageAccountName
 }
@@ -134,15 +140,26 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
-    azureFileShares: analyticsEnabled ? [
-      {
-        storageName: analyticsStorageAccount.name
-        storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
-        storageAccountName: analyticsStorageAccount.name
-        fileShareName: resourceNames.analytics.storage.fileShareName
-        mountPath: analyticsFileShareMountPath
-      }
-    ] : []
+    azureFileShares: concat(
+      [
+        {
+          storageName: dataFilesStorageAccount.name
+          storageAccountKey: dataFilesStorageAccount.listKeys().keys[0].value
+          storageAccountName: dataFilesStorageAccount.name
+          fileShareName: resourceNames.dataFiles.storage.fileShareName
+          mountPath: dataFilesFileShareMountPath
+        }
+      ],
+      analyticsEnabled ? [
+        {
+          storageName: analyticsStorageAccount.name
+          storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
+          storageAccountName: analyticsStorageAccount.name
+          fileShareName: resourceNames.analytics.storage.fileShareName
+          mountPath: analyticsFileShareMountPath
+        }
+      ] : []
+    )
     alerts: deployAlerts ? {
       appServiceHealth: true
       httpErrors: true
@@ -157,6 +174,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       PublicApp__BasicAuthPassword: publicAppBasicAuthPassword
       Analytics__Enabled: analyticsEnabled
       Analytics__BasePath: analyticsFileShareMountPath
+      DataFiles__BasePath: dataFilesFileShareMountPath
       TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
     }
     tagValues: tagValues

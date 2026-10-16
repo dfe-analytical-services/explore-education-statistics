@@ -7,6 +7,8 @@ type ResourceNames = {
     alertsGroup: string
     analyticsFileShare: string
     analyticsStorageAccount: string
+    dataFilesFileShare: string
+    dataFilesStorageAccount: string
     backupVault: {
       vault: string
       psqlFlexibleServerBackupPolicy: string

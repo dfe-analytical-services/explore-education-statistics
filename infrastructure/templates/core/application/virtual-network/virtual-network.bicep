@@ -58,6 +58,9 @@ var searchStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-sear
 // Analytics subnets. 
 var analyticsFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-analytics'
 var analyticsStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-anlyt-pep'
+
+// Data files subnets.
+var dataFilesStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-datafiles-pep'
     
 
 var subnets = deploySubnets ? [{
@@ -242,6 +245,12 @@ var subnets = deploySubnets ? [{
   properties: {
     addressPrefix: '10.0.23.0/24'
   }
+}
+{
+  name: dataFilesStoragePrivateEndpointsSubnetName
+  properties: {
+    addressPrefix: '10.0.24.0/24'
+  }
 }] : null
 
 module vNetModule '../../../common/components/virtual-network/virtual-network.bicep' = {
@@ -350,5 +359,9 @@ output subnets VNetSubnets = {
   sqlServerPrivateEndpoints: {
     name: sqlServerPrivateEndpointsSubnetName
     id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, sqlServerPrivateEndpointsSubnetName)
+  }
+  dataFilesStoragePrivateEndpoints: {
+    name: dataFilesStoragePrivateEndpointsSubnetName
+    id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, dataFilesStoragePrivateEndpointsSubnetName)
   }
 }

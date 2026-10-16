@@ -188,6 +188,8 @@ var resourceNames = {
     alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
     analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
     analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+    dataFilesFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-datafiles'
+    dataFilesStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}datafiles'
     backupVault: {
       vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
       psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
@@ -418,6 +420,10 @@ output dataProcessorFunctionAppStagingUrl string = deployDataProcessor ? dataPro
 
 output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   ? dataProcessorModule!.outputs.publicApiDataFileShareMountPath
+  : ''
+
+output dataProcessorDataFilesFileShareMountPath string = deployDataProcessor
+  ? dataProcessorModule!.outputs.dataFilesFileShareMountPath
   : ''
 
 output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey

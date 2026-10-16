@@ -39,6 +39,8 @@ param tagValues object
 
 var publicApiDataFileShareMountPath = '/data/public-api-data'
 
+var dataFilesFileShareMountPath = '/data/data-files'
+
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
   name: resourceNames.existingResources.adminApp
 }
@@ -52,6 +54,10 @@ var adminAppClientId = adminAppServiceIdentity.properties.clientId
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.publicApi.publicApiStorageAccount
+}
+
+resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: resourceNames.existingResources.dataFilesStorageAccount
 }
 
 resource dataProcessorFunctionAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -123,6 +129,13 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       storageAccountName: resourceNames.publicApi.publicApiStorageAccount
       fileShareName: resourceNames.publicApi.publicApiFileShare
       mountPath: publicApiDataFileShareMountPath
+    }
+    {
+      storageName: resourceNames.existingResources.dataFilesFileShare
+      storageAccountKey: dataFilesStorageAccount.listKeys().keys[0].value
+      storageAccountName: resourceNames.existingResources.dataFilesStorageAccount
+      fileShareName: resourceNames.existingResources.dataFilesFileShare
+      mountPath: dataFilesFileShareMountPath
     }]
     storageFirewallRules: storageFirewallRules
     alerts: deployAlerts ? {
@@ -144,5 +157,6 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
 output managedIdentityName string = dataProcessorFunctionAppManagedIdentity.name
 output managedIdentityClientId string = dataProcessorFunctionAppManagedIdentity.properties.clientId
 output publicApiDataFileShareMountPath string = publicApiDataFileShareMountPath
+output dataFilesFileShareMountPath string = dataFilesFileShareMountPath
 output url string = dataProcessorFunctionAppModule.outputs.url
 output stagingUrl string = dataProcessorFunctionAppModule.outputs.stagingUrl
