@@ -1,4 +1,4 @@
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 import { IpRange } from '../../common/types.bicep'
 
 @description('Specifies common resource naming variables.')
@@ -14,11 +14,11 @@ param tagValues object
 param deployAlerts bool
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.screenerFunctionPrivateEndpoints
+  name: resourceNames.vnet.subnets.screenerStoragePrivateEndpoints
   parent: vNet
 }
 
@@ -34,16 +34,16 @@ var storageAccountConfig = {
 module screenerLogsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'screenerLogsStorageAccountDeploy'
   params: {
-    storageAccountName: resourceNames.screener.screenerLogsStorageAccount
+    storageAccountName: resourceNames.screener.logsStorageAccount
     publicNetworkAccessEnabled: true
     firewallRules: storageFirewallRules
     sku: storageAccountConfig.sku
     kind: storageAccountConfig.kind
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     privateEndpointSubnetIds: {
       file: storagePrivateEndpointSubnet.id
@@ -55,7 +55,7 @@ module screenerLogsStorageAccountModule '../../common/components/storage/storage
 module screenerLogsFileShareModule '../../common/components/storage/fileShare.bicep' = {
   name: 'screenerLogsFileShareDeploy'
   params: {
-    fileShareName: resourceNames.screener.screenerLogsFileShare
+    fileShareName: resourceNames.screener.logsFileShare
     fileShareQuotaGbs: storageAccountConfig.fileShare.quotaGbs
     fileShareAccessTier: storageAccountConfig.fileShare.accessTier
     storageAccountName: screenerLogsStorageAccountModule.outputs.storageAccountName
@@ -63,11 +63,11 @@ module screenerLogsFileShareModule '../../common/components/storage/fileShare.bi
       availability: true
       latency: true
       capacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
   }
 }
 
 output storageAccountName string = screenerLogsStorageAccountModule.outputs.storageAccountName
-output fileShareName string = resourceNames.screener.screenerLogsFileShare
+output fileShareName string = resourceNames.screener.logsFileShare
