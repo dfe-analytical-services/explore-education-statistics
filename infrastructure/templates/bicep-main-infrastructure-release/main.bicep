@@ -293,7 +293,8 @@ module adminModuleDeploy '../admin/main.bicep' = {
   }
   dependsOn: [
     // Admin is dependent on Importer's storage account being available
-    // in order to reference its connection string secret in Key Vault.
+    // in order to reference its connection string secret in Key Vault,
+    // and on the data files storage account created by the Importer.
     importerModuleDeploy
   ]
 }
@@ -318,6 +319,10 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     existingStagingSlotAppSettings: contentApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    // The data files storage account is created by the Importer.
+    importerModuleDeploy
+  ]
 }
 
 module dataApiModuleDeploy '../data-api/main.bicep' = {
@@ -339,6 +344,10 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     existingStagingSlotAppSettings: dataApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    // The data files storage account is created by the Importer.
+    importerModuleDeploy
+  ]
 }
 
 module publicSiteModuleDeploy '../public-site/main.bicep' = {

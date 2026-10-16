@@ -23,6 +23,8 @@ var resourceNames = getResourceNamesForEnvironment({
   environmentName: environmentName
 })
 
+var dataFilesFileShareMountPath = '\\mounts\\data-files'
+
 var keyVaultName = resourceNames.keyVault.keyVault
 
 var secretNames = [
@@ -44,5 +46,6 @@ output appSettings object = {
   App__RowsPerBatch: rowsPerBatch
   App__PrivateStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
   App__ImporterStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.importerStorageAccountConnectionString]
+  DataFiles__BasePath: dataFilesFileShareMountPath
   Deploy__DeployedAt: deployedAt
 }

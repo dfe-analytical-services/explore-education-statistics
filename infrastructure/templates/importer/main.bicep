@@ -73,6 +73,65 @@ resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' exis
   parent: vNet
 }
 
+resource dataFilesStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
+  name: resourceNames.vnet.subnets.dataFilesStoragePrivateEndpoints
+  parent: vNet
+}
+
+var dataFilesFileShareMountPath = '\\mounts\\data-files'
+
+module dataFilesStorageAccountModule '../common/components/storage/storage-account.bicep' = {
+  name: 'dataFilesStorageAccountModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.dataFiles.storage.storageAccountName
+    publicNetworkAccessEnabled: true
+    firewallRules: maintenanceIpRanges
+    sku: 'Premium_ZRS'
+    kind: 'FileStorage'
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
+    privateEndpointSubnetIds: {
+      file: dataFilesStoragePrivateEndpointSubnet.id
+    }
+    tagValues: tagValues
+  }
+}
+
+module dataFilesFileShareModule '../common/components/storage/fileShare.bicep' = {
+  name: 'dataFilesFileShareModuleDeploy'
+  params: {
+    fileShareName: resourceNames.dataFiles.storage.fileShareName
+    fileShareQuotaGbs: 100
+    storageAccountName: dataFilesStorageAccountModule.outputs.storageAccountName
+    fileShareAccessTier: 'Premium'
+    alerts: deployAlerts ? {
+      availability: true
+      latency: true
+      capacity: true
+      alertsGroupName: resourceNames.alertsGroup
+    } : null
+    tagValues: tagValues
+  }
+}
+
+module dataFilesFileShareBackupModule '../common/components/recovery-services-vault/file-share-registration.bicep' = {
+  name: 'dataFilesFileShareBackupModuleDeploy'
+  params: {
+    vaultName: resourceNames.backups.recoveryServicesVault
+    backupPolicyName: 'DailyPolicy'
+    storageAccountName: dataFilesStorageAccountModule.outputs.storageAccountName
+    fileShareName: dataFilesFileShareModule.outputs.fileShareName
+    tagValues: tagValues
+  }
+}
+
+resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
+  name: resourceNames.dataFiles.storage.storageAccountName
+}
+
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'importerFunctionAppModuleDeploy'
   params: {
@@ -126,6 +185,15 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       alertsGroupName: resourceNames.alertsGroup
     } : null
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    azureFileShares: [
+      {
+        storageName: dataFilesStorageAccount.name
+        storageAccountKey: dataFilesStorageAccount.listKeys().keys[0].value
+        storageAccountName: dataFilesStorageAccount.name
+        fileShareName: dataFilesFileShareModule.outputs.fileShareName
+        mountPath: dataFilesFileShareMountPath
+      }
+    ]
     appSettings: []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
