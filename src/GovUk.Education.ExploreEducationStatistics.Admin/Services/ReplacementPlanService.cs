@@ -80,8 +80,6 @@ public class ReplacementPlanService(
             replacementApiDataSetVersion.Id,
             cancellationToken
         );
-        var isPatch = DataSetVersionNumber.TryParse(apiDataSetVersionPlan.Version, out var number) && number.Patch > 0;
-
         // If no mapping is found and the API version status is DRAFT, this data set version was deleted and recreated (& no mapping was necessary)
         // `completeStatusResult` is used for when we are replacing a draft release file (not an amendment) and therefore the mapping is complete/not applicable.
         var completeStatusResult = new MappingStatusViewModel
@@ -98,12 +96,9 @@ public class ReplacementPlanService(
         return apiDataSetVersionPlan with
         {
             MappingStatus = apiMappingStatus ?? (apiDataSetVersionPlan.ReadyToPublish ? completeStatusResult : null), // If no mapping is found, this data set version was deleted and recreated (& no mapping was necessary)
-            Valid =
-                (
-                    isPatch
-                        ? apiMappingStatus is { IsMajorVersionUpdate: false } && apiDataSetVersionPlan.ReadyToPublish
-                        : apiDataSetVersionPlan.ReadyToPublish
-                ) || (apiMappingStatus is null && apiDataSetVersionPlan.ReadyToPublish), // Data set version was deleted and recreated (as opposed to as a patch increment of a previous data set version)
+            // A patch version with major changes can only be finalised (and therefore be ready to publish)
+            // if a BAU user has explicitly overridden the block on major changes in release amendments.
+            Valid = apiDataSetVersionPlan.ReadyToPublish,
         };
     }
 

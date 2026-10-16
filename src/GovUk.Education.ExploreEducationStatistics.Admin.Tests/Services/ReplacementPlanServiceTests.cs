@@ -1651,7 +1651,6 @@ public class ReplacementPlanServiceTests
     // When user has uploaded major version data set
     [InlineData(DataSetVersionStatus.Published, true, false)]
     [InlineData(DataSetVersionStatus.Mapping, true, false)]
-    [InlineData(DataSetVersionStatus.Draft, true, false)]
     // When user has uploaded minor version
     [InlineData(DataSetVersionStatus.Published, false, false)]
     [InlineData(DataSetVersionStatus.Mapping, false, false)]
@@ -1663,6 +1662,33 @@ public class ReplacementPlanServiceTests
     [InlineData(DataSetVersionStatus.Withdrawn, false, false)]
     [InlineData(DataSetVersionStatus.Cancelled, false, false)]
     public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_ReplacementValidated(
+        DataSetVersionStatus dataSetVersionStatus,
+        bool majorVersionUpdate,
+        bool expectedValidValue
+    )
+    {
+        await AssertReplacementPlanForLinkedPublicApiDataSet(
+            dataSetVersionStatus,
+            majorVersionUpdate,
+            expectedValidValue
+        );
+    }
+
+    /// <summary>
+    /// A patch version with major changes can only reach Draft (finalised) status if a BAU user
+    /// has overridden the block on major changes in release amendments.
+    /// </summary>
+    [Fact]
+    public async Task GetReplacementPlan_FileIsLinkedToPublicApiDataSet_FinalisedMajorPatchVersion_ReplacementValid()
+    {
+        await AssertReplacementPlanForLinkedPublicApiDataSet(
+            DataSetVersionStatus.Draft,
+            majorVersionUpdate: true,
+            expectedValidValue: true
+        );
+    }
+
+    private async Task AssertReplacementPlanForLinkedPublicApiDataSet(
         DataSetVersionStatus dataSetVersionStatus,
         bool majorVersionUpdate,
         bool expectedValidValue

@@ -978,6 +978,7 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
 
     public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
+        bool allowMajorVersionUpdate = false,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 
