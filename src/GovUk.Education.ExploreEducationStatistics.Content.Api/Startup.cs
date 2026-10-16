@@ -29,7 +29,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -154,8 +156,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
                 provider.GetRequiredService<ILogger<MemoryCacheService>>()
             );
         });
-        services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddStorageDataSets();
         services.AddTransient<IDataSetFileService, DataSetFileService>();
         services.AddTransient<IPublicationRepository, PublicationRepository>();
         services.AddTransient<IPublicationService, PublicationService>();
@@ -193,7 +194,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
 
-        services.AddAnalytics(configuration);
+        services.AddContentAnalytics(configuration);
 
         services.AddSingleton<DateTimeProvider>();
         services.AddSingleton(TimeProvider.System);

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Security\GovUk.Education.ExploreEducationStatistics.Content.Security.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
+    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Storage\GovUk.Education.ExploreEducationStatistics.Data.Storage.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Data.ViewModels.csproj" />
   </ItemGroup>
 </Project>

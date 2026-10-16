@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common;
 using GovUk.Education.ExploreEducationStatistics.Analytics.Common.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -26,7 +27,11 @@ public class ReleaseFileServicePermissionTests
 
     private static readonly ReleaseVersion ReleaseVersion = new() { Id = Guid.NewGuid() };
 
-    private static readonly ReleaseFile ReleaseFile = new() { ReleaseVersion = ReleaseVersion, File = new File() };
+    private static readonly ReleaseFile ReleaseFile = new()
+    {
+        ReleaseVersion = ReleaseVersion,
+        File = new File { Type = FileType.Ancillary },
+    };
 
     [Fact]
     public async Task StreamFile()
