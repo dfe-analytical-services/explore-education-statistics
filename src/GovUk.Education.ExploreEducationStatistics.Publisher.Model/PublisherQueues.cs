@@ -7,4 +7,5 @@ public static class PublisherQueues
     public const string PublishReleaseFilesQueue = "publish-release-files";
     public const string PublishTaxonomyQueue = "publish-taxonomy";
     public const string NotifyChangeQueue = "notify";
+    public const string PublicationZipPurgeQueue = "publication-zip-purge";
 }

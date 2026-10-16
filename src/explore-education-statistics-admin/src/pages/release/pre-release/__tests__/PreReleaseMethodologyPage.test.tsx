@@ -11,7 +11,7 @@ import _methodologyService, {
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/methodologyContentService');

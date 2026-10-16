@@ -62,7 +62,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
@@ -78,7 +78,7 @@ public class ReleaseVersionsControllerUnitTests
                 DataFile = dataFile,
                 MetaFile = metaFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -104,7 +104,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
@@ -120,7 +120,7 @@ public class ReleaseVersionsControllerUnitTests
                 DataFile = dataFile,
                 MetaFile = metaFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -140,7 +140,12 @@ public class ReleaseVersionsControllerUnitTests
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
             .Setup(service =>
-                service.UploadFromZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), "Data set title", default)
+                service.UploadFromZip(
+                    _releaseVersionId,
+                    It.IsAny<IManagedStreamZipFile>(),
+                    "Data set title",
+                    It.IsAny<CancellationToken>()
+                )
             )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
@@ -154,7 +159,7 @@ public class ReleaseVersionsControllerUnitTests
                 Title = "Data set title",
                 ZipFile = dataSetZipFile,
             },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -175,7 +180,13 @@ public class ReleaseVersionsControllerUnitTests
 
         var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
         releaseDataFileService
-            .Setup(service => service.UploadFromBulkZip(_releaseVersionId, It.IsAny<IManagedStreamZipFile>(), default))
+            .Setup(service =>
+                service.UploadFromBulkZip(
+                    _releaseVersionId,
+                    It.IsAny<IManagedStreamZipFile>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
             .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
 
         // Act
@@ -183,7 +194,7 @@ public class ReleaseVersionsControllerUnitTests
 
         var response = await controller.UploadDataSetAsBulkZip(
             new() { ReleaseVersionId = _releaseVersionId, ZipFile = dataSetBulkZipFile },
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -195,28 +206,51 @@ public class ReleaseVersionsControllerUnitTests
     }
 
     [Fact]
+    public async Task GetDataSetUploads_Success_ReturnsOk()
+    {
+        // Arrange
+        List<DataSetUploadViewModel> dataSetUploads = [DataSetUploadMockBuilder.BuildViewModel()];
+
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+        releaseDataFileService
+            .Setup(mock => mock.ListDataSetUploads(_releaseVersionId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSetUploads);
+
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+        // Act
+        var response = await controller.GetDataSetUploads(_releaseVersionId, cancellationToken: CancellationToken.None);
+
+        // Assert
+        VerifyAllMocks(releaseDataFileService);
+
+        Assert.Same(dataSetUploads, response.AssertOkResult());
+    }
+
+    [Fact]
     public async Task DeleteDataSetUpload_Success_ReturnsNoContent()
     {
         // Arrange
         var dataSetUploadId = Guid.NewGuid();
 
-        var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
-        dataSetUploadRepository
-            .Setup(mock => mock.Delete(_releaseVersionId, dataSetUploadId, default))
+        releaseDataFileService
+            .Setup(mock => mock.DeleteDataSetUpload(_releaseVersionId, dataSetUploadId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
 
-        var controller = BuildController(dataSetUploadRepository: dataSetUploadRepository.Object);
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
         // Act
         var response = await controller.DeleteDataSetUpload(
             _releaseVersionId,
             dataSetUploadId,
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
-        VerifyAllMocks(dataSetUploadRepository);
+        VerifyAllMocks(releaseDataFileService);
         response.AssertNoContent();
     }
 
@@ -234,7 +268,7 @@ public class ReleaseVersionsControllerUnitTests
                 service.SaveDataSetsFromTemporaryBlobStorage(
                     _releaseVersionId,
                     new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
-                    default
+                    It.IsAny<CancellationToken>()
                 )
             )
             .ReturnsAsync(Unit.Instance);
@@ -245,7 +279,7 @@ public class ReleaseVersionsControllerUnitTests
         var response = await controller.ImportDataSetsFromTempStorage(
             _releaseVersionId,
             [expectedVm1.Id, expectedVm2.Id, expectedVm3.Id],
-            cancellationToken: default
+            cancellationToken: CancellationToken.None
         );
 
         // Assert
@@ -495,7 +529,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, It.IsAny<CancellationToken>());
+        var result = await controller.GetDeleteReleaseVersionPlan(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -510,13 +544,13 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance);
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -531,13 +565,13 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new NotFoundResult());
 
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -552,7 +586,7 @@ public class ReleaseVersionsControllerUnitTests
         var releaseVersionService = new Mock<IReleaseVersionService>(Strict);
 
         releaseVersionService
-            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, default))
+            .Setup(service => service.DeleteReleaseVersion(_releaseVersionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(
                 ValidationUtils.ValidationResult(new ErrorViewModel { Code = "error code", Path = "error path" })
             );
@@ -560,7 +594,7 @@ public class ReleaseVersionsControllerUnitTests
         var controller = BuildController(releaseVersionService: releaseVersionService.Object);
 
         // Act
-        var result = await controller.DeleteReleaseVersion(_releaseVersionId, default);
+        var result = await controller.DeleteReleaseVersion(_releaseVersionId, CancellationToken.None);
 
         // Assert
         VerifyAllMocks(releaseVersionService);
@@ -717,7 +751,6 @@ public class ReleaseVersionsControllerUnitTests
         IReleasePublishingStatusService? releaseStatusService = null,
         IReleaseChecklistService? releaseChecklistService = null,
         IDataImportService? importService = null,
-        IDataSetUploadRepository? dataSetUploadRepository = null,
         IDataSetFileStorage? dataSetFileStorage = null,
         IDataSetScreenerService? dataSetScreenerService = null
     )
@@ -730,7 +763,6 @@ public class ReleaseVersionsControllerUnitTests
             releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
             releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
             importService ?? Mock.Of<IDataImportService>(Strict),
-            dataSetUploadRepository ?? Mock.Of<IDataSetUploadRepository>(Strict),
             dataSetFileStorage ?? Mock.Of<IDataSetFileStorage>(Strict),
             dataSetScreenerService ?? Mock.Of<IDataSetScreenerService>(Strict)
         );

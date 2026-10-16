@@ -12,8 +12,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useCallback } from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 
 const ReleaseDataBlockCreatePage = () => {
   const navigate = useNavigate();

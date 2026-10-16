@@ -22,12 +22,7 @@ describe('useNavRoutes', () => {
       () => useNavRoutes(methodologyNavRoutes, { methodologyId }),
       {
         wrapper: ({ children }: { children?: ReactNode }) => (
-          <MemoryRouter
-            future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
-            initialEntries={[location]}
-          >
-            {children}
-          </MemoryRouter>
+          <MemoryRouter initialEntries={[location]}>{children}</MemoryRouter>
         ),
       },
     );

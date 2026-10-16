@@ -14,7 +14,7 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');
@@ -256,6 +256,65 @@ describe('ReleaseApiDataSetDetailsPage', () => {
     expect(
       screen.queryByTestId('live-version-summary'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders warning when draft version file is not API compatible', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: { ...testDraftVersion, publicApiCompatible: false },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByTestId('api-incompatible-warning'),
+    ).toHaveTextContent('failed the API compatibility checks');
+
+    expect(
+      within(screen.getByTestId('draft-version-summary')).getByTestId(
+        'API compatible',
+      ),
+    ).toHaveTextContent('No');
+  });
+
+  test('does not render warning when draft version file is API compatible', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: { ...testDraftVersion, publicApiCompatible: true },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('api-incompatible-warning'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render warning when draft version file API compatibility is unknown', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue({
+      ...testDataSet,
+      draftVersion: { ...testDraftVersion, publicApiCompatible: null },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Draft version details'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('api-incompatible-warning'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      within(screen.getByTestId('draft-version-summary')).getByTestId(
+        'API compatible',
+      ),
+    ).toHaveTextContent('Not available');
   });
 
   test('does not render the `Remove draft version` button for a user without permission to manage public API data sets', async () => {

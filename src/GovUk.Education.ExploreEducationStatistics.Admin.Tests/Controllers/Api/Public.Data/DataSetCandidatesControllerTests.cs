@@ -76,7 +76,9 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
                 releaseFiles,
                 releaseFile =>
                     candidates.Any(candidate =>
-                        candidate.ReleaseFileId == releaseFile.Id && candidate.Title == releaseFile.Name
+                        candidate.ReleaseFileId == releaseFile.Id
+                        && candidate.Title == releaseFile.Name
+                        && candidate.PublicApiCompatible == true
                     )
             );
         }
@@ -239,13 +241,14 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
         }
 
         [Fact]
-        public async Task ReleaseFileIsIncompatible_NotReturned()
+        public async Task ReleaseFileIsIncompatible_BauUser_Returned()
         {
             Release release = DataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true);
 
             DataImport dataImport = DataFixture
                 .DefaultDataImport()
-                .WithFile(DataFixture.DefaultFile(FileType.Data).WithReplacingId(Guid.NewGuid()));
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithStatus(DataImportStatus.COMPLETE);
 
             var releaseVersion = release.Versions.Single();
 
@@ -267,7 +270,9 @@ public abstract class DataSetCandidatesControllerTests(DataSetCandidatesControll
 
             var candidates = response.AssertOk<List<DataSetCandidateViewModel>>();
 
-            Assert.Empty(candidates);
+            var candidate = Assert.Single(candidates);
+            Assert.Equal(releaseFile.Id, candidate.ReleaseFileId);
+            Assert.False(candidate.PublicApiCompatible);
         }
 
         [Theory]

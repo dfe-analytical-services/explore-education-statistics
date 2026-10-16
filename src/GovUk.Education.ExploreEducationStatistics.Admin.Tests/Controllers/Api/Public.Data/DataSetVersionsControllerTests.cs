@@ -660,8 +660,10 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
     public class CreateNextVersionTests(DataSetVersionsControllerTestsFixture fixture)
         : DataSetVersionsControllerTests(fixture)
     {
-        [Fact]
-        public async Task BauUser_Success()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)] // BAU users can override the API compatibility result
+        public async Task BauUser_Success(bool publicApiCompatible)
         {
             ReleaseFile releaseFile = DataFixture
                 .DefaultReleaseFile()
@@ -670,7 +672,8 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
                         .DefaultReleaseVersion()
                         .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
                 )
-                .WithFile(DataFixture.DefaultFile(FileType.Data));
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithApiCompatibility(publicApiCompatible);
 
             await fixture
                 .GetContentDbContext()
@@ -857,6 +860,58 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             );
 
             response.AssertOk<DataSetVersionSummaryViewModel>();
+        }
+
+        [Theory]
+        [InlineData(PublicationRole.Approver)]
+        [InlineData(PublicationRole.Drafter)]
+        public async Task UserOnPublicationTeam_ReleaseFileNotApiCompatible_Returns400(PublicationRole publicationRole)
+        {
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+            User user = DataFixture.DefaultUser().WithId(identityUser.GetUserId());
+
+            Publication publication = DataFixture.DefaultPublication();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(publication))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data))
+                .WithApiCompatibility(false);
+
+            UserPublicationRole userPublicationRole = DataFixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithPublication(publication)
+                .WithRole(publicationRole);
+
+            await fixture
+                .GetContentDbContext()
+                .AddTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                    context.UserPublicationRoles.Add(userPublicationRole);
+                });
+
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            var response = await CreateNextVersion(
+                dataSetId: Guid.NewGuid(),
+                releaseFileId: releaseFile.Id,
+                user: identityUser
+            );
+
+            MockUtils.VerifyAllMocks(processorClientMock);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasError(
+                expectedPath: "releaseFileId",
+                expectedCode: nameof(ValidationMessages.ReleaseFileNotApiCompatible)
+            );
         }
 
         [Fact]

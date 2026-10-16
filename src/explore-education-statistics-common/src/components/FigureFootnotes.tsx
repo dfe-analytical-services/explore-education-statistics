@@ -39,6 +39,7 @@ const FigureFootnotes = ({
         itemName="footnote"
         itemNamePlural="footnotes"
         testId="footnotes"
+        renderAllItems
       >
         {footnotes.map(footnote => (
           <li key={footnote.id}>

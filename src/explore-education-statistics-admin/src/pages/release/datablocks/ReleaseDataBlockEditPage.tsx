@@ -21,8 +21,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import isGuid from '@common/utils/string/isGuid';
 import React, { useCallback, useRef } from 'react';
-import { generatePath, useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router';
 
 interface Model {
   dataBlock: ReleaseDataBlock;

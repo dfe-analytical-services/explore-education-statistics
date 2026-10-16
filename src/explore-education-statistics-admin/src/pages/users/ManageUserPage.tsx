@@ -11,7 +11,7 @@ import React from 'react';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import releaseQueries from '@admin/queries/releaseQueries';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 export default function ManageUserPage() {
   const { userId } = useParams<{ userId: string }>() as { userId: string };

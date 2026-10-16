@@ -15,7 +15,7 @@ import { ReleaseVersion } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 
 jest.mock('@admin/services/apiDataSetService');

@@ -12,7 +12,7 @@ import { GlobalPermissions } from '@admin/services/authService';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import { ChangeSet } from '@common/services/types/apiDataSetChanges';
 import TestRouterRenderer from '@admin/components/testing/TestRouterRenderer';
 

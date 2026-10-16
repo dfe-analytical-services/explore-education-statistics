@@ -2,20 +2,17 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React, { ReactNode } from 'react';
+import React from 'react';
 
-interface Props {
-  triggerButton?: ReactNode;
-}
+const triggerText = 'What are release types?';
 
-const ReleaseTypesModal = ({
-  triggerButton = <ButtonText>What are release types?</ButtonText>,
-}: Props) => (
+const ReleaseTypesModal = () => (
   <Modal
     className="govuk-!-width-one-half"
+    noJsFallbackSummary={triggerText}
     showClose
     title="Release types guidance"
-    triggerButton={triggerButton}
+    triggerButton={<ButtonText>{triggerText}</ButtonText>}
   >
     <p>
       This is a description list of the different types of publication we

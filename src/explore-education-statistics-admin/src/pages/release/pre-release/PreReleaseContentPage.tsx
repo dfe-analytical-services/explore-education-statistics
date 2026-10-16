@@ -8,7 +8,7 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router';
 
 const PreReleaseContentPage = () => {
   const { publicationId, releaseVersionId } =

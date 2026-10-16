@@ -5,8 +5,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 interface Props {
   publicationId: string;

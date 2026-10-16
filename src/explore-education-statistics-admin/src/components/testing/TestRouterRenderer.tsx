@@ -4,8 +4,8 @@ import {
   MemoryRouter,
   RouterProvider,
   Routes,
+  Route,
 } from 'react-router';
-import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import TestLocationContext from '@admin/components/testing/TestLocationContext';
 

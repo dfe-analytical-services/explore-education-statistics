@@ -16,7 +16,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
+import { generatePath } from 'react-router';
 import styles from './DraftApiDataSetsTable.module.scss';
 
 export const columnWidth = 90;
