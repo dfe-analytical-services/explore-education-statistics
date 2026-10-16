@@ -1,3 +1,4 @@
+import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
@@ -9,6 +10,12 @@ import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-conf
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
+
+@description('Per-service overrides. Empty preserves all existing Http401 rules.')
+param http401Alerts ServiceHttpStatusAlerts = {}
+
+@description('Per-service overrides. Empty preserves all existing Http5xx rules.')
+param http5xxAlerts ServiceHttpStatusAlerts = {}
 
 //
 // Tagging config.
@@ -196,6 +203,8 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
+    http401Alert: http401Alerts.?importer
+    http5xxAlert: http5xxAlerts.?importer
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
@@ -218,6 +227,8 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
+    http401Alert: http401Alerts.?notifier
+    http5xxAlert: http5xxAlerts.?notifier
     tagValues: tags
   }
 }
@@ -243,6 +254,8 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
+    http401Alert: http401Alerts.?publisher
+    http5xxAlert: http5xxAlerts.?publisher
     tagValues: tags
   }
   dependsOn: [
@@ -263,6 +276,8 @@ module adminModuleDeploy '../admin/main.bicep' = {
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
+    http401Alert: http401Alerts.?admin
+    http5xxAlert: http5xxAlerts.?admin
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
@@ -299,6 +314,8 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
+    http401Alert: http401Alerts.?contentApi
+    http5xxAlert: http5xxAlerts.?contentApi
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
@@ -322,6 +339,8 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
     publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http401Alert: http401Alerts.?dataApi
+    http5xxAlert: http5xxAlerts.?dataApi
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
     tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
@@ -353,6 +372,8 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
     publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http401Alert: http401Alerts.?publicSite
+    http5xxAlert: http5xxAlerts.?publicSite
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

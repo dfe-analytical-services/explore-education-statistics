@@ -1,3 +1,4 @@
+import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { keyVaultRef } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
@@ -38,6 +39,12 @@ param analyticsEnabled bool
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
+
+@description('Optional override of the existing Http401 rule. Omit to preserve current behaviour.')
+param http401Alert HttpStatusAlertConfig?
+
+@description('Optional override of the existing Http5xx rule. Omit to preserve current behaviour.')
+param http5xxAlert HttpStatusAlertConfig?
 
 @description('''
 Whether to restrict this App Service origin to requests routed through this environment's Azure Front Door
@@ -160,6 +167,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     alerts: deployAlerts ? {
       appServiceHealth: true
       httpErrors: true
+      http401: http401Alert
+      http5xx: http5xxAlert
       alertsGroupName: resourceNames.alertsGroup
     } : null
     applicationAppSettings: {
