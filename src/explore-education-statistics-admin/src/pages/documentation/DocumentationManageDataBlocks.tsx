@@ -3,6 +3,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import {
   documentationConfigureChartsRoute,
+  documentationManageContentRoute,
   documentationManageDataRoute,
 } from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
@@ -512,7 +513,7 @@ const DocumentationManageDataBlock = () => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <Link to="./manage-content">
+                <Link to={documentationManageContentRoute.fullPath}>
                   Managing content: step by step
                 </Link>
                 .
