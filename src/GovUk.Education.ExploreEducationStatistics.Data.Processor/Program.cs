@@ -92,6 +92,8 @@ return;
 
 // Caches the StatsDB's shared locations for StatisticsDbDataSetWriter. It isn't behind IStorageDataSetWriter
 // as it isn't scoped to a data set. It will be removed once data sets are parquet files with their own locations.
+// @MarkFix This loads the StatsDB location cache directly at startup, outside IStorageDataSetWriter. Remove it
+// once ParquetV1DataSetWriter stops writing meta and locations to the StatsDB (after footnotes etc. are migrated).
 void LoadLocationCache()
 {
     var dbContextSupplier = host.Services.GetRequiredService<IDbContextSupplier>();
