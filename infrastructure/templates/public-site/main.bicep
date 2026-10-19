@@ -29,17 +29,6 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-@description('URL for the ACR hosting Docker images for this App Service.')
-param dockerRegistryUrl string
-
-@secure()
-@description('Username for the user pulling Docker images for this App Service.')
-param dockerPullUsername string
-
-@secure()
-@description('Password for the user pulling Docker images for this App Service.')
-param dockerPullPassword string
-
 @secure()
 @description('''
 The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to
@@ -105,14 +94,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       alertsGroupName: resourceNames.alertsGroup
     } : null
     websitePort: 3000
-    applicationAppSettings: {
-      DOCKER_REGISTRY_SERVER_URL: dockerRegistryUrl
-      DOCKER_REGISTRY_SERVER_USERNAME: dockerPullUsername
-      DOCKER_REGISTRY_SERVER_PASSWORD: dockerPullPassword
-      NEXT_CONFIG_MODE: 'server'
-      NODE_ENV: 'production'
-      WEBSITES_DISABLE_CONTENT_COMPRESSION: true
-    }
+    applicationAppSettings: {}
     existingProdAppSettings: existingProdAppSettings
     tagValues: tagValues
   }

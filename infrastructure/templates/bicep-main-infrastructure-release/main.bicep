@@ -196,8 +196,6 @@ resource dataProtectionKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
   }
 }
 
-var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
-
 module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
@@ -328,9 +326,6 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publicSiteConfig.appServiceSku!
-    dockerRegistryUrl: dockerRegistryUrl
-    dockerPullUsername: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
-    dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     deployAlerts: true

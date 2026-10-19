@@ -50,6 +50,8 @@ resource nlSearchFunctionApp 'Microsoft.Web/sites@2025-03-01' existing = {
 }
 
 var secretNames = [
+  resourceNames.keyVault.secrets.acr.dockerPullUsername
+  resourceNames.keyVault.secrets.acr.dockerPullPassword
   resourceNames.keyVault.secrets.publicSite.basicAuthUsername
   resourceNames.keyVault.secrets.publicSite.basicAuthPassword
 ]
@@ -82,4 +84,10 @@ output appSettings object = {
   PUBLIC_API_DOCS_URL: 'https://${publicApiUrl}/docs'
   DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
   DEPLOYED_AT: deployedAt
+  DOCKER_REGISTRY_SERVER_URL: 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
+  DOCKER_REGISTRY_SERVER_USERNAME: secretRefs[resourceNames.keyVault.secrets.acr.dockerPullUsername]
+  DOCKER_REGISTRY_SERVER_PASSWORD: secretRefs[resourceNames.keyVault.secrets.acr.dockerPullPassword]
+  NEXT_CONFIG_MODE: 'server'
+  NODE_ENV: 'production'
+  WEBSITES_DISABLE_CONTENT_COMPRESSION: true
 }
