@@ -3,13 +3,11 @@ Creates Event Grid subscriptions for the Search Docs Function App, for a defined
  Each subscription delivers events to a storage queue within the Search Docs Function App storage account.
 '''
 
-import { abbreviations } from '../../common/abbreviations.bicep'
-import { eventTopics } from '../../common/eventTopics.bicep'
-import { buildFullyQualifiedTopicName } from '../../common/functions.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
-@description('Resource prefix for all resources.')
-param resourcePrefix string
+@description('Specifies common resource naming variables.')
+param resourceNames ResourceNames
 
 @description('Queue names for the Search Docs Function App used as Event Grid subscription destinations.')
 param storageQueueNames SearchStorageQueueNames
@@ -17,63 +15,66 @@ param storageQueueNames SearchStorageQueueNames
 @description('The name of the Search Docs Function App storage account.')
 param searchDocsFunctionAppStorageAccountName string
 
+var topicNames = resourceNames.eventGrid.topics
+var subscriptionNames = resourceNames.search.searchDocsEventSubscriptions
+
 // Define each of the topics and their associated subscriptions
 var eventGridCustomTopicSubscriptions = [
   {
-    topicName: eventTopics.publicationChanged
+    topicName: topicNames.publicationChanged
     subscriptions: [
       {
-        name: 'publication-archived'
+        name: subscriptionNames.publicationArchived
         includedEventTypes: ['publication-archived']
         queueName: storageQueueNames.publicationArchived
       }
       {
-        name: 'publication-changed'
+        name: subscriptionNames.publicationChanged
         includedEventTypes: ['publication-changed']
         queueName: storageQueueNames.publicationChanged
       }
       {
-        name: 'publication-deleted'
+        name: subscriptionNames.publicationDeleted
         includedEventTypes: ['publication-deleted']
         queueName: storageQueueNames.publicationDeleted
       }
       {
-        name: 'publication-latest-published-release-reordered'
+        name: subscriptionNames.publicationLatestPublishedReleaseReordered
         includedEventTypes: ['publication-latest-published-release-reordered']
         queueName: storageQueueNames.publicationLatestPublishedReleaseReordered
       }
       {
-        name: 'publication-restored'
+        name: subscriptionNames.publicationRestored
         includedEventTypes: ['publication-restored']
         queueName: storageQueueNames.publicationRestored
       }
     ]
   }
   {
-    topicName: eventTopics.releaseChanged
+    topicName: topicNames.releaseChanged
     subscriptions: [
       {
-        name: 'release-slug-changed'
+        name: subscriptionNames.releaseSlugChanged
         includedEventTypes: ['release-slug-changed']
         queueName: storageQueueNames.releaseSlugChanged
       }
     ]
   }
   {
-    topicName: eventTopics.releaseVersionChanged
+    topicName: topicNames.releaseVersionChanged
     subscriptions: [
       {
-        name: 'release-version-published'
+        name: subscriptionNames.releaseVersionPublished
         includedEventTypes: ['release-version-published']
         queueName: storageQueueNames.releaseVersionPublished
       }
     ]
   }
   {
-    topicName: eventTopics.themeChanged
+    topicName: topicNames.themeChanged
     subscriptions: [
       {
-        name: 'theme-changed'
+        name: subscriptionNames.themeChanged
         includedEventTypes: ['theme-changed']
         queueName: storageQueueNames.themeUpdated
       }
@@ -92,8 +93,8 @@ module eventGridQueueSubscriptionModuleDeploy '../../common/components/event-gri
   for (subscription, index) in subscriptions: {
     name: 'eventGridQueueSubscriptionModuleDeploy-${index}'
     params: {
-      name: '${resourcePrefix}-${abbreviations.eventGridSubscriptions}-${subscription.name}'
-      topicName: buildFullyQualifiedTopicName(resourcePrefix, subscription.topicName)
+      name: subscription.name
+      topicName: subscription.topicName
       includedEventTypes: subscription.includedEventTypes
       storageAccountName: searchDocsFunctionAppStorageAccountName
       queueName: subscription.queueName

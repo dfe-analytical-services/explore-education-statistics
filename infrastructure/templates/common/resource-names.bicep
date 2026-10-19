@@ -108,6 +108,8 @@ type ResourceNames = {
   }
   nlSearch: {
     functionApp: string
+    appServicePlan: string
+    functionStorageAccount: string
   }
   notifier: {
     functionApp: string
@@ -152,6 +154,23 @@ type ResourceNames = {
   }
   search: {
     service: string
+    storageAccount: string
+    appInsights: string
+    searchDocsEventSubscriptions: {
+      publicationArchived: string
+      publicationChanged: string
+      publicationDeleted: string
+      publicationLatestPublishedReleaseReordered: string
+      publicationRestored: string
+      releaseSlugChanged: string
+      releaseVersionPublished: string
+      themeChanged: string
+    }
+  }
+  searchDocs: {
+    functionApp: string
+    appServicePlan: string
+    functionStorageAccount: string
   }
   storageAccounts: {
     core: string
@@ -400,6 +419,8 @@ func getResourceNames(
   }
   nlSearch: {
     functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
+    appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
+    functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
   }
   notifier: {
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
@@ -447,7 +468,24 @@ func getResourceNames(
     logsFileShare: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener-logs-${abbreviations.fileShare}'
   }
   search: {
-    service: '${newResourcePrefix}-srch'
+    service: '${newResourcePrefix}-${abbreviations.searchSearchServices}'
+    storageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
+    appInsights: '${newResourcePrefix}-${abbreviations.insightsComponents}-search'
+    searchDocsEventSubscriptions: {
+      publicationArchived: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-archived'
+      publicationChanged: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-changed'
+      publicationDeleted: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-deleted'
+      publicationLatestPublishedReleaseReordered: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-latest-published-release-reordered'
+      publicationRestored: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-restored'
+      releaseSlugChanged: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-release-slug-changed'
+      releaseVersionPublished: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-release-version-published'
+      themeChanged: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-theme-changed'
+    }
+  }
+  searchDocs: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
+    functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
   }
   storageAccounts: {
     core: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eescore'

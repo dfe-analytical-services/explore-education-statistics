@@ -1,9 +1,3 @@
-import { abbreviations } from 'abbreviations.bicep'
-
-@export()
-func buildFullyQualifiedTopicName(resourcePrefix string, topicName string) string =>
-  '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
-
 @export()
 @description('Returns a percentage of a number.')
 func percentage(number int, percent int) int => int((number * percent) / 100)
