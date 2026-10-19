@@ -810,4 +810,182 @@ describe('FiltersForm', () => {
       );
     });
   });
+
+  describe('paired indicators', () => {
+    const parentLabel = 'Number of excluded sessions';
+    const childLabel = 'Number of unauthorised reasons sessions';
+
+    // No filters, so only indicators need selecting to submit the form
+    const testSubjectMetaPairedIndicators = produce(testSubjectMeta, draft => {
+      draft.filters = {};
+      draft.indicators.AbsenceByReason.options[1].parentIndicatorId =
+        'number-excluded-sessions';
+    });
+
+    test('renders the child indicator as disabled with a hint', () => {
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeEnabled();
+      expect(screen.getByLabelText(childLabel)).toBeDisabled();
+      expect(
+        screen.getByText(`Selected automatically with ${parentLabel}`),
+      ).toBeInTheDocument();
+    });
+
+    test('checking and unchecking the parent indicator also checks and unchecks the child indicator', async () => {
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      await user.click(screen.getByLabelText(parentLabel));
+
+      expect(screen.getByLabelText(parentLabel)).toBeChecked();
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+
+      // Changing another indicator keeps the child indicator selected
+      await user.click(screen.getByLabelText('Authorised absence rate'));
+
+      expect(screen.getByLabelText('Authorised absence rate')).toBeChecked();
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+
+      await user.click(screen.getByLabelText(parentLabel));
+
+      expect(screen.getByLabelText(parentLabel)).not.toBeChecked();
+      expect(screen.getByLabelText(childLabel)).not.toBeChecked();
+      expect(screen.getByLabelText('Authorised absence rate')).toBeChecked();
+    });
+
+    test('selecting and unselecting all subgroup options includes the child indicator', async () => {
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Select all 2 subgroup options for Absence by reason',
+        }),
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeChecked();
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Unselect all 2 subgroup options for Absence by reason',
+        }),
+      );
+
+      expect(screen.getByLabelText(parentLabel)).not.toBeChecked();
+      expect(screen.getByLabelText(childLabel)).not.toBeChecked();
+    });
+
+    test('submits the child indicator with the parent indicator', async () => {
+      const onSubmit = jest.fn();
+
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={onSubmit}
+        />,
+      );
+
+      await user.click(screen.getByLabelText(parentLabel));
+      await user.click(screen.getByRole('button', { name: 'Create table' }));
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      expect(onSubmit).toHaveBeenCalledWith({
+        filterHierarchies: {},
+        filters: {},
+        indicators: [
+          'number-excluded-sessions',
+          'number-unauthorised-reasons-sessions',
+        ],
+      });
+    });
+
+    test('selects the child indicator when only the parent indicator is in the initial values', () => {
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          initialValues={{
+            indicators: ['number-excluded-sessions'],
+            filters: [],
+            filterHierarchies: undefined,
+          }}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeChecked();
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+    });
+
+    test('does not select the child indicator when it is in the initial values without the parent indicator', () => {
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          initialValues={{
+            indicators: ['number-unauthorised-reasons-sessions'],
+            filters: [],
+            filterHierarchies: undefined,
+          }}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(screen.getByLabelText(parentLabel)).not.toBeChecked();
+      expect(screen.getByLabelText(childLabel)).not.toBeChecked();
+    });
+
+    test('automatically selects a single parent indicator with its child indicator', () => {
+      const testSubjectMetaOnePairedIndicator = produce(
+        testSubjectMetaPairedIndicators,
+        draft => {
+          delete draft.indicators.AbsenceFields;
+        },
+      );
+
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaOnePairedIndicator}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeChecked();
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+    });
+  });
 });
