@@ -37,7 +37,9 @@ import {
 import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { useCallback, useMemo, useState } from 'react';
+import xor from 'lodash/xor';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
 import getFilterHierarchyLabelsMap, {
@@ -390,27 +392,9 @@ export default function FiltersForm({
                     name="indicators"
                     options={indicatorOptionGroups}
                     order={[]}
-                    onChange={event => {
-                      // Set the value ourselves so paired child indicators (which are
-                      // disabled) are checked and unchecked with their parent indicators
-                      event.preventDefault();
-
-                      const { checked, value } = event.target;
-                      const selectedIndicators = getValues('indicators');
-
-                      setValue(
-                        'indicators',
-                        normalisePairedIndicators(
-                          checked
-                            ? [...selectedIndicators, value]
-                            : selectedIndicators.filter(
-                                indicator => indicator !== value,
-                              ),
-                          pairedIndicatorChildIds,
-                        ),
-                        { shouldValidate: true },
-                      );
-                    }}
+                  />
+                  <PairedIndicatorsSync
+                    childIdsByParentId={pairedIndicatorChildIds}
                   />
 
                   {simpleFilters.length + hierarchiedFilterIds.length > 0 && (
@@ -677,4 +661,40 @@ export default function FiltersForm({
       }}
     </FormProvider>
   );
+}
+
+/**
+ * Keeps paired child indicators selected with their parent indicators.
+ *
+ * Child indicator checkboxes are disabled, so react-hook-form leaves them out
+ * when reading the checkbox values on change. Rather than intercepting the
+ * change (which would stop the browser toggling the clicked checkbox),
+ * we correct the selection after each change.
+ */
+function PairedIndicatorsSync({
+  childIdsByParentId,
+}: {
+  childIdsByParentId: Dictionary<string>;
+}) {
+  const { setValue } = useFormContext<FiltersFormValues>();
+  const indicators = useWatch<FiltersFormValues, 'indicators'>({
+    name: 'indicators',
+  });
+
+  useEffect(() => {
+    if (!indicators) {
+      return;
+    }
+
+    const normalisedIndicators = normalisePairedIndicators(
+      indicators,
+      childIdsByParentId,
+    );
+
+    if (xor(indicators, normalisedIndicators).length > 0) {
+      setValue('indicators', normalisedIndicators, { shouldValidate: true });
+    }
+  }, [indicators, childIdsByParentId, setValue]);
+
+  return null;
 }
