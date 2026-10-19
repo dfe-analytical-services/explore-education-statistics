@@ -57,7 +57,11 @@ public static class SubjectGeneratorExtensions
             {
                 var list = filters.Invoke(context).ToList();
 
-                list.ForEach(filter => filter.Subject = subject);
+                list.ForEach(filter =>
+                {
+                    filter.Subject = subject;
+                    filter.SubjectId = subject.Id;
+                });
 
                 return list;
             }
@@ -78,7 +82,11 @@ public static class SubjectGeneratorExtensions
             {
                 var list = indicatorGroups.Invoke(context).ToList();
 
-                list.ForEach(indicatorGroup => indicatorGroup.Subject = subject);
+                list.ForEach(indicatorGroup =>
+                {
+                    indicatorGroup.Subject = subject;
+                    indicatorGroup.SubjectId = subject.Id;
+                });
 
                 return list;
             }
