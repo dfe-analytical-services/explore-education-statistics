@@ -2,6 +2,7 @@ import PageMetaTitle from '@admin/components/PageMetaTitle';
 import { useReleaseVersionContext } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import ReleaseApiDataSetsSection from '@admin/pages/release/data/components/ReleaseApiDataSetsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
+import ReleaseDataPairedIndicatorsSection from '@admin/pages/release/data/components/ReleaseDataPairedIndicatorsSection';
 import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/data-uploads/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
@@ -95,6 +96,17 @@ const ReleaseDataPage = () => {
             lazy
           >
             <ReleaseDataReorderSection
+              key={completeDataFilesCount}
+              releaseVersionId={releaseVersionId}
+              canUpdateRelease={canUpdateRelease}
+            />
+          </TabsSection>
+          <TabsSection
+            id={releaseDataPageTabs.pairedIndicators.id}
+            title={releaseDataPageTabs.pairedIndicators.title}
+            lazy
+          >
+            <ReleaseDataPairedIndicatorsSection
               key={completeDataFilesCount}
               releaseVersionId={releaseVersionId}
               canUpdateRelease={canUpdateRelease}
