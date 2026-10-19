@@ -1,6 +1,5 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('The IP address ranges that can access the Analytics Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
@@ -10,9 +9,6 @@ param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
 
 @description('Name of the shared analytics storage account.')
 param analyticsStorageAccountName string
@@ -30,14 +26,14 @@ param analyticsRequestFilesConsumerCron string
 param tagValues object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.analyticsFunctionApp
+  name: resourceNames.vnet.subnets.analyticsFunctionApp
   parent: vNet
 }
 
@@ -46,13 +42,13 @@ resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' 
 }
 
 resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.storagePrivateEndpoints
+  name: resourceNames.vnet.subnets.analyticsStoragePrivateEndpoints
   parent: vNet
 }
 
 // Shared log analytics workspace. Currently the Public API deployment is responsible for creating this.
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
-  name: resourceNames.existingResources.logAnalyticsWorkspace
+  name: resourceNames.logAnalyticsWorkspace
 }
 
 var fileShareMountPath = '/data/analytics'
@@ -60,10 +56,10 @@ var fileShareMountPath = '/data/analytics'
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'analyticsFunctionAppModuleDeploy'
   params: {
-    functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
+    functionAppName: resourceNames.analytics.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspace.id
-    appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-analytics'
+    appServicePlanName: resourceNames.analytics.appServicePlan
     appSettings: [
       {
         name: 'Analytics__BasePath'
@@ -93,7 +89,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     operatingSystem: 'Linux'
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
-    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa'
+    storageAccountName: resourceNames.analytics.functionStorageAccount
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
@@ -112,7 +108,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       fileServiceAvailability: false
       fileServiceLatency: false
       fileServiceCapacity: false
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     azureFileShares: [{
       storageName: analyticsStorageAccountName
