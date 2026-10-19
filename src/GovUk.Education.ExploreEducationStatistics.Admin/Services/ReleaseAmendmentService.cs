@@ -546,19 +546,19 @@ public class ReleaseAmendmentService(
             .ToAsyncEnumerable()
             .SelectAwait(async originalFootnote =>
             {
-                var filterSubjectIds = originalFootnote.Filters.ToDictionary(
+                var filterIdToSubjectIdMap = originalFootnote.Filters.ToDictionary(
                     filterFootnote => filterFootnote.FilterId,
                     filterFootnote => filterFootnote.SubjectId
                 );
-                var filterGroupSubjectIds = originalFootnote.FilterGroups.ToDictionary(
+                var filterGroupIdToSubjectIdMap = originalFootnote.FilterGroups.ToDictionary(
                     filterGroupFootnote => filterGroupFootnote.FilterGroupId,
                     filterGroupFootnote => filterGroupFootnote.SubjectId
                 );
-                var filterItemSubjectIds = originalFootnote.FilterItems.ToDictionary(
+                var filterItemIdToSubjectIdMap = originalFootnote.FilterItems.ToDictionary(
                     filterItemFootnote => filterItemFootnote.FilterItemId,
                     filterItemFootnote => filterItemFootnote.SubjectId
                 );
-                var indicatorSubjectIds = originalFootnote.Indicators.ToDictionary(
+                var indicatorIdToSubjectIdMap = originalFootnote.Indicators.ToDictionary(
                     indicatorFootnote => indicatorFootnote.IndicatorId,
                     indicatorFootnote => indicatorFootnote.SubjectId
                 );
@@ -569,10 +569,10 @@ public class ReleaseAmendmentService(
                 return await footnoteRepository.CreateFootnote(
                     amendmentReleaseVersionId,
                     originalFootnote.Content,
-                    filterSubjectIds: filterSubjectIds,
-                    filterGroupSubjectIds: filterGroupSubjectIds,
-                    filterItemSubjectIds: filterItemSubjectIds,
-                    indicatorSubjectIds: indicatorSubjectIds,
+                    filterIdToSubjectIdMap: filterIdToSubjectIdMap,
+                    filterGroupIdToSubjectIdMap: filterGroupIdToSubjectIdMap,
+                    filterItemIdToSubjectIdMap: filterItemIdToSubjectIdMap,
+                    indicatorIdToSubjectIdMap: indicatorIdToSubjectIdMap,
                     subjectIds: subjectIds,
                     originalFootnote.Order
                 );
