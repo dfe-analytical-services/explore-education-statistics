@@ -17,10 +17,10 @@ public class FootnoteRepository : IFootnoteRepository
     public async Task<Footnote> CreateFootnote(
         Guid releaseVersionId,
         string content,
-        IReadOnlyDictionary<Guid, Guid> filterSubjectIds,
-        IReadOnlyDictionary<Guid, Guid> filterGroupSubjectIds,
-        IReadOnlyDictionary<Guid, Guid> filterItemSubjectIds,
-        IReadOnlyDictionary<Guid, Guid> indicatorSubjectIds,
+        IReadOnlyDictionary<Guid, Guid> filterIdToSubjectIdMap,
+        IReadOnlyDictionary<Guid, Guid> filterGroupIdToSubjectIdMap,
+        IReadOnlyDictionary<Guid, Guid> filterItemIdToSubjectIdMap,
+        IReadOnlyDictionary<Guid, Guid> indicatorIdToSubjectIdMap,
         IReadOnlySet<Guid> subjectIds,
         int order
     )
@@ -30,16 +30,16 @@ public class FootnoteRepository : IFootnoteRepository
             ReleaseVersionId = releaseVersionId,
             Content = content,
             Order = order,
-            Filters = filterSubjectIds
+            Filters = filterIdToSubjectIdMap
                 .Select(pair => new FilterFootnote { FilterId = pair.Key, SubjectId = pair.Value })
                 .ToList(),
-            FilterGroups = filterGroupSubjectIds
+            FilterGroups = filterGroupIdToSubjectIdMap
                 .Select(pair => new FilterGroupFootnote { FilterGroupId = pair.Key, SubjectId = pair.Value })
                 .ToList(),
-            FilterItems = filterItemSubjectIds
+            FilterItems = filterItemIdToSubjectIdMap
                 .Select(pair => new FilterItemFootnote { FilterItemId = pair.Key, SubjectId = pair.Value })
                 .ToList(),
-            Indicators = indicatorSubjectIds
+            Indicators = indicatorIdToSubjectIdMap
                 .Select(pair => new IndicatorFootnote { IndicatorId = pair.Key, SubjectId = pair.Value })
                 .ToList(),
             Subjects = subjectIds.Select(subjectId => new SubjectFootnote { SubjectId = subjectId }).ToList(),
