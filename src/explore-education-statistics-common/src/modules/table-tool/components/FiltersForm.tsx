@@ -19,6 +19,11 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import {
+  getPairedIndicatorChildIds,
+  normalisePairedIndicators,
+  orderPairedIndicatorOptions,
+} from '@common/modules/table-tool/utils/pairedIndicators';
+import {
   FullTableQuery,
   Subject,
   SubjectMeta,
@@ -132,13 +137,24 @@ export default function FiltersForm({
     [hierarchiedFilters],
   );
 
+  const pairedIndicatorChildIds = useMemo(
+    () => getPairedIndicatorChildIds(Object.values(subjectMeta.indicators)),
+    [subjectMeta.indicators],
+  );
+
   const initialFormValues: FiltersFormValues = useMemo(() => {
-    // Automatically select indicator when one indicator group with one option
-    const indicatorValues = Object.values(subjectMeta.indicators);
-    const indicators =
-      indicatorValues.length === 1 && indicatorValues[0].options.length === 1
-        ? [indicatorValues[0].options[0].value]
-        : (initialValues?.indicators ?? []);
+    // Automatically select indicator when there is only one indicator that can be selected,
+    // ignoring paired child indicators as they're selected automatically with their parent
+    const selectableIndicators = Object.values(subjectMeta.indicators)
+      .flatMap(group => group.options)
+      .filter(option => !option.parentIndicatorId);
+
+    const indicators = normalisePairedIndicators(
+      selectableIndicators.length === 1
+        ? [selectableIndicators[0].value]
+        : (initialValues?.indicators ?? []),
+      pairedIndicatorChildIds,
+    );
 
     const filters = mapValues(Object.fromEntries(simpleFilters), filter => {
       const filterGroupOptions = Object.values(filter.options);
@@ -187,14 +203,29 @@ export default function FiltersForm({
       indicators,
       filterHierarchies: initialFilterHierarchyValues,
     };
-  }, [initialValues, subjectMeta, simpleFilters, filterHierarchies]);
+  }, [
+    initialValues,
+    subjectMeta,
+    simpleFilters,
+    filterHierarchies,
+    pairedIndicatorChildIds,
+  ]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
   const handleSubmit = useCallback(
-    async (values: FiltersFormValues) => {
+    async (formValues: FiltersFormValues) => {
+      // Ensure paired child indicators are always queried with their parent indicators
+      const values: FiltersFormValues = {
+        ...formValues,
+        indicators: normalisePairedIndicators(
+          formValues.indicators,
+          pairedIndicatorChildIds,
+        ),
+      };
+
       setPreviousValues({ ...values });
 
       try {
@@ -230,6 +261,7 @@ export default function FiltersForm({
       goToNextStep,
       onSubmit,
       onTableQueryError,
+      pairedIndicatorChildIds,
       selectedPublication?.title,
       subject?.name,
     ],
@@ -247,10 +279,32 @@ export default function FiltersForm({
 
   const allFiltersOpen = openFilterGroups.length === allFilterGroupKeys.length;
 
-  const orderedIndicators = orderBy(
-    Object.values(subjectMeta.indicators),
-    'order',
-  );
+  const indicatorOptionGroups = useMemo(() => {
+    const indicatorLabels = Object.fromEntries(
+      Object.values(subjectMeta.indicators)
+        .flatMap(group => group.options)
+        .map(option => [option.value, option.label]),
+    );
+
+    return orderBy(Object.values(subjectMeta.indicators), 'order').map(
+      group => ({
+        legend: group.label,
+        options: orderPairedIndicatorOptions(group.options).map(option =>
+          option.parentIndicatorId
+            ? {
+                ...option,
+                className: styles.pairedIndicator,
+                disabled: true,
+                hint: `Selected automatically with ${
+                  indicatorLabels[option.parentIndicatorId] ??
+                  'its paired indicator'
+                }`,
+              }
+            : option,
+        ),
+      }),
+    );
+  }, [subjectMeta.indicators]);
 
   const validationSchema = useMemo<ObjectSchema<FiltersFormValues>>(() => {
     return Yup.object({
@@ -334,11 +388,29 @@ export default function FiltersForm({
                     }
                     legendSize="m"
                     name="indicators"
-                    options={orderedIndicators.map(group => ({
-                      legend: group.label,
-                      options: group.options,
-                    }))}
+                    options={indicatorOptionGroups}
                     order={[]}
+                    onChange={event => {
+                      // Set the value ourselves so paired child indicators (which are
+                      // disabled) are checked and unchecked with their parent indicators
+                      event.preventDefault();
+
+                      const { checked, value } = event.target;
+                      const selectedIndicators = getValues('indicators');
+
+                      setValue(
+                        'indicators',
+                        normalisePairedIndicators(
+                          checked
+                            ? [...selectedIndicators, value]
+                            : selectedIndicators.filter(
+                                indicator => indicator !== value,
+                              ),
+                          pairedIndicatorChildIds,
+                        ),
+                        { shouldValidate: true },
+                      );
+                    }}
                   />
 
                   {simpleFilters.length + hierarchiedFilterIds.length > 0 && (
@@ -492,7 +564,7 @@ export default function FiltersForm({
                   itemName="indicator"
                   itemNamePlural="indicators"
                 >
-                  {orderedIndicators
+                  {indicatorOptionGroups
                     .flatMap(group => group.options)
                     .filter(indicator =>
                       values.indicators.includes(indicator.value),
