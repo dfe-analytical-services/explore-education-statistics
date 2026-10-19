@@ -3,6 +3,7 @@ import Link from '@admin/components/Link';
 import React from 'react';
 import {
   documentationContentStandardsRoute,
+  documentationEditReleaseRoute,
   documentationStyleGuideRoute,
 } from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
@@ -632,7 +633,7 @@ const DocumentationManageContent = () => {
               </p>
               <p>
                 For detailed guidance on how to update a release's status -{' '}
-                <Link to="./edit-release">
+                <Link to={documentationEditReleaseRoute.fullPath}>
                   Updating release status: step by step.
                 </Link>
               </p>
