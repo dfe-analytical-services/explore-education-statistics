@@ -2,6 +2,17 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import React from 'react';
+import {
+  administrationBoundaryDataRoute,
+  administrationFeedbackRoute,
+  administrationGlossaryRoute,
+  administrationImportsRoute,
+  administrationInvitedUsersRoute,
+  administrationPreReleaseUsersRoute,
+  administrationServiceAnnouncementRoute,
+  administrationUsersRoute,
+} from '@admin/routes/administrationRoutes';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
 
 const BauDashboardPage = () => {
   const { user } = useAuthContext();
@@ -18,7 +29,7 @@ const BauDashboardPage = () => {
         {user?.permissions.canAccessAllImports && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/imports">
+              <Link to={administrationImportsRoute.fullPath}>
                 Manage incomplete imports
               </Link>
             </h3>
@@ -31,7 +42,7 @@ const BauDashboardPage = () => {
         {user?.permissions.isBauUser && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/boundary-data">
+              <Link to={administrationBoundaryDataRoute.fullPath}>
                 Manage boundary data
               </Link>
             </h3>
@@ -44,7 +55,9 @@ const BauDashboardPage = () => {
         {user?.permissions.isBauUser && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/glossary">Manage glossary</Link>
+              <Link to={administrationGlossaryRoute.fullPath}>
+                Manage glossary
+              </Link>
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-1">
               Clear glossary cache.
@@ -57,7 +70,9 @@ const BauDashboardPage = () => {
         {user?.permissions.isBauUser && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/feedback">View feedback</Link>
+              <Link to={administrationFeedbackRoute.fullPath}>
+                View feedback
+              </Link>
             </h3>
             <p className="govuk-caption-m govuk-!-margin-top-1">
               View feedback submitted by consumers of the service.
@@ -68,7 +83,7 @@ const BauDashboardPage = () => {
         {user?.permissions.isBauUser && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/education-in-numbers">
+              <Link to={educationInNumbersListRoute.fullPath}>
                 Manage Education in Numbers
               </Link>
             </h3>
@@ -81,7 +96,7 @@ const BauDashboardPage = () => {
         {user?.permissions.isBauUser && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-              <Link to="/administration/service-announcement">
+              <Link to={administrationServiceAnnouncementRoute.fullPath}>
                 Service announcement
               </Link>
             </h3>
@@ -102,7 +117,7 @@ const BauDashboardPage = () => {
           <>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <Link to="/administration/users">Manage users</Link>
+                <Link to={administrationUsersRoute.fullPath}>Manage users</Link>
               </h3>
               <p className="govuk-caption-m govuk-!-margin-top-1">
                 Assign users permissions and roles within the service.
@@ -110,7 +125,9 @@ const BauDashboardPage = () => {
             </div>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <Link to="/administration/users/invites">Invite new users</Link>
+                <Link to={administrationInvitedUsersRoute.fullPath}>
+                  Invite new users
+                </Link>
               </h3>
               <p className="govuk-caption-m govuk-!-margin-top-1">
                 Invite new users to the service and assign their roles and
@@ -119,7 +136,7 @@ const BauDashboardPage = () => {
             </div>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <Link to="/administration/users/pre-release">
+                <Link to={administrationPreReleaseUsersRoute.fullPath}>
                   Pre-release users
                 </Link>
               </h3>

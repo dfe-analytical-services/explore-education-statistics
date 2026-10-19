@@ -12,6 +12,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import releaseQueries from '@admin/queries/releaseQueries';
 import { useParams } from 'react-router';
+import { administrationUsersRoute } from '@admin/routes/administrationRoutes';
 
 export default function ManageUserPage() {
   const { userId } = useParams<{ userId: string }>() as { userId: string };
@@ -72,7 +73,10 @@ export default function ManageUserPage() {
         )}
       </LoadingSpinner>
       <div className="govuk-!-margin-top-6">
-        <Link to="/administration/users" className="govuk-back-link">
+        <Link
+          to={administrationUsersRoute.fullPath}
+          className="govuk-back-link"
+        >
           Back
         </Link>
       </div>

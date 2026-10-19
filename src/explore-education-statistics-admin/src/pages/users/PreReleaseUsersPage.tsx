@@ -9,6 +9,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
 import preReleaseUsersQueries from '@admin/queries/user-management/preReleaseUsersQueries';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 
 const PreReleaseUsersPage = () => {
   const {
@@ -91,7 +92,10 @@ const PreReleaseUsersPage = () => {
         </LoadingSpinner>
       </table>
       <p>
-        <Link to="/administration/" className="govuk-back-link">
+        <Link
+          to={administrationIndexRoute.fullPath}
+          className="govuk-back-link"
+        >
           Back
         </Link>
       </p>
