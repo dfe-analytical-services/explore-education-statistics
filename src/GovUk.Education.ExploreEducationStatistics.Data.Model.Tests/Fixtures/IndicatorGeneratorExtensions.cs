@@ -69,6 +69,7 @@ public static class IndicatorGeneratorExtensions
                             IndicatorId = indicator.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
+                            SubjectId = indicator.IndicatorGroup.SubjectId,
                         };
 
                         footnote.Indicators.Add(indicatorFootnote);
