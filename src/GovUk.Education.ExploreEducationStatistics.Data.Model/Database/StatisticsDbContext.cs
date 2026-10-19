@@ -112,11 +112,16 @@ public class StatisticsDbContext : DbContext
     public DbSet<Location> Location { get; set; } = null!;
     public DbSet<Observation> Observation { get; set; } = null!;
     public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; } = null!;
+
+    [Obsolete("No longer used. Kept until the table is dropped.")]
     public DbSet<ReleaseVersion> ReleaseVersion { get; set; } = null!;
+
     public DbSet<Subject> Subject { get; set; } = null!;
     public DbSet<SubjectFootnote> SubjectFootnote { get; set; } = null!;
 
+    [Obsolete("No longer used. Kept until the table is dropped.")]
     public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
+
     public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
     public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
     public DbSet<MatchedFilterItem> MatchedFilterItems => this.TempTableSet<MatchedFilterItem>();
@@ -291,6 +296,7 @@ public class StatisticsDbContext : DbContext
         modelBuilder.Entity<Indicator>().Property(indicator => indicator.Unit).HasConversion(unitConverter);
     }
 
+#pragma warning disable CS0618 // Type or member is obsolete
     private static void ConfigurePublication(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ReleaseVersion>().HasIndex(rv => rv.PublicationId);
@@ -308,18 +314,13 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder.Entity<ReleaseSubject>().HasOne(rs => rs.Subject).WithMany().OnDelete(DeleteBehavior.Cascade);
     }
+#pragma warning restore CS0618
 
     private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
     {
         modelBuilder
             .Entity<ReleaseFootnote>()
             .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.FootnoteId });
-
-        modelBuilder
-            .Entity<ReleaseFootnote>()
-            .HasOne(rf => rf.ReleaseVersion)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder
             .Entity<ReleaseFootnote>()

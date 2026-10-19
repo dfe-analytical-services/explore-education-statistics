@@ -442,8 +442,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
         services.AddTransient<IUserResourceRoleNotificationService, UserResourceRoleNotificationService>();
         services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
-        services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
-        services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
+        services.AddTransient<SubjectDeleter, SubjectDeleter>();
         services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IMethodologyService, MethodologyService>();

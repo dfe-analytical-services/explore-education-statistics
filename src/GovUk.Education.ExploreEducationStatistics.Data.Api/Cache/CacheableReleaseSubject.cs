@@ -1,21 +1,21 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 
 public record CacheableReleaseSubject
 {
-    public ReleaseSubject ReleaseSubject { get; }
+    public ReleaseFile ReleaseFile { get; }
     private ReleaseVersion ContentReleaseVersion { get; }
 
-    public CacheableReleaseSubject(ReleaseSubject releaseSubject, ReleaseVersion contentReleaseVersion)
+    public CacheableReleaseSubject(ReleaseFile releaseFile, ReleaseVersion contentReleaseVersion)
     {
-        ReleaseSubject = releaseSubject;
+        ReleaseFile = releaseFile;
         ContentReleaseVersion = contentReleaseVersion;
     }
 
-    public Guid SubjectId => ReleaseSubject.SubjectId;
+    public Guid SubjectId => ReleaseFile.File.SubjectId!.Value;
     public string ReleaseSlug => ContentReleaseVersion.Release.Slug;
     public string PublicationSlug => ContentReleaseVersion.Release.Publication.Slug;
 }

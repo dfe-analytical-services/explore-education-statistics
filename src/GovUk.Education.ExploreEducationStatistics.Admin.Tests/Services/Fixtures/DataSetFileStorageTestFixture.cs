@@ -281,7 +281,7 @@ public class DataSetFileStorageTestFixture
         }
 
         var releaseFilesToSave = releaseFileReplacing.Concat(releaseFiles).Distinct().ToArray();
-        testFixture.SetUpImportAndBlobMocks(user, releaseVersion);
+        testFixture.SetUpImportAndBlobMocks(user);
         await testFixture.SetupContentDbContext(contentDbContext, releaseVersion, releaseFilesToSave, metaFiles[0]);
 
         return testFixture;
@@ -348,7 +348,7 @@ public class DataSetFileStorageTestFixture
             .Returns(Task.FromResult(true));
 
         SetupPatchDataSetVersionCreation();
-        SetUpImportAndBlobMocks(user, ReleaseVersion, metaFileName);
+        SetUpImportAndBlobMocks(user, metaFileName);
     }
 
     private void SetupMocksForBulkUpload((File, string)[] fileAndDataSetName)
@@ -485,18 +485,12 @@ public class DataSetFileStorageTestFixture
             )
             .Returns(Task.FromResult(DataFile));
 
-        SetUpImportAndBlobMocks(user, ReleaseVersion, metaFileName);
+        SetUpImportAndBlobMocks(user, metaFileName);
     }
 
-    private void SetUpImportAndBlobMocks(User user, ReleaseVersion releaseVersion, string? metaFileName = null)
+    private void SetUpImportAndBlobMocks(User user, string? metaFileName = null)
     {
-        ReleaseVersionRepository
-            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id))
-            .Returns(Task.FromResult(SubjectId));
-
-        ReleaseVersionRepository
-            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id))
-            .Returns(Task.FromResult(SubjectId));
+        ReleaseVersionRepository.Setup(mock => mock.CreateStatisticsDbSubject()).Returns(Task.FromResult(SubjectId));
 
         if (metaFileName is not null)
         {

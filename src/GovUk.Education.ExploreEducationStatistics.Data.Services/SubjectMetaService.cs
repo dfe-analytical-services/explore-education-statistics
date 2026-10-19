@@ -60,27 +60,20 @@ public class SubjectMetaService(
             .OnSuccess(GetSubjectMeta);
     }
 
-    public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject)
+    public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseFile releaseFile)
     {
         return await userService
-            .CheckCanViewSubjectData(releaseSubject)
-            .OnSuccess(async rs =>
+            .CheckCanViewSubjectData(releaseFile)
+            .OnSuccess(async () =>
             {
-                var releaseFile = await contentDbContext
-                    .ReleaseFiles.Include(rf => rf.File)
-                    .Where(rf =>
-                        rf.ReleaseVersionId == rs.ReleaseVersionId
-                        && rf.File.SubjectId == rs.SubjectId
-                        && rf.File.Type == FileType.Data
-                    )
-                    .SingleAsync();
+                var subjectId = releaseFile.File.SubjectId!.Value;
 
                 return new SubjectMetaViewModel
                 {
-                    Filters = await GetFilters(releaseSubject.SubjectId, releaseFile.FilterSequence),
-                    Indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence),
-                    Locations = await GetLocations(releaseSubject.SubjectId),
-                    TimePeriod = await GetTimePeriods(releaseSubject.SubjectId),
+                    Filters = await GetFilters(subjectId, releaseFile.FilterSequence),
+                    Indicators = await GetIndicators(subjectId, releaseFile.IndicatorSequence),
+                    Locations = await GetLocations(subjectId),
+                    TimePeriod = await GetTimePeriods(subjectId),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                 };
             });
@@ -95,9 +88,7 @@ public class SubjectMetaService(
         return await releaseSubjectService
             .Find(subjectId: request.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(userService.CheckCanViewSubjectData)
-            .OnSuccess(releaseSubject =>
-                GetSubjectMetaViewModelFromRequest(request, releaseSubject, cancellationToken)
-            );
+            .OnSuccess(releaseFile => GetSubjectMetaViewModelFromRequest(request, releaseFile, cancellationToken));
     }
 
     public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
@@ -164,7 +155,7 @@ public class SubjectMetaService(
 
     private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromRequest(
         LocationsOrTimePeriodsQueryRequest request,
-        ReleaseSubject releaseSubject,
+        ReleaseFile releaseFile,
         CancellationToken cancellationToken
     )
     {
@@ -197,15 +188,6 @@ public class SubjectMetaService(
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                var releaseFile = await contentDbContext
-                    .ReleaseFiles.Include(rf => rf.File)
-                    .Where(rf =>
-                        rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                        && rf.File.SubjectId == releaseSubject.SubjectId
-                        && rf.File.Type == FileType.Data
-                    )
-                    .SingleAsync(cancellationToken: cancellationToken);
-
                 var matchingObservationsTable = await observationService.GetMatchedObservations(
                     request.AsFullTableQuery(),
                     cancellationToken
@@ -225,7 +207,7 @@ public class SubjectMetaService(
                 logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                var indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence);
+                var indicators = await GetIndicators(request.SubjectId, releaseFile.IndicatorSequence);
                 logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                 return new SubjectMetaViewModel

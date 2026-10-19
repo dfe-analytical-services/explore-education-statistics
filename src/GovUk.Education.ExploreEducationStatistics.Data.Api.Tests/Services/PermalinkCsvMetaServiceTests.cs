@@ -5,8 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -21,11 +21,8 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
@@ -68,7 +65,6 @@ public class PermalinkCsvMetaServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var subjectId = Guid.NewGuid();
@@ -77,10 +73,9 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseFile?)null);
 
             var service = BuildService(
-                contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 releaseSubjectService: releaseSubjectService.Object
             );
@@ -178,7 +173,6 @@ public class PermalinkCsvMetaServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var subjectId = Guid.NewGuid();
@@ -187,10 +181,9 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseFile?)null);
 
             var service = BuildService(
-                contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 releaseSubjectService: releaseSubjectService.Object
             );
@@ -269,7 +262,6 @@ public class PermalinkCsvMetaServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var subjectId = Guid.NewGuid();
@@ -278,10 +270,9 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseFile?)null);
 
             var service = BuildService(
-                contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 releaseSubjectService: releaseSubjectService.Object
             );
@@ -368,39 +359,27 @@ public class PermalinkCsvMetaServiceTests
             .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
-        };
+        Subject subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups);
 
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Location.AddRangeAsync(locations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
 
-            releaseSubjectService
-                .Setup(s => s.FindForLatestPublishedVersion(releaseSubject.SubjectId))
-                .ReturnsAsync(releaseSubject);
+            releaseSubjectService.Setup(s => s.FindForLatestPublishedVersion(subject.Id)).ReturnsAsync(releaseFile);
 
             // Ordering of CSV headers in meta should reflect the
             // column ordering in the original data file's header.
@@ -424,19 +403,9 @@ public class PermalinkCsvMetaServiceTests
 
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
-            releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                        ),
-                        default
-                    )
-                )
-                .ReturnsAsync(csv.ToStream());
+            releaseFileBlobService.Setup(s => s.GetDownloadStream(releaseFile, default)).ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 releaseSubjectService: releaseSubjectService.Object,
                 releaseFileBlobService: releaseFileBlobService.Object
@@ -451,7 +420,7 @@ public class PermalinkCsvMetaServiceTests
                     .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
-            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
+            var result = await service.GetCsvMeta(subject.Id, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
 
@@ -509,244 +478,6 @@ public class PermalinkCsvMetaServiceTests
     }
 
     [Fact]
-    public async Task GetCsvMeta_SubjectExists_MultipleReleaseFilesExist()
-    {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
-
-        var indicatorGroups = _fixture
-            .DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
-            .GenerateList();
-
-        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
-
-        var locations = _fixture
-            .DefaultLocation()
-            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList();
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
-        };
-
-        var releaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id };
-
-        var releaseDataFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
-
-        // Create a file for the subject and release which is not a data file
-        var releaseMetadataFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Metadata },
-        };
-
-        // Create a data file for the subject but for a different release
-        var releaseDataFileOtherRelease = new ReleaseFile
-        {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(releaseDataFile, releaseMetadataFile, releaseDataFileOtherRelease);
-            await contentDbContext.SaveChangesAsync();
-
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-            await statisticsDbContext.Location.AddRangeAsync(locations);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
-
-            releaseSubjectService
-                .Setup(s => s.FindForLatestPublishedVersion(releaseSubject.SubjectId))
-                .ReturnsAsync(releaseSubject);
-
-            // Ordering of CSV headers in meta should reflect the
-            // column ordering in the original data file's header.
-            var csv = string.Join(
-                ',',
-                "time_period",
-                "time_identifier",
-                "country_name",
-                "country_code",
-                "la_name",
-                "new_la_code",
-                "old_la_code",
-                "region_name",
-                "region_code",
-                filters[1].Name,
-                filters[0].Name,
-                indicators[2].Name,
-                indicators[0].Name,
-                indicators[1].Name
-            );
-
-            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
-
-            releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseDataFile.FileId
-                            && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
-                        ),
-                        default
-                    )
-                )
-                .ReturnsAsync(csv.ToStream());
-
-            var service = BuildService(
-                contentDbContext: contentDbContext,
-                statisticsDbContext: statisticsDbContext,
-                releaseSubjectService: releaseSubjectService.Object,
-                releaseFileBlobService: releaseFileBlobService.Object
-            );
-
-            var tableResultMeta = new SubjectResultMetaViewModel
-            {
-                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                Locations = LocationViewModelBuilder
-                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
-            };
-
-            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
-
-            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
-
-            var viewModel = result.AssertRight();
-
-            // Ordering of headers is same as original data file.
-            var expectedHeaders = new List<string>
-            {
-                "time_period",
-                "time_identifier",
-                "geographic_level",
-                "country_name",
-                "country_code",
-                "la_name",
-                "new_la_code",
-                "old_la_code",
-                "region_name",
-                "region_code",
-                filters[1].Name,
-                filters[0].Name,
-                indicators[2].Name,
-                indicators[0].Name,
-                indicators[1].Name,
-            };
-
-            Assert.Equal(expectedHeaders, viewModel.Headers);
-        }
-    }
-
-    [Fact]
-    public async Task GetCsvMeta_SubjectExists_ReleaseFileNotFound_HeadersInDefaultOrder()
-    {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
-
-        var indicatorGroups = _fixture
-            .DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
-            .GenerateList();
-
-        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
-
-        var locations = _fixture
-            .DefaultLocation()
-            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
-            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList();
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-            await statisticsDbContext.Location.AddRangeAsync(locations);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
-
-            releaseSubjectService
-                .Setup(s => s.FindForLatestPublishedVersion(releaseSubject.SubjectId))
-                .ReturnsAsync(releaseSubject);
-
-            var service = BuildService(
-                contentDbContext: contentDbContext,
-                statisticsDbContext: statisticsDbContext,
-                releaseSubjectService: releaseSubjectService.Object
-            );
-
-            var tableResultMeta = new SubjectResultMetaViewModel
-            {
-                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                Locations = LocationViewModelBuilder
-                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
-            };
-
-            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
-
-            VerifyAllMocks(releaseSubjectService);
-
-            var viewModel = result.AssertRight();
-
-            // Headers are in a default ordering.
-            var expectedHeaders = new List<string>
-            {
-                "time_period",
-                "time_identifier",
-                "geographic_level",
-                "country_code",
-                "country_name",
-                "region_code",
-                "region_name",
-                "new_la_code",
-                "old_la_code",
-                "la_name",
-                filters[0].Name,
-                filters[1].Name,
-                indicators[0].Name,
-                indicators[1].Name,
-                indicators[2].Name,
-            };
-
-            Assert.Equal(expectedHeaders, viewModel.Headers);
-        }
-    }
-
-    [Fact]
     public async Task GetCsvMeta_SubjectExists_BlobNotFound_HeadersInDefaultOrder()
     {
         var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
@@ -765,55 +496,35 @@ public class PermalinkCsvMetaServiceTests
             .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
-        };
+        Subject subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups);
 
-        var releaseFile = new ReleaseFile
-        {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(_fixture.DefaultReleaseVersion())
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
-            await contentDbContext.SaveChangesAsync();
-
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Location.AddRangeAsync(locations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
 
-            releaseSubjectService
-                .Setup(s => s.FindForLatestPublishedVersion(releaseSubject.SubjectId))
-                .ReturnsAsync(releaseSubject);
+            releaseSubjectService.Setup(s => s.FindForLatestPublishedVersion(subject.Id)).ReturnsAsync(releaseFile);
 
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
 
             releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
-                        ),
-                        default
-                    )
-                )
+                .Setup(s => s.GetDownloadStream(releaseFile, default))
                 .ThrowsAsync(new FileNotFoundException("File not found"));
 
             var service = BuildService(
-                contentDbContext: contentDbContext,
                 statisticsDbContext: statisticsDbContext,
                 releaseSubjectService: releaseSubjectService.Object,
                 releaseFileBlobService: releaseFileBlobService.Object
@@ -828,7 +539,7 @@ public class PermalinkCsvMetaServiceTests
                     .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
             };
 
-            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
+            var result = await service.GetCsvMeta(subject.Id, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 
@@ -882,7 +593,6 @@ public class PermalinkCsvMetaServiceTests
     }
 
     private static PermalinkCsvMetaService BuildService(
-        ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IReleaseSubjectService? releaseSubjectService = null,
         IReleaseFileBlobService? releaseFileBlobService = null
@@ -890,7 +600,6 @@ public class PermalinkCsvMetaServiceTests
     {
         return new(
             logger: Mock.Of<ILogger<PermalinkCsvMetaService>>(),
-            contentDbContext: contentDbContext,
             statisticsDbContext: statisticsDbContext,
             releaseSubjectService: releaseSubjectService ?? Mock.Of<IReleaseSubjectService>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)

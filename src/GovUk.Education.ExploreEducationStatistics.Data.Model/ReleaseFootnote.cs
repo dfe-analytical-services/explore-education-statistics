@@ -7,7 +7,5 @@ public class ReleaseFootnote
 
     public Guid FootnoteId { get; set; }
 
-    public ReleaseVersion ReleaseVersion { get; set; } = null!;
-
     public Guid ReleaseVersionId { get; set; }
 }

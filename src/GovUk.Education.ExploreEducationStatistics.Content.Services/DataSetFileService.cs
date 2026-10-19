@@ -228,7 +228,10 @@ public class DataSetFileService(
 
         var variables = GetVariables(releaseFile.File.DataSetFileMeta!);
 
-        var footnotes = await footnoteRepository.GetFootnotes(releaseFile.ReleaseVersionId, releaseFile.File.SubjectId);
+        var footnotes = await footnoteRepository.GetFootnotes(
+            releaseFile.ReleaseVersionId,
+            releaseFile.File.SubjectId!.Value
+        );
 
         return new DataSetFileViewModel
         {

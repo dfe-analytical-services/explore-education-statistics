@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -24,7 +24,6 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
 {
     private readonly ILogger<SubjectCsvMetaService> _logger;
     private readonly StatisticsDbContext _statisticsDbContext;
-    private readonly ContentDbContext _contentDbContext;
     private readonly IUserService _userService;
     private readonly IFilterItemRepository _filterItemRepository;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
@@ -32,7 +31,6 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
     public SubjectCsvMetaService(
         ILogger<SubjectCsvMetaService> logger,
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext,
         IUserService userService,
         IFilterItemRepository filterItemRepository,
         IReleaseFileBlobService releaseFileBlobService
@@ -40,21 +38,20 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
     {
         _logger = logger;
         _statisticsDbContext = statisticsDbContext;
-        _contentDbContext = contentDbContext;
         _userService = userService;
         _filterItemRepository = filterItemRepository;
         _releaseFileBlobService = releaseFileBlobService;
     }
 
     public async Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
-        ReleaseSubject releaseSubject,
+        ReleaseFile releaseFile,
         FullTableQuery query,
         CancellationToken cancellationToken = default
     )
     {
         return await _userService
-            .CheckCanViewSubjectData(releaseSubject)
-            .OnSuccess(() => GetCsvStream(releaseSubject, cancellationToken))
+            .CheckCanViewSubjectData(releaseFile)
+            .OnSuccess(() => GetCsvStream(releaseFile, cancellationToken))
             .OnSuccess(async csvStream =>
             {
                 var locations = GetLocations([.. query.LocationIds]);
@@ -74,23 +71,10 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             });
     }
 
-    private async Task<Stream?> GetCsvStream(
-        ReleaseSubject releaseSubject,
-        CancellationToken cancellationToken = default
-    )
+    private async Task<Stream?> GetCsvStream(ReleaseFile releaseFile, CancellationToken cancellationToken = default)
     {
         try
         {
-            var releaseFile = await _contentDbContext
-                .ReleaseFiles.Include(rf => rf.File)
-                .SingleAsync(
-                    predicate: rf =>
-                        rf.File.SubjectId == releaseSubject.SubjectId
-                        && rf.File.Type == FileType.Data
-                        && rf.ReleaseVersionId == releaseSubject.ReleaseVersionId,
-                    cancellationToken: cancellationToken
-                );
-
             return (
                 await _releaseFileBlobService.GetDownloadStream(releaseFile, cancellationToken: cancellationToken)
             ).Right;
@@ -100,8 +84,8 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             _logger.LogError(
                 exception,
                 message: "Could not get file for release subject (ReleaseVersionId = {ReleaseVersionId}, SubjectId = {SubjectId})",
-                releaseSubject.ReleaseVersionId,
-                releaseSubject.SubjectId
+                releaseFile.ReleaseVersionId,
+                releaseFile.File.SubjectId
             );
 
             return null;

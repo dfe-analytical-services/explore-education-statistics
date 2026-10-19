@@ -424,26 +424,20 @@ public class DataSetMappingServiceTests
     {
         var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
-        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
-
-        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(statsReleaseVersion)
-            .WithSubjects(_fixture.DefaultSubject().Generate(2))
-            .GenerateTuple2();
+        var (originalSubject, replacementSubject) = _fixture.DefaultSubject().GenerateTuple2();
 
         var originalFile = new File
         {
             Id = Guid.NewGuid(),
             Type = FileType.Data,
-            SubjectId = originalReleaseSubject.SubjectId,
+            SubjectId = originalSubject.Id,
         };
 
         var replacementFile = new File
         {
             Id = Guid.NewGuid(),
             Type = FileType.Data,
-            SubjectId = replacementReleaseSubject.SubjectId,
+            SubjectId = replacementSubject.Id,
             Replacing = originalFile,
         };
 
@@ -473,7 +467,7 @@ public class DataSetMappingServiceTests
         {
             Label = "Filter - not changing",
             Name = "filter_not_changing",
-            Subject = originalReleaseSubject.Subject,
+            Subject = originalSubject,
             FilterGroups = new List<FilterGroup> { originalFilterGroup },
         };
 
@@ -481,7 +475,7 @@ public class DataSetMappingServiceTests
         {
             Label = "Filter - not changing",
             Name = "filter_not_changing",
-            Subject = replacementReleaseSubject.Subject,
+            Subject = replacementSubject,
             FilterGroups = new List<FilterGroup> { replacementFilterGroup },
         };
 
@@ -501,14 +495,14 @@ public class DataSetMappingServiceTests
         var originalIndicatorGroup = new IndicatorGroup
         {
             Label = "Default group - not changing",
-            Subject = originalReleaseSubject.Subject,
+            Subject = originalSubject,
             Indicators = new List<Indicator> { originalIndicator },
         };
 
         var replacementIndicatorGroup = new IndicatorGroup
         {
             Label = "Default group - not changing",
-            Subject = replacementReleaseSubject.Subject,
+            Subject = replacementSubject,
             Indicators = new List<Indicator> { replacementIndicator },
         };
 
@@ -523,7 +517,7 @@ public class DataSetMappingServiceTests
         };
         var observationForOriginalLocation = new Observation
         {
-            SubjectId = originalReleaseSubject.SubjectId,
+            SubjectId = originalSubject.Id,
             Location = originalLocation,
         };
 
@@ -537,7 +531,7 @@ public class DataSetMappingServiceTests
         };
         var observationForReplacementLocation = new Observation
         {
-            SubjectId = replacementReleaseSubject.SubjectId,
+            SubjectId = replacementSubject.Id,
             Location = replacementLocation,
         };
 
@@ -554,7 +548,7 @@ public class DataSetMappingServiceTests
             Name = "Test DataBlock",
             Query = new FullTableQuery
             {
-                SubjectId = originalReleaseSubject.SubjectId,
+                SubjectId = originalSubject.Id,
                 Filters = new[] { originalFilterItem.Id },
                 Indicators = new[] { originalIndicator.Id },
                 LocationIds = [originalLocation.Id],
@@ -565,7 +559,7 @@ public class DataSetMappingServiceTests
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
         timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .Setup(service => service.GetTimePeriods(replacementSubject.Id))
             .ReturnsAsync(
                 new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
             );
@@ -588,8 +582,7 @@ public class DataSetMappingServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            statisticsDbContext.Subject.AddRange(originalSubject, replacementSubject);
             statisticsDbContext.Filter.AddRange(originalFilter, replacementFilter);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);

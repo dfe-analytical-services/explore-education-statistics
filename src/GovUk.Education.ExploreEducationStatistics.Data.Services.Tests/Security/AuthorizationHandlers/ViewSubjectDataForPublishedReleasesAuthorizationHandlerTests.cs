@@ -1,13 +1,12 @@
 #nullable enable
 using System.Security.Claims;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +19,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     private readonly DataFixture _dataFixture = new();
 
     [Fact]
-    public async Task ReleaseSubjectIsNotPublished()
+    public async Task ReleaseFileIsNotPublished()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -28,9 +27,10 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
-        ReleaseSubject releaseSubject = _dataFixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id));
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -46,7 +46,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var authContext = new AuthorizationHandlerContext(
                 [Activator.CreateInstance<ViewSubjectDataRequirement>()],
                 _dataFixture.Generator<ClaimsPrincipal>(),
-                releaseSubject
+                releaseFile
             );
 
             await handler.HandleAsync(authContext);
@@ -56,7 +56,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     }
 
     [Fact]
-    public async Task ReleaseSubjectIsLatestPublishedVersion()
+    public async Task ReleaseFileIsLatestPublishedVersion()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -64,9 +64,10 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 
         var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
-        ReleaseSubject releaseSubject = _dataFixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(_dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id));
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFile(_dataFixture.DefaultFile(FileType.Data));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
@@ -82,7 +83,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
             var authContext = new AuthorizationHandlerContext(
                 [Activator.CreateInstance<ViewSubjectDataRequirement>()],
                 _dataFixture.Generator<ClaimsPrincipal>(),
-                releaseSubject
+                releaseFile
             );
 
             await handler.HandleAsync(authContext);

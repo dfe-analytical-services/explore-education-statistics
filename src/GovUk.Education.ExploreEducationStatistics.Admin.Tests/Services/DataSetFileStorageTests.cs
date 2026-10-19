@@ -252,9 +252,7 @@ public class DataSetFileStorageTests
             .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()))
             .Generate();
 
-        releaseVersionRepository
-            .Setup(mock => mock.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id))
-            .Returns(Task.FromResult(subjectId));
+        releaseVersionRepository.Setup(mock => mock.CreateStatisticsDbSubject()).Returns(Task.FromResult(subjectId));
 
         var originalDataFile = _fixture.DefaultFile().WithFilename(dataFileName).WithType(FileType.Data).Generate();
 

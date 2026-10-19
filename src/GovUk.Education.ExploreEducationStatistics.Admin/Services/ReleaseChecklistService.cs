@@ -248,7 +248,7 @@ public class ReleaseChecklistService : IReleaseChecklistService
         }
         else
         {
-            var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(releaseVersion, dataFiles);
+            var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(dataFiles);
 
             if (subjectsWithNoFootnotes.Any())
             {
@@ -291,18 +291,14 @@ public class ReleaseChecklistService : IReleaseChecklistService
             .AnyAsync(c => c.Resolved == null);
     }
 
-    private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
-        ReleaseVersion releaseVersion,
-        IEnumerable<File> dataFiles
-    )
+    private async Task<List<Subject>> GetSubjectsWithNoFootnotes(IEnumerable<File> dataFiles)
     {
         var allowedSubjectIds = dataFiles
             .Where(dataFile => dataFile.SubjectId.HasValue)
-            .Select(dataFile => dataFile.SubjectId!.Value);
-
-        return (await _footnoteRepository.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-            .Where(subject => allowedSubjectIds.Contains(subject.Id))
+            .Select(dataFile => dataFile.SubjectId!.Value)
             .ToList();
+
+        return (await _footnoteRepository.GetSubjectsWithNoFootnotes(allowedSubjectIds)).ToList();
     }
 
     private async Task<bool> HasFeaturedTable(Guid releaseVersionId) =>

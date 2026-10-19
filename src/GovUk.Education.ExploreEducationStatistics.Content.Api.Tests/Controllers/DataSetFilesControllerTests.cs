@@ -2365,18 +2365,16 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 .WithReleaseVersion(publication.Releases[0].Versions[0])
                 .WithFile(DataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
-            var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseFile.ReleaseVersionId };
-
             ReleaseFootnote releaseFootnote1 = DataFixture
                 .DefaultReleaseFootnote()
-                .WithReleaseVersion(statsReleaseVersion)
+                .WithReleaseVersionId(releaseFile.ReleaseVersionId)
                 .WithFootnote(DataFixture.DefaultFootnote().WithSubjects(new List<Subject> { subject }));
 
             var filter = DataFixture.DefaultFilter().WithSubject(subject);
 
             ReleaseFootnote releaseFootnote2 = DataFixture
                 .DefaultReleaseFootnote()
-                .WithReleaseVersion(statsReleaseVersion)
+                .WithReleaseVersionId(releaseFile.ReleaseVersionId)
                 .WithFootnote(DataFixture.DefaultFootnote().WithFilters(new List<Filter> { filter }));
 
             await fixture

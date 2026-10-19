@@ -1,6 +1,6 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -10,18 +10,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 public class ViewSubjectDataAuthorizationHandler(
     ContentDbContext contentDbContext,
     IAuthorizationHandlerService authorizationHandlerService
-) : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseSubject>
+) : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseFile>
 {
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewSubjectDataRequirement requirement,
-        ReleaseSubject releaseSubject
+        ReleaseFile releaseFile
     )
     {
         // If this data has been published, it is visible to anyone.
         var releaseVersion = await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
-            .SingleAsync(rv => rv.Id == releaseSubject.ReleaseVersionId);
+            .SingleAsync(rv => rv.Id == releaseFile.ReleaseVersionId);
 
         if (await authorizationHandlerService.IsReleaseVersionViewableByUser(releaseVersion, context.User))
         {

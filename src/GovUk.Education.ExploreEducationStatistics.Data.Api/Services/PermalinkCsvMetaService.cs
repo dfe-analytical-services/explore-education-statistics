@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -21,21 +21,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 {
     private readonly ILogger<PermalinkCsvMetaService> _logger;
-    private readonly ContentDbContext _contentDbContext;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IReleaseSubjectService _releaseSubjectService;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public PermalinkCsvMetaService(
         ILogger<PermalinkCsvMetaService> logger,
-        ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IReleaseSubjectService releaseSubjectService,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
-        _contentDbContext = contentDbContext;
         _statisticsDbContext = statisticsDbContext;
         _releaseSubjectService = releaseSubjectService;
         _releaseFileBlobService = releaseFileBlobService;
@@ -47,9 +44,9 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         CancellationToken cancellationToken = default
     )
     {
-        var releaseSubject = await _releaseSubjectService.FindForLatestPublishedVersion(subjectId: subjectId);
+        var releaseFile = await _releaseSubjectService.FindForLatestPublishedVersion(subjectId: subjectId);
 
-        var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
+        var csvStream = releaseFile is not null ? await GetCsvStream(releaseFile, cancellationToken) : null;
 
         var locations = await GetLocations(tableResultMeta.Locations);
 
@@ -77,23 +74,10 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         };
     }
 
-    private async Task<Stream?> GetCsvStream(
-        ReleaseSubject releaseSubject,
-        CancellationToken cancellationToken = default
-    )
+    private async Task<Stream?> GetCsvStream(ReleaseFile releaseFile, CancellationToken cancellationToken = default)
     {
         try
         {
-            var releaseFile = await _contentDbContext
-                .ReleaseFiles.Include(rf => rf.File)
-                .SingleAsync(
-                    predicate: rf =>
-                        rf.File.SubjectId == releaseSubject.SubjectId
-                        && rf.File.Type == FileType.Data
-                        && rf.ReleaseVersionId == releaseSubject.ReleaseVersionId,
-                    cancellationToken: cancellationToken
-                );
-
             return (
                 await _releaseFileBlobService.GetDownloadStream(releaseFile, cancellationToken: cancellationToken)
             ).Right;
@@ -103,8 +87,8 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             _logger.LogError(
                 exception,
                 message: "Could not get file for release subject (ReleaseVersionId = {ReleaseVersionId}, SubjectId = {SubjectId})",
-                releaseSubject.ReleaseVersionId,
-                releaseSubject.SubjectId
+                releaseFile.ReleaseVersionId,
+                releaseFile.File.SubjectId
             );
 
             return null;

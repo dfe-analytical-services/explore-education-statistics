@@ -21,7 +21,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using ReleaseSubject = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -258,16 +257,6 @@ public class ReleaseAmendmentServiceTests
             },
         };
 
-        Subject subject = _fixture.DefaultSubject();
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersionId = originalReleaseVersion.Id,
-            SubjectId = subject.Id,
-            Created = DateTime.UtcNow.AddDays(-2),
-            Updated = DateTime.UtcNow.AddDays(-1),
-        };
-
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -300,21 +289,6 @@ public class ReleaseAmendmentServiceTests
             contentDbContext.ReleaseFiles.AddRange(releaseFiles);
             contentDbContext.DataBlockVersionLinks.AddRange(unattachedDataBlockVersionLinks);
             await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseVersion.Add(
-                new Data.Model.ReleaseVersion
-                {
-                    Id = originalReleaseVersion.Id,
-                    PublicationId = originalReleaseVersion.PublicationId,
-                }
-            );
-
-            statisticsDbContext.Subject.AddRange(subject);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
         }
 
         Guid? amendmentId;
@@ -598,45 +572,6 @@ public class ReleaseAmendmentServiceTests
                 }
             );
         }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            // Check the Statistics Release has been amended OK.  It should have the same Id as the new Content
-            // Release amendment.
-            var statsReleaseVersionAmendment = statisticsDbContext.ReleaseVersion.SingleOrDefault(rv =>
-                rv.Id == amendmentId
-            );
-            Assert.NotNull(statsReleaseVersionAmendment);
-            Assert.Equal(originalReleaseVersion.PublicationId, statsReleaseVersionAmendment.PublicationId);
-
-            // Check that Subjects have been linked to the new amendment OK.
-            var releaseSubjectLinks = statisticsDbContext
-                .ReleaseSubject.AsQueryable()
-                .Where(r => r.ReleaseVersionId == amendmentId)
-                .ToList();
-
-            var releaseSubjectAmendment = Assert.Single(releaseSubjectLinks);
-
-            releaseSubjectAmendment.AssertDeepEqualTo(
-                releaseSubject,
-                ignoreProperties:
-                [
-                    rs => rs.Created,
-                    rs => rs.Updated,
-                    // SubjectId will be the same despite a different instance of Subject itself.
-                    rs => rs.Subject,
-                    rs => rs.ReleaseVersion,
-                    rs => rs.ReleaseVersionId,
-                ]
-            );
-
-            Assert.NotEqual(releaseSubject.Created, releaseSubjectAmendment.Created);
-            releaseSubjectAmendment.Created.AssertUtcNow();
-
-            Assert.Null(releaseSubjectAmendment.Updated);
-
-            Assert.Equal(amendmentId, releaseSubjectAmendment.ReleaseVersionId);
-        }
     }
 
     [Fact]
@@ -784,41 +719,34 @@ public class ReleaseAmendmentServiceTests
                     .GenerateList(1)
             );
 
-        Data.Model.ReleaseVersion originalStatsReleaseVersion = _fixture
-            .DefaultStatsReleaseVersion()
-            .WithId(originalReleaseVersion.Id);
-
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(originalStatsReleaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
-                    .WithIndicatorGroups(
-                        _fixture
-                            .DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)
-                    )
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+            .WithIndicatorGroups(
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(1)).Generate(1)
             );
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(originalReleaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(originalStatsReleaseVersion)
+            .WithReleaseVersionId(originalReleaseVersion.Id)
             .WithFootnotes(
                 _fixture
                     .DefaultFootnote()
                     .ForIndex(
                         0,
                         s =>
-                            s.SetSubjects(ListOf(releaseSubject.Subject))
-                                .SetFilters(releaseSubject.Subject.Filters)
-                                .SetFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
-                                .SetFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
-                                .SetIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators)
+                            s.SetSubjects(ListOf(subject))
+                                .SetFilters(subject.Filters)
+                                .SetFilterGroups(subject.Filters[0].FilterGroups)
+                                .SetFilterItems(subject.Filters[0].FilterGroups[0].FilterItems)
+                                .SetIndicators(subject.IndicatorGroups[0].Indicators)
                     )
-                    .ForIndex(1, s => s.SetSubjects(ListOf(releaseSubject.Subject)))
+                    .ForIndex(1, s => s.SetSubjects(ListOf(subject)))
                     .GenerateList()
             )
             .GenerateList();
@@ -829,12 +757,12 @@ public class ReleaseAmendmentServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
             contentDbContext.ReleaseVersions.AddRange(originalReleaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(releaseFile);
             contentDbContext.Users.AddRange(_fixture.DefaultUser().WithId(_userId));
 
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseVersion.AddRange(originalStatsReleaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.AddRange(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
 
             await statisticsDbContext.SaveChangesAsync();
@@ -847,11 +775,11 @@ public class ReleaseAmendmentServiceTests
             var releaseAmendmentService = BuildService(contentDbContext, statisticsDbContext);
 
             // Method under test
-            var result = await releaseAmendmentService.CreateReleaseAmendment(originalStatsReleaseVersion.Id);
+            var result = await releaseAmendmentService.CreateReleaseAmendment(originalReleaseVersion.Id);
             var viewModel = result.AssertRight();
 
             Assert.NotEqual(Guid.Empty, viewModel.Id);
-            Assert.NotEqual(originalStatsReleaseVersion.Id, viewModel.Id);
+            Assert.NotEqual(originalReleaseVersion.Id, viewModel.Id);
             amendmentId = viewModel.Id;
         }
 
@@ -1051,8 +979,7 @@ public class ReleaseAmendmentServiceTests
         return new ReleaseAmendmentService(
             contentDbContext,
             userService ?? UserServiceMock().Object,
-            new FootnoteRepository(statisticsDbContext),
-            statisticsDbContext
+            new FootnoteRepository(statisticsDbContext)
         );
     }
 }

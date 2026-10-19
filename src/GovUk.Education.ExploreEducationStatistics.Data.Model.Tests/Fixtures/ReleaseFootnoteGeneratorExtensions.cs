@@ -15,10 +15,10 @@ public static class ReleaseFootnoteGeneratorExtensions
     public static InstanceSetters<ReleaseFootnote> SetDefaults(this InstanceSetters<ReleaseFootnote> setters) =>
         setters.SetDefault(rf => rf.ReleaseVersionId).SetDefault(rf => rf.FootnoteId);
 
-    public static Generator<ReleaseFootnote> WithReleaseVersion(
+    public static Generator<ReleaseFootnote> WithReleaseVersionId(
         this Generator<ReleaseFootnote> generator,
-        ReleaseVersion releaseVersion
-    ) => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
+        Guid releaseVersionId
+    ) => generator.ForInstance(s => s.SetReleaseVersionId(releaseVersionId));
 
     public static Generator<ReleaseFootnote> WithFootnote(
         this Generator<ReleaseFootnote> generator,
@@ -35,10 +35,10 @@ public static class ReleaseFootnoteGeneratorExtensions
         return generator;
     }
 
-    public static InstanceSetters<ReleaseFootnote> SetReleaseVersion(
+    public static InstanceSetters<ReleaseFootnote> SetReleaseVersionId(
         this InstanceSetters<ReleaseFootnote> setters,
-        ReleaseVersion releaseVersion
-    ) => setters.Set(rf => rf.ReleaseVersion, releaseVersion);
+        Guid releaseVersionId
+    ) => setters.Set(rf => rf.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<ReleaseFootnote> SetFootnote(
         this InstanceSetters<ReleaseFootnote> setters,

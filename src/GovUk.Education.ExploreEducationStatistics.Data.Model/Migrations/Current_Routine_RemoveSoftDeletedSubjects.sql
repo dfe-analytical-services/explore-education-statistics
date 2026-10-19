@@ -14,7 +14,6 @@ BEGIN
     );
 
     -- Define a temporary result set of all soft-deleted Subjects
-    -- For each Subject ensure no ReleaseSubject link (should never happen)
     -- For each Subject include the Observation count
     -- Order the Subjects in ascending order by Observation count
     -- Calculate a running total of the Observation count
@@ -28,9 +27,6 @@ BEGIN
                  FROM Subject
                           LEFT JOIN Observation ON Subject.Id = Observation.SubjectId
                  WHERE Subject.SoftDeleted = 1
-                   AND NOT EXISTS(SELECT *
-                                  FROM ReleaseSubject
-                                  WHERE ReleaseSubject.SubjectId = Subject.Id)
                  GROUP BY Subject.Id
              )
     INSERT

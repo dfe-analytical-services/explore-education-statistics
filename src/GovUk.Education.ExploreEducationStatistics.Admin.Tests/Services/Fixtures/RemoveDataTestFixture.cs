@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
@@ -33,7 +34,7 @@ public class RemoveDataSetTestFixture
     public Mock<IDataSetVersionService> DataSetVersionService { get; set; }
     public Mock<IFootnoteRepository> FootnoteRepository { get; set; }
     public Mock<IDataBlockService> DataBlockService { get; set; }
-    public Mock<IReleaseSubjectRepository> ReleaseSubjectRepository { get; set; }
+    public Mock<SubjectDeleter> SubjectDeleter { get; set; }
     public Mock<IPrivateBlobCacheService> PrivateCacheService { get; set; }
     public ReleaseVersion ReleaseVersion { get; private set; } = null!;
     public Subject Subject { get; private set; } = null!;
@@ -48,7 +49,7 @@ public class RemoveDataSetTestFixture
         Mock<IDataSetVersionService>? dataSetVersionService = null,
         Mock<IFootnoteRepository>? footnoteRepository = null,
         Mock<IDataBlockService>? dataBlockService = null,
-        Mock<IReleaseSubjectRepository>? releaseSubjectRepository = null,
+        Mock<SubjectDeleter>? subjectDeleter = null,
         Mock<IPrivateBlobCacheService>? privateBlobCacheService = null,
         Mock<ILogger<ReleaseVersionService>>? logger = null
     )
@@ -58,7 +59,7 @@ public class RemoveDataSetTestFixture
         DataSetVersionService = dataSetVersionService ?? new Mock<IDataSetVersionService>(Strict);
         FootnoteRepository = footnoteRepository ?? new Mock<IFootnoteRepository>(Strict);
         DataBlockService = dataBlockService ?? new Mock<IDataBlockService>(Strict);
-        ReleaseSubjectRepository = releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>(Strict);
+        SubjectDeleter = subjectDeleter ?? new Mock<SubjectDeleter>(Strict);
         PrivateCacheService = privateBlobCacheService ?? new Mock<IPrivateBlobCacheService>(Strict);
         Logger = logger ?? new Mock<ILogger<ReleaseVersionService>>(Strict);
     }
@@ -157,8 +158,14 @@ public class RemoveDataSetTestFixture
         DataImportService
             .Setup(service => service.GetImport(File.Id))
             .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
-        ReleaseSubjectRepository
-            .Setup(service => service.DeleteReleaseSubject(ReleaseVersion.Id, Subject.Id, true))
+        FootnoteRepository
+            .Setup(service =>
+                service.DeleteFootnotesBySubject(
+                    ReleaseVersion.Id,
+                    Subject.Id,
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(new[] { Subject.Id }))
+                )
+            )
             .Returns(Task.CompletedTask);
         ReleaseDataFileService
             .Setup(service => service.Delete(ReleaseVersion.Id, File.Id, false))

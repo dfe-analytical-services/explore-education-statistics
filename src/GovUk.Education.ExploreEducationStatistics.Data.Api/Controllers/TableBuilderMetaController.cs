@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -47,25 +47,25 @@ public class TableBuilderMetaController(
     }
 
     private async Task<Either<ActionResult, CacheableReleaseSubject>> GetCacheableReleaseSubject(
-        ReleaseSubject releaseSubject
+        ReleaseFile releaseFile
     )
     {
-        // TODO EES-3363 CacheableReleaseSubject exists to provide the Publication slug not available from the ReleaseSubject
+        // TODO EES-3363 CacheableReleaseSubject exists to provide the Publication slug not available from the ReleaseFile
         // In future we should change the storage path for cached items to use Publication and Release id's in the
         // directory structure rather than slugs so that we don't need to lookup the Publication from the Content Release.
         return await contentPersistenceHelper
             .CheckEntityExists<ReleaseVersion>(
-                releaseSubject.ReleaseVersionId,
+                releaseFile.ReleaseVersionId,
                 q => q.Include(rv => rv.Release).ThenInclude(r => r.Publication)
             )
-            .OnSuccess(releaseVersion => new CacheableReleaseSubject(releaseSubject, releaseVersion));
+            .OnSuccess(releaseVersion => new CacheableReleaseSubject(releaseFile, releaseVersion));
     }
 
     private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(CacheableReleaseSubject cacheable)
     {
         return publicBlobCacheService.GetOrCreateAsync(
             cacheKey: new SubjectMetaCacheKey(cacheable),
-            createIfNotExistsFn: () => subjectMetaService.GetSubjectMeta(cacheable.ReleaseSubject),
+            createIfNotExistsFn: () => subjectMetaService.GetSubjectMeta(cacheable.ReleaseFile),
             logger: logger
         );
     }

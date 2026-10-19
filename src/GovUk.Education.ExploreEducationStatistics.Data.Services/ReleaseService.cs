@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -61,46 +60,25 @@ public class ReleaseService : IReleaseService
             return new List<SubjectViewModel>();
         }
 
-        var releaseSubjects = await _statisticsDbContext
-            .ReleaseSubject.AsQueryable()
-            .Where(rs => rs.ReleaseVersionId == releaseVersionId && subjectsToInclude.Contains(rs.SubjectId))
-            .ToListAsync();
-
-        if (
-            !ComparerUtils.SequencesAreEqualIgnoringOrder(
-                releaseSubjects.Select(rs => rs.SubjectId).ToList(),
-                subjectsToInclude
-            )
-        )
-        {
-            throw new DataException(
-                $"""
-                Statistics DB has a different subjects than the Content DB
-                StatsDB subjects: {releaseSubjects.Select(rs => rs.SubjectId).JoinToString(',')}
-                ContentDb subjects: {subjectsToInclude.JoinToString(',')}
-                """
-            );
-        }
-
         var releaseFiles = await QueryReleaseDataFiles(releaseVersionId)
             .Where(rf => rf.File.SubjectId.HasValue && subjectsToInclude.Contains(rf.File.SubjectId.Value))
             .ToListAsync();
 
         return (
-            await releaseSubjects.SelectAsync(async rs =>
+            await releaseFiles.SelectAsync(async releaseFile =>
             {
-                var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
+                var subjectId = releaseFile.File.SubjectId!.Value;
 
                 return new SubjectViewModel(
-                    id: rs.SubjectId,
+                    id: subjectId,
                     name: releaseFile.Name ?? string.Empty,
                     order: releaseFile.Order,
                     content: releaseFile.Summary ?? string.Empty,
-                    timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                    geographicLevels: await GetGeographicLevels(rs.SubjectId),
-                    geographicLevelsCsvOnly: await GetGeographicLevels(rs.SubjectId, csvOnly: true),
-                    filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
-                    indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
+                    timePeriods: await _timePeriodService.GetTimePeriodLabels(subjectId),
+                    geographicLevels: await GetGeographicLevels(subjectId),
+                    geographicLevelsCsvOnly: await GetGeographicLevels(subjectId, csvOnly: true),
+                    filters: await GetFilters(subjectId, releaseFile.FilterSequence),
+                    indicators: await GetIndicators(subjectId, releaseFile.IndicatorSequence),
                     file: releaseFile.ToFileInfo(),
                     lastUpdated: releaseFile.Published
                 );

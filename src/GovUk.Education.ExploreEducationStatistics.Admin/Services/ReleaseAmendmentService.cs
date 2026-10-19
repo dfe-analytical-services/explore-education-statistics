@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseAmendmentService(
     ContentDbContext context,
     IUserService userService,
-    IFootnoteRepository footnoteRepository,
-    StatisticsDbContext statisticsDbContext
+    IFootnoteRepository footnoteRepository
 ) : IReleaseAmendmentService
 {
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
@@ -36,7 +34,6 @@ public class ReleaseAmendmentService(
             .OnSuccess(userService.CheckCanMakeAmendmentOfReleaseVersion)
             .OnSuccess(originalReleaseVersion =>
                 CreateBasicReleaseAmendment(originalReleaseVersion, createdDate)
-                    .OnSuccessDo(CreateStatisticsReleaseAmendment)
                     .OnSuccessDo(amendment => CopyFootnotes(releaseVersionId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalReleaseVersion, amendment))
                     .OnSuccess(amendment => new IdViewModel(amendment.Id))
@@ -498,49 +495,17 @@ public class ReleaseAmendmentService(
             .ToList();
     }
 
-    private async Task<Either<ActionResult, Unit>> CreateStatisticsReleaseAmendment(
-        ReleaseVersion amendmentReleaseVersion
-    )
-    {
-        var statsReleaseVersion = await statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
-            rv.Id == amendmentReleaseVersion.PreviousVersionId
-        );
-
-        // Release does not have to have stats uploaded but if it has then
-        // create a link row to link back to the original subject
-        if (statsReleaseVersion != null)
-        {
-            var statsAmendmentVersion = new Data.Model.ReleaseVersion
-            {
-                Id = amendmentReleaseVersion.Id,
-                PublicationId = amendmentReleaseVersion.PublicationId,
-            };
-
-            var statsAmendmentSubjectLinks = statisticsDbContext
-                .ReleaseSubject.Where(rs => rs.ReleaseVersionId == amendmentReleaseVersion.PreviousVersionId)
-                .Select(originalReleaseSubject => new ReleaseSubject
-                {
-                    // Assign it to the new release version.
-                    ReleaseVersionId = amendmentReleaseVersion.Id,
-
-                    // Copy certain fields from the original.
-                    SubjectId = originalReleaseSubject.SubjectId,
-                });
-            statisticsDbContext.ReleaseVersion.Add(statsAmendmentVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
-
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        return Unit.Instance;
-    }
-
     private async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(
         Guid originalReleaseVersionId,
         Guid amendmentReleaseVersionId
     )
     {
-        var originalFootnotes = await footnoteRepository.GetFootnotes(originalReleaseVersionId);
+        var originalSubjectIds = await context
+            .ReleaseFiles.Where(rf => rf.ReleaseVersionId == originalReleaseVersionId && rf.File.Type == FileType.Data)
+            .Select(rf => rf.File.SubjectId!.Value)
+            .ToListAsync();
+
+        var originalFootnotes = await footnoteRepository.GetFootnotes(originalReleaseVersionId, originalSubjectIds);
 
         return await originalFootnotes
             .ToAsyncEnumerable()

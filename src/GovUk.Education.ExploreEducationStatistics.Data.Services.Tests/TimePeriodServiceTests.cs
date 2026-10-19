@@ -119,11 +119,7 @@ public abstract class TimePeriodServiceTests
         [Fact]
         public async Task SubjectHasQuarterlyObservations_ReturnsCorrectFromAndToLabels()
         {
-            var releaseVersion = new ReleaseVersion();
-
             var subject = new Subject();
-
-            var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
             var subjectObservation1 = new Observation
             {
@@ -150,9 +146,7 @@ public abstract class TimePeriodServiceTests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
                 statisticsDbContext.Subject.Add(subject);
-                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 statisticsDbContext.Observation.AddRange(subjectObservation1, subjectObservation2, subjectObservation3);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -171,11 +165,7 @@ public abstract class TimePeriodServiceTests
         [Fact]
         public async Task SubjectHasWeeklyObservations_ReturnsCorrectFromAndToLabels()
         {
-            var releaseVersion = new ReleaseVersion();
-
             var subject = new Subject();
-
-            var releaseSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
             var subjectObservation1 = new Observation
             {
@@ -201,9 +191,7 @@ public abstract class TimePeriodServiceTests
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
                 statisticsDbContext.Subject.Add(subject);
-                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 statisticsDbContext.Observation.AddRange(subjectObservation1, subjectObservation2, subjectObservation3);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -222,19 +210,13 @@ public abstract class TimePeriodServiceTests
         [Fact]
         public async Task SubjectHasNoObservations_ReturnsEmptyLabels()
         {
-            var releaseVersion = new ReleaseVersion();
-
             var subject = new Subject();
-
-            var releaseSubject1 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
                 statisticsDbContext.Subject.Add(subject);
-                statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
                 await statisticsDbContext.SaveChangesAsync();
             }
 

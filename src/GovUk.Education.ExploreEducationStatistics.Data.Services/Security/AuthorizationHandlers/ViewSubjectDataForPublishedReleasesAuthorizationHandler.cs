@@ -1,12 +1,12 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 
 public class ViewSubjectDataForPublishedReleasesAuthorizationHandler
-    : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseSubject>
+    : AuthorizationHandler<ViewSubjectDataRequirement, ReleaseFile>
 {
     private readonly IReleaseVersionRepository _releaseVersionRepository;
 
@@ -18,10 +18,10 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandler
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext authContext,
         ViewSubjectDataRequirement requirement,
-        ReleaseSubject releaseSubject
+        ReleaseFile releaseFile
     )
     {
-        if (await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseVersionId))
+        if (await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseFile.ReleaseVersionId))
         {
             authContext.Succeed(requirement);
         }

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
@@ -34,19 +32,17 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
+        var subject1 = new Subject();
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject2 = new Subject();
 
-        var releaseSubject2 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject1Filter1 = new Filter { Subject = subject1, Label = "subject 1 filter 1" };
 
-        var subject1Filter1 = new Filter { Subject = releaseSubject1.Subject, Label = "subject 1 filter 1" };
-
-        var subject1Filter2 = new Filter { Subject = releaseSubject1.Subject, Label = "subject 1 filter 2" };
+        var subject1Filter2 = new Filter { Subject = subject1, Label = "subject 1 filter 2" };
 
         var subject1IndicatorGroup1 = new IndicatorGroup
         {
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 indicator group 1",
             Indicators = new List<Indicator>
             {
@@ -58,7 +54,7 @@ public class ReleaseServiceTests
 
         var subject1IndicatorGroup2 = new IndicatorGroup
         {
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 indicator group 2",
             Indicators = new List<Indicator>
             {
@@ -67,11 +63,11 @@ public class ReleaseServiceTests
             },
         };
 
-        var subject2Filter1 = new Filter { Subject = releaseSubject2.Subject, Label = "subject 2 filter 1" };
+        var subject2Filter1 = new Filter { Subject = subject2, Label = "subject 2 filter 1" };
 
         var subject2IndicatorGroup1 = new IndicatorGroup
         {
-            Subject = releaseSubject2.Subject,
+            Subject = subject2,
             Label = "subject 2 indicator group 1",
             Indicators = new List<Indicator> { new Indicator { Label = "subject 2 indicator group 1 indicator 1" } },
         };
@@ -79,7 +75,7 @@ public class ReleaseServiceTests
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
             await statisticsDbContext.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject2Filter1);
             await statisticsDbContext.IndicatorGroup.AddRangeAsync(
                 subject1IndicatorGroup1,
@@ -89,10 +85,7 @@ public class ReleaseServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -103,7 +96,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 ContentLength = 10240,
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
                 DataSetFileVersionGeographicLevels =
                 [
                     new() { GeographicLevel = GeographicLevel.LocalAuthority },
@@ -123,7 +116,7 @@ public class ReleaseServiceTests
                 Filename = "data2.csv",
                 ContentLength = 20480,
                 Type = FileType.Data,
-                SubjectId = releaseSubject2.Subject.Id,
+                SubjectId = subject2.Id,
                 DataSetFileVersionGeographicLevels = [new() { GeographicLevel = GeographicLevel.Country }],
             },
             Summary = "Data set 2 guidance",
@@ -147,11 +140,11 @@ public class ReleaseServiceTests
             var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
+                .Setup(s => s.GetTimePeriodLabels(subject1.Id))
                 .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
+                .Setup(s => s.GetTimePeriodLabels(subject2.Id))
                 .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
 
             var service = BuildReleaseService(
@@ -168,7 +161,7 @@ public class ReleaseServiceTests
 
             Assert.NotNull(subjects);
             Assert.Equal(2, subjects.Count);
-            Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
+            Assert.Equal(subject1.Id, subjects[0].Id);
             Assert.Equal(releaseFile1.Name, subjects[0].Name);
             Assert.Equal(releaseFile1.Summary, subjects[0].Content);
             Assert.Equal(releaseFile1.File.Id, subjects[0].File.Id);
@@ -197,7 +190,7 @@ public class ReleaseServiceTests
             Assert.Equal("subject 1 indicator group 2 indicator 1", subjects[0].Indicators[3]);
             Assert.Equal("subject 1 indicator group 2 indicator 2", subjects[0].Indicators[4]);
 
-            Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
+            Assert.Equal(subject2.Id, subjects[1].Id);
             Assert.Equal(releaseFile2.Name, subjects[1].Name);
             Assert.Equal(releaseFile2.Summary, subjects[1].Content);
             Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
@@ -224,14 +217,11 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_NoSubjects()
     {
-        var statsReleaseVersion = new Model.ReleaseVersion();
-
-        var contentReleaseVersion = new ReleaseVersion { Id = statsReleaseVersion.Id };
+        var contentReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
 
         await using var statisticsDbContext = InMemoryStatisticsDbContext();
         await using var contentDbContext = InMemoryContentDbContext();
 
-        statisticsDbContext.ReleaseVersion.Add(statsReleaseVersion);
         contentDbContext.ReleaseVersions.Add(contentReleaseVersion);
 
         var service = BuildReleaseService(contentDbContext: contentDbContext, statisticsDbContext: statisticsDbContext);
@@ -242,103 +232,21 @@ public class ReleaseServiceTests
     }
 
     [Fact]
-    public async Task ListSubjects_StatsDbHasMissingSubject()
-    {
-        Model.ReleaseVersion statisticsReleaseVersion = _fixture.DefaultStatsReleaseVersion();
-
-        ReleaseSubject releaseSubject1 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(statisticsReleaseVersion)
-            .WithSubject(_fixture.DefaultSubject());
-
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
-
-        ReleaseFile releaseFile1 = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(contentReleaseVersion)
-            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(releaseSubject1.SubjectId));
-
-        ReleaseFile releaseFile2 = _fixture
-            .DefaultReleaseFile()
-            .WithReleaseVersion(contentReleaseVersion)
-            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(Guid.NewGuid()));
-
-        DataImport import1 = _fixture
-            .DefaultDataImport()
-            .WithFile(releaseFile1.File)
-            .WithStatus(DataImportStatus.COMPLETE);
-
-        DataImport import2 = _fixture
-            .DefaultDataImport()
-            .WithFile(releaseFile2.File)
-            .WithStatus(DataImportStatus.COMPLETE);
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
-            await contentDbContext.DataImports.AddRangeAsync(import1, import2);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = BuildReleaseService(
-                contentDbContext: contentDbContext,
-                statisticsDbContext: statisticsDbContext
-            );
-
-            var exception = await Assert.ThrowsAsync<DataException>(() =>
-                service.ListSubjects(contentReleaseVersion.Id)
-            );
-
-            Assert.Equal(
-                $"""
-                Statistics DB has a different subjects than the Content DB
-                StatsDB subjects: {releaseSubject1.SubjectId}
-                ContentDb subjects: {releaseFile1.File.SubjectId},{releaseFile2.File.SubjectId}
-                """,
-                exception.Message
-            );
-        }
-    }
-
-    [Fact]
     public async Task ListSubjects_FiltersPendingReplacementSubjects()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
+        var subject1 = new Subject();
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject2 = new Subject();
 
-        var releaseSubject2 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
-
-        var releaseSubject2Replacement = new ReleaseSubject
-        {
-            ReleaseVersion = statisticsReleaseVersion,
-            Subject = new Subject(),
-        };
+        var subject2Replacement = new Subject();
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject2Replacement);
+            await statisticsDbContext.AddRangeAsync(subject1, subject2, subject2Replacement);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -348,7 +256,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
 
@@ -356,14 +264,14 @@ public class ReleaseServiceTests
         {
             Filename = "data2.csv",
             Type = FileType.Data,
-            SubjectId = releaseSubject2.Subject.Id,
+            SubjectId = subject2.Id,
         };
 
         var file2Replacement = new File
         {
             Filename = "data2_replacement.csv",
             Type = FileType.Data,
-            SubjectId = releaseSubject2Replacement.Subject.Id,
+            SubjectId = subject2Replacement.Id,
             Replacing = file2,
         };
 
@@ -414,9 +322,9 @@ public class ReleaseServiceTests
 
             Assert.NotNull(subjects);
             Assert.Equal(2, subjects.Count);
-            Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
+            Assert.Equal(subject1.Id, subjects[0].Id);
             Assert.Equal(releaseFile1.Name, subjects[0].Name);
-            Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
+            Assert.Equal(subject2.Id, subjects[1].Id);
             Assert.Equal(releaseFile2.Name, subjects[1].Name);
         }
     }
@@ -424,31 +332,18 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersImportingSubjects()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
+        var subject1 = new Subject { Id = Guid.NewGuid() };
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = statisticsReleaseVersion,
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
-
-        var releaseSubject2 = new ReleaseSubject
-        {
-            ReleaseVersion = statisticsReleaseVersion,
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
+        var subject2 = new Subject { Id = Guid.NewGuid() };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.AddRangeAsync(subject1, subject2);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -458,7 +353,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
 
@@ -470,7 +365,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data2.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject2.Subject.Id,
+                SubjectId = subject2.Id,
             },
         };
 
@@ -504,7 +399,7 @@ public class ReleaseServiceTests
             var subjects = result.AssertRight();
 
             Assert.Single(subjects);
-            Assert.Equal(releaseSubject2.Subject.Id, subjects[0].Id);
+            Assert.Equal(subject2.Id, subjects[0].Id);
             Assert.Equal(releaseFile2.Name, subjects[0].Name);
         }
     }
@@ -512,20 +407,16 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FiltersSubjectsWithNoImport()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
-        var releaseSubject = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject = new Subject();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile = new ReleaseFile
         {
@@ -535,7 +426,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject.Subject.Id,
+                SubjectId = subject.Id,
             },
         };
 
@@ -601,38 +492,36 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_FilterOrder()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
-
         var subject1Filter1Id = Guid.NewGuid();
         var subject1Filter2Id = Guid.NewGuid();
         var subject1Filter3Id = Guid.NewGuid();
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject1 = new Subject();
 
         var subject1Filter1 = new Filter
         {
             Id = subject1Filter1Id,
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 filter 1",
         };
 
         var subject1Filter2 = new Filter
         {
             Id = subject1Filter2Id,
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 filter 2",
         };
 
         var subject1Filter3 = new Filter
         {
             Id = subject1Filter3Id,
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 filter 3",
         };
 
         var subject1IndicatorGroup1 = new IndicatorGroup
         {
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 indicator group 1",
             Indicators = new List<Indicator> { new() { Label = "subject 1 indicator group 1 indicator 1" } },
         };
@@ -640,16 +529,13 @@ public class ReleaseServiceTests
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1);
+            await statisticsDbContext.Subject.AddRangeAsync(subject1);
             await statisticsDbContext.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
             await statisticsDbContext.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -660,7 +546,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 ContentLength = 10240,
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
             FilterSequence = new List<FilterSequenceEntry>
             {
@@ -707,26 +593,24 @@ public class ReleaseServiceTests
     [Fact]
     public async Task ListSubjects_IndicatorOrder()
     {
-        var statisticsReleaseVersion = new Model.ReleaseVersion();
-
         var subject1Indicator1 = new Indicator { Id = Guid.NewGuid(), Label = "subject 1 indicator 1" };
         var subject1Indicator2 = new Indicator { Id = Guid.NewGuid(), Label = "subject 1 indicator 2" };
         var subject1Indicator3 = new Indicator { Id = Guid.NewGuid(), Label = "subject 1 indicator 3" };
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = statisticsReleaseVersion, Subject = new Subject() };
+        var subject1 = new Subject();
 
-        var subject1Filter1 = new Filter { Subject = releaseSubject1.Subject, Label = "subject 1 filter 1" };
+        var subject1Filter1 = new Filter { Subject = subject1, Label = "subject 1 filter 1" };
 
         var subject1IndicatorGroup1 = new IndicatorGroup
         {
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 indicator group 1",
             Indicators = new List<Indicator> { subject1Indicator1, subject1Indicator2 },
         };
 
         var subject1IndicatorGroup2 = new IndicatorGroup
         {
-            Subject = releaseSubject1.Subject,
+            Subject = subject1,
             Label = "subject 1 indicator group 2",
             Indicators = new List<Indicator> { subject1Indicator3 },
         };
@@ -734,16 +618,13 @@ public class ReleaseServiceTests
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1);
+            await statisticsDbContext.Subject.AddRangeAsync(subject1);
             await statisticsDbContext.Filter.AddRangeAsync(subject1Filter1);
             await statisticsDbContext.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject1IndicatorGroup2);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        ReleaseVersion contentReleaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithId(statisticsReleaseVersion.Id)
-            .WithRelease(_fixture.DefaultRelease());
+        ReleaseVersion contentReleaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFile1 = new ReleaseFile
         {
@@ -754,7 +635,7 @@ public class ReleaseServiceTests
                 Filename = "data1.csv",
                 ContentLength = 10240,
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
             IndicatorSequence = new List<IndicatorGroupSequenceEntry>
             {
@@ -802,18 +683,9 @@ public class ReleaseServiceTests
     {
         var releaseVersionId = Guid.NewGuid();
         var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
-        var statsReleaseVersion = new Model.ReleaseVersion { Id = releaseVersionId };
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = statsReleaseVersion,
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
-        var releaseSubject2 = new ReleaseSubject
-        {
-            ReleaseVersion = statsReleaseVersion,
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
+        var subject1 = new Subject { Id = Guid.NewGuid() };
+        var subject2 = new Subject { Id = Guid.NewGuid() };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -823,7 +695,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
         var releaseFile2 = new ReleaseFile
@@ -834,7 +706,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data2.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject2.Subject.Id,
+                SubjectId = subject2.Id,
             },
         };
 
@@ -844,7 +716,7 @@ public class ReleaseServiceTests
         var dataBlockVersion1 = new DataBlockVersion
         {
             Name = "Test data block 1",
-            Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
+            Query = new FullTableQuery { SubjectId = subject1.Id },
             ReleaseVersion = releaseVersion,
         };
         var featuredTable1 = new FeaturedTable
@@ -857,7 +729,7 @@ public class ReleaseServiceTests
         var dataBlockVersion2 = new DataBlockVersion
         {
             Name = "Test data block 2",
-            Query = new FullTableQuery { SubjectId = releaseSubject2.Subject.Id },
+            Query = new FullTableQuery { SubjectId = subject2.Id },
             ReleaseVersion = releaseVersion,
         };
         var featuredTable2 = new FeaturedTable
@@ -882,7 +754,7 @@ public class ReleaseServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.AddRangeAsync(subject1, subject2);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -903,13 +775,13 @@ public class ReleaseServiceTests
             Assert.Equal(featuredTable1.Id, featuredTables[0].Id);
             Assert.Equal(featuredTable1.Name, featuredTables[0].Name);
             Assert.Equal(featuredTable1.Description, featuredTables[0].Description);
-            Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
+            Assert.Equal(subject1.Id, featuredTables[0].SubjectId);
             Assert.Equal(dataBlockVersion1.Id, featuredTables[0].DataBlockVersionId);
 
             Assert.Equal(featuredTable2.Id, featuredTables[1].Id);
             Assert.Equal(featuredTable2.Name, featuredTables[1].Name);
             Assert.Equal(featuredTable2.Description, featuredTables[1].Description);
-            Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
+            Assert.Equal(subject2.Id, featuredTables[1].SubjectId);
             Assert.Equal(dataBlockVersion2.Id, featuredTables[1].DataBlockVersionId);
         }
     }
@@ -920,11 +792,7 @@ public class ReleaseServiceTests
         var releaseVersionId = Guid.NewGuid();
         var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = new Model.ReleaseVersion { Id = releaseVersionId },
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
+        var subject1 = new Subject { Id = Guid.NewGuid() };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -934,7 +802,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
 
@@ -943,7 +811,7 @@ public class ReleaseServiceTests
         var dataBlockVersion1 = new DataBlockVersion
         {
             Name = "Test data block",
-            Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
+            Query = new FullTableQuery { SubjectId = subject1.Id },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -960,7 +828,7 @@ public class ReleaseServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddAsync(releaseSubject1);
+            await statisticsDbContext.AddAsync(subject1);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -986,11 +854,7 @@ public class ReleaseServiceTests
         var releaseVersionId = Guid.NewGuid();
         var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = new Model.ReleaseVersion { Id = releaseVersionId },
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
+        var subject1 = new Subject { Id = Guid.NewGuid() };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1000,7 +864,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
 
@@ -1009,7 +873,7 @@ public class ReleaseServiceTests
         var dataBlockVersion1 = new DataBlockVersion
         {
             Name = "Test data block",
-            Query = new FullTableQuery { SubjectId = releaseSubject1.Subject.Id },
+            Query = new FullTableQuery { SubjectId = subject1.Id },
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -1026,7 +890,7 @@ public class ReleaseServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddAsync(releaseSubject1);
+            await statisticsDbContext.AddAsync(subject1);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1052,11 +916,7 @@ public class ReleaseServiceTests
         var releaseVersionId = Guid.NewGuid();
         var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
 
-        var releaseSubject1 = new ReleaseSubject
-        {
-            ReleaseVersion = new Model.ReleaseVersion { Id = releaseVersionId },
-            Subject = new Subject { Id = Guid.NewGuid() },
-        };
+        var subject1 = new Subject { Id = Guid.NewGuid() };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -1066,7 +926,7 @@ public class ReleaseServiceTests
             {
                 Filename = "data1.csv",
                 Type = FileType.Data,
-                SubjectId = releaseSubject1.Subject.Id,
+                SubjectId = subject1.Id,
             },
         };
 
@@ -1099,7 +959,7 @@ public class ReleaseServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            await statisticsDbContext.AddAsync(releaseSubject1);
+            await statisticsDbContext.AddAsync(subject1);
             await statisticsDbContext.SaveChangesAsync();
         }
 

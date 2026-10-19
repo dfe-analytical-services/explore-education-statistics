@@ -25,6 +25,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
@@ -45,7 +46,6 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
-using StatsReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
@@ -272,7 +272,6 @@ public abstract class ReleaseVersionServiceTests
             var dataImportService = new Mock<IDataImportService>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             privateCacheService
                 .Setup(service =>
@@ -294,13 +293,19 @@ public abstract class ReleaseVersionServiceTests
 
             footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id)).ReturnsAsync([]);
 
+            footnoteRepository
+                .Setup(service =>
+                    service.DeleteFootnotesBySubject(
+                        releaseVersion.Id,
+                        subject.Id,
+                        It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(new[] { subject.Id }))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
             releaseDataFileService
                 .Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository
-                .Setup(service => service.DeleteReleaseSubject(releaseVersion.Id, subject.Id, true))
-                .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -312,8 +317,7 @@ public abstract class ReleaseVersionServiceTests
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
                     footnoteRepository: footnoteRepository.Object,
-                    releaseDataFileService: releaseDataFileService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object
+                    releaseDataFileService: releaseDataFileService.Object
                 );
 
                 var result = await releaseVersionService.RemoveDataFiles(
@@ -326,11 +330,141 @@ public abstract class ReleaseVersionServiceTests
                     dataBlockService,
                     dataImportService,
                     footnoteRepository,
-                    releaseDataFileService,
-                    releaseSubjectRepository
+                    releaseDataFileService
                 );
 
                 result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var softDeletedSubject = await statisticsDbContext
+                    .Subject.IgnoreQueryFilters()
+                    .SingleAsync(s => s.Id == subject.Id);
+
+                Assert.True(softDeletedSubject.SoftDeleted);
+            }
+        }
+
+        [Fact]
+        public async Task SubjectSharedWithPreviousVersion_SubjectIsNotSoftDeleted()
+        {
+            Release release = _dataFixture.DefaultRelease();
+
+            ReleaseVersion previousReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(0)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-1));
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(1)
+                .WithPreviousVersionId(previousReleaseVersion.Id);
+
+            Subject subject = _dataFixture.DefaultSubject();
+
+            File file = _dataFixture.DefaultFile().WithSubjectId(subject.Id).WithType(FileType.Data);
+
+            ReleaseFile previousReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(previousReleaseVersion)
+                .WithFile(file);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(file);
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(previousReleaseVersion, releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(previousReleaseFile, releaseFile);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.Subject.Add(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+
+            privateCacheService
+                .Setup(service =>
+                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersion.Id, subject.Id))
+                )
+                .Returns(Task.CompletedTask);
+
+            dataBlockService
+                .Setup(service => service.GetDeletePlan(releaseVersion.Id, It.Is<Subject>(s => s.Id == subject.Id)))
+                .ReturnsAsync(new DeleteDataBlockPlanViewModel());
+
+            dataBlockService
+                .Setup(service => service.DeleteDataBlockVersions(It.IsAny<DeleteDataBlockPlanViewModel>()))
+                .ReturnsAsync(Unit.Instance);
+
+            dataImportService
+                .Setup(service => service.GetImport(file.Id))
+                .ReturnsAsync(new DataImport { Status = DataImportStatus.COMPLETE });
+
+            footnoteRepository.Setup(service => service.GetFootnotes(releaseVersion.Id, subject.Id)).ReturnsAsync([]);
+
+            footnoteRepository
+                .Setup(service =>
+                    service.DeleteFootnotesBySubject(
+                        releaseVersion.Id,
+                        subject.Id,
+                        It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(new[] { subject.Id }))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            releaseDataFileService
+                .Setup(service => service.Delete(releaseVersion.Id, file.Id, false))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    context,
+                    statisticsDbContext,
+                    privateCacheService: privateCacheService.Object,
+                    dataBlockService: dataBlockService.Object,
+                    dataImportService: dataImportService.Object,
+                    footnoteRepository: footnoteRepository.Object,
+                    releaseDataFileService: releaseDataFileService.Object
+                );
+
+                var result = await releaseVersionService.RemoveDataFiles(
+                    releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id
+                );
+
+                VerifyAllMocks(
+                    privateCacheService,
+                    dataBlockService,
+                    dataImportService,
+                    footnoteRepository,
+                    releaseDataFileService
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var retainedSubject = await statisticsDbContext
+                    .Subject.IgnoreQueryFilters()
+                    .SingleAsync(s => s.Id == subject.Id);
+
+                Assert.False(retainedSubject.SoftDeleted);
             }
         }
 
@@ -616,7 +750,7 @@ public abstract class ReleaseVersionServiceTests
                 dataImportService: testFixture.DataImportService.Object,
                 dataBlockService: testFixture.DataBlockService.Object,
                 footnoteRepository: testFixture.FootnoteRepository.Object,
-                releaseSubjectRepository: testFixture.ReleaseSubjectRepository.Object,
+                subjectDeleter: testFixture.SubjectDeleter.Object,
                 privateCacheService: testFixture.PrivateCacheService.Object,
                 releaseDataFileService: testFixture.ReleaseDataFileService.Object
             );
@@ -1633,12 +1767,6 @@ public abstract class ReleaseVersionServiceTests
                 .WithRelease(_dataFixture.DefaultRelease().WithPublication(release.Publication))
                 .WithVersion(0);
 
-            var statisticsReleaseVersion = new StatsReleaseVersion
-            {
-                Id = releaseVersion.Id,
-                PublicationId = releaseVersion.Publication.Id,
-            };
-
             var permalink = new Permalink { Id = Guid.NewGuid(), ReleaseVersionId = releaseVersion.Id };
 
             // This Permalink should not be removed as it is for another ReleaseVersion.
@@ -1683,16 +1811,9 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                context.ReleaseVersion.AddRange(statisticsReleaseVersion);
-                await context.SaveChangesAsync();
-            }
-
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
@@ -1712,10 +1833,6 @@ public abstract class ReleaseVersionServiceTests
             dataSetUploadRepository
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository
-                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
-                .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
@@ -1773,7 +1890,6 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
@@ -1796,11 +1912,6 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 dataSetUploadRepository.Verify(mock => mock.DeleteAll(releaseVersion.Id, default), Times.Once);
-
-                releaseSubjectRepository.Verify(
-                    mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
-                    Times.Once
-                );
 
                 // This ReleaseVersion is a Draft, so verifying the Strict releasePublishingStatusRepository
                 // asserts that its Azure Storage ReleaseStatus entries are removed regardless of it never
@@ -1895,15 +2006,6 @@ public abstract class ReleaseVersionServiceTests
                     methodologyScheduledWithAnotherRelease.ScheduledWithReleaseVersionId,
                     unrelatedMethodology.ScheduledWithReleaseVersionId
                 );
-
-                // We don't expect the Statistics ReleaseVersion to be deleted at this point, whether the
-                // Content ReleaseVersion is a draft or not. This needs to remain until the stored procedure
-                // that removes soft-deleted Subjects related to this ReleaseVersion is run.
-                Assert.NotNull(
-                    await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(rv =>
-                        rv.Id == statisticsReleaseVersion.Id
-                    )
-                );
             }
         }
 
@@ -1937,7 +2039,6 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
@@ -1957,10 +2058,6 @@ public abstract class ReleaseVersionServiceTests
             dataSetUploadRepository
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository
-                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
-                .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
@@ -2001,7 +2098,6 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
@@ -2089,11 +2185,38 @@ public abstract class ReleaseVersionServiceTests
                 SubjectId = Guid.NewGuid(),
             };
 
+            File orphanedSubjectFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(orphanedSubjectId)
+                .WithType(FileType.Data);
+
+            File sharedSubjectFile = _dataFixture.DefaultFile().WithSubjectId(sharedSubjectId).WithType(FileType.Data);
+
+            var releaseFiles = new[]
+            {
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(orphanedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(survivingReleaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
+            };
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseVersions.AddRange(releaseVersion, survivingReleaseVersion);
+                context.ReleaseFiles.AddRange(releaseFiles);
                 context.Permalinks.AddRange(
                     legacyPermalink,
                     strandedPermalink,
@@ -2103,20 +2226,10 @@ public abstract class ReleaseVersionServiceTests
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                context.ReleaseSubject.AddRange(
-                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = orphanedSubjectId },
-                    new ReleaseSubject { ReleaseVersionId = releaseVersion.Id, SubjectId = sharedSubjectId },
-                    new ReleaseSubject { ReleaseVersionId = survivingReleaseVersion.Id, SubjectId = sharedSubjectId }
-                );
-                await context.SaveChangesAsync();
-            }
-
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
@@ -2137,8 +2250,14 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository
-                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
+            footnoteRepository
+                .Setup(mock =>
+                    mock.DeleteFootnotesBySubject(
+                        releaseVersion.Id,
+                        It.IsAny<Guid>(),
+                        It.IsAny<IReadOnlyCollection<Guid>>()
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2193,7 +2312,7 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
+                    footnoteRepository: footnoteRepository.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
@@ -2214,6 +2333,164 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Equal(2, remainingPermalinkIds.Count);
                 Assert.Contains(sharedSubjectPermalink.Id, remainingPermalinkIds);
                 Assert.Contains(unrelatedPermalink.Id, remainingPermalinkIds);
+            }
+        }
+
+        [Fact]
+        public async Task Success_SoftDeletesSubjectsOrphanedByTheDeletion()
+        {
+            Release release = _dataFixture
+                .DefaultRelease()
+                .WithPublication(_dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme()));
+
+            ReleaseVersion previousReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(0)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-1));
+
+            ReleaseVersion releaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(release)
+                .WithVersion(1)
+                .WithPreviousVersionId(previousReleaseVersion.Id);
+
+            Subject orphanedSubject = _dataFixture.DefaultSubject();
+            Subject sharedSubject = _dataFixture.DefaultSubject();
+
+            File orphanedSubjectFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(orphanedSubject.Id)
+                .WithType(FileType.Data);
+
+            File sharedSubjectFile = _dataFixture.DefaultFile().WithSubjectId(sharedSubject.Id).WithType(FileType.Data);
+
+            var releaseFiles = new[]
+            {
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(orphanedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(previousReleaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                contentDbContext.ReleaseVersions.AddRange(previousReleaseVersion, releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.Subject.AddRange(orphanedSubject, sharedSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+            var processorClient = new Mock<IProcessorClient>(Strict);
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+
+            const bool forceDeleteRelatedData = false;
+
+            releaseDataFilesService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            releaseFileService
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .ReturnsAsync(Unit.Instance);
+
+            dataSetUploadRepository
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance);
+
+            foreach (var subjectId in new[] { orphanedSubject.Id, sharedSubject.Id })
+            {
+                footnoteRepository
+                    .Setup(mock =>
+                        mock.DeleteFootnotesBySubject(
+                            releaseVersion.Id,
+                            subjectId,
+                            It.Is<IReadOnlyCollection<Guid>>(ids =>
+                                ids.Order().SequenceEqual(new[] { orphanedSubject.Id, sharedSubject.Id }.Order())
+                            )
+                        )
+                    )
+                    .Returns(Task.CompletedTask);
+            }
+
+            releasePublishingStatusRepository
+                .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
+                .Returns(Task.CompletedTask);
+
+            privateCacheService
+                .Setup(mock =>
+                    mock.DeleteCacheFolderAsync(
+                        ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))
+                    )
+                )
+                .Returns(Task.CompletedTask);
+
+            processorClient
+                .Setup(mock =>
+                    mock.BulkDeleteDataSetVersions(
+                        releaseVersion.Id,
+                        forceDeleteRelatedData,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance);
+
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.All, []);
+            userPreReleaseRoleRepository
+                .Setup(mock => mock.RemoveMany(It.IsAny<List<UserPreReleaseRole>>(), default))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseDataFileService: releaseDataFilesService.Object,
+                    releaseFileService: releaseFileService.Object,
+                    dataSetUploadRepository: dataSetUploadRepository.Object,
+                    footnoteRepository: footnoteRepository.Object,
+                    releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
+                    privateCacheService: privateCacheService.Object,
+                    processorClient: processorClient.Object,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.DeleteReleaseVersion(releaseVersion.Id);
+
+                result.AssertRight();
+
+                VerifyAllMocks(footnoteRepository);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var subjects = await statisticsDbContext.Subject.IgnoreQueryFilters().ToListAsync();
+
+                Assert.True(subjects.Single(s => s.Id == orphanedSubject.Id).SoftDeleted);
+                Assert.False(subjects.Single(s => s.Id == sharedSubject.Id).SoftDeleted);
             }
         }
 
@@ -2389,7 +2666,6 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var dataSetUploadRepository = new Mock<IDataSetUploadRepository>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
@@ -2409,10 +2685,6 @@ public abstract class ReleaseVersionServiceTests
             dataSetUploadRepository
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
-
-            releaseSubjectRepository
-                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
-                .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
@@ -2453,7 +2725,6 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     dataSetUploadRepository: dataSetUploadRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
                     privateCacheService: privateCacheService.Object,
                     publicBlobStorageService: publicBlobStorageService.Object,
@@ -2510,10 +2781,35 @@ public abstract class ReleaseVersionServiceTests
                 .WithRelease(_dataFixture.DefaultRelease().WithPublication(release.Publication))
                 .WithVersion(0);
 
-            var statisticsReleaseVersion = new StatsReleaseVersion
+            Subject orphanedSubject = _dataFixture.DefaultSubject();
+            orphanedSubject.SoftDeleted = softDeleted;
+
+            Subject sharedSubject = _dataFixture.DefaultSubject();
+
+            File orphanedSubjectFile = _dataFixture
+                .DefaultFile()
+                .WithSubjectId(orphanedSubject.Id)
+                .WithType(FileType.Data);
+
+            File sharedSubjectFile = _dataFixture.DefaultFile().WithSubjectId(sharedSubject.Id).WithType(FileType.Data);
+
+            var releaseFiles = new[]
             {
-                Id = releaseVersion.Id,
-                PublicationId = releaseVersion.Publication.Id,
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(orphanedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
+                _dataFixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(anotherReleaseVersion)
+                    .WithFile(sharedSubjectFile)
+                    .Generate(),
             };
 
             // A DataBlock on the ReleaseVersion being deleted, which is also used as a KeyStatistic. The
@@ -2562,6 +2858,7 @@ public abstract class ReleaseVersionServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseVersions.AddRange(releaseVersion, anotherReleaseVersion);
+                context.ReleaseFiles.AddRange(releaseFiles);
                 context.DataBlocks.Add(dataBlock);
                 context.KeyStatisticsDataBlock.Add(keyStatistic);
                 context.MethodologyVersions.AddRange(
@@ -2573,7 +2870,7 @@ public abstract class ReleaseVersionServiceTests
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                context.ReleaseVersion.AddRange(statisticsReleaseVersion);
+                context.Subject.AddRange(orphanedSubject, sharedSubject);
                 await context.SaveChangesAsync();
             }
 
@@ -2581,8 +2878,8 @@ public abstract class ReleaseVersionServiceTests
             var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releasePublishingStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+            var subjectDeleter = new Mock<SubjectDeleter>(Strict);
             var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
             var processorClient = new Mock<IProcessorClient>(Strict);
             var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
@@ -2602,13 +2899,26 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository
-                .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
-                .Returns(Task.CompletedTask);
+            foreach (var subjectId in new[] { orphanedSubject.Id, sharedSubject.Id })
+            {
+                footnoteRepository
+                    .Setup(mock =>
+                        mock.DeleteFootnotesBySubject(
+                            releaseVersion.Id,
+                            subjectId,
+                            It.Is<IReadOnlyCollection<Guid>>(ids =>
+                                ids.Order().SequenceEqual(new[] { orphanedSubject.Id, sharedSubject.Id }.Order())
+                            )
+                        )
+                    )
+                    .Returns(Task.CompletedTask);
+            }
 
             footnoteRepository
                 .Setup(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id))
                 .Returns(Task.CompletedTask);
+
+            subjectDeleter.Setup(mock => mock.Delete(orphanedSubject.Id, It.IsAny<StatisticsDbContext>()));
 
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
@@ -2655,8 +2965,8 @@ public abstract class ReleaseVersionServiceTests
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releasePublishingStatusRepository: releasePublishingStatusRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
+                    subjectDeleter: subjectDeleter.Object,
                     privateCacheService: privateCacheService.Object,
                     processorClient: processorClient.Object,
                     userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object,
@@ -2677,18 +2987,19 @@ public abstract class ReleaseVersionServiceTests
                     Times.Once
                 );
 
-                releaseSubjectRepository.Verify(
-                    mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
+                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
+
+                subjectDeleter.Verify(
+                    mock => mock.Delete(orphanedSubject.Id, It.IsAny<StatisticsDbContext>()),
                     Times.Once
                 );
-
-                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
 
                 VerifyAllMocks(
                     privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
                     footnoteRepository,
+                    subjectDeleter,
                     processorClient,
                     releasePublishingStatusRepository,
                     userPreReleaseRoleRepository,
@@ -2739,14 +3050,10 @@ public abstract class ReleaseVersionServiceTests
                 Assert.Empty(contentDbContext.DataBlockVersions);
                 Assert.Empty(contentDbContext.DataBlocks);
 
-                // We expect the Statistics ReleaseVersion to be deleted immediately for test ReleaseVersions,
-                // as they do not use Subjects large enough to warrant using the stored procedure that cleans up
-                // soft-deleted Subjects.
-                Assert.Null(
-                    await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(rv =>
-                        rv.Id == statisticsReleaseVersion.Id
-                    )
-                );
+                var subjects = await statisticsDbContext.Subject.IgnoreQueryFilters().ToListAsync();
+
+                Assert.False(subjects.Single(s => s.Id == orphanedSubject.Id).SoftDeleted);
+                Assert.False(subjects.Single(s => s.Id == sharedSubject.Id).SoftDeleted);
             }
         }
 
@@ -3237,7 +3544,7 @@ public abstract class ReleaseVersionServiceTests
         IFootnoteRepository? footnoteRepository = null,
         IDataBlockService? dataBlockService = null,
         IReleasePublishingStatusRepository? releasePublishingStatusRepository = null,
-        IReleaseSubjectRepository? releaseSubjectRepository = null,
+        SubjectDeleter? subjectDeleter = null,
         IDataSetVersionService? dataSetVersionService = null,
         IProcessorClient? processorClient = null,
         IPrivateBlobCacheService? privateCacheService = null,
@@ -3269,7 +3576,7 @@ public abstract class ReleaseVersionServiceTests
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>(Strict),
-            releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
+            subjectDeleter ?? Mock.Of<SubjectDeleter>(Strict),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
             processorClient ?? Mock.Of<IProcessorClient>(Strict),
             privateCacheService ?? Mock.Of<IPrivateBlobCacheService>(Strict),

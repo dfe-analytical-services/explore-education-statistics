@@ -1,9 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
@@ -12,6 +11,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
@@ -20,31 +20,30 @@ public class SubjectCsvMetaServicePermissionTests
     private static readonly Guid ReleaseVersionId = Guid.NewGuid();
     private static readonly Guid SubjectId = Guid.NewGuid();
 
-    private static readonly ReleaseSubject ReleaseSubject = new()
+    private static readonly ReleaseFile ReleaseFile = new()
     {
         ReleaseVersionId = ReleaseVersionId,
-        SubjectId = SubjectId,
+        File = new File { SubjectId = SubjectId },
     };
 
     [Fact]
     public async Task GetSubjectCsvMeta()
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
-            .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .SetupResourceCheckToFail(ReleaseFile, DataSecurityPolicies.CanViewSubjectData)
             .AssertForbidden(async userService =>
             {
                 var service = BuildService(userService.Object);
 
                 var query = new FullTableQuery { SubjectId = SubjectId };
 
-                return await service.GetSubjectCsvMeta(ReleaseSubject, query);
+                return await service.GetSubjectCsvMeta(ReleaseFile, query);
             });
     }
 
     private static SubjectCsvMetaService BuildService(
         IUserService userService,
         StatisticsDbContext? statisticsDbContext = null,
-        ContentDbContext? contentDbContext = null,
         IFilterItemRepository? filterItemRepository = null,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
@@ -52,7 +51,6 @@ public class SubjectCsvMetaServicePermissionTests
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
             statisticsDbContext: statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
-            contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             userService: userService,
             filterItemRepository: filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)

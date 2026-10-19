@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -122,13 +123,7 @@ public class FootnoteServicePermissionTests
     )
         where TPolicy : Enum
     {
-        var (
-            contentPersistenceHelper,
-            dataBlockService,
-            footnoteService,
-            statisticsPersistenceHelper,
-            releaseSubjectRepository
-        ) = Mocks();
+        var (contentPersistenceHelper, dataBlockService, footnoteService, statisticsPersistenceHelper) = Mocks();
 
         return PermissionTestUtils
             .PolicyCheckBuilder<TPolicy>()
@@ -137,11 +132,11 @@ public class FootnoteServicePermissionTests
             {
                 var service = new FootnoteService(
                     InMemoryStatisticsDbContext(),
+                    InMemoryApplicationDbContext(),
                     contentPersistenceHelper.Object,
                     userService.Object,
                     dataBlockService.Object,
                     footnoteService.Object,
-                    releaseSubjectRepository.Object,
                     statisticsPersistenceHelper.Object
                 );
 
@@ -153,16 +148,14 @@ public class FootnoteServicePermissionTests
         Mock<IPersistenceHelper<ContentDbContext>>,
         Mock<IDataBlockService>,
         Mock<IFootnoteRepository>,
-        Mock<IPersistenceHelper<StatisticsDbContext>>,
-        Mock<IReleaseSubjectRepository>
+        Mock<IPersistenceHelper<StatisticsDbContext>>
     ) Mocks()
     {
         return (
             MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion),
             new Mock<IDataBlockService>(),
             new Mock<IFootnoteRepository>(),
-            MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
-            new Mock<IReleaseSubjectRepository>()
+            MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote)
         );
     }
 }

@@ -23,13 +23,19 @@ public interface IFootnoteRepository
 
     Task<Footnote> GetFootnote(Guid footnoteId);
 
-    Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, Guid? subjectId = null);
+    Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, Guid subjectId);
 
-    Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseVersionId);
+    Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, IReadOnlyCollection<Guid> subjectIds);
+
+    Task<IList<Subject>> GetSubjectsWithNoFootnotes(IReadOnlyCollection<Guid> subjectIds);
 
     Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId);
 
-    Task DeleteFootnotesBySubject(Guid releaseVersionId, Guid subjectId);
+    Task DeleteFootnotesBySubject(
+        Guid releaseVersionId,
+        Guid subjectId,
+        IReadOnlyCollection<Guid> releaseVersionSubjectIds
+    );
 
     Task DeleteFootnotesByReleaseVersion(Guid releaseVersionId);
 

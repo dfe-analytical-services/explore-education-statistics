@@ -1,17 +1,18 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
@@ -45,11 +46,12 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var indicator1Id = Guid.NewGuid();
         var indicator2Id = Guid.NewGuid();
@@ -113,9 +115,10 @@ public class TableBuilderServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.Observation.AddRange(observations);
             statisticsDbContext.MatchedObservations.AddRange(
                 new MatchedObservation(observations[0].Id),
@@ -129,7 +132,7 @@ public class TableBuilderServiceTests
         {
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Indicators = [indicator1Id, indicator2Id],
                 LocationIds = [location1Id, location2Id, location3Id],
                 TimePeriod = new TimePeriodQuery
@@ -206,20 +209,22 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -230,7 +235,7 @@ public class TableBuilderServiceTests
 
             var query = new FullTableQuery
             {
-                // Does not match the saved release subject
+                // Does not match the saved release file
                 SubjectId = Guid.NewGuid(),
             };
 
@@ -247,14 +252,7 @@ public class TableBuilderServiceTests
             .DefaultPublication()
             .WithReleases([_fixture.DefaultRelease(publishedVersions: 1)]);
 
-        var releaseVersion = publication.Releases.Single().Versions.Single();
-
-        // Set up a ReleaseSubject that references a non-existent publication
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(Guid.NewGuid())
-            );
+        Subject subject = _fixture.DefaultSubject();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -263,16 +261,24 @@ public class TableBuilderServiceTests
             contentDbContext.Publications.Add(publication);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
+
+        // Set up the subject to reference a non-existent publication
+        var subjectRepository = new Mock<ISubjectRepository>(Strict);
+        subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id, default)).ReturnsAsync(Guid.NewGuid());
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
+            var service = BuildTableBuilderService(
+                statisticsDbContext,
+                contentDbContext: contentDbContext,
+                subjectRepository: subjectRepository.Object
+            );
 
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
             var result = await service.Query(query);
 
@@ -283,16 +289,14 @@ public class TableBuilderServiceTests
     [Fact]
     public async Task Query_LatestRelease_ReleaseNotFound()
     {
-        // Set up a ReleaseSubject that references a non-existent release version
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture.DefaultStatsReleaseVersion());
+        // Set up a Subject that has no release file in the content db
+        Subject subject = _fixture.DefaultSubject();
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -302,7 +306,7 @@ public class TableBuilderServiceTests
             var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
 
             // SubjectId exists, but no Content.Model.Release
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
             var result = await service.Query(query);
 
@@ -319,11 +323,12 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var indicator1Id = Guid.NewGuid();
         var indicator2Id = Guid.NewGuid();
@@ -383,9 +388,10 @@ public class TableBuilderServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.Observation.AddRange(observations);
             statisticsDbContext.MatchedObservations.AddRange(
                 new MatchedObservation(observations[0].Id),
@@ -394,11 +400,12 @@ public class TableBuilderServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Indicators = [indicator1Id, indicator2Id],
                 LocationIds = [location1Id, location2Id, location3Id],
                 TimePeriod = new TimePeriodQuery
@@ -422,12 +429,7 @@ public class TableBuilderServiceTests
 
             subjectResultMetaService
                 .Setup(s =>
-                    s.GetSubjectMeta(
-                        releaseSubject.ReleaseVersionId,
-                        query,
-                        It.IsAny<IList<Observation>>(),
-                        It.IsAny<bool>()
-                    )
+                    s.GetSubjectMeta(releaseVersion.Id, query, It.IsAny<IList<Observation>>(), It.IsAny<bool>())
                 )
                 .ReturnsAsync(subjectMeta);
 
@@ -436,12 +438,13 @@ public class TableBuilderServiceTests
 
             var service = BuildTableBuilderService(
                 statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
                 observationService: observationService.Object,
                 subjectResultMetaService: subjectResultMetaService.Object,
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
 
-            var result = await service.Query(releaseSubject.ReleaseVersionId, query);
+            var result = await service.Query(releaseVersion.Id, query);
 
             VerifyAllMocks(observationService, subjectResultMetaService, tableBuilderQueryOptimiser);
 
@@ -479,28 +482,31 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext);
+            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
             // Query using a non-existent release version id
             var result = await service.Query(releaseVersionId: Guid.NewGuid(), query);
@@ -518,30 +524,33 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildTableBuilderService(statisticsDbContext);
+            var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
             var query = new FullTableQuery
             {
-                // Does not match saved release subject
+                // Does not match saved release file
                 SubjectId = Guid.NewGuid(),
             };
 
@@ -651,30 +660,28 @@ public class TableBuilderServiceTests
             )
             .GenerateList();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture
-                    .DefaultStatsReleaseVersion()
-                    .WithId(publication.Releases[0].Versions[0].Id)
-                    .WithPublicationId(publication.Id)
-            )
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(filters)
-                    .WithIndicatorGroups(indicatorGroups)
-                    .WithObservations(observations)
-            );
+        var releaseVersion = publication.Releases.Single().Versions.Single();
+
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.Observation.AddRange(observations);
             statisticsDbContext.MatchedObservations.AddRange(
                 observations.Select(o => new MatchedObservation(o.Id)).ToArray()
@@ -687,7 +694,7 @@ public class TableBuilderServiceTests
         {
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.Subject.Id,
+                SubjectId = subject.Id,
                 Indicators = indicators.Select(i => i.Id).ToList(),
                 LocationIds = locations.Select(l => l.Id).ToList(),
                 TimePeriod = new TimePeriodQuery
@@ -741,9 +748,8 @@ public class TableBuilderServiceTests
             subjectCsvMetaService
                 .Setup(s =>
                     s.GetSubjectCsvMeta(
-                        It.Is<ReleaseSubject>(rs =>
-                            rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId
+                        It.Is<ReleaseFile>(rf =>
+                            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == subject.Id
                         ),
                         query,
                         default
@@ -774,15 +780,13 @@ public class TableBuilderServiceTests
     [Fact]
     public async Task QueryToCsvStream_LatestRelease_ReleaseVersionNotFound()
     {
-        // Set up a ReleaseSubject that references a non-existent release
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(_fixture.DefaultStatsReleaseVersion());
+        // Set up a Subject that has no release file in the content db
+        Subject subject = _fixture.DefaultSubject();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -795,7 +799,7 @@ public class TableBuilderServiceTests
             );
 
             // SubjectId exists, but no Content.Model.Release
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
             using var stream = new MemoryStream();
 
@@ -814,20 +818,22 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -932,27 +938,26 @@ public class TableBuilderServiceTests
             )
             .GenerateList();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            )
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(filters)
-                    .WithIndicatorGroups(indicatorGroups)
-                    .WithObservations(observations)
-            );
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.Observation.AddRange(observations);
             statisticsDbContext.MatchedObservations.AddRange(
                 observations.Select(o => new MatchedObservation(o.Id)).ToArray()
@@ -965,7 +970,7 @@ public class TableBuilderServiceTests
         {
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.Subject.Id,
+                SubjectId = subject.Id,
                 Indicators = indicators.Select(i => i.Id).ToList(),
                 LocationIds = locations.Select(l => l.Id).ToList(),
                 TimePeriod = new TimePeriodQuery
@@ -1016,9 +1021,8 @@ public class TableBuilderServiceTests
             subjectCsvMetaService
                 .Setup(s =>
                     s.GetSubjectCsvMeta(
-                        It.Is<ReleaseSubject>(rs =>
-                            rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId
+                        It.Is<ReleaseFile>(rf =>
+                            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == subject.Id
                         ),
                         query,
                         default
@@ -1035,7 +1039,7 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(releaseVersion.Id, query, stream);
 
             VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1056,16 +1060,16 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            )
-            .WithSubject(_fixture.DefaultSubject());
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var indicators = _fixture
             .DefaultIndicator()
-            .WithIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(releaseSubject.Subject))
+            .WithIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject))
             .GenerateList(3);
 
         var locations = _fixture
@@ -1076,7 +1080,7 @@ public class TableBuilderServiceTests
 
         var observations = _fixture
             .DefaultObservation()
-            .WithSubject(releaseSubject.Subject)
+            .WithSubject(subject)
             .WithMeasures(indicators)
             .ForRange(..2, o => o.SetLocation(locations[0]).SetTimePeriod(2022, AcademicYear))
             .ForRange(2..4, o => o.SetLocation(locations[1]).SetTimePeriod(2022, AcademicYear))
@@ -1087,9 +1091,10 @@ public class TableBuilderServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.Observation.AddRange(observations);
             statisticsDbContext.MatchedObservations.AddRange(
                 observations.Select(o => new MatchedObservation(o.Id)).ToArray()
@@ -1102,7 +1107,7 @@ public class TableBuilderServiceTests
         {
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.Subject.Id,
+                SubjectId = subject.Id,
                 Indicators = indicators.Select(i => i.Id).ToList(),
                 LocationIds = locations.Select(l => l.Id).ToList(),
                 TimePeriod = new TimePeriodQuery
@@ -1143,9 +1148,8 @@ public class TableBuilderServiceTests
             subjectCsvMetaService
                 .Setup(s =>
                     s.GetSubjectCsvMeta(
-                        It.Is<ReleaseSubject>(rs =>
-                            rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                            && rs.SubjectId == releaseSubject.SubjectId
+                        It.Is<ReleaseFile>(rf =>
+                            rf.ReleaseVersionId == releaseVersion.Id && rf.File.SubjectId == subject.Id
                         ),
                         query,
                         default
@@ -1162,7 +1166,7 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(releaseVersion.Id, query, stream);
 
             VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1183,20 +1187,22 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1205,7 +1211,7 @@ public class TableBuilderServiceTests
         {
             var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
             using var stream = new MemoryStream();
 
@@ -1225,20 +1231,22 @@ public class TableBuilderServiceTests
 
         var releaseVersion = publication.Releases.Single().Versions.Single();
 
-        ReleaseSubject releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(
-                _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
-            );
+        Subject subject = _fixture.DefaultSubject();
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             contentDbContext.Publications.Add(publication);
+            contentDbContext.ReleaseFiles.Add(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1252,7 +1260,7 @@ public class TableBuilderServiceTests
 
             using var stream = new MemoryStream();
 
-            var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
+            var result = await service.QueryToCsvStream(releaseVersion.Id, query, stream);
 
             result.AssertNotFound();
         }
@@ -1281,7 +1289,6 @@ public class TableBuilderServiceTests
         ContentDbContext? contentDbContext = null,
         ILocationService? locationService = null,
         IObservationService? observationService = null,
-        IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         ISubjectResultMetaService? subjectResultMetaService = null,
         ISubjectCsvMetaService? subjectCsvMetaService = null,
         ISubjectRepository? subjectRepository = null,
@@ -1291,15 +1298,16 @@ public class TableBuilderServiceTests
         IOptions<LocationsOptions>? locationsOptions = null
     )
     {
+        contentDbContext ??= InMemoryContentDbContext();
+
         return new(
             statisticsDbContext,
-            contentDbContext ?? InMemoryContentDbContext(),
+            contentDbContext,
             locationService ?? Mock.Of<ILocationService>(Strict),
             observationService ?? Mock.Of<IObservationService>(Strict),
-            statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
             subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
             subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
-            subjectRepository ?? new SubjectRepository(statisticsDbContext),
+            subjectRepository ?? new SubjectRepository(contentDbContext),
             tableBuilderQueryOptimiser ?? Mock.Of<ITableBuilderQueryOptimiser>(Strict),
             userService ?? AlwaysTrueUserService().Object,
             tableBuilderOptions ?? DefaultTableBuilderOptions(),

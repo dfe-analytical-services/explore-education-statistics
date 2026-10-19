@@ -1,5 +1,5 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 
 public interface ISubjectRepository
 {

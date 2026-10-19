@@ -330,7 +330,15 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-            footnoteRepository.Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id)).ReturnsAsync([subject]);
+            footnoteRepository
+                .Setup(r =>
+                    r.GetSubjectsWithNoFootnotes(
+                        It.Is<IReadOnlyCollection<Guid>>(ids =>
+                            ids.SequenceEqual(new[] { subject.Id, otherSubject.Id })
+                        )
+                    )
+                )
+                .ReturnsAsync([subject]);
 
             releaseDataFileRepository.Setup(r => r.ListReplacementDataFiles(releaseVersion.Id)).ReturnsAsync([]);
 
@@ -599,7 +607,13 @@ public class ReleaseChecklistServiceTests
                 .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, CancellationToken.None))
                 .ReturnsAsync(Unit.Instance);
 
-            footnoteRepository.Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id)).ReturnsAsync([]);
+            footnoteRepository
+                .Setup(r =>
+                    r.GetSubjectsWithNoFootnotes(
+                        It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(new[] { subject.Id }))
+                    )
+                )
+                .ReturnsAsync([]);
 
             dataSetVersionService
                 .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id, CancellationToken.None))

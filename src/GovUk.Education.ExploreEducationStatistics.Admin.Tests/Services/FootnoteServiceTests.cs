@@ -24,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -34,7 +35,7 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_SubjectNotLinkedToRelease_ReturnsValidationResult()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -52,22 +53,12 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(releaseVersion.Id, contextId, subjectIds: SetOf(subject.Id));
 
@@ -79,22 +70,12 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterNotLinkedToRelease_ReturnsValidationResult()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -108,23 +89,13 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filter = _fixture.DefaultFilter().Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(releaseVersion.Id, contextId, filterIds: SetOf(filter.Id));
 
@@ -136,23 +107,13 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterGroupNotLinkedToRelease_ReturnsValidationResult()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filter = _fixture.DefaultFilter().Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -166,24 +127,14 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterGroup = _fixture.DefaultFilterGroup().Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -199,24 +150,14 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterItemNotLinkedToRelease_ReturnsValidationResult()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterGroup = _fixture.DefaultFilterGroup().Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -230,25 +171,15 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -264,22 +195,12 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_IndicatorNotLinkedToRelease_ReturnsValidationResult()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -293,7 +214,7 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var indicator = _fixture.DefaultIndicator().Generate();
         var indicatorGroup = _fixture
             .DefaultIndicatorGroup()
@@ -303,20 +224,10 @@ public class FootnoteServiceTests
             .DefaultSubject()
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -332,7 +243,7 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
@@ -347,25 +258,10 @@ public class FootnoteServiceTests
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
         var subject2 = _fixture.DefaultSubject().Generate();
-        var releaseSubject1 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject1)
-            .Generate();
-        var releaseSubject2 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject2)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject1, subject2),
-            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject1, subject2));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -406,7 +302,7 @@ public class FootnoteServiceTests
         bool subjectMissing
     )
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
@@ -421,25 +317,10 @@ public class FootnoteServiceTests
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
         var subject2 = _fixture.DefaultSubject().Generate();
-        var releaseSubject1 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject1)
-            .Generate();
-        var releaseSubject2 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject2)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject1, subject2),
-            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject1, subject2));
 
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -458,7 +339,7 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_SubjectNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -478,23 +359,12 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -512,23 +382,12 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -544,24 +403,13 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filter = _fixture.DefaultFilter().Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -579,24 +427,13 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterGroupNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filter = _fixture.DefaultFilter().Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -612,25 +449,14 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterGroup = _fixture.DefaultFilterGroup().Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -648,25 +474,14 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterItemNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterGroup = _fixture.DefaultFilterGroup().Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -682,26 +497,15 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
         var subject = _fixture.DefaultSubject().WithFilters(new List<Filter> { filter }).Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -719,23 +523,12 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_IndicatorNotLinkedToRelease_ReturnsValidationResult()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var subject = _fixture.DefaultSubject().Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -751,7 +544,7 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var indicator = _fixture.DefaultIndicator().Generate();
         var indicatorGroup = _fixture
             .DefaultIndicatorGroup()
@@ -761,21 +554,10 @@ public class FootnoteServiceTests
             .DefaultSubject()
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
-        await SeedDatabase(
-            contextId,
-            releaseVersion,
-            subjects: ListOf(subject),
-            releaseSubjects: ListOf(releaseSubject),
-            footnotes: ListOf(footnote)
-        );
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject), footnotes: ListOf(footnote));
 
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
@@ -793,7 +575,7 @@ public class FootnoteServiceTests
     public async Task UpdateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
@@ -808,16 +590,6 @@ public class FootnoteServiceTests
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
         var subject2 = _fixture.DefaultSubject().Generate();
-        var releaseSubject1 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject1)
-            .Generate();
-        var releaseSubject2 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject2)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -825,7 +597,6 @@ public class FootnoteServiceTests
             contextId,
             releaseVersion,
             subjects: ListOf(subject1, subject2),
-            releaseSubjects: ListOf(releaseSubject1, releaseSubject2),
             footnotes: ListOf(footnote)
         );
 
@@ -868,7 +639,7 @@ public class FootnoteServiceTests
     )
     {
         var footnote = _fixture.DefaultFootnote().Generate();
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
         var filterItem = _fixture.DefaultFilterItem().Generate();
         var filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem> { filterItem }).Generate();
         var filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup> { filterGroup }).Generate();
@@ -883,16 +654,6 @@ public class FootnoteServiceTests
             .WithIndicatorGroups(new List<IndicatorGroup> { indicatorGroup })
             .Generate();
         var subject2 = _fixture.DefaultSubject().Generate();
-        var releaseSubject1 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject1)
-            .Generate();
-        var releaseSubject2 = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(subject2)
-            .Generate();
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -900,7 +661,6 @@ public class FootnoteServiceTests
             contextId,
             releaseVersion,
             subjects: ListOf(subject1, subject2),
-            releaseSubjects: ListOf(releaseSubject1, releaseSubject2),
             footnotes: ListOf(footnote)
         );
 
@@ -921,19 +681,15 @@ public class FootnoteServiceTests
     [Fact]
     public async Task CreateFootnote_MultipleFootnotesHaveExpectedOrder()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(_fixture.DefaultSubject())
-            .Generate();
+        Subject subject = _fixture.DefaultSubject();
 
         // Create a release which already has some existing footnotes
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(2))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(2))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -941,17 +697,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.Subject.Add(releaseSubject.Subject);
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -978,7 +732,7 @@ public class FootnoteServiceTests
                     filterGroupIds: SetOf<Guid>(),
                     filterItemIds: SetOf<Guid>(),
                     indicatorIds: SetOf<Guid>(),
-                    subjectIds: SetOf(releaseSubject.Subject.Id)
+                    subjectIds: SetOf(subject.Id)
                 )
             ).AssertRight();
 
@@ -1007,35 +761,26 @@ public class FootnoteServiceTests
     [Fact]
     public async Task GetFootnote()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
-                    .WithIndicatorGroups(
-                        _fixture
-                            .DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)
-                    )
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+            .WithIndicatorGroups(
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(1)).Generate(1)
+            );
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(
                 _fixture
                     .DefaultFootnote()
-                    .WithSubjects(ListOf(releaseSubject.Subject))
-                    .WithFilters(releaseSubject.Subject.Filters)
-                    .WithFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
-                    .WithFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
-                    .WithIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators)
+                    .WithSubjects(ListOf(subject))
+                    .WithFilters(subject.Filters)
+                    .WithFilterGroups(subject.Filters[0].FilterGroups)
+                    .WithFilterItems(subject.Filters[0].FilterGroups[0].FilterItems)
+                    .WithIndicators(subject.IndicatorGroups[0].Indicators)
             )
             .Generate();
 
@@ -1044,16 +789,15 @@ public class FootnoteServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.Add(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1074,39 +818,36 @@ public class FootnoteServiceTests
             Assert.Equal(releaseVersion.Id, retrievedFootnote.Releases.First().ReleaseVersionId);
 
             Assert.Single(retrievedFootnote.Subjects);
-            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Subjects.First().SubjectId);
+            Assert.Equal(subject.Id, retrievedFootnote.Subjects.First().SubjectId);
 
             Assert.Single(retrievedFootnote.Filters);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
+            Assert.Equal(subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
+            Assert.Equal(subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
 
             Assert.Single(retrievedFootnote.FilterGroups);
+            Assert.Equal(subject.Filters[0].FilterGroups[0].Id, retrievedFootnote.FilterGroups.First().FilterGroup.Id);
             Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Id,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Id
-            );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Label,
+                subject.Filters[0].FilterGroups[0].Label,
                 retrievedFootnote.FilterGroups.First().FilterGroup.Label
             );
 
             Assert.Single(retrievedFootnote.FilterItems);
             Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
+                subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
                 retrievedFootnote.FilterItems.First().FilterItem.Id
             );
             Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Label,
+                subject.Filters[0].FilterGroups[0].FilterItems[0].Label,
                 retrievedFootnote.FilterItems.First().FilterItem.Label
             );
 
             Assert.Single(retrievedFootnote.Indicators);
             Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id,
+                subject.IndicatorGroups[0].Indicators[0].Id,
                 retrievedFootnote.Indicators.First().Indicator.Id
             );
             Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Label,
+                subject.IndicatorGroups[0].Indicators[0].Label,
                 retrievedFootnote.Indicators.First().Indicator.Label
             );
         }
@@ -1115,11 +856,11 @@ public class FootnoteServiceTests
     [Fact]
     public async Task GetFootnote_ReleaseNotFound()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(_fixture.DefaultFootnote())
             .Generate();
 
@@ -1149,11 +890,14 @@ public class FootnoteServiceTests
     [Fact]
     public async Task GetFootnote_ReleaseAndFootnoteNotRelated()
     {
-        var (releaseVersion, otherReleaseVersion) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
+        var (releaseVersion, otherReleaseVersion) = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .GenerateTuple2();
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(_fixture.DefaultFootnote())
             .Generate();
 
@@ -1162,12 +906,11 @@ public class FootnoteServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
             statisticsDbContext.ReleaseFootnote.Add(releaseFootnote);
 
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
 
             await contentDbContext.SaveChangesAsync();
         }
@@ -1184,32 +927,62 @@ public class FootnoteServiceTests
     }
 
     [Fact]
+    public async Task GetFootnotes_ReturnsFootnotesForSubjectsOfReleaseVersion()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var (subject1, subject2) = _fixture.DefaultSubject().GenerateTuple2();
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .WithReleaseVersionId(releaseVersion.Id)
+            .ForIndex(0, s => s.SetFootnote(_fixture.DefaultFootnote().WithOrder(0).WithSubjects(ListOf(subject1))))
+            .ForIndex(1, s => s.SetFootnote(_fixture.DefaultFootnote().WithOrder(1).WithSubjects(ListOf(subject2))))
+            .GenerateList(2);
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(contextId, releaseVersion, subjects: ListOf(subject1, subject2));
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            statisticsDbContext.Subject.AttachRange(subject1, subject2);
+            statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        {
+            var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
+
+            var result = (await service.GetFootnotes(releaseVersion.Id)).AssertRight();
+
+            Assert.Equal(
+                releaseFootnotes.Select(releaseFootnote => releaseFootnote.FootnoteId),
+                result.Select(footnote => footnote.Id)
+            );
+            Assert.Equal(subject1.Id, Assert.Single(result[0].Subjects).SubjectId);
+            Assert.Equal(subject2.Id, Assert.Single(result[1].Subjects).SubjectId);
+        }
+    }
+
+    [Fact]
     public async Task DeleteFootnote()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubjects = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubjects(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-                    .WithIndicatorGroups(_ =>
-                        _fixture
-                            .DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)
-                    )
-                    .GenerateList(2)
+        var (subject1, subject2) = _fixture
+            .DefaultSubject()
+            .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+            .WithIndicatorGroups(_ =>
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(1)).Generate(1)
             )
-            .GenerateList();
-
-        var (subject1, subject2) = releaseSubjects.Select(rs => rs.Subject).ToTuple2();
+            .GenerateTuple2();
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(
                 _fixture
                     .DefaultFootnote()
@@ -1225,20 +998,22 @@ public class FootnoteServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubjects);
+            statisticsDbContext.Subject.AddRange(subject1, subject2);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         {
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.AddRange(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
-                    .Generate()
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFiles([
+                        _fixture.DefaultFile(FileType.Data).WithSubjectId(subject1.Id).Generate(),
+                        _fixture.DefaultFile(FileType.Data).WithSubjectId(subject2.Id).Generate(),
+                    ])
+                    .GenerateList()
             );
             await contentDbContext.SaveChangesAsync();
         }
@@ -1281,22 +1056,16 @@ public class FootnoteServiceTests
     [Fact]
     public async Task DeleteFootnote_MultipleFootnotesHaveExpectedOrder()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(3))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(3))
             .GenerateList(3);
 
         var contextId = Guid.NewGuid().ToString();
@@ -1304,16 +1073,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1359,27 +1127,18 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnote_AddCriteria()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
-                    .WithIndicatorGroups(
-                        _fixture
-                            .DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)
-                    )
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+            .WithIndicatorGroups(
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(1)).Generate(1)
+            );
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(_fixture.DefaultFootnote().WithOrder(1))
             .Generate();
 
@@ -1388,16 +1147,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1420,11 +1178,11 @@ public class FootnoteServiceTests
                 releaseVersionId: releaseVersion.Id,
                 footnoteId: releaseFootnote.FootnoteId,
                 "Updated footnote",
-                filterIds: SetOf(releaseSubject.Subject.Filters[0].Id),
-                filterGroupIds: SetOf(releaseSubject.Subject.Filters[1].FilterGroups[0].Id),
-                filterItemIds: SetOf(releaseSubject.Subject.Filters[2].FilterGroups[0].FilterItems[0].Id),
-                indicatorIds: SetOf(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id),
-                subjectIds: SetOf(releaseSubject.Subject.Id)
+                filterIds: SetOf(subject.Filters[0].Id),
+                filterGroupIds: SetOf(subject.Filters[1].FilterGroups[0].Id),
+                filterItemIds: SetOf(subject.Filters[2].FilterGroups[0].FilterItems[0].Id),
+                indicatorIds: SetOf(subject.IndicatorGroups[0].Indicators[0].Id),
+                subjectIds: SetOf(subject.Id)
             );
 
             result.AssertRight();
@@ -1444,29 +1202,23 @@ public class FootnoteServiceTests
             Assert.Equal(releaseFootnote.FootnoteId, savedReleaseFootnote.FootnoteId);
 
             var savedSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote);
-            Assert.Equal(releaseSubject.Subject.Id, savedSubjectFootnote.SubjectId);
+            Assert.Equal(subject.Id, savedSubjectFootnote.SubjectId);
             Assert.Equal(releaseFootnote.FootnoteId, savedSubjectFootnote.FootnoteId);
 
             var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Id, savedFilterFootnote.FilterId);
+            Assert.Equal(subject.Filters[0].Id, savedFilterFootnote.FilterId);
             Assert.Equal(releaseFootnote.FootnoteId, savedFilterFootnote.FootnoteId);
 
             var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote);
-            Assert.Equal(releaseSubject.Subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
+            Assert.Equal(subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
             Assert.Equal(releaseFootnote.FootnoteId, savedFilterGroupFootnote.FootnoteId);
 
             var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote);
-            Assert.Equal(
-                releaseSubject.Subject.Filters[2].FilterGroups[0].FilterItems[0].Id,
-                savedFilterItemFootnote.FilterItemId
-            );
+            Assert.Equal(subject.Filters[2].FilterGroups[0].FilterItems[0].Id, savedFilterItemFootnote.FilterItemId);
             Assert.Equal(releaseFootnote.FootnoteId, savedFilterItemFootnote.FootnoteId);
 
             var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote);
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id,
-                savedIndicatorFootnote.IndicatorId
-            );
+            Assert.Equal(subject.IndicatorGroups[0].Indicators[0].Id, savedIndicatorFootnote.IndicatorId);
             Assert.Equal(releaseFootnote.FootnoteId, savedIndicatorFootnote.FootnoteId);
         }
     }
@@ -1474,27 +1226,18 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnote_RemoveCriteria()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
-                    .WithIndicatorGroups(
-                        _fixture
-                            .DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)
-                    )
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+            .WithIndicatorGroups(
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(1)).Generate(1)
+            );
 
         var releaseFootnote = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
+            .WithReleaseVersionId(releaseVersion.Id)
             .WithFootnote(_fixture.DefaultFootnote().WithOrder(1))
             .Generate();
 
@@ -1503,16 +1246,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnote);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1569,22 +1311,16 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnotes()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(3))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(3))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1592,16 +1328,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1656,22 +1391,16 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnotes_ReleaseNotFound()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(2))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(2))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1679,12 +1408,17 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(new Content.Model.ReleaseVersion { Id = releaseVersion.Id });
+            contentDbContext.ReleaseFiles.Add(
+                _fixture
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
+                    .Generate()
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -1724,22 +1458,16 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnotes_FootnoteMissing()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(2))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(2))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1747,16 +1475,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1794,22 +1521,16 @@ public class FootnoteServiceTests
     [Fact]
     public async Task UpdateFootnotes_FootnoteNotForRelease()
     {
-        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
 
-        var releaseSubject = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(releaseVersion)
-            .WithSubject(
-                _fixture
-                    .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
-            )
-            .Generate();
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2));
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
-            .WithReleaseVersion(releaseVersion)
-            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(releaseSubject.Subject)).GenerateList(2))
+            .WithReleaseVersionId(releaseVersion.Id)
+            .WithFootnotes(_fixture.DefaultFootnote().WithSubjects(ListOf(subject)).GenerateList(2))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -1817,16 +1538,15 @@ public class FootnoteServiceTests
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Subject.Add(subject);
             statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
             await statisticsDbContext.SaveChangesAsync();
 
-            contentDbContext.Add(
+            contentDbContext.ReleaseFiles.Add(
                 _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
+                    .DefaultReleaseFile()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
                     .Generate()
             );
             await contentDbContext.SaveChangesAsync();
@@ -1868,23 +1588,27 @@ public class FootnoteServiceTests
         string contextId,
         ReleaseVersion releaseVersion,
         IReadOnlyList<Subject>? subjects = null,
-        IReadOnlyList<ReleaseSubject>? releaseSubjects = null,
         IReadOnlyList<Footnote>? footnotes = null
     )
     {
         await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
 
             if (!subjects.IsNullOrEmpty())
             {
                 statisticsDbContext.Subject.AddRange(subjects!);
-            }
 
-            if (!releaseSubjects.IsNullOrEmpty())
-            {
-                statisticsDbContext.ReleaseSubject.AddRange(releaseSubjects!);
+                contentDbContext.ReleaseFiles.AddRange(
+                    subjects!.Select(subject =>
+                        _fixture
+                            .DefaultReleaseFile()
+                            .WithReleaseVersion(releaseVersion)
+                            .WithFile(_fixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
+                            .Generate()
+                    )
+                );
             }
 
             if (!footnotes.IsNullOrEmpty())
@@ -1893,14 +1617,6 @@ public class FootnoteServiceTests
             }
 
             await statisticsDbContext.SaveChangesAsync();
-
-            contentDbContext.Add(
-                _fixture
-                    .DefaultReleaseVersion()
-                    .WithId(releaseVersion.Id)
-                    .WithRelease(_fixture.DefaultRelease())
-                    .Generate()
-            );
             await contentDbContext.SaveChangesAsync();
         }
     }
@@ -1995,21 +1711,20 @@ public class FootnoteServiceTests
         IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
         IUserService? userService = null,
         IDataBlockService? dataBlockService = null,
-        IReleaseSubjectRepository? releaseSubjectRepository = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null
     )
     {
-        var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
+        var contentContext = contentDbContext ?? InMemoryApplicationDbContext();
 
         var footnoteRepository = new FootnoteRepository(statisticsDbContext);
 
         return new FootnoteService(
             statisticsDbContext,
+            contentContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
             userService ?? AlwaysTrueUserService().Object,
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository,
-            releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext, footnoteRepository),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
         );
     }

@@ -1020,7 +1020,7 @@ public class ReleaseDataFileServiceTests
 
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
         footnoteRepository
-            .Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+            .Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId.Value))
             .ReturnsAsync([new Footnote { Id = Guid.NewGuid(), Content = "Footnote content!" }]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1065,7 +1065,7 @@ public class ReleaseDataFileServiceTests
 
         var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
         footnoteRepository
-            .Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+            .Setup(mock => mock.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId.Value))
             .ReturnsAsync([]);
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

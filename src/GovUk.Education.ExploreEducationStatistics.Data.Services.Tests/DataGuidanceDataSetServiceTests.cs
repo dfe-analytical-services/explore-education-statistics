@@ -13,7 +13,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
@@ -22,7 +21,7 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets()
     {
-        var releaseVersion = new ReleaseVersion();
+        var releaseVersionId = Guid.NewGuid();
 
         var subject1 = new Subject();
 
@@ -61,10 +60,6 @@ public class DataGuidanceDataSetServiceTests
                 new() { Name = "subject2_indicator", Label = "Subject 2 Indicator" },
             },
         };
-
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject1 };
-
-        var releaseSubject2 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = subject2 };
 
         var subject1Observation1 = new Observation
         {
@@ -144,36 +139,34 @@ public class DataGuidanceDataSetServiceTests
         var releaseFootnote1 = new ReleaseFootnote
         {
             Footnote = subject1Footnote1.Footnote,
-            ReleaseVersion = releaseVersion,
+            ReleaseVersionId = releaseVersionId,
         };
         var releaseFootnote2 = new ReleaseFootnote
         {
             Footnote = subject1Footnote2.Footnote,
-            ReleaseVersion = releaseVersion,
+            ReleaseVersionId = releaseVersionId,
         };
         var releaseFootnote3 = new ReleaseFootnote
         {
             Footnote = subject1Footnote3.Footnote,
-            ReleaseVersion = releaseVersion,
+            ReleaseVersionId = releaseVersionId,
         };
         var releaseFootnote4 = new ReleaseFootnote
         {
             Footnote = subject2Footnote1.Footnote,
-            ReleaseVersion = releaseVersion,
+            ReleaseVersionId = releaseVersionId,
         };
         var releaseFootnote5 = new ReleaseFootnote
         {
             Footnote = subject2Footnote2.Footnote,
-            ReleaseVersion = releaseVersion,
+            ReleaseVersionId = releaseVersionId,
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
             statisticsDbContext.Subject.AddRange(subject1, subject2);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
             statisticsDbContext.Filter.AddRange(subject1Filter, subject2Filter);
             statisticsDbContext.IndicatorGroup.AddRange(subject1IndicatorGroup, subject2IndicatorGroup);
             statisticsDbContext.Observation.AddRange(
@@ -199,7 +192,7 @@ public class DataGuidanceDataSetServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersionId };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -252,7 +245,7 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
 
-            var result = (await service.ListDataSets(releaseVersion.Id)).AssertRight();
+            var result = (await service.ListDataSets(releaseVersionId)).AssertRight();
 
             // Assert there are two data sets with the correct content
 
@@ -312,28 +305,27 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets_OrderedByName()
     {
-        var releaseVersion = new ReleaseVersion();
+        var releaseVersionId = Guid.NewGuid();
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
-        var releaseSubject2 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
-        var releaseSubject3 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var subject1 = new Subject();
+        var subject2 = new Subject();
+        var subject3 = new Subject();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2, releaseSubject3);
+            statisticsDbContext.Subject.AddRange(subject1, subject2, subject3);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersionId };
 
         var releaseFile1 = new ReleaseFile
         {
             ReleaseVersion = contentReleaseVersion,
             File = new File
             {
-                SubjectId = releaseSubject1.SubjectId,
+                SubjectId = subject1.Id,
                 Filename = "file1.csv",
                 Type = FileType.Data,
             },
@@ -344,7 +336,7 @@ public class DataGuidanceDataSetServiceTests
             ReleaseVersion = contentReleaseVersion,
             File = new File
             {
-                SubjectId = releaseSubject2.SubjectId,
+                SubjectId = subject2.Id,
                 Filename = "file2.csv",
                 Type = FileType.Data,
             },
@@ -355,7 +347,7 @@ public class DataGuidanceDataSetServiceTests
             ReleaseVersion = contentReleaseVersion,
             File = new File
             {
-                SubjectId = releaseSubject3.SubjectId,
+                SubjectId = subject3.Id,
                 Filename = "file3.csv",
                 Type = FileType.Data,
             },
@@ -380,7 +372,7 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
 
-            var result = await service.ListDataSets(releaseVersion.Id);
+            var result = await service.ListDataSets(releaseVersionId);
 
             var viewModels = result.AssertRight();
 
@@ -395,24 +387,23 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets_FilterDataSetsByFileId()
     {
-        var releaseVersion = new ReleaseVersion();
+        var releaseVersionId = Guid.NewGuid();
 
-        var releaseSubject1 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var subject1 = new Subject();
 
-        var releaseSubject2 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var subject2 = new Subject();
 
-        var releaseSubject3 = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var subject3 = new Subject();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2, releaseSubject3);
+            statisticsDbContext.Subject.AddRange(subject1, subject2, subject3);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersionId };
 
         var releaseFile1 = new ReleaseFile
         {
@@ -420,7 +411,7 @@ public class DataGuidanceDataSetServiceTests
             Name = "Data set 1",
             File = new File
             {
-                SubjectId = releaseSubject1.SubjectId,
+                SubjectId = subject1.Id,
                 Filename = "file1.csv",
                 Type = FileType.Data,
             },
@@ -432,7 +423,7 @@ public class DataGuidanceDataSetServiceTests
             Name = "Data set 2",
             File = new File
             {
-                SubjectId = releaseSubject2.SubjectId,
+                SubjectId = subject2.Id,
                 Filename = "file2.csv",
                 Type = FileType.Data,
             },
@@ -444,7 +435,7 @@ public class DataGuidanceDataSetServiceTests
             Name = "Data set 3",
             File = new File
             {
-                SubjectId = releaseSubject3.SubjectId,
+                SubjectId = subject3.Id,
                 Filename = "file3.csv",
                 Type = FileType.Data,
             },
@@ -463,7 +454,7 @@ public class DataGuidanceDataSetServiceTests
             var service = SetupService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
 
             var result = await service.ListDataSets(
-                releaseVersion.Id,
+                releaseVersionId,
                 new List<Guid> { releaseFile1.FileId, releaseFile3.FileId }
             );
 
@@ -480,21 +471,20 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets_ReplacementInProgressIsIgnored()
     {
-        var releaseVersion = new ReleaseVersion();
+        var releaseVersionId = Guid.NewGuid();
 
-        var originalSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var originalSubject = new Subject();
 
-        var replacementSubject = new ReleaseSubject { ReleaseVersion = releaseVersion, Subject = new Subject() };
+        var replacementSubject = new Subject();
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalSubject, replacementSubject);
+            statisticsDbContext.Subject.AddRange(originalSubject, replacementSubject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersion.Id };
+        var contentReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseVersionId };
 
         var originalFile = new ReleaseFile
         {
@@ -503,7 +493,7 @@ public class DataGuidanceDataSetServiceTests
             {
                 Filename = "file1.csv",
                 Type = FileType.Data,
-                SubjectId = originalSubject.SubjectId,
+                SubjectId = originalSubject.Id,
             },
         };
 
@@ -514,7 +504,7 @@ public class DataGuidanceDataSetServiceTests
             {
                 Filename = "file1.csv",
                 Type = FileType.Data,
-                SubjectId = replacementSubject.SubjectId,
+                SubjectId = replacementSubject.Id,
                 Replacing = originalFile.File,
             },
         };
@@ -581,34 +571,22 @@ public class DataGuidanceDataSetServiceTests
     [Fact]
     public async Task ListDataSets_AmendedRelease()
     {
-        var releaseVersion1 = new ReleaseVersion { Id = Guid.NewGuid() };
+        var releaseVersion1Id = Guid.NewGuid();
 
-        var releaseVersion2 = new ReleaseVersion { Id = Guid.NewGuid() };
+        var releaseVersion2Id = Guid.NewGuid();
 
         var subject1 = new Subject();
         var subject2 = new Subject();
-
-        // Version 1 has one data set, Version 2 adds another data set
-
-        var releaseVersion1Subject1 = new ReleaseSubject { ReleaseVersion = releaseVersion1, Subject = subject1 };
-
-        var releaseVersion2Subject1 = new ReleaseSubject { ReleaseVersion = releaseVersion2, Subject = subject1 };
-
-        var releaseVersion2Subject2 = new ReleaseSubject { ReleaseVersion = releaseVersion2, Subject = subject2 };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion1, releaseVersion2);
             statisticsDbContext.Subject.AddRange(subject1, subject2);
-            statisticsDbContext.ReleaseSubject.AddRange(
-                releaseVersion1Subject1,
-                releaseVersion2Subject1,
-                releaseVersion2Subject2
-            );
             await statisticsDbContext.SaveChangesAsync();
         }
+
+        // Version 1 has one data set, Version 2 adds another data set
 
         var file1 = new File
         {
@@ -626,14 +604,14 @@ public class DataGuidanceDataSetServiceTests
 
         var contentReleaseVersion1 = new Content.Model.ReleaseVersion
         {
-            Id = releaseVersion1.Id,
+            Id = releaseVersion1Id,
             PreviousVersionId = null,
         };
 
         var contentReleaseVersion2 = new Content.Model.ReleaseVersion
         {
-            Id = releaseVersion2.Id,
-            PreviousVersionId = releaseVersion1.Id,
+            Id = releaseVersion2Id,
+            PreviousVersionId = releaseVersion1Id,
         };
 
         var releaseVersion1File1 = new ReleaseFile
@@ -673,7 +651,7 @@ public class DataGuidanceDataSetServiceTests
         {
             var service = SetupService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
 
-            var version1Result = await service.ListDataSets(releaseVersion1.Id);
+            var version1Result = await service.ListDataSets(releaseVersion1Id);
             var version1ViewModels = version1Result.AssertRight();
 
             // Assert version 1 has one data set with the correct content
@@ -688,7 +666,7 @@ public class DataGuidanceDataSetServiceTests
             Assert.Empty(version1ViewModels[0].GeographicLevels);
             Assert.Empty(version1ViewModels[0].Variables);
 
-            var version2Result = await service.ListDataSets(releaseVersion2.Id);
+            var version2Result = await service.ListDataSets(releaseVersion2Id);
             var version2ViewModels = version2Result.AssertRight();
 
             // Assert version 2 has two data sets with the correct content

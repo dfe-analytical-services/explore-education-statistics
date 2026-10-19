@@ -43,11 +43,11 @@ public class FootnoteRepository : IFootnoteRepository
             Subjects = subjectIds.Select(subjectId => new SubjectFootnote { SubjectId = subjectId }).ToList(),
         };
 
-        // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all foonotes for a subject.
-        // Currently this involves getting all footnotes with criteria matching the subject directly or indirectly.
-        // This would also prevent removing a subject from a release until all of its footnote links are removed.
-        // Currently a footnote could remain linked to a release and a subject (either directly or indirectly via
-        // its FilterItems/FilterGroups/Filters/Indicators) even though no ReleaseSubject exists.
+        // TODO EES-2971 We could link Footnote with the data set's ReleaseFile to simplify getting all foonotes for a
+        // subject. Currently this involves getting all footnotes with criteria matching the subject directly or
+        // indirectly. This would also prevent removing a subject from a release until all of its footnote links are
+        // removed. Currently a footnote could remain linked to a release and a subject (either directly or indirectly
+        // via its FilterItems/FilterGroups/Filters/Indicators) even though the subject's data set has been removed.
 
         await _context.Footnote.AddAsync(footnote);
         await _context.SaveChangesAsync();
@@ -190,7 +190,11 @@ public class FootnoteRepository : IFootnoteRepository
             .ToListAsync();
     }
 
-    public async Task DeleteFootnotesBySubject(Guid releaseVersionId, Guid subjectId)
+    public async Task DeleteFootnotesBySubject(
+        Guid releaseVersionId,
+        Guid subjectId,
+        IReadOnlyCollection<Guid> releaseVersionSubjectIds
+    )
     {
         var footnotes = await GetFootnotes(releaseVersionId, subjectId);
 
@@ -238,8 +242,8 @@ public class FootnoteRepository : IFootnoteRepository
                     if (
                         !await IsFootnoteLinkedToAnotherSubjectForThisRelease(
                             footnoteId: footnote.Id,
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId
+                            subjectId: subjectId,
+                            releaseVersionSubjectIds: releaseVersionSubjectIds
                         )
                     )
                     {
@@ -266,9 +270,8 @@ public class FootnoteRepository : IFootnoteRepository
     /// <remarks>
     /// <see cref="DeleteFootnotesBySubject"/> only finds Footnotes that are linked to the Subject being
     /// deleted, so it cannot see a Footnote whose only remaining link is its ReleaseFootnote, and it is not
-    /// called at all for a ReleaseVersion that has no ReleaseSubjects. Deleting the statistics ReleaseVersion
-    /// cascades those ReleaseFootnotes away, which would leave the Footnote rows behind with nothing
-    /// referencing them, so this sweeps up whatever is left before that happens.
+    /// called at all for a ReleaseVersion that has no data sets. This sweeps up whatever is left so that no
+    /// Footnote or ReleaseFootnote is left behind referencing the deleted ReleaseVersion.
     /// </remarks>
     public async Task DeleteFootnotesByReleaseVersion(Guid releaseVersionId)
     {
@@ -346,33 +349,12 @@ public class FootnoteRepository : IFootnoteRepository
         return GetBaseFootnoteQuery().SingleAsync(f => f.Id == id);
     }
 
-    public async Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, Guid? subjectId = null)
+    public async Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, Guid subjectId)
     {
-        if (subjectId.HasValue)
-        {
-            return await GetFootnotes(releaseVersionId, new List<Guid> { subjectId.Value });
-        }
-
-        var subjectsIdsForReleaseVersion = await _context
-            .ReleaseSubject.Where(rs => rs.ReleaseVersionId == releaseVersionId)
-            .Select(rs => rs.SubjectId)
-            .ToListAsync();
-
-        var footnotes = await GetFootnotes(releaseVersionId, subjectsIdsForReleaseVersion);
-
-        // Remove the below check as part of EES-2971
-        var releaseFootnotes = _context.ReleaseFootnote.Where(rf => rf.ReleaseVersionId == releaseVersionId).ToList();
-        if (footnotes.Count != releaseFootnotes.Count)
-        {
-            throw new Exception(
-                $"Number of footnotes different from number of ReleaseFootnotes for ReleaseVersion {releaseVersionId}"
-            );
-        }
-
-        return footnotes;
+        return await GetFootnotes(releaseVersionId, new List<Guid> { subjectId });
     }
 
-    private async Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, IEnumerable<Guid> subjectIds)
+    public async Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, IReadOnlyCollection<Guid> subjectIds)
     {
         return (
             await GetBaseFootnoteQuery()
@@ -432,28 +414,27 @@ public class FootnoteRepository : IFootnoteRepository
             .Include(footnote => footnote.Subjects);
     }
 
-    public async Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseVersionId)
+    public async Task<IList<Subject>> GetSubjectsWithNoFootnotes(IReadOnlyCollection<Guid> subjectIds)
     {
         return await _context
-            .ReleaseSubject.Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersionId)
-            .Where(releaseSubject =>
-                !releaseSubject.Subject.Footnotes.Any()
-                && !releaseSubject.Subject.Filters.SelectMany(filter => filter.Footnotes).Any()
-                && !releaseSubject
-                    .Subject.Filters.SelectMany(filter => filter.FilterGroups)
+            .Subject.Where(subject => subjectIds.Contains(subject.Id))
+            .Where(subject =>
+                !subject.Footnotes.Any()
+                && !subject.Filters.SelectMany(filter => filter.Footnotes).Any()
+                && !subject
+                    .Filters.SelectMany(filter => filter.FilterGroups)
                     .SelectMany(filterGroup => filterGroup.Footnotes)
                     .Any()
-                && !releaseSubject
-                    .Subject.Filters.SelectMany(filter => filter.FilterGroups)
+                && !subject
+                    .Filters.SelectMany(filter => filter.FilterGroups)
                     .SelectMany(filterGroup => filterGroup.FilterItems)
                     .SelectMany(filterItem => filterItem.Footnotes)
                     .Any()
-                && !releaseSubject
-                    .Subject.IndicatorGroups.SelectMany(indicatorGroup => indicatorGroup.Indicators)
+                && !subject
+                    .IndicatorGroups.SelectMany(indicatorGroup => indicatorGroup.Indicators)
                     .SelectMany(indicator => indicator.Footnotes)
                     .Any()
             )
-            .Select(releaseSubject => releaseSubject.Subject)
             .ToListAsync();
     }
 
@@ -478,14 +459,11 @@ public class FootnoteRepository : IFootnoteRepository
 
     private async Task<bool> IsFootnoteLinkedToAnotherSubjectForThisRelease(
         Guid footnoteId,
-        Guid releaseVersionId,
-        Guid subjectId
+        Guid subjectId,
+        IReadOnlyCollection<Guid> releaseVersionSubjectIds
     )
     {
-        var otherSubjectIds = await _context
-            .ReleaseSubject.Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId != subjectId)
-            .Select(rs => rs.SubjectId)
-            .ToListAsync();
+        var otherSubjectIds = releaseVersionSubjectIds.Where(id => id != subjectId).ToList();
 
         var footnote = await GetFootnote(footnoteId);
         return footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId))

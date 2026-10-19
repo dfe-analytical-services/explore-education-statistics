@@ -181,7 +181,7 @@ public class ReleaseDataFileService(
 
                 var footnotes = await footnoteRepository.GetFootnotes(
                     releaseVersionId: releaseFile.ReleaseVersionId,
-                    subjectId: releaseFile.File.SubjectId
+                    subjectId: releaseFile.File.SubjectId!.Value
                 );
 
                 return new DataSetAccoutrementsViewModel

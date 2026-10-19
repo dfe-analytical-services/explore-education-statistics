@@ -9,7 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -36,7 +38,6 @@ public class TableBuilderService : ITableBuilderService
     private readonly ContentDbContext _contentDbContext;
     private readonly ILocationService _locationService;
     private readonly IObservationService _observationService;
-    private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly ISubjectResultMetaService _subjectResultMetaService;
     private readonly ISubjectCsvMetaService _subjectCsvMetaService;
     private readonly ISubjectRepository _subjectRepository;
@@ -50,7 +51,6 @@ public class TableBuilderService : ITableBuilderService
         ContentDbContext contentDbContext,
         ILocationService locationService,
         IObservationService observationService,
-        IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
         ISubjectResultMetaService subjectResultMetaService,
         ISubjectCsvMetaService subjectCsvMetaService,
         ISubjectRepository subjectRepository,
@@ -64,7 +64,6 @@ public class TableBuilderService : ITableBuilderService
         _contentDbContext = contentDbContext;
         _locationService = locationService;
         _observationService = observationService;
-        _statisticsPersistenceHelper = statisticsPersistenceHelper;
         _subjectResultMetaService = subjectResultMetaService;
         _subjectCsvMetaService = subjectCsvMetaService;
         _subjectRepository = subjectRepository;
@@ -89,7 +88,7 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
+        return await CheckReleaseFileExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
             .OnSuccess(async queryObservations =>
@@ -123,7 +122,7 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
+        return await CheckReleaseFileExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
             .OnSuccess(async queryObservations =>
@@ -162,12 +161,12 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await CheckReleaseSubjectExists(query.SubjectId, releaseVersionId)
+        return await CheckReleaseFileExists(query.SubjectId, releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccessVoid(async releaseSubject =>
+            .OnSuccessVoid(async releaseFile =>
             {
                 await _subjectCsvMetaService
-                    .GetSubjectCsvMeta(releaseSubject, query, cancellationToken)
+                    .GetSubjectCsvMeta(releaseFile, query, cancellationToken)
                     .OnSuccessVoid(async meta =>
                     {
                         await using var writer = new StreamWriter(stream, leaveOpen: true);
@@ -290,11 +289,15 @@ public class TableBuilderService : ITableBuilderService
             );
     }
 
-    private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseVersionId)
+    private Task<Either<ActionResult, ReleaseFile>> CheckReleaseFileExists(Guid subjectId, Guid releaseVersionId)
     {
-        return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(query =>
-            query.Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId)
-        );
+        return _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleOrNotFoundAsync(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.SubjectId == subjectId
+                && rf.File.Type == FileType.Data
+            );
     }
 
     private async Task WriteCsvHeaderRow(CsvWriter csv, SubjectCsvMetaViewModel meta)

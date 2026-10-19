@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -123,20 +122,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -147,11 +142,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -163,19 +157,18 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filter0Items.Concat(filter1Items).Concat(filter2Items).Select(fi => fi.Id)],
                 LocationIds = [.. locations.Select(l => l.Id)],
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -252,20 +245,16 @@ public class SubjectCsvMetaServiceTests
             .ForIndex(1, o => o.SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1]))
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -276,11 +265,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -292,13 +280,12 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = new[]
                 {
                     filter0Items[0],
@@ -313,7 +300,7 @@ public class SubjectCsvMetaServiceTests
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -363,20 +350,16 @@ public class SubjectCsvMetaServiceTests
             .WithMeasures(indicators)
             .GenerateList(2);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -387,14 +370,13 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Filter.AddRangeAsync(filters);
             await statisticsDbContext.Indicator.AddRangeAsync(indicators);
             await statisticsDbContext.Observation.AddRangeAsync(observations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -406,18 +388,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             // Only indicators from the query will be included in the meta
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Indicators = indicators[1..2].Concat(indicators[4..6]).Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -448,20 +429,16 @@ public class SubjectCsvMetaServiceTests
             .WithMeasures(indicators)
             .GenerateList(2);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -472,11 +449,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -488,18 +464,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             // Indicator ids don't match any in the database
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -538,20 +513,16 @@ public class SubjectCsvMetaServiceTests
             .ForRange(2..4, o => o.SetLocation(locations[3]))
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -562,11 +533,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -578,18 +548,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 LocationIds = new List<Guid> { locations[0].Id, locations[3].Id },
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -617,16 +586,12 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups),
-        };
+        Subject subject = _fixture.DefaultSubject().WithFilters(filters).WithIndicatorGroups(indicatorGroups);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -637,12 +602,11 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Location.AddRangeAsync(locations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -654,13 +618,12 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
-            var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
+            var query = new FullTableQuery { SubjectId = subject.Id };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -702,20 +665,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList(1);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -726,14 +685,13 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Filter.AddRangeAsync(filters);
             await statisticsDbContext.Indicator.AddRangeAsync(indicators);
             await statisticsDbContext.Observation.AddRangeAsync(observations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var csv = string.Join(
@@ -770,18 +728,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filterItems.Select(fi => fi.Id)],
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -878,20 +835,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList();
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -902,14 +855,13 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.Filter.AddRangeAsync(filters);
             await statisticsDbContext.Indicator.AddRangeAsync(indicators);
             await statisticsDbContext.Observation.AddRangeAsync(observations);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var csv = string.Join(
@@ -949,18 +901,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filter0Items.Concat(filter1Items).Concat(filter2Items).Select(fi => fi.Id)],
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1014,20 +965,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList(1);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1038,11 +985,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var csv = string.Join(
@@ -1074,18 +1020,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filterItems.Select(fi => fi.Id)],
                 Indicators = [.. ListOf(indicators[1].Id, indicators[3].Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1129,20 +1074,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList(1);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1153,11 +1094,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var csv = string.Join(
@@ -1187,19 +1127,18 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             // Indicator ids don't matching any saved in the database
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filterItems.Select(fi => fi.Id)],
                 Indicators = [.. ListOf(Guid.NewGuid(), Guid.NewGuid())],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1240,20 +1179,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList(1);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1264,11 +1199,10 @@ public class SubjectCsvMetaServiceTests
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             // CSV contains headers that don't correspond to any meta
@@ -1301,18 +1235,17 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filterItems.Select(fi => fi.Id)],
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1328,252 +1261,6 @@ public class SubjectCsvMetaServiceTests
                 filters[0].Name,
                 indicators[0].Name,
                 indicators[1].Name,
-            };
-
-            Assert.Equal(expectedHeaders, viewModel.Headers);
-        }
-    }
-
-    [Fact]
-    public async Task GetSubjectCsvMeta_Headers_MultipleReleaseFilesExist()
-    {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
-
-        var filterItems = filters.SelectMany(f => f.FilterGroups).SelectMany(fg => fg.FilterItems).ToList();
-
-        var indicatorGroups = _fixture
-            .DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
-            .GenerateList();
-
-        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToArray();
-
-        var observations = _fixture
-            .DefaultObservation()
-            .ForInstance(o =>
-                o.SetMeasures(indicators)
-                    .SetFilterItems(filterItems[0], filterItems[1])
-                    .SetLocation(
-                        _fixture
-                            .DefaultLocation()
-                            .WithPresetRegionAndLocalAuthority()
-                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
-                    )
-                    .SetTimePeriod(2022, AcademicYear)
-            )
-            .GenerateList(1);
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
-
-        var releaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id };
-
-        var releaseDataFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
-
-        // Create a file for the subject and release which is not a data file
-        var releaseMetadataFile = new ReleaseFile
-        {
-            ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Metadata },
-        };
-
-        // Create a data file for the subject but for a different release
-        var releaseDataFileOtherRelease = new ReleaseFile
-        {
-            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(releaseDataFile, releaseMetadataFile, releaseDataFileOtherRelease);
-            await contentDbContext.SaveChangesAsync();
-
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-            await statisticsDbContext.Filter.AddRangeAsync(filters);
-            await statisticsDbContext.Indicator.AddRangeAsync(indicators);
-            await statisticsDbContext.Observation.AddRangeAsync(observations);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var csv = string.Join(
-                ',',
-                "time_period",
-                "time_identifier",
-                "geographic_level",
-                "country_name",
-                "country_code",
-                "la_name",
-                "new_la_code",
-                "old_la_code",
-                "region_name",
-                "region_code",
-                filters[1].Name,
-                filters[0].Name,
-                indicators[2].Name,
-                indicators[0].Name,
-                indicators[1].Name
-            );
-
-            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
-
-            releaseFileBlobService
-                .Setup(s =>
-                    s.GetDownloadStream(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseDataFile.FileId
-                            && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
-                        ),
-                        default
-                    )
-                )
-                .ReturnsAsync(csv.ToStream());
-
-            var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
-                releaseFileBlobService: releaseFileBlobService.Object
-            );
-
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Filters = [.. filterItems.Select(fi => fi.Id)],
-                Indicators = [.. indicators.Select(i => i.Id)],
-            };
-
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
-
-            VerifyAllMocks(releaseFileBlobService);
-
-            var viewModel = result.AssertRight();
-
-            // Order of headers is dictated by the order of headers in the data file CSV.
-            var expectedHeaders = new List<string>
-            {
-                "time_period",
-                "time_identifier",
-                "geographic_level",
-                "country_name",
-                "country_code",
-                "la_name",
-                "new_la_code",
-                "old_la_code",
-                "region_name",
-                "region_code",
-                filters[1].Name,
-                filters[0].Name,
-                indicators[2].Name,
-                indicators[0].Name,
-                indicators[1].Name,
-            };
-
-            Assert.Equal(expectedHeaders, viewModel.Headers);
-        }
-    }
-
-    [Fact]
-    public async Task GetSubjectCsvMeta_Headers_ReleaseFileNotFound()
-    {
-        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
-
-        var filterItems = filters.SelectMany(f => f.FilterGroups).SelectMany(fg => fg.FilterItems).ToList();
-
-        var indicatorGroups = _fixture
-            .DefaultIndicatorGroup()
-            .ForIndex(0, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(1)))
-            .ForIndex(1, ig => ig.SetIndicators(_fixture.DefaultIndicator().Generate(2)))
-            .GenerateList();
-
-        var indicators = indicatorGroups.SelectMany(ig => ig.Indicators).ToList();
-
-        var observations = _fixture
-            .DefaultObservation()
-            .ForInstance(o =>
-                o.SetMeasures(indicators)
-                    .SetFilterItems(filterItems[0], filterItems[1])
-                    .SetLocation(
-                        _fixture
-                            .DefaultLocation()
-                            .WithPresetRegionAndLocalAuthority()
-                            .WithGeographicLevel(GeographicLevel.LocalAuthority)
-                    )
-                    .SetTimePeriod(2022, AcademicYear)
-            )
-            .GenerateList(1);
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var service = BuildService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
-
-            var query = new FullTableQuery
-            {
-                SubjectId = releaseSubject.SubjectId,
-                Filters = [.. filterItems.Select(fi => fi.Id)],
-                LocationIds = [.. observations.Select(o => o.Location.Id)],
-                Indicators = [.. indicators.Select(i => i.Id)],
-            };
-
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
-
-            var viewModel = result.AssertRight();
-
-            // No release file found. Fallback to a default ordering of headers.
-            var expectedHeaders = new List<string>
-            {
-                "time_period",
-                "time_identifier",
-                "geographic_level",
-                "country_code",
-                "country_name",
-                "region_code",
-                "region_name",
-                "new_la_code",
-                "old_la_code",
-                "la_name",
-                filters[0].Name,
-                filters[1].Name,
-                indicators[0].Name,
-                indicators[1].Name,
-                indicators[2].Name,
             };
 
             Assert.Equal(expectedHeaders, viewModel.Headers);
@@ -1610,20 +1297,16 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList(1);
 
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-            Subject = _fixture
-                .DefaultSubject()
-                .WithFilters(filters)
-                .WithIndicatorGroups(indicatorGroups)
-                .WithObservations(observations),
-        };
+        Subject subject = _fixture
+            .DefaultSubject()
+            .WithFilters(filters)
+            .WithIndicatorGroups(indicatorGroups)
+            .WithObservations(observations);
 
         var releaseFile = new ReleaseFile
         {
-            ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
+            File = new File { SubjectId = subject.Id, Type = FileType.Data },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -1631,15 +1314,13 @@ public class SubjectCsvMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            // Release file is saved and can be found.
             await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
             await contentDbContext.SaveChangesAsync();
 
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -1658,19 +1339,18 @@ public class SubjectCsvMetaServiceTests
 
             var service = BuildService(
                 statisticsDbContext: statisticsDbContext,
-                contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery
             {
-                SubjectId = releaseSubject.SubjectId,
+                SubjectId = subject.Id,
                 Filters = [.. filterItems.Select(fi => fi.Id)],
                 LocationIds = [.. observations.Select(o => o.Location.Id)],
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(releaseFile, query);
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1725,14 +1405,12 @@ public class SubjectCsvMetaServiceTests
 
     private static SubjectCsvMetaService BuildService(
         StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
             statisticsDbContext: statisticsDbContext,
-            contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
             filterItemRepository: new FilterItemRepository(
                 statisticsDbContext,

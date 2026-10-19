@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -391,7 +392,7 @@ public class ReleaseVersionServicePermissionTests
             Mock.Of<IFootnoteRepository>(),
             Mock.Of<IDataBlockService>(),
             Mock.Of<IReleasePublishingStatusRepository>(),
-            Mock.Of<IReleaseSubjectRepository>(),
+            Mock.Of<SubjectDeleter>(),
             Mock.Of<IDataSetVersionService>(),
             Mock.Of<IProcessorClient>(),
             Mock.Of<IPrivateBlobCacheService>(),

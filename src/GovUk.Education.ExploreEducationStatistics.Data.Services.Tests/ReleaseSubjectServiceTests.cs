@@ -1,269 +1,231 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
 public class ReleaseSubjectServiceTests
 {
+    private readonly DataFixture _fixture = new();
+
     [Fact]
     public async Task Find_ReleaseId()
     {
-        var releaseSubject = new ReleaseSubject { Subject = new Subject(), ReleaseVersion = new ReleaseVersion() };
+        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+
+        ReleaseFile releaseFile = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(releaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data));
 
         var contextId = Guid.NewGuid().ToString();
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-            await statisticsDbContext.SaveChangesAsync();
+            contentDbContext.ReleaseFiles.Add(releaseFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, contentDbContext);
+            var service = BuildService(contentDbContext);
 
             var result = await service.Find(
-                subjectId: releaseSubject.SubjectId,
-                releaseVersionId: releaseSubject.ReleaseVersionId
+                subjectId: releaseFile.File.SubjectId!.Value,
+                releaseVersionId: releaseFile.ReleaseVersionId
             );
 
-            var actualReleaseSubject = result.AssertRight();
-            Assert.Equal(releaseSubject.ReleaseVersionId, actualReleaseSubject.ReleaseVersionId);
-            Assert.Equal(releaseSubject.SubjectId, actualReleaseSubject.SubjectId);
+            var actualReleaseFile = result.AssertRight();
+            Assert.Equal(releaseFile.ReleaseVersionId, actualReleaseFile.ReleaseVersionId);
+            Assert.Equal(releaseFile.File.SubjectId, actualReleaseFile.File.SubjectId);
         }
     }
 
     [Fact]
     public async Task Find_NoReleaseId()
     {
-        var subject = new Subject();
+        var subjectId = Guid.NewGuid();
 
-        var previousReleaseVersion = new Content.Model.ReleaseVersion
+        var previousReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(-2),
             Version = 0,
         };
 
-        var latestReleaseVersion = new Content.Model.ReleaseVersion
+        var latestReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(-1),
             Version = 1,
         };
 
-        var futureReleaseVersion = new Content.Model.ReleaseVersion
+        var futureReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(1),
             Version = 2,
         };
 
-        var releaseSubjectPreviousRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = previousReleaseVersion.Id },
-        };
+        File file = _fixture.DefaultFile(FileType.Data).WithSubjectId(subjectId);
 
-        var releaseSubjectLatestRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = latestReleaseVersion.Id },
-        };
+        ReleaseFile releaseFilePreviousRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(previousReleaseVersion)
+            .WithFile(file);
+
+        ReleaseFile releaseFileLatestRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(latestReleaseVersion)
+            .WithFile(file);
 
         // Link the Subject to the next version of the Release with a future Published date/time
         // that should not be considered Live
-        var releaseSubjectFutureRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
-        };
+        ReleaseFile releaseFileFutureRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(futureReleaseVersion)
+            .WithFile(file);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.Subject.Add(subject);
-            statisticsDbContext.ReleaseSubject.AddRange(
-                releaseSubjectLatestRelease,
-                releaseSubjectFutureRelease,
-                releaseSubjectPreviousRelease
+            contentDbContext.ReleaseFiles.AddRange(
+                releaseFileLatestRelease,
+                releaseFileFutureRelease,
+                releaseFilePreviousRelease
             );
-            await statisticsDbContext.SaveChangesAsync();
-
-            contentDbContext.ReleaseVersions.AddRange(
-                latestReleaseVersion,
-                futureReleaseVersion,
-                previousReleaseVersion
-            );
-
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, contentDbContext);
+            var service = BuildService(contentDbContext);
 
-            var result = await service.Find(subject.Id);
+            var result = await service.Find(subjectId);
 
-            var actualReleaseSubject = result.AssertRight();
-            Assert.Equal(releaseSubjectLatestRelease.ReleaseVersionId, actualReleaseSubject.ReleaseVersionId);
-            Assert.Equal(releaseSubjectLatestRelease.SubjectId, actualReleaseSubject.SubjectId);
+            var actualReleaseFile = result.AssertRight();
+            Assert.Equal(releaseFileLatestRelease.ReleaseVersionId, actualReleaseFile.ReleaseVersionId);
+            Assert.Equal(subjectId, actualReleaseFile.File.SubjectId);
         }
     }
 
     [Fact]
     public async Task FindForLatestPublishedVersion()
     {
-        var subject = new Subject();
+        var subjectId = Guid.NewGuid();
 
-        var previousReleaseVersion = new Content.Model.ReleaseVersion
+        var previousReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(-2),
             Version = 0,
         };
 
-        var latestReleaseVersion = new Content.Model.ReleaseVersion
+        var latestReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(-1),
             Version = 1,
         };
 
-        var futureReleaseVersion = new Content.Model.ReleaseVersion
+        var futureReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(1),
             Version = 2,
         };
 
-        var releaseSubjectPreviousRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = previousReleaseVersion.Id },
-        };
+        File file = _fixture.DefaultFile(FileType.Data).WithSubjectId(subjectId);
 
-        var releaseSubjectLatestRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = latestReleaseVersion.Id },
-        };
+        ReleaseFile releaseFilePreviousRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(previousReleaseVersion)
+            .WithFile(file);
+
+        ReleaseFile releaseFileLatestRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(latestReleaseVersion)
+            .WithFile(file);
 
         // Link the Subject to the next version of the Release with a future Published date/time
         // that should not be considered Live
-        var releaseSubjectFutureRelease = new ReleaseSubject
-        {
-            Subject = subject,
-            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
-        };
+        ReleaseFile releaseFileFutureRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(futureReleaseVersion)
+            .WithFile(file);
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.Subject.Add(subject);
-            statisticsDbContext.ReleaseSubject.AddRange(
-                releaseSubjectLatestRelease,
-                releaseSubjectFutureRelease,
-                releaseSubjectPreviousRelease
+            contentDbContext.ReleaseFiles.AddRange(
+                releaseFileLatestRelease,
+                releaseFileFutureRelease,
+                releaseFilePreviousRelease
             );
-            await statisticsDbContext.SaveChangesAsync();
-
-            contentDbContext.ReleaseVersions.AddRange(
-                latestReleaseVersion,
-                futureReleaseVersion,
-                previousReleaseVersion
-            );
-
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, contentDbContext);
+            var service = BuildService(contentDbContext);
 
-            var result = await service.FindForLatestPublishedVersion(subject.Id);
+            var result = await service.FindForLatestPublishedVersion(subjectId);
 
             Assert.NotNull(result);
-            Assert.Equal(releaseSubjectLatestRelease.ReleaseVersionId, result!.ReleaseVersionId);
-            Assert.Equal(releaseSubjectLatestRelease.SubjectId, result.SubjectId);
+            Assert.Equal(releaseFileLatestRelease.ReleaseVersionId, result!.ReleaseVersionId);
+            Assert.Equal(subjectId, result.File.SubjectId);
         }
     }
 
     [Fact]
     public async Task FindForLatestPublishedVersion_NoReleases()
     {
-        var subject = new Subject();
+        await using var contentDbContext = InMemoryContentDbContext();
 
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            await statisticsDbContext.Subject.AddAsync(subject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        {
-            var service = BuildService(statisticsDbContext, contentDbContext);
-            Assert.Null(await service.FindForLatestPublishedVersion(subject.Id));
-        }
+        var service = BuildService(contentDbContext);
+        Assert.Null(await service.FindForLatestPublishedVersion(Guid.NewGuid()));
     }
 
     [Fact]
     public async Task FindForLatestPublishedVersion_NoPublishedReleases()
     {
-        var futureReleaseVersion = new Content.Model.ReleaseVersion
+        var futureReleaseVersion = new ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTimeOffset.UtcNow.AddDays(1),
         };
 
         // Link the Subject to a Release with a future Published date/time that should not be considered Live
-        var releaseSubjectFutureRelease = new ReleaseSubject
-        {
-            Subject = new Subject(),
-            ReleaseVersion = new ReleaseVersion { Id = futureReleaseVersion.Id },
-        };
+        ReleaseFile releaseFileFutureRelease = _fixture
+            .DefaultReleaseFile()
+            .WithReleaseVersion(futureReleaseVersion)
+            .WithFile(_fixture.DefaultFile(FileType.Data));
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            statisticsDbContext.ReleaseSubject.Add(releaseSubjectFutureRelease);
-            await statisticsDbContext.SaveChangesAsync();
-
-            contentDbContext.ReleaseVersions.AddRange(futureReleaseVersion);
+            contentDbContext.ReleaseFiles.Add(releaseFileFutureRelease);
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, contentDbContext);
-            Assert.Null(await service.FindForLatestPublishedVersion(releaseSubjectFutureRelease.SubjectId));
+            var service = BuildService(contentDbContext);
+            Assert.Null(await service.FindForLatestPublishedVersion(releaseFileFutureRelease.File.SubjectId!.Value));
         }
     }
 
-    private static ReleaseSubjectService BuildService(
-        StatisticsDbContext statisticsDbContext,
-        ContentDbContext contentDbContext
-    )
+    private static ReleaseSubjectService BuildService(ContentDbContext contentDbContext)
     {
-        return new ReleaseSubjectService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
+        return new ReleaseSubjectService(contentDbContext: contentDbContext);
     }
 }

@@ -479,7 +479,7 @@ public class DataSetFileServiceTests
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             footnoteRepository
-                .Setup(s => s.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+                .Setup(s => s.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId!.Value))
                 .ReturnsAsync(footnotes);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -611,7 +611,7 @@ public class DataSetFileServiceTests
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
             footnoteRepository
-                .Setup(s => s.GetFootnotes(latestVersion.Id, latestReleaseFile.File.SubjectId))
+                .Setup(s => s.GetFootnotes(latestVersion.Id, latestReleaseFile.File.SubjectId!.Value))
                 .ReturnsAsync([]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

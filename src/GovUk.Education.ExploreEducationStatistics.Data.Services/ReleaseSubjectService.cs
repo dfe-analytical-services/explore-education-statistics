@@ -1,9 +1,8 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,37 +11,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
 public class ReleaseSubjectService : IReleaseSubjectService
 {
-    private readonly StatisticsDbContext _statisticsDbContext;
     private readonly ContentDbContext _contentDbContext;
 
-    public ReleaseSubjectService(StatisticsDbContext statisticsDbContext, ContentDbContext contentDbContext)
+    public ReleaseSubjectService(ContentDbContext contentDbContext)
     {
-        _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId, Guid? releaseVersionId = null)
+    public async Task<Either<ActionResult, ReleaseFile>> Find(Guid subjectId, Guid? releaseVersionId = null)
     {
         return await (
             releaseVersionId.HasValue
-                ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(rs =>
-                    rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId
-                )
+                ? _contentDbContext
+                    .ReleaseFiles.Include(rf => rf.File)
+                    .FirstOrDefaultAsync(rf =>
+                        rf.ReleaseVersionId == releaseVersionId
+                        && rf.File.SubjectId == subjectId
+                        && rf.File.Type == FileType.Data
+                    )
                 : FindForLatestPublishedVersion(subjectId)
         ).OrNotFound();
     }
 
-    public async Task<ReleaseSubject?> FindForLatestPublishedVersion(Guid subjectId)
+    public async Task<ReleaseFile?> FindForLatestPublishedVersion(Guid subjectId)
     {
         // Find all versions of a Release that this Subject is linked to.
-        var releaseSubjects = await _statisticsDbContext
-            .ReleaseSubject.AsNoTracking()
-            .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
+        var releaseFiles = await _contentDbContext
+            .ReleaseFiles.AsNoTracking()
+            .Include(rf => rf.File)
+            .Where(rf => rf.File.SubjectId == subjectId && rf.File.Type == FileType.Data)
             .ToListAsync();
 
-        var releaseVersionIdsLinkedToSubject = releaseSubjects
-            .Select(releaseSubject => releaseSubject.ReleaseVersionId)
-            .ToList();
+        var releaseVersionIdsLinkedToSubject = releaseFiles.Select(rf => rf.ReleaseVersionId).ToList();
 
         // Find all versions of the Release that this Subject is linked to that are currently live
         // or in the past have been live before being amended. Order them by Version to get the latest
@@ -60,9 +60,7 @@ public class ReleaseSubjectService : IReleaseSubjectService
         }
 
         // Finally, now that we have identified the latest Release version linked to this Subject, return the
-        // appropriate ReleaseSubject record.
-        return releaseSubjects.SingleOrDefault(releaseSubject =>
-            releaseSubject.ReleaseVersionId == latestLiveReleaseVersionLinkedToSubject.Id
-        );
+        // appropriate ReleaseFile record.
+        return releaseFiles.SingleOrDefault(rf => rf.ReleaseVersionId == latestLiveReleaseVersionLinkedToSubject.Id);
     }
 }

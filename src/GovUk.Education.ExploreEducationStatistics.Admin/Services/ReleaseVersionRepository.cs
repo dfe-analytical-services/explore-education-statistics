@@ -47,26 +47,13 @@ public class ReleaseVersionRepository(
             .ToListAsync();
     }
 
-    public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId)
+    public async Task<Guid> CreateStatisticsDbSubject()
     {
-        var existingStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.FirstOrDefaultAsync(rv =>
-            rv.Id == releaseVersionId
-        );
+        var subject = new Subject();
 
-        if (existingStatsReleaseVersion == null)
-        {
-            var releaseVersion = await contentDbContext.ReleaseVersions.FirstAsync(rv => rv.Id == releaseVersionId);
-
-            statisticsDbContext.ReleaseVersion.Add(
-                new Data.Model.ReleaseVersion { Id = releaseVersionId, PublicationId = releaseVersion.PublicationId }
-            );
-        }
-
-        var releaseSubject = new ReleaseSubject { ReleaseVersionId = releaseVersionId, Subject = new Subject() };
-
-        statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+        statisticsDbContext.Subject.Add(subject);
         await statisticsDbContext.SaveChangesAsync();
 
-        return releaseSubject.SubjectId;
+        return subject.Id;
     }
 }

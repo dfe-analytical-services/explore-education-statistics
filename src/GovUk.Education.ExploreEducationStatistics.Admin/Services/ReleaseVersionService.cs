@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Queries;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -53,7 +54,7 @@ public class ReleaseVersionService(
     IFootnoteRepository footnoteRepository,
     IDataBlockService dataBlockService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
-    IReleaseSubjectRepository releaseSubjectRepository,
+    SubjectDeleter subjectDeleter,
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
@@ -148,10 +149,11 @@ public class ReleaseVersionService(
                 // prior to hard-deleting them, as a number of Services / Repositories that
                 // will be called during the hard delete are not configured to look for
                 // soft-deleted data.
+                var subjectIds = await GetSubjectIds(releaseVersion.Id, cancellationToken);
+
                 var subjects = await statisticsDbContext
-                    .ReleaseSubject.IgnoreQueryFilters()
-                    .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersion.Id)
-                    .Select(releaseSubject => releaseSubject.Subject)
+                    .Subject.IgnoreQueryFilters()
+                    .Where(subject => subjectIds.Contains(subject.Id))
                     .ToListAsync(cancellationToken);
 
                 releaseVersion.SoftDeleted = false;
@@ -180,6 +182,13 @@ public class ReleaseVersionService(
         CancellationToken cancellationToken = default
     )
     {
+        var subjectIds = await GetSubjectIds(releaseVersion.Id, cancellationToken);
+        var orphanedSubjectIds = await GetSubjectIdsOrphanedByDeletion(
+            releaseVersion.Id,
+            subjectIds,
+            cancellationToken
+        );
+
         return await processorClient
             .BulkDeleteDataSetVersions(
                 releaseVersionId: releaseVersion.Id,
@@ -201,7 +210,7 @@ public class ReleaseVersionService(
                 releaseFileService.DeleteAll(releaseVersionId: releaseVersion.Id, forceDelete: forceDeleteRelatedData)
             )
             .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(releaseVersion.Id, cancellationToken))
-            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
+            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, orphanedSubjectIds, cancellationToken))
             .OnSuccessDo(async _ =>
             {
                 // Methodologies scheduled with this ReleaseVersion have to be unscheduled before it is
@@ -237,30 +246,23 @@ public class ReleaseVersionService(
                     releaseVersionIds: [releaseVersion.Id]
                 );
 
-                // TODO: This may be redundant (investigate as part of EES-1295)
-                await releaseSubjectRepository.DeleteAllReleaseSubjects(
-                    releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedSubjects: !forceDeleteRelatedData
-                );
+                foreach (var subjectId in subjectIds)
+                {
+                    await DeleteSubject(
+                        releaseVersionId: releaseVersion.Id,
+                        subjectId: subjectId,
+                        releaseVersionSubjectIds: subjectIds,
+                        orphaned: orphanedSubjectIds.Contains(subjectId),
+                        softDeleteOrphanedSubject: !forceDeleteRelatedData
+                    );
+                }
 
                 if (forceDeleteRelatedData)
                 {
-                    // DeleteAllReleaseSubjects only deletes Footnotes that are reachable from a Subject of
-                    // this ReleaseVersion, so any Footnote left linked to it solely by its ReleaseFootnote
-                    // has to be removed before deleting the statistics ReleaseVersion cascades that link
-                    // away and strands the Footnote row.
+                    // Deleting the Subjects only deletes Footnotes that are reachable from a Subject of this
+                    // ReleaseVersion, so any Footnote left linked to it solely by its ReleaseFootnote has to be
+                    // removed as well.
                     await footnoteRepository.DeleteFootnotesByReleaseVersion(releaseVersion.Id);
-
-                    var statsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
-                        statsReleaseVersion => statsReleaseVersion.Id == releaseVersion.Id,
-                        cancellationToken
-                    );
-
-                    if (statsReleaseVersion != null)
-                    {
-                        statisticsDbContext.ReleaseVersion.Remove(statsReleaseVersion);
-                        await statisticsDbContext.SaveChangesAsync(cancellationToken);
-                    }
                 }
             });
     }
@@ -282,10 +284,12 @@ public class ReleaseVersionService(
     /// to a Permalink of theirs.
     /// </para>
     /// </remarks>
-    private async Task DeletePermalinks(Guid releaseVersionId, CancellationToken cancellationToken)
+    private async Task DeletePermalinks(
+        Guid releaseVersionId,
+        IReadOnlyCollection<Guid> orphanedSubjectIds,
+        CancellationToken cancellationToken
+    )
     {
-        var orphanedSubjectIds = await GetSubjectIdsOrphanedByDeletion(releaseVersionId, cancellationToken);
-
         var permalinks = await context
             .Permalinks.Where(permalink =>
                 permalink.ReleaseVersionId == releaseVersionId || orphanedSubjectIds.Contains(permalink.SubjectId)
@@ -318,40 +322,89 @@ public class ReleaseVersionService(
     }
 
     /// <summary>
+    /// Gets the ids of the Subjects of a ReleaseVersion's data sets.
+    /// </summary>
+    /// <remarks>
+    /// Must be called before the data sets' ReleaseFiles are deleted, as they are what a Subject is reachable by.
+    /// </remarks>
+    private async Task<List<Guid>> GetSubjectIds(Guid releaseVersionId, CancellationToken cancellationToken = default)
+    {
+        // ReleaseFiles of a soft-deleted ReleaseVersion are filtered out by default, so ignore query filters to
+        // see them all.
+        return await context
+            .ReleaseFiles.AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == releaseVersionId && releaseFile.File.Type == FileType.Data
+            )
+            .Select(releaseFile => releaseFile.File.SubjectId!.Value)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
     /// Gets the ids of the Subjects that belong to this ReleaseVersion and to no other, and which deleting
     /// it therefore leaves orphaned.
     /// </summary>
-    /// <remarks>
-    /// Must be called before the ReleaseSubjects are deleted, as they are what a Subject is reachable by.
-    /// </remarks>
     private async Task<List<Guid>> GetSubjectIdsOrphanedByDeletion(
         Guid releaseVersionId,
-        CancellationToken cancellationToken
+        IReadOnlyCollection<Guid> subjectIds,
+        CancellationToken cancellationToken = default
     )
     {
-        // The Subjects of a cancelled amendment are soft-deleted, so ignore query filters to see them all.
-        var subjectIds = await statisticsDbContext
-            .ReleaseSubject.AsNoTracking()
-            .IgnoreQueryFilters()
-            .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersionId)
-            .Select(releaseSubject => releaseSubject.SubjectId)
-            .ToListAsync(cancellationToken);
-
         if (subjectIds.Count == 0)
         {
             return [];
         }
 
-        var subjectIdsSharedWithOtherReleaseVersions = await statisticsDbContext
-            .ReleaseSubject.AsNoTracking()
+        var subjectIdsSharedWithOtherReleaseVersions = await context
+            .ReleaseFiles.AsNoTracking()
             .IgnoreQueryFilters()
-            .Where(releaseSubject =>
-                subjectIds.Contains(releaseSubject.SubjectId) && releaseSubject.ReleaseVersionId != releaseVersionId
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId != releaseVersionId
+                && releaseFile.File.Type == FileType.Data
+                && releaseFile.File.SubjectId.HasValue
+                && subjectIds.Contains(releaseFile.File.SubjectId.Value)
             )
-            .Select(releaseSubject => releaseSubject.SubjectId)
+            .Select(releaseFile => releaseFile.File.SubjectId!.Value)
             .ToListAsync(cancellationToken);
 
         return subjectIds.Except(subjectIdsSharedWithOtherReleaseVersions).ToList();
+    }
+
+    private async Task DeleteSubject(
+        Guid releaseVersionId,
+        Guid subjectId,
+        IReadOnlyCollection<Guid> releaseVersionSubjectIds,
+        bool orphaned,
+        bool softDeleteOrphanedSubject
+    )
+    {
+        await footnoteRepository.DeleteFootnotesBySubject(
+            releaseVersionId: releaseVersionId,
+            subjectId: subjectId,
+            releaseVersionSubjectIds: releaseVersionSubjectIds
+        );
+
+        if (!orphaned)
+        {
+            return;
+        }
+
+        if (softDeleteOrphanedSubject)
+        {
+            var subject = await statisticsDbContext.Subject.FirstOrDefaultAsync(s => s.Id == subjectId);
+            if (subject != null)
+            {
+                statisticsDbContext.Subject.Update(subject);
+                subject.SoftDeleted = true;
+            }
+        }
+        else
+        {
+            subjectDeleter.Delete(subjectId, statisticsDbContext);
+        }
+
+        await statisticsDbContext.SaveChangesAsync();
     }
 
     private async Task HardDeleteReleaseVersion(ReleaseVersion releaseVersion, CancellationToken cancellationToken)
@@ -806,7 +859,7 @@ public class ReleaseVersionService(
             {
                 var footnotes = await footnoteRepository.GetFootnotes(
                     releaseVersionId: releaseVersionId,
-                    subjectId: tuple.releaseFile.File.SubjectId
+                    subjectId: tuple.subject.Id
                 );
 
                 var linkedApiDataSetVersionDeletionPlan = tuple.apiDataSetVersion is null
@@ -905,9 +958,18 @@ public class ReleaseVersionService(
             .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlockVersions(deletePlan.DeleteDataBlockPlan))
             .OnSuccessDo(async deletePlan =>
             {
-                await releaseSubjectRepository.DeleteReleaseSubject(
+                var releaseVersionSubjectIds = await GetSubjectIds(releaseVersionId);
+                var orphanedSubjectIds = await GetSubjectIdsOrphanedByDeletion(
+                    releaseVersionId,
+                    [deletePlan.SubjectId]
+                );
+
+                await DeleteSubject(
                     releaseVersionId: releaseVersionId,
-                    subjectId: deletePlan.SubjectId
+                    subjectId: deletePlan.SubjectId,
+                    releaseVersionSubjectIds: releaseVersionSubjectIds,
+                    orphaned: orphanedSubjectIds.Contains(deletePlan.SubjectId),
+                    softDeleteOrphanedSubject: true
                 );
                 await privateCacheService.DeleteItemAsync(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)

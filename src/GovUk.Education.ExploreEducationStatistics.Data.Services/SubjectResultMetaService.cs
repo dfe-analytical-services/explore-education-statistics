@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -27,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 public class SubjectResultMetaService : ISubjectResultMetaService
 {
     private readonly ContentDbContext _contentDbContext;
-    private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
     private readonly IBoundaryLevelRepository _boundaryLevelRepository;
     private readonly IFilterItemRepository _filterItemRepository;
     private readonly IFootnoteRepository _footnoteRepository;
@@ -36,13 +36,11 @@ public class SubjectResultMetaService : ISubjectResultMetaService
     private readonly ITimePeriodService _timePeriodService;
     private readonly IUserService _userService;
     private readonly ISubjectRepository _subjectRepository;
-    private readonly IReleaseDataFileRepository _releaseDataFileRepository;
     private readonly LocationsOptions _locationOptions;
     private readonly ILogger _logger;
 
     public SubjectResultMetaService(
         ContentDbContext contentDbContext,
-        IPersistenceHelper<StatisticsDbContext> persistenceHelper,
         IBoundaryLevelRepository boundaryLevelRepository,
         IFilterItemRepository filterItemRepository,
         IFootnoteRepository footnoteRepository,
@@ -51,13 +49,11 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         ITimePeriodService timePeriodService,
         IUserService userService,
         ISubjectRepository subjectRepository,
-        IReleaseDataFileRepository releaseDataFileRepository,
         IOptions<LocationsOptions> locationOptions,
         ILogger<SubjectResultMetaService> logger
     )
     {
         _contentDbContext = contentDbContext;
-        _persistenceHelper = persistenceHelper;
         _boundaryLevelRepository = boundaryLevelRepository;
         _filterItemRepository = filterItemRepository;
         _footnoteRepository = footnoteRepository;
@@ -66,7 +62,6 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         _timePeriodService = timePeriodService;
         _userService = userService;
         _subjectRepository = subjectRepository;
-        _releaseDataFileRepository = releaseDataFileRepository;
         _locationOptions = locationOptions.Value;
         _logger = logger;
     }
@@ -78,9 +73,9 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         bool isCroppedTable
     )
     {
-        return await CheckReleaseSubjectExists(releaseVersionId: releaseVersionId, subjectId: query.SubjectId)
+        return await CheckReleaseFileExists(releaseVersionId: releaseVersionId, subjectId: query.SubjectId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
-            .OnSuccess(async releaseSubject =>
+            .OnSuccess(async releaseFile =>
             {
                 var stopwatch = Stopwatch.StartNew();
                 stopwatch.Start();
@@ -89,11 +84,6 @@ public class SubjectResultMetaService : ISubjectResultMetaService
 
                 _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
-
-                var releaseFile = await _releaseDataFileRepository.GetBySubject(
-                    releaseVersionId: releaseVersionId,
-                    subjectId: releaseSubject.SubjectId
-                );
 
                 var filterItems = await _filterItemRepository.GetFilterItemsFromObservations(observations);
                 var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
@@ -120,7 +110,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                 _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                var publicationId = await _subjectRepository.FindPublicationIdForSubject(releaseSubject.SubjectId);
+                var publicationId = await _subjectRepository.FindPublicationIdForSubject(query.SubjectId);
                 var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                 var locationViewModels = await _locationService.GetLocationViewModels(
@@ -150,13 +140,15 @@ public class SubjectResultMetaService : ISubjectResultMetaService
             });
     }
 
-    private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseVersionId, Guid subjectId)
+    private Task<Either<ActionResult, ReleaseFile>> CheckReleaseFileExists(Guid releaseVersionId, Guid subjectId)
     {
-        return _persistenceHelper.CheckEntityExists<ReleaseSubject>(query =>
-            query
-                .Include(rs => rs.Subject)
-                .Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId)
-        );
+        return _contentDbContext
+            .ReleaseFiles.Include(rf => rf.File)
+            .SingleOrNotFoundAsync(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.SubjectId == subjectId
+                && rf.File.Type == FileType.Data
+            );
     }
 
     private List<BoundaryLevelViewModel> GetBoundaryLevelViewModels(List<GeographicLevel> geographicLevels)

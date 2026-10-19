@@ -9,5 +9,5 @@ public interface IReleaseVersionRepository
 
     Task<List<ReleaseVersion>> ListReleasesForUser(Guid userId, params ReleaseApprovalStatus[] releaseApprovalStatuses);
 
-    Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId);
+    Task<Guid> CreateStatisticsDbSubject();
 }

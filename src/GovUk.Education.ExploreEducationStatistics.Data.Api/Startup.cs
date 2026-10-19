@@ -181,7 +181,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
-        services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
         services.AddTransient<ISubjectRepository, SubjectRepository>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
         services.AddTransient<ITimePeriodService, TimePeriodService>();

@@ -23,29 +23,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class FootnoteService : IFootnoteService
 {
     private readonly StatisticsDbContext _context;
+    private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly IUserService _userService;
     private readonly IDataBlockService _dataBlockService;
     private readonly IFootnoteRepository _footnoteRepository;
-    private readonly IReleaseSubjectRepository _releaseSubjectRepository;
 
     public FootnoteService(
         StatisticsDbContext context,
+        ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IUserService userService,
         IDataBlockService dataBlockService,
         IFootnoteRepository footnoteRepository,
-        IReleaseSubjectRepository releaseSubjectRepository,
         IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper
     )
     {
         _context = context;
+        _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _userService = userService;
         _dataBlockService = dataBlockService;
         _footnoteRepository = footnoteRepository;
-        _releaseSubjectRepository = releaseSubjectRepository;
         _statisticsPersistenceHelper = statisticsPersistenceHelper;
     }
 
@@ -235,7 +235,9 @@ public class FootnoteService : IFootnoteService
         return await _contentPersistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
-            .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseVersionId));
+            .OnSuccess(async _ =>
+                await _footnoteRepository.GetFootnotes(releaseVersionId, await ListReleaseSubjectIds(releaseVersionId))
+            );
     }
 
     private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId, IReadOnlyCollection<Guid> subjectIds)
@@ -344,7 +346,16 @@ public class FootnoteService : IFootnoteService
         IReadOnlySet<Guid> indicatorIds
     )
     {
-        var releaseSubjects = await _releaseSubjectRepository.FindAll(releaseVersionId, HydrateReleaseSubjects);
+        var releaseSubjectIds = await ListReleaseSubjectIds(releaseVersionId);
+
+        var releaseSubjects = await _context
+            .Subject.Include(s => s.IndicatorGroups)
+                .ThenInclude(ig => ig.Indicators)
+            .Include(s => s.Filters)
+                .ThenInclude(f => f.FilterGroups)
+                    .ThenInclude(fg => fg.FilterItems)
+            .Where(s => releaseSubjectIds.Contains(s.Id))
+            .ToListAsync();
 
         if (
             !AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects)
@@ -360,21 +371,17 @@ public class FootnoteService : IFootnoteService
         return Unit.Instance;
     }
 
-    private IQueryable<ReleaseSubject> HydrateReleaseSubjects(IQueryable<ReleaseSubject> queryable)
+    private async Task<List<Guid>> ListReleaseSubjectIds(Guid releaseVersionId)
     {
-        return queryable
-            .Include(rs => rs.Subject)
-                .ThenInclude(s => s.IndicatorGroups)
-                    .ThenInclude(ig => ig.Indicators)
-            .Include(rs => rs.Subject)
-                .ThenInclude(s => s.Filters)
-                    .ThenInclude(f => f.FilterGroups)
-                        .ThenInclude(fg => fg.FilterItems);
+        return await _contentDbContext
+            .ReleaseFiles.Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data)
+            .Select(rf => rf.File.SubjectId!.Value)
+            .ToListAsync();
     }
 
     private static bool AllSpecifiedSubjectsAreLinkedToRelease(
         IReadOnlySet<Guid> subjectIds,
-        IReadOnlyList<ReleaseSubject> releaseSubjects
+        IReadOnlyList<Subject> releaseSubjects
     )
     {
         if (!subjectIds.Any())
@@ -382,14 +389,14 @@ public class FootnoteService : IFootnoteService
             return true;
         }
 
-        IReadOnlyList<Guid> releaseSubjectIds = releaseSubjects.Select(rs => rs.SubjectId).ToList();
+        IReadOnlyList<Guid> releaseSubjectIds = releaseSubjects.Select(s => s.Id).ToList();
 
         return releaseSubjectIds.ContainsAll(subjectIds);
     }
 
     private static bool AllSpecifiedFiltersAreLinkedToRelease(
         IReadOnlySet<Guid> filterIds,
-        IReadOnlyList<ReleaseSubject> releaseSubjects
+        IReadOnlyList<Subject> releaseSubjects
     )
     {
         if (!filterIds.Any())
@@ -397,17 +404,14 @@ public class FootnoteService : IFootnoteService
             return true;
         }
 
-        IReadOnlyList<Guid> releaseFilterIds = releaseSubjects
-            .SelectMany(rs => rs.Subject.Filters)
-            .Select(f => f.Id)
-            .ToList();
+        IReadOnlyList<Guid> releaseFilterIds = releaseSubjects.SelectMany(s => s.Filters).Select(f => f.Id).ToList();
 
         return releaseFilterIds.ContainsAll(filterIds);
     }
 
     private static bool AllSpecifiedFilterGroupsAreLinkedToRelease(
         IReadOnlySet<Guid> filterGroupIds,
-        IReadOnlyList<ReleaseSubject> releaseSubjects
+        IReadOnlyList<Subject> releaseSubjects
     )
     {
         if (!filterGroupIds.Any())
@@ -416,7 +420,7 @@ public class FootnoteService : IFootnoteService
         }
 
         IReadOnlyList<Guid> releaseFilterGroupIds = releaseSubjects
-            .SelectMany(rs => rs.Subject.Filters)
+            .SelectMany(s => s.Filters)
             .SelectMany(f => f.FilterGroups)
             .Select(fg => fg.Id)
             .ToList();
@@ -426,7 +430,7 @@ public class FootnoteService : IFootnoteService
 
     private static bool AllSpecifiedFilterItemsAreLinkedToRelease(
         IReadOnlySet<Guid> filterItemIds,
-        IReadOnlyList<ReleaseSubject> releaseSubjects
+        IReadOnlyList<Subject> releaseSubjects
     )
     {
         if (!filterItemIds.Any())
@@ -435,7 +439,7 @@ public class FootnoteService : IFootnoteService
         }
 
         IReadOnlyList<Guid> releaseFilterItemIds = releaseSubjects
-            .SelectMany(rs => rs.Subject.Filters)
+            .SelectMany(s => s.Filters)
             .SelectMany(f => f.FilterGroups)
             .SelectMany(fg => fg.FilterItems)
             .Select(fi => fi.Id)
@@ -446,7 +450,7 @@ public class FootnoteService : IFootnoteService
 
     private static bool AllSpecifiedIndicatorsAreLinkedToRelease(
         IReadOnlySet<Guid> indicatorIds,
-        IReadOnlyList<ReleaseSubject> releaseSubjects
+        IReadOnlyList<Subject> releaseSubjects
     )
     {
         if (!indicatorIds.Any())
@@ -455,7 +459,7 @@ public class FootnoteService : IFootnoteService
         }
 
         IReadOnlyList<Guid> releaseIndicatorIds = releaseSubjects
-            .SelectMany(rs => rs.Subject.IndicatorGroups)
+            .SelectMany(s => s.IndicatorGroups)
             .SelectMany(ig => ig.Indicators)
             .Select(i => i.Id)
             .ToList();

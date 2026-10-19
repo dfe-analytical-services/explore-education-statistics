@@ -266,105 +266,54 @@ public class ReleaseVersionRepositoryTests
         }
     }
 
-    public class CreateStatisticsDbReleaseVersionAndSubjectHierarchy : ReleaseVersionRepositoryTests
+    public class CreateStatisticsDbSubjectTests : ReleaseVersionRepositoryTests
     {
         [Fact]
-        public async Task StatsReleaseDoesNotExist_CreatesStatsReleaseAndReleaseSubject()
+        public async Task CreatesSubject()
         {
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            Guid? createdSubjectId;
+            Guid createdSubjectId;
             var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var repository = BuildRepository(contentDbContext, statisticsDbContext);
-                createdSubjectId = await repository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
+                var repository = BuildRepository(statisticsDbContext: statisticsDbContext);
+                createdSubjectId = await repository.CreateStatisticsDbSubject();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var statsReleaseVersion = Assert.Single(statisticsDbContext.ReleaseVersion);
+                var subject = Assert.Single(statisticsDbContext.Subject);
 
-                Assert.Equal(releaseVersion.Id, statsReleaseVersion.Id);
-                Assert.Equal(releaseVersion.PublicationId, statsReleaseVersion.PublicationId);
-
-                var releaseSubject = Assert.Single(statisticsDbContext.ReleaseSubject);
-
-                Assert.Equal(releaseVersion.Id, releaseSubject.ReleaseVersionId);
-                Assert.Equal(createdSubjectId, releaseSubject.SubjectId);
+                Assert.Equal(createdSubjectId, subject.Id);
+                Assert.False(subject.SoftDeleted);
             }
         }
 
         [Fact]
-        public async Task StatsReleaseExists_CreatesReleaseSubject()
+        public async Task SubjectExists_CreatesNewSubject()
         {
-            ReleaseVersion releaseVersion = _fixture
-                .DefaultReleaseVersion()
-                .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-            Data.Model.ReleaseVersion existingStatsReleaseVersion = _fixture
-                .DefaultStatsReleaseVersion()
-                .WithId(releaseVersion.Id)
-                .WithPublicationId(releaseVersion.PublicationId);
-
-            ReleaseSubject existingReleaseSubject = _fixture
-                .DefaultReleaseSubject()
-                .WithReleaseVersion(existingStatsReleaseVersion)
-                .WithSubject(_fixture.DefaultSubject());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            Subject existingSubject = _fixture.DefaultSubject();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                statisticsDbContext.ReleaseVersion.Add(existingStatsReleaseVersion);
-                statisticsDbContext.ReleaseSubject.Add(existingReleaseSubject);
+                statisticsDbContext.Subject.Add(existingSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            Guid? createdSubjectId;
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            Guid createdSubjectId;
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var repository = BuildRepository(contentDbContext, statisticsDbContext);
-                createdSubjectId = await repository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
+                var repository = BuildRepository(statisticsDbContext: statisticsDbContext);
+                createdSubjectId = await repository.CreateStatisticsDbSubject();
             }
 
+            Assert.NotEqual(existingSubject.Id, createdSubjectId);
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var statsReleaseVersion = Assert.Single(statisticsDbContext.ReleaseVersion);
-
-                Assert.Equal(releaseVersion.Id, statsReleaseVersion.Id);
-                Assert.Equal(releaseVersion.PublicationId, statsReleaseVersion.PublicationId);
-
-                Assert.Equal(2, await statisticsDbContext.ReleaseSubject.CountAsync());
-
-                Assert.True(
-                    await statisticsDbContext.ReleaseSubject.AnyAsync(rs =>
-                        rs.ReleaseVersionId == releaseVersion.Id && rs.SubjectId == existingReleaseSubject.SubjectId
-                    )
-                );
-
-                Assert.True(
-                    await statisticsDbContext.ReleaseSubject.AnyAsync(rs =>
-                        rs.ReleaseVersionId == releaseVersion.Id && rs.SubjectId == createdSubjectId
-                    )
-                );
+                Assert.Equal(2, await statisticsDbContext.Subject.CountAsync());
+                Assert.True(await statisticsDbContext.Subject.AnyAsync(s => s.Id == existingSubject.Id));
+                Assert.True(await statisticsDbContext.Subject.AnyAsync(s => s.Id == createdSubjectId));
             }
         }
     }

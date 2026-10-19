@@ -216,9 +216,7 @@ public class DataSetFileStorage(
 
         foreach (var dataSetUpload in dataSetUploads)
         {
-            var subjectId = await releaseVersionRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                releaseVersionId
-            );
+            var subjectId = await releaseVersionRepository.CreateStatisticsDbSubject();
 
             var replacingFile = dataSetUpload.ReplacingFileId is null
                 ? null
