@@ -5,3 +5,7 @@ param environmentConfigParam = {
   environmentName: 'Production'
   domain: 'explore-education-statistics.service.gov.uk'
 }
+
+param publisherConfigParam = {
+  frontDoorCachePurgeEnabled: true
+}

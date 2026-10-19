@@ -55,16 +55,10 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 deploymentName: $(bicepConfigDeployName)
 
-            - template: ../../../../common/ci/tasks/set-appsettings-from-json.yml
-              parameters:
-                serviceConnection: ${{ parameters.serviceConnection }}
-                displayName: Public Site - updating app settings
-                appName: $(subscription)-as-ees-public-site
-                resourceGroupName: $(resourceGroupName)
-                appSettingsJson: $(appSettings)
-
-            # Applying the new appsettings above and then updating the container image here means
-            # the restart below picks up both together, rather than risking two restarts in a row.
+            # The container image is updated BEFORE the appsettings below, so that by the time the
+            # app restarts with this deploy's "deployedAt" marker, it is already configured to run the
+            # new image. Were the appsettings applied first, the app could restart and report the new
+            # marker while still running the old image, letting the health check below pass early.
             - task: AzureCLI@2
               displayName: Public Site - Update container image
               inputs:
@@ -76,20 +70,15 @@ jobs:
                   az webapp config container set \
                     --name $(subscription)-as-ees-public-site \
                     --resource-group $(resourceGroupName) \
-                    --container-image-name eesacr.azurecr.io/ees-public-frontend:$(resources.pipeline.MainBuild.runName) \
-                    --container-registry-url https://eesacr.azurecr.io
+                    --container-image-name eesacr.azurecr.io/ees-public-frontend:$(resources.pipeline.MainBuild.runName)
 
-            - task: AzureCLI@2
-              displayName: Public Site - Restart app to pull new image
-              inputs:
-                azureSubscription: ${{ parameters.serviceConnection }}
-                scriptType: bash
-                scriptLocation: inlineScript
-                inlineScript: |
-                  set -e
-                  az webapp restart \
-                    --name $(subscription)-as-ees-public-site \
-                    --resource-group $(resourceGroupName)
+            - template: ../../../../common/ci/tasks/set-appsettings-from-json.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Public Site - updating app settings
+                appName: $(subscription)-as-ees-public-site
+                resourceGroupName: $(resourceGroupName)
+                appSettingsJson: $(appSettings)
 
             # Confirm the app has actually restarted by waiting for it to report back this
             # deploy's marker. A successful response here also signifies that the app is healthy.
