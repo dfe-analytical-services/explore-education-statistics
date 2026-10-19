@@ -95,6 +95,7 @@ public static class FilterGroupGeneratorExtensions
                             FilterGroupId = filterGroup.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
+                            SubjectId = filterGroup.Filter.SubjectId,
                         };
 
                         footnote.FilterGroups.Add(filterGroupFootnote);

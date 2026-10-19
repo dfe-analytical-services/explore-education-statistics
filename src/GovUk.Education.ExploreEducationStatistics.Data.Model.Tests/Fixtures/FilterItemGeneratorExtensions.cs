@@ -61,6 +61,7 @@ public static class FilterItemGeneratorExtensions
                             FilterItemId = filterItem.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
+                            SubjectId = filterItem.FilterGroup.Filter.SubjectId,
                         };
 
                         footnote.FilterItems.Add(filterItemFootnote);

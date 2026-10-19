@@ -6,10 +6,10 @@ public interface IFootnoteRepository
     Task<Footnote> CreateFootnote(
         Guid releaseVersionId,
         string content,
-        IReadOnlySet<Guid> filterIds,
-        IReadOnlySet<Guid> filterGroupIds,
-        IReadOnlySet<Guid> filterItemIds,
-        IReadOnlySet<Guid> indicatorIds,
+        IReadOnlyDictionary<Guid, Guid> filterSubjectIds,
+        IReadOnlyDictionary<Guid, Guid> filterGroupSubjectIds,
+        IReadOnlyDictionary<Guid, Guid> filterItemSubjectIds,
+        IReadOnlyDictionary<Guid, Guid> indicatorSubjectIds,
         IReadOnlySet<Guid> subjectIds,
         int order
     );
