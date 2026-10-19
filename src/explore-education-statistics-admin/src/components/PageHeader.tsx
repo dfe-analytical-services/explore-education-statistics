@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { handleLogout } from '@admin/auth/msal';
-import { signInRoute } from '@admin/routes/routes';
+import { homeRoute, signInRoute } from '@admin/routes/routes';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import ButtonText from '@common/components/ButtonText';
 import { useMobileMedia } from '@common/hooks/useMedia';
@@ -87,7 +87,7 @@ const PageHeader = ({ wide }: Props) => {
             </div>
             <div className="govuk-header__content">
               <Link
-                to="/"
+                to={homeRoute.fullPath}
                 className="govuk-header__link govuk-header__service-name"
               >
                 Explore education statistics
