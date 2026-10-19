@@ -150,6 +150,7 @@ public static class FilterGeneratorExtensions
                             FilterId = filter.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
+                            SubjectId = filter.SubjectId,
                         };
 
                         footnote.Filters.Add(filterFootnote);
