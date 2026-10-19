@@ -546,16 +546,22 @@ public class ReleaseAmendmentService(
             .ToAsyncEnumerable()
             .SelectAwait(async originalFootnote =>
             {
-                var filterIds = originalFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId).ToHashSet();
-                var filterGroupIds = originalFootnote
-                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
-                    .ToHashSet();
-                var filterItemIds = originalFootnote
-                    .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItemId)
-                    .ToHashSet();
-                var indicatorIds = originalFootnote
-                    .Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
-                    .ToHashSet();
+                var filterSubjectIds = originalFootnote.Filters.ToDictionary(
+                    filterFootnote => filterFootnote.FilterId,
+                    filterFootnote => filterFootnote.SubjectId
+                );
+                var filterGroupSubjectIds = originalFootnote.FilterGroups.ToDictionary(
+                    filterGroupFootnote => filterGroupFootnote.FilterGroupId,
+                    filterGroupFootnote => filterGroupFootnote.SubjectId
+                );
+                var filterItemSubjectIds = originalFootnote.FilterItems.ToDictionary(
+                    filterItemFootnote => filterItemFootnote.FilterItemId,
+                    filterItemFootnote => filterItemFootnote.SubjectId
+                );
+                var indicatorSubjectIds = originalFootnote.Indicators.ToDictionary(
+                    indicatorFootnote => indicatorFootnote.IndicatorId,
+                    indicatorFootnote => indicatorFootnote.SubjectId
+                );
                 var subjectIds = originalFootnote
                     .Subjects.Select(subjectFootnote => subjectFootnote.SubjectId)
                     .ToHashSet();
@@ -563,10 +569,10 @@ public class ReleaseAmendmentService(
                 return await footnoteRepository.CreateFootnote(
                     amendmentReleaseVersionId,
                     originalFootnote.Content,
-                    filterIds: filterIds,
-                    filterGroupIds: filterGroupIds,
-                    filterItemIds: filterItemIds,
-                    indicatorIds: indicatorIds,
+                    filterSubjectIds: filterSubjectIds,
+                    filterGroupSubjectIds: filterGroupSubjectIds,
+                    filterItemSubjectIds: filterItemSubjectIds,
+                    indicatorSubjectIds: indicatorSubjectIds,
                     subjectIds: subjectIds,
                     originalFootnote.Order
                 );
