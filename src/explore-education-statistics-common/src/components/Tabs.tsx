@@ -36,6 +36,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
 
   const sections = filteredChildren.map((section, index) => {
     const sectionId = section.props.id || `${id}-${index + 1}`;
+    const isSelected = selectedTabIndex === index;
 
     return cloneElement<
       TabsSectionProps &
@@ -45,8 +46,11 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       section,
       {
         'aria-labelledby': `${sectionId}-tab`,
+        // Hide tabs with CSS instead of using the 'hidden' attribute until JS
+        // loads and we can determine which tab *should* be selected/visible
+        className: !hasCheckedHash && !isSelected ? 'dfe-js-hidden' : undefined,
         hasSiblings: filteredChildren.length > 1,
-        hidden: !hasCheckedHash || selectedTabIndex !== index,
+        hidden: hasCheckedHash ? !isSelected : undefined,
         id: sectionId,
         key: sectionId,
       },

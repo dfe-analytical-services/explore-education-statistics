@@ -7,7 +7,7 @@ import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStat
 import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import { ReleaseVersionHomeContent } from '@common/services/publicationService';
-import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
