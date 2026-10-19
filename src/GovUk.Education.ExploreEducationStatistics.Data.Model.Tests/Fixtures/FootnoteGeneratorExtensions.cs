@@ -104,7 +104,12 @@ public static class FootnoteGeneratorExtensions
             {
                 return filters
                     .Invoke(context)
-                    .Select(filter => new FilterFootnote { Footnote = footnote, Filter = filter })
+                    .Select(filter => new FilterFootnote
+                    {
+                        Footnote = footnote,
+                        Filter = filter,
+                        SubjectId = filter.SubjectId,
+                    })
                     .ToList();
             }
         );
@@ -128,7 +133,12 @@ public static class FootnoteGeneratorExtensions
             {
                 return filterGroups
                     .Invoke(context)
-                    .Select(filterGroup => new FilterGroupFootnote { Footnote = footnote, FilterGroup = filterGroup })
+                    .Select(filterGroup => new FilterGroupFootnote
+                    {
+                        Footnote = footnote,
+                        FilterGroup = filterGroup,
+                        SubjectId = filterGroup.Filter.SubjectId,
+                    })
                     .ToList();
             }
         );
@@ -152,7 +162,12 @@ public static class FootnoteGeneratorExtensions
             {
                 return filterItems
                     .Invoke(context)
-                    .Select(filterItem => new FilterItemFootnote { Footnote = footnote, FilterItem = filterItem })
+                    .Select(filterItem => new FilterItemFootnote
+                    {
+                        Footnote = footnote,
+                        FilterItem = filterItem,
+                        SubjectId = filterItem.FilterGroup.Filter.SubjectId,
+                    })
                     .ToList();
             }
         );
@@ -176,7 +191,12 @@ public static class FootnoteGeneratorExtensions
             {
                 return indicators
                     .Invoke(context)
-                    .Select(indicator => new IndicatorFootnote { Footnote = footnote, Indicator = indicator })
+                    .Select(indicator => new IndicatorFootnote
+                    {
+                        Footnote = footnote,
+                        Indicator = indicator,
+                        SubjectId = indicator.IndicatorGroup.SubjectId,
+                    })
                     .ToList();
             }
         );
