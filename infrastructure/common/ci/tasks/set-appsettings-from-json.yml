@@ -22,6 +22,10 @@ parameters:
 steps:
   - task: AzureCLI@2
     displayName: ${{ parameters.displayName }}
+    # Supplied via an environment variable rather than inline in the script, so that the JSON is never
+    # interpreted by bash - inline, a single quote within any value would break the script.
+    env:
+      APP_SETTINGS_JSON: ${{ parameters.appSettingsJson }}
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
@@ -30,7 +34,7 @@ steps:
         set -e
 
         # Generate key-value pairs from the appsettings JSON.
-        parsedSettings=$(echo '${{ parameters.appSettingsJson }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"') || {
+        parsedSettings=$(printf '%s' "$APP_SETTINGS_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"') || {
           echo "##vso[task.logissue type=error]Failed to parse appSettingsJson as JSON - see the jq error above. This most likely means the value was truncated or malformed somewhere upstream, not that it's genuinely empty."
           exit 1
         }

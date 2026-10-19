@@ -39,7 +39,7 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        set -e
+        set -eo pipefail
 
         if [ "${{ parameters.appType }}" == "webApp" ]; then
           cliCommand=webapp
