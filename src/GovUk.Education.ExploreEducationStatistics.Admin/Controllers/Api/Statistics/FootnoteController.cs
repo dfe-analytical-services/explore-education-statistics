@@ -205,14 +205,15 @@ public class FootnoteController : ControllerBase
 
         var filterItemsGroupByFilter = footnote
             .FilterItems.GroupBy(
-                filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup.Filter,
+                filterItemFootnote =>
+                    (filterItemFootnote.SubjectId, filterItemFootnote.FilterItem.FilterGroup.FilterId),
                 filterItemFootnote => filterItemFootnote.FilterItemId
             )
             .ToList();
 
         var filterGroupsGroupByFilter = footnote
             .FilterGroups.GroupBy(
-                filterGroupFootnote => filterGroupFootnote.FilterGroup.Filter,
+                filterGroupFootnote => (filterGroupFootnote.SubjectId, filterGroupFootnote.FilterGroup.FilterId),
                 filterGroupFootnote => filterGroupFootnote.FilterGroupId
             )
             .ToList();
@@ -223,14 +224,14 @@ public class FootnoteController : ControllerBase
         );
 
         var filterGroupsByFilter = filterGroupsGroupByFilter.ToDictionary(
-            grouping => grouping.Key.Id,
+            grouping => grouping.Key.FilterId,
             grouping => grouping.ToList()
         );
 
         // There can be more than one indicator belonging to the same subject in each group so we add Distinct here.
         var indicatorGroupsBySubject = footnote
             .Indicators.GroupBy(
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId,
+                indicatorFootnote => indicatorFootnote.SubjectId,
                 indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId
             )
             .ToDictionary(grouping => grouping.Key, grouping => grouping.Distinct().ToList());
@@ -243,10 +244,7 @@ public class FootnoteController : ControllerBase
             .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
         var filtersBySubject = footnote
-            .Filters.GroupBy(
-                filterFootnote => filterFootnote.Filter.SubjectId,
-                filterFootnote => filterFootnote.FilterId
-            )
+            .Filters.GroupBy(filterFootnote => filterFootnote.SubjectId, filterFootnote => filterFootnote.FilterId)
             .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
 
         // Index filter groups related to the filter items
@@ -301,7 +299,10 @@ public class FootnoteController : ControllerBase
         }
     }
 
-    private static void AppendFilters(IEnumerable<Filter> filters, IDictionary<Guid, List<Guid>> filtersBySubject)
+    private static void AppendFilters(
+        IEnumerable<(Guid SubjectId, Guid FilterId)> filters,
+        IDictionary<Guid, List<Guid>> filtersBySubject
+    )
     {
         foreach (var filter in filters)
         {
@@ -311,9 +312,9 @@ public class FootnoteController : ControllerBase
                 filtersBySubject.Add(filter.SubjectId, idList);
             }
 
-            if (!idList.Contains(filter.Id))
+            if (!idList.Contains(filter.FilterId))
             {
-                idList.Add(filter.Id);
+                idList.Add(filter.FilterId);
             }
         }
     }
