@@ -353,13 +353,15 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task GetSharedFootnotes_CountsFootnotesWithMoreThanOneReleaseVersion()
+    public async Task GetSharedFootnotes_CountsSharedFootnotesAndFootnotesWithoutReleaseVersionId()
     {
         // Arrange
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(3);
 
         Footnote sharedFootnote1 = _fixture.DefaultFootnote();
         Footnote sharedFootnote2 = _fixture.DefaultFootnote();
+        Footnote migratedFootnote = _fixture.DefaultFootnote();
+        migratedFootnote.ReleaseVersionId = releaseVersions[0].Id;
 
         var releaseFootnotes = _fixture
             .DefaultReleaseFootnote()
@@ -369,6 +371,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
             .ForIndex(3, s => s.SetReleaseVersion(releaseVersions[1]).SetFootnote(sharedFootnote2))
             .ForIndex(4, s => s.SetReleaseVersion(releaseVersions[2]).SetFootnote(sharedFootnote2))
             .ForIndex(5, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(_fixture.DefaultFootnote()))
+            .ForIndex(6, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(migratedFootnote))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -389,6 +392,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
 
             // Assert
             Assert.Equal(2, result.SharedFootnotes);
+            Assert.Equal(4, result.FootnotesWithoutReleaseVersionId);
         }
     }
 
