@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     /// <inheritdoc />
-    public partial class Ees2979AddFootnoteReleaseVersionId : Migration
+    public partial class Ees7767AddFootnoteReleaseVersionId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
