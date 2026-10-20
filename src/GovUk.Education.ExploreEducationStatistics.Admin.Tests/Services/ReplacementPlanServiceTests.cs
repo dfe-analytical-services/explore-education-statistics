@@ -3790,7 +3790,7 @@ public class ReplacementPlanServiceTests
                 subject != null
                     ? new List<SubjectFootnote> { new() { Subject = subject } }
                     : new List<SubjectFootnote>(),
-            Releases = new List<ReleaseFootnote> { new() { ReleaseVersion = releaseVersion } },
+            ReleaseVersion = releaseVersion,
         };
     }
 

@@ -803,24 +803,19 @@ public class ReleaseAmendmentServiceTests
                     )
             );
 
-        var releaseFootnotes = _fixture
-            .DefaultReleaseFootnote()
+        var footnotes = _fixture
+            .DefaultFootnote()
             .WithReleaseVersion(originalStatsReleaseVersion)
-            .WithFootnotes(
-                _fixture
-                    .DefaultFootnote()
-                    .ForIndex(
-                        0,
-                        s =>
-                            s.SetSubjects(ListOf(releaseSubject.Subject))
-                                .SetFilters(releaseSubject.Subject.Filters)
-                                .SetFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
-                                .SetFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
-                                .SetIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators)
-                    )
-                    .ForIndex(1, s => s.SetSubjects(ListOf(releaseSubject.Subject)))
-                    .GenerateList()
+            .ForIndex(
+                0,
+                s =>
+                    s.SetSubjects(ListOf(releaseSubject.Subject))
+                        .SetFilters(releaseSubject.Subject.Filters)
+                        .SetFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
+                        .SetFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
+                        .SetIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators)
             )
+            .ForIndex(1, s => s.SetSubjects(ListOf(releaseSubject.Subject)))
             .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
@@ -835,7 +830,7 @@ public class ReleaseAmendmentServiceTests
 
             statisticsDbContext.ReleaseVersion.AddRange(originalStatsReleaseVersion);
             statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
-            statisticsDbContext.ReleaseFootnote.AddRange(releaseFootnotes);
+            statisticsDbContext.Footnote.AddRange(footnotes);
 
             await statisticsDbContext.SaveChangesAsync();
         }
@@ -861,16 +856,15 @@ public class ReleaseAmendmentServiceTests
                 .Footnote.Include(f => f.Filters)
                 .Include(f => f.FilterGroups)
                 .Include(f => f.FilterItems)
-                .Include(f => f.Releases)
                 .Include(f => f.Subjects)
                 .Include(f => f.Indicators)
-                .Where(f => f.Releases.FirstOrDefault(r => r.ReleaseVersionId == amendmentId) != null)
+                .Where(f => f.ReleaseVersionId == amendmentId)
                 .OrderBy(f => f.Content)
                 .ToList();
 
             Assert.Equal(2, newFootnotesFromDb.Count);
-            AssertFootnoteDetailsCopiedCorrectly(releaseFootnotes[0].Footnote, newFootnotesFromDb[0]);
-            AssertFootnoteDetailsCopiedCorrectly(releaseFootnotes[1].Footnote, newFootnotesFromDb[1]);
+            AssertFootnoteDetailsCopiedCorrectly(footnotes[0], newFootnotesFromDb[0]);
+            AssertFootnoteDetailsCopiedCorrectly(footnotes[1], newFootnotesFromDb[1]);
         }
     }
 
