@@ -74,15 +74,11 @@ public class FootnoteService : IFootnoteService
             )
             .OnSuccess(async () =>
             {
-                var releaseHasFootnotes = await _context.Footnote.AnyAsync(footnote =>
-                    footnote.ReleaseVersionId == releaseVersionId
-                );
+                var currentMaxOrder = await _context
+                    .Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
+                    .MaxAsync(footnote => (int?)footnote.Order);
 
-                var order = releaseHasFootnotes
-                    ? await _context
-                        .Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
-                        .MaxAsync(footnote => footnote.Order) + 1
-                    : 0;
+                var order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
 
                 var footnote = await _footnoteRepository.CreateFootnote(
                     releaseVersionId,
