@@ -12,14 +12,13 @@ Test Setup          fail test fast if required
 
 
 *** Test Cases ***
-Navigates correctly to administration page as bau1
+Navigates correctly to administration page
     user navigates to    %{ADMIN_URL}/
     user waits until h1 is visible    Dashboard
-    user clicks link     Platform administration
-    
+    user clicks link    Platform administration
+
     user waits until page finishes loading
     user waits until h1 is visible    Platform administration
-
 
 Navigate correctly to Manage incomplete imports
     user navigates to    %{ADMIN_URL}/administration
@@ -38,14 +37,14 @@ Navigate correctly to Manage boundary data page
 
     user waits until page finishes loading
     user waits until h1 is visible    Boundary data
-    
+
 Navigate correctly to Upload boundary data file page
     user navigates to    %{ADMIN_URL}/administration/boundary-data
     user waits until h1 is visible    Boundary data
     user clicks link    Upload boundary data file
 
     user waits until page finishes loading
-    user waits until page contains title caption    Upload boundary data    
+    user waits until page contains title caption    Upload boundary data
 
 Navigate correctly to Manage glossary page
     user navigates to    %{ADMIN_URL}/administration
@@ -109,3 +108,7 @@ Navigate correctly to Pre-release users page
 
     user waits until page finishes loading
     user waits until h1 is visible    Pre-release users
+
+Navigate to documentation root page
+    user navigates to    %{ADMIN_URL}/documentation
+    user waits until h1 is visible    Documentation

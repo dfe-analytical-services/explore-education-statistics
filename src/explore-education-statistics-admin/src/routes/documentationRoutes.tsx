@@ -87,62 +87,62 @@ export const documentationConfigureChartsRoute: ProtectedRouteProps = {
 const documentationRoutes = {
   documentationIndexRoute: {
     ...documentationIndexRoute,
-    component: AdminDocumentationHome,
+    element: <AdminDocumentationHome />,
   },
 
   documentationContentStandardsRoute: {
     ...documentationContentStandardsRoute,
-    component: AdminDocumentationContentDesignStandards,
+    element: <AdminDocumentationContentDesignStandards />,
   },
 
   documentationGlossaryRoute: {
     ...documentationGlossaryRoute,
-    component: AdminDocumentationGlossary,
+    element: <AdminDocumentationGlossary />,
   },
 
   documentationStyleGuideRoute: {
     ...documentationStyleGuideRoute,
-    component: AdminDocumentationStyle,
+    element: <AdminDocumentationStyle />,
   },
 
   documentationUsingDashboardRoute: {
     ...documentationUsingDashboardRoute,
-    component: AdminDocumentationUsingDashboard,
+    element: <AdminDocumentationUsingDashboard />,
   },
 
   documentationCreateReleaseRoute: {
     ...documentationCreateReleaseRoute,
-    component: AdminDocumentationCreateNewRelease,
+    element: <AdminDocumentationCreateNewRelease />,
   },
 
   documentationCreatePublicationRoute: {
     ...documentationCreatePublicationRoute,
-    component: AdminDocumentationCreateNewPublication,
+    element: <AdminDocumentationCreateNewPublication />,
   },
 
   documentationEditReleaseRoute: {
     ...documentationEditReleaseRoute,
-    component: AdminDocumentationEditRelease,
+    element: <AdminDocumentationEditRelease />,
   },
 
   documentationManageContentRoute: {
     ...documentationManageContentRoute,
-    component: AdminDocumentationManageContent,
+    element: <AdminDocumentationManageContent />,
   },
 
   documentationManageDataRoute: {
     ...documentationManageDataRoute,
-    component: AdminDocumentationManageData,
+    element: <AdminDocumentationManageData />,
   },
 
   documentationManageDataBlockRoute: {
     ...documentationManageDataBlockRoute,
-    component: AdminDocumentationManageDataBlocks,
+    element: <AdminDocumentationManageDataBlocks />,
   },
 
   documentationConfigureChartsRoute: {
     ...documentationConfigureChartsRoute,
-    component: AdminDocumentationConfigureCharts,
+    element: <AdminDocumentationConfigureCharts />,
   },
 };
 
