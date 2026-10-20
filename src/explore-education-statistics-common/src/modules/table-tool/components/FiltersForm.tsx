@@ -318,6 +318,20 @@ export default function FiltersForm({
     );
   }, [subjectMeta.indicators, pairedIndicatorChildIds]);
 
+  // Show both paired indicators when searching for either of them
+  const pairedIndicatorLinks = useMemo(
+    () =>
+      Object.entries(pairedIndicatorChildIds).reduce<Dictionary<string[]>>(
+        (acc, [parentId, childId]) => {
+          acc[parentId] = [childId];
+          acc[childId] = [parentId];
+          return acc;
+        },
+        {},
+      ),
+    [pairedIndicatorChildIds],
+  );
+
   const validationSchema = useMemo<ObjectSchema<FiltersFormValues>>(() => {
     return Yup.object({
       indicators: Yup.array()
@@ -399,6 +413,7 @@ export default function FiltersForm({
                       </>
                     }
                     legendSize="m"
+                    linkedOptionValues={pairedIndicatorLinks}
                     name="indicators"
                     options={indicatorOptionGroups}
                     order={[]}
