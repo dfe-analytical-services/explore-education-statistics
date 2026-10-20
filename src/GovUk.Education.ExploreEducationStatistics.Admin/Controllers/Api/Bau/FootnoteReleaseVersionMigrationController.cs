@@ -135,6 +135,11 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     private async Task DeleteOrphanedFootnotes(MigrationResult result, CancellationToken cancellationToken)
     {
+        // Footnotes are left without a ReleaseFootnote when deleting a Subject removes their only link to a
+        // ReleaseVersion, and were left behind by statistics ReleaseVersion deletions before EES-7369. Nothing can
+        // reach them, but they have no ReleaseVersion to backfill, which would stop ReleaseVersionId being made
+        // non-nullable. Any with a ReleaseVersionId would also reappear in that ReleaseVersion once footnotes are
+        // read through ReleaseVersionId rather than ReleaseFootnote.
         var orphanedFootnotes = await statisticsDbContext
             .Footnote.Where(footnote => !footnote.Releases.Any())
             .ToListAsync(cancellationToken);
