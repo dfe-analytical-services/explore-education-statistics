@@ -21,7 +21,6 @@ import { SelectedPublication } from '@common/modules/table-tool/types/selectedPu
 import {
   getPairedIndicatorChildIds,
   normalisePairedIndicators,
-  orderPairedIndicatorOptions,
 } from '@common/modules/table-tool/utils/pairedIndicators';
 import {
   FullTableQuery,
@@ -291,22 +290,33 @@ export default function FiltersForm({
     return orderBy(Object.values(subjectMeta.indicators), 'order').map(
       group => ({
         legend: group.label,
-        options: orderPairedIndicatorOptions(group.options).map(option =>
-          option.parentIndicatorId
+        // Keep the order set by analysts, even if a child indicator isn't next to its parent
+        options: group.options.map(option => {
+          if (option.parentIndicatorId) {
+            return {
+              ...option,
+              disabled: true,
+              hint: `Selected automatically with ${
+                indicatorLabels[option.parentIndicatorId] ??
+                'its paired indicator'
+              }`,
+            };
+          }
+
+          const childId = pairedIndicatorChildIds[option.value];
+
+          return childId
             ? {
                 ...option,
-                className: styles.pairedIndicator,
-                disabled: true,
-                hint: `Selected automatically with ${
-                  indicatorLabels[option.parentIndicatorId] ??
-                  'its paired indicator'
+                hint: `Also selects ${
+                  indicatorLabels[childId] ?? 'a paired indicator'
                 }`,
               }
-            : option,
-        ),
+            : option;
+        }),
       }),
     );
-  }, [subjectMeta.indicators]);
+  }, [subjectMeta.indicators, pairedIndicatorChildIds]);
 
   const validationSchema = useMemo<ObjectSchema<FiltersFormValues>>(() => {
     return Yup.object({

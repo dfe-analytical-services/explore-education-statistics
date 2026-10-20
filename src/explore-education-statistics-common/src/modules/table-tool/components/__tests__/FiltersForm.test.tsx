@@ -838,6 +838,35 @@ describe('FiltersForm', () => {
       expect(
         screen.getByText(`Selected automatically with ${parentLabel}`),
       ).toBeInTheDocument();
+      expect(
+        screen.getByText(`Also selects ${childLabel}`),
+      ).toBeInTheDocument();
+    });
+
+    test('keeps the analyst ordering when the child indicator is not next to its parent indicator', () => {
+      const testSubjectMetaChildFirst = produce(
+        testSubjectMetaPairedIndicators,
+        draft => {
+          draft.indicators.AbsenceByReason.options.reverse();
+        },
+      );
+
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaChildFirst}
+          onSubmit={noop}
+        />,
+      );
+
+      const checkboxes = within(
+        screen.getByRole('group', { name: 'Absence by reason' }),
+      ).getAllByRole('checkbox');
+
+      expect(checkboxes[0]).toHaveAccessibleName(childLabel);
+      expect(checkboxes[1]).toHaveAccessibleName(parentLabel);
     });
 
     test('checking and unchecking the parent indicator also checks and unchecks the child indicator', async () => {

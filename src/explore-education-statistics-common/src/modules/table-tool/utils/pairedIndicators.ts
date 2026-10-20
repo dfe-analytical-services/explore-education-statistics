@@ -50,26 +50,3 @@ export function normalisePairedIndicators(
 
   return [...result];
 }
-
-/**
- * Order options so that each child indicator immediately follows its parent
- * indicator, where both are in the same group.
- */
-export function orderPairedIndicatorOptions(
-  options: IndicatorOption[],
-): IndicatorOption[] {
-  const optionValues = new Set(options.map(option => option.value));
-
-  const isChildInGroup = (option: IndicatorOption) =>
-    !!option.parentIndicatorId && optionValues.has(option.parentIndicatorId);
-
-  return options
-    .filter(option => !isChildInGroup(option))
-    .flatMap(option => [
-      option,
-      ...options.filter(
-        child =>
-          isChildInGroup(child) && child.parentIndicatorId === option.value,
-      ),
-    ]);
-}

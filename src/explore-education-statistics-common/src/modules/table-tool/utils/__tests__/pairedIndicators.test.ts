@@ -1,7 +1,6 @@
 import {
   getPairedIndicatorChildIds,
   normalisePairedIndicators,
-  orderPairedIndicatorOptions,
 } from '@common/modules/table-tool/utils/pairedIndicators';
 import { IndicatorOption } from '@common/services/tableBuilderService';
 
@@ -86,34 +85,6 @@ describe('pairedIndicators', () => {
       const selected = ['indicator-1', 'indicator-2'];
 
       expect(normalisePairedIndicators(selected, {})).toBe(selected);
-    });
-  });
-
-  describe('orderPairedIndicatorOptions', () => {
-    test('moves a child directly after its parent', () => {
-      const result = orderPairedIndicatorOptions([
-        createOption('indicator-2', 'indicator-1'),
-        createOption('indicator-3'),
-        createOption('indicator-1'),
-      ]);
-
-      expect(result.map(option => option.value)).toEqual([
-        'indicator-3',
-        'indicator-1',
-        'indicator-2',
-      ]);
-    });
-
-    test('keeps a child in place when its parent is in another group', () => {
-      const result = orderPairedIndicatorOptions([
-        createOption('indicator-2', 'indicator-other-group'),
-        createOption('indicator-3'),
-      ]);
-
-      expect(result.map(option => option.value)).toEqual([
-        'indicator-2',
-        'indicator-3',
-      ]);
     });
   });
 });
