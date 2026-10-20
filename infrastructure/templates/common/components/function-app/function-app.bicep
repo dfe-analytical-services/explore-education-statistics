@@ -83,7 +83,9 @@ param appSettings {
 @description('''
 The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
 prevent infrastructure deploys from overriding application-specific appsettings that a code deploy
-pipeline has since applied back to the bootstrap values passed in via "appSettings" above. See
+pipeline has since applied back to the bootstrap values passed in via "appSettings" above. These take
+precedence over "appSettings", but not over the infrastructure appsettings defined in this template,
+so that changes to infrastructure appsettings still win over existing appsettings. See
 "applicationAppSettings"/"existingProdAppSettings" in app-service.bicep for the App Service
 equivalent of this pattern (Function Apps have no deployment slot, so there's only one to track).
 ''')
@@ -318,15 +320,19 @@ var infraAppSettings = [
 
 // Flatten the array-based infra/application appsettings into object form so they can be merged
 // key-by-key with existingAppSettings, applied below via a separate "config/appsettings" child
-// resource (which takes a flat object directly) rather than inline on the site resource itself -
-// see "appSettings" in app-service.bicep for the identical App Service pattern, including why
-// existingAppSettings has to win on any key collision.
-var baseAppSettingsObject = reduce(
-  union(infraAppSettings, appSettings),
-  {},
-  (cur, next) => union(cur, { '${next.name}': next.value })
+// resource (which takes a flat object directly) rather than inline on the site resource itself.
+var applicationAppSettingsObject = reduce(appSettings, {}, (cur, next) => union(cur, { '${next.name}': next.value }))
+var infraAppSettingsObject = reduce(infraAppSettings, {}, (cur, next) => union(cur, { '${next.name}': next.value }))
+
+// Combine the appsettings supplied by the caller of this template with any appsettings under the control
+// of the application deploy pipeline, and finally with the infrastructure appsettings from this template.
+// This retains any application-specific appsettings since applied by the code deploy pipeline, while 
+// still allowing this infrastructure deploy to update its own infrastructure appsettings, which win over
+// any conflicts.
+var combinedAppSettingsObject = union(
+  union(applicationAppSettingsObject, existingAppSettings),
+  infraAppSettingsObject
 )
-var combinedAppSettingsObject = union(baseAppSettingsObject, existingAppSettings)
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
