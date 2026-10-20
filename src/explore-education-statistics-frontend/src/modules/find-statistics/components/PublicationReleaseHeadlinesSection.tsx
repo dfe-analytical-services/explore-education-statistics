@@ -37,6 +37,7 @@ const PublicationReleaseHeadlinesSection = ({
                 key={keyStat.id}
                 releaseVersionId={releaseVersionId}
                 dataBlockId={keyStat.dataBlockId}
+                dataBlockStaleTime={Infinity}
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}

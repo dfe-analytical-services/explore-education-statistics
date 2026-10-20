@@ -3,13 +3,10 @@ import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
 import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useId, useRef, useState } from 'react';
 import styles from './Details.module.scss';
 import ButtonText from './ButtonText';
 import VisuallyHidden from './VisuallyHidden';
-
-let hasNativeDetails: boolean;
-let idCounter = 0;
 
 export type DetailsToggleHandler = (isOpen: boolean) => void;
 
@@ -43,7 +40,7 @@ export interface DetailsProps {
 const Details = ({
   className,
   children,
-  id: propId = `details-content-${(idCounter += 1)}`,
+  id: propId,
   detailsId,
   jsRequired = false,
   open: defaultOpen = false,
@@ -55,18 +52,12 @@ const Details = ({
   preventToggle = false,
   testId,
 }: DetailsProps) => {
-  const [id] = useState(propId);
+  const generatedId = useId();
+  const [id] = useState(propId ?? `details-content-${generatedId}`);
   const ref = useRef<HTMLDetailsElement>(null);
 
   const { onMounted } = useMounted(undefined, jsRequired);
   const [open, toggleOpen] = useToggle(defaultOpen);
-
-  useEffect(() => {
-    if (typeof hasNativeDetails === 'undefined') {
-      hasNativeDetails =
-        typeof document.createElement('details').open === 'boolean';
-    }
-  }, []);
 
   useEffect(() => {
     if (preventToggle) {
@@ -75,22 +66,6 @@ const Details = ({
     }
     toggleOpen(defaultOpen);
   }, [defaultOpen, preventToggle, toggleOpen]);
-
-  useEffect(() => {
-    if (hasNativeDetails) {
-      return;
-    }
-
-    if (ref.current) {
-      // Don't really need to include this, but just
-      // polyfills DOM behaviour for IE/Edge
-      if (open) {
-        ref.current.setAttribute('open', '');
-      } else {
-        ref.current.removeAttribute('open');
-      }
-    }
-  }, [open]);
 
   return (
     <details
@@ -141,17 +116,7 @@ const Details = ({
         </span>
         {summaryAfter}
       </summary>
-      <div
-        className="govuk-details__text"
-        id={onMounted(id)}
-        style={onMounted(
-          !hasNativeDetails
-            ? {
-                display: !open ? 'none' : undefined,
-              }
-            : undefined,
-        )}
-      >
+      <div className="govuk-details__text" id={onMounted(id)}>
         {children}
 
         {showCloseButton && (

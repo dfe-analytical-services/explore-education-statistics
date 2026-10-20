@@ -20,6 +20,7 @@ import ReleaseExploreDataPage from '@frontend/modules/find-statistics/ReleaseExp
 import ReleaseHelpPage from '@frontend/modules/find-statistics/ReleaseHelpPage';
 import ReleaseHomePage from '@frontend/modules/find-statistics/ReleaseHomePage';
 import ReleaseMethodologyPage from '@frontend/modules/find-statistics/ReleaseMethodologyPage';
+import prefetchSsrDataBlocks from '@frontend/modules/find-statistics/utils/prefetchSsrDataBlocks';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import { QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextPage } from 'next';
@@ -188,11 +189,18 @@ export const getServerSideProps: GetServerSideProps = withAxiosHandler(
 
           const hasSummarySection = summarySection.content.length > 0;
 
+          // So data-block key stats are in the server-rendered HTML.
+          const dehydratedState = await prefetchSsrDataBlocks({
+            homeContent,
+            releaseVersionId: releaseVersionSummary.id,
+          });
+
           return {
             props: {
               ...baseProps,
               page: 'home',
               homeContent,
+              dehydratedState,
               inPageNavItems: [
                 hasSummarySection && {
                   id: 'background-information',
