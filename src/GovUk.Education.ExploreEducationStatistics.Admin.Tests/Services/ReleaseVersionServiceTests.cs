@@ -2606,10 +2606,6 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
-            footnoteRepository
-                .Setup(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id))
-                .Returns(Task.CompletedTask);
-
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
@@ -2681,8 +2677,6 @@ public abstract class ReleaseVersionServiceTests
                     mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once
                 );
-
-                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
 
                 VerifyAllMocks(
                     privateCacheService,

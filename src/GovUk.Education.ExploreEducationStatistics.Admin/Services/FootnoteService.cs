@@ -74,15 +74,14 @@ public class FootnoteService : IFootnoteService
             )
             .OnSuccess(async () =>
             {
-                var releaseHasFootnotes = await _context.ReleaseFootnote.AnyAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
+                var releaseHasFootnotes = await _context.Footnote.AnyAsync(footnote =>
+                    footnote.ReleaseVersionId == releaseVersionId
                 );
 
                 var order = releaseHasFootnotes
                     ? await _context
-                        .ReleaseFootnote.Include(rf => rf.Footnote)
-                        .Where(rf => rf.ReleaseVersionId == releaseVersionId)
-                        .MaxAsync(rf => rf.Footnote.Order) + 1
+                        .Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
+                        .MaxAsync(footnote => footnote.Order) + 1
                     : 0;
 
                 var footnote = await _footnoteRepository.CreateFootnote(
@@ -106,7 +105,12 @@ public class FootnoteService : IFootnoteService
         return await _contentPersistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-            .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId))
+            .OnSuccess(_ =>
+                _statisticsPersistenceHelper.CheckEntityExists<Footnote>(
+                    footnoteId,
+                    query => query.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
+                )
+            )
             .OnSuccessVoid(async footnote =>
             {
                 await _footnoteRepository.DeleteFootnote(releaseVersionId: releaseVersionId, footnoteId: footnote.Id);
@@ -139,51 +143,26 @@ public class FootnoteService : IFootnoteService
                     indicatorIds
                 )
             )
-            .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote))
+            .OnSuccess(_ =>
+                _statisticsPersistenceHelper.CheckEntityExists<Footnote>(
+                    footnoteId,
+                    query => HydrateFootnote(query).Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
+                )
+            )
             .OnSuccess(async footnote =>
             {
-                // NOTE: At the time of writing, footnotes are now always exclusive to a particular release, but
-                // in the past this wasn't always the case.
-                // TODO EES-2979 Remove this check once all footnotes only belong to one release
-                if (
-                    await _footnoteRepository.IsFootnoteExclusiveToRelease(
-                        releaseVersionId: releaseVersionId,
-                        footnoteId: footnote.Id
-                    )
-                )
-                {
-                    _context.Update(footnote);
+                _context.Update(footnote);
 
-                    footnote.Content = content;
+                footnote.Content = content;
 
-                    UpdateFilterLinks(footnote, filterIds);
-                    UpdateFilterGroupLinks(footnote, filterGroupIds);
-                    UpdateFilterItemLinks(footnote, filterItemIds);
-                    UpdateIndicatorLinks(footnote, indicatorIds);
-                    UpdateSubjectLinks(footnote, subjectIds);
+                UpdateFilterLinks(footnote, filterIds);
+                UpdateFilterGroupLinks(footnote, filterGroupIds);
+                UpdateFilterItemLinks(footnote, filterItemIds);
+                UpdateIndicatorLinks(footnote, indicatorIds);
+                UpdateSubjectLinks(footnote, subjectIds);
 
-                    await _context.SaveChangesAsync();
-                    return await _footnoteRepository.GetFootnote(footnoteId);
-                }
-
-                // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one
-                // release If this amendment of the footnote affects other release then break the link with the old
-                // and create a new one
-                await _footnoteRepository.DeleteReleaseFootnoteLink(
-                    releaseVersionId: releaseVersionId,
-                    footnoteId: footnote.Id
-                );
-
-                return await _footnoteRepository.CreateFootnote(
-                    releaseVersionId,
-                    content,
-                    filterIds: filterIds,
-                    filterGroupIds: filterGroupIds,
-                    filterItemIds: filterItemIds,
-                    indicatorIds: indicatorIds,
-                    subjectIds: subjectIds,
-                    footnote.Order
-                );
+                await _context.SaveChangesAsync();
+                return await _footnoteRepository.GetFootnote(footnoteId);
             })
             .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseVersionId));
     }
@@ -221,7 +200,7 @@ public class FootnoteService : IFootnoteService
             {
                 var footnote = await _footnoteRepository.GetFootnote(footnoteId);
 
-                if (footnote.Releases.All(rf => rf.ReleaseVersionId != release.Id))
+                if (footnote.ReleaseVersionId != release.Id)
                 {
                     return new NotFoundResult();
                 }
@@ -323,8 +302,8 @@ public class FootnoteService : IFootnoteService
     )
     {
         var allReleaseFootnoteIds = await _context
-            .ReleaseFootnote.Where(rf => rf.ReleaseVersionId == releaseVersionId)
-            .Select(rf => rf.FootnoteId)
+            .Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
+            .Select(footnote => footnote.Id)
             .ToListAsync();
 
         if (!SequencesAreEqualIgnoringOrder(allReleaseFootnoteIds, footnoteIds))
