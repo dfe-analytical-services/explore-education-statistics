@@ -1,6 +1,6 @@
 import { RefObject } from 'react';
 
-export default function copyElementToClipboard(
+export default async function copyElementToClipboard(
   elementRef: RefObject<HTMLElement | null>,
 ) {
   if (!elementRef.current) return;
@@ -14,5 +14,5 @@ export default function copyElementToClipboard(
     }),
   });
 
-  navigator.clipboard.write([clipboardItem]);
+  await navigator.clipboard.write([clipboardItem]);
 }
