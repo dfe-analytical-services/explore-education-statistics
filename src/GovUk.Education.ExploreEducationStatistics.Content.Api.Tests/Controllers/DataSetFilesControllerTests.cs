@@ -2367,17 +2367,17 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
 
             var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseFile.ReleaseVersionId };
 
-            ReleaseFootnote releaseFootnote1 = DataFixture
-                .DefaultReleaseFootnote()
+            Footnote footnote1 = DataFixture
+                .DefaultFootnote()
                 .WithReleaseVersion(statsReleaseVersion)
-                .WithFootnote(DataFixture.DefaultFootnote().WithSubjects(new List<Subject> { subject }));
+                .WithSubjects(new List<Subject> { subject });
 
             var filter = DataFixture.DefaultFilter().WithSubject(subject);
 
-            ReleaseFootnote releaseFootnote2 = DataFixture
-                .DefaultReleaseFootnote()
+            Footnote footnote2 = DataFixture
+                .DefaultFootnote()
                 .WithReleaseVersion(statsReleaseVersion)
-                .WithFootnote(DataFixture.DefaultFootnote().WithFilters(new List<Filter> { filter }));
+                .WithFilters(new List<Filter> { filter });
 
             await fixture
                 .GetContentDbContext()
@@ -2389,7 +2389,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                 .GetStatisticsDbContext()
                 .AddTestData(context =>
                 {
-                    context.ReleaseFootnote.AddRange(releaseFootnote1, releaseFootnote2);
+                    context.Footnote.AddRange(footnote1, footnote2);
                 });
 
             var publicBlobStorageService = fixture.PublicBlobStorageService;
