@@ -101,15 +101,11 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
                 .Releases.OrderBy(releaseFootnote => releaseFootnote.ReleaseVersionId)
                 .ToList();
 
-            // The existing footnote keeps the first ReleaseFootnote, and a copy of it is created for each of the
-            // remaining ReleaseFootnotes
+            // The existing footnote takes the first ReleaseFootnote ReleaseVersionId, and a copy of the footnote is
+            // created for each of the remaining ReleaseFootnotes ReleaseVersionIds
             var firstReleaseFootnote = releaseFootnotes[0];
-
-            if (footnote.ReleaseVersionId != firstReleaseFootnote.ReleaseVersionId)
-            {
-                footnote.ReleaseVersionId = firstReleaseFootnote.ReleaseVersionId;
-                result.ReleaseVersionIdsSet++;
-            }
+            footnote.ReleaseVersionId = firstReleaseFootnote.ReleaseVersionId;
+            result.ReleaseVersionIdsSet++;
 
             foreach (var releaseFootnote in releaseFootnotes.Skip(1))
             {
@@ -146,11 +142,12 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     private async Task DeleteOrphanedFootnotes(MigrationResult result, CancellationToken cancellationToken)
     {
-        // Footnotes are left without a ReleaseFootnote when deleting a Subject removes their only link to a
-        // ReleaseVersion, and were left behind by statistics ReleaseVersion deletions before EES-7369. Nothing can
-        // reach them, but they have no ReleaseVersion to backfill, which would stop ReleaseVersionId being made
-        // non-nullable. Any with a ReleaseVersionId would also reappear in that ReleaseVersion once footnotes are
-        // read through ReleaseVersionId rather than ReleaseFootnote.
+        // These orphaned footnotes aren't created by this migration. They already exist, left without a
+        // ReleaseFootnote when deleting a Subject removed their only link to a ReleaseVersion, or by statistics
+        // ReleaseVersion deletions before EES-7369. Nothing can reach them, but they have no ReleaseVersion to set
+        // ReleaseVersionId from, so they need removing before ReleaseVersionId can be made non-nullable. Any with a
+        // ReleaseVersionId would also reappear in that ReleaseVersion once footnotes are read through
+        // ReleaseVersionId rather than ReleaseFootnote.
         var orphanedFootnotes = await statisticsDbContext
             .Footnote.Where(footnote => !footnote.Releases.Any())
             .ToListAsync(cancellationToken);
