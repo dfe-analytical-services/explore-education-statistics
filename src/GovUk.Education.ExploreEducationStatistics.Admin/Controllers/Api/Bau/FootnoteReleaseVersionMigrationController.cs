@@ -33,11 +33,13 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
         public int SharedFootnotes { get; set; }
 
         public int FootnotesWithoutReleaseVersionId { get; set; }
+
+        public int OrphanedFootnotes { get; set; }
     }
 
     /// <summary>
-    /// Counts the Footnotes which are shared by more than one ReleaseVersion, and the Footnotes which have no
-    /// ReleaseVersionId.
+    /// Counts the Footnotes which are shared by more than one ReleaseVersion, the Footnotes which have no
+    /// ReleaseVersionId, and the Footnotes which belong to no ReleaseVersion.
     /// </summary>
     [HttpGet("shared-footnotes")]
     public async Task<SharedFootnotesResult> GetSharedFootnotes(CancellationToken cancellationToken = default) =>
@@ -49,6 +51,10 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
             ),
             FootnotesWithoutReleaseVersionId = await statisticsDbContext.Footnote.CountAsync(
                 footnote => footnote.ReleaseVersionId == null,
+                cancellationToken
+            ),
+            OrphanedFootnotes = await statisticsDbContext.Footnote.CountAsync(
+                footnote => !footnote.Releases.Any(),
                 cancellationToken
             ),
         };
@@ -142,12 +148,8 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     private async Task DeleteOrphanedFootnotes(MigrationResult result, CancellationToken cancellationToken)
     {
-        // These orphaned footnotes aren't created by this migration. They already exist, left without a
-        // ReleaseFootnote when deleting a Subject removed their only link to a ReleaseVersion, or by statistics
-        // ReleaseVersion deletions before EES-7369. Nothing can reach them, but they have no ReleaseVersion to set
-        // ReleaseVersionId from, so they need removing before ReleaseVersionId can be made non-nullable. Any with a
-        // ReleaseVersionId would also reappear in that ReleaseVersion once footnotes are read through
-        // ReleaseVersionId rather than ReleaseFootnote.
+        // These orphaned footnotes aren't created by this migration - but we still want to remove them so we can
+        // update Footnote.ReleaseVersionId to be non-nullable later
         var orphanedFootnotes = await statisticsDbContext
             .Footnote.Where(footnote => !footnote.Releases.Any())
             .ToListAsync(cancellationToken);

@@ -353,7 +353,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task GetSharedFootnotes_CountsSharedFootnotesAndFootnotesWithoutReleaseVersionId()
+    public async Task GetSharedFootnotes_CountsSharedOrphanedAndFootnotesWithoutReleaseVersionId()
     {
         // Arrange
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(3);
@@ -393,6 +393,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
             // Assert
             Assert.Equal(2, result.SharedFootnotes);
             Assert.Equal(4, result.FootnotesWithoutReleaseVersionId);
+            Assert.Equal(1, result.OrphanedFootnotes);
         }
     }
 
