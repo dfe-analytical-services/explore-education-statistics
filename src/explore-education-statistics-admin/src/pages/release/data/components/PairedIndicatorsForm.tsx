@@ -218,6 +218,7 @@ function PairedIndicatorsFields({
       id="pairedIndicators"
       legend="Paired indicators"
       legendSize="m"
+      hint="A child indicator is selected automatically with its parent indicator in the table tool, and cannot be selected on its own. An indicator can only have one parent or one child indicator, and cannot be both a parent and a child indicator."
       error={typeof listError === 'string' ? listError : undefined}
     >
       {fields.length === 0 && (
