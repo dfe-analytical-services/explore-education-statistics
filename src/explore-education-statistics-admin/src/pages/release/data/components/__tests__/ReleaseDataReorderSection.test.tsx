@@ -1,4 +1,4 @@
-import ReleaseDataPairedIndicatorsSection from '@admin/pages/release/data/components/ReleaseDataPairedIndicatorsSection';
+import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
 import _adminTableBuilderService from '@admin/services/tableBuilderService';
 import render from '@common-test/render';
 import _tableBuilderService, {
@@ -18,7 +18,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-describe('ReleaseDataPairedIndicatorsSection', () => {
+describe('ReleaseDataReorderSection', () => {
   const testSubjects = [
     { id: 'subject-1', name: 'Subject 1' },
     { id: 'subject-2', name: 'Subject 2' },
@@ -51,33 +51,45 @@ describe('ReleaseDataPairedIndicatorsSection', () => {
     timePeriod: { hint: '', legend: '', options: [] },
   };
 
-  test('renders the data sets in the release', async () => {
+  test('renders the manage buttons for each data set', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(
-      <ReleaseDataPairedIndicatorsSection
+      <ReleaseDataReorderSection
         releaseVersionId="release-version-id"
         canUpdateRelease
       />,
     );
 
+    expect(
+      screen.getByRole('heading', { name: 'Manage filters and indicators' }),
+    ).toBeInTheDocument();
+
     const rows = within(await screen.findByRole('table')).getAllByRole('row');
 
     expect(rows).toHaveLength(3);
-    expect(within(rows[1]).getByText('Subject 1')).toBeInTheDocument();
     expect(
       within(rows[1]).getByRole('button', {
-        name: 'Pair indicators for Subject 1',
+        name: 'Manage filters for Subject 1',
       }),
     ).toBeInTheDocument();
-    expect(within(rows[2]).getByText('Subject 2')).toBeInTheDocument();
+    expect(
+      within(rows[1]).getByRole('button', {
+        name: 'Manage indicators for Subject 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(rows[2]).getByRole('button', {
+        name: 'Manage indicators for Subject 2',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('renders a warning and no data sets when the release cannot be updated', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(
-      <ReleaseDataPairedIndicatorsSection
+      <ReleaseDataReorderSection
         releaseVersionId="release-version-id"
         canUpdateRelease={false}
       />,
@@ -91,7 +103,7 @@ describe('ReleaseDataPairedIndicatorsSection', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('saving paired indicators for a data set updates them and returns to the data sets', async () => {
+  test('managing indicators shows the reorder list and paired indicators form, and saving pairs returns to the data sets', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     adminTableBuilderService.getPairedIndicators.mockResolvedValue({
@@ -106,7 +118,7 @@ describe('ReleaseDataPairedIndicatorsSection', () => {
     });
 
     const { user } = render(
-      <ReleaseDataPairedIndicatorsSection
+      <ReleaseDataReorderSection
         releaseVersionId="release-version-id"
         canUpdateRelease
       />,
@@ -114,10 +126,15 @@ describe('ReleaseDataPairedIndicatorsSection', () => {
 
     await user.click(
       await screen.findByRole('button', {
-        name: 'Pair indicators for Subject 2',
+        name: 'Manage indicators for Subject 2',
       }),
     );
 
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Reorder indicators for Subject 2',
+      }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole('heading', {
         name: 'Pair indicators for Subject 2',
