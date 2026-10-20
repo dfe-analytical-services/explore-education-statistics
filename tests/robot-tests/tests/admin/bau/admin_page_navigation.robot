@@ -20,3 +20,9 @@ Navigate to Manage boundary data page
 
     user waits until page finishes loading
     user waits until h1 is visible    Boundary data
+
+Navigate to Upload boundary data file page
+    user clicks link    Upload boundary data file
+
+    user waits until page finishes loading
+    user waits until page contains title caption    Upload boundary data
