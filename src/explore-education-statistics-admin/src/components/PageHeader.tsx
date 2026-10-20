@@ -1,11 +1,16 @@
 import Link from '@admin/components/Link';
 import { handleLogout } from '@admin/auth/msal';
-import { homeRoute, signInRoute } from '@admin/routes/routes';
+import {
+  homeRoute,
+  publishersGuideRoute,
+  signInRoute,
+} from '@admin/routes/routes';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import ButtonText from '@common/components/ButtonText';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import React, { useState } from 'react';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 import styles from './PageHeader.module.scss';
 
 interface Props {
@@ -134,14 +139,17 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
   <>
     {user.permissions.canAccessAnalystPages && (
       <li className="govuk-header__navigation-item">
-        <a className="govuk-header__link" href="/publishers-guide">
+        <a className="govuk-header__link" href={publishersGuideRoute.fullPath}>
           Publisher's guide
         </a>
       </li>
     )}
     {user.permissions.isBauUser && (
       <li className="govuk-header__navigation-item">
-        <a className="govuk-header__link" href="/administration">
+        <a
+          className="govuk-header__link"
+          href={administrationIndexRoute.fullPath}
+        >
           Platform administration
         </a>
       </li>
