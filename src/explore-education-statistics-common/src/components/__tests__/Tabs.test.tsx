@@ -1,6 +1,7 @@
 import { waitFor } from '@testing-library/dom';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
@@ -632,6 +633,51 @@ describe('Tabs', () => {
       expect(tabSection3).toBeVisible();
 
       expect(window.location.hash).toBe('#test-tabs-3');
+    });
+  });
+
+  describe('server render', () => {
+    function renderServerMarkup() {
+      const container = document.createElement('div');
+      container.innerHTML = renderToStaticMarkup(
+        <Tabs id="test-tabs">
+          <TabsSection title="Tab 1">
+            <p>Test section 1 content</p>
+          </TabsSection>
+          <TabsSection title="Tab 2">
+            <p>Test section 2 content</p>
+          </TabsSection>
+          <TabsSection title="Tab 3" lazy>
+            <p>Test section 3 content</p>
+          </TabsSection>
+        </Tabs>,
+      );
+      return container;
+    }
+
+    test('does not hide any tab section', () => {
+      const container = renderServerMarkup();
+      const sections = container.querySelectorAll('section');
+
+      expect(sections).toHaveLength(2);
+      expect(sections[0]).not.toHaveAttribute('hidden');
+      expect(sections[1]).not.toHaveAttribute('hidden');
+
+      expect(container).toHaveTextContent('Test section 1 content');
+      expect(container).toHaveTextContent('Test section 2 content');
+    });
+
+    test('hides all but the first tab section when JS is enabled', () => {
+      const sections = renderServerMarkup().querySelectorAll('section');
+
+      expect(sections[0]).not.toHaveClass('dfe-js-hidden');
+      expect(sections[1]).toHaveClass('dfe-js-hidden');
+    });
+
+    test('does not render lazy tab sections', () => {
+      expect(renderServerMarkup()).not.toHaveTextContent(
+        'Test section 3 content',
+      );
     });
   });
 });

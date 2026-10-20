@@ -46,13 +46,14 @@ const TabsSection = ({
   // Hide additional props from the component's public API to
   // avoid any confusion over this component's usage as
   // it should only be used in combination with Tabs.
-  const { hidden, ...tabProps } = restProps as HTMLAttributes<HTMLElement>;
+  const { className, hidden, ...tabProps } =
+    restProps as HTMLAttributes<HTMLElement>;
 
   const { onMedia } = useDesktopMedia();
   const [hasRendered, setRendered] = useState(!lazy);
 
   useEffect(() => {
-    if (lazy && !hasRendered && !hidden) {
+    if (lazy && !hasRendered && hidden === false) {
       setRendered(true);
     }
   }, [hasRendered, hidden, lazy]);
@@ -63,7 +64,7 @@ const TabsSection = ({
         hasSiblings ? onMedia(tabProps['aria-labelledby']) : undefined
       }
       hidden={hidden}
-      className={classNames(classes.panel, styles.panel, {
+      className={classNames(classes.panel, styles.panel, className, {
         [styles.panelHidden]: hidden,
       })}
       id={id}
