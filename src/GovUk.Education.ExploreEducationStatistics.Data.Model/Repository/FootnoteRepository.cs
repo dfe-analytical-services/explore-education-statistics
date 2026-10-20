@@ -253,7 +253,8 @@ public class FootnoteRepository : IFootnoteRepository
     {
         var footnoteToRemove = await _context
             .Footnote
-            // These includes are necessary so that the related entities are marked for deletion
+            // The database cascades the delete to these links, but the in-memory test provider only cascades to
+            // tracked entities, so these includes are only needed for tests
             .Include(footnote => footnote.Subjects)
             .Include(footnote => footnote.Filters)
             .Include(footnote => footnote.FilterGroups)
