@@ -153,6 +153,18 @@ Validate Release Home tab - Headline facts and figures
     user checks key stat guidance    3    What is unauthorized absence rate?
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
+Download headlines as PNG
+    Remove File    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+
+    user opens details dropdown    Export options    id:releaseHeadlines-summary
+    user clicks button    Download headlines as PNG    id:releaseHeadlines-summary
+
+    Wait Until Keyword Succeeds    10    1    File Should Exist
+    ...    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+
+    ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+    Should Be True    ${file_size} > 0
+
 Validate Headlines facts and figures -- Charts tab
     open headline chart
     chart legend should be
