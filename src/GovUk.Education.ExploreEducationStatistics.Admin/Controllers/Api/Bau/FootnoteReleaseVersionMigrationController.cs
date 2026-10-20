@@ -31,10 +31,13 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
     public class SharedFootnotesResult
     {
         public int SharedFootnotes { get; set; }
+
+        public int FootnotesWithoutReleaseVersionId { get; set; }
     }
 
     /// <summary>
-    /// Counts the Footnotes which are shared by more than one ReleaseVersion.
+    /// Counts the Footnotes which are shared by more than one ReleaseVersion, and the Footnotes which have no
+    /// ReleaseVersionId.
     /// </summary>
     [HttpGet("shared-footnotes")]
     public async Task<SharedFootnotesResult> GetSharedFootnotes(CancellationToken cancellationToken = default) =>
@@ -42,6 +45,10 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
         {
             SharedFootnotes = await statisticsDbContext.Footnote.CountAsync(
                 footnote => footnote.Releases.Count > 1,
+                cancellationToken
+            ),
+            FootnotesWithoutReleaseVersionId = await statisticsDbContext.Footnote.CountAsync(
+                footnote => footnote.ReleaseVersionId == null,
                 cancellationToken
             ),
         };
@@ -94,9 +101,13 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
                 .Releases.OrderBy(releaseFootnote => releaseFootnote.ReleaseVersionId)
                 .ToList();
 
-            if (footnote.ReleaseVersionId != releaseFootnotes[0].ReleaseVersionId)
+            // The existing footnote keeps the first ReleaseFootnote, and a copy of it is created for each of the
+            // remaining ReleaseFootnotes
+            var firstReleaseFootnote = releaseFootnotes[0];
+
+            if (footnote.ReleaseVersionId != firstReleaseFootnote.ReleaseVersionId)
             {
-                footnote.ReleaseVersionId = releaseFootnotes[0].ReleaseVersionId;
+                footnote.ReleaseVersionId = firstReleaseFootnote.ReleaseVersionId;
                 result.ReleaseVersionIdsSet++;
             }
 
