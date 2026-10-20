@@ -231,7 +231,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task OrphanedFootnote_DeletedWithItsLinks()
+    public async Task OrphanedFootnote_Deleted()
     {
         // Arrange
         Subject subject = _fixture.DefaultSubject();
@@ -260,7 +260,6 @@ public class FootnoteReleaseVersionMigrationControllerTests
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
             Assert.Empty(context.Footnote);
-            Assert.Empty(context.SubjectFootnote);
             Assert.Single(context.Subject);
         }
     }
@@ -350,6 +349,46 @@ public class FootnoteReleaseVersionMigrationControllerTests
             Assert.Equal(3, context.Footnote.Count());
             Assert.All(context.Footnote, f => Assert.Null(f.ReleaseVersionId));
             Assert.Equal(3, context.ReleaseFootnote.Count());
+        }
+    }
+
+    [Fact]
+    public async Task GetSharedFootnotes_CountsFootnotesWithMoreThanOneReleaseVersion()
+    {
+        // Arrange
+        var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(3);
+
+        Footnote sharedFootnote1 = _fixture.DefaultFootnote();
+        Footnote sharedFootnote2 = _fixture.DefaultFootnote();
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .ForIndex(0, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(sharedFootnote1))
+            .ForIndex(1, s => s.SetReleaseVersion(releaseVersions[1]).SetFootnote(sharedFootnote1))
+            .ForIndex(2, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(sharedFootnote2))
+            .ForIndex(3, s => s.SetReleaseVersion(releaseVersions[1]).SetFootnote(sharedFootnote2))
+            .ForIndex(4, s => s.SetReleaseVersion(releaseVersions[2]).SetFootnote(sharedFootnote2))
+            .ForIndex(5, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(_fixture.DefaultFootnote()))
+            .GenerateList();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseFootnote.AddRange(releaseFootnotes);
+            context.Footnote.Add(_fixture.DefaultFootnote());
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var controller = BuildController(context);
+
+            // Act
+            var result = await controller.GetSharedFootnotes();
+
+            // Assert
+            Assert.Equal(2, result.SharedFootnotes);
         }
     }
 

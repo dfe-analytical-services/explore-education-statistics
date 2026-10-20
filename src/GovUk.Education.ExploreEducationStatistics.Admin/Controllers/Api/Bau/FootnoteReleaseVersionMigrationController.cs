@@ -28,6 +28,24 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
         public int Remaining { get; set; }
     }
 
+    public class SharedFootnotesResult
+    {
+        public int SharedFootnotes { get; set; }
+    }
+
+    /// <summary>
+    /// Counts the Footnotes which are shared by more than one ReleaseVersion.
+    /// </summary>
+    [HttpGet("shared-footnotes")]
+    public async Task<SharedFootnotesResult> GetSharedFootnotes(CancellationToken cancellationToken = default) =>
+        new()
+        {
+            SharedFootnotes = await statisticsDbContext.Footnote.CountAsync(
+                footnote => footnote.Releases.Count > 1,
+                cancellationToken
+            ),
+        };
+
     /// <summary>
     /// Gives every Footnote shared by more than one ReleaseVersion a copy of its own for every ReleaseVersion but the
     /// first, deletes Footnotes which belong to no ReleaseVersion, and sets the ReleaseVersionId of up to
@@ -60,7 +78,12 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     private async Task ForkSharedFootnotes(MigrationResult result, CancellationToken cancellationToken)
     {
-        var sharedFootnotes = await HydrateFootnotes(statisticsDbContext.Footnote)
+        var sharedFootnotes = await statisticsDbContext
+            .Footnote.Include(footnote => footnote.Subjects)
+            .Include(footnote => footnote.Filters)
+            .Include(footnote => footnote.FilterGroups)
+            .Include(footnote => footnote.FilterItems)
+            .Include(footnote => footnote.Indicators)
             .Include(footnote => footnote.Releases)
             .Where(footnote => footnote.Releases.Count > 1)
             .ToListAsync(cancellationToken);
@@ -112,8 +135,8 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     private async Task DeleteOrphanedFootnotes(MigrationResult result, CancellationToken cancellationToken)
     {
-        var orphanedFootnotes = await HydrateFootnotes(statisticsDbContext.Footnote)
-            .Where(footnote => !footnote.Releases.Any())
+        var orphanedFootnotes = await statisticsDbContext
+            .Footnote.Where(footnote => !footnote.Releases.Any())
             .ToListAsync(cancellationToken);
 
         statisticsDbContext.Footnote.RemoveRange(orphanedFootnotes);
@@ -142,15 +165,5 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
         result.ReleaseVersionIdsSet += footnotes.Count;
         result.Remaining = footnotesToSetCount - footnotes.Count;
-    }
-
-    private static IQueryable<Footnote> HydrateFootnotes(IQueryable<Footnote> query)
-    {
-        return query
-            .Include(footnote => footnote.Subjects)
-            .Include(footnote => footnote.Filters)
-            .Include(footnote => footnote.FilterGroups)
-            .Include(footnote => footnote.FilterItems)
-            .Include(footnote => footnote.Indicators);
     }
 }
