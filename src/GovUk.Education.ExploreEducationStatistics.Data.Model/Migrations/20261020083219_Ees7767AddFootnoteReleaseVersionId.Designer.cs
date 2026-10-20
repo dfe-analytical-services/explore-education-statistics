@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20261020083219_Ees2979AddFootnoteReleaseVersionId")]
-    partial class Ees2979AddFootnoteReleaseVersionId
+    [Migration("20261020083219_Ees7767AddFootnoteReleaseVersionId")]
+    partial class Ees7767AddFootnoteReleaseVersionId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
