@@ -229,13 +229,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("ReleaseVersionId")
+                    b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReleaseVersionId");
 
                     b.ToTable("Footnote");
                 });
@@ -537,21 +539,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("FilterItemId");
 
                     b.ToTable("ObservationFilterItem");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseFootnote", b =>
-                {
-                    b.Property<Guid>("ReleaseVersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FootnoteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ReleaseVersionId", "FootnoteId");
-
-                    b.HasIndex("FootnoteId");
-
-                    b.ToTable("ReleaseFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
@@ -1090,6 +1077,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Navigation("Footnote");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion", "ReleaseVersion")
+                        .WithMany()
+                        .HasForeignKey("ReleaseVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReleaseVersion");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", "IndicatorGroup")
@@ -1176,25 +1174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Navigation("Observation");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseFootnote", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
-                        .WithMany("Releases")
-                        .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion", "ReleaseVersion")
-                        .WithMany()
-                        .HasForeignKey("ReleaseVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Footnote");
-
-                    b.Navigation("ReleaseVersion");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion", "ReleaseVersion")
@@ -1261,8 +1240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Navigation("Filters");
 
                     b.Navigation("Indicators");
-
-                    b.Navigation("Releases");
 
                     b.Navigation("Subjects");
                 });
