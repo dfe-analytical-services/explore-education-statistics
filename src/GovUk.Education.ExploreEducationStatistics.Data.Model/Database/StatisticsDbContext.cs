@@ -117,7 +117,6 @@ public class StatisticsDbContext : DbContext
     public DbSet<SubjectFootnote> SubjectFootnote { get; set; } = null!;
 
     public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
-    public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
     public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
     public DbSet<MatchedFilterItem> MatchedFilterItems => this.TempTableSet<MatchedFilterItem>();
 
@@ -132,6 +131,7 @@ public class StatisticsDbContext : DbContext
         ConfigureFilterFootnote(modelBuilder);
         ConfigureFilterGroupFootnote(modelBuilder);
         ConfigureFilterItemFootnote(modelBuilder);
+        ConfigureFootnote(modelBuilder);
         ConfigureIdTempTable(modelBuilder);
         ConfigureIndicatorFootnote(modelBuilder);
         ConfigureLocation(modelBuilder);
@@ -141,7 +141,6 @@ public class StatisticsDbContext : DbContext
         ConfigureTableBuilderTempTables(modelBuilder);
         ConfigurePublication(modelBuilder);
         ConfigureReleaseSubject(modelBuilder);
-        ConfigureReleaseFootnote(modelBuilder);
         ConfigureSubject(modelBuilder);
         ConfigureSubjectFootnote(modelBuilder);
         ConfigureTimePeriod(modelBuilder);
@@ -309,26 +308,6 @@ public class StatisticsDbContext : DbContext
         modelBuilder.Entity<ReleaseSubject>().HasOne(rs => rs.Subject).WithMany().OnDelete(DeleteBehavior.Cascade);
     }
 
-    private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<ReleaseFootnote>()
-            .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.FootnoteId });
-
-        modelBuilder
-            .Entity<ReleaseFootnote>()
-            .HasOne(rf => rf.ReleaseVersion)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder
-            .Entity<ReleaseFootnote>()
-            .HasOne(rf => rf.Footnote)
-            .WithMany(footnote => footnote.Releases)
-            .HasForeignKey(releaseFootnote => releaseFootnote.FootnoteId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-
     private static void ConfigureMeasures(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -426,6 +405,16 @@ public class StatisticsDbContext : DbContext
             isKeyless: false,
             builder => builder.HasKey(idTempTable => idTempTable.Id)
         );
+    }
+
+    private static void ConfigureFootnote(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .Entity<Footnote>()
+            .HasOne(footnote => footnote.ReleaseVersion)
+            .WithMany()
+            .HasForeignKey(footnote => footnote.ReleaseVersionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)

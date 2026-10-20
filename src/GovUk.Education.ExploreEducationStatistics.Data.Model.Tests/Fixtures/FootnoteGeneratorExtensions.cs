@@ -11,6 +11,14 @@ public static class FootnoteGeneratorExtensions
     public static Generator<Footnote> WithDefaults(this Generator<Footnote> generator) =>
         generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<Footnote> WithReleaseVersion(
+        this Generator<Footnote> generator,
+        ReleaseVersion releaseVersion
+    ) => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
+
+    public static Generator<Footnote> WithReleaseVersionId(this Generator<Footnote> generator, Guid releaseVersionId) =>
+        generator.ForInstance(s => s.SetReleaseVersionId(releaseVersionId));
+
     public static Generator<Footnote> WithSubjects(this Generator<Footnote> generator, IEnumerable<Subject> subjects) =>
         generator.ForInstance(s => s.SetSubjects(subjects));
 
@@ -45,6 +53,16 @@ public static class FootnoteGeneratorExtensions
             .Set(f => f.Order, f => f.IndexFaker)
             .Set(f => f.Created, f => f.Date.Past())
             .Set(f => f.Updated, (f, footnote) => f.Date.Soon(14, footnote.Created));
+
+    public static InstanceSetters<Footnote> SetReleaseVersion(
+        this InstanceSetters<Footnote> instanceSetter,
+        ReleaseVersion releaseVersion
+    ) => instanceSetter.Set(f => f.ReleaseVersion, releaseVersion).SetReleaseVersionId(releaseVersion.Id);
+
+    public static InstanceSetters<Footnote> SetReleaseVersionId(
+        this InstanceSetters<Footnote> instanceSetter,
+        Guid releaseVersionId
+    ) => instanceSetter.Set(f => f.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<Footnote> SetSubjects(
         this InstanceSetters<Footnote> instanceSetter,
