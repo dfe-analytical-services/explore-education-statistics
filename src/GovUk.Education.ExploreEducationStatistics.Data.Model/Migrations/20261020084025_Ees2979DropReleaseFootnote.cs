@@ -11,16 +11,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // The migrate-footnote-release-versions BAU endpoint has to have forked every shared Footnote and set
-            // every ReleaseVersionId. Footnotes which have lost their only ReleaseFootnote since it was last run
-            // belong to no ReleaseVersion, so they are deleted along with their links.
+            // The migrate-footnote-release-versions BAU endpoint has to have been run until shared-footnotes reports
+            // no shared footnotes, no footnotes without a ReleaseVersionId and no orphaned footnotes
             migrationBuilder.Sql(
                 @"
                 IF EXISTS (SELECT FootnoteId FROM ReleaseFootnote GROUP BY FootnoteId HAVING COUNT(*) > 1)
                     THROW 50000, 'Footnotes are still shared by more than one ReleaseVersion.', 1;
 
-                DELETE FROM Footnote
-                WHERE NOT EXISTS (SELECT 1 FROM ReleaseFootnote WHERE ReleaseFootnote.FootnoteId = Footnote.Id);
+                IF EXISTS (
+                    SELECT 1
+                    FROM Footnote
+                    WHERE NOT EXISTS (SELECT 1 FROM ReleaseFootnote WHERE ReleaseFootnote.FootnoteId = Footnote.Id)
+                )
+                    THROW 50000, 'Footnotes belong to no ReleaseVersion.', 1;
 
                 IF EXISTS (
                     SELECT 1
