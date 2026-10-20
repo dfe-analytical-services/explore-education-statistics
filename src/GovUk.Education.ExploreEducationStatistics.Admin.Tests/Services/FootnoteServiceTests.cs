@@ -1080,8 +1080,8 @@ public class FootnoteServiceTests
             Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Subjects.First().SubjectId);
 
             Assert.Single(retrievedFootnote.Filters);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Filters.First().SubjectId);
 
             Assert.Single(retrievedFootnote.FilterGroups);
             Assert.Equal(
