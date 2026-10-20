@@ -26,4 +26,7 @@ public class Footnote : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     public List<SubjectFootnote> Subjects { get; set; } = new();
 
     public List<ReleaseFootnote> Releases { get; set; } = new();
+
+    // TODO EES-2979 Make this non-nullable and remove Releases once every Footnote belongs to one ReleaseVersion
+    public Guid? ReleaseVersionId { get; set; }
 }
