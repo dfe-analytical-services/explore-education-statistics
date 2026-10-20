@@ -898,6 +898,68 @@ describe('FiltersForm', () => {
       expect(screen.getByLabelText('Authorised absence rate')).toBeChecked();
     });
 
+    test('searching for the parent indicator also shows the child indicator', async () => {
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      await user.type(
+        screen.getByLabelText('Search options for Indicators'),
+        'excluded',
+      );
+
+      await waitFor(() =>
+        expect(
+          screen.queryByLabelText('Authorised absence rate'),
+        ).not.toBeInTheDocument(),
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeInTheDocument();
+      expect(screen.getByLabelText(childLabel)).toBeInTheDocument();
+    });
+
+    test('searching for the child indicator keeps showing the parent indicator after unchecking it', async () => {
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaPairedIndicators}
+          onSubmit={noop}
+        />,
+      );
+
+      await user.type(
+        screen.getByLabelText('Search options for Indicators'),
+        'reasons',
+      );
+
+      await waitFor(() =>
+        expect(
+          screen.queryByLabelText('Authorised absence rate'),
+        ).not.toBeInTheDocument(),
+      );
+
+      expect(screen.getByLabelText(parentLabel)).toBeInTheDocument();
+      expect(screen.getByLabelText(childLabel)).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText(parentLabel));
+      expect(screen.getByLabelText(childLabel)).toBeChecked();
+
+      await user.click(screen.getByLabelText(parentLabel));
+
+      expect(screen.getByLabelText(parentLabel)).not.toBeChecked();
+      expect(screen.getByLabelText(childLabel)).not.toBeChecked();
+      expect(screen.getByLabelText(parentLabel)).toBeInTheDocument();
+      expect(screen.getByLabelText(childLabel)).toBeInTheDocument();
+    });
+
     test('selecting and unselecting all subgroup options includes the child indicator', async () => {
       const { user } = render(
         <FiltersForm
