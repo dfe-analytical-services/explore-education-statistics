@@ -126,25 +126,40 @@ const FormCheckboxSearchSubGroups = ({
     [options],
   );
 
-  const totalFilteredOptions = useMemo(
-    () => filteredOptions.reduce((acc, group) => acc + group.options.length, 0),
+  // Disabled options can't be selected on their own, so are left out of select all
+  const selectableFilteredOptions = useMemo(
+    () =>
+      filteredOptions.map(group => ({
+        ...group,
+        options: group.options.filter(option => !option.disabled),
+      })),
     [filteredOptions],
+  );
+
+  const totalFilteredOptions = useMemo(
+    () =>
+      selectableFilteredOptions.reduce(
+        (acc, group) => acc + group.options.length,
+        0,
+      ),
+    [selectableFilteredOptions],
   );
 
   const isAllChecked = useMemo(
     () =>
-      filteredOptions.every(group =>
+      totalFilteredOptions > 0 &&
+      selectableFilteredOptions.every(group =>
         group.options.every(option => value.includes(option.value)),
       ),
-    [filteredOptions, value],
+    [selectableFilteredOptions, totalFilteredOptions, value],
   );
 
   const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> =
     useCallback(
       event => {
-        onAllChange?.(event, isAllChecked, filteredOptions);
+        onAllChange?.(event, isAllChecked, selectableFilteredOptions);
       },
-      [isAllChecked, onAllChange, filteredOptions],
+      [isAllChecked, onAllChange, selectableFilteredOptions],
     );
 
   const renderCheckboxes = () => {
@@ -176,8 +191,8 @@ const FormCheckboxSearchSubGroups = ({
                     <VisuallyHidden>{` for ${optionGroup.legend}`}</VisuallyHidden>
                   </>
                 )}
-                onAllChange={(event, checked) => {
-                  onSubGroupAllChange?.(event, checked, optionGroup.options);
+                onAllChange={(event, checked, selectableOptions) => {
+                  onSubGroupAllChange?.(event, checked, selectableOptions);
                 }}
               />
             ))}
@@ -195,8 +210,8 @@ const FormCheckboxSearchSubGroups = ({
             }
             value={value}
             selectAll
-            onAllChange={(event, checked) => {
-              onSubGroupAllChange?.(event, checked, filteredOptions[0].options);
+            onAllChange={(event, checked, selectableOptions) => {
+              onSubGroupAllChange?.(event, checked, selectableOptions);
             }}
           />
         )}
