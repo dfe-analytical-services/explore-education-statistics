@@ -90,6 +90,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountPublicNetworkAccessEnabled: true
     publicNetworkAccessEnabled: true
     storageFirewallRules: maintenanceIpRanges
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {

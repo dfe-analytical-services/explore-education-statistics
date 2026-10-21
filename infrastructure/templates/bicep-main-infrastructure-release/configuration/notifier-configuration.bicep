@@ -5,9 +5,6 @@ type NotifierConfig = {
 
   @description('Function App Service SKU')
   appServiceSku: FunctionAppServicePlanSku?
-
-  @description('Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key.')
-  suppressExceptionsForTeamOnlyApiKeyErrors: bool?
 }
 
 var defaultConfig = {
@@ -15,7 +12,6 @@ var defaultConfig = {
     tier: 'Standard'
     name: 'S1'
   }
-  suppressExceptionsForTeamOnlyApiKeyErrors: false
 }
 
 @export()
