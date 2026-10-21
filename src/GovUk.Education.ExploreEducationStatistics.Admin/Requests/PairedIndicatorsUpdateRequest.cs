@@ -15,7 +15,9 @@ public record PairedIndicatorsUpdateRequest
         {
             RuleFor(request => request.PairedIndicators).NotNull();
 
-            RuleForEach(request => request.PairedIndicators).SetValidator(new PairedIndicatorRequest.Validator());
+            RuleForEach(request => request.PairedIndicators)
+                .NotNull()
+                .SetValidator(new PairedIndicatorRequest.Validator());
 
             RuleFor(request => request.PairedIndicators)
                 .Must(HaveUniqueChildren)
@@ -24,7 +26,11 @@ public record PairedIndicatorsUpdateRequest
                 .WithMessage(ValidationMessages.PairedIndicatorParentHasMultipleChildren)
                 .Must(NotBeChained)
                 .WithMessage(ValidationMessages.PairedIndicatorsCannotBeChained)
-                .When(request => request.PairedIndicators is not null);
+                // Only check across pairs once every pair is present, as null pairs are reported above
+                .When(request =>
+                    request.PairedIndicators is not null
+                    && request.PairedIndicators.All(pair => (PairedIndicatorRequest?)pair is not null)
+                );
         }
 
         private static bool HaveUniqueChildren(List<PairedIndicatorRequest> pairedIndicators) =>
