@@ -1,7 +1,7 @@
 import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Names of the Content API Front Door child resources.')
-param names ResourceNames.frontDoor.contentApi
+param contentApiNames ResourceNames.frontDoor.contentApi
 
 @description('Name of the existing Azure Front Door profile.')
 param frontDoorProfileName string
@@ -49,7 +49,7 @@ module publisherFrontDoorRoleAssignment '../../../common/components/front-door/a
 
 resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
   parent: frontDoor
-  name: names.originGroup
+  name: contentApiNames.originGroup
   properties: {
     loadBalancingSettings: {
       sampleSize: 4
@@ -62,7 +62,7 @@ resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
 
 resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
   parent: originGroup
-  name: names.origin
+  name: contentApiNames.origin
   properties: {
     hostName: contentApiOriginHostName
     httpPort: 80
@@ -87,7 +87,7 @@ module certificateModule '../../../common/components/front-door/byoCertificate.b
 
 resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-04-15' = {
   parent: frontDoor
-  name: names.customDomain
+  name: contentApiNames.customDomain
   properties: {
     hostName: contentApiHostName
     tlsSettings: {
@@ -103,7 +103,7 @@ resource customDomainWithCertificate 'Microsoft.Cdn/profiles/customdomains@2025-
 
 resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
-  name: names.route
+  name: contentApiNames.route
   properties: {
     customDomains: [
       {
@@ -133,7 +133,7 @@ resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
 
 resource allFilesZipCacheRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoint
-  name: names.allFilesCacheRoute
+  name: contentApiNames.allFilesCacheRoute
   properties: {
     customDomains: [
       {

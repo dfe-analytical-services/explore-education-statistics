@@ -2,7 +2,7 @@ import { ResourceNames } from '../../../common/resource-names.bicep'
 import { VNetAddressRanges, VNetSubnets } from 'types.bicep'
 
 @description('Names of the VNet and its subnets.')
-param names ResourceNames.vnet
+param vnetNames ResourceNames.vnet
 
 @description('Whether or not to deploy the subnets.')
 param deploySubnets bool
@@ -13,44 +13,44 @@ param addressRanges VNetAddressRanges
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var vNetName = names.vnet
+var vNetName = vnetNames.vnet
 
 // Core shared infrastructure subnets.
-var applicationGatewaySubnetName = names.subnets.applicationGateway
-var eventGridCustomTopicPrivateEndpointsSubnetName = names.subnets.eventGridCustomTopicPrivateEndpoints
+var applicationGatewaySubnetName = vnetNames.subnets.applicationGateway
+var eventGridCustomTopicPrivateEndpointsSubnetName = vnetNames.subnets.eventGridCustomTopicPrivateEndpoints
 
 // Core application subnets.
-var adminSubnetName = names.subnets.admin
-var importerSubnetName = names.subnets.importer
-var publisherSubnetName = names.subnets.publisher
-var notifySubnetName = names.subnets.notifier
-var contentSubnetName = names.subnets.contentApi
-var dataSubnetName = names.subnets.dataApi
-var sqlServerPrivateEndpointsSubnetName = names.subnets.sqlServerPrivateEndpoints
+var adminSubnetName = vnetNames.subnets.admin
+var importerSubnetName = vnetNames.subnets.importer
+var publisherSubnetName = vnetNames.subnets.publisher
+var notifySubnetName = vnetNames.subnets.notifier
+var contentSubnetName = vnetNames.subnets.contentApi
+var dataSubnetName = vnetNames.subnets.dataApi
+var sqlServerPrivateEndpointsSubnetName = vnetNames.subnets.sqlServerPrivateEndpoints
 
 // Screener subnets.
-var screenerFunctionAppSubnetName = names.subnets.screenerFunctionApp
-var screenerStoragePrivateEndpointsSubnetName = names.subnets.screenerStoragePrivateEndpoints
+var screenerFunctionAppSubnetName = vnetNames.subnets.screenerFunctionApp
+var screenerStoragePrivateEndpointsSubnetName = vnetNames.subnets.screenerStoragePrivateEndpoints
 
 // Public API subnets.
-var publicApiDataProcessorSubnetName = names.subnets.publicApiDataProcessor
-var publicApiDataProcessorPrivateEndpointsSubnetName = names.subnets.publicApiDataProcessorPrivateEndpoints
-var publicApiStoragePrivateEndpointsSubnetName = names.subnets.publicApiStoragePrivateEndpoints
-var containerAppEnvironmentSubnetName = names.subnets.containerAppEnvironment
-var psqlFlexibleServerSubnetName = names.subnets.psqlFlexibleServer
+var publicApiDataProcessorSubnetName = vnetNames.subnets.publicApiDataProcessor
+var publicApiDataProcessorPrivateEndpointsSubnetName = vnetNames.subnets.publicApiDataProcessorPrivateEndpoints
+var publicApiStoragePrivateEndpointsSubnetName = vnetNames.subnets.publicApiStoragePrivateEndpoints
+var containerAppEnvironmentSubnetName = vnetNames.subnets.containerAppEnvironment
+var psqlFlexibleServerSubnetName = vnetNames.subnets.psqlFlexibleServer
 
 // NL Search subnets.
-var nlSearchFunctionAppSubnetName = names.subnets.nlSearchFunctionApp
-var nlSearchFunctionAppPrivateEndpointsSubnetName = names.subnets.nlSearchFunctionAppPrivateEndpoints
+var nlSearchFunctionAppSubnetName = vnetNames.subnets.nlSearchFunctionApp
+var nlSearchFunctionAppPrivateEndpointsSubnetName = vnetNames.subnets.nlSearchFunctionAppPrivateEndpoints
 
 // Search subnets.
-var searchDocsFunctionAppSubnetName = names.subnets.searchDocsFunctionApp
-var searchDocsFunctionAppPrivateEndpointsSubnetName = names.subnets.searchDocsFunctionAppPrivateEndpoints
-var searchStoragePrivateEndpointsSubnetName = names.subnets.searchStoragePrivateEndpoints
+var searchDocsFunctionAppSubnetName = vnetNames.subnets.searchDocsFunctionApp
+var searchDocsFunctionAppPrivateEndpointsSubnetName = vnetNames.subnets.searchDocsFunctionAppPrivateEndpoints
+var searchStoragePrivateEndpointsSubnetName = vnetNames.subnets.searchStoragePrivateEndpoints
 
 // Analytics subnets.
-var analyticsFunctionAppSubnetName = names.subnets.analyticsFunctionApp
-var analyticsStoragePrivateEndpointsSubnetName = names.subnets.analyticsStoragePrivateEndpoints
+var analyticsFunctionAppSubnetName = vnetNames.subnets.analyticsFunctionApp
+var analyticsStoragePrivateEndpointsSubnetName = vnetNames.subnets.analyticsStoragePrivateEndpoints
 
 var subnets = deploySubnets ? [{
   name: adminSubnetName

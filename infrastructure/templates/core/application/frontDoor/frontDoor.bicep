@@ -2,7 +2,7 @@ import { FrontDoorCertificateType } from '../../../common/components/front-door/
 import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Names of the Front Door profile and its child resources.')
-param names ResourceNames.frontDoor
+param frontDoorNames ResourceNames.frontDoor
 
 @description('Name of the Key Vault certificate used by the public site custom domain.')
 param publicSiteCertificateName string
@@ -46,13 +46,13 @@ param deployAlerts bool
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var frontDoorProfileName = names.frontDoorName
+var frontDoorProfileName = frontDoorNames.frontDoorName
 
 var publicSiteHostName = replace(publicSiteUrl, 'https://', '')
 var contentApiHostName = replace(contentApiUrl, 'https://', '')
 
-var publicSiteCustomDomainName = names.publicSite.customDomain
-var contentApiCustomDomainName = names.contentApi.customDomain
+var publicSiteCustomDomainName = frontDoorNames.publicSite.customDomain
+var contentApiCustomDomainName = frontDoorNames.contentApi.customDomain
 
 var nextJsRuleSetName = 'nextjsruleset'
 
@@ -60,12 +60,12 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
   name: '${frontDoorProfileName}ModuleDeploy'
   params: {
     frontDoorProfileName: frontDoorProfileName
-    endpointName: names.defaultEndpoint.endpointName
-    originGroupName: names.publicSite.originGroup
-    originName: names.publicSite.origin
-    routeName: names.publicSite.route
-    wafPolicyName: names.wafPolicy
-    wafSecurityPolicyName: names.wafSecurityPolicy
+    endpointName: frontDoorNames.defaultEndpoint.endpointName
+    originGroupName: frontDoorNames.publicSite.originGroup
+    originName: frontDoorNames.publicSite.origin
+    routeName: frontDoorNames.publicSite.route
+    wafPolicyName: frontDoorNames.wafPolicy
+    wafSecurityPolicyName: frontDoorNames.wafSecurityPolicy
     keyVaultName: keyVaultName
     siteHostName: publicSiteHostName
     originHostName: '${publicSiteAppServiceName}.azurewebsites.net'
@@ -94,9 +94,9 @@ module frontDoorModule '../../../common/components/front-door/frontDoor.bicep' =
 module contentApiFrontDoorModule 'content-api-front-door.bicep' = {
   name: '${frontDoorProfileName}ContentApiModuleDeploy'
   params: {
-    names: names.contentApi
+    contentApiNames: frontDoorNames.contentApi
     frontDoorProfileName: frontDoorProfileName
-    frontDoorEndpointName: names.defaultEndpoint.endpointName
+    frontDoorEndpointName: frontDoorNames.defaultEndpoint.endpointName
     keyVaultName: keyVaultName
     certificateName: contentApiCertificateName
     contentApiHostName: contentApiHostName
@@ -111,8 +111,8 @@ module contentApiFrontDoorModule 'content-api-front-door.bicep' = {
 module wafSecurityPolicyModule '../../../common/components/front-door/wafSecurityPolicy.bicep' = {
   name: '${frontDoorProfileName}WafSecurityPolicyModule'
   params: {
-    securityPolicyName: names.wafSecurityPolicy
-    wafPolicyName: names.wafPolicy
+    securityPolicyName: frontDoorNames.wafSecurityPolicy
+    wafPolicyName: frontDoorNames.wafPolicy
     customDomainNames: [
       publicSiteCustomDomainName
       contentApiCustomDomainName

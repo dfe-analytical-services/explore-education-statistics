@@ -2,7 +2,6 @@ import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../a
 import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
 
-
 @description('Name of the Key Vault instance in which to store certificates.')
 param keyVaultName string
 

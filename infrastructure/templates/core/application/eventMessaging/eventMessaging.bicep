@@ -29,7 +29,7 @@ param resourceNames {
 }
 
 @description('Names of the Event Grid resources.')
-param names ResourceNames.eventGrid
+param eventGridNames ResourceNames.eventGrid
 
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
@@ -37,7 +37,7 @@ param deployAlerts bool
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-var topicNamesList = map(items(names.topics), item => item.value)
+var topicNamesList = map(items(eventGridNames.topics), item => item.value)
 
 resource adminAppService 'Microsoft.Web/sites@2024-04-01' existing = {
   name: resourceNames.adminApp

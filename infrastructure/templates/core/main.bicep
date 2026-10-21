@@ -139,7 +139,7 @@ var resourceNames = getResourceNamesForEnvironment({
 module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   name: 'vNetModuleDeploy'
   params: {
-    names: resourceNames.vnet
+    vnetNames: resourceNames.vnet
     deploySubnets: deploySubnets
     addressRanges: vNetAddressRanges
     tagValues: tagValues
@@ -186,7 +186,7 @@ module backupsModule 'application/backups/backups.bicep' = {
   name: 'backupsModuleDeploy'
   params: {
     location: location
-    names: resourceNames.backups
+    backupsNames: resourceNames.backups
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     deployRecoveryServicesVault: deployRecoveryServicesVault
     recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
@@ -198,7 +198,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
   name: 'eventMessagingModuleDeploy'
   params: {
     location: location
-    names: resourceNames.eventGrid
+    eventGridNames: resourceNames.eventGrid
     resourceNames: {
       adminApp: resourceNames.admin.appService
       alertsGroup: alertsModule.outputs.actionGroupName
@@ -216,7 +216,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
 module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzureFrontDoor) {
   name: 'frontDoorModuleDeploy'
   params: {
-    names: resourceNames.frontDoor
+    frontDoorNames: resourceNames.frontDoor
     publicSiteCertificateName: resourceNames.keyVault.certificates.publicSite
     contentApiCertificateName: resourceNames.keyVault.certificates.contentApiFrontDoor
     publicSiteAppServiceName: resourceNames.publicSite.appService
@@ -238,15 +238,10 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
   name: 'appGatewayModuleDeploy'
   params: {
     location: location
-    names: resourceNames.applicationGateway
-    subnetName: resourceNames.vnet.subnets.applicationGateway
-    publicApiCertificateName: resourceNames.keyVault.certificates.publicApiAppGateway
-    publicSiteCertificateName: resourceNames.keyVault.certificates.publicSite
+    resourceNames: resourceNames
+    subnetName: vNetModule.outputs.applicationGatewaySubnetName
     alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    publicApiAppName: resourceNames.publicApi.apiApp
-    publicApiDocsAppName: resourceNames.publicApi.docsApp
-    publicSiteAppServiceName: resourceNames.publicSite.appService
     vnetName: vNetModule.outputs.vNetName
     publicApiAppGatewayFqdn: publicApiApplicationGatewayFqdn
     publicApiPublicUrl: publicApiPublicUrl

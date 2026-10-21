@@ -1,33 +1,18 @@
 import { ResourceNames } from '../../../common/resource-names.bicep'
 
-@description('Names of the Application Gateway and its associated resources.')
-param names ResourceNames.applicationGateway
+@description('Specifies common resource naming variables.')
+param resourceNames ResourceNames
 
 @description('Name of the subnet that the Application Gateway is deployed into.')
 param subnetName string
 
-@description('Name of the Key Vault certificate used by the public API listener.')
-param publicApiCertificateName string
-
-@description('Name of the Key Vault certificate used by the public site listener.')
-param publicSiteCertificateName string
-
 @description('The location to create resources in')
 param location string
 
-@description('')
-param publicApiAppName string
-
-@description('')
-param publicApiDocsAppName string
-
-@description('')
-param publicSiteAppServiceName string
-
-@description('')
+@description('Name of the Key Vault holding the Application Gateway\'s certificates and the FUAPI header secret.')
 param keyVaultName string
 
-@description('')
+@description('Name of the VNet that the Application Gateway\'s subnet belongs to.')
 param vnetName string
 
 @description('FQDN of the public API listener in Application Gateway. This is the FQDN that FaUAPI proxies traffic to to access the public API from Application Gateway.')
@@ -51,10 +36,6 @@ param deployAlerts bool
 @description('Tags for the resources')
 param tagValues object
 
-var appGatewayName = names.applicationGateway
-
-var docsRewriteSetName = names.publicApiDocsRewriteSet
-
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
   name: vnetName
 }
@@ -65,17 +46,17 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing 
 }
 
 resource apiApp 'Microsoft.App/containerApps@2024-03-01' existing = {
-  name: publicApiAppName
+  name: resourceNames.publicApi.apiApp
 }
 
 resource apiDocsSite 'Microsoft.Web/staticSites@2023-12-01' existing = {
-  name: publicApiDocsAppName
+  name: resourceNames.publicApi.docsApp
 }
 
 module globalWafPolicyModule '../../../common/components/application-gateway/appGatewayWafPolicy.bicep' = {
   name: 'globalWafPolicyModuleDeploy'
   params: {
-    name: names.globalWafPolicy
+    name: resourceNames.applicationGateway.globalWafPolicy
     location: location
     mode: 'Detection'
     tagValues: tagValues
@@ -90,7 +71,7 @@ module publicApiWafPolicyModule 'publicApiWafPolicy.bicep' = {
   name: 'publicApiWafPolicyModuleDeploy'
   params: {
     location: location
-    policyName: names.publicApiWafPolicy
+    policyName: resourceNames.applicationGateway.sites.publicApi.wafPolicy
     fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
     tagValues: tagValues
   }
@@ -100,41 +81,41 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
   name: 'appGatewayDeploy'
   params: {
     location: location
-    appGatewayName: appGatewayName
-    managedIdentityName: names.managedIdentity
+    appGatewayName: resourceNames.applicationGateway.applicationGateway
+    managedIdentityName: resourceNames.applicationGateway.managedIdentity
     keyVaultName: keyVaultName
     subnetId: subnet.id
     frontendConfig: {
-      name: names.frontendIpConfig
-      publicIpAddressName: names.publicIpAddress
+      name: resourceNames.applicationGateway.frontendIpConfig
+      publicIpAddressName: resourceNames.applicationGateway.publicIpAddress
     }
     sites: [
       {
-        name: names.publicApiSite
-        certificateName: publicApiCertificateName
+        name: resourceNames.applicationGateway.sites.publicApi.site
+        certificateName: resourceNames.keyVault.certificates.publicApiAppGateway
         fqdn: replace(publicApiAppGatewayFqdn, 'https://', '')
         wafPolicyName: publicApiWafPolicyModule.outputs.name
       }
       {
-        name: '${publicSiteAppServiceName}-site'
-        certificateName: publicSiteCertificateName
+        name: resourceNames.applicationGateway.sites.publicSite.site
+        certificateName: resourceNames.keyVault.certificates.publicSite
         fqdn: publicSiteFqdn
-        wafPolicyName: names.globalWafPolicy
+        wafPolicyName: resourceNames.applicationGateway.globalWafPolicy
       }
     ]
     backends: [
       {
-        name: publicApiAppName
+        name: resourceNames.applicationGateway.sites.publicApi.backend
         fqdn: apiApp.properties.configuration.ingress.fqdn
         healthProbePath: '/health'
       }
       {
-        name: publicApiDocsAppName
+        name: resourceNames.applicationGateway.sites.publicApiDocs.backend
         fqdn: apiDocsSite.properties.defaultHostname
         healthProbePath: '/'
       }
       {
-        name: '${publicSiteAppServiceName}-backend'
+        name: resourceNames.applicationGateway.sites.publicSite.backend
         fqdn: publicSiteInternalServiceFqdn
         healthProbePath: '/health'
         intervalSeconds: 60
@@ -143,22 +124,22 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
     ]
     routes: [
       {
-        name: names.publicApiSite
-        siteName: names.publicApiSite
-        defaultBackendName: publicApiAppName
+        name: resourceNames.applicationGateway.sites.publicApi.route
+        siteName: resourceNames.applicationGateway.sites.publicApi.site
+        defaultBackendName: resourceNames.applicationGateway.sites.publicApi.backend
         pathRules: [
           {
-            name: 'docs-backend'
+            name: resourceNames.applicationGateway.sites.publicApiDocs.pathRules.backend
             paths: ['/docs/*']
             type: 'backend'
-            backendName: publicApiDocsAppName
-            rewriteSetName: docsRewriteSetName
+            backendName: resourceNames.applicationGateway.sites.publicApiDocs.backend
+            rewriteSetName: resourceNames.applicationGateway.sites.publicApi.rewriteSet
           }
           {
             // Redirect non-rooted URL (has no trailing slash) to the
             // rooted URL so that relative links in the docs site
             // can resolve correctly.
-            name: 'docs-root-redirect'
+            name: resourceNames.applicationGateway.sites.publicApiDocs.pathRules.rootRedirect
             paths: ['/docs']
             type: 'redirect'
             redirectUrl: '${publicApiPublicUrl}/docs/'
@@ -168,14 +149,14 @@ module appGatewayModule '../../../common/components/application-gateway/appGatew
         ]
       }
       {
-        name: '${publicSiteAppServiceName}-route'
-        siteName: '${publicSiteAppServiceName}-site'
-        defaultBackendName: '${publicSiteAppServiceName}-backend'
+        name: resourceNames.applicationGateway.sites.publicSite.route
+        siteName: resourceNames.applicationGateway.sites.publicSite.site
+        defaultBackendName: resourceNames.applicationGateway.sites.publicSite.backend
       }
     ]
     rewrites: [
       {
-        name: docsRewriteSetName
+        name: resourceNames.applicationGateway.sites.publicApi.rewriteSet
         rules: [
           {
             name: 'trim-docs-path-prefix'

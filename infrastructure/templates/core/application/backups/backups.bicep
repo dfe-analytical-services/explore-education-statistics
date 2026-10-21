@@ -1,7 +1,7 @@
 import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Names of the backup resources.')
-param names ResourceNames.backups
+param backupsNames ResourceNames.backups
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -22,7 +22,7 @@ module backupVaultModule 'backup-vault.bicep' = {
   name: 'backupVaultModuleDeploy'
   params: {
     location: location
-    vaultName: names.backupVault
+    vaultName: backupsNames.backupVault
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     tagValues: tagValues
   }
@@ -32,7 +32,7 @@ module backupBlobsPolicyModule 'backup-vault-blobs-policy.bicep' = {
   name: 'backupVaultBlobsPolicyModuleDeploy'
   params: {
     vaultName: backupVaultModule.outputs.vaultName
-    policyName: names.backupVaultBlobsPolicy
+    policyName: backupsNames.backupVaultBlobsPolicy
   }
 }
 
@@ -40,7 +40,7 @@ module backupPsqlFlexibleServerPolicyModule 'backup-vault-psql-flexibleserver-po
   name: 'backupVaultPsqlFlexibleServerPolicyModuleDeploy'
   params: {
     vaultName: backupVaultModule.outputs.vaultName
-    policyName: names.backupVaultPsqlFlexibleServerPolicy
+    policyName: backupsNames.backupVaultPsqlFlexibleServerPolicy
   }
 }
 
@@ -48,7 +48,7 @@ module recoveryServicesVaultModule 'recovery-services-vault.bicep' = if (deployR
   name: 'recoveryServicesVaultApplicationModuleDeploy'
   params: {
     location: location
-    vaultName: names.recoveryServicesVault
+    vaultName: backupsNames.recoveryServicesVault
     immutable: recoveryServicesVaultImmutable
     tagValues: tagValues
   }

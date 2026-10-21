@@ -34,9 +34,28 @@ type ResourceNames = {
     publicIpAddress: string
     frontendIpConfig: string
     globalWafPolicy: string
-    publicApiWafPolicy: string
-    publicApiSite: string
-    publicApiDocsRewriteSet: string
+    sites: {
+      publicSite: {
+        backend: string
+        route: string
+        site: string
+      }
+      publicApi: {
+        backend: string
+        route: string
+        site: string
+        wafPolicy: string
+        rewriteSet: string
+      }
+      publicApiDocs: {
+        backend: string
+        // Path rules on the Public API's route that serve the docs site.
+        pathRules: {
+          backend: string
+          rootRedirect: string
+        }
+      }
+    }
   }
   backups: {
     backupVault: string
@@ -288,9 +307,27 @@ func getResourceNames(
     publicIpAddress: '${publicApiResourcePrefix}-pip'
     frontendIpConfig: '${publicApiResourcePrefix}-public-frontend-ip-config'
     globalWafPolicy: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01-global-afwp'
-    publicApiWafPolicy: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01-public-api-afwp'
-    publicApiSite: publicApiResourcePrefix
-    publicApiDocsRewriteSet: '${publicApiResourcePrefix}-docs-rewrites'
+    sites: {
+      publicSite: {
+        backend: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site-backend'
+        route: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site-route'
+        site: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site-site'
+      }
+      publicApi: {
+        backend: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
+        route: publicApiResourcePrefix
+        site: publicApiResourcePrefix
+        wafPolicy: '${newResourcePrefix}-${abbreviations.networkApplicationGateways}-01-public-api-afwp'
+        rewriteSet: '${publicApiResourcePrefix}-docs-rewrites'
+      }
+      publicApiDocs: {
+        backend: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
+        pathRules: {
+          backend: 'docs-backend'
+          rootRedirect: 'docs-root-redirect'
+        }
+      }
+    }
   }
   backups: {
     backupVault: '${newResourcePrefix}-${abbreviations.backupVaults}'
