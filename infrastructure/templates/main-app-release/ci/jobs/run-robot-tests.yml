@@ -1,8 +1,6 @@
 parameters:
   - name: serviceConnection
     type: string
-  - name: environment
-    type: string
   - name: testEnvironment
     type: string
   - name: dependsOn
@@ -25,10 +23,6 @@ jobs:
         fetchDepth: 1
         fetchTags: false
 
-      - template: ../../../../common/ci/tasks/get-resource-names.yml
-        parameters:
-          environment: ${{ parameters.environment }}
-
       - template: ../../../../../azure-pipelines-install-python.yml
 
       - task: CopyFiles@2
@@ -42,9 +36,12 @@ jobs:
         displayName: Get secrets from Key Vault
         inputs:
           azureSubscription: ${{ parameters.serviceConnection }}
-          KeyVaultName: $(resourceNames.keyVault.keyVault)
+          # TODO EES-7502 - pick the correct resource name based on target subscription.
+          # Ideally add AZ CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
+          # to get the correct Key Vault name for the target subscription.
+          KeyVaultName: $(subscription)-kv-ees-01
           SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
-          RunAsPreJob: false
+          RunAsPreJob: true
 
       - task: Bash@3
         displayName: Public UI tests
