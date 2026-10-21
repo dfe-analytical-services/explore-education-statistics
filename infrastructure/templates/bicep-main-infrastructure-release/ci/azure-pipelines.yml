@@ -1,22 +1,20 @@
-# trigger:
-#   batch: true
-#   branches:
-#     include:
-#     - master
-#     - dev
-#     - test
-#   paths:
-#     include:
-#     - infrastructure/templates/common
-#     - infrastructure/templates/admin
-#     - infrastructure/templates/bicep-main-infrastructure-release
-#     - infrastructure/templates/content-api
-#     - infrastructure/templates/data-api
-#     - infrastructure/templates/importer
-#     - infrastructure/templates/notifier
-#     - infrastructure/templates/publisher
-trigger: none
-pr: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - dev
+    - test
+  paths:
+    include:
+    - infrastructure/templates/common
+    - infrastructure/templates/admin
+    - infrastructure/templates/bicep-main-infrastructure-release
+    - infrastructure/templates/content-api
+    - infrastructure/templates/data-api
+    - infrastructure/templates/importer
+    - infrastructure/templates/notifier
+    - infrastructure/templates/publisher
 
 pool:
   vmImage: $(vmImageName)
