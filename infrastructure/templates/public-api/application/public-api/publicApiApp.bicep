@@ -207,15 +207,6 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   }
 }
 
-module storePublicApiContainerAppPrivateUrl '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storePublicApiContainerAppPrivateUrl'
-  params: {
-    keyVaultName: resourceNames.keyVault.keyVault
-    secretName: 'ees-publicapi-public-api-containerapp-private-url'
-    secretValue: 'https://${apiContainerAppModule.outputs.containerAppFqdn}'
-  }
-}
-
 output containerAppFqdn string = apiContainerAppModule.outputs.containerAppFqdn
 output containerAppName string = apiContainerAppModule.outputs.containerAppName
 output healthProbePath string = '/health'
