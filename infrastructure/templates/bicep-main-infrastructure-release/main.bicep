@@ -1,7 +1,7 @@
 import { getResourceNames } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
-import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
@@ -16,17 +16,16 @@ import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-si
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
 param tags Tags = {
+  CostCentre: ''
   Department: ''
   Solution: ''
-  Environment: ''
-  Subscription: ''
-  CostCentre: ''
   ServiceOwner: ''
-  DateProvisioned: ''
   CreatedBy: ''
-  DeploymentRepo: ''
-  DeploymentScript: ''
+  DeploymentRepoUrl: ''
 }
+
+@description('Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
+param dateProvisioned string = utcNow('u')
 
 
 
@@ -37,6 +36,12 @@ param environmentConfigParam EnvironmentConfig = {}
 
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+
+// Pipeline-supplied tags, plus those that vary by environment and deployment.
+var tagValues = union(tags, {
+  Environment: environmentConfig.environmentName!
+  DateProvisioned: dateProvisioned
+})
 
 // These values are all supplied specifically by pipeline variables.
 param environmentPipelineVariables EnvironmentPipelineVariables = {}
@@ -50,9 +55,6 @@ param adminConfigParam AdminConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
-
-// These values are all supplied specifically by pipeline variables.
-param adminPipelineVariables AdminPipelineVariables = {}
 
 
 
@@ -127,16 +129,6 @@ var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 
 
 //
-// Secret pipeline variables (required to be top-level params).
-//
-
-@secure()
-@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-param publicAppBasicAuthPassword string = ''
-
-
-
-//
 // Resource provisioning.
 //
 
@@ -200,7 +192,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -218,7 +210,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -243,7 +235,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     deployAlerts: true
-    tagValues: tags
+    tagValues: tagValues
   }
   dependsOn: [
     // Publisher is dependent on Notifier's storage account being available
@@ -267,9 +259,9 @@ module adminModuleDeploy '../admin/main.bicep' = {
     enableSwagger: environmentConfig.enableSwagger!
     enableThemeDeletion: adminConfig.enableThemeDeletion!
     enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
-    publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
-    screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
+    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
+    publicDataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
+    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
     publicApiUrl: publicApiConfig.publicUrl!
     publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
     prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
@@ -280,7 +272,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
   dependsOn: [
     // Admin is dependent on Importer's storage account being available
@@ -305,7 +297,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -318,9 +310,9 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     enableSwagger: environmentConfig.enableSwagger!
@@ -328,7 +320,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
-    tagValues: tags
+    tagValues: tagValues
   }
 }
 
@@ -349,13 +341,13 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
+    publicAppBasicAuthEnabled: environmentConfig.basicAuthEnabled!
+    publicAppBasicAuthUsername: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthUsername)
+    publicAppBasicAuthPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publicSite.basicAuthPassword)
     deployAlerts: true
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    tagValues: tags
+    tagValues: tagValues
   }
 }

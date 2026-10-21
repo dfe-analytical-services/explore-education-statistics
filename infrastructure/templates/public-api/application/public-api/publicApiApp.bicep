@@ -24,6 +24,7 @@ param publicSiteUrl string
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@secure()
 @description('Specifies the Application (Client) Id of the App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string
 
