@@ -76,5 +76,3 @@ module publicApiStorageBackupModule '../../../common/components/recovery-service
 }
 
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
-output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
-output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName

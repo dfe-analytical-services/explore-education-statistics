@@ -52,8 +52,8 @@ param linuxFxVersion string?
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
 
-@description('Name of the Key Vault secret holding the storage account\'s connection string. Defaults to "{storageAccountName}-connection-string".')
-param storageAccountConnectionStringSecretName string?
+@description('Name of the Key Vault secret in which to store the storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING).')
+param storageAccountConnectionStringSecretName string
 
 @description('Storage Account SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
@@ -252,7 +252,7 @@ module storageAccountModule '../storage/storage-account.bicep' = {
     sku: storageAccountSku
     kind: 'StorageV2'
     keyVaultName: keyVaultName
-    connectionStringSecretNameOverride: storageAccountConnectionStringSecretName
+    connectionStringSecretName: storageAccountConnectionStringSecretName
     privateEndpointSubnetIds: privateEndpoints != null ? {
       blob: privateEndpoints!.storageAccounts
       file: privateEndpoints!.storageAccounts
@@ -286,7 +286,7 @@ var infraAppSettings = [
   }
   {
     name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-    value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName)
+    value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName!)
   }
   {
     name: 'WEBSITE_CONTENTSHARE'
