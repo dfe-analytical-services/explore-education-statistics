@@ -34,6 +34,28 @@ jobs:
           Contents: .env.${{ parameters.testEnvironment }}
           TargetFolder: tests/robot-tests
 
+      # TODO EES-7502 - add Azure CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
+      # instead. Until then, this builds the Key Vault name the same way as resource-names.bicep, using the "elz" flag
+      # from the environment's variable group to choose between the legacy and ELZ naming conventions.
+      - task: Bash@3
+        displayName: Get Key Vault name
+        env:
+          # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ names.
+          ELZ: $(elz)
+        inputs:
+          targetType: inline
+          script: |
+            set -eo pipefail
+
+            if [ "$ELZ" = "true" ]; then
+              keyVaultName="$(subscription)kv-uks-ees01"
+            else
+              keyVaultName="$(subscription)-kv-ees-01"
+            fi
+
+            echo "Using Key Vault $keyVaultName"
+            echo "##vso[task.setvariable variable=keyVaultName]$keyVaultName"
+
       - task: AzureKeyVault@2
         displayName: Get secrets from Key Vault
         inputs:
@@ -41,13 +63,14 @@ jobs:
           # TODO EES-7502 - pick the correct resource name based on target subscription.
           # Ideally add AZ CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
           # to get the correct Key Vault name for the target subscription.
-          KeyVaultName: $(subscription)-kv-ees-01
+          KeyVaultName: $(keyVaultName)
           # The Basic Auth secrets only exist in environments with Basic Auth enabled.
           ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
             SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
           ${{ else }}:
             SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl
-          RunAsPreJob: true
+          # Runs as a normal step so that it can use the Key Vault name worked out above.
+          RunAsPreJob: false
 
       - task: Bash@3
         displayName: Public UI tests

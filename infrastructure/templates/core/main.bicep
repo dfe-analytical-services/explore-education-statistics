@@ -286,6 +286,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.core
+    connectionStringSecretName: resourceNames.keyVault.secrets.coreStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -302,6 +303,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   name: 'publicStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.public
+    connectionStringSecretName: resourceNames.keyVault.secrets.publicStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName

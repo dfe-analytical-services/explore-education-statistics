@@ -83,6 +83,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     functionAppName: resourceNames.publisher.functionApp
     appServicePlanName: resourceNames.publisher.appServicePlan
     storageAccountName: resourceNames.publisher.storageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
     storageAccountSku: 'Standard_GZRS'
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
