@@ -79,6 +79,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     functionAppName: resourceNames.importer.functionApp
     appServicePlanName: resourceNames.importer.appServicePlan
     storageAccountName: resourceNames.importer.storageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.importerStorageAccountConnectionString
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true
