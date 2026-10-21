@@ -49,7 +49,7 @@ module storageAccountModule '../../../common/components/storage/storage-account.
     sku: 'Standard_LRS'
     publicNetworkAccessEnabled: true
     keyVaultName: keyVaultName
-    connectionStringSecretNameOverride: connectionStringSecretName
+    connectionStringSecretName: connectionStringSecretName
     firewallRules: firewallRules
     allowedSubnetIds: [
       subnets.admin.id

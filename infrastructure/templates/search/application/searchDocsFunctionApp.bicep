@@ -189,6 +189,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     deployQueueRoleAssignment: true
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: resourceNames.searchDocs.functionStorageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.searchDocsStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
