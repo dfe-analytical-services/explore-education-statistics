@@ -32,9 +32,6 @@ param publisherConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
 }
 
 param publicSiteConfigParam = {
