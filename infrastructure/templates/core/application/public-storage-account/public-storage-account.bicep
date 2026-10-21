@@ -4,6 +4,9 @@ import { VNetSubnets } from '../virtual-network/types.bicep'
 @description('Name of the storage account.')
 param storageAccountName string
 
+@description('Name of the Key Vault secret holding the storage account\'s connection string.')
+param connectionStringSecretName string
+
 @description('Retention of blobs in days.')
 param blobDeleteRetentionDays int
 
@@ -46,7 +49,7 @@ module storageAccountModule '../../../common/components/storage/storage-account.
     sku: 'Standard_LRS'
     publicNetworkAccessEnabled: true
     keyVaultName: keyVaultName
-    connectionStringSecretNameOverride: 'ees-storage-public'
+    connectionStringSecretNameOverride: connectionStringSecretName
     firewallRules: firewallRules
     allowedSubnetIds: [
       subnets.admin.id
