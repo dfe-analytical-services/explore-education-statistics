@@ -161,8 +161,8 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
       allowedPrincipalIds: []
       requireAuthentication: true
     }
-    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
-    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
+    dockerPullManagedIdentityClientId: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
+    dockerPullManagedIdentitySecretValue: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     deploymentStorageAccountName: resourceNames.screener.functionStorageAccount
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules

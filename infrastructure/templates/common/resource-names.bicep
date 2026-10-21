@@ -209,6 +209,7 @@ type ResourceNames = {
       acr: {
         dockerPullUsername: string
         dockerPullPassword: string
+        dockerRegistryServerDomain: string
       }
       admin: {
         adminSignalrConnectionString: string
@@ -501,6 +502,7 @@ func getResourceNames(
       acr: {
         dockerPullUsername: 'DOCKER-REGISTRY-SERVER-USERNAME'
         dockerPullPassword: 'DOCKER-REGISTRY-SERVER-PASSWORD'
+        dockerRegistryServerDomain: 'DOCKER-REGISTRY-SERVER-DOMAIN'
       }
       admin: {
         adminGovUkNotifyApiKey: 'ees-admin-govuknotify-api-key'

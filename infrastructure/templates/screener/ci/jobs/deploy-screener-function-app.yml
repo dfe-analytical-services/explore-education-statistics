@@ -35,7 +35,7 @@ jobs:
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
               keyVaultName: $(resourceNames.keyVault.keyVault)
-              secretName: ees-screener-app-registration-client-id
+              secretName: $(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
               variableName: screenerAppRegistrationClientId
 
           - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml

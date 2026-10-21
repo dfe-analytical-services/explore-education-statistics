@@ -105,8 +105,8 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     location: location
     functionAppImageName: 'ees-screener-api'
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
-    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
-    screenerAppRegistrationClientId: keyVault.getSecret('ees-screener-app-registration-client-id')
+    acrLoginServer: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerRegistryServerDomain)
+    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
     logScreeningResults: logScreeningResults
