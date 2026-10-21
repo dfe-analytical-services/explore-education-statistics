@@ -285,6 +285,10 @@ type ResourceNames = {
       notifierStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
+      analyticsStorageAccountConnectionString: string
+      nlSearchStorageAccountConnectionString: string
+      searchDocsStorageAccountConnectionString: string
+      searchStorageAccountConnectionString: string
       publicApiContainerAppPrivateUrl: string
     }
   }
@@ -604,6 +608,10 @@ func getResourceNames(
       notifierStorageAccountConnectionString: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eesnotify-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
+      analyticsStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa-connection-string'
+      nlSearchStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn-connection-string'
+      searchDocsStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn-connection-string'
+      searchStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search-connection-string'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
@@ -915,6 +923,10 @@ func getElzResourceNames(env string) ResourceNames => {
       notifierStorageAccountConnectionString: 'notifier-storage-connection-string'
       publicStorageAccountConnectionString: 'public-storage-connection-string'
       publisherStorageAccountConnectionString: 'publisher-storage-connection-string'
+      analyticsStorageAccountConnectionString: 'analytics-storage-connection-string'
+      nlSearchStorageAccountConnectionString: 'nlsearch-storage-connection-string'
+      searchDocsStorageAccountConnectionString: 'searchdocs-storage-connection-string'
+      searchStorageAccountConnectionString: 'search-storage-connection-string'
     }
   }
   alertsGroup: elzName(env, elzAbbreviations.insightsActionGroups, 'alertedusers')

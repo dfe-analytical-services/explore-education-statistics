@@ -28,8 +28,8 @@ param azureFileShares AzureFileShareMount[] = []
 @description('Name of the deployment storage account.')
 param deploymentStorageAccountName string
 
-@description('Name of the Key Vault secret holding the deployment storage account\'s connection string. Defaults to "{deploymentStorageAccountName}-connection-string".')
-param deploymentStorageAccountConnectionStringSecretName string?
+@description('Name of the Key Vault secret in which to store the deployment storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING).')
+param deploymentStorageAccountConnectionStringSecretName string
 
 @description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
@@ -208,7 +208,7 @@ module deploymentStorageAccountModule '../../components/storage/storage-account.
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     keyVaultName: keyVaultName
-    connectionStringSecretNameOverride: deploymentStorageAccountConnectionStringSecretName
+    connectionStringSecretName: deploymentStorageAccountConnectionStringSecretName
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
       file: privateEndpoints.storageAccounts
@@ -316,7 +316,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
           }
           {
             name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-            value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName})'
+            value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName!})'
           }
           {
             name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
