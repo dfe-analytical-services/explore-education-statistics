@@ -1,6 +1,7 @@
 #nullable enable
 using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Text;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -19,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using FluentValidationKeys = GovUk.Education.ExploreEducationStatistics.Common.Validators.FluentValidationKeys;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
@@ -294,6 +296,26 @@ public abstract class PairedIndicatorsControllerTests(PairedIndicatorsController
             );
 
             AssertValidationError(response, ValidationMessages.PairedIndicatorsCannotBeChained);
+            Assert.Null(await GetSavedPairedIndicators(dataSet.ReleaseFile.Id));
+        }
+
+        [Fact]
+        public async Task NullPair_ReturnsValidationError()
+        {
+            var dataSet = await SeedDataSet();
+
+            var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
+
+            var response = await client.PutAsync(
+                PairedIndicatorsUrl(dataSet.ReleaseVersion.Id, dataSet.SubjectId),
+                new StringContent("""{ "pairedIndicators": [null] }""", Encoding.UTF8, "application/json")
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+            // The "Validator" suffix is dropped from FluentValidation error codes in responses
+            var error = Assert.Single(validationProblem.Errors);
+            Assert.Equal(FluentValidationKeys.NotNullValidator.Replace("Validator", ""), error.Code);
+            Assert.Equal("pairedIndicators[0]", error.Path);
             Assert.Null(await GetSavedPairedIndicators(dataSet.ReleaseFile.Id));
         }
 
