@@ -87,6 +87,9 @@ type ResourceNames = {
   }
   keyVault: {
     keyVault: string
+    keys: {
+      dataProtection: string
+    }
     secrets: {
       acr: {
         dockerPullUsername: string
@@ -253,6 +256,9 @@ func getResourceNames(
   }
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    keys: {
+      dataProtection: 'ees-dataprotection-key'
+    }
     secrets: {
       acr: {
         dockerPullUsername: 'DOCKER-REGISTRY-SERVER-USERNAME'
