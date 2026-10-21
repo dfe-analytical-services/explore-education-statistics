@@ -3,6 +3,8 @@ parameters:
     type: string
   - name: environment
     type: string
+  - name: bicepParamFile
+    type: string
   - name: dependsOn
     type: object
     default: []
@@ -12,13 +14,27 @@ jobs:
     displayName: Deploy Importer
     dependsOn: ${{ parameters.dependsOn }}
     environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/importer/importer-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/importer/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: ImporterBicepConfig$(Build.BuildNumber)
     strategy:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - download: MainBuild
               displayName: Download Importer (Processor) artifact
               artifact: processor
+
+            - template: ../tasks/get-new-appsettings.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Importer
+                templateFile: $(templateFile)
+                paramFile: $(paramFile)
+                bicepConfigDeployName: $(bicepConfigDeployName)
 
             - template: ../tasks/deploy-function-app.yml
               parameters:
@@ -27,3 +43,6 @@ jobs:
                 appName: $(subscription)-fa-ees-importer
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/processor/GovUk.Education.ExploreEducationStatistics.Data.Processor.zip
+                appSettingsJson: $(appSettings)
+                healthCheckPath: /api/health
+                deployedAt: $(deployedAt)
