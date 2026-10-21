@@ -1,3 +1,4 @@
+import { HttpStatusAlertConfig, httpStatusAlertOverride } from '../alerts/httpStatusAlertConfig.bicep'
 import { IpRange, FirewallRule } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 import { abbreviations } from '../../abbreviations.bicep'
@@ -167,6 +168,8 @@ param alerts {
   cpuPercentage: bool
   functionAppHealth: bool
   httpErrors: bool
+  http401: HttpStatusAlertConfig?
+  http5xx: HttpStatusAlertConfig?
   memoryPercentage: bool
   storageAccountAvailability: bool
   storageLatency: bool
@@ -481,6 +484,7 @@ module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
       }
       config: {
         ...staticMinGreaterThanZero
+        ...httpStatusAlertOverride(httpStatusCode == 'Http401' ? alerts!.?http401 : alerts!.?http5xx)
         nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName
