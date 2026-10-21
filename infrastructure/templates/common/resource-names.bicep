@@ -274,7 +274,6 @@ type ResourceNames = {
       publisher: {
         databaseUserPassword: string
         notifyApiKey: string
-        publicDataDbConnectionString: string
       }
       screener: {
         appRegistrationClientId: string
@@ -289,7 +288,6 @@ type ResourceNames = {
       nlSearchStorageAccountConnectionString: string
       searchDocsStorageAccountConnectionString: string
       searchStorageAccountConnectionString: string
-      publicApiContainerAppPrivateUrl: string
     }
   }
   alertsGroup: string
@@ -596,12 +594,10 @@ func getResourceNames(
       publisher: {
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
-        publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
       }
       screener: {
         appRegistrationClientId: 'ees-screener-app-registration-client-id'
       }
-      publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
@@ -911,12 +907,10 @@ func getElzResourceNames(env string) ResourceNames => {
       publisher: {
         databaseUserPassword: 'publisher-sql-password'
         notifyApiKey: 'publisher-govuknotify-api-key'
-        publicDataDbConnectionString: 'publisher-publicdatadb-connection-string'
       }
       screener: {
         appRegistrationClientId: 'screener-app-registration-client-id'
       }
-      publicApiContainerAppPrivateUrl: 'papi-private-url'
       bauEmail: 'bau-email'
       coreStorageAccountConnectionString: 'core-storage-connection-string'
       importerStorageAccountConnectionString: 'importer-storage-connection-string'

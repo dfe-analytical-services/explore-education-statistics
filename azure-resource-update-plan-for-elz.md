@@ -47,7 +47,7 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 21 | Network | Subnet layout: one integration subnet per App Service plan, two shared private endpoint subnets, dedicated App Gateway and Container Apps subnets. See [section 5](#5-subnet-migration). | Proposed / Blocked |
 | 22 | Network | VNet and subnet address ranges come from the `.bicepparam` files (EES-7425). | Done |
 | 23 | Network | Actual ELZ IP ranges. | Decided (ranges received) |
-| 24 | Secrets | Only store secrets that something reads. Storage account connection strings are only written to Key Vault when a `connectionStringSecretName` is supplied, and storage access keys are never stored. Anything that needs a key directly (e.g. Azure Files mounts) uses `listKeys()` at deploy time. | Decided |
+| 24 | Secrets | Only store secrets that something reads. Storage account connection strings are only written to Key Vault when a `connectionStringSecretName` is supplied, and storage access keys are never stored. Anything that needs a key directly (e.g. Azure Files mounts) uses `listKeys()` at deploy time. Values that aren't sensitive (e.g. managed identity connection strings, internal URLs) are passed as plain values, not through Key Vault, where they can be derived by other means. | Decided |
 
 ## 2. Actions
 
@@ -69,6 +69,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 11 | Apply naming decisions 7-9 (App Gateway child names, Key Vault certificate and secret names, storage connection-string secret names) in `getElzResourceNames()` | In progress | Core, public, Importer, Notifier, Publisher and Screener storage modules now take their connection-string secret name from `resourceNames`. Legacy output verified unchanged |
 | 11a | Move the Key Vault secret names that are still hardcoded into `resourceNames`, so they follow the `elz` flag | To do | About 15 in Bicep (e.g. `ees-alerts-slackconfig`, `ees-sql-admin-password`, `ees-publicapi-app-gateway-fuapi-header`) and the Robot tests and Public API pipeline YAML |
 | 11b | Stop storing unused secrets: `storage-account.bicep` takes `connectionStringSecretName` (was `connectionStringSecretNameOverride`), stores the connection string only when it's supplied, and never stores access keys | In progress | Removes 16 access-key secrets and 3 unused connection strings (Public API data, Analytics and screener logs storage) per environment. Verified by snapshot: nothing else changes |
+| 11c | Stop using Key Vault for values that aren't secret where they can be derived by other means: the three PostgreSQL connection strings (managed identity, no password) are built with `publicDataDbConnectionString()` in `common/functions.bicep`, and Admin reads the Public API's private URL from the Container App itself | In progress | Removes 4 secrets per environment, and `publisher.publicDataDbConnectionString` and `publicApiContainerAppPrivateUrl` from `resourceNames`. The data processor's pipeline sets its connection string from the new `dataProcessorPsqlConnectionString` output. Verified by snapshot: the apps' connection strings and the Admin private URL match what the secrets held |
 | 12 | Confirm the subnet layout, then change the `ResourceNames` subnets and the VNet module to match | Blocked | Needs answers to open questions 2 and 3. See [section 5](#5-subnet-migration) |
 | 13 | Move names still built inside modules into `resourceNames`: private endpoints, alerts, the private DNS VNet link, the resource group | To do | They won't follow the `elz` flag until then |
 | 14 | Remove the subscription allow-lists, e.g. the `@allowed` list in `frontDoor.bicep` | To do | Decision 12 |
@@ -288,9 +289,7 @@ Decision 8 drops the `ees-` prefix and puts the workload name first; decision 9 
 | `keyVault.secrets.publicSite.basicAuthPassword` | `ees-public-site-basic-auth-password` | `publicsite-basic-auth-password` |
 | `keyVault.secrets.publisher.databaseUserPassword` | `ees-sql-password-publisher` | `publisher-sql-password` |
 | `keyVault.secrets.publisher.notifyApiKey` | `ees-publisher-govuknotify-api-key` | `publisher-govuknotify-api-key` |
-| `keyVault.secrets.publisher.publicDataDbConnectionString` | `ees-publisher-connectionstring-publicdatadb` | `publisher-publicdatadb-connection-string` |
 | `keyVault.secrets.screener.appRegistrationClientId` | `ees-screener-app-registration-client-id` | `screener-app-registration-client-id` |
-| `keyVault.secrets.publicApiContainerAppPrivateUrl` | `ees-publicapi-public-api-containerapp-private-url` | `papi-private-url` |
 | `keyVault.secrets.bauEmail` | `ees-bau-email` | `bau-email` |
 | `keyVault.secrets.coreStorageAccountConnectionString` | `ees-storage-core` | `core-storage-connection-string` |
 | `keyVault.secrets.publicStorageAccountConnectionString` | `ees-storage-public` | `public-storage-connection-string` |
@@ -537,4 +536,4 @@ Shortcuts taken along the way that need revisiting.
 | # | Item | Where | Why it was deferred |
 |---|---|---|---|
 | 1 | Make the Robot UI tests job use `get-resource-names.yml` for its Key Vault name, instead of building the name in its own Bash step. Remove the hand-built legacy and ELZ names, and the `TODO EES-7502`, when doing so. | `infrastructure/templates/main-app-release/ci/jobs/run-robot-tests.yml` | `get-resource-names.yml` needs the Azure CLI, which isn't installed on the self-hosted `ees-ubuntu2604-large-v2` agents the job runs on. Needs the CLI added to `infrastructure/scripts/vmss-agent-bootstrap.sh` and the scale sets reimaged first. |
-| 2 | Delete the secrets that are no longer written from the existing legacy Key Vaults: the `*-access-key` secrets and the Public API data, Analytics and screener logs storage connection strings. | Each environment's `s101…-kv-ees-01` | Bicep doesn't delete secrets it stops managing. They'd be left holding storage keys that are no longer refreshed. Check first that nobody uses them by hand. |
+| 2 | Delete the secrets that are no longer written from the existing legacy Key Vaults: the `*-access-key` secrets; the Public API data, Analytics and screener logs storage connection strings; `ees-admin-connectionstring-publicdatadb`, `ees-publisher-connectionstring-publicdatadb`, `ees-publicapi-data-processor-connectionstring-publicdatadb` and `ees-publicapi-public-api-containerapp-private-url`. | Each environment's `s101…-kv-ees-01` | Bicep doesn't delete secrets it stops managing. They'd be left holding storage keys that are no longer refreshed. Check first that nobody uses them by hand. |

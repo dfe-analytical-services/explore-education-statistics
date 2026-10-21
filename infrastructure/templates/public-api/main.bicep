@@ -8,6 +8,7 @@ import {
 import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig } from '../common/components/storage/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../common/functions.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -343,7 +344,10 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 }
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
-output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
+output dataProcessorPsqlConnectionString string = publicDataDbConnectionString(
+  resourceNames.databases.postgreSqlFlexibleServer,
+  resourceNames.publicApi.processor.identity
+)
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule!.outputs.managedIdentityClientId

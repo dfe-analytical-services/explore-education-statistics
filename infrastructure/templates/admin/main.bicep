@@ -1,5 +1,6 @@
 import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { ResourceNames } from '../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { SignalRSku } from '../common/components/signalr/types.bicep'
 
@@ -114,7 +115,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
       {
         name: 'PublicDataDb'
         type: 'Custom'
-        connectionString: '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault};SecretName=ees-admin-connectionstring-publicdatadb)'
+        connectionString: publicDataDbConnectionString(resourceNames.databases.postgreSqlFlexibleServer, resourceNames.admin.appService)
       }
     ]
     vnetLink: {
