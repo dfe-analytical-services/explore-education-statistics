@@ -81,7 +81,7 @@ jobs:
                     --connection-string-type PostgreSQL \
                     --slot staging \
                     --settings \
-                      "PublicDataDb=@Microsoft.KeyVault(VaultName=$(resourceNames.keyVault.keyVault); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
+                      "PublicDataDb=$(dataProcessorPsqlConnectionString)"
 
             - template: ../tasks/wait-for-endpoint-result.yml
               parameters:

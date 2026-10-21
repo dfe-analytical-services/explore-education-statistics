@@ -1,5 +1,6 @@
 import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { ResourceNames } from '../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { IpRange } from '../common/types.bicep'
 
@@ -124,7 +125,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       {
         name: 'PublicDataDb'
         type: 'PostgreSQL'
-        connectionString: '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault};SecretName=${resourceNames.keyVault.secrets.publisher.publicDataDbConnectionString})'
+        connectionString: publicDataDbConnectionString(resourceNames.databases.postgreSqlFlexibleServer, resourceNames.publisher.functionApp)
       }
     ]
     alerts: deployAlerts ? {
