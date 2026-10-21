@@ -1136,6 +1136,17 @@ user checks list contains exact items in order
         user checks element should contain    ${actual}[${index}]    ${content}
     END
 
+user checks list contains exact visible items in order
+    [Arguments]    ${locator}    @{expected_items}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${actual}=    get visible child elements    ${list}    css:li
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
+
 user checks items matching locator contain exact items in order
     [Arguments]    @{expected_items}    ${locator}
     ${actual}=    Get WebElements    ${locator}

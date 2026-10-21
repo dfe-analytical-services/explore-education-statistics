@@ -183,6 +183,10 @@ def get_child_elements(parent_locator: object, child_locator: str):
         raise_assertion_error(err)
 
 
+def get_visible_child_elements(parent_locator: object, child_locator: str):
+    return [element for element in get_child_elements(parent_locator, child_locator) if element.is_displayed()]
+
+
 def user_sets_focus_to_element(selector):
     sl().wait_until_page_contains_element(selector)
     sl().set_focus_to_element(selector)
