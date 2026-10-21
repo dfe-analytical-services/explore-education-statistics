@@ -7,10 +7,6 @@ param environmentConfigParam = {
   basicAuthEnabled: true
 }
 
-param adminConfigParam = {
-  enableThemeDeletion: true
-}
-
 param importerConfigParam = {
   appServiceSku: {
     tier: 'PremiumV2'

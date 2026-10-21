@@ -1,0 +1,58 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployPublicSite
+    displayName: Deploy Public Site
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            # No artifact download needed - the Public Site's build output is a Docker image,
+            # already pushed to the container registry by the build pipeline.
+            - task: AzureCLI@2
+              displayName: Public Site - Update container image
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az webapp config container set \
+                    --name $(subscription)-as-ees-public-site \
+                    --resource-group $(resourceGroupName) \
+                    --container-image-name eesacr.azurecr.io/ees-public-frontend:$(resources.pipeline.MainBuild.runName) \
+                    --container-registry-url https://eesacr.azurecr.io
+
+            - task: AzureCLI@2
+              displayName: Public Site - Restart app to pull new image
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -e
+                  az webapp restart \
+                    --name $(subscription)-as-ees-public-site \
+                    --resource-group $(resourceGroupName)
+
+                  # TODO EES-7734 - provide deployedAt health check enhancement to this
+                  # app deploy to ensure we're receiving successful health checks from
+                  # correct version of this app.  In the meantime, sleep to give the
+                  # restart a chance to begin.
+                  sleep 30  
+
+            - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayName: Public Site - Checking app is healthy after deploy
+                endpoint: https://$(subscription)-as-ees-public-site.azurewebsites.net/health
+                maxAttempts: 20

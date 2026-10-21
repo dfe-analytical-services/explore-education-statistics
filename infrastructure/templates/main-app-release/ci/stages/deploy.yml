@@ -1,0 +1,96 @@
+parameters:
+  - name: stageName
+    type: string
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: bicepParamFile
+    type: string
+    values:
+      - dev
+      - test
+      - preprod
+      - prod
+  - name: condition
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
+  - name: deployAdminFirst
+    type: boolean
+    default: true
+
+stages:
+  - stage: ${{ parameters.stageName }}
+    displayName: Deploy ${{ parameters.environment }}
+    dependsOn: ${{ parameters.dependsOn }}
+    # Prevent this stage from running in parallel with the same deploy stage in other
+    # ongoing runs of this pipeline. Instead, multiple executions of this stage will
+    # be queued and run sequentially in the order that their pipelines were triggered.
+    lockBehavior: sequential
+    condition: ${{ parameters.condition }}
+    variables:
+      - group: Common - ${{ parameters.environment }}
+    jobs:
+      - template: ../jobs/deploy-admin.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+
+      - template: ../jobs/deploy-content-api.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
+
+      - template: ../jobs/deploy-data-api.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          bicepParamFile: ${{ parameters.bicepParamFile }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
+
+      - template: ../jobs/deploy-notifier.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
+
+      - template: ../jobs/deploy-publisher.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
+
+      - template: ../jobs/deploy-importer.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin
+
+      - template: ../jobs/deploy-public-site.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          environment: ${{ parameters.environment }}
+          ${{ if eq(parameters.deployAdminFirst, true) }}:
+            dependsOn:
+              - DeployAdmin

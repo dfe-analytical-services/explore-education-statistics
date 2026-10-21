@@ -6,15 +6,8 @@ param environmentConfigParam = {
   domain: 'dev.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  enableSwagger: true
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-    overridesDurationInSeconds: 10
-  }
-  tableBuilderMaxTableCellsAllowed: 25000
   additionalAdminAllowedOrigins: [
     'https://localhost:5021'
     'http://localhost:5021'
@@ -24,12 +17,6 @@ param environmentConfigParam = {
   ]
   basicAuthEnabled: true
   blobDeleteRetentionDays: 3
-}
-
-param adminConfigParam = {
-  preReleaseMinutesBeforeStart: 1440
-  enableThemeDeletion: true
-  enableEinPublishedPageDeletion: true
 }
 
 param notifierConfigParam = {

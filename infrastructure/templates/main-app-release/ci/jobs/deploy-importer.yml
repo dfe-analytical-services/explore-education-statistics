@@ -1,0 +1,29 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployImporter
+    displayName: Deploy Importer
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: MainBuild
+              displayName: Download Importer (Processor) artifact
+              artifact: processor
+
+            - template: ../tasks/deploy-function-app.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Importer
+                appName: $(subscription)-fa-ees-importer
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/processor/GovUk.Education.ExploreEducationStatistics.Data.Processor.zip

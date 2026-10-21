@@ -68,6 +68,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -833,7 +834,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseSpaStaticFiles();
         app.UseCookiePolicy();
         app.UseRouting();
-        app.UseHealthChecks("/api/health");
+        app.UseHealthChecks("/api/health", new HealthCheckOptions().IncludeDeployedAt());
 
         app.UseAuthentication();
         app.UseAuthorization();
