@@ -1,3 +1,4 @@
+import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { getResourceNamesForEnvironment } from 'resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
@@ -8,6 +9,12 @@ import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-conf
 import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-configuration.bicep'
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
+
+@description('Per-service overrides. Empty preserves all existing Http401 rules.')
+param http401Alerts ServiceHttpStatusAlerts = {}
+
+@description('Per-service overrides. Empty preserves all existing Http5xx rules.')
+param http5xxAlerts ServiceHttpStatusAlerts = {}
 
 //
 // Tagging config.
@@ -209,6 +216,8 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
+    http401Alert: http401Alerts.?importer
+    http5xxAlert: http5xxAlerts.?importer
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
@@ -231,6 +240,8 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     existingAppSettings: notifierProdAppSettings
     deployAlerts: true
+    http401Alert: http401Alerts.?notifier
+    http5xxAlert: http5xxAlerts.?notifier
     tagValues: tagValues
   }
 }
@@ -247,6 +258,8 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
     existingAppSettings: publisherProdAppSettings
     deployAlerts: true
+    http401Alert: http401Alerts.?publisher
+    http5xxAlert: http5xxAlerts.?publisher
     tagValues: tagValues
   }
   dependsOn: [
@@ -265,6 +278,8 @@ module adminModuleDeploy '../admin/main.bicep' = {
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
+    http401Alert: http401Alerts.?admin
+    http5xxAlert: http5xxAlerts.?admin
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -289,6 +304,8 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
+    http401Alert: http401Alerts.?contentApi
+    http5xxAlert: http5xxAlerts.?contentApi
     detailedErrors: environmentConfig.detailedErrors!
     restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
@@ -309,6 +326,8 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
+    http401Alert: http401Alerts.?dataApi
+    http5xxAlert: http5xxAlerts.?dataApi
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -327,6 +346,8 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     deployAlerts: true
+    http401Alert: http401Alerts.?publicSite
+    http5xxAlert: http5xxAlerts.?publicSite
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

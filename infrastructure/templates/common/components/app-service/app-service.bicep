@@ -1,3 +1,4 @@
+import { HttpStatusAlertConfig } from '../alerts/httpStatusAlertConfig.bicep'
 import { ConnectionString, FirewallRule } from '../../types.bicep'
 import { AzureFileShareMount } from '../storage/types.bicep'
 import { builtInRoleDefinitionIds } from '../../builtInRoles.bicep'
@@ -99,6 +100,8 @@ param websitePort int?
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  http401: HttpStatusAlertConfig?
+  http5xx: HttpStatusAlertConfig?
   responseTimeSeconds: int?
   alertsGroupName: string
 }?
