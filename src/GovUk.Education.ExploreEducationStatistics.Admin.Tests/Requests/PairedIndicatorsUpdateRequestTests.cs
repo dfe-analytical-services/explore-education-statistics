@@ -49,6 +49,19 @@ public class PairedIndicatorsUpdateRequestTests
     }
 
     [Fact]
+    public void WhenPairIsNull_ValidationFails()
+    {
+        var request = new PairedIndicatorsUpdateRequest
+        {
+            PairedIndicators = [Pair(Guid.NewGuid(), Guid.NewGuid()), null!],
+        };
+
+        var result = _validator.TestValidate(request);
+
+        result.ShouldHaveValidationErrorFor("PairedIndicators[1]").WithErrorCode(FluentValidationKeys.NotNullValidator);
+    }
+
+    [Fact]
     public void WhenIndicatorIsPairedWithItself_ValidationFails()
     {
         var indicatorId = Guid.NewGuid();
