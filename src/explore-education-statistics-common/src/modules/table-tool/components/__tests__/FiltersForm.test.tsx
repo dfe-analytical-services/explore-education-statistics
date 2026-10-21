@@ -961,33 +961,98 @@ describe('FiltersForm', () => {
     });
 
     test('selecting and unselecting all subgroup options includes the child indicator', async () => {
+      // Pair two indicators in a group that also has an unpaired indicator
+      const testSubjectMetaSameGroupPair = produce(testSubjectMeta, draft => {
+        draft.filters = {};
+        draft.indicators.AbsenceFields.options[2].parentIndicatorId =
+          'number-overall-absence-sessions';
+      });
+
       const { user } = render(
         <FiltersForm
           {...testWizardStepProps}
           stepTitle="Choose your filters"
           subject={testSubject}
-          subjectMeta={testSubjectMetaPairedIndicators}
+          subjectMeta={testSubjectMetaSameGroupPair}
+          onSubmit={noop}
+        />,
+      );
+
+      // The disabled child indicator isn't counted as it can't be selected on its own
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Select all 2 subgroup options for Absence fields',
+        }),
+      );
+
+      expect(screen.getByLabelText('Authorised absence rate')).toBeChecked();
+      expect(
+        screen.getByLabelText('Number of overall absence sessions'),
+      ).toBeChecked();
+      expect(screen.getByLabelText('Unauthorised absence rate')).toBeChecked();
+
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Unselect all 2 subgroup options for Absence fields',
+        }),
+      );
+
+      expect(
+        screen.getByLabelText('Authorised absence rate'),
+      ).not.toBeChecked();
+      expect(
+        screen.getByLabelText('Number of overall absence sessions'),
+      ).not.toBeChecked();
+      expect(
+        screen.getByLabelText('Unauthorised absence rate'),
+      ).not.toBeChecked();
+    });
+
+    test('selecting and unselecting all subgroup options works when the parent indicator is in another group', async () => {
+      // Parent is in 'Absence by reason', child is in 'Absence fields' with two unpaired indicators
+      const testSubjectMetaSplitPair = produce(testSubjectMeta, draft => {
+        draft.filters = {};
+        draft.indicators.AbsenceFields.options[0].parentIndicatorId =
+          'number-excluded-sessions';
+      });
+
+      const { user } = render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaSplitPair}
           onSubmit={noop}
         />,
       );
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Select all 2 subgroup options for Absence by reason',
+          name: 'Select all 2 subgroup options for Absence fields',
         }),
       );
 
-      expect(screen.getByLabelText(parentLabel)).toBeChecked();
-      expect(screen.getByLabelText(childLabel)).toBeChecked();
+      expect(
+        screen.getByLabelText('Number of overall absence sessions'),
+      ).toBeChecked();
+      expect(screen.getByLabelText('Unauthorised absence rate')).toBeChecked();
+      // The child stays unselected as its parent isn't selected
+      expect(
+        screen.getByLabelText('Authorised absence rate'),
+      ).not.toBeChecked();
 
       await user.click(
         screen.getByRole('button', {
-          name: 'Unselect all 2 subgroup options for Absence by reason',
+          name: 'Unselect all 2 subgroup options for Absence fields',
         }),
       );
 
-      expect(screen.getByLabelText(parentLabel)).not.toBeChecked();
-      expect(screen.getByLabelText(childLabel)).not.toBeChecked();
+      expect(
+        screen.getByLabelText('Number of overall absence sessions'),
+      ).not.toBeChecked();
+      expect(
+        screen.getByLabelText('Unauthorised absence rate'),
+      ).not.toBeChecked();
     });
 
     test('submits the child indicator with the parent indicator', async () => {
