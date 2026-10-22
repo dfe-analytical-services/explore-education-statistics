@@ -31,8 +31,9 @@ public class DataReplacementPlanViewModel
         && Footnotes.All(info => info.Valid)
         && (ApiDataSetVersionPlan?.Valid ?? true);
 
-    // Trimmed down version of the data replacement plan that
-    // only shows full replacement details for invalid items.
+    // Trimmed down version of the data replacement plan that only shows full replacement details for invalid items.
+    // Indicators and locations are retained for valid items so the frontend can continue to display (and allow
+    // remapping of) items that have already been mapped.
     public DataReplacementPlanViewModel ToSummary()
     {
         return new DataReplacementPlanViewModel
@@ -74,7 +75,9 @@ public class DataBlockReplacementPlanViewModel(
 
     public DataBlockReplacementPlanViewModel ToSummary()
     {
-        return Valid ? new DataBlockReplacementPlanViewModel(Id, Name) : this;
+        return Valid
+            ? new DataBlockReplacementPlanViewModel(Id, Name, indicators: IndicatorGroups, locations: Locations)
+            : this;
     }
 }
 
@@ -106,7 +109,7 @@ public class FootnoteReplacementPlanViewModel(
 
     public FootnoteReplacementPlanViewModel ToSummary()
     {
-        return Valid ? new FootnoteReplacementPlanViewModel(Id, Content) : this;
+        return Valid ? new FootnoteReplacementPlanViewModel(Id, Content, indicatorGroups: IndicatorGroups) : this;
     }
 }
 
