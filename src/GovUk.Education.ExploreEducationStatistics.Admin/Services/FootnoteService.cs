@@ -63,16 +63,9 @@ public class FootnoteService : IFootnoteService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
-                GetLinkSubjectIdMaps(
-                    releaseVersionId,
-                    subjectIds,
-                    filterIds,
-                    filterGroupIds,
-                    filterItemIds,
-                    indicatorIds
-                )
+                GetFootnoteLinks(releaseVersionId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds)
             )
-            .OnSuccess(async linkSubjectIdMaps =>
+            .OnSuccess(async footnoteLinks =>
             {
                 var currentMaxOrder = await _context
                     .Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
@@ -83,10 +76,10 @@ public class FootnoteService : IFootnoteService
                 var footnote = await _footnoteRepository.CreateFootnote(
                     releaseVersionId,
                     content,
-                    filterIdToSubjectIdMap: linkSubjectIdMaps.FilterIdToSubjectIdMap,
-                    filterGroupIdToSubjectIdMap: linkSubjectIdMaps.FilterGroupIdToSubjectIdMap,
-                    filterItemIdToSubjectIdMap: linkSubjectIdMaps.FilterItemIdToSubjectIdMap,
-                    indicatorIdToSubjectIdMap: linkSubjectIdMaps.IndicatorIdToSubjectIdMap,
+                    filterLinks: footnoteLinks.Filters,
+                    filterGroupLinks: footnoteLinks.FilterGroups,
+                    filterItemLinks: footnoteLinks.FilterItems,
+                    indicatorLinks: footnoteLinks.Indicators,
                     subjectIds: subjectIds,
                     order
                 );
@@ -130,14 +123,7 @@ public class FootnoteService : IFootnoteService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
-                GetLinkSubjectIdMaps(
-                    releaseVersionId,
-                    subjectIds,
-                    filterIds,
-                    filterGroupIds,
-                    filterItemIds,
-                    indicatorIds
-                )
+                GetFootnoteLinks(releaseVersionId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds)
             )
             .OnSuccessCombineWith(_ =>
                 _statisticsPersistenceHelper.CheckEntityExists<Footnote>(
@@ -145,18 +131,18 @@ public class FootnoteService : IFootnoteService
                     query => HydrateFootnote(query).Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
                 )
             )
-            .OnSuccess(async linkSubjectIdMapsAndFootnote =>
+            .OnSuccess(async footnoteLinksAndFootnote =>
             {
-                var (linkSubjectIdMaps, footnote) = linkSubjectIdMapsAndFootnote;
+                var (footnoteLinks, footnote) = footnoteLinksAndFootnote;
 
                 _context.Update(footnote);
 
                 footnote.Content = content;
 
-                UpdateFilterLinks(footnote, linkSubjectIdMaps.FilterIdToSubjectIdMap);
-                UpdateFilterGroupLinks(footnote, linkSubjectIdMaps.FilterGroupIdToSubjectIdMap);
-                UpdateFilterItemLinks(footnote, linkSubjectIdMaps.FilterItemIdToSubjectIdMap);
-                UpdateIndicatorLinks(footnote, linkSubjectIdMaps.IndicatorIdToSubjectIdMap);
+                UpdateFilterLinks(footnote, footnoteLinks.Filters);
+                UpdateFilterGroupLinks(footnote, footnoteLinks.FilterGroups);
+                UpdateFilterItemLinks(footnote, footnoteLinks.FilterItems);
+                UpdateIndicatorLinks(footnote, footnoteLinks.Indicators);
                 UpdateSubjectLinks(footnote, subjectIds);
 
                 await _context.SaveChangesAsync();
@@ -220,112 +206,55 @@ public class FootnoteService : IFootnoteService
         return subjectIds.Select(id => new SubjectFootnote { FootnoteId = footnoteId, SubjectId = id }).ToList();
     }
 
-    private List<FilterFootnote> CreateFilterLinks(
-        Guid footnoteId,
-        IReadOnlyDictionary<Guid, Guid> filterIdToSubjectIdMap
-    )
-    {
-        return filterIdToSubjectIdMap
-            .Select(pair => new FilterFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterId = pair.Key,
-                SubjectId = pair.Value,
-            })
-            .ToList();
-    }
-
-    private List<FilterGroupFootnote> CreateFilterGroupLinks(
-        Guid footnoteId,
-        IReadOnlyDictionary<Guid, Guid> filterGroupIdToSubjectIdMap
-    )
-    {
-        return filterGroupIdToSubjectIdMap
-            .Select(pair => new FilterGroupFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterGroupId = pair.Key,
-                SubjectId = pair.Value,
-            })
-            .ToList();
-    }
-
-    private List<FilterItemFootnote> CreateFilterItemLinks(
-        Guid footnoteId,
-        IReadOnlyDictionary<Guid, Guid> filterItemIdToSubjectIdMap
-    )
-    {
-        return filterItemIdToSubjectIdMap
-            .Select(pair => new FilterItemFootnote
-            {
-                FootnoteId = footnoteId,
-                FilterItemId = pair.Key,
-                SubjectId = pair.Value,
-            })
-            .ToList();
-    }
-
-    private List<IndicatorFootnote> CreateIndicatorsLinks(
-        Guid footnoteId,
-        IReadOnlyDictionary<Guid, Guid> indicatorIdToSubjectIdMap
-    )
-    {
-        return indicatorIdToSubjectIdMap
-            .Select(pair => new IndicatorFootnote
-            {
-                FootnoteId = footnoteId,
-                IndicatorId = pair.Key,
-                SubjectId = pair.Value,
-            })
-            .ToList();
-    }
-
-    private void UpdateFilterLinks(Footnote footnote, IReadOnlyDictionary<Guid, Guid> filterIdToSubjectIdMap)
+    private void UpdateFilterLinks(Footnote footnote, List<FilterFootnote> filterLinks)
     {
         if (
-            !SequencesAreEqualIgnoringOrder(footnote.Filters.Select(link => link.FilterId), filterIdToSubjectIdMap.Keys)
+            !SequencesAreEqualIgnoringOrder(
+                footnote.Filters.Select(link => link.FilterId),
+                filterLinks.Select(link => link.FilterId)
+            )
         )
         {
-            footnote.Filters = CreateFilterLinks(footnote.Id, filterIdToSubjectIdMap);
+            footnote.Filters = filterLinks;
         }
     }
 
-    private void UpdateFilterGroupLinks(Footnote footnote, IReadOnlyDictionary<Guid, Guid> filterGroupIdToSubjectIdMap)
+    private void UpdateFilterGroupLinks(Footnote footnote, List<FilterGroupFootnote> filterGroupLinks)
     {
         if (
             !SequencesAreEqualIgnoringOrder(
                 footnote.FilterGroups.Select(link => link.FilterGroupId),
-                filterGroupIdToSubjectIdMap.Keys
+                filterGroupLinks.Select(link => link.FilterGroupId)
             )
         )
         {
-            footnote.FilterGroups = CreateFilterGroupLinks(footnote.Id, filterGroupIdToSubjectIdMap);
+            footnote.FilterGroups = filterGroupLinks;
         }
     }
 
-    private void UpdateFilterItemLinks(Footnote footnote, IReadOnlyDictionary<Guid, Guid> filterItemIdToSubjectIdMap)
+    private void UpdateFilterItemLinks(Footnote footnote, List<FilterItemFootnote> filterItemLinks)
     {
         if (
             !SequencesAreEqualIgnoringOrder(
                 footnote.FilterItems.Select(link => link.FilterItemId),
-                filterItemIdToSubjectIdMap.Keys
+                filterItemLinks.Select(link => link.FilterItemId)
             )
         )
         {
-            footnote.FilterItems = CreateFilterItemLinks(footnote.Id, filterItemIdToSubjectIdMap);
+            footnote.FilterItems = filterItemLinks;
         }
     }
 
-    private void UpdateIndicatorLinks(Footnote footnote, IReadOnlyDictionary<Guid, Guid> indicatorIdToSubjectIdMap)
+    private void UpdateIndicatorLinks(Footnote footnote, List<IndicatorFootnote> indicatorLinks)
     {
         if (
             !SequencesAreEqualIgnoringOrder(
                 footnote.Indicators.Select(link => link.IndicatorId),
-                indicatorIdToSubjectIdMap.Keys
+                indicatorLinks.Select(link => link.IndicatorId)
             )
         )
         {
-            footnote.Indicators = CreateIndicatorsLinks(footnote.Id, indicatorIdToSubjectIdMap);
+            footnote.Indicators = indicatorLinks;
         }
     }
 
@@ -370,7 +299,7 @@ public class FootnoteService : IFootnoteService
     /// release version's subjects, failing if any of them, or any of the given subjects, are not linked to the
     /// release version.
     /// </summary>
-    private async Task<Either<ActionResult, LinkSubjectIdMaps>> GetLinkSubjectIdMaps(
+    private async Task<Either<ActionResult, FootnoteLinks>> GetFootnoteLinks(
         Guid releaseVersionId,
         IReadOnlySet<Guid> subjectIds,
         IReadOnlySet<Guid> filterIds,
@@ -381,45 +310,70 @@ public class FootnoteService : IFootnoteService
     {
         var releaseSubjects = await _releaseSubjectRepository.FindAll(releaseVersionId, HydrateReleaseSubjects);
 
-        var linkSubjectIdMaps = new LinkSubjectIdMaps(
-            FilterIdToSubjectIdMap: FindIdToSubjectIdMap(filterIds, subject => subject.Filters.Select(f => f.Id)),
-            FilterGroupIdToSubjectIdMap: FindIdToSubjectIdMap(
-                filterGroupIds,
-                subject => subject.Filters.SelectMany(f => f.FilterGroups).Select(fg => fg.Id)
-            ),
-            FilterItemIdToSubjectIdMap: FindIdToSubjectIdMap(
-                filterItemIds,
-                subject =>
-                    subject.Filters.SelectMany(f => f.FilterGroups).SelectMany(fg => fg.FilterItems).Select(fi => fi.Id)
-            ),
-            IndicatorIdToSubjectIdMap: FindIdToSubjectIdMap(
-                indicatorIds,
-                subject => subject.IndicatorGroups.SelectMany(ig => ig.Indicators).Select(i => i.Id)
-            )
+        var filters = releaseSubjects.SelectMany(rs => rs.Subject.Filters).ToList();
+
+        var footnoteLinks = new FootnoteLinks(
+            Filters: filters
+                .Where(filter => filterIds.Contains(filter.Id))
+                .Select(filter => new FilterFootnote { FilterId = filter.Id, SubjectId = filter.SubjectId })
+                .ToList(),
+            FilterGroups: filters
+                .SelectMany(
+                    filter => filter.FilterGroups,
+                    (filter, filterGroup) =>
+                        new FilterGroupFootnote
+                        {
+                            FilterGroupId = filterGroup.Id,
+                            FilterId = filter.Id,
+                            SubjectId = filter.SubjectId,
+                        }
+                )
+                .Where(link => filterGroupIds.Contains(link.FilterGroupId))
+                .ToList(),
+            FilterItems: filters
+                .SelectMany(filter =>
+                    filter.FilterGroups.SelectMany(
+                        filterGroup => filterGroup.FilterItems,
+                        (filterGroup, filterItem) =>
+                            new FilterItemFootnote
+                            {
+                                FilterItemId = filterItem.Id,
+                                FilterGroupId = filterGroup.Id,
+                                FilterId = filter.Id,
+                                SubjectId = filter.SubjectId,
+                            }
+                    )
+                )
+                .Where(link => filterItemIds.Contains(link.FilterItemId))
+                .ToList(),
+            Indicators: releaseSubjects
+                .SelectMany(rs => rs.Subject.IndicatorGroups)
+                .SelectMany(
+                    indicatorGroup => indicatorGroup.Indicators,
+                    (indicatorGroup, indicator) =>
+                        new IndicatorFootnote
+                        {
+                            IndicatorId = indicator.Id,
+                            IndicatorGroupId = indicatorGroup.Id,
+                            SubjectId = indicatorGroup.SubjectId,
+                        }
+                )
+                .Where(link => indicatorIds.Contains(link.IndicatorId))
+                .ToList()
         );
 
         if (
             !releaseSubjects.Select(rs => rs.SubjectId).ContainsAll(subjectIds)
-            || linkSubjectIdMaps.FilterIdToSubjectIdMap.Count != filterIds.Count
-            || linkSubjectIdMaps.FilterGroupIdToSubjectIdMap.Count != filterGroupIds.Count
-            || linkSubjectIdMaps.FilterItemIdToSubjectIdMap.Count != filterItemIds.Count
-            || linkSubjectIdMaps.IndicatorIdToSubjectIdMap.Count != indicatorIds.Count
+            || footnoteLinks.Filters.Count != filterIds.Count
+            || footnoteLinks.FilterGroups.Count != filterGroupIds.Count
+            || footnoteLinks.FilterItems.Count != filterItemIds.Count
+            || footnoteLinks.Indicators.Count != indicatorIds.Count
         )
         {
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
 
-        return linkSubjectIdMaps;
-
-        Dictionary<Guid, Guid> FindIdToSubjectIdMap(
-            IReadOnlySet<Guid> ids,
-            Func<Subject, IEnumerable<Guid>> subjectIdsSelector
-        ) =>
-            releaseSubjects
-                .SelectMany(rs =>
-                    subjectIdsSelector(rs.Subject).Where(ids.Contains).Select(id => (Id: id, rs.SubjectId))
-                )
-                .ToDictionary(link => link.Id, link => link.SubjectId);
+        return footnoteLinks;
     }
 
     private IQueryable<ReleaseSubject> HydrateReleaseSubjects(IQueryable<ReleaseSubject> queryable)
@@ -435,13 +389,12 @@ public class FootnoteService : IFootnoteService
     }
 
     /// <summary>
-    /// The subject id of each filter, filter group, filter item and indicator a footnote is linked to, keyed by
-    /// their ids.
+    /// The links from a footnote to each filter, filter group, filter item and indicator it applies to.
     /// </summary>
-    private record LinkSubjectIdMaps(
-        Dictionary<Guid, Guid> FilterIdToSubjectIdMap,
-        Dictionary<Guid, Guid> FilterGroupIdToSubjectIdMap,
-        Dictionary<Guid, Guid> FilterItemIdToSubjectIdMap,
-        Dictionary<Guid, Guid> IndicatorIdToSubjectIdMap
+    private record FootnoteLinks(
+        List<FilterFootnote> Filters,
+        List<FilterGroupFootnote> FilterGroups,
+        List<FilterItemFootnote> FilterItems,
+        List<IndicatorFootnote> Indicators
     );
 }

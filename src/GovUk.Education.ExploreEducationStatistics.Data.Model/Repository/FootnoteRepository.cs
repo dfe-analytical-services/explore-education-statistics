@@ -17,10 +17,10 @@ public class FootnoteRepository : IFootnoteRepository
     public async Task<Footnote> CreateFootnote(
         Guid releaseVersionId,
         string content,
-        IReadOnlyDictionary<Guid, Guid> filterIdToSubjectIdMap,
-        IReadOnlyDictionary<Guid, Guid> filterGroupIdToSubjectIdMap,
-        IReadOnlyDictionary<Guid, Guid> filterItemIdToSubjectIdMap,
-        IReadOnlyDictionary<Guid, Guid> indicatorIdToSubjectIdMap,
+        List<FilterFootnote> filterLinks,
+        List<FilterGroupFootnote> filterGroupLinks,
+        List<FilterItemFootnote> filterItemLinks,
+        List<IndicatorFootnote> indicatorLinks,
         IReadOnlySet<Guid> subjectIds,
         int order
     )
@@ -30,18 +30,10 @@ public class FootnoteRepository : IFootnoteRepository
             ReleaseVersionId = releaseVersionId,
             Content = content,
             Order = order,
-            Filters = filterIdToSubjectIdMap
-                .Select(pair => new FilterFootnote { FilterId = pair.Key, SubjectId = pair.Value })
-                .ToList(),
-            FilterGroups = filterGroupIdToSubjectIdMap
-                .Select(pair => new FilterGroupFootnote { FilterGroupId = pair.Key, SubjectId = pair.Value })
-                .ToList(),
-            FilterItems = filterItemIdToSubjectIdMap
-                .Select(pair => new FilterItemFootnote { FilterItemId = pair.Key, SubjectId = pair.Value })
-                .ToList(),
-            Indicators = indicatorIdToSubjectIdMap
-                .Select(pair => new IndicatorFootnote { IndicatorId = pair.Key, SubjectId = pair.Value })
-                .ToList(),
+            Filters = filterLinks,
+            FilterGroups = filterGroupLinks,
+            FilterItems = filterItemLinks,
+            Indicators = indicatorLinks,
             Subjects = subjectIds.Select(subjectId => new SubjectFootnote { SubjectId = subjectId }).ToList(),
         };
 
@@ -327,12 +319,8 @@ public class FootnoteRepository : IFootnoteRepository
         return _context
             .Footnote.Include(footnote => footnote.Filters)
             .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-                    .ThenInclude(filterItem => filterItem.FilterGroup)
             .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
             .Include(footnote => footnote.Subjects);
     }
 
