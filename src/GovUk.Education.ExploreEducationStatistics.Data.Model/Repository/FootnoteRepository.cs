@@ -43,7 +43,7 @@ public class FootnoteRepository : IFootnoteRepository
         return footnote;
     }
 
-    public async Task<List<Footnote>> GetFilteredFootnotes(
+    public async Task<List<Footnote>> GetFootnotesForSelection(
         Guid releaseVersionId,
         Guid subjectId,
         IReadOnlyCollection<Guid> filterIds,
