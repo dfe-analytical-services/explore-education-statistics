@@ -188,7 +188,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         IReadOnlyCollection<Guid> indicatorIds
     )
     {
-        var footnotes = await _footnoteRepository.GetFilteredFootnotes(
+        var footnotes = await _footnoteRepository.GetFootnotesForSelection(
             releaseVersionId: releaseVersionId,
             subjectId: subjectId,
             filterIds: filterItems.Select(fi => fi.FilterGroup.Filter.Id).Distinct().ToList(),
