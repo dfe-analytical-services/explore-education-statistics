@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -134,7 +135,16 @@ public class SubjectResultMetaServiceTests
             .ReturnsAsync([]);
 
         footnoteRepository
-            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>()
+                )
+            )
             .ReturnsAsync([]);
 
         indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
@@ -289,7 +299,16 @@ public class SubjectResultMetaServiceTests
         filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations)).ReturnsAsync([]);
 
         footnoteRepository
-            .Setup(s => s.GetFilteredFootnotes(releaseVersion.Id, subject.Id, new List<Guid>(), query.Indicators))
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>()
+                )
+            )
             .ReturnsAsync([]);
 
         indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
@@ -338,6 +357,144 @@ public class SubjectResultMetaServiceTests
             Assert.Equal(2, boundaryLevels[1].Id);
             Assert.Equal("Regions November 2021", boundaryLevels[1].Label);
             Assert.True(viewModel.GeoJsonAvailable);
+        }
+    }
+
+    [Fact]
+    public async Task GetSubjectMeta_FootnotesFilteredByFilterItemsAndTheirParents()
+    {
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var releaseVersion = publication.ReleaseVersions[0];
+
+        Subject subject = _dataFixture.DefaultSubject();
+
+        ReleaseSubject releaseSubject = _dataFixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            )
+            .WithSubject(subject);
+
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id));
+
+        Filter filter = _dataFixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 3).WithSubject(subject);
+        var filterItems = filter.FilterGroups[0].FilterItems;
+
+        Location location = _dataFixture.DefaultLocation().WithPresetRegion();
+
+        var observations = ListOf(
+            new Observation
+            {
+                Location = location,
+                FilterItems = [new ObservationFilterItem { FilterItemId = filterItems[0].Id }],
+            },
+            new Observation
+            {
+                Location = location,
+                FilterItems =
+                [
+                    new ObservationFilterItem { FilterItemId = filterItems[0].Id },
+                    new ObservationFilterItem { FilterItemId = filterItems[1].Id },
+                ],
+            }
+        );
+
+        var expectedFilterItemIds = ListOf(filterItems[0].Id, filterItems[1].Id);
+
+        var query = new FullTableQuery { Indicators = new List<Guid>(), SubjectId = subject.Id };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
+        var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
+        var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+        var indicatorRepository = new Mock<IIndicatorRepository>(Strict);
+        var locationService = new Mock<ILocationService>(Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+        boundaryLevelRepository
+            .Setup(s => s.FindByGeographicLevels(new List<GeographicLevel> { location.GeographicLevel }))
+            .Returns([]);
+
+        filterItemRepository
+            .Setup(s => s.GetFilterItemsFromObservations(observations))
+            .ReturnsAsync([filterItems[0], filterItems[1]]);
+
+        locationService
+            .Setup(s =>
+                s.GetLocationViewModels(
+                    It.IsAny<List<Location>>(),
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null
+                )
+            )
+            .ReturnsAsync([]);
+
+        footnoteRepository
+            .Setup(s =>
+                s.GetFilteredFootnotes(
+                    releaseVersion.Id,
+                    subject.Id,
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.Id))),
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.FilterGroups[0].Id))),
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
+                    new List<Guid>()
+                )
+            )
+            .ReturnsAsync([]);
+
+        indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators)).Returns([]);
+
+        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
+
+        timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = BuildService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                boundaryLevelRepository: boundaryLevelRepository.Object,
+                locationService: locationService.Object,
+                filterItemRepository: filterItemRepository.Object,
+                footnoteRepository: footnoteRepository.Object,
+                indicatorRepository: indicatorRepository.Object,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                timePeriodService: timePeriodService.Object
+            );
+
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations, isCroppedTable: false);
+
+            VerifyAllMocks(
+                boundaryLevelRepository,
+                filterItemRepository,
+                footnoteRepository,
+                indicatorRepository,
+                releaseDataFileRepository,
+                timePeriodService
+            );
+
+            result.AssertRight();
         }
     }
 
