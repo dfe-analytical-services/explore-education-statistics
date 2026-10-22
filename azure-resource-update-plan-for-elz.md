@@ -24,7 +24,7 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 
 | # | Area | Decision | Status |
 |---|---|---|---|
-| 1 | Naming | Pattern `{sub}{type}-uks-{workload}{nn}`, e.g. `s292d01app-uks-dataapi01`. | Decided |
+| 1 | Naming | Pattern `{sub}{type}-uks-{workload}{nn}`, e.g. `s292d01app-uks-dataapi01`. The `{nn}` instance number is only used where decision 25 says so. | Decided |
 | 2 | Naming | Storage accounts drop the `01` and all hyphens, and stay within 24 characters, e.g. `s292d01stukscore`. | Decided |
 | 3 | Naming | Workload names `dataapi` and `contentapi` (not `data` and `content`); shared resources use `ees`. | Decided |
 | 4 | Naming | The `papi` sub-project is combined, unhyphenated, into the workload (`papiprocessor`). `sapi` is dropped (just `screener`). | Decided |
@@ -48,6 +48,9 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 22 | Network | VNet and subnet address ranges come from the `.bicepparam` files (EES-7425). | Done |
 | 23 | Network | Actual ELZ IP ranges. | Decided (ranges received) |
 | 24 | Secrets | Only store secrets that something reads. Storage account connection strings are only written to Key Vault when a `connectionStringSecretName` is supplied, and storage access keys are never stored. Anything that needs a key directly (e.g. Azure Files mounts) uses `listKeys()` at deploy time. Values that aren't sensitive (e.g. managed identity connection strings, internal URLs) are passed as plain values, not through Key Vault, where they can be derived by other means. | Decided |
+| 25 | Naming | The `01` instance number is only used on resources we could run two of for the same purpose (apps, plans, App Insights, Key Vault, SQL and PostgreSQL servers, VNet, App Gateway, Front Door profile and endpoint, Search, Container Apps environment, Data Factory, vaults, identities, alerts). Resources named by their purpose drop it: Event Grid topics and subscriptions, backup and WAF policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, subnets and file shares. e.g. `s292d01evgt-uks-publicationchanged`, `snet-uks-admin` (see decision 26 for the prefix). | Decided |
+| 26 | Naming | Policies and child resources drop the environment prefix too, since their names only need to be unique within their parent or resource group: `{type}-uks-{purpose}`. Covers WAF policies, backup policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, Event Grid subscriptions, subnets and file shares, e.g. `waf-uks-agwglobal`, `snet-uks-admin`, `fdfpuksees`. Event Grid topics keep the prefix because their endpoints must be unique within the region. Top-level resources keep it so they're distinguishable across environments in alerts, cost reports and Log Analytics. | Decided |
+| 27 | Naming | Event Grid topics deliberately keep the environment prefix (but not `01`), e.g. `s292d01evgt-uks-publicationchanged`. A custom topic's name becomes part of its public endpoint hostname, `https://{topic}.uksouth-1.eventgrid.azure.net/api/events`, so it must be unique within the region across all of Azure. Without the prefix, every environment would try to claim the same hostname in UK South, and any other Azure customer using the name would block us. Their child Event Grid subscriptions don't need it (decision 26). | Decided |
 
 ## 2. Actions
 
@@ -106,37 +109,37 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `applicationGateway.managedIdentity` | Managed Identity | `s101d01-ees-id-agw-01` | `s292d01id-uks-agw01` |  |
 | `applicationGateway.publicIpAddress` | Public IP | `s101d01-ees-papi-pip` | `s292d01pip-uks-agw01` | It is the gateway's IP, not the Public API's |
 | `applicationGateway.frontendIpConfig` | AGW frontend IP config (child) | `s101d01-ees-papi-public-frontend-ip-config` | `public-frontend-ip-config` | NEW. Child of the gateway: unique per gateway, so no prefix needed |
-| `applicationGateway.globalWafPolicy` | App Gateway WAF Policy | `s101d01-ees-agw-01-global-afwp` | `s292d01waf-uks-agwglobal01` | `afwp` is the Azure Firewall abbreviation |
+| `applicationGateway.globalWafPolicy` | App Gateway WAF Policy | `s101d01-ees-agw-01-global-afwp` | `waf-uks-agwglobal` | `afwp` is the Azure Firewall abbreviation |
 | `applicationGateway.sites.publicSite.backend` | AGW backend pool (child) | `s101d01-as-ees-public-site-backend` | `publicsite-backend` | NEW. Child of the gateway |
 | `applicationGateway.sites.publicSite.route` | AGW routing rule (child) | `s101d01-as-ees-public-site-route` | `publicsite-routing-rule` | Decision 7: App Gateway rules end in `-rule` |
 | `applicationGateway.sites.publicSite.site` | AGW listener/site (child) | `s101d01-as-ees-public-site-site` | `publicsite-site` | NEW. Child of the gateway |
 | `applicationGateway.sites.publicApi.backend` | AGW backend pool (child) | `s101d01-ees-papi-ca-api` | `papi-backend` | Child of the gateway; today it reuses the container app's name |
 | `applicationGateway.sites.publicApi.route` | AGW routing rule (child) | `s101d01-ees-papi` | `papi-routing-rule` | Decision 7: App Gateway rules end in `-rule` |
 | `applicationGateway.sites.publicApi.site` | AGW listener/site (child) | `s101d01-ees-papi` | `papi-site` | NEW. Child of the gateway |
-| `applicationGateway.sites.publicApi.wafPolicy` | App Gateway WAF Policy | `s101d01-ees-agw-01-public-api-afwp` | `s292d01waf-uks-agwpapi01` | `afwp` is the Azure Firewall abbreviation |
+| `applicationGateway.sites.publicApi.wafPolicy` | App Gateway WAF Policy | `s101d01-ees-agw-01-public-api-afwp` | `waf-uks-agwpapi` | `afwp` is the Azure Firewall abbreviation |
 | `applicationGateway.sites.publicApi.rewriteSet` | AGW rewrite rule set (child) | `s101d01-ees-papi-docs-rewrites` | `papidocs-rewrites` | Decision 7: named after the docs site it rewrites for |
 | `applicationGateway.sites.publicApiDocs.backend` | AGW backend pool (child) | `s101d01-ees-papi-stapp-docs` | `papidocs-backend` | Child of the gateway; today it reuses the static web app's name |
 | `applicationGateway.sites.publicApiDocs.pathRules.backend` | AGW path rule (child) | `docs-backend` | `papidocs-path-rule` | Decision 7: workload-first, like the other App Gateway child names |
 | `applicationGateway.sites.publicApiDocs.pathRules.rootRedirect` | AGW path rule (child) | `docs-root-redirect` | `papidocs-root-redirect-rule` | Decision 7: App Gateway rules end in `-rule` |
 | `backups.backupVault` | Backup Vault | `s101d01-ees-bvault` | `s292d01bvault-uks-ees01` |  |
-| `backups.backupVaultBlobsPolicy` | Backup Vault Policy | `s101d01-ees-blob-bkpol` | `s292d01bkpol-uks-blob01` |  |
-| `backups.backupVaultPsqlFlexibleServerPolicy` | Backup Vault Policy | `s101d01-ees-psql-flexible-server-bkpol` | `s292d01bkpol-uks-psql01` | Third PostgreSQL spelling removed |
+| `backups.backupVaultBlobsPolicy` | Backup Vault Policy | `s101d01-ees-blob-bkpol` | `bkpol-uks-blob` |  |
+| `backups.backupVaultPsqlFlexibleServerPolicy` | Backup Vault Policy | `s101d01-ees-psql-flexible-server-bkpol` | `bkpol-uks-psql` | Third PostgreSQL spelling removed |
 | `backups.recoveryServicesVault` | Recovery Services Vault | `s101d01-ees-rsv` | `s292d01rsv-uks-ees01` |  |
 | `containerAppEnvironment` | Container App Environment | `s101d01-ees-cae-01` | `s292d01cae-uks-ees01` |  |
-| `dataFactory` | Data Factory | `s101d01-df-ees-release` | `s292d01adf-uks-release01` | `df`→`adf` |
+| `dataFactory` | Data Factory | `s101d01-df-ees-release` | `s292d01adf-uks-ees01` | `df`→`adf` |
 | `frontDoor.frontDoorName` | Front Door Profile | `s101d01-ees-afd` | `s292d01afd-uks-ees01` | ⚠ global resource, so `uks` is misleading |
 | `frontDoor.defaultEndpoint.endpointName` | Front Door Endpoint | `s101d01-ees-fde` | `s292d01fde-uks-ees01` | Endpoint names are globally unique hostnames |
-| `frontDoor.wafPolicy` | Front Door WAF Policy | `s101d01eesafdwafp` | `s292d01fdfpuksees01` | Alphanumeric only; `wafp`→`fdfp` |
-| `frontDoor.wafSecurityPolicy` | Front Door Security Policy | `s101d01eesafdwafsp` | `s292d01afdsp-uks-ees01` | Hyphens are allowed here |
-| `frontDoor.publicSite.customDomain` | Front Door Custom Domain | `s101d01-ees-public-site-afd-domain` | `s292d01afdd-uks-publicsite01` |  |
-| `frontDoor.publicSite.originGroup` | Front Door Origin Group | `s101d01-ees-fdog` | `s292d01fdog-uks-publicsite01` | Says which site (TODO EES-7502) |
-| `frontDoor.publicSite.origin` | Front Door Origin | `s101d01-ees-fdo` | `s292d01fdo-uks-publicsite01` | Says which site (TODO EES-7502) |
-| `frontDoor.publicSite.route` | Front Door Route | `s101d01-ees-fdr` | `s292d01fdr-uks-publicsite01` | Says which site (TODO EES-7502) |
-| `frontDoor.contentApi.customDomain` | Front Door Custom Domain | `s101d01-ees-content-afd-domain` | `s292d01afdd-uks-contentapi01` |  |
-| `frontDoor.contentApi.originGroup` | Front Door Origin Group | `s101d01-ees-content-fdog` | `s292d01fdog-uks-contentapi01` |  |
-| `frontDoor.contentApi.origin` | Front Door Origin | `s101d01-ees-content-fdo` | `s292d01fdo-uks-contentapi01` |  |
-| `frontDoor.contentApi.route` | Front Door Route | `s101d01-ees-content-fdr` | `s292d01fdr-uks-contentapi01` |  |
-| `frontDoor.contentApi.allFilesCacheRoute` | Front Door Route | `s101d01-ees-content-all-files-cache-fdr` | `s292d01fdr-uks-contentapiallfilescache01` |  |
+| `frontDoor.wafPolicy` | Front Door WAF Policy | `s101d01eesafdwafp` | `fdfpuksees` | Alphanumeric only; `wafp`→`fdfp` |
+| `frontDoor.wafSecurityPolicy` | Front Door Security Policy | `s101d01eesafdwafsp` | `afdsp-uks-ees` | Hyphens are allowed here |
+| `frontDoor.publicSite.customDomain` | Front Door Custom Domain | `s101d01-ees-public-site-afd-domain` | `afdd-uks-publicsite` |  |
+| `frontDoor.publicSite.originGroup` | Front Door Origin Group | `s101d01-ees-fdog` | `fdog-uks-publicsite` | Says which site (TODO EES-7502) |
+| `frontDoor.publicSite.origin` | Front Door Origin | `s101d01-ees-fdo` | `fdo-uks-publicsite` | Says which site (TODO EES-7502) |
+| `frontDoor.publicSite.route` | Front Door Route | `s101d01-ees-fdr` | `fdr-uks-publicsite` | Says which site (TODO EES-7502) |
+| `frontDoor.contentApi.customDomain` | Front Door Custom Domain | `s101d01-ees-content-afd-domain` | `afdd-uks-contentapi` |  |
+| `frontDoor.contentApi.originGroup` | Front Door Origin Group | `s101d01-ees-content-fdog` | `fdog-uks-contentapi` |  |
+| `frontDoor.contentApi.origin` | Front Door Origin | `s101d01-ees-content-fdo` | `fdo-uks-contentapi` |  |
+| `frontDoor.contentApi.route` | Front Door Route | `s101d01-ees-content-fdr` | `fdr-uks-contentapi` |  |
+| `frontDoor.contentApi.allFilesCacheRoute` | Front Door Route | `s101d01-ees-content-all-files-cache-fdr` | `fdr-uks-contentapiallfilescache` |  |
 | `storageAccounts.core` | Storage Account | `s101d01saeescore` (Test/Pre-Prod `s101t01storageeescore`) | `s292d01stukscore` | Test/Pre-Prod `storage` special case removed |
 | `storageAccounts.public` | Storage Account | `s101d01saeespublic` | `s292d01stukspublic` |  |
 | `storageAccounts.logging` | Storage Account | `s101d01saeeslogging` | `s292d01stukslogging` |  |
@@ -146,16 +149,16 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `keyVault.certificates.contentApiFrontDoor` | Key Vault certificate | `s101d01-as-ees-content-afd-certificate` | `contentapi-afd-certificate` | Decision 8: no `ees-` or subscription prefix |
 | `keyVault.certificates.publicApiAppGateway` | Key Vault certificate | `s101d01-ees-papi-certificate` | `papi-agw-certificate` | Decision 8: no `ees-` or subscription prefix |
 | `alertsGroup` | Action Group | `s101d01-ag-ees-alertedusers` | `s292d01ag-uks-alertedusers01` |  |
-| `alertsLogicApp` | Logic App | `s101d01-la-ees-slackwebhook` | `s292d01logic-uks-slackwebhook01` | `la`→`logic` (or drop it with the Slack webhooks, EES-7608) |
+| `alertsLogicApp` | Logic App | `s101d01-la-ees-slackwebhook` | `s292d01logic-uks-alerts01` | `la`→`logic` (or drop it with the Slack webhooks, EES-7608) |
 | `databases.coreSqlServer` | SQL Server | `s101d01-sqlsvr-ees-01` | `s292d01sql-uks-core01` | Named by purpose |
 | `databases.publicSqlServer` | SQL Server | `s101d01-sqlsvr-ees-02` | `s292d01sql-uks-public01` | Named by purpose |
 | `databases.contentDb` | SQL Database | `content` | `content` | NEW. Unchanged |
 | `databases.statisticsDb` | SQL Database | `statistics` | `statistics` | NEW. Unchanged |
 | `databases.postgreSqlFlexibleServer` | PostgreSQL Flexible Server | `s101d01-ees-psql-flexibleserver` | `s292d01psql-uks-ees01` | `-flexibleserver` suffix removed (TODO EES-7502) |
-| `eventGrid.topics.publicationChanged` | Event Grid Topic | `s101d01-ees-evgt-publication-changed` | `s292d01evgt-uks-publicationchanged01` |  |
-| `eventGrid.topics.releaseChanged` | Event Grid Topic | `s101d01-ees-evgt-release-changed` | `s292d01evgt-uks-releasechanged01` |  |
-| `eventGrid.topics.releaseVersionChanged` | Event Grid Topic | `s101d01-ees-evgt-release-version-changed` | `s292d01evgt-uks-releaseversionchanged01` |  |
-| `eventGrid.topics.themeChanged` | Event Grid Topic | `s101d01-ees-evgt-theme-changed` | `s292d01evgt-uks-themechanged01` |  |
+| `eventGrid.topics.publicationChanged` | Event Grid Topic | `s101d01-ees-evgt-publication-changed` | `s292d01evgt-uks-publicationchanged` |  |
+| `eventGrid.topics.releaseChanged` | Event Grid Topic | `s101d01-ees-evgt-release-changed` | `s292d01evgt-uks-releasechanged` |  |
+| `eventGrid.topics.releaseVersionChanged` | Event Grid Topic | `s101d01-ees-evgt-release-version-changed` | `s292d01evgt-uks-releaseversionchanged` |  |
+| `eventGrid.topics.themeChanged` | Event Grid Topic | `s101d01-ees-evgt-theme-changed` | `s292d01evgt-uks-themechanged` |  |
 | `logAnalyticsWorkspace` | Log Analytics Workspace | `s101d01-ees-log` | `s292d01log-uks-ees01` |  |
 
 ### Main apps
@@ -201,7 +204,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `publicApi.processor.identity` | Managed Identity | `s101d01-ees-papi-id-fa-processor` | `s292d01id-uks-papiprocessor01` | Embedded `fa` removed |
 | `publicApi.processor.storageAccountsPrefix` | Storage Account prefix (→ `mg`, `s1`, `s2`) | `s101d01eessaprocessor` | `s292d01stukspapiproc` | `papiprocessor` + `mg` would be 27 chars, over the 24 limit, so shortened to `papiproc` (22 with suffix) |
 | `publicApi.storage.storageAccount` | Storage Account | `s101d01eespapisa` | `s292d01stukspapi` |  |
-| `publicApi.storage.fileShare` | File Share | `s101d01-ees-papi-share-data` | `s292d01share-uks-papidata01` |  |
+| `publicApi.storage.fileShare` | File Share | `s101d01-ees-papi-share-data` | `share-uks-papidata` |  |
 
 ### Screener (`sapi` dropped)
 
@@ -212,7 +215,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `screener.appInsights` | Application Insights | `s101d01-ees-sapi-ai-screener` | `s292d01appi-uks-screener01` | Last table had the current name wrong: it does include `sapi` |
 | `screener.functionStorageAccount` | Storage Account | `s101d01eessapisafn` | `s292d01stuksscreenerfn` |  |
 | `screener.logsStorageAccount` | Storage Account | `s101d01eessapisalogs` | `s292d01stuksscreenerlogs` | Exactly 24 chars |
-| `screener.logsFileShare` | File Share | `s101d01-ees-sapi-fa-screener-logs-share` | `s292d01share-uks-screenerlogs01` |  |
+| `screener.logsFileShare` | File Share | `s101d01-ees-sapi-fa-screener-logs-share` | `share-uks-screenerlogs` |  |
 
 ### Search
 
@@ -224,14 +227,14 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `search.service` | Search Service | `s101d01-ees-srch` | `s292d01srch-uks-ees01` |  |
 | `search.storageAccount` | Storage Account | `s101d01eessasearch` | `s292d01stukssearch` |  |
 | `search.appInsights` | Application Insights | `s101d01-ees-ai-search` | `s292d01appi-uks-search01` | Shared by nlSearch and searchDocs |
-| `search.searchDocsEventSubscriptions.publicationArchived` | Event Grid Subscription | `s101d01-ees-evgs-publication-archived` | `s292d01evgs-uks-publicationarchived01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.publicationChanged` | Event Grid Subscription | `s101d01-ees-evgs-publication-changed` | `s292d01evgs-uks-publicationchanged01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.publicationDeleted` | Event Grid Subscription | `s101d01-ees-evgs-publication-deleted` | `s292d01evgs-uks-publicationdeleted01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.publicationLatestPublishedReleaseReordered` | Event Grid Subscription | `s101d01-ees-evgs-publication-latest-published-release-reordered` | `s292d01evgs-uks-publicationlatestpublishedreleasereordered01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.publicationRestored` | Event Grid Subscription | `s101d01-ees-evgs-publication-restored` | `s292d01evgs-uks-publicationrestored01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.releaseSlugChanged` | Event Grid Subscription | `s101d01-ees-evgs-release-slug-changed` | `s292d01evgs-uks-releaseslugchanged01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.releaseVersionPublished` | Event Grid Subscription | `s101d01-ees-evgs-release-version-published` | `s292d01evgs-uks-releaseversionpublished01` | NEW (last table only had a `{topic}` placeholder) |
-| `search.searchDocsEventSubscriptions.themeChanged` | Event Grid Subscription | `s101d01-ees-evgs-theme-changed` | `s292d01evgs-uks-themechanged01` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.publicationArchived` | Event Grid Subscription | `s101d01-ees-evgs-publication-archived` | `evgs-uks-publicationarchived` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.publicationChanged` | Event Grid Subscription | `s101d01-ees-evgs-publication-changed` | `evgs-uks-publicationchanged` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.publicationDeleted` | Event Grid Subscription | `s101d01-ees-evgs-publication-deleted` | `evgs-uks-publicationdeleted` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.publicationLatestPublishedReleaseReordered` | Event Grid Subscription | `s101d01-ees-evgs-publication-latest-published-release-reordered` | `evgs-uks-publicationlatestpublishedreleasereordered` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.publicationRestored` | Event Grid Subscription | `s101d01-ees-evgs-publication-restored` | `evgs-uks-publicationrestored` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.releaseSlugChanged` | Event Grid Subscription | `s101d01-ees-evgs-release-slug-changed` | `evgs-uks-releaseslugchanged` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.releaseVersionPublished` | Event Grid Subscription | `s101d01-ees-evgs-release-version-published` | `evgs-uks-releaseversionpublished` | NEW (last table only had a `{topic}` placeholder) |
+| `search.searchDocsEventSubscriptions.themeChanged` | Event Grid Subscription | `s101d01-ees-evgs-theme-changed` | `evgs-uks-themechanged` | NEW (last table only had a `{topic}` placeholder) |
 | `searchDocs.functionApp` | Function App | `s101d01-ees-fa-searchdocs` | `s292d01func-uks-searchdocs01` |  |
 | `searchDocs.appServicePlan` | App Service Plan | `s101d01-ees-asp-searchdocs` | `s292d01plan-uks-searchdocs01` |  |
 | `searchDocs.functionStorageAccount` | Storage Account | `s101d01eessasearchdocsfn` | `s292d01stukssearchdocsfn` | Exactly 24 chars |
@@ -245,7 +248,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `analytics.appInsights` | Application Insights | `s101d01-ees-ai-analytics` | `s292d01appi-uks-analytics01` |  |
 | `analytics.functionStorageAccount` | Storage Account | `s101d01eessaanlytfa` | `s292d01stuksanalyticsfn` | `fa`→`fn`, matching the other function storage accounts |
 | `analytics.storage.storageAccountName` | Storage Account | `s101d01eessaanlyt` | `s292d01stuksanalytics` |  |
-| `analytics.storage.fileShareName` | File Share | `s101d01-ees-share-anlyt` | `s292d01share-uks-analytics01` | Child of the storage account, so the prefix is optional |
+| `analytics.storage.fileShareName` | File Share | `s101d01-ees-share-anlyt` | `share-uks-analytics` | Child of the storage account, so the prefix is optional |
 
 ### Key Vault secrets named after a storage account today
 
@@ -300,8 +303,8 @@ Recommended on 15 Oct 2026. **Not yet confirmed** with the DfE platform team; se
 
 - **One integration subnet per App Service plan**, delegated and holding nothing else. About /26 each, inside a /24 block reserved per workload so a second app can be added later. Named by what the app does, not its resource type.
 - **Two shared private endpoint subnets** replace the 10 per-workload `-pep` subnets:
-  - `s292d01snet-uks-datapep01`: SQL, PostgreSQL, storage, Key Vault, Event Grid, Search, SignalR, ACR.
-  - `s292d01snet-uks-appspep01`: inbound private endpoints to the apps themselves.
+  - `snet-uks-datapep`: SQL, PostgreSQL, storage, Key Vault, Event Grid, Search, SignalR, ACR.
+  - `snet-uks-appspep`: inbound private endpoints to the apps themselves.
   - Set `privateEndpointNetworkPolicies` on both, put each private endpoint in an Application Security Group, and write NSG rules from each app's integration subnet to those groups.
 - **Dedicated subnets** kept for the App Gateway and the Container Apps environment.
 
@@ -311,47 +314,47 @@ Recommended on 15 Oct 2026. **Not yet confirmed** with the DfE platform team; se
 
 | Group | Subnets |
 |---|---|
-| Integration (12) | `admin01`, `contentapi01`, `dataapi01`, `publicsite01` (new), `importer01`, `notifier01`, `publisher01`, `screener01`, `papiprocessor01`, `nlsearch01`, `searchdocs01`, `analytics01`. A second app in a workload (e.g. a screener UI) gets its own subnet from the same /24 block |
-| Dedicated (2) | `agw01`, `cae01` |
-| Shared private endpoints (2) | `datapep01`, `appspep01` |
+| Integration (12) | `admin`, `contentapi`, `dataapi`, `publicsite` (new), `importer`, `notifier`, `publisher`, `screener`, `papiprocessor`, `nlsearch`, `searchdocs`, `analytics`. A second app in a workload (e.g. a screener UI) gets its own subnet from the same /24 block |
+| Dedicated (2) | `agw`, `cae` |
+| Shared private endpoints (2) | `datapep`, `appspep` |
 
-All prefixed `s292d01snet-uks-`. New subnets with no current equivalent, to add to `resourceNames.vnet.subnets`:
+All prefixed `snet-uks-`, with no environment prefix or `01` (decisions 25 and 26). New subnets with no current equivalent, to add to `resourceNames.vnet.subnets`:
 
 | Proposed `resourceNames` path | Type | Proposed (s292 Dev) | Notes |
 |---|---|---|---|
-| `vnet.subnets.publicSite` | Subnet (integration) | `s292d01snet-uks-publicsite01` | The public site has no VNet integration today; it needs it once the Content API is private |
-| `vnet.subnets.dataPrivateEndpoints` | Subnet (private endpoints) | `s292d01snet-uks-datapep01` | Replaces 6 subnets outright and takes the storage side of 4 more |
-| `vnet.subnets.appsPrivateEndpoints` | Subnet (private endpoints) | `s292d01snet-uks-appspep01` | Takes the function apps' inbound PEs from 4 subnets |
+| `vnet.subnets.publicSite` | Subnet (integration) | `snet-uks-publicsite` | The public site has no VNet integration today; it needs it once the Content API is private |
+| `vnet.subnets.dataPrivateEndpoints` | Subnet (private endpoints) | `snet-uks-datapep` | Replaces 6 subnets outright and takes the storage side of 4 more |
+| `vnet.subnets.appsPrivateEndpoints` | Subnet (private endpoints) | `snet-uks-appspep` | Takes the function apps' inbound PEs from 4 subnets |
 
 ### Existing subnets and where they go
 
-Until this layout is confirmed, `getElzResourceNames()` in `resource-names.bicep` keeps today's one-to-one set of subnets under ELZ names, so the VNet templates work unchanged. The private endpoint subnets are named `s292d01snet-uks-sqlpep01`, `…-psql01`, `…-evgtpep01`, `…-papistpep01`, `…-searchstpep01`, `…-analyticsstpep01`, `…-screenerpep01`, `…-papiprocessorpep01`, `…-nlsearchpep01` and `…-searchdocspep01`. Moving to the shared subnets below also means changing the `ResourceNames` type and the VNet module.
+Until this layout is confirmed, `getElzResourceNames()` in `resource-names.bicep` keeps today's one-to-one set of subnets under ELZ names, so the VNet templates work unchanged. The private endpoint subnets are named `snet-uks-sqlpep`, `…-psql`, `…-evgtpep`, `…-papistpep`, `…-searchstpep`, `…-analyticsstpep`, `…-screenerpep`, `…-papiprocessorpep`, `…-nlsearchpep` and `…-searchdocspep`. Moving to the shared subnets below also means changing the `ResourceNames` type and the VNet module.
 
 | `resourceNames` path | Type | Current (Dev) | Proposed (s292 Dev) | Notes |
 |---|---|---|---|---|
-| `vnet.subnets.applicationGateway` | Subnet (dedicated) | `s101d01-ees-snet-agw-01` | `s292d01snet-uks-agw01` | Kept: App Gateway needs its own subnet |
-| `vnet.subnets.containerAppEnvironment` | Subnet (dedicated, `Microsoft.App/environments`) | `s101d01-ees-snet-cae-01` | `s292d01snet-uks-cae01` | Kept: the CAE needs its own subnet |
-| `vnet.subnets.admin` | Subnet (integration) | `s101d01-snet-ees-admin` | `s292d01snet-uks-admin01` |  |
-| `vnet.subnets.contentApi` | Subnet (integration) | `s101d01-snet-ees-content` | `s292d01snet-uks-contentapi01` |  |
-| `vnet.subnets.dataApi` | Subnet (integration) | `s101d01-snet-ees-data` | `s292d01snet-uks-dataapi01` |  |
-| `vnet.subnets.importer` | Subnet (integration) | `s101d01-snet-ees-importer` | `s292d01snet-uks-importer01` |  |
-| `vnet.subnets.notifier` | Subnet (integration) | `s101d01-snet-ees-notify` | `s292d01snet-uks-notifier01` | `notify`→`notifier` |
-| `vnet.subnets.publisher` | Subnet (integration) | `s101d01-snet-ees-publisher` | `s292d01snet-uks-publisher01` |  |
-| `vnet.subnets.screenerFunctionApp` | Subnet (integration) | `s101d01-ees-sapi-snet-fa-screener` | `s292d01snet-uks-screener01` | `sapi` and `fa` dropped |
-| `vnet.subnets.publicApiDataProcessor` | Subnet (integration) | `s101d01-ees-papi-snet-fa-processor` | `s292d01snet-uks-papiprocessor01` | `fa` dropped |
-| `vnet.subnets.nlSearchFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-nlsearch` | `s292d01snet-uks-nlsearch01` | `fa` dropped |
-| `vnet.subnets.searchDocsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-searchdocs` | `s292d01snet-uks-searchdocs01` | `fa` dropped |
-| `vnet.subnets.analyticsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-analytics` | `s292d01snet-uks-analytics01` | `fa` dropped |
-| `vnet.subnets.sqlServerPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sqlsvr-pep` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet (both SQL servers) |
-| `vnet.subnets.psqlFlexibleServer` | Subnet (private endpoints) | `s101d01-ees-snet-psql-flexibleserver` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet. Not delegated today: it only holds the PostgreSQL private endpoint |
-| `vnet.subnets.eventGridCustomTopicPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-evgt-pep` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet (Event Grid topics) |
-| `vnet.subnets.publicApiStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-sa-pep` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet (Public API storage) |
-| `vnet.subnets.searchStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-search-pep` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet (search storage, Search service) |
-| `vnet.subnets.analyticsStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-anlyt-pep` | `s292d01snet-uks-datapep01` | REMOVED: merged into the shared data PE subnet (analytics storage) |
-| `vnet.subnets.screenerStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-sapi-snet-sa-screener-pep` | `s292d01snet-uks-datapep01 + s292d01snet-uks-appspep01` | REMOVED: split. Storage PEs go to the data subnet; the screener function app's inbound PE goes to the apps subnet |
-| `vnet.subnets.publicApiDataProcessorPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-fa-processor-pep` | `s292d01snet-uks-datapep01 + s292d01snet-uks-appspep01` | REMOVED: split. Durable Functions storage PEs go to the data subnet; the processor's inbound PE goes to the apps subnet |
-| `vnet.subnets.nlSearchFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-nlsearch-pep` | `s292d01snet-uks-datapep01 + s292d01snet-uks-appspep01` | REMOVED: split. Function storage PEs go to the data subnet; the function app's inbound PE goes to the apps subnet |
-| `vnet.subnets.searchDocsFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-searchdocs-pep` | `s292d01snet-uks-datapep01 + s292d01snet-uks-appspep01` | REMOVED: split, as above |
+| `vnet.subnets.applicationGateway` | Subnet (dedicated) | `s101d01-ees-snet-agw-01` | `snet-uks-agw` | Kept: App Gateway needs its own subnet |
+| `vnet.subnets.containerAppEnvironment` | Subnet (dedicated, `Microsoft.App/environments`) | `s101d01-ees-snet-cae-01` | `snet-uks-cae` | Kept: the CAE needs its own subnet |
+| `vnet.subnets.admin` | Subnet (integration) | `s101d01-snet-ees-admin` | `snet-uks-admin` |  |
+| `vnet.subnets.contentApi` | Subnet (integration) | `s101d01-snet-ees-content` | `snet-uks-contentapi` |  |
+| `vnet.subnets.dataApi` | Subnet (integration) | `s101d01-snet-ees-data` | `snet-uks-dataapi` |  |
+| `vnet.subnets.importer` | Subnet (integration) | `s101d01-snet-ees-importer` | `snet-uks-importer` |  |
+| `vnet.subnets.notifier` | Subnet (integration) | `s101d01-snet-ees-notify` | `snet-uks-notifier` | `notify`→`notifier` |
+| `vnet.subnets.publisher` | Subnet (integration) | `s101d01-snet-ees-publisher` | `snet-uks-publisher` |  |
+| `vnet.subnets.screenerFunctionApp` | Subnet (integration) | `s101d01-ees-sapi-snet-fa-screener` | `snet-uks-screener` | `sapi` and `fa` dropped |
+| `vnet.subnets.publicApiDataProcessor` | Subnet (integration) | `s101d01-ees-papi-snet-fa-processor` | `snet-uks-papiprocessor` | `fa` dropped |
+| `vnet.subnets.nlSearchFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-nlsearch` | `snet-uks-nlsearch` | `fa` dropped |
+| `vnet.subnets.searchDocsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-searchdocs` | `snet-uks-searchdocs` | `fa` dropped |
+| `vnet.subnets.analyticsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-analytics` | `snet-uks-analytics` | `fa` dropped |
+| `vnet.subnets.sqlServerPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sqlsvr-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (both SQL servers) |
+| `vnet.subnets.psqlFlexibleServer` | Subnet (private endpoints) | `s101d01-ees-snet-psql-flexibleserver` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet. Not delegated today: it only holds the PostgreSQL private endpoint |
+| `vnet.subnets.eventGridCustomTopicPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-evgt-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (Event Grid topics) |
+| `vnet.subnets.publicApiStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-sa-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (Public API storage) |
+| `vnet.subnets.searchStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-search-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (search storage, Search service) |
+| `vnet.subnets.analyticsStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-anlyt-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (analytics storage) |
+| `vnet.subnets.screenerStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-sapi-snet-sa-screener-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Storage PEs go to the data subnet; the screener function app's inbound PE goes to the apps subnet |
+| `vnet.subnets.publicApiDataProcessorPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-fa-processor-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Durable Functions storage PEs go to the data subnet; the processor's inbound PE goes to the apps subnet |
+| `vnet.subnets.nlSearchFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-nlsearch-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Function storage PEs go to the data subnet; the function app's inbound PE goes to the apps subnet |
+| `vnet.subnets.searchDocsFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-searchdocs-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split, as above |
 
 ## 6. Upgrading resources and amending resource types
 
