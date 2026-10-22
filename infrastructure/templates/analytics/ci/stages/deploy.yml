@@ -36,8 +36,6 @@ stages:
     condition: ${{ parameters.condition }}
     variables:
       - group: Common - ${{ parameters.environment }}
-      - name: analyticsFunctionAppName
-        value: $(subscription)-ees-fa-analytics
       - name: infraDeployName
         value: AnalyticsInfrastructure$(Build.BuildNumber)
     jobs:

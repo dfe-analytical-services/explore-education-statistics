@@ -23,6 +23,10 @@ type ResourceNames = {
     signalRName: string
   }
   analytics: {
+    functionApp: string
+    appServicePlan: string
+    appInsights: string
+    functionStorageAccount: string
     storage: {
       storageAccountName: string
       fileShareName: string
@@ -309,9 +313,13 @@ func getResourceNames(
     signalRName: '${legacyResourcePrefix}-${abbreviations.signalRServiceSignalR}-ees-admin'
   }
   analytics: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
+    appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-analytics'
+    appInsights: '${newResourcePrefix}-${abbreviations.insightsComponents}-analytics'
+    functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa'
     storage: {
       storageAccountName: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
-      fileShareName: '${newResourcePrefix}-share-anlyt'
+      fileShareName: '${newResourcePrefix}-${abbreviations.fileShare}-anlyt'
     }
   }
   applicationGateway: {
