@@ -1,7 +1,5 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
-
-@description('Naming prefix for resources.')
-param resourcePrefix string
+@description('Name of the Recovery Services Vault.')
+param vaultName string
 
 @description('The location to create resources in.')
 param location string
@@ -12,12 +10,10 @@ param immutable bool
 @description('Tags for the resources')
 param tagValues object
 
-var recoveryServicesVaultName = '${resourcePrefix}-${abbreviations.recoveryServicesVaults}'
-
 module recoveryVaultModule '../../../common/components/recovery-services-vault/recovery-services-vault.bicep' = {
   name: 'recoveryVaultDeploy'
   params: {
-    vaultName: recoveryServicesVaultName
+    vaultName: vaultName
     location: location
     redundancy: 'GeoRedundant'
     immutable: immutable
@@ -36,7 +32,7 @@ module fileShareBackupPolicyModule '../../../common/components/recovery-services
   name: 'fileShareBackupPolicyDeploy'
   params: {
     policyName: 'DailyPolicy'
-    vaultName: recoveryServicesVaultName
+    vaultName: vaultName
     location: location
     dailyBackupTimeUtc: '00:00'
     daysToRetainDailyBackups: 30
@@ -56,4 +52,4 @@ module fileShareBackupPolicyModule '../../../common/components/recovery-services
   ]
 }
 
-output recoveryServicesVaultName string = recoveryServicesVaultName
+output recoveryServicesVaultName string = vaultName

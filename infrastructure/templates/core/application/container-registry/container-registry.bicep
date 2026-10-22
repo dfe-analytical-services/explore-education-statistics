@@ -1,8 +1,11 @@
+@description('Name of the Container Registry.')
+param containerRegistryName string
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-02-01-preview' = {
-  name: 'eesacr'
+  name: containerRegistryName
   location: resourceGroup().location
   sku: {
     name: 'Standard'

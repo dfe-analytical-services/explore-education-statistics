@@ -1,7 +1,5 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
+@description('Name of the Backup Vault.')
+param vaultName string
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -11,8 +9,6 @@ param deployBackupVaultReaderRoleAssignment bool
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
-
-var vaultName = '${resourcePrefix}-${abbreviations.backupVaults}'
 
 module backupVaultModule '../../../common/components/data-protection/backupVault.bicep' = {
   name: '${vaultName}Deploy'

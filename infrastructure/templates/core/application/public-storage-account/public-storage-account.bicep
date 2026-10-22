@@ -1,9 +1,8 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
 import { IpRange } from '../../../common/types.bicep'
 import { VNetSubnets } from '../virtual-network/types.bicep'
 
-@description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Name of the storage account.')
+param storageAccountName string
 
 @description('Retention of blobs in days.')
 param blobDeleteRetentionDays int
@@ -35,8 +34,6 @@ param tagValues object
 resource backupVault 'Microsoft.DataProtection/backupVaults@2026-06-01' existing = {
   name: backupVaultName
 }
-
-var storageAccountName = '${subscription}${abbreviations.storageStorageAccounts}eespublic'
 
 // TODO EES-7502 - remove when standardising role assignment GUID generation.
 var backupContributorRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1') 

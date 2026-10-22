@@ -1,7 +1,5 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
-
-@description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Name of the storage account.')
+param storageAccountName string
 
 @description('Retention of blobs in days.')
 param blobDeleteRetentionDays int
@@ -14,8 +12,6 @@ param deployAlerts bool
 
 @description('Tags for the resources')
 param tagValues object
-
-var storageAccountName = '${subscription}${abbreviations.storageStorageAccounts}eeslogging'
 
 module storageAccountModule '../../../common/components/storage/storage-account.bicep' = {
   name: 'loggingStorageAccountDeploy'

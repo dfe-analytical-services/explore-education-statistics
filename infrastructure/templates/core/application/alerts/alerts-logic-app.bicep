@@ -1,7 +1,8 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
-
-@description('Resource prefix for all resources.')
+@description('Subscription name e.g. s101d01, passed to the logic app as a workflow parameter.')
 param subscription string
+
+@description('Name of the logic app.')
+param alertsLogicAppName string
 
 @description('Resource Id of the Log Analytics Workspace to link the logic app to.')
 param logAnalyticsWorkspaceId string
@@ -17,8 +18,6 @@ param slackAlertsConfig string
 @secure()
 @description('The Power Automate Webhook URL used to post messages to Teams.')
 param teamsPowerAutomateWebhookUrl string
-
-var alertsLogicAppName = '${subscription}-${abbreviations.logicWorkflows}-ees-slackwebhook'
 
 resource alertsLogicApp 'Microsoft.Logic/workflows@2019-05-01' = {
   name: alertsLogicAppName
