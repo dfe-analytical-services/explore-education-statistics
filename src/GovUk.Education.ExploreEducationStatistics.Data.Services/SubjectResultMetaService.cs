@@ -185,7 +185,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         Guid releaseVersionId,
         Guid subjectId,
         IList<FilterItem> filterItems,
-        List<Guid> indicatorIds
+        IReadOnlyCollection<Guid> indicatorIds
     )
     {
         var footnotes = await _footnoteRepository.GetFilteredFootnotes(
