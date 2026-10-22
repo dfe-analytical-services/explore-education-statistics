@@ -1079,6 +1079,99 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
+    public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsLinkedToFootnoteForAnotherSubject()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(1))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .GenerateList(1)
+                    )
+                    .Generate(2)
+            )
+            .GenerateList();
+
+        var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
+
+        var footnotes = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .ForIndex(0, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+            .ForIndex(
+                1,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 and subject 2 filter 1")
+                        .SetFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
+            )
+            .ForIndex(
+                2,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 group 1 and subject 2 filter 1 group 1")
+                        .SetFilterGroups(
+                            ListOf(subject1.Filters[0].FilterGroups[0], subject2.Filters[0].FilterGroups[0])
+                        )
+            )
+            .ForIndex(
+                3,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 group 1 item 1 and subject 2 filter 1 group 1 item 1")
+                        .SetFilterItems(
+                            ListOf(
+                                subject1.Filters[0].FilterGroups[0].FilterItems[0],
+                                subject2.Filters[0].FilterGroups[0].FilterItems[0]
+                            )
+                        )
+            )
+            .ForIndex(
+                4,
+                s =>
+                    s.SetContent("Applies to subject 1 indicator 1 and subject 2 indicator 1")
+                        .SetIndicators(
+                            ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])
+                        )
+            )
+            .GenerateList();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.Subject.AddRange(subject1, subject2);
+            context.Filter.AddRange(subject1.Filters.Concat(subject2.Filters));
+            context.IndicatorGroup.AddRange(subject1.IndicatorGroups[0], subject2.IndicatorGroups[0]);
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseSubject.AddRange(releaseSubjects);
+            context.Footnote.AddRange(footnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            // Get footnotes applying to subject 2 but only include filter item and indicator id's from subject 1
+            var results = await GetFilteredFootnotesForFilterItems(
+                context,
+                releaseVersionId: releaseVersion.Id,
+                subjectId: subject2.Id,
+                filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
+                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id)
+            );
+
+            // Footnotes linked to subject 2 data should not be matched by the links they also have to subject 1 data
+            var result = Assert.Single(results);
+            Assert.Equal(footnotes[0].Id, result.Id);
+        }
+    }
+
+    [Fact]
     public async Task GetFootnotes_MapsAllCriteria()
     {
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
