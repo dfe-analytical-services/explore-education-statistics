@@ -2,7 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public class FilterFootnote
 {
-    public Filter Filter { get; set; }
     public Guid FilterId { get; set; }
     public Guid SubjectId { get; set; }
     public Footnote Footnote { get; set; }
