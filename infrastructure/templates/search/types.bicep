@@ -1,21 +1,4 @@
 @export()
-type ResourceNames = {
-  existingResources: {
-    logAnalyticsWorkspace: string
-    keyVault: string
-    vNet: string
-    alertsGroup: string
-    subnets: {
-      nlSearchFunctionApp: string
-      nlSearchFunctionAppPrivateEndpoints: string
-      searchDocsFunctionApp: string
-      searchDocsFunctionAppPrivateEndpoints: string
-      searchStoragePrivateEndpoints: string
-    }
-  }
-}
-
-@export()
 @sealed()
 type SearchStorageQueueNames = {
   @description('Queue name for when a publication is archived.')

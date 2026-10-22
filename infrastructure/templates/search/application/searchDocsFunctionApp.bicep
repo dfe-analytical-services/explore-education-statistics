@@ -1,6 +1,6 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames, SearchStorageQueueNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
+import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
@@ -33,9 +33,6 @@ param storageFirewallRules IpRange[]
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
-@description('Resource prefix for all resources.')
-param resourcePrefix string
-
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
@@ -59,20 +56,20 @@ param storageQueueNames SearchStorageQueueNames = {
 param tagValues object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunctionApp
+  name: resourceNames.vnet.subnets.searchDocsFunctionApp
   parent: vNet
 }
 
 resource searchDocsFunctionAppPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchDocsFunctionAppPrivateEndpoints
+  name: resourceNames.vnet.subnets.searchDocsFunctionAppPrivateEndpoints
   parent: vNet
 }
 
@@ -97,9 +94,9 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
-    functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    functionAppName: resourceNames.searchDocs.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
+    appServicePlanName: resourceNames.searchDocs.appServicePlan
     appSettings: [
       {
         name: 'App__SearchStorageConnectionString'
@@ -191,7 +188,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     deployQueueRoleAssignment: true
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
+    storageAccountName: resourceNames.searchDocs.functionStorageAccount
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
@@ -211,7 +208,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       fileServiceAvailability: true
       fileServiceLatency: false
       fileServiceCapacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     tagValues: tagValues
   }
