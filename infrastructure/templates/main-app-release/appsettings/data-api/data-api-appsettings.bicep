@@ -51,11 +51,19 @@ var keyVaultName = resourceNames.keyVault.keyVault
 var dataProtectionKeyUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/keys/${resourceNames.keyVault.keys.dataProtection}'
 var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}/'
 
-var secretNames = [
-  resourceNames.keyVault.secrets.publicStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publicSite.basicAuthUsername
-  resourceNames.keyVault.secrets.publicSite.basicAuthPassword
-]
+// The Basic Auth credentials are only looked up when Basic Auth is enabled, as Key Vault secrets
+// can't be blank and so won't exist in environments without Basic Auth e.g. Production.
+var secretNames = concat(
+  [
+    resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+  ],
+  basicAuthEnabled
+    ? [
+        resourceNames.keyVault.secrets.publicSite.basicAuthUsername
+        resourceNames.keyVault.secrets.publicSite.basicAuthPassword
+      ]
+    : []
+)
 
 resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
   name: '${keyVaultName}/${secretName}'
@@ -67,17 +75,20 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 var secretRefs = secretRefsFromSecrets(secrets)
 
 @description('Application-specific appsettings for the Data API, applied to its staging slot ahead of each code deploy.')
-output appSettings object = {
+output appSettings object = union({
   PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
   enableSwagger: enableSwagger
   PublicApp__Url: 'https://${domain}'
   PublicApp__BasicAuth: basicAuthEnabled
-  PublicApp__BasicAuthUsername: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
-  PublicApp__BasicAuthPassword: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
   Analytics__Enabled: analyticsEnabled
   Analytics__BasePath: analyticsFileShareMountPath
   TableBuilder__MaxTableCellsAllowed: tableBuilderMaxTableCellsAllowed
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
   DataProtection__KeyVaultUri: keyVaultUri
   Deploy__DeployedAt: deployedAt
-}
+}, basicAuthEnabled
+  ? {
+      PublicApp__BasicAuthUsername: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
+      PublicApp__BasicAuthPassword: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
+    }
+  : {})

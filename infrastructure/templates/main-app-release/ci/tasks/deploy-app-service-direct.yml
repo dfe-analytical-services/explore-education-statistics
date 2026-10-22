@@ -32,7 +32,7 @@ steps:
 
   - task: AzureCLI@2
     displayName: ${{ parameters.displayNamePrefix }} - deploying code directly to production
-    retryCountOnTaskFailure: 3
+    retryCountOnTaskFailure: 5
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash

@@ -34,7 +34,7 @@ steps:
 
   - task: AzureCLI@2
     displayName: ${{ parameters.displayNamePrefix }} - deploying code to staging slot
-    retryCountOnTaskFailure: 3
+    retryCountOnTaskFailure: 5
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash

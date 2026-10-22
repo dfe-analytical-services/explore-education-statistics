@@ -5,6 +5,8 @@ parameters:
     type: string
   - name: bicepParamFile
     type: string
+  - name: basicAuthEnabled
+    type: boolean
   - name: slotSwappingBehaviour
     type: string
     default: Default
@@ -42,6 +44,7 @@ jobs:
                 templateFile: $(templateFile)
                 paramFile: $(paramFile)
                 bicepConfigDeployName: $(bicepConfigDeployName)
+                additionalParameters: basicAuthEnabled=${{ parameters.basicAuthEnabled }}
 
             - template: ../tasks/deploy-app-service.yml
               parameters:
