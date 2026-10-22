@@ -21,11 +21,6 @@ public static class IndicatorGeneratorExtensions
         IndicatorGroup indicatorGroup
     ) => generator.ForInstance(s => s.SetIndicatorGroup(indicatorGroup));
 
-    public static Generator<Indicator> WithFootnotes(
-        this Generator<Indicator> generator,
-        IEnumerable<Footnote> footnotes
-    ) => generator.ForInstance(s => s.SetFootnotes(footnotes));
-
     public static InstanceSetters<Indicator> SetDefaults(this InstanceSetters<Indicator> setters) =>
         setters
             .SetDefault(i => i.Id)
@@ -52,31 +47,4 @@ public static class IndicatorGeneratorExtensions
                 }
             )
             .Set(i => i.IndicatorGroupId, indicatorGroup.Id);
-
-    public static InstanceSetters<Indicator> SetFootnotes(
-        this InstanceSetters<Indicator> setters,
-        IEnumerable<Footnote> footnotes
-    ) =>
-        setters.Set(
-            obj => obj.Footnotes,
-            (_, indicator) =>
-                footnotes
-                    .Select(footnote =>
-                    {
-                        var indicatorFootnote = new IndicatorFootnote
-                        {
-                            Indicator = indicator,
-                            IndicatorId = indicator.Id,
-                            IndicatorGroupId = indicator.IndicatorGroup.Id,
-                            Footnote = footnote,
-                            FootnoteId = footnote.Id,
-                            SubjectId = indicator.IndicatorGroup.SubjectId,
-                        };
-
-                        footnote.Indicators.Add(indicatorFootnote);
-
-                        return indicatorFootnote;
-                    })
-                    .ToList()
-        );
 }

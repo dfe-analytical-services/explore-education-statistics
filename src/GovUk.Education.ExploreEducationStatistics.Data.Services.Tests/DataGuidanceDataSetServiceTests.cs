@@ -28,9 +28,15 @@ public class DataGuidanceDataSetServiceTests
 
         var subject2 = new Subject { Id = Guid.NewGuid() };
 
+        var subject1FilterGroup = new FilterGroup { Id = Guid.NewGuid() };
+
+        var subject2FilterItem = new FilterItem { Id = Guid.NewGuid() };
+
         var subject1Filter = new Filter
         {
+            Id = Guid.NewGuid(),
             Subject = subject1,
+            FilterGroups = [subject1FilterGroup],
             Name = "subject1_filter",
             Label = "Subject 1 Filter",
             Hint = "Hint",
@@ -39,6 +45,7 @@ public class DataGuidanceDataSetServiceTests
         var subject2Filter = new Filter
         {
             Subject = subject2,
+            FilterGroups = [new FilterGroup { FilterItems = [subject2FilterItem] }],
             Name = "subject2_filter",
             Label = "Subject 2 Filter",
             Hint = null,
@@ -58,7 +65,12 @@ public class DataGuidanceDataSetServiceTests
             Subject = subject2,
             Indicators = new List<Indicator>
             {
-                new() { Name = "subject2_indicator", Label = "Subject 2 Indicator" },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "subject2_indicator",
+                    Label = "Subject 2 Indicator",
+                },
             },
         };
 
@@ -126,7 +138,7 @@ public class DataGuidanceDataSetServiceTests
         };
         var subject1Footnote2 = new FilterFootnote
         {
-            Filter = subject1Filter,
+            FilterId = subject1Filter.Id,
             SubjectId = subject1.Id,
             Footnote = new Footnote
             {
@@ -137,7 +149,7 @@ public class DataGuidanceDataSetServiceTests
         };
         var subject1Footnote3 = new FilterGroupFootnote
         {
-            FilterGroup = new FilterGroup { Filter = subject1Filter },
+            FilterGroupId = subject1FilterGroup.Id,
             SubjectId = subject1.Id,
             Footnote = new Footnote
             {
@@ -149,7 +161,7 @@ public class DataGuidanceDataSetServiceTests
 
         var subject2Footnote1 = new FilterItemFootnote
         {
-            FilterItem = new FilterItem { FilterGroup = new FilterGroup { Filter = subject2Filter } },
+            FilterItemId = subject2FilterItem.Id,
             SubjectId = subject2.Id,
             Footnote = new Footnote
             {
@@ -160,7 +172,7 @@ public class DataGuidanceDataSetServiceTests
         };
         var subject2Footnote2 = new IndicatorFootnote
         {
-            Indicator = subject2IndicatorGroup.Indicators[0],
+            IndicatorId = subject2IndicatorGroup.Indicators[0].Id,
             SubjectId = subject2.Id,
             Footnote = new Footnote
             {
