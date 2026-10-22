@@ -1761,9 +1761,7 @@ public class FootnoteRepositoryTests
             .GetFootnotesForSelection(
                 releaseVersionId: releaseVersionId,
                 subjectId: subjectId,
-                filterIds: filterItems.Select(fi => fi.FilterGroup.FilterId).Distinct().ToList(),
-                filterGroupIds: filterItems.Select(fi => fi.FilterGroupId).Distinct().ToList(),
-                filterItemIds: filterItemIds,
+                filterItems: filterItems,
                 indicatorIds: indicatorIds
             );
     }
