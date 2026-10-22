@@ -1,4 +1,4 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -19,7 +19,7 @@ param deployAlerts bool = false
 param tagValues object
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
-  name: resourceNames.existingResources.logAnalyticsWorkspace
+  name: resourceNames.logAnalyticsWorkspace
 }
 
 module applicationInsightsModule '../../../common/components/monitoring/appInsights.bicep' = {
@@ -32,7 +32,7 @@ module applicationInsightsModule '../../../common/components/monitoring/appInsig
       exceptionCount: true
       exceptionServerCount: true
       failedRequests: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     tagValues: tagValues
   }
@@ -50,7 +50,7 @@ module availabilityTestModule '../../../common/components/monitoring/availabilit
     appInsightsId: applicationInsightsModule.outputs.applicationInsightsId
     testDescription: '${environmentName} Public API availability test - anonymous GET of the publications list'
     url: '${publicApiUrl}/v1/publications?pageSize=1'
-    alertsGroupName: resourceNames.existingResources.alertsGroup
+    alertsGroupName: resourceNames.alertsGroup
     deployAlerts: deployAlerts
     tagValues: tagValues
   }

@@ -63,6 +63,7 @@ type ResourceNames = {
     backupVaultPsqlFlexibleServerPolicy: string
     recoveryServicesVault: string
   }
+  containerAppEnvironment: string
   contentApi: {
     appService: string
     appServicePlan: string
@@ -112,9 +113,14 @@ type ResourceNames = {
   }
   publicApi: {
     apiApp: string
+    apiAppIdentity: string
+    appInsights: string
     docsApp: string
     processor: {
       functionApp: string
+      appServicePlan: string
+      identity: string
+      storageAccountsPrefix: string
     }
     storage: {
       storageAccount: string
@@ -256,6 +262,7 @@ type ResourceNames = {
     publicSqlServer: string
     contentDb: string
     statisticsDb: string
+    postgreSqlFlexibleServer: string
   }
   eventGrid: {
     topics: {
@@ -335,6 +342,7 @@ func getResourceNames(
     backupVaultPsqlFlexibleServerPolicy: '${newResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
     recoveryServicesVault: '${newResourcePrefix}-${abbreviations.recoveryServicesVaults}'
   }
+  containerAppEnvironment: '${newResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
   contentApi: {
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-content'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-content'
@@ -387,9 +395,16 @@ func getResourceNames(
   }
   publicApi: {
     apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
+    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appContainerApps}-api'
+    appInsights: '${publicApiResourcePrefix}-${abbreviations.insightsComponents}'
     docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
     processor: {
       functionApp: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
+      // TODO EES-7502 - the Data Processor's App Service Plan was given the same name as the Function App
+      // itself, rather than a name using the App Service Plan abbreviation.
+      appServicePlan: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
+      identity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'
+      storageAccountsPrefix: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}processor'
     }
     storage: {
       storageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
@@ -532,6 +547,7 @@ func getResourceNames(
     publicSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-02'
     contentDb: 'content'
     statisticsDb: 'statistics'
+    postgreSqlFlexibleServer: '${newResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
   }
   eventGrid: {
     topics: {
