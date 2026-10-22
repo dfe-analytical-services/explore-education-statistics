@@ -191,9 +191,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
         var footnotes = await _footnoteRepository.GetFootnotesForSelection(
             releaseVersionId: releaseVersionId,
             subjectId: subjectId,
-            filterIds: filterItems.Select(fi => fi.FilterGroup.Filter.Id).Distinct().ToList(),
-            filterGroupIds: filterItems.Select(fi => fi.FilterGroup.Id).Distinct().ToList(),
-            filterItemIds: filterItems.Select(fi => fi.Id).ToList(),
+            filterItems: filterItems,
             indicatorIds: indicatorIds
         );
 
