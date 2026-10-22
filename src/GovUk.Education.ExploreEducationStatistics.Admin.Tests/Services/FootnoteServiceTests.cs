@@ -393,6 +393,10 @@ public class FootnoteServiceTests
         Assert.Equal(subject1.Id, filterGroupFootnote.SubjectId);
         Assert.Equal(subject1.Id, filterItemFootnote.SubjectId);
         Assert.Equal(subject1.Id, indicatorFootnote.SubjectId);
+        Assert.Equal(filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(filterGroup.Id, filterItemFootnote.FilterGroupId);
+        Assert.Equal(filter.Id, filterItemFootnote.FilterId);
+        Assert.Equal(indicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
         Assert.Equal("Test footnote", footnote.Content);
     }
 
@@ -859,6 +863,10 @@ public class FootnoteServiceTests
         Assert.Equal(subject1.Id, filterGroupFootnote.SubjectId);
         Assert.Equal(subject1.Id, filterItemFootnote.SubjectId);
         Assert.Equal(subject1.Id, indicatorFootnote.SubjectId);
+        Assert.Equal(filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(filterGroup.Id, filterItemFootnote.FilterGroupId);
+        Assert.Equal(filter.Id, filterItemFootnote.FilterId);
+        Assert.Equal(indicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
     }
 
     [Theory]
@@ -1083,35 +1091,24 @@ public class FootnoteServiceTests
             Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().FilterId);
             Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Filters.First().SubjectId);
 
-            Assert.Single(retrievedFootnote.FilterGroups);
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Id,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Id
-            );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Label,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Label
-            );
+            var filterGroupLink = Assert.Single(retrievedFootnote.FilterGroups);
+            Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Id, filterGroupLink.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, filterGroupLink.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, filterGroupLink.SubjectId);
 
-            Assert.Single(retrievedFootnote.FilterItems);
+            var filterItemLink = Assert.Single(retrievedFootnote.FilterItems);
             Assert.Equal(
                 releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
-                retrievedFootnote.FilterItems.First().FilterItem.Id
+                filterItemLink.FilterItemId
             );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Label,
-                retrievedFootnote.FilterItems.First().FilterItem.Label
-            );
+            Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Id, filterItemLink.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, filterItemLink.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, filterItemLink.SubjectId);
 
-            Assert.Single(retrievedFootnote.Indicators);
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id,
-                retrievedFootnote.Indicators.First().Indicator.Id
-            );
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Label,
-                retrievedFootnote.Indicators.First().Indicator.Label
-            );
+            var indicatorLink = Assert.Single(retrievedFootnote.Indicators);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id, indicatorLink.IndicatorId);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Id, indicatorLink.IndicatorGroupId);
+            Assert.Equal(releaseSubject.Subject.Id, indicatorLink.SubjectId);
         }
     }
 
@@ -1494,6 +1491,7 @@ public class FootnoteServiceTests
             var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote);
             Assert.Equal(releaseSubject.Subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
             Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.Filters[1].Id, savedFilterGroupFootnote.FilterId);
             Assert.Equal(releaseSubject.Subject.Id, savedFilterGroupFootnote.SubjectId);
 
             var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote);
@@ -1502,6 +1500,8 @@ public class FootnoteServiceTests
                 savedFilterItemFootnote.FilterItemId
             );
             Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.Filters[2].FilterGroups[0].Id, savedFilterItemFootnote.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[2].Id, savedFilterItemFootnote.FilterId);
             Assert.Equal(releaseSubject.Subject.Id, savedFilterItemFootnote.SubjectId);
 
             var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote);
@@ -1510,6 +1510,7 @@ public class FootnoteServiceTests
                 savedIndicatorFootnote.IndicatorId
             );
             Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Id, savedIndicatorFootnote.IndicatorGroupId);
             Assert.Equal(releaseSubject.Subject.Id, savedIndicatorFootnote.SubjectId);
         }
     }

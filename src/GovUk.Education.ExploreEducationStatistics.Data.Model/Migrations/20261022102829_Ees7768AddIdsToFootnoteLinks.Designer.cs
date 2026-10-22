@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20261020134135_Ees7768AddSubjectIdToFootnoteLinks")]
-    partial class Ees7768AddSubjectIdToFootnoteLinks
+    [Migration("20261022102829_Ees7768AddIdsToFootnoteLinks")]
+    partial class Ees7768AddIdsToFootnoteLinks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -179,6 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
@@ -217,6 +220,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FilterGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FilterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectId")
@@ -299,6 +308,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IndicatorGroupId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectId")
