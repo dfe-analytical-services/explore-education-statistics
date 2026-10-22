@@ -324,6 +324,17 @@ public class FootnoteService : IFootnoteService
     {
         var releaseSubjects = await _releaseSubjectRepository.FindAll(releaseVersionId, HydrateReleaseSubjects);
 
+        var unlinkedSubjectIds = subjectIds.Except(releaseSubjects.Select(rs => rs.SubjectId)).ToList();
+        if (unlinkedSubjectIds.Count > 0)
+        {
+            return ValidationResult(
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(
+                    releaseVersionId,
+                    unlinkedSubjectIds
+                )
+            );
+        }
+
         var filters = releaseSubjects.SelectMany(rs => rs.Subject.Filters).ToList();
 
         var footnoteLinks = new FootnoteLinks(
@@ -376,15 +387,33 @@ public class FootnoteService : IFootnoteService
                 .ToList()
         );
 
+        var unlinkedFilterIds = filterIds.Except(footnoteLinks.Filters.Select(link => link.FilterId)).ToList();
+        var unlinkedFilterGroupIds = filterGroupIds
+            .Except(footnoteLinks.FilterGroups.Select(link => link.FilterGroupId))
+            .ToList();
+        var unlinkedFilterItemIds = filterItemIds
+            .Except(footnoteLinks.FilterItems.Select(link => link.FilterItemId))
+            .ToList();
+        var unlinkedIndicatorIds = indicatorIds
+            .Except(footnoteLinks.Indicators.Select(link => link.IndicatorId))
+            .ToList();
+
         if (
-            !releaseSubjects.Select(rs => rs.SubjectId).ContainsAll(subjectIds)
-            || footnoteLinks.Filters.Count != filterIds.Count
-            || footnoteLinks.FilterGroups.Count != filterGroupIds.Count
-            || footnoteLinks.FilterItems.Count != filterItemIds.Count
-            || footnoteLinks.Indicators.Count != indicatorIds.Count
+            unlinkedFilterIds.Count > 0
+            || unlinkedFilterGroupIds.Count > 0
+            || unlinkedFilterItemIds.Count > 0
+            || unlinkedIndicatorIds.Count > 0
         )
         {
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return ValidationResult(
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersionId,
+                    unlinkedFilterIds,
+                    unlinkedFilterGroupIds,
+                    unlinkedFilterItemIds,
+                    unlinkedIndicatorIds
+                )
+            );
         }
 
         return footnoteLinks;
