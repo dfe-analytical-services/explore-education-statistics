@@ -153,11 +153,13 @@ public class FootnoteService : IFootnoteService
 
                 footnote.Content = content;
 
-                UpdateFilterLinks(footnote, footnoteLinks.Filters);
-                UpdateFilterGroupLinks(footnote, footnoteLinks.FilterGroups);
-                UpdateFilterItemLinks(footnote, footnoteLinks.FilterItems);
-                UpdateIndicatorLinks(footnote, footnoteLinks.Indicators);
-                UpdateSubjectLinks(footnote, subjectIds);
+                footnote.Filters = footnoteLinks.Filters;
+                footnote.FilterGroups = footnoteLinks.FilterGroups;
+                footnote.FilterItems = footnoteLinks.FilterItems;
+                footnote.Indicators = footnoteLinks.Indicators;
+                footnote.Subjects = subjectIds
+                    .Select(subjectId => new SubjectFootnote { SubjectId = subjectId })
+                    .ToList();
 
                 await _context.SaveChangesAsync();
                 return await _footnoteRepository.GetFootnote(footnoteId);
@@ -213,71 +215,6 @@ public class FootnoteService : IFootnoteService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseVersionId));
-    }
-
-    private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId, IReadOnlyCollection<Guid> subjectIds)
-    {
-        return subjectIds.Select(id => new SubjectFootnote { FootnoteId = footnoteId, SubjectId = id }).ToList();
-    }
-
-    private void UpdateFilterLinks(Footnote footnote, List<FilterFootnote> filterLinks)
-    {
-        if (
-            !SequencesAreEqualIgnoringOrder(
-                footnote.Filters.Select(link => link.FilterId),
-                filterLinks.Select(link => link.FilterId)
-            )
-        )
-        {
-            footnote.Filters = filterLinks;
-        }
-    }
-
-    private void UpdateFilterGroupLinks(Footnote footnote, List<FilterGroupFootnote> filterGroupLinks)
-    {
-        if (
-            !SequencesAreEqualIgnoringOrder(
-                footnote.FilterGroups.Select(link => link.FilterGroupId),
-                filterGroupLinks.Select(link => link.FilterGroupId)
-            )
-        )
-        {
-            footnote.FilterGroups = filterGroupLinks;
-        }
-    }
-
-    private void UpdateFilterItemLinks(Footnote footnote, List<FilterItemFootnote> filterItemLinks)
-    {
-        if (
-            !SequencesAreEqualIgnoringOrder(
-                footnote.FilterItems.Select(link => link.FilterItemId),
-                filterItemLinks.Select(link => link.FilterItemId)
-            )
-        )
-        {
-            footnote.FilterItems = filterItemLinks;
-        }
-    }
-
-    private void UpdateIndicatorLinks(Footnote footnote, List<IndicatorFootnote> indicatorLinks)
-    {
-        if (
-            !SequencesAreEqualIgnoringOrder(
-                footnote.Indicators.Select(link => link.IndicatorId),
-                indicatorLinks.Select(link => link.IndicatorId)
-            )
-        )
-        {
-            footnote.Indicators = indicatorLinks;
-        }
-    }
-
-    private void UpdateSubjectLinks(Footnote footnote, IReadOnlyCollection<Guid> subjectIds)
-    {
-        if (!SequencesAreEqualIgnoringOrder(footnote.Subjects.Select(link => link.SubjectId), subjectIds))
-        {
-            footnote.Subjects = CreateSubjectLinks(footnote.Id, subjectIds);
-        }
     }
 
     private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)
