@@ -653,12 +653,17 @@ public class ReplacementService(
             .FilterGroupFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id);
 
+        var replacementFilterGroup = await statisticsDbContext.FilterGroup.SingleAsync(filterGroup =>
+            filterGroup.Id == plan.TargetValue
+        );
+
         statisticsDbContext.Remove(filterGroupFootnote);
         await statisticsDbContext.FilterGroupFootnote.AddAsync(
             new FilterGroupFootnote
             {
                 FootnoteId = footnoteId,
                 FilterGroupId = plan.TargetValue,
+                FilterId = replacementFilterGroup.FilterId,
                 SubjectId = replacementSubjectId,
             }
         );
@@ -674,12 +679,18 @@ public class ReplacementService(
             .FilterItemFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterItemId == plan.Id);
 
+        var replacementFilterItem = await statisticsDbContext
+            .FilterItem.Include(filterItem => filterItem.FilterGroup)
+            .SingleAsync(filterItem => filterItem.Id == plan.TargetValue);
+
         statisticsDbContext.Remove(filterItemFootnote);
         await statisticsDbContext.FilterItemFootnote.AddAsync(
             new FilterItemFootnote
             {
                 FootnoteId = footnoteId,
                 FilterItemId = plan.TargetValue,
+                FilterGroupId = replacementFilterItem.FilterGroupId,
+                FilterId = replacementFilterItem.FilterGroup.FilterId,
                 SubjectId = replacementSubjectId,
             }
         );
@@ -695,12 +706,17 @@ public class ReplacementService(
             .IndicatorFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.IndicatorId == plan.Id);
 
+        var replacementIndicator = await statisticsDbContext.Indicator.SingleAsync(indicator =>
+            indicator.Id == plan.TargetValue
+        );
+
         statisticsDbContext.Remove(indicatorFootnote);
         await statisticsDbContext.IndicatorFootnote.AddAsync(
             new IndicatorFootnote
             {
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue,
+                IndicatorGroupId = replacementIndicator.IndicatorGroupId,
                 SubjectId = replacementSubjectId,
             }
         );
