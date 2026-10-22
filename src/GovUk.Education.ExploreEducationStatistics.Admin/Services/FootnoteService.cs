@@ -63,7 +63,14 @@ public class FootnoteService : IFootnoteService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
-                GetFootnoteLinks(releaseVersionId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds)
+                CreateFootnoteLinks(
+                    releaseVersionId,
+                    subjectIds,
+                    filterIds,
+                    filterGroupIds,
+                    filterItemIds,
+                    indicatorIds
+                )
             )
             .OnSuccess(async footnoteLinks =>
             {
@@ -123,7 +130,14 @@ public class FootnoteService : IFootnoteService
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ =>
-                GetFootnoteLinks(releaseVersionId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds)
+                CreateFootnoteLinks(
+                    releaseVersionId,
+                    subjectIds,
+                    filterIds,
+                    filterGroupIds,
+                    filterItemIds,
+                    indicatorIds
+                )
             )
             .OnSuccessCombineWith(_ =>
                 _statisticsPersistenceHelper.CheckEntityExists<Footnote>(
@@ -299,7 +313,7 @@ public class FootnoteService : IFootnoteService
     /// release version's subjects, failing if any of them, or any of the given subjects, are not linked to the
     /// release version.
     /// </summary>
-    private async Task<Either<ActionResult, FootnoteLinks>> GetFootnoteLinks(
+    private async Task<Either<ActionResult, FootnoteLinks>> CreateFootnoteLinks(
         Guid releaseVersionId,
         IReadOnlySet<Guid> subjectIds,
         IReadOnlySet<Guid> filterIds,
