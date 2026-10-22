@@ -67,6 +67,7 @@ public static class IndicatorGeneratorExtensions
                         {
                             Indicator = indicator,
                             IndicatorId = indicator.Id,
+                            IndicatorGroupId = indicator.IndicatorGroup.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
                             SubjectId = indicator.IndicatorGroup.SubjectId,

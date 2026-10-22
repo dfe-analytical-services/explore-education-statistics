@@ -213,7 +213,7 @@ public class FootnoteController : ControllerBase
             GetOrAddFilterGroup(
                 subjects,
                 filterGroupFootnote.SubjectId,
-                filterGroupFootnote.FilterGroup.FilterId,
+                filterGroupFootnote.FilterId,
                 filterGroupFootnote.FilterGroupId
             ).Selected = true;
         }
@@ -223,8 +223,8 @@ public class FootnoteController : ControllerBase
             GetOrAddFilterGroup(
                 subjects,
                 filterItemFootnote.SubjectId,
-                filterItemFootnote.FilterItem.FilterGroup.FilterId,
-                filterItemFootnote.FilterItem.FilterGroupId
+                filterItemFootnote.FilterId,
+                filterItemFootnote.FilterGroupId
             )
                 .FilterItems.Add(filterItemFootnote.FilterItemId.ToString());
         }
@@ -233,7 +233,7 @@ public class FootnoteController : ControllerBase
         {
             GetOrAddSubject(subjects, indicatorFootnote.SubjectId)
                 .IndicatorGroups.GetOrSet(
-                    indicatorFootnote.Indicator.IndicatorGroupId,
+                    indicatorFootnote.IndicatorGroupId,
                     () => new FootnoteIndicatorGroupViewModel { Indicators = [] }
                 )
                 .Indicators.Add(indicatorFootnote.IndicatorId.ToString());
