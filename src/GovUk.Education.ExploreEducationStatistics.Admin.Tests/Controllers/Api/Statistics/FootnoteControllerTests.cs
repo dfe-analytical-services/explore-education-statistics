@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -192,6 +194,98 @@ public class FootnoteControllerTests
         );
 
         result.AssertOkResult();
+    }
+
+    [Fact]
+    public async Task GetFootnote_BuildsLinkHierarchyFromLinkParentIds()
+    {
+        var subjectId = Guid.NewGuid();
+        var filter1Id = Guid.NewGuid();
+        var filter1Group1Id = Guid.NewGuid();
+        var filter1Group1Item1Id = Guid.NewGuid();
+        var filter1Group2Id = Guid.NewGuid();
+        var filter2Id = Guid.NewGuid();
+        var indicatorGroupId = Guid.NewGuid();
+        var indicatorId = Guid.NewGuid();
+
+        var footnote = new Footnote
+        {
+            Id = Guid.NewGuid(),
+            Content = "Footnote",
+            Filters = [new FilterFootnote { FilterId = filter2Id, SubjectId = subjectId }],
+            FilterGroups =
+            [
+                new FilterGroupFootnote
+                {
+                    FilterGroupId = filter1Group2Id,
+                    FilterId = filter1Id,
+                    SubjectId = subjectId,
+                },
+            ],
+            FilterItems =
+            [
+                new FilterItemFootnote
+                {
+                    FilterItemId = filter1Group1Item1Id,
+                    FilterGroupId = filter1Group1Id,
+                    FilterId = filter1Id,
+                    SubjectId = subjectId,
+                },
+            ],
+            Indicators =
+            [
+                new IndicatorFootnote
+                {
+                    IndicatorId = indicatorId,
+                    IndicatorGroupId = indicatorGroupId,
+                    SubjectId = subjectId,
+                },
+            ],
+            Subjects = [],
+        };
+
+        var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
+
+        footnoteService.Setup(s => s.GetFootnote(ReleaseVersionId, footnote.Id)).ReturnsAsync(footnote);
+
+        var controller = new FootnoteController(
+            Mock.Of<IFilterRepository>(MockBehavior.Strict),
+            footnoteService.Object,
+            Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
+            Mock.Of<IReleaseService>(MockBehavior.Strict),
+            Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict)
+        );
+
+        var result = await controller.GetFootnote(ReleaseVersionId, footnote.Id);
+
+        VerifyAllMocks(footnoteService);
+
+        var viewModel = result.AssertOkResult();
+
+        var subject = Assert.Single(viewModel.Subjects);
+        Assert.Equal(subjectId, subject.Key);
+        Assert.False(subject.Value.Selected);
+
+        Assert.Equal(2, subject.Value.Filters.Count);
+
+        var filter1ViewModel = subject.Value.Filters[filter1Id];
+        Assert.False(filter1ViewModel.Selected);
+        Assert.Equal(2, filter1ViewModel.FilterGroups.Count);
+        Assert.False(filter1ViewModel.FilterGroups[filter1Group1Id].Selected);
+        Assert.Equal(
+            ListOf(filter1Group1Item1Id.ToString()),
+            filter1ViewModel.FilterGroups[filter1Group1Id].FilterItems
+        );
+        Assert.True(filter1ViewModel.FilterGroups[filter1Group2Id].Selected);
+        Assert.Empty(filter1ViewModel.FilterGroups[filter1Group2Id].FilterItems);
+
+        var filter2ViewModel = subject.Value.Filters[filter2Id];
+        Assert.True(filter2ViewModel.Selected);
+        Assert.Empty(filter2ViewModel.FilterGroups);
+
+        var indicatorGroup = Assert.Single(subject.Value.IndicatorGroups);
+        Assert.Equal(indicatorGroupId, indicatorGroup.Key);
+        Assert.Equal(ListOf(indicatorId.ToString()), indicatorGroup.Value.Indicators);
     }
 
     [Fact]
