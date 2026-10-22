@@ -136,7 +136,7 @@ public class SubjectResultMetaServiceTests
 
         footnoteRepository
             .Setup(s =>
-                s.GetFilteredFootnotes(
+                s.GetFootnotesForSelection(
                     releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
@@ -300,7 +300,7 @@ public class SubjectResultMetaServiceTests
 
         footnoteRepository
             .Setup(s =>
-                s.GetFilteredFootnotes(
+                s.GetFootnotesForSelection(
                     releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
@@ -451,7 +451,7 @@ public class SubjectResultMetaServiceTests
 
         footnoteRepository
             .Setup(s =>
-                s.GetFilteredFootnotes(
+                s.GetFootnotesForSelection(
                     releaseVersion.Id,
                     subject.Id,
                     It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.Id))),
