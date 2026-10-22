@@ -92,6 +92,8 @@ public class ReplacementService(
                 var originalSubjectId = plan.OriginalSubjectId;
                 var replacementSubjectId = plan.ReplacementSubjectId;
 
+                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
+
                 await foreach (
                     var dataBlockPlan in plan.DataBlocks.ToAsyncEnumerable().WithCancellation(cancellationToken)
                 )
@@ -103,6 +105,12 @@ public class ReplacementService(
                     await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
                 }
 
+                var replacementParentIds = await GetReplacementParentIds(
+                    plan.Footnotes,
+                    replacementDataSet,
+                    cancellationToken
+                );
+
                 await foreach (
                     var footnotePlan in plan.Footnotes.ToAsyncEnumerable().WithCancellation(cancellationToken)
                 )
@@ -111,6 +119,7 @@ public class ReplacementService(
                         footnotePlan,
                         originalSubjectId,
                         replacementSubjectId,
+                        replacementParentIds,
                         cancellationToken
                     );
                 }
@@ -119,8 +128,6 @@ public class ReplacementService(
                     mapping.OriginalDataFileId == originalReleaseFile.FileId
                     && mapping.ReplacementDataFileId == replacementReleaseFile.FileId
                 );
-
-                var replacementDataSet = storageDataSetResolver.Resolve(replacementReleaseFile.File);
 
                 replacementReleaseFile.FilterSequence = await ReplaceFilterSequence(
                     originalReleaseFile,
@@ -575,10 +582,64 @@ public class ReplacementService(
             });
     }
 
+    /// <summary>
+    /// Finds the parents, in the replacement data set, of the filter groups, filter items and indicators that the
+    /// footnotes' links are being replaced with.
+    /// </summary>
+    private static async Task<ReplacementParentIds> GetReplacementParentIds(
+        IEnumerable<FootnoteReplacementPlanViewModel> footnotePlans,
+        IStorageDataSet replacementDataSet,
+        CancellationToken cancellationToken
+    )
+    {
+        var replacementParentIds = new ReplacementParentIds(
+            FilterIdsByFilterGroupId: new Dictionary<Guid, Guid>(),
+            FilterGroupIdsByFilterItemId: new Dictionary<Guid, Guid>(),
+            IndicatorGroupIdsByIndicatorId: new Dictionary<Guid, Guid>()
+        );
+
+        var footnotePlanList = footnotePlans.ToList();
+
+        if (footnotePlanList.Any(plan => plan.FilterGroups.Any() || plan.FilterItems.Any()))
+        {
+            var filterGroups = (
+                await replacementDataSet.ListFilters(includeItems: true, cancellationToken: cancellationToken)
+            )
+                .SelectMany(filter => filter.FilterGroups)
+                .ToList();
+
+            foreach (var filterGroup in filterGroups)
+            {
+                replacementParentIds.FilterIdsByFilterGroupId[filterGroup.Id] = filterGroup.FilterId;
+
+                foreach (var filterItem in filterGroup.FilterItems)
+                {
+                    replacementParentIds.FilterGroupIdsByFilterItemId[filterItem.Id] = filterGroup.Id;
+                }
+            }
+        }
+
+        var indicatorIds = footnotePlanList
+            .SelectMany(plan => plan.IndicatorGroups.Values.SelectMany(group => group.Indicators))
+            .Select(ReplacementPlanTargetId)
+            .ToHashSet();
+
+        if (indicatorIds.Count > 0)
+        {
+            foreach (var indicator in await replacementDataSet.ListIndicators(indicatorIds, cancellationToken))
+            {
+                replacementParentIds.IndicatorGroupIdsByIndicatorId[indicator.Id] = indicator.IndicatorGroupId;
+            }
+        }
+
+        return replacementParentIds;
+    }
+
     private async Task ReplaceLinksForFootnote(
         FootnoteReplacementPlanViewModel replacementPlan,
         Guid originalSubjectId,
         Guid replacementSubjectId,
+        ReplacementParentIds replacementParentIds,
         CancellationToken cancellationToken
     )
     {
@@ -591,12 +652,12 @@ public class ReplacementService(
 
         await foreach (var plan in replacementPlan.FilterGroups.ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan, replacementSubjectId);
+            await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan, replacementSubjectId, replacementParentIds);
         }
 
         await foreach (var plan in replacementPlan.FilterItems.ToAsyncEnumerable().WithCancellation(cancellationToken))
         {
-            await ReplaceFootnoteFilterItem(replacementPlan.Id, plan, replacementSubjectId);
+            await ReplaceFootnoteFilterItem(replacementPlan.Id, plan, replacementSubjectId, replacementParentIds);
         }
 
         await foreach (
@@ -606,7 +667,7 @@ public class ReplacementService(
                 .WithCancellation(cancellationToken)
         )
         {
-            await ReplaceIndicatorFootnote(replacementPlan.Id, plan, replacementSubjectId);
+            await ReplaceIndicatorFootnote(replacementPlan.Id, plan, replacementSubjectId, replacementParentIds);
         }
     }
 
@@ -650,16 +711,13 @@ public class ReplacementService(
     private async Task ReplaceFootnoteFilterGroup(
         Guid footnoteId,
         TargetableReplacementViewModel plan,
-        Guid replacementSubjectId
+        Guid replacementSubjectId,
+        ReplacementParentIds replacementParentIds
     )
     {
         var filterGroupFootnote = await statisticsDbContext
             .FilterGroupFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id);
-
-        var replacementFilterGroup = await statisticsDbContext.FilterGroup.SingleAsync(filterGroup =>
-            filterGroup.Id == plan.TargetValue
-        );
 
         statisticsDbContext.Remove(filterGroupFootnote);
         await statisticsDbContext.FilterGroupFootnote.AddAsync(
@@ -667,7 +725,7 @@ public class ReplacementService(
             {
                 FootnoteId = footnoteId,
                 FilterGroupId = plan.TargetValue,
-                FilterId = replacementFilterGroup.FilterId,
+                FilterId = replacementParentIds.FilterIdsByFilterGroupId[plan.TargetValue],
                 SubjectId = replacementSubjectId,
             }
         );
@@ -676,16 +734,15 @@ public class ReplacementService(
     private async Task ReplaceFootnoteFilterItem(
         Guid footnoteId,
         TargetableReplacementViewModel plan,
-        Guid replacementSubjectId
+        Guid replacementSubjectId,
+        ReplacementParentIds replacementParentIds
     )
     {
         var filterItemFootnote = await statisticsDbContext
             .FilterItemFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterItemId == plan.Id);
 
-        var replacementFilterItem = await statisticsDbContext
-            .FilterItem.Include(filterItem => filterItem.FilterGroup)
-            .SingleAsync(filterItem => filterItem.Id == plan.TargetValue);
+        var replacementFilterGroupId = replacementParentIds.FilterGroupIdsByFilterItemId[plan.TargetValue];
 
         statisticsDbContext.Remove(filterItemFootnote);
         await statisticsDbContext.FilterItemFootnote.AddAsync(
@@ -693,8 +750,8 @@ public class ReplacementService(
             {
                 FootnoteId = footnoteId,
                 FilterItemId = plan.TargetValue,
-                FilterGroupId = replacementFilterItem.FilterGroupId,
-                FilterId = replacementFilterItem.FilterGroup.FilterId,
+                FilterGroupId = replacementFilterGroupId,
+                FilterId = replacementParentIds.FilterIdsByFilterGroupId[replacementFilterGroupId],
                 SubjectId = replacementSubjectId,
             }
         );
@@ -703,16 +760,13 @@ public class ReplacementService(
     private async Task ReplaceIndicatorFootnote(
         Guid footnoteId,
         TargetableReplacementViewModel plan,
-        Guid replacementSubjectId
+        Guid replacementSubjectId,
+        ReplacementParentIds replacementParentIds
     )
     {
         var indicatorFootnote = await statisticsDbContext
             .IndicatorFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.IndicatorId == plan.Id);
-
-        var replacementIndicator = await statisticsDbContext.Indicator.SingleAsync(indicator =>
-            indicator.Id == plan.TargetValue
-        );
 
         statisticsDbContext.Remove(indicatorFootnote);
         await statisticsDbContext.IndicatorFootnote.AddAsync(
@@ -720,7 +774,7 @@ public class ReplacementService(
             {
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue,
-                IndicatorGroupId = replacementIndicator.IndicatorGroupId,
+                IndicatorGroupId = replacementParentIds.IndicatorGroupIdsByIndicatorId[plan.TargetValue],
                 SubjectId = replacementSubjectId,
             }
         );
@@ -801,4 +855,14 @@ public class ReplacementService(
     {
         return plan.TargetValue;
     }
+
+    /// <summary>
+    /// The parents, in the replacement data set, of the filter groups, filter items and indicators that footnote links
+    /// are being replaced with.
+    /// </summary>
+    private record ReplacementParentIds(
+        Dictionary<Guid, Guid> FilterIdsByFilterGroupId,
+        Dictionary<Guid, Guid> FilterGroupIdsByFilterItemId,
+        Dictionary<Guid, Guid> IndicatorGroupIdsByIndicatorId
+    );
 }
