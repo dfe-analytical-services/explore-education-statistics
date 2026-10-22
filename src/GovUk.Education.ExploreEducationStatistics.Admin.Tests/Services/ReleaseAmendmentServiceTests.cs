@@ -906,13 +906,13 @@ public class ReleaseAmendmentServiceTests
         );
 
         Assert.Equal(
-            originalFootnote.FilterGroups.SelectNullSafe(f => f.FilterGroupId),
-            newFootnote.FilterGroups.SelectNullSafe(f => f.FilterGroupId)
+            originalFootnote.FilterGroups.SelectNullSafe(f => (f.FilterGroupId, f.FilterId)),
+            newFootnote.FilterGroups.SelectNullSafe(f => (f.FilterGroupId, f.FilterId))
         );
 
         Assert.Equal(
-            originalFootnote.FilterItems.SelectNullSafe(f => f.FilterItemId),
-            newFootnote.FilterItems.SelectNullSafe(f => f.FilterItemId)
+            originalFootnote.FilterItems.SelectNullSafe(f => (f.FilterItemId, f.FilterGroupId, f.FilterId)),
+            newFootnote.FilterItems.SelectNullSafe(f => (f.FilterItemId, f.FilterGroupId, f.FilterId))
         );
 
         Assert.Equal(
@@ -921,8 +921,8 @@ public class ReleaseAmendmentServiceTests
         );
 
         Assert.Equal(
-            originalFootnote.Indicators.SelectNullSafe(f => f.IndicatorId),
-            newFootnote.Indicators.SelectNullSafe(f => f.IndicatorId)
+            originalFootnote.Indicators.SelectNullSafe(f => (f.IndicatorId, f.IndicatorGroupId)),
+            newFootnote.Indicators.SelectNullSafe(f => (f.IndicatorId, f.IndicatorGroupId))
         );
     }
 
