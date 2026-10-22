@@ -136,14 +136,7 @@ public class SubjectResultMetaServiceTests
 
         footnoteRepository
             .Setup(s =>
-                s.GetFootnotesForSelection(
-                    releaseVersion.Id,
-                    subject.Id,
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>()
-                )
+                s.GetFootnotesForSelection(releaseVersion.Id, subject.Id, new List<FilterItem>(), new List<Guid>())
             )
             .ReturnsAsync([]);
 
@@ -300,14 +293,7 @@ public class SubjectResultMetaServiceTests
 
         footnoteRepository
             .Setup(s =>
-                s.GetFootnotesForSelection(
-                    releaseVersion.Id,
-                    subject.Id,
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>()
-                )
+                s.GetFootnotesForSelection(releaseVersion.Id, subject.Id, new List<FilterItem>(), new List<Guid>())
             )
             .ReturnsAsync([]);
 
@@ -361,7 +347,7 @@ public class SubjectResultMetaServiceTests
     }
 
     [Fact]
-    public async Task GetSubjectMeta_FootnotesFilteredByFilterItemsAndTheirParents()
+    public async Task GetSubjectMeta_FootnotesForFilterItemsFromObservations()
     {
         Publication publication = _dataFixture
             .DefaultPublication()
@@ -403,8 +389,6 @@ public class SubjectResultMetaServiceTests
                 ],
             }
         );
-
-        var expectedFilterItemIds = ListOf(filterItems[0].Id, filterItems[1].Id);
 
         var query = new FullTableQuery { Indicators = new List<Guid>(), SubjectId = subject.Id };
 
@@ -454,9 +438,7 @@ public class SubjectResultMetaServiceTests
                 s.GetFootnotesForSelection(
                     releaseVersion.Id,
                     subject.Id,
-                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.Id))),
-                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(ListOf(filter.FilterGroups[0].Id))),
-                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(expectedFilterItemIds)),
+                    It.Is<IList<FilterItem>>(items => items.SequenceEqual(ListOf(filterItems[0], filterItems[1]))),
                     new List<Guid>()
                 )
             )
