@@ -27,6 +27,10 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - download: MainBuild
               displayName: Download Content API artifact
               artifact: content-api
@@ -43,7 +47,7 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayNamePrefix: Content API
-                appName: $(subscription)-as-ees-content
+                appName: $(resourceNames.contentApi.appService)
                 resourceGroupName: $(resourceGroupName)
                 artifactZipPath: $(Pipeline.Workspace)/MainBuild/content-api/GovUk.Education.ExploreEducationStatistics.Content.Api.zip
                 appSettingsJson: $(appSettings)
