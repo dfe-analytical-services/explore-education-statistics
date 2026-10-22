@@ -137,6 +137,7 @@ public static class FootnoteGeneratorExtensions
                     {
                         Footnote = footnote,
                         FilterGroup = filterGroup,
+                        FilterId = filterGroup.Filter.Id,
                         SubjectId = filterGroup.Filter.SubjectId,
                     })
                     .ToList();
@@ -166,6 +167,8 @@ public static class FootnoteGeneratorExtensions
                     {
                         Footnote = footnote,
                         FilterItem = filterItem,
+                        FilterGroupId = filterItem.FilterGroup.Id,
+                        FilterId = filterItem.FilterGroup.Filter.Id,
                         SubjectId = filterItem.FilterGroup.Filter.SubjectId,
                     })
                     .ToList();
@@ -195,6 +198,7 @@ public static class FootnoteGeneratorExtensions
                     {
                         Footnote = footnote,
                         Indicator = indicator,
+                        IndicatorGroupId = indicator.IndicatorGroup.Id,
                         SubjectId = indicator.IndicatorGroup.SubjectId,
                     })
                     .ToList();

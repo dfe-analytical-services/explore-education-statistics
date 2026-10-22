@@ -176,6 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
@@ -214,6 +217,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FilterGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FilterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectId")
@@ -296,6 +305,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FootnoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IndicatorGroupId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SubjectId")
