@@ -200,17 +200,18 @@ public class FootnoteController : ControllerBase
 
         foreach (var subjectFootnote in footnote.Subjects)
         {
-            GetOrAddSubject(subjectFootnote.SubjectId).Selected = true;
+            GetOrAddSubject(subjects, subjectFootnote.SubjectId).Selected = true;
         }
 
         foreach (var filterFootnote in footnote.Filters)
         {
-            GetOrAddFilter(filterFootnote.SubjectId, filterFootnote.FilterId).Selected = true;
+            GetOrAddFilter(subjects, filterFootnote.SubjectId, filterFootnote.FilterId).Selected = true;
         }
 
         foreach (var filterGroupFootnote in footnote.FilterGroups)
         {
             GetOrAddFilterGroup(
+                subjects,
                 filterGroupFootnote.SubjectId,
                 filterGroupFootnote.FilterGroup.FilterId,
                 filterGroupFootnote.FilterGroupId
@@ -220,6 +221,7 @@ public class FootnoteController : ControllerBase
         foreach (var filterItemFootnote in footnote.FilterItems)
         {
             GetOrAddFilterGroup(
+                subjects,
                 filterItemFootnote.SubjectId,
                 filterItemFootnote.FilterItem.FilterGroup.FilterId,
                 filterItemFootnote.FilterItem.FilterGroupId
@@ -229,7 +231,7 @@ public class FootnoteController : ControllerBase
 
         foreach (var indicatorFootnote in footnote.Indicators)
         {
-            GetOrAddSubject(indicatorFootnote.SubjectId)
+            GetOrAddSubject(subjects, indicatorFootnote.SubjectId)
                 .IndicatorGroups.GetOrSet(
                     indicatorFootnote.Indicator.IndicatorGroupId,
                     () => new FootnoteIndicatorGroupViewModel { Indicators = [] }
@@ -244,15 +246,26 @@ public class FootnoteController : ControllerBase
             Subjects = subjects,
         };
 
-        FootnoteSubjectViewModel GetOrAddSubject(Guid subjectId) =>
-            subjects.GetOrSet(subjectId, () => new FootnoteSubjectViewModel { Filters = [], IndicatorGroups = [] });
+        static FootnoteSubjectViewModel GetOrAddSubject(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId
+        ) => subjects.GetOrSet(subjectId, () => new FootnoteSubjectViewModel { Filters = [], IndicatorGroups = [] });
 
-        FootnoteFilterViewModel GetOrAddFilter(Guid subjectId, Guid filterId) =>
-            GetOrAddSubject(subjectId)
+        static FootnoteFilterViewModel GetOrAddFilter(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId,
+            Guid filterId
+        ) =>
+            GetOrAddSubject(subjects, subjectId)
                 .Filters.GetOrSet(filterId, () => new FootnoteFilterViewModel { FilterGroups = [] });
 
-        FootnoteFilterGroupViewModel GetOrAddFilterGroup(Guid subjectId, Guid filterId, Guid filterGroupId) =>
-            GetOrAddFilter(subjectId, filterId)
+        static FootnoteFilterGroupViewModel GetOrAddFilterGroup(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId,
+            Guid filterId,
+            Guid filterGroupId
+        ) =>
+            GetOrAddFilter(subjects, subjectId, filterId)
                 .FilterGroups.GetOrSet(filterGroupId, () => new FootnoteFilterGroupViewModel { FilterItems = [] });
     }
 }
