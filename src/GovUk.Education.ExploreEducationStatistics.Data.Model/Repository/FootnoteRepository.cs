@@ -37,12 +37,6 @@ public class FootnoteRepository : IFootnoteRepository
             Subjects = subjectIds.Select(subjectId => new SubjectFootnote { SubjectId = subjectId }).ToList(),
         };
 
-        // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all foonotes for a subject.
-        // Currently this involves getting all footnotes with criteria matching the subject directly or indirectly.
-        // This would also prevent removing a subject from a release until all of its footnote links are removed.
-        // Currently a footnote could remain linked to a release and a subject (either directly or indirectly via
-        // its FilterItems/FilterGroups/Filters/Indicators) even though no ReleaseSubject exists.
-
         await _context.Footnote.AddAsync(footnote);
         await _context.SaveChangesAsync();
 
