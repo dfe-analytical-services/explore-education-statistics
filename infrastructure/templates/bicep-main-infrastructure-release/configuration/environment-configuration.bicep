@@ -1,4 +1,3 @@
-import { MemoryCacheConfig } from '../types.bicep'
 import { IpRange } from '../../common/types.bicep'
 
 @export()
@@ -21,9 +20,6 @@ type EnvironmentConfig = {
 
   @description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
   tableBuilderMaxTableCellsAllowed: int?
-
-  @description('Global configuration for memory caches.')
-  memoryCacheConfig: MemoryCacheConfig?
 
   @description('Whether or not to enable autoscaling of App Services in this environment.')
   autoscaleAppServices: bool?
@@ -52,9 +48,6 @@ type EnvironmentConfig = {
 
 @export()
 type EnvironmentPipelineVariables = {
-
-  @description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-  publicAppBasicAuthUsername: string?
 
   @description('Provides access to resources for specific IP address ranges used for service maintenance.')
   maintenanceIpRanges: IpRange[]?

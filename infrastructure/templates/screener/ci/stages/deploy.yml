@@ -37,8 +37,6 @@ stages:
     variables:
       - group: Common - ${{ parameters.environment }}
       - group: Screener Infrastructure - ${{ parameters.environment }}
-      - name: screenerFunctionAppName
-        value: $(subscription)-ees-sapi-fa-screener
       - name: infraDeployName
         value: ScreenerInfrastructure$(Build.BuildNumber)
     jobs:

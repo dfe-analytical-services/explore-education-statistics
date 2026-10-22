@@ -1,4 +1,4 @@
-import { ResourceNames } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -20,10 +20,10 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
 // Identity again to pull Docker images, but for now we continue to use our shared SPN.
 // module apiContainerAppAcrPullRoleAssignmentModule '../../components/containerRegistryRoleAssignment.bicep' = {
 //   name: '${resourceNames.publicApi.apiAppIdentity}AcrPullRoleAssignmentDeploy'
-//   scope: resourceGroup(resourceNames.existingResources.acrResourceGroup)
+//   scope: resourceGroup(acrResourceGroupName) // Would need passing in from main.bicep's acrResourceGroupName param.
 //   params: {
 //     role: 'AcrPull'
-//     containerRegistryName: resourceNames.existingResources.acr
+//     containerRegistryName: resourceNames.acr.serverName
 //     principalIds: [apiContainerAppManagedIdentity.properties.principalId]
 //   }
 // }
@@ -31,7 +31,7 @@ resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedI
 module apiContainerAppSearchServiceRoleAssignmentModule '../../../common/components/search/searchServiceRoleAssignment.bicep' = {
   name: '${resourceNames.publicApi.apiAppIdentity}SearchServiceRoleAssignmentDeploy'
   params: {
-    searchServiceName: resourceNames.sharedResources.searchService
+    searchServiceName: resourceNames.search.service
     principalIds: [apiContainerAppManagedIdentity.properties.principalId]
     role: 'Search Index Data Reader'
   }

@@ -1,0 +1,74 @@
+parameters:
+  - name: action
+    type: string
+    default: create
+    values:
+      - create
+      - validate
+  - name: displayName
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: subscriptionId
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: parameterFile
+    type: string
+  - name: adminProdAppSettings
+    type: string
+    default: '{}'
+  - name: adminStagingSlotAppSettings
+    type: string
+    default: '{}'
+  - name: contentApiProdAppSettings
+    type: string
+    default: '{}'
+  - name: contentApiStagingSlotAppSettings
+    type: string
+    default: '{}'
+  - name: dataApiProdAppSettings
+    type: string
+    default: '{}'
+  - name: dataApiStagingSlotAppSettings
+    type: string
+    default: '{}'
+  - name: publicSiteProdAppSettings
+    type: string
+    default: '{}'
+  - name: importerProdAppSettings
+    type: string
+    default: '{}'
+  - name: publisherProdAppSettings
+    type: string
+    default: '{}'
+  - name: notifierProdAppSettings
+    type: string
+    default: '{}'
+
+steps:
+  - task: BicepDeploy@0
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      operation: ${{ parameters.action }}
+      validationLevel: template
+      name: MainInfrastructure$(Build.BuildNumber)-${{ parameters.action }}
+      azureResourceManagerConnection: ${{ parameters.serviceConnection }}
+      subscriptionId: ${{ parameters.subscriptionId }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      templateFile: $(templateFile)
+      parametersFile: ${{ parameters.parameterFile }}
+      parameters: |
+        tags: $(resourceTags)
+        environmentPipelineVariables:
+          maintenanceIpRanges: $(maintenanceFirewallRules)
+        adminProdAppSettings: ${{ parameters.adminProdAppSettings }}
+        adminStagingSlotAppSettings: ${{ parameters.adminStagingSlotAppSettings }}
+        contentApiProdAppSettings: ${{ parameters.contentApiProdAppSettings }}
+        contentApiStagingSlotAppSettings: ${{ parameters.contentApiStagingSlotAppSettings }}
+        dataApiProdAppSettings: ${{ parameters.dataApiProdAppSettings }}
+        dataApiStagingSlotAppSettings: ${{ parameters.dataApiStagingSlotAppSettings }}
+        publicSiteProdAppSettings: ${{ parameters.publicSiteProdAppSettings }}
+        importerProdAppSettings: ${{ parameters.importerProdAppSettings }}
+        publisherProdAppSettings: ${{ parameters.publisherProdAppSettings }}
+        notifierProdAppSettings: ${{ parameters.notifierProdAppSettings }}

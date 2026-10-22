@@ -11,6 +11,7 @@ import boundaryTypesMap from '@common/utils/boundaryTypesMap';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
+import { administrationBoundaryDataUploadRoute } from '@admin/routes/administrationRoutes';
 import styles from './BoundaryDataPage.module.scss';
 
 const BoundaryDataPage = () => {
@@ -99,7 +100,10 @@ const BoundaryDataPage = () => {
           </ol>
         </InsetText>
 
-        <Link to="boundary-data/upload" className="govuk-button">
+        <Link
+          to={administrationBoundaryDataUploadRoute.fullPath}
+          className="govuk-button"
+        >
           Upload boundary data file
         </Link>
 

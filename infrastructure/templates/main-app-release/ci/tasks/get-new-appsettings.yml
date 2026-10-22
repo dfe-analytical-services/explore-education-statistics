@@ -1,0 +1,47 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: templateFile
+    type: string
+  - name: paramFile
+    type: string
+  - name: bicepConfigDeployName
+    type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - Get new application-specific appsettings to deploy
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+
+        # A marker unique to this deploy, baked in as the Deploy__DeployedAt
+        # appsetting below - see wait-for-app-service-restart.yml.
+        deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
+
+        # TODO EES-7502 - consider using bicep snapshot as per usage in
+        # infrastructure/common/ci/tasks/get-resource-names.yml to speed up
+        # this task by 40 seconds or so.
+        #
+        # This would mean not versioning the secrets in any of the Bicep files
+        # that we snapshot, and so we'll need to ensure that restarts occur
+        # successfully on every deployed app service and function app regardless
+        # of Azure seeing no changes in appsettings. This will allow us to update
+        # secrets and be sure they are used on the next deployment.
+        az deployment group create \
+          --name ${{ parameters.bicepConfigDeployName }} \
+          --resource-group $(resourceGroupName) \
+          --template-file ${{ parameters.templateFile }} \
+          --parameters ${{ parameters.paramFile }} \
+          --parameters deployedAt="$deployedAt"
+
+  - template: ../../../../common/ci/tasks/bicep-output-variables.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      deploymentName: ${{ parameters.bicepConfigDeployName }}

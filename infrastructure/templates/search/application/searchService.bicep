@@ -1,9 +1,5 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
+import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -42,19 +38,19 @@ param logAnalyticsWorkspaceId string
 param tagValues object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource searchStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.searchStoragePrivateEndpoints
+  name: resourceNames.vnet.subnets.searchStoragePrivateEndpoints
   parent: vNet
 }
 
-var searchServiceName = '${resourcePrefix}-${abbreviations.searchSearchServices}'
+var searchServiceName = resourceNames.search.service
 var searchStorageDocumentContainerNames = map(items(searchStorageDocumentContainers), item => item.value)
 
 module searchServiceModule '../components/searchService.bicep' = {
@@ -72,7 +68,7 @@ module searchServiceModule '../components/searchService.bicep' = {
       searchLatency: true
       searchQueriesPerSecond: true
       throttledSearchQueriesPercentage: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     tagValues: tagValues
@@ -82,7 +78,7 @@ module searchServiceModule '../components/searchService.bicep' = {
 module searchStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'searchStorageAccountModuleDeploy'
   params: {
-    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
+    storageAccountName: resourceNames.search.storageAccount
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: 'Standard_LRS'
@@ -91,7 +87,7 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
     alerts: {
       availability: true
       latency: false
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     privateEndpointSubnetIds: {
       blob: searchStoragePrivateEndpointSubnet.id

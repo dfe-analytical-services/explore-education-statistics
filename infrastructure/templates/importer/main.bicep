@@ -1,6 +1,6 @@
-import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
+import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
+import { ResourceNames } from '../common/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -25,14 +25,22 @@ param maintenanceIpRanges IpRange[]
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
+@description('Optional override of the existing Http401 rule. Omit to preserve current behaviour.')
+param http401Alert HttpStatusAlertConfig?
+
+@description('Optional override of the existing Http5xx rule. Omit to preserve current behaviour.')
+param http5xxAlert HttpStatusAlertConfig?
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that the code
+deployment pipeline has since applied - see importer-appsettings.bicep.
+''')
+param existingAppSettings object = {}
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -82,13 +90,14 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     netFrameworkVersion: 'v10.0'
     alwaysOn: true
     deployQueueRoleAssignment: true
-    healthCheckPath: '/'
+    healthCheckPath: '/api/health'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
     outboundSubnetId: outboundVnetSubnet.id
     storageAccountAllowedSubnetIds: [adminSubnet.id]
     storageAccountPublicNetworkAccessEnabled: true
     publicNetworkAccessEnabled: true
     storageFirewallRules: maintenanceIpRanges
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
@@ -106,6 +115,8 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       cpuPercentage: true
       functionAppHealth: true
       httpErrors: true
+      http401: http401Alert
+      http5xx: http5xxAlert
       memoryPercentage: true
       storageAccountAvailability: false
       storageLatency: false
@@ -115,20 +126,8 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       alertsGroupName: resourceNames.alertsGroup
     } : null
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    appSettings: [
-      {
-        name: 'App__RowsPerBatch'
-        value: '3000'
-      }
-      {
-        name: 'App__PrivateStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.coreStorageAccountConnectionString)
-      }
-      {
-        name: 'App__ImporterStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.importerStorageAccountConnectionString)
-      }
-    ]
+    appSettings: []
+    existingAppSettings: existingAppSettings
     tagValues: tagValues
   }
 }

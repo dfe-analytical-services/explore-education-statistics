@@ -1,4 +1,5 @@
-import { ResourceNames, ContainerAppWorkloadProfile } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
+import { ContainerAppWorkloadProfile } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -16,19 +17,19 @@ param workloadProfiles ContainerAppWorkloadProfile[] = []
 param tagValues object
 
 resource analyticsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: resourceNames.existingResources.analyticsStorageAccount
+  name: resourceNames.analytics.storage.storageAccountName
 }
 
 resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: resourceNames.publicApi.publicApiStorageAccount
+  name: resourceNames.publicApi.storage.storageAccount
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.containerAppEnvironment
+  name: resourceNames.vnet.subnets.containerAppEnvironment
   parent: vNet
 }
 
@@ -36,23 +37,23 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
   name: 'containerAppEnvironmentDeploy'
   params: {
     location: location
-    containerAppEnvironmentName: resourceNames.sharedResources.containerAppEnvironment
+    containerAppEnvironmentName: resourceNames.containerAppEnvironment
     subnetId: subnet.id
-    logAnalyticsWorkspaceName: resourceNames.existingResources.logAnalyticsWorkspace
+    logAnalyticsWorkspaceName: resourceNames.logAnalyticsWorkspace
     applicationInsightsKey: applicationInsightsKey
     azureFileStorages: [
       {
-        storageName: resourceNames.existingResources.analyticsFileShare
-        storageAccountName: resourceNames.existingResources.analyticsStorageAccount
+        storageName: resourceNames.analytics.storage.fileShareName
+        storageAccountName: resourceNames.analytics.storage.storageAccountName
         storageAccountKey: analyticsStorageAccount.listKeys().keys[0].value
-        fileShareName: resourceNames.existingResources.analyticsFileShare
+        fileShareName: resourceNames.analytics.storage.fileShareName
         accessMode: 'ReadWrite'
       }
       {
-        storageName: resourceNames.publicApi.publicApiFileShare
-        storageAccountName: resourceNames.publicApi.publicApiStorageAccount
+        storageName: resourceNames.publicApi.storage.fileShare
+        storageAccountName: resourceNames.publicApi.storage.storageAccount
         storageAccountKey: publicApiStorageAccount.listKeys().keys[0].value
-        fileShareName: resourceNames.publicApi.publicApiFileShare
+        fileShareName: resourceNames.publicApi.storage.fileShare
         accessMode: 'ReadWrite'
       }
     ]

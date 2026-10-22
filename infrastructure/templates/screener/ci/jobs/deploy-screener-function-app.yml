@@ -19,11 +19,26 @@ jobs:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+            fetchDepth: 1
+            sparseCheckoutDirectories: infrastructure/templates/common
+
+          - template: ../../../../common/ci/tasks/get-resource-names.yml
+            parameters:
+              environment: ${{ parameters.environment }}
+
           - template: ../../../../common/ci/tasks/bicep-output-variables.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
 
-          - template: ../../../public-api/ci/tasks/wait-for-endpoint-success.yml
+          - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
+            parameters:
+              serviceConnection: ${{ parameters.serviceConnection }}
+              keyVaultName: $(resourceNames.keyVault.keyVault)
+              secretName: $(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
+              variableName: screenerAppRegistrationClientId
+
+          - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
               displayName: Check the Screener API Function App is healthy after deployment

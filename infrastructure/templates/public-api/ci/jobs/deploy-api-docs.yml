@@ -15,12 +15,20 @@ jobs:
     environment: ${{ parameters.environment }}
     variables:
       docsPath: $(Pipeline.Workspace)/MainBuild/public-api-docs
-      nodeVersion: '22.23.3'
+      nodeVersion: '22.23.4'
       rubyVersion: '4.0.x'
     strategy:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+              fetchDepth: 1
+              sparseCheckoutDirectories: infrastructure/templates/common
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - download: MainBuild
               displayName: Download Public API docs artifact
               artifact: public-api-docs
@@ -62,7 +70,7 @@ jobs:
                 scriptLocation: inlineScript
                 inlineScript: |
                   set -e
-                  deploymentToken=`az staticwebapp secrets list -n $(docsAppName) --query "properties.apiKey" -o tsv`
+                  deploymentToken=`az staticwebapp secrets list -n $(resourceNames.publicApi.docsApp) --query "properties.apiKey" -o tsv`
                   echo "##vso[task.setvariable variable=docsDeploymentToken;]$deploymentToken"
 
             - task: AzureStaticWebApp@0

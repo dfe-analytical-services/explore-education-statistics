@@ -1,14 +1,20 @@
-import { getResourceNames } from 'resource-names.bicep'
+import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
-import { AdminConfig, AdminPipelineVariables, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
+import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
 import { ContentApiConfig, mergeContentApiConfig } from 'configuration/content-api-configuration.bicep'
 import { DataApiConfig, mergeDataApiConfig } from 'configuration/data-api-configuration.bicep'
 import { ImporterConfig, mergeImporterConfig } from 'configuration/importer-configuration.bicep'
 import { NotifierConfig, mergeNotifierConfig } from 'configuration/notifier-configuration.bicep'
 import { PublisherConfig, mergePublisherConfig } from 'configuration/publisher-configuration.bicep'
-import { PublicApiConfig, mergePublicApiConfig } from 'configuration/public-api-configuration.bicep'
 import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-site-configuration.bicep'
+
+@description('Per-service overrides. Empty preserves all existing Http401 rules.')
+param http401Alerts ServiceHttpStatusAlerts = {}
+
+@description('Per-service overrides. Empty preserves all existing Http5xx rules.')
+param http5xxAlerts ServiceHttpStatusAlerts = {}
 
 //
 // Tagging config.
@@ -16,17 +22,16 @@ import { PublicSiteConfig, mergePublicSiteConfig } from 'configuration/public-si
 
 @description('Tags for tagging resources created in Azure. These are all fed in from pipeline variables.')
 param tags Tags = {
+  CostCentre: ''
   Department: ''
   Solution: ''
-  Environment: ''
-  Subscription: ''
-  CostCentre: ''
   ServiceOwner: ''
-  DateProvisioned: ''
   CreatedBy: ''
-  DeploymentRepo: ''
-  DeploymentScript: ''
+  DeploymentRepoUrl: ''
 }
+
+@description('Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
+param dateProvisioned string = utcNow('u')
 
 
 
@@ -37,6 +42,12 @@ param environmentConfigParam EnvironmentConfig = {}
 
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+
+// Pipeline-supplied tags, plus those that vary by environment and deployment.
+var tagValues = union(tags, {
+  Environment: environmentConfig.environmentName!
+  DateProvisioned: dateProvisioned
+})
 
 // These values are all supplied specifically by pipeline variables.
 param environmentPipelineVariables EnvironmentPipelineVariables = {}
@@ -51,8 +62,13 @@ param adminConfigParam AdminConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var adminConfig = mergeAdminConfig(adminConfigParam)
 
-// These values are all supplied specifically by pipeline variables.
-param adminPipelineVariables AdminPipelineVariables = {}
+@secure()
+@description('The existing appsettings for the Admin App Service production slot, fetched by the pipeline before deployment.')
+param adminProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Admin App Service staging slot, fetched by the pipeline before deployment.')
+param adminStagingSlotAppSettings object = {}
 
 
 
@@ -64,6 +80,14 @@ param contentApiConfigParam ContentApiConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var contentApiConfig = mergeContentApiConfig(contentApiConfigParam)
 
+@secure()
+@description('The existing appsettings for the Content API App Service production slot, fetched by the pipeline before deployment.')
+param contentApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Content API App Service staging slot, fetched by the pipeline before deployment.')
+param contentApiStagingSlotAppSettings object = {}
+
 
 
 //
@@ -73,6 +97,14 @@ param dataApiConfigParam DataApiConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var dataApiConfig = mergeDataApiConfig(dataApiConfigParam)
+
+@secure()
+@description('The existing appsettings for the Data API App Service production slot, fetched by the pipeline before deployment.')
+param dataApiProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Data API App Service staging slot, fetched by the pipeline before deployment.')
+param dataApiStagingSlotAppSettings object = {}
 
 
 
@@ -84,6 +116,10 @@ param importerConfigParam ImporterConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var importerConfig = mergeImporterConfig(importerConfigParam)
 
+@secure()
+@description('The existing appsettings for the Importer Function App, fetched by the pipeline before deployment.')
+param importerProdAppSettings object = {}
+
 
 
 //
@@ -93,6 +129,10 @@ param notifierConfigParam NotifierConfig = {}
 
 // Merge default configuration with overridden configuration from params files.
 var notifierConfig = mergeNotifierConfig(notifierConfigParam)
+
+@secure()
+@description('The existing appsettings for the Notifier Function App, fetched by the pipeline before deployment.')
+param notifierProdAppSettings object = {}
 
 
 
@@ -104,15 +144,9 @@ param publisherConfigParam PublisherConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var publisherConfig = mergePublisherConfig(publisherConfigParam)
 
-
-
-//
-// Public API-specific config.
-//
-param publicApiConfigParam PublicApiConfig = {}
-
-// Merge default configuration with overridden configuration from params files.
-var publicApiConfig = mergePublicApiConfig(publicApiConfigParam)
+@secure()
+@description('The existing appsettings for the Publisher Function App, fetched by the pipeline before deployment.')
+param publisherProdAppSettings object = {}
 
 
 
@@ -124,15 +158,9 @@ param publicSiteConfigParam PublicSiteConfig = {}
 // Merge default configuration with overridden configuration from params files.
 var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 
-
-
-//
-// Secret pipeline variables (required to be top-level params).
-//
-
 @secure()
-@description('Password protecting the public app, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-param publicAppBasicAuthPassword string = ''
+@description('The existing appsettings for the Public Site App Service, fetched by the pipeline before deployment.')
+param publicSiteProdAppSettings object = {}
 
 
 
@@ -140,23 +168,10 @@ param publicAppBasicAuthPassword string = ''
 // Resource provisioning.
 //
 
-var legacyResourcePrefix = environmentConfig.environmentIdentifier!
-var newResourcePrefix = '${environmentConfig.environmentIdentifier!}-ees'
-var publicApiResourcePrefix = '${newResourcePrefix}-papi'
-var screenerResourcePrefix = '${newResourcePrefix}-sapi'
-
-// TODO EES-7502 - use standardised naming convention for Notifier storage.
-var notifierStorageAccountPrefix = environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production' 
-  ? 'storage'
-  : 'sa'
-
-var resourceNames = getResourceNames(
-  legacyResourcePrefix,
-  publicApiResourcePrefix,
-  screenerResourcePrefix,
-  newResourcePrefix,
-  notifierStorageAccountPrefix
-)
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: environmentConfig.environmentIdentifier!
+  environmentName: environmentConfig.environmentName!
+})
 
 var minTlsVersion = '1.2'
 
@@ -179,16 +194,24 @@ var baseAdminAllowedOrigins = [
 
 var adminSiteAllowedOrigins = union(baseAdminAllowedOrigins, environmentConfig.?additionalAdminAllowedOrigins ?? [])
 
-// TODO EES-7502 - use standardised hostname for the Content API .
-var contentApiPublicHostname = '${environmentConfig.environmentName! == 'Pre-Production' ? 'cont' : 'content'}.${environmentConfig.domain!}'
-
-var dataApiPublicHostname = 'data.${environmentConfig.domain!}'
-
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: resourceNames.keyVault.keyVault
 }
 
-var dockerRegistryUrl = 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
+// Used to encrypt the ASP.NET Core Data Protection key ring for Windows App Services, as the key ring
+// can't safely live on local disk when shared across deployment slots.
+resource dataProtectionKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
+  parent: keyVault
+  name: resourceNames.keyVault.keys.dataProtection
+  properties: {
+    kty: 'RSA'
+    keySize: 2048
+    keyOps: [
+      'wrapKey'
+      'unwrapKey'
+    ]
+  }
+}
 
 module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
@@ -196,11 +219,14 @@ module importerModuleDeploy '../importer/main.bicep' = {
     resourceNames: resourceNames
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
+    http401Alert: http401Alerts.?importer
+    http5xxAlert: http5xxAlerts.?importer
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.importer.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
-    tagValues: tags
+    existingAppSettings: importerProdAppSettings
+    tagValues: tagValues
   }
 }
 
@@ -209,16 +235,17 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: notifierConfig.appServiceSku!
-    suppressExceptionsForTeamOnlyApiKeyErrors: notifierConfig.suppressExceptionsForTeamOnlyApiKeyErrors!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     allowedOrigins: publicSiteAllowedOrigins
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.notifier.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    existingAppSettings: notifierProdAppSettings
     deployAlerts: true
-    tagValues: tags
+    http401Alert: http401Alerts.?notifier
+    http5xxAlert: http5xxAlerts.?notifier
+    tagValues: tagValues
   }
 }
 
@@ -227,23 +254,16 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publisherConfig.appServiceSku!
-    prepareScheduledReleaseVersionsNowEnabled: publisherConfig.prepareScheduledReleaseVersionsNowEnabled!
-    publishScheduledReleaseVersionsNowEnabled: publisherConfig.publishScheduledReleaseVersionsNowEnabled!
-    functionAppTimeZone: publisherConfig.functionAppTimeZone!
-    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-    adminAppUrl: 'https://admin.${environmentConfig.domain!}'
-    publicAppUrl: 'https://${environmentConfig.domain!}'
-    contentApiHostName: contentApiPublicHostname
-    frontDoorCachePurgeEnabled: publisherConfig.frontDoorCachePurgeEnabled!
-    frontDoorEndpointResourceId: afdEndpointResourceId
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.publisher.databaseUserPassword)
     maintenanceIpRanges: environmentPipelineVariables.maintenanceIpRanges!
     blobDeleteRetentionDays: environmentConfig.blobDeleteRetentionDays!
+    existingAppSettings: publisherProdAppSettings
     deployAlerts: true
-    tagValues: tags
+    http401Alert: http401Alerts.?publisher
+    http5xxAlert: http5xxAlerts.?publisher
+    tagValues: tagValues
   }
   dependsOn: [
     // Publisher is dependent on Notifier's storage account being available
@@ -257,30 +277,19 @@ module adminModuleDeploy '../admin/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: adminConfig.appServiceSku!
-    adminHostname: 'admin.${environmentConfig.domain!}'
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     signalRAllowedOrigins: adminSiteAllowedOrigins
     signalRSku: adminConfig.signalRSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     deployAlerts: true
+    http401Alert: http401Alerts.?admin
+    http5xxAlert: http5xxAlerts.?admin
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    enableThemeDeletion: adminConfig.enableThemeDeletion!
-    enableEinPublishedPageDeletion: adminConfig.enableEinPublishedPageDeletion!
-    apiAppRegistrationClientId: adminPipelineVariables.apiAppRegistrationClientId!
-    publicDataProcessorAppRegistrationClientId: adminPipelineVariables.publicDataProcessorAppRegistrationClientId!
-    screenerAppRegistrationClientId: adminPipelineVariables.screenerAppRegistrationClientId!
-    publicApiUrl: publicApiConfig.publicUrl!
-    publicApiDocsUrl: '${publicApiConfig.publicUrl!}/docs'
-    prepareScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.prepareScheduledReleaseVersionsFunctionCronSchedule!
-    publishScheduledReleaseVersionsFunctionCronSchedule: environmentConfig.publishScheduledReleaseVersionsFunctionCronSchedule!
-    preReleaseMinutesBeforeStart: adminConfig.preReleaseMinutesBeforeStart!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
-    memoryCacheConfig: environmentConfig.memoryCacheConfig!
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.admin.databaseUserPassword)
-    tagValues: tags
+    existingProdAppSettings: adminProdAppSettings
+    existingStagingSlotAppSettings: adminStagingSlotAppSettings
+    tagValues: tagValues
   }
   dependsOn: [
     // Admin is dependent on Importer's storage account being available
@@ -294,18 +303,20 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: contentApiConfig.appServiceSku!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
     deployAlerts: true
+    http401Alert: http401Alerts.?contentApi
+    http5xxAlert: http5xxAlerts.?contentApi
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
     restrictOriginToFrontDoor: contentApiConfig.restrictOriginToFrontDoor!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.contentApi.databaseUserPassword)
-    tagValues: tags
+    existingProdAppSettings: contentApiProdAppSettings
+    existingStagingSlotAppSettings: contentApiStagingSlotAppSettings
+    tagValues: tagValues
   }
 }
 
@@ -314,21 +325,19 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: dataApiConfig.appServiceSku!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
     analyticsEnabled: environmentConfig.analyticsEnabled!
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http401Alert: http401Alerts.?dataApi
+    http5xxAlert: http5xxAlerts.?dataApi
     detailedErrors: environmentConfig.detailedErrors!
-    enableSwagger: environmentConfig.enableSwagger!
-    tableBuilderMaxTableCellsAllowed: environmentConfig.tableBuilderMaxTableCellsAllowed!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     databaseUserPassword: keyVault.getSecret(resourceNames.keyVault.secrets.dataApi.databaseUserPassword)
-    tagValues: tags
+    existingProdAppSettings: dataApiProdAppSettings
+    existingStagingSlotAppSettings: dataApiStagingSlotAppSettings
+    tagValues: tagValues
   }
 }
 
@@ -337,25 +346,15 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
   params: {
     resourceNames: resourceNames
     appServiceSku: publicSiteConfig.appServiceSku!
-    environmentName: environmentConfig.environmentName!
-    googleAnalyticsTrackingId: publicSiteConfig.googleAnalyticsTrackingId!
-    defaultCacheMaxAgeSeconds: publicSiteConfig.defaultCacheMaxAgeSeconds!
-    publicApiPublicHostname: publicApiConfig.publicUrl!
-    publicAppUrl: 'https://${environmentConfig.domain!}'
-    contentApiPublicHostname: contentApiPublicHostname
-    dataApiPublicHostname: dataApiPublicHostname
-    dockerRegistryUrl: dockerRegistryUrl
-    dockerPullUsername: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
-    dockerPullPassword: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
-    publicAppBasicAuth: environmentConfig.basicAuthEnabled!
-    publicAppBasicAuthUsername: environmentPipelineVariables.publicAppBasicAuthUsername!
-    publicAppBasicAuthPassword: publicAppBasicAuthPassword
     deployAlerts: true
+    http401Alert: http401Alerts.?publicSite
+    http5xxAlert: http5xxAlerts.?publicSite
     detailedErrors: environmentConfig.detailedErrors!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    tagValues: tags
+    existingProdAppSettings: publicSiteProdAppSettings
+    tagValues: tagValues
   }
 }

@@ -1,6 +1,6 @@
 import { FirewallRule, IpRange } from '../../common/types.bicep'
 import { FunctionAppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -22,6 +22,7 @@ param storageFirewallRules IpRange[]
 @description('IP address ranges that are allowed to access the Function App endpoints. Dependent on "publicNetworkAccessEnabled" being true.')
 param functionAppFirewallRules FirewallRule[] = []
 
+@secure()
 @description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
 param screenerAppRegistrationClientId string
 
@@ -66,25 +67,25 @@ param tagValues object
 var eesyscreenerLogsFileShareMountPath = '/screener/logs'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.screenerFunction
+  name: resourceNames.vnet.subnets.screenerFunctionApp
   parent: vNet
 }
 
 resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.screenerFunctionPrivateEndpoints
+  name: resourceNames.vnet.subnets.screenerStoragePrivateEndpoints
   parent: vNet
 }
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: resourceNames.existingResources.adminApp
+  name: resourceNames.admin.appService
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -93,7 +94,7 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
 }
 
 resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: resourceNames.screener.screenerLogsStorageAccount
+  name: resourceNames.screener.logsStorageAccount
 }
 
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
@@ -106,7 +107,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
   params: {
     operatingSystem: operatingSystem
     sku: sku
-    functionAppName: resourceNames.screener.screenerFunction
+    functionAppName: resourceNames.screener.functionApp
     acrLoginServer: acrLoginServer
     functionAppImageName: functionAppImageName
     functionAppDockerImageTag: screenerDockerImageTag
@@ -115,7 +116,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     healthCheckPath: '/api/healthcheck'
     minimumInstanceCount: minimumInstanceCount
     maximumInstanceCount: maximumInstanceCount
-    appServicePlanName: resourceNames.screener.screenerFunction
+    appServicePlanName: resourceNames.screener.appServicePlan
     appSettings: [
       {
         name: 'STORAGE_URL'
@@ -143,7 +144,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
       }
       {
         name: 'AzureWebJobs_StartScreening__queueServiceUri'
-        value: 'https://${resourceNames.screener.screenerFunctionStorageAccount}.queue.core.windows.net'
+        value: 'https://${resourceNames.screener.functionStorageAccount}.queue.core.windows.net'
       }
       {
         name: 'AzureWebJobs_StartScreening__credential'
@@ -160,9 +161,9 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
       allowedPrincipalIds: []
       requireAuthentication: true
     }
-    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
-    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
-    deploymentStorageAccountName: resourceNames.screener.screenerFunctionStorageAccount
+    dockerPullManagedIdentityClientId: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
+    dockerPullManagedIdentitySecretValue: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
+    deploymentStorageAccountName: resourceNames.screener.functionStorageAccount
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     publicNetworkAccessEnabled: true
@@ -173,10 +174,10 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     subnetId: outboundVnetSubnet.id
     includeQueueServices: true
     azureFileShares: [{
-      storageName: resourceNames.screener.screenerLogsStorageAccount
+      storageName: resourceNames.screener.logsStorageAccount
       storageAccountKey: eesyscreenerLogsStorageAccount.listKeys().keys[0].value
-      storageAccountName: resourceNames.screener.screenerLogsStorageAccount
-      fileShareName: resourceNames.screener.screenerLogsFileShare
+      storageAccountName: resourceNames.screener.logsStorageAccount
+      fileShareName: resourceNames.screener.logsFileShare
       mountPath: eesyscreenerLogsFileShareMountPath
     }]
     alerts: deployAlerts
@@ -185,7 +186,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
           memoryPercentage: true
           storageAccountAvailability: true
           storageLatency: false
-          alertsGroupName: resourceNames.existingResources.alertsGroup
+          alertsGroupName: resourceNames.alertsGroup
           functionAppHealth: true
           httpErrors: true
           fileServiceAvailability: true

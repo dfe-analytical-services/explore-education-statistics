@@ -1,0 +1,34 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: displayNamePrefix
+    type: string
+  - name: appName
+    type: string
+  - name: resourceGroupName
+    type: string
+  - name: healthCheckPath
+    type: string
+    default: /api/health
+
+steps:
+  - task: AzureCLI@2
+    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into production.
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -e
+        az webapp deployment slot swap \
+          --name ${{ parameters.appName }} \
+          --resource-group ${{ parameters.resourceGroupName }} \
+          --slot deploy \
+          --target-slot production
+
+  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+    parameters:
+      serviceConnection: ${{ parameters.serviceConnection }}
+      displayName: ${{ parameters.displayNamePrefix }} - waiting for the app service swapped into production to report healthy after swap
+      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+      maxAttempts: 20

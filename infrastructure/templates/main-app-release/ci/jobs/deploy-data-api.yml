@@ -1,0 +1,56 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployDataApi
+    displayName: Deploy Data API
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/data-api/data-api-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/data-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: DataApiBicepConfig$(Build.BuildNumber)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
+            - download: MainBuild
+              displayName: Download Data API artifact
+              artifact: data-api
+
+            - template: ../tasks/get-new-appsettings.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Data API
+                templateFile: $(templateFile)
+                paramFile: $(paramFile)
+                bicepConfigDeployName: $(bicepConfigDeployName)
+
+            - template: ../tasks/deploy-app-service.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Data API
+                appName: $(resourceNames.dataApi.appService)
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/data-api/GovUk.Education.ExploreEducationStatistics.Data.Api.zip
+                appSettingsJson: $(appSettings)
+                deployedAt: $(deployedAt)
+                environment: ${{ parameters.environment }}
+                slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}

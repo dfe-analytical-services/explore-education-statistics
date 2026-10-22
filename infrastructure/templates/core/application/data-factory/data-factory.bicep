@@ -1,8 +1,7 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
 import { staticTotalGreaterThanZero } from '../../../common/components/alerts/staticAlertConfig.bicep'
 
-@description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+@description('Name of the Data Factory.')
+param dataFactoryName string
 
 @description('Name of the Key Vault instance to add as a linked service.')
 param keyVaultName string
@@ -15,8 +14,6 @@ param deployAlerts bool
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
-
-var dataFactoryName = '${subscription}-${abbreviations.dataFactoryFactories}-ees-release'
 
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   name: dataFactoryName

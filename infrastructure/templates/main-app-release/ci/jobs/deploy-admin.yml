@@ -1,0 +1,99 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
+
+jobs:
+  - deployment: DeployAdmin
+    displayName: Deploy Admin
+    environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/admin/admin-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/admin/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: AdminBicepConfig$(Build.BuildNumber)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
+            - download: MainBuild
+              displayName: Download Admin artifact
+              artifact: admin
+
+            - template: ../tasks/get-new-appsettings.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Admin
+                templateFile: $(templateFile)
+                paramFile: $(paramFile)
+                bicepConfigDeployName: $(bicepConfigDeployName)
+
+            # Database migrations run as part of Admin's startup, so by the time the staging
+            # slot (or production, on the direct path) reports healthy here, they've already
+            # run successfully. This job intentionally stops right after that health check -
+            # see SwapAdminIntoProduction below - so that services waiting on Admin (via
+            # deployAdminFirst) can start as soon as migrations are done, without also waiting
+            # for the slot swap itself to complete.
+            - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
+                - template: ../tasks/deploy-app-service-to-staging-slot.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(resourceNames.admin.appService)
+                    resourceGroupName: $(resourceGroupName)
+                    artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
+                    appSettingsJson: $(appSettings)
+                    healthCheckPath: /api/health
+                    deployedAt: $(deployedAt)
+            - ${{ else }}:
+                - template: ../tasks/deploy-app-service-direct.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(resourceNames.admin.appService)
+                    resourceGroupName: $(resourceGroupName)
+                    artifactZipPath: $(Pipeline.Workspace)/MainBuild/admin/GovUk.Education.ExploreEducationStatistics.Admin.zip
+                    appSettingsJson: $(appSettings)
+                    healthCheckPath: /api/health
+                    deployedAt: $(deployedAt)
+
+  # Only exists when slot swapping is actually in play for this run. Separating this out from
+  # the main Admin deploy flow into a separate job allows us to kick off the subsequent
+  # deploys of all other services in this pipeline as soon as Admin has started up successfully
+  # in the staging slot (and has therefore run any migrations it needed to run), rather than having
+  # to wait for Admin's deploy to fully complete before starting their own.
+  - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
+      - deployment: SwapAdminIntoProduction
+        displayName: Swap Admin Into Production
+        dependsOn: DeployAdmin
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - download: none
+
+                - template: ../../../../common/ci/tasks/get-resource-names.yml
+                  parameters:
+                    environment: ${{ parameters.environment }}
+
+                - template: ../tasks/swap-staging-slot-into-production.yml
+                  parameters:
+                    serviceConnection: ${{ parameters.serviceConnection }}
+                    displayNamePrefix: Admin
+                    appName: $(resourceNames.admin.appService)
+                    resourceGroupName: $(resourceGroupName)
+                    healthCheckPath: /api/health
