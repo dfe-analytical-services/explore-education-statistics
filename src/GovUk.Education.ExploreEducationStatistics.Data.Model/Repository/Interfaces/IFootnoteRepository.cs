@@ -15,17 +15,17 @@ public interface IFootnoteRepository
     );
 
     /// <summary>
-    /// Gets the release version's footnotes that apply to a selection of the subject's filters, filter groups, filter
-    /// items and indicators. A footnote applies if it is linked directly to the subject, or if it is linked to the
-    /// subject's data and the selection includes one of its filter, filter group or filter item links for the subject
-    /// (if it has any) and one of its indicator links for the subject (if it has any).
+    /// Gets the release version's footnotes that apply to a selection of the subject's filter items and indicators,
+    /// where selecting a filter item also selects its filter group and filter. A footnote applies if it is linked
+    /// directly to the subject, or if it is linked to the subject's data and the selection includes one of its filter,
+    /// filter group or filter item links for the subject (if it has any) and one of its indicator links for the subject
+    /// (if it has any).
+    /// The filter items must have their FilterGroup loaded.
     /// </summary>
     Task<List<Footnote>> GetFootnotesForSelection(
         Guid releaseVersionId,
         Guid subjectId,
-        IReadOnlyCollection<Guid> filterIds,
-        IReadOnlyCollection<Guid> filterGroupIds,
-        IReadOnlyCollection<Guid> filterItemIds,
+        IList<FilterItem> filterItems,
         IReadOnlyCollection<Guid> indicatorIds
     );
 

@@ -46,12 +46,14 @@ public class FootnoteRepository : IFootnoteRepository
     public async Task<List<Footnote>> GetFootnotesForSelection(
         Guid releaseVersionId,
         Guid subjectId,
-        IReadOnlyCollection<Guid> filterIds,
-        IReadOnlyCollection<Guid> filterGroupIds,
-        IReadOnlyCollection<Guid> filterItemIds,
+        IList<FilterItem> filterItems,
         IReadOnlyCollection<Guid> indicatorIds
     )
     {
+        var filterItemIds = filterItems.Select(filterItem => filterItem.Id).ToList();
+        var filterGroupIds = filterItems.Select(filterItem => filterItem.FilterGroupId).Distinct().ToList();
+        var filterIds = filterItems.Select(filterItem => filterItem.FilterGroup.FilterId).Distinct().ToList();
+
         var footnotesQueryable = _context.Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId);
 
         // If the list of filter and indicator id's are empty,
