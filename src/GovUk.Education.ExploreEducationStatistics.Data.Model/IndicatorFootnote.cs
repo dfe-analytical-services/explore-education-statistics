@@ -2,7 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public class IndicatorFootnote
 {
-    public Indicator Indicator { get; set; }
     public Guid IndicatorId { get; set; }
     public Guid IndicatorGroupId { get; set; }
     public Guid SubjectId { get; set; }

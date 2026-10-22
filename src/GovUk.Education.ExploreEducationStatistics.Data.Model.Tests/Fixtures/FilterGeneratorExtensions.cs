@@ -60,9 +60,6 @@ public static class FilterGeneratorExtensions
         Func<SetterContext, IEnumerable<FilterGroup>> filterGroups
     ) => generator.ForInstance(s => s.SetFilterGroups(filterGroups.Invoke));
 
-    public static Generator<Filter> WithFootnotes(this Generator<Filter> generator, IEnumerable<Footnote> footnotes) =>
-        generator.ForInstance(s => s.SetFootnotes(footnotes));
-
     public static InstanceSetters<Filter> SetDefaults(this InstanceSetters<Filter> setters) =>
         setters
             .SetDefault(f => f.Id)
@@ -132,31 +129,5 @@ public static class FilterGeneratorExtensions
 
                 return list;
             }
-        );
-
-    public static InstanceSetters<Filter> SetFootnotes(
-        this InstanceSetters<Filter> setters,
-        IEnumerable<Footnote> footnotes
-    ) =>
-        setters.Set(
-            f => f.Footnotes,
-            (_, filter) =>
-                footnotes
-                    .Select(footnote =>
-                    {
-                        var filterFootnote = new FilterFootnote
-                        {
-                            Filter = filter,
-                            FilterId = filter.Id,
-                            Footnote = footnote,
-                            FootnoteId = footnote.Id,
-                            SubjectId = filter.SubjectId,
-                        };
-
-                        footnote.Filters.Add(filterFootnote);
-
-                        return filterFootnote;
-                    })
-                    .ToList()
         );
 }

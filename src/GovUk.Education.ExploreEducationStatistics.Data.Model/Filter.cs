@@ -15,7 +15,6 @@ public class Filter
     public Subject Subject { get; set; } = null!;
     public Guid SubjectId { get; set; }
     public List<FilterGroup> FilterGroups { get; set; } = new();
-    public List<FilterFootnote> Footnotes { get; set; } = new();
 
     public static IEqualityComparer<Filter> IdComparer { get; } = new IdEqualityComparer();
 
