@@ -253,9 +253,8 @@ public class FootnoteControllerTests
         footnoteService.Setup(s => s.GetFootnote(ReleaseVersionId, footnote.Id)).ReturnsAsync(footnote);
 
         var controller = new FootnoteController(
-            Mock.Of<IFilterRepository>(MockBehavior.Strict),
             footnoteService.Object,
-            Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
+            Mock.Of<IStorageDataSetResolver>(MockBehavior.Strict),
             Mock.Of<IReleaseService>(MockBehavior.Strict),
             Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict)
         );
