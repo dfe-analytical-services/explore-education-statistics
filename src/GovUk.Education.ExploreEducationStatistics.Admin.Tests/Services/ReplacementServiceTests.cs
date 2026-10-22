@@ -1432,6 +1432,7 @@ public class ReplacementServiceTests
                 replacementFilterGroup1.Label,
                 replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroup.Label
             );
+            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilterGroup.FilterGroups.First().FilterId);
             Assert.Equal(
                 replacementReleaseSubject.SubjectId,
                 replacedFootnoteForFilterGroup.FilterGroups.First().SubjectId
@@ -1451,6 +1452,8 @@ public class ReplacementServiceTests
                 replacementFilterItem1.Label,
                 replacedFootnoteForFilterItem.FilterItems.First().FilterItem.Label
             );
+            Assert.Equal(replacementFilterGroup1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterGroupId);
+            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterId);
             Assert.Equal(
                 replacementReleaseSubject.SubjectId,
                 replacedFootnoteForFilterItem.FilterItems.First().SubjectId
@@ -1468,6 +1471,10 @@ public class ReplacementServiceTests
             Assert.Equal(replacementIndicator.Id, replacedFootnoteForIndicator.Indicators.First().Indicator.Id);
             Assert.Equal(replacementIndicator.Label, replacedFootnoteForIndicator.Indicators.First().Indicator.Label);
             Assert.Equal(replacementIndicator.Name, replacedFootnoteForIndicator.Indicators.First().Indicator.Name);
+            Assert.Equal(
+                replacementIndicatorGroup.Id,
+                replacedFootnoteForIndicator.Indicators.First().IndicatorGroupId
+            );
             Assert.Equal(
                 replacementReleaseSubject.SubjectId,
                 replacedFootnoteForIndicator.Indicators.First().SubjectId

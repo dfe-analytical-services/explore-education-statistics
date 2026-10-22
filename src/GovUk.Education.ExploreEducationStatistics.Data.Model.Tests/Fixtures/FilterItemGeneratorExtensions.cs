@@ -59,6 +59,8 @@ public static class FilterItemGeneratorExtensions
                         {
                             FilterItem = filterItem,
                             FilterItemId = filterItem.Id,
+                            FilterGroupId = filterItem.FilterGroup.Id,
+                            FilterId = filterItem.FilterGroup.Filter.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
                             SubjectId = filterItem.FilterGroup.Filter.SubjectId,
