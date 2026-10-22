@@ -1,11 +1,14 @@
 import { abbreviations } from '../../../common/abbreviations.bicep'
-import { VNetSubnets } from 'types.bicep'
+import { VNetAddressRanges, VNetSubnets } from 'types.bicep'
 
 @description('Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string
 
 @description('Whether or not to deploy the subnets.')
 param deploySubnets bool
+
+@description('CIDR address ranges for the VNet and each of its subnets.')
+param addressRanges VNetAddressRanges
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -58,12 +61,11 @@ var searchStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-sear
 // Analytics subnets. 
 var analyticsFunctionAppSubnetName = '${generalSubnetNamePrefix}fa-analytics'
 var analyticsStoragePrivateEndpointsSubnetName = '${generalSubnetNamePrefix}sa-anlyt-pep'
-    
 
 var subnets = deploySubnets ? [{
   name: adminSubnetName
   properties: {
-    addressPrefix: '10.0.0.0/24'
+    addressPrefix: addressRanges.subnets.admin
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -74,7 +76,7 @@ var subnets = deploySubnets ? [{
 {
   name: importerSubnetName
   properties: {
-    addressPrefix: '10.0.1.0/24'
+    addressPrefix: addressRanges.subnets.importer
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -85,7 +87,7 @@ var subnets = deploySubnets ? [{
 {
   name: publisherSubnetName
   properties: {
-    addressPrefix: '10.0.2.0/24'
+    addressPrefix: addressRanges.subnets.publisher
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -96,7 +98,7 @@ var subnets = deploySubnets ? [{
 {
   name: notifySubnetName
   properties: {
-    addressPrefix: '10.0.3.0/24'
+    addressPrefix: addressRanges.subnets.notify
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -107,7 +109,7 @@ var subnets = deploySubnets ? [{
 {
   name: contentSubnetName
   properties: {
-    addressPrefix: '10.0.4.0/24'
+    addressPrefix: addressRanges.subnets.content
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -118,7 +120,7 @@ var subnets = deploySubnets ? [{
 {
   name: dataSubnetName
   properties: {
-    addressPrefix: '10.0.5.0/24'
+    addressPrefix: addressRanges.subnets.data
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -129,7 +131,7 @@ var subnets = deploySubnets ? [{
 {
   name: publicApiDataProcessorSubnetName
   properties: {
-    addressPrefix: '10.0.6.0/24'
+    addressPrefix: addressRanges.subnets.publicApiDataProcessor
     serviceEndpoints: [
       'Microsoft.Sql'
       'Microsoft.Storage'
@@ -140,13 +142,13 @@ var subnets = deploySubnets ? [{
 {
   name: publicApiDataProcessorPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.7.0/24'
+    addressPrefix: addressRanges.subnets.publicApiDataProcessorPrivateEndpoints
   }
 }
 {
   name: containerAppEnvironmentSubnetName
   properties: {
-    addressPrefix: '10.0.8.0/23'
+    addressPrefix: addressRanges.subnets.containerAppEnvironment
     serviceEndpoints: ['Microsoft.Storage']
     delegations: ['environment']
   }
@@ -154,31 +156,31 @@ var subnets = deploySubnets ? [{
 {
   name: applicationGatewaySubnetName
   properties: {
-    addressPrefix: '10.0.10.0/24'
+    addressPrefix: addressRanges.subnets.applicationGateway
   }
 }
 {
   name: publicApiStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.11.0/24'
+    addressPrefix: addressRanges.subnets.publicApiStoragePrivateEndpoints
   }
 }
 {
   name: psqlFlexibleServerSubnetName
   properties: {
-    addressPrefix: '10.0.12.0/24'
+    addressPrefix: addressRanges.subnets.psqlFlexibleServer
   }
 }
 {
   name: searchStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.13.0/24'
+    addressPrefix: addressRanges.subnets.searchStoragePrivateEndpoints
   }
 }
 {
   name: searchDocsFunctionAppSubnetName
   properties: {
-    addressPrefix: '10.0.14.0/24'
+    addressPrefix: addressRanges.subnets.searchDocsFunctionApp
     serviceEndpoints: ['Microsoft.Storage']
     delegations: ['webapp']
   }
@@ -186,19 +188,19 @@ var subnets = deploySubnets ? [{
 {
   name: searchDocsFunctionAppPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.15.0/24'
+    addressPrefix: addressRanges.subnets.searchDocsFunctionAppPrivateEndpoints
   }
 }
 {
   name: analyticsStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.16.0/24'
+    addressPrefix: addressRanges.subnets.analyticsStoragePrivateEndpoints
   }
 }
 {
   name: analyticsFunctionAppSubnetName
   properties: {
-    addressPrefix: '10.0.17.0/24'
+    addressPrefix: addressRanges.subnets.analyticsFunctionApp
     serviceEndpoints: ['Microsoft.Storage']
     delegations: ['webapp']
   }
@@ -206,13 +208,13 @@ var subnets = deploySubnets ? [{
 {
   name: screenerStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.18.0/24'
+    addressPrefix: addressRanges.subnets.screenerStoragePrivateEndpoints
   }
 }
 {
   name: screenerFunctionAppSubnetName
   properties: {
-    addressPrefix: '10.0.19.0/24'
+    addressPrefix: addressRanges.subnets.screenerFunctionApp
     serviceEndpoints: ['Microsoft.Storage']
     delegations: ['webapp']
   }
@@ -220,19 +222,19 @@ var subnets = deploySubnets ? [{
 {
   name: eventGridCustomTopicPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.20.0/24'
+    addressPrefix: addressRanges.subnets.eventGridCustomTopicPrivateEndpoints
   }
 }
 {
   name: nlSearchFunctionAppPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.21.0/24'
+    addressPrefix: addressRanges.subnets.nlSearchFunctionAppPrivateEndpoints
   }
 }
 {
   name: nlSearchFunctionAppSubnetName
   properties: {
-    addressPrefix: '10.0.22.0/24'
+    addressPrefix: addressRanges.subnets.nlSearchFunctionApp
     serviceEndpoints: ['Microsoft.Storage']
     delegations: ['webapp']
   }
@@ -240,7 +242,7 @@ var subnets = deploySubnets ? [{
 {
   name: sqlServerPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: '10.0.23.0/24'
+    addressPrefix: addressRanges.subnets.sqlServerPrivateEndpoints
   }
 }] : null
 
@@ -248,7 +250,7 @@ module vNetModule '../../../common/components/virtual-network/virtual-network.bi
   name: '${vNetName}ModuleDeploy'
   params: {
     vNetName: vNetName
-    addressSpacePrefix: '10.0.0.0/16'
+    addressSpacePrefix: addressRanges.vNet
     subnets: subnets
     tagValues: tagValues
   }
