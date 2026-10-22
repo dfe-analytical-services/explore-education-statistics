@@ -799,7 +799,12 @@ func getElzResourceNames(env string) ResourceNames => {
     service: elzName(env, elzAbbreviations.searchSearchServices, 'ees')
     storageAccount: elzStorageAccountName(env, 'search')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'search')
-    searchDocsEventSubscriptions: {
+  }
+  searchDocs: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'searchdocs')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'searchdocs')
+    functionStorageAccount: elzStorageAccountName(env, 'searchdocsfn')
+    eventSubscriptions: {
       publicationArchived: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationarchived')
       publicationChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationchanged')
       publicationDeleted: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationdeleted')
@@ -809,11 +814,6 @@ func getElzResourceNames(env string) ResourceNames => {
       releaseVersionPublished: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'releaseversionpublished')
       themeChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'themechanged')
     }
-  }
-  searchDocs: {
-    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'searchdocs')
-    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'searchdocs')
-    functionStorageAccount: elzStorageAccountName(env, 'searchdocsfn')
   }
   storageAccounts: {
     core: elzStorageAccountName(env, 'core')
