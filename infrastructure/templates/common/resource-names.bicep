@@ -156,7 +156,12 @@ type ResourceNames = {
     service: string
     storageAccount: string
     appInsights: string
-    searchDocsEventSubscriptions: {
+  }
+  searchDocs: {
+    functionApp: string
+    appServicePlan: string
+    functionStorageAccount: string
+    eventSubscriptions: {
       publicationArchived: string
       publicationChanged: string
       publicationDeleted: string
@@ -166,11 +171,6 @@ type ResourceNames = {
       releaseVersionPublished: string
       themeChanged: string
     }
-  }
-  searchDocs: {
-    functionApp: string
-    appServicePlan: string
-    functionStorageAccount: string
   }
   storageAccounts: {
     core: string
@@ -471,7 +471,12 @@ func getResourceNames(
     service: '${newResourcePrefix}-${abbreviations.searchSearchServices}'
     storageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search'
     appInsights: '${newResourcePrefix}-${abbreviations.insightsComponents}-search'
-    searchDocsEventSubscriptions: {
+  }
+  searchDocs: {
+    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
+    appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
+    functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
+    eventSubscriptions: {
       publicationArchived: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-archived'
       publicationChanged: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-changed'
       publicationDeleted: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-publication-deleted'
@@ -481,11 +486,6 @@ func getResourceNames(
       releaseVersionPublished: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-release-version-published'
       themeChanged: '${newResourcePrefix}-${abbreviations.eventGridSubscriptions}-theme-changed'
     }
-  }
-  searchDocs: {
-    functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
-    appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
-    functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
   }
   storageAccounts: {
     core: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eescore'

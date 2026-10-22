@@ -16,7 +16,7 @@ param storageQueueNames SearchStorageQueueNames
 param searchDocsFunctionAppStorageAccountName string
 
 var topicNames = resourceNames.eventGrid.topics
-var subscriptionNames = resourceNames.search.searchDocsEventSubscriptions
+var subscriptionNames = resourceNames.searchDocs.eventSubscriptions
 
 // Define each of the topics and their associated subscriptions
 var eventGridCustomTopicSubscriptions = [
