@@ -60,6 +60,11 @@ def clear_local_storage_file(user: str):
 
 
 def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
+    robot_test_access_token = local_storage_json.get("robotTests.accessToken")
+
+    if robot_test_access_token:
+        return robot_test_access_token["accessToken"]
+
     for key, value in local_storage_json.items():
         # If value is already a dict, check it directly
         if isinstance(value, dict):

@@ -22,6 +22,46 @@ export interface PostLoginState {
 let msalInstance: PublicClientApplication;
 let adminApiScope: string;
 
+const robotTestAccessTokenStorageKey = 'robotTests.accessToken';
+
+export function getRobotTestAccessToken(): string | undefined {
+  if (process.env.APP_ENV === 'Production') {
+    return undefined;
+  }
+
+  const localStorageItem =
+    window.localStorage.getItem(robotTestAccessTokenStorageKey) ?? undefined;
+  if (!localStorageItem) return undefined;
+  try {
+    const parsed = JSON.parse(localStorageItem) as { accessToken?: string };
+
+    return parsed.accessToken;
+  } catch (_) {
+    return undefined;
+  }
+}
+
+function cacheRobotTestAccessToken(accessToken: string) {
+  if (!accessToken) {
+    return;
+  }
+
+  // Keep this disabled in Production. If you have a more specific robot-test
+  // config flag, use that here instead.
+  if (process.env.APP_ENV === 'Production') {
+    return;
+  }
+
+  window.localStorage.setItem(
+    robotTestAccessTokenStorageKey,
+    JSON.stringify({ accessToken }),
+  );
+}
+
+function clearRobotTestAccesToken() {
+  window.localStorage.removeItem(robotTestAccessTokenStorageKey);
+}
+
 export async function createMsalInstance(
   config: OidcConfig,
 ): Promise<PublicClientApplication> {
@@ -29,10 +69,9 @@ export async function createMsalInstance(
     auth: {
       clientId: config.clientId,
       authority: config.authority,
-      redirectUri: dashboardRoute.fullPath,
+      redirectUri: '/redirect', // TODO: get the config site url, going to need to pass the overall config object
       postLogoutRedirectUri: signedOutRoute.fullPath,
       knownAuthorities: config.knownAuthorities,
-      protocolMode: ProtocolMode.OIDC,
       authorityMetadata:
         config.authorityMetadata &&
         JSON.stringify({
@@ -46,9 +85,9 @@ export async function createMsalInstance(
     },
     cache: {
       cacheLocation: 'localStorage',
-      storeAuthStateInCookie: false,
     },
     system: {
+      protocolMode: ProtocolMode.OIDC,
       loggerOptions: {
         logLevel: LogLevel.Verbose,
         loggerCallback: (level, message, containsPii) => {
@@ -101,7 +140,7 @@ export function handleLogin(returnUrl?: string) {
   getMsalInstance()
     .loginRedirect({
       scopes: [adminApiScope],
-      redirectUri: dashboardRoute.fullPath,
+      redirectUri: '/redirect', // TODO: Get the config site url
       redirectStartPage: dashboardRoute.fullPath,
       state: JSON.stringify(postLoginState),
     })
@@ -115,8 +154,12 @@ export function handleLogin(returnUrl?: string) {
 }
 
 export function handleLogout() {
+  // if we don't we'd be logged in constantly
+  clearRobotTestAccesToken();
+
   getMsalInstance()
     .logoutRedirect({
+      idTokenHint: getMsalInstance().getAllAccounts()[0].idToken,
       account: getMsalInstance().getAllAccounts()[0],
       postLogoutRedirectUri: signedOutRoute.fullPath,
     })
@@ -135,12 +178,44 @@ export function acquireTokenSilent(): Promise<AuthenticationResult> {
   const accounts = instance.getAllAccounts();
 
   if (!accounts || accounts.length === 0) {
+    // only do this if there is no one logged in, as we're going to set it later
+    const robotTestAccessToken = getRobotTestAccessToken();
+
+    if (robotTestAccessToken) {
+      return Promise.resolve({
+        accessToken: robotTestAccessToken,
+        account: {
+          homeAccountId: 'robot-tests',
+          environment: 'robot-tests',
+          tenantId: 'robot-tests',
+          username: 'robot-tests',
+          localAccountId: 'robot-tests',
+          name: 'Robot Tests',
+        },
+        authority: '',
+        uniqueId: 'robot-tests',
+        tenantId: 'robot-tests',
+        scopes: [adminApiScope],
+        idToken: '',
+        idTokenClaims: {},
+        fromCache: true,
+        expiresOn: null,
+        tokenType: 'Bearer',
+        correlationId: '',
+      });
+    }
+
     handleLogin(window.location.pathname);
     return Promise.reject(new Error('No account available'));
   }
 
-  return instance.acquireTokenSilent({
-    scopes: [adminApiScope],
-    account: accounts[0],
-  });
+  return instance
+    .acquireTokenSilent({
+      scopes: [adminApiScope],
+      account: accounts[0],
+    })
+    .then(authenticationResult => {
+      cacheRobotTestAccessToken(authenticationResult.accessToken);
+      return authenticationResult;
+    });
 }

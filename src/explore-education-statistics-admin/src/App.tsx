@@ -25,6 +25,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { createBrowserRouter, Outlet, useLocation } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
+import RedirectPage from '@admin/auth/RedirectPage';
 import { ProtectedRouteProps, PublicRouteProps } from '@admin/routes/types';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
@@ -55,17 +56,33 @@ function ApplicationInsightsTracking() {
   return null;
 }
 
+const BaseProviders = composeProviders(
+  ConfigContextProvider,
+  ApplicationInsightsContextProvider,
+  NetworkActivityContextProvider,
+  UnheadProvider,
+  QueryClientProvider,
+);
+
+const Providers = composeProviders(
+  ConfiguredMsalProvider,
+  AuthContextProvider,
+  LastLocationContextProvider,
+);
+
 function AppLayout() {
   return (
-    <Providers>
-      <PageErrorBoundary>
-        <NotificationHubContextProvider>
-          <ApplicationInsightsTracking />
+    <BaseProviders>
+      <Providers>
+        <PageErrorBoundary>
+          <NotificationHubContextProvider>
+            <ApplicationInsightsTracking />
 
-          <Outlet />
-        </NotificationHubContextProvider>
-      </PageErrorBoundary>
-    </Providers>
+            <Outlet />
+          </NotificationHubContextProvider>
+        </PageErrorBoundary>
+      </Providers>
+    </BaseProviders>
   );
 }
 
@@ -115,22 +132,19 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    element: (
+      <BaseProviders>
+        <RedirectPage />
+      </BaseProviders>
+    ),
+    path: '/redirect',
+  },
 ]);
 
 export default function App() {
   return <RouterProvider router={router} />;
 }
-
-const Providers = composeProviders(
-  ConfigContextProvider,
-  ApplicationInsightsContextProvider,
-  NetworkActivityContextProvider,
-  UnheadProvider,
-  QueryClientProvider,
-  ConfiguredMsalProvider,
-  AuthContextProvider,
-  LastLocationContextProvider,
-);
 
 function ApplicationInsightsContextProvider({
   children,

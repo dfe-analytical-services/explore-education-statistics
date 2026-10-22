@@ -147,11 +147,11 @@ importers:
   src/explore-education-statistics-admin:
     dependencies:
       '@azure/msal-browser':
-        specifier: ^3.7.1
-        version: 3.30.0
+        specifier: ^5.25.1
+        version: 5.25.1
       '@azure/msal-react':
-        specifier: ^2.0.10
-        version: 2.2.0(@azure/msal-browser@3.30.0)(react@19.2.7)
+        specifier: ^5.7.2
+        version: 5.7.2(@azure/msal-browser@5.25.1)(react@19.2.7)
       '@ckeditor/ckeditor5-react':
         specifier: ^11.2.0
         version: 11.2.0(ckeditor5@46.1.1(supports-color@10.2.2))(react@19.2.7)
@@ -1016,32 +1016,32 @@ packages:
     resolution: {integrity: sha512-fCqPIfOcLE+CGqGPd66c8bZpwAji98tZ4JI9i/mlTNTlsIWslCfpg48s/ypyLxZTump5sypjrKn2/kY7q8oAbA==}
     engines: {node: '>=20.0.0'}
 
-  '@azure/msal-browser@3.30.0':
-    resolution: {integrity: sha512-I0XlIGVdM4E9kYP5eTjgW8fgATdzwxJvQ6bm2PNiHaZhEuUz47NYw1xHthC9R+lXz4i9zbShS0VdLyxd7n0GGA==}
-    engines: {node: '>=0.8.0'}
-
   '@azure/msal-browser@5.17.0':
     resolution: {integrity: sha512-/yTnW2TCk9Mh+2b/NOaHAN+MryUNxzRTaJD/YtrqOA9bpBWfTXn/iyReRbaLrK/btBo3stEzLyEvuWp2NZ5DuA==}
     engines: {node: '>=0.8.0'}
 
-  '@azure/msal-common@14.16.1':
-    resolution: {integrity: sha512-nyxsA6NA4SVKh5YyRpbSXiMr7oQbwark7JU9LMeg6tJYTSPyAGkdx61wPT4gyxZfxlSxMMEyAsWaubBlNyIa1w==}
+  '@azure/msal-browser@5.25.1':
+    resolution: {integrity: sha512-NDW2/bz2Pz71EJAlhSw+jg1kpRIWtrzj0gCzcHuG1u7iLvSOHpUc5lICkDA9x0bbeityxTneiunSBluvS+/y4w==}
     engines: {node: '>=0.8.0'}
 
   '@azure/msal-common@16.11.1':
     resolution: {integrity: sha512-yPohvMwWLv1XnaWnIUyKUh8CvcVChCGqG/VluGwfGmaAfrZTNt5yQ+sIs462Sgw6+e2K83KGmMJ860p73ZSCrw==}
     engines: {node: '>=0.8.0'}
 
+  '@azure/msal-common@16.14.2':
+    resolution: {integrity: sha512-HOBR0Gfo39TMrkxNG8k6cfjRkrRjXZc3JQs3ebMWQc9S4cihuknMYra3sgmzbZB752oQBqBN9+WF7c826p2vIQ==}
+    engines: {node: '>=0.8.0'}
+
   '@azure/msal-node@5.4.0':
     resolution: {integrity: sha512-6EZEParwHRlnSSIikw8FNAnAzwmh71uhveUXdPNFeZFviJ9SH+rwFiurhjzXqICYTrpm3E+dj693QOwfPbJXAQ==}
     engines: {node: '>=20'}
 
-  '@azure/msal-react@2.2.0':
-    resolution: {integrity: sha512-2V+9JXeXyyjYNF92y5u0tU4el9px/V1+vkRuN+DtoxyiMHCtYQpJoaFdGWArh43zhz5aqQqiGW/iajPDSu3QsQ==}
-    engines: {node: '>=10'}
+  '@azure/msal-react@5.7.2':
+    resolution: {integrity: sha512-xxwNH2dp77ACHuPFG+a9LTPinz7s+Xoh66Vvz/pWeyPMSXT0p+I4p9UXWpLWzY8qKBxJWbhyLwAtoaqVFiakHQ==}
+    engines: {node: '>=20'}
     peerDependencies:
-      '@azure/msal-browser': ^3.27.0
-      react: ^16.8.0 || ^17 || ^18
+      '@azure/msal-browser': ^5.24.0
+      react: ^16.8.0 || ^17 || ^18 || ^19.2.1
 
   '@azure/opentelemetry-instrumentation-azure-sdk@1.0.0-beta.9':
     resolution: {integrity: sha512-gNCFokEoQQEkhu2T8i1i+1iW2o9wODn2slu5tpqJmjV1W7qf9dxVv6GNXW1P1WC8wMga8BCc2t/oMhOK3iwRQg==}
@@ -11937,26 +11937,26 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@azure/msal-browser@3.30.0':
-    dependencies:
-      '@azure/msal-common': 14.16.1
-
   '@azure/msal-browser@5.17.0':
     dependencies:
       '@azure/msal-common': 16.11.1
 
-  '@azure/msal-common@14.16.1': {}
+  '@azure/msal-browser@5.25.1':
+    dependencies:
+      '@azure/msal-common': 16.14.2
 
   '@azure/msal-common@16.11.1': {}
+
+  '@azure/msal-common@16.14.2': {}
 
   '@azure/msal-node@5.4.0':
     dependencies:
       '@azure/msal-common': 16.11.1
       jsonwebtoken: 9.0.3
 
-  '@azure/msal-react@2.2.0(@azure/msal-browser@3.30.0)(react@19.2.7)':
+  '@azure/msal-react@5.7.2(@azure/msal-browser@5.25.1)(react@19.2.7)':
     dependencies:
-      '@azure/msal-browser': 3.30.0
+      '@azure/msal-browser': 5.25.1
       react: 19.2.7
 
   '@azure/opentelemetry-instrumentation-azure-sdk@1.0.0-beta.9(supports-color@8.1.1)':

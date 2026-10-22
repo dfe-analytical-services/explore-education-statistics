@@ -13,7 +13,11 @@ import authService, {
   SignInResponse,
 } from '@admin/services/authService';
 import logger from '@common/services/logger';
-import { acquireTokenSilent, PostLoginState } from '@admin/auth/msal';
+import {
+  acquireTokenSilent,
+  getRobotTestAccessToken,
+  PostLoginState,
+} from '@admin/auth/msal';
 import {
   expiredInviteRoute,
   homeRoute,
@@ -109,7 +113,7 @@ interface State {
 
 export const AuthContextProvider = ({
   children,
-  verboseLogging = false,
+  verboseLogging = true,
 }: Props) => {
   const location = useLocation();
 
@@ -257,7 +261,12 @@ export const AuthContextProvider = ({
       // can be rendered. If any of this component's children are using the
       // "useAuth()" hook, they will see at this point that there is no
       // logged-in user.
-      if (!accounts.length || !Object.keys(accounts[0]).length) {
+      //
+      // we also need to check the robot text access token just in case it's set
+      if (
+        (!accounts.length || !Object.keys(accounts[0]).length) &&
+        getRobotTestAccessToken() === undefined
+      ) {
         log(
           'AuthContext: MSAL login or initialisation has completed and ' +
             'there is no logged-in user. Setting user as "none" and continuing.',
