@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.TimeIdentifierUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimeIdentifierUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class TimeIdentifierExtensions
 {
