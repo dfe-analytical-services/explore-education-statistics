@@ -635,6 +635,18 @@ func getResourceNames(
 func elzName(environmentIdentifier string, abbreviation string, workload string) string =>
   '${environmentIdentifier}${abbreviation}-uks-${workload}01'
 
+// Builds a resource name using the ELZ naming convention but without the "01" instance number, for resources that
+// are named by their purpose and would never have a second instance for the same purpose, but whose names still need
+// to be unique beyond their resource group e.g. Event Grid topics, whose endpoints are unique per region.
+func elzPurposeName(environmentIdentifier string, abbreviation string, purpose string) string =>
+  '${environmentIdentifier}${abbreviation}-uks-${purpose}'
+
+// Builds a resource name using the ELZ naming convention but without the environment prefix or "01" instance
+// number, for policies and child resources whose names only need to be unique within their parent or resource group
+// e.g. subnets, file shares, WAF policies and Front Door routes.
+func elzLocalName(abbreviation string, purpose string) string =>
+  '${abbreviation}-uks-${purpose}'
+
 // Storage Account names may only contain lowercase letters and numbers, up to 24 characters, so these drop the
 // hyphens and the trailing "01" from the ELZ naming convention e.g. s292d01stukscore.
 func elzStorageAccountName(environmentIdentifier string, workload string) string =>
@@ -657,16 +669,15 @@ func getElzResourceNames(env string) ResourceNames => {
     functionStorageAccount: elzStorageAccountName(env, 'analyticsfn')
     storage: {
       storageAccountName: elzStorageAccountName(env, 'analytics')
-      fileShareName: elzName(env, elzAbbreviations.fileShare, 'analytics')
+      fileShareName: elzLocalName(elzAbbreviations.fileShare, 'analytics')
     }
   }
   applicationGateway: {
     applicationGateway: elzName(env, elzAbbreviations.networkApplicationGateways, 'ees')
     managedIdentity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'agw')
     publicIpAddress: elzName(env, elzAbbreviations.networkPublicIPAddresses, 'agw')
-    // The gateway's child resources only need to be unique within the gateway itself.
     frontendIpConfig: 'public-frontend-ip-config'
-    globalWafPolicy: elzName(env, elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwglobal')
+    globalWafPolicy: elzLocalName(elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwglobal')
     sites: {
       publicSite: {
         backend: 'publicsite-backend'
@@ -677,7 +688,7 @@ func getElzResourceNames(env string) ResourceNames => {
         backend: 'papi-backend'
         route: 'papi-routing-rule'
         site: 'papi-site'
-        wafPolicy: elzName(env, elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwpapi')
+        wafPolicy: elzLocalName(elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwpapi')
         rewriteSet: 'papidocs-rewrites'
       }
       publicApiDocs: {
@@ -692,8 +703,8 @@ func getElzResourceNames(env string) ResourceNames => {
   }
   backups: {
     backupVault: elzName(env, elzAbbreviations.backupVaults, 'ees')
-    backupVaultBlobsPolicy: elzName(env, elzAbbreviations.backupVaultPolicies, 'blob')
-    backupVaultPsqlFlexibleServerPolicy: elzName(env, elzAbbreviations.backupVaultPolicies, 'psql')
+    backupVaultBlobsPolicy: elzLocalName(elzAbbreviations.backupVaultPolicies, 'blob')
+    backupVaultPsqlFlexibleServerPolicy: elzLocalName(elzAbbreviations.backupVaultPolicies, 'psql')
     recoveryServicesVault: elzName(env, elzAbbreviations.recoveryServicesVaults, 'ees')
   }
   containerAppEnvironment: elzName(env, elzAbbreviations.appManagedEnvironments, 'ees')
@@ -707,27 +718,27 @@ func getElzResourceNames(env string) ResourceNames => {
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'dataapi')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'dataapi')
   }
-  dataFactory: elzName(env, elzAbbreviations.dataFactoryFactories, 'release')
+  dataFactory: elzName(env, elzAbbreviations.dataFactoryFactories, 'ees')
   frontDoor: {
     frontDoorName: elzName(env, elzAbbreviations.frontDoorProfiles, 'ees')
     defaultEndpoint: {
       endpointName: elzName(env, elzAbbreviations.frontDoorEndpoints, 'ees')
     }
     // Front Door WAF policy names may only contain letters and numbers.
-    wafPolicy: '${env}${elzAbbreviations.frontDoorWafPolicies}uksees01'
-    wafSecurityPolicy: elzName(env, elzAbbreviations.frontDoorWafSecurityPolicies, 'ees')
+    wafPolicy: '${elzAbbreviations.frontDoorWafPolicies}uksees'
+    wafSecurityPolicy: elzLocalName(elzAbbreviations.frontDoorWafSecurityPolicies, 'ees')
     publicSite: {
-      customDomain: elzName(env, elzAbbreviations.frontDoorDomains, 'publicsite')
-      originGroup: elzName(env, elzAbbreviations.frontDoorOriginGroups, 'publicsite')
-      origin: elzName(env, elzAbbreviations.frontDoorOrigins, 'publicsite')
-      route: elzName(env, elzAbbreviations.frontDoorRoutes, 'publicsite')
+      customDomain: elzLocalName(elzAbbreviations.frontDoorDomains, 'publicsite')
+      originGroup: elzLocalName(elzAbbreviations.frontDoorOriginGroups, 'publicsite')
+      origin: elzLocalName(elzAbbreviations.frontDoorOrigins, 'publicsite')
+      route: elzLocalName(elzAbbreviations.frontDoorRoutes, 'publicsite')
     }
     contentApi: {
-      customDomain: elzName(env, elzAbbreviations.frontDoorDomains, 'contentapi')
-      originGroup: elzName(env, elzAbbreviations.frontDoorOriginGroups, 'contentapi')
-      origin: elzName(env, elzAbbreviations.frontDoorOrigins, 'contentapi')
-      route: elzName(env, elzAbbreviations.frontDoorRoutes, 'contentapi')
-      allFilesCacheRoute: elzName(env, elzAbbreviations.frontDoorRoutes, 'contentapiallfilescache')
+      customDomain: elzLocalName(elzAbbreviations.frontDoorDomains, 'contentapi')
+      originGroup: elzLocalName(elzAbbreviations.frontDoorOriginGroups, 'contentapi')
+      origin: elzLocalName(elzAbbreviations.frontDoorOrigins, 'contentapi')
+      route: elzLocalName(elzAbbreviations.frontDoorRoutes, 'contentapi')
+      allFilesCacheRoute: elzLocalName(elzAbbreviations.frontDoorRoutes, 'contentapiallfilescache')
     }
   }
   importer: {
@@ -762,7 +773,7 @@ func getElzResourceNames(env string) ResourceNames => {
     }
     storage: {
       storageAccount: elzStorageAccountName(env, 'papi')
-      fileShare: elzName(env, elzAbbreviations.fileShare, 'papidata')
+      fileShare: elzLocalName(elzAbbreviations.fileShare, 'papidata')
     }
   }
   publicSite: {
@@ -782,21 +793,21 @@ func getElzResourceNames(env string) ResourceNames => {
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'screener')
     functionStorageAccount: elzStorageAccountName(env, 'screenerfn')
     logsStorageAccount: elzStorageAccountName(env, 'screenerlogs')
-    logsFileShare: elzName(env, elzAbbreviations.fileShare, 'screenerlogs')
+    logsFileShare: elzLocalName(elzAbbreviations.fileShare, 'screenerlogs')
   }
   search: {
     service: elzName(env, elzAbbreviations.searchSearchServices, 'ees')
     storageAccount: elzStorageAccountName(env, 'search')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'search')
     searchDocsEventSubscriptions: {
-      publicationArchived: elzName(env, elzAbbreviations.eventGridSubscriptions, 'publicationarchived')
-      publicationChanged: elzName(env, elzAbbreviations.eventGridSubscriptions, 'publicationchanged')
-      publicationDeleted: elzName(env, elzAbbreviations.eventGridSubscriptions, 'publicationdeleted')
-      publicationLatestPublishedReleaseReordered: elzName(env, elzAbbreviations.eventGridSubscriptions, 'publicationlatestpublishedreleasereordered')
-      publicationRestored: elzName(env, elzAbbreviations.eventGridSubscriptions, 'publicationrestored')
-      releaseSlugChanged: elzName(env, elzAbbreviations.eventGridSubscriptions, 'releaseslugchanged')
-      releaseVersionPublished: elzName(env, elzAbbreviations.eventGridSubscriptions, 'releaseversionpublished')
-      themeChanged: elzName(env, elzAbbreviations.eventGridSubscriptions, 'themechanged')
+      publicationArchived: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationarchived')
+      publicationChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationchanged')
+      publicationDeleted: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationdeleted')
+      publicationLatestPublishedReleaseReordered: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationlatestpublishedreleasereordered')
+      publicationRestored: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationrestored')
+      releaseSlugChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'releaseslugchanged')
+      releaseVersionPublished: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'releaseversionpublished')
+      themeChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'themechanged')
     }
   }
   searchDocs: {
@@ -815,41 +826,41 @@ func getElzResourceNames(env string) ResourceNames => {
     vnet: elzName(env, elzAbbreviations.networkVirtualNetworks, 'ees')
     subnets: {
       // Core shared infrastructure subnets.
-      applicationGateway: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'agw')
-      eventGridCustomTopicPrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'evgtpep')
+      applicationGateway: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'agw')
+      eventGridCustomTopicPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'evgtpep')
 
       // Core application subnets.
-      admin: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'admin')
-      contentApi: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'contentapi')
-      dataApi: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'dataapi')
-      importer: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'importer')
-      notifier: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'notifier')
-      publisher: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'publisher')
-      sqlServerPrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'sqlpep')
+      admin: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'admin')
+      contentApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'contentapi')
+      dataApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'dataapi')
+      importer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'importer')
+      notifier: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'notifier')
+      publisher: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'publisher')
+      sqlServerPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'sqlpep')
 
       // Screener subnets.
-      screenerFunctionApp: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'screener')
-      screenerStoragePrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'screenerpep')
+      screenerFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screener')
+      screenerStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screenerpep')
 
       // Public API subnets.
-      publicApiDataProcessor: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessor')
-      publicApiDataProcessorPrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessorpep')
-      publicApiStoragePrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'papistpep')
-      containerAppEnvironment: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'cae')
-      psqlFlexibleServer: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'psql')
+      publicApiDataProcessor: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessor')
+      publicApiDataProcessorPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessorpep')
+      publicApiStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papistpep')
+      containerAppEnvironment: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'cae')
+      psqlFlexibleServer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'psql')
 
       // NL Search subnets.
-      nlSearchFunctionApp: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearch')
-      nlSearchFunctionAppPrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearchpep')
+      nlSearchFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearch')
+      nlSearchFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearchpep')
 
       // Search subnets.
-      searchDocsFunctionApp: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocs')
-      searchDocsFunctionAppPrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocspep')
-      searchStoragePrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'searchstpep')
+      searchDocsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocs')
+      searchDocsFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocspep')
+      searchStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchstpep')
 
       // Analytics subnets.
-      analyticsFunctionApp: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'analytics')
-      analyticsStoragePrivateEndpoints: elzName(env, elzAbbreviations.networkVirtualNetworksSubnets, 'analyticsstpep')
+      analyticsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analytics')
+      analyticsStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analyticsstpep')
     }
   }
   keyVault: {
@@ -924,7 +935,7 @@ func getElzResourceNames(env string) ResourceNames => {
     }
   }
   alertsGroup: elzName(env, elzAbbreviations.insightsActionGroups, 'alertedusers')
-  alertsLogicApp: elzName(env, elzAbbreviations.logicWorkflows, 'slackwebhook')
+  alertsLogicApp: elzName(env, elzAbbreviations.logicWorkflows, 'alerts')
   databases: {
     coreSqlServer: elzName(env, elzAbbreviations.sqlServers, 'core')
     publicSqlServer: elzName(env, elzAbbreviations.sqlServers, 'public')
@@ -934,10 +945,10 @@ func getElzResourceNames(env string) ResourceNames => {
   }
   eventGrid: {
     topics: {
-      publicationChanged: elzName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.publicationChanged, '-', ''))
-      releaseChanged: elzName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseChanged, '-', ''))
-      releaseVersionChanged: elzName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseVersionChanged, '-', ''))
-      themeChanged: elzName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.themeChanged, '-', ''))
+      publicationChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.publicationChanged, '-', ''))
+      releaseChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseChanged, '-', ''))
+      releaseVersionChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseVersionChanged, '-', ''))
+      themeChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.themeChanged, '-', ''))
     }
   }
   logAnalyticsWorkspace: elzName(env, elzAbbreviations.operationalInsightsWorkspaces, 'ees')
