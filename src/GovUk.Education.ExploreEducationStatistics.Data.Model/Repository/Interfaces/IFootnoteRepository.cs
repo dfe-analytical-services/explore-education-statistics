@@ -17,8 +17,10 @@ public interface IFootnoteRepository
     Task<List<Footnote>> GetFilteredFootnotes(
         Guid releaseVersionId,
         Guid subjectId,
-        IEnumerable<Guid> filterItemIds,
-        IEnumerable<Guid> indicatorIds
+        IReadOnlyCollection<Guid> filterIds,
+        IReadOnlyCollection<Guid> filterGroupIds,
+        IReadOnlyCollection<Guid> filterItemIds,
+        IReadOnlyCollection<Guid> indicatorIds
     );
 
     Task<Footnote> GetFootnote(Guid footnoteId);

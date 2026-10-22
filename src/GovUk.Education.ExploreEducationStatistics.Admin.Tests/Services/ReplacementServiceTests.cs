@@ -453,7 +453,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter",
             filterFootnotes: new List<FilterFootnote>
             {
-                new() { Filter = originalFilter1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterId = originalFilter1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -462,7 +462,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter group",
             filterGroupFootnotes: new List<FilterGroupFootnote>
             {
-                new() { FilterGroup = originalFilterGroup1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterGroupId = originalFilterGroup1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -471,7 +471,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter item",
             filterItemFootnotes: new List<FilterItemFootnote>
             {
-                new() { FilterItem = originalFilterItem1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterItemId = originalFilterItem1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -480,7 +480,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -1093,7 +1093,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter",
             filterFootnotes: new List<FilterFootnote>
             {
-                new() { Filter = originalFilter1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterId = originalFilter1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -1102,7 +1102,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter group",
             filterGroupFootnotes: new List<FilterGroupFootnote>
             {
-                new() { FilterGroup = originalFilterGroup1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterGroupId = originalFilterGroup1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -1111,7 +1111,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter item",
             filterItemFootnotes: new List<FilterItemFootnote>
             {
-                new() { FilterItem = originalFilterItem1, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterItemId = originalFilterItem1.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -1120,7 +1120,7 @@ public class ReplacementServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -1409,9 +1409,7 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilter.Indicators);
             Assert.Empty(replacedFootnoteForFilter.Subjects);
 
-            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilter.Filters.First().Filter.Id);
-            Assert.Equal(replacementFilter1.Label, replacedFootnoteForFilter.Filters.First().Filter.Label);
-            Assert.Equal(replacementFilter1.Name, replacedFootnoteForFilter.Filters.First().Filter.Name);
+            Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilter.Filters.First().FilterId);
             Assert.Equal(replacementReleaseSubject.SubjectId, replacedFootnoteForFilter.Filters.First().SubjectId);
 
             var replacedFootnoteForFilterGroup = await GetFootnoteById(statisticsDbContext, footnoteForFilterGroup.Id);
@@ -1424,14 +1422,7 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilterGroup.Indicators);
             Assert.Empty(replacedFootnoteForFilterGroup.Subjects);
 
-            Assert.Equal(
-                replacementFilterGroup1.Id,
-                replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroup.Id
-            );
-            Assert.Equal(
-                replacementFilterGroup1.Label,
-                replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroup.Label
-            );
+            Assert.Equal(replacementFilterGroup1.Id, replacedFootnoteForFilterGroup.FilterGroups.First().FilterGroupId);
             Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilterGroup.FilterGroups.First().FilterId);
             Assert.Equal(
                 replacementReleaseSubject.SubjectId,
@@ -1447,11 +1438,7 @@ public class ReplacementServiceTests
             Assert.Empty(replacedFootnoteForFilterItem.Indicators);
             Assert.Empty(replacedFootnoteForFilterItem.Subjects);
 
-            Assert.Equal(replacementFilterItem1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterItem.Id);
-            Assert.Equal(
-                replacementFilterItem1.Label,
-                replacedFootnoteForFilterItem.FilterItems.First().FilterItem.Label
-            );
+            Assert.Equal(replacementFilterItem1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterItemId);
             Assert.Equal(replacementFilterGroup1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterGroupId);
             Assert.Equal(replacementFilter1.Id, replacedFootnoteForFilterItem.FilterItems.First().FilterId);
             Assert.Equal(
@@ -1468,9 +1455,7 @@ public class ReplacementServiceTests
             Assert.Single(replacedFootnoteForIndicator.Indicators);
             Assert.Empty(replacedFootnoteForIndicator.Subjects);
 
-            Assert.Equal(replacementIndicator.Id, replacedFootnoteForIndicator.Indicators.First().Indicator.Id);
-            Assert.Equal(replacementIndicator.Label, replacedFootnoteForIndicator.Indicators.First().Indicator.Label);
-            Assert.Equal(replacementIndicator.Name, replacedFootnoteForIndicator.Indicators.First().Indicator.Name);
+            Assert.Equal(replacementIndicator.Id, replacedFootnoteForIndicator.Indicators.First().IndicatorId);
             Assert.Equal(
                 replacementIndicatorGroup.Id,
                 replacedFootnoteForIndicator.Indicators.First().IndicatorGroupId
@@ -3236,13 +3221,9 @@ public class ReplacementServiceTests
     {
         return await context
             .Footnote.Include(footnote => footnote.Filters)
-                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
             .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
             .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
             .Include(footnote => footnote.Subjects)
                 .ThenInclude(subjectFootnote => subjectFootnote.Subject)
             .SingleAsync(footnote => footnote.Id == id);
