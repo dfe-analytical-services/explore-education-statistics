@@ -97,18 +97,22 @@ public class FootnoteRepository : IFootnoteRepository
                         && footnote.Filters.All(filterFootnote => filterFootnote.SubjectId != subjectId)
                     )
                     ||
-                    // or it's got a filter item applicable to one of the filter item id's
+                    // or it's got a filter item for this subject id applicable to one of the filter item id's
                     footnote.FilterItems.Any(filterItemFootnote =>
-                        filterItemIds.Contains(filterItemFootnote.FilterItemId)
+                        filterItemFootnote.SubjectId == subjectId
+                        && filterItemIds.Contains(filterItemFootnote.FilterItemId)
                     )
                     ||
-                    // or it's got a filter group applicable to one of the filter group id's
+                    // or it's got a filter group for this subject id applicable to one of the filter group id's
                     footnote.FilterGroups.Any(filterGroupFootnote =>
-                        filterGroupIds.Contains(filterGroupFootnote.FilterGroupId)
+                        filterGroupFootnote.SubjectId == subjectId
+                        && filterGroupIds.Contains(filterGroupFootnote.FilterGroupId)
                     )
                     ||
-                    // or it's got a filter applicable to one of the filter id's.
-                    footnote.Filters.Any(filterFootnote => filterIds.Contains(filterFootnote.FilterId))
+                    // or it's got a filter for this subject id applicable to one of the filter id's.
+                    footnote.Filters.Any(filterFootnote =>
+                        filterFootnote.SubjectId == subjectId && filterIds.Contains(filterFootnote.FilterId)
+                    )
                 )
                 &&
                 // and it must be applicable to one or more of the indicators if there are any.
@@ -116,8 +120,10 @@ public class FootnoteRepository : IFootnoteRepository
                     // It's either not got any applicable indicators for this subject id
                     footnote.Indicators.All(indicatorFootnote => indicatorFootnote.SubjectId != subjectId)
                     ||
-                    // or it's got an indicator applicable to one of the indicator id's.
-                    footnote.Indicators.Any(indicatorFootnote => indicatorIds.Contains(indicatorFootnote.IndicatorId))
+                    // or it's got an indicator for this subject id applicable to one of the indicator id's.
+                    footnote.Indicators.Any(indicatorFootnote =>
+                        indicatorFootnote.SubjectId == subjectId && indicatorIds.Contains(indicatorFootnote.IndicatorId)
+                    )
                 )
             )
         );
