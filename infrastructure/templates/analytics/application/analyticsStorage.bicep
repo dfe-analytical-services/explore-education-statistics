@@ -43,7 +43,6 @@ module analyticsStorageAccountModule '../../common/components/storage/storage-ac
     firewallRules: storageFirewallRules
     sku: storageAccountConfig.sku
     kind: storageAccountConfig.kind
-    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true

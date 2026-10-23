@@ -34,7 +34,6 @@ module publicApiStorageAccountModule '../../../common/components/storage/storage
     firewallRules: storageFirewallRules
     sku: config.sku
     kind: config.kind
-    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true

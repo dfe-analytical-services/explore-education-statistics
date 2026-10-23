@@ -207,8 +207,10 @@ module deploymentStorageAccountModule '../../components/storage/storage-account.
     firewallRules: storageFirewallRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: keyVaultName
-    connectionStringSecretName: deploymentStorageAccountConnectionStringSecretName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: deploymentStorageAccountConnectionStringSecretName
+    }
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
       file: privateEndpoints.storageAccounts

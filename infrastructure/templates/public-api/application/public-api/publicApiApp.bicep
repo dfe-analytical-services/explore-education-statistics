@@ -1,4 +1,5 @@
 import { ResourceNames } from '../../../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../../../common/functions.bicep'
 import { ContainerAppResourceConfig, SearchServiceConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
@@ -117,7 +118,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: 'Server=${resourceNames.databases.postgreSqlFlexibleServer}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${resourceNames.publicApi.apiAppIdentity}'
+        value: publicDataDbConnectionString(resourceNames.databases.postgreSqlFlexibleServer, resourceNames.publicApi.apiAppIdentity)
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to
