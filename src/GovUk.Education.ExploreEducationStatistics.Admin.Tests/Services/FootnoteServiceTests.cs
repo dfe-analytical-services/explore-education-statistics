@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -40,13 +41,17 @@ public class FootnoteServiceTests
 
         await SeedDatabase(contextId, releaseVersion);
 
+        var unlinkedSubjectId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            subjectIds: SetOf(Guid.NewGuid())
+            subjectIds: SetOf(unlinkedSubjectId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedSubjectId]),
+        ]);
     }
 
     [Fact]
@@ -96,13 +101,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterIds: SetOf(Guid.NewGuid())
+            filterIds: SetOf(unlinkedFilterId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [unlinkedFilterId],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -154,13 +169,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterGroupId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterGroupIds: SetOf(Guid.NewGuid())
+            filterGroupIds: SetOf(unlinkedFilterGroupId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [unlinkedFilterGroupId],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -218,13 +243,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedFilterItemId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterItemIds: SetOf(Guid.NewGuid())
+            filterItemIds: SetOf(unlinkedFilterItemId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [unlinkedFilterItemId],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -281,13 +316,23 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject)
         );
 
+        var unlinkedIndicatorId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            indicatorIds: SetOf(Guid.NewGuid())
+            indicatorIds: SetOf(unlinkedIndicatorId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: [unlinkedIndicatorId]
+            ),
+        ]);
     }
 
     [Fact]
@@ -389,6 +434,14 @@ public class FootnoteServiceTests
         Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
         Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
         Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
+        Assert.Equal(subject1.Id, filterFootnote.SubjectId);
+        Assert.Equal(subject1.Id, filterGroupFootnote.SubjectId);
+        Assert.Equal(subject1.Id, filterItemFootnote.SubjectId);
+        Assert.Equal(subject1.Id, indicatorFootnote.SubjectId);
+        Assert.Equal(filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(filterGroup.Id, filterItemFootnote.FilterGroupId);
+        Assert.Equal(filter.Id, filterItemFootnote.FilterId);
+        Assert.Equal(indicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
         Assert.Equal("Test footnote", footnote.Content);
     }
 
@@ -441,17 +494,36 @@ public class FootnoteServiceTests
             releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
         );
 
+        var unlinkedId = Guid.NewGuid();
+
         var result = await CreateFootnoteWithConfiguration(
             releaseVersion.Id,
             contextId,
-            filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-            filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-            filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-            indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-            subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id)
+            filterIds: SetOf(filterMissing ? unlinkedId : filter.Id),
+            filterGroupIds: SetOf(filterGroupMissing ? unlinkedId : filterGroup.Id),
+            filterItemIds: SetOf(filterItemMissing ? unlinkedId : filterItem.Id),
+            indicatorIds: SetOf(indicatorMissing ? unlinkedId : indicator.Id),
+            subjectIds: SetOf(subjectMissing ? unlinkedId : subject2.Id)
         );
 
-        result.AssertInternalServerError();
+        if (subjectMissing)
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedId]),
+            ]);
+        }
+        else
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersion.Id,
+                    unlinkedFilterIds: filterMissing ? [unlinkedId] : [],
+                    unlinkedFilterGroupIds: filterGroupMissing ? [unlinkedId] : [],
+                    unlinkedFilterItemIds: filterItemMissing ? [unlinkedId] : [],
+                    unlinkedIndicatorIds: indicatorMissing ? [unlinkedId] : []
+                ),
+            ]);
+        }
     }
 
     [Fact]
@@ -464,14 +536,18 @@ public class FootnoteServiceTests
 
         await SeedDatabase(contextId, releaseVersion, footnotes: ListOf(footnote));
 
+        var unlinkedSubjectId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            subjectIds: SetOf(Guid.NewGuid())
+            subjectIds: SetOf(unlinkedSubjectId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedSubjectId]),
+        ]);
     }
 
     [Fact]
@@ -530,14 +606,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterIds: SetOf(Guid.NewGuid())
+            filterIds: SetOf(unlinkedFilterId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [unlinkedFilterId],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -598,14 +684,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterGroupId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterGroupIds: SetOf(Guid.NewGuid())
+            filterGroupIds: SetOf(unlinkedFilterGroupId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [unlinkedFilterGroupId],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -668,14 +764,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedFilterItemId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterItemIds: SetOf(Guid.NewGuid())
+            filterItemIds: SetOf(unlinkedFilterItemId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [unlinkedFilterItemId],
+                unlinkedIndicatorIds: []
+            ),
+        ]);
     }
 
     [Fact]
@@ -737,14 +843,24 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedIndicatorId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            indicatorIds: SetOf(Guid.NewGuid())
+            indicatorIds: SetOf(unlinkedIndicatorId)
         );
 
-        result.AssertInternalServerError();
+        result.AssertBadRequestWithErrorViewModels([
+            ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                releaseVersion.Id,
+                unlinkedFilterIds: [],
+                unlinkedFilterGroupIds: [],
+                unlinkedFilterItemIds: [],
+                unlinkedIndicatorIds: [unlinkedIndicatorId]
+            ),
+        ]);
     }
 
     [Fact]
@@ -851,6 +967,14 @@ public class FootnoteServiceTests
         Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
         Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
         Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
+        Assert.Equal(subject1.Id, filterFootnote.SubjectId);
+        Assert.Equal(subject1.Id, filterGroupFootnote.SubjectId);
+        Assert.Equal(subject1.Id, filterItemFootnote.SubjectId);
+        Assert.Equal(subject1.Id, indicatorFootnote.SubjectId);
+        Assert.Equal(filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(filterGroup.Id, filterItemFootnote.FilterGroupId);
+        Assert.Equal(filter.Id, filterItemFootnote.FilterId);
+        Assert.Equal(indicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
     }
 
     [Theory]
@@ -904,18 +1028,37 @@ public class FootnoteServiceTests
             footnotes: ListOf(footnote)
         );
 
+        var unlinkedId = Guid.NewGuid();
+
         var result = await UpdateFootnoteWithConfiguration(
             releaseVersion.Id,
             footnote.Id,
             contextId,
-            filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-            filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-            filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-            indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-            subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id)
+            filterIds: SetOf(filterMissing ? unlinkedId : filter.Id),
+            filterGroupIds: SetOf(filterGroupMissing ? unlinkedId : filterGroup.Id),
+            filterItemIds: SetOf(filterItemMissing ? unlinkedId : filterItem.Id),
+            indicatorIds: SetOf(indicatorMissing ? unlinkedId : indicator.Id),
+            subjectIds: SetOf(subjectMissing ? unlinkedId : subject2.Id)
         );
 
-        result.AssertInternalServerError();
+        if (subjectMissing)
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteSubjectNotAttachedToRelease(releaseVersion.Id, [unlinkedId]),
+            ]);
+        }
+        else
+        {
+            result.AssertBadRequestWithErrorViewModels([
+                ValidationMessages.GenerateErrorFootnoteFilterOrIndicatorNotAttachedToRelease(
+                    releaseVersion.Id,
+                    unlinkedFilterIds: filterMissing ? [unlinkedId] : [],
+                    unlinkedFilterGroupIds: filterGroupMissing ? [unlinkedId] : [],
+                    unlinkedFilterItemIds: filterItemMissing ? [unlinkedId] : [],
+                    unlinkedIndicatorIds: indicatorMissing ? [unlinkedId] : []
+                ),
+            ]);
+        }
     }
 
     [Fact]
@@ -1072,38 +1215,27 @@ public class FootnoteServiceTests
             Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Subjects.First().SubjectId);
 
             Assert.Single(retrievedFootnote.Filters);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
-            Assert.Equal(releaseSubject.Subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Filters.First().SubjectId);
 
-            Assert.Single(retrievedFootnote.FilterGroups);
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Id,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Id
-            );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].Label,
-                retrievedFootnote.FilterGroups.First().FilterGroup.Label
-            );
+            var filterGroupLink = Assert.Single(retrievedFootnote.FilterGroups);
+            Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Id, filterGroupLink.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, filterGroupLink.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, filterGroupLink.SubjectId);
 
-            Assert.Single(retrievedFootnote.FilterItems);
+            var filterItemLink = Assert.Single(retrievedFootnote.FilterItems);
             Assert.Equal(
                 releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
-                retrievedFootnote.FilterItems.First().FilterItem.Id
+                filterItemLink.FilterItemId
             );
-            Assert.Equal(
-                releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Label,
-                retrievedFootnote.FilterItems.First().FilterItem.Label
-            );
+            Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Id, filterItemLink.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[0].Id, filterItemLink.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, filterItemLink.SubjectId);
 
-            Assert.Single(retrievedFootnote.Indicators);
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id,
-                retrievedFootnote.Indicators.First().Indicator.Id
-            );
-            Assert.Equal(
-                releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Label,
-                retrievedFootnote.Indicators.First().Indicator.Label
-            );
+            var indicatorLink = Assert.Single(retrievedFootnote.Indicators);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id, indicatorLink.IndicatorId);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Id, indicatorLink.IndicatorGroupId);
+            Assert.Equal(releaseSubject.Subject.Id, indicatorLink.SubjectId);
         }
     }
 
@@ -1481,10 +1613,13 @@ public class FootnoteServiceTests
             var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote);
             Assert.Equal(releaseSubject.Subject.Filters[0].Id, savedFilterFootnote.FilterId);
             Assert.Equal(footnote.Id, savedFilterFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.Id, savedFilterFootnote.SubjectId);
 
             var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote);
             Assert.Equal(releaseSubject.Subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
             Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.Filters[1].Id, savedFilterGroupFootnote.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, savedFilterGroupFootnote.SubjectId);
 
             var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote);
             Assert.Equal(
@@ -1492,6 +1627,9 @@ public class FootnoteServiceTests
                 savedFilterItemFootnote.FilterItemId
             );
             Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.Filters[2].FilterGroups[0].Id, savedFilterItemFootnote.FilterGroupId);
+            Assert.Equal(releaseSubject.Subject.Filters[2].Id, savedFilterItemFootnote.FilterId);
+            Assert.Equal(releaseSubject.Subject.Id, savedFilterItemFootnote.SubjectId);
 
             var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote);
             Assert.Equal(
@@ -1499,6 +1637,8 @@ public class FootnoteServiceTests
                 savedIndicatorFootnote.IndicatorId
             );
             Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
+            Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Id, savedIndicatorFootnote.IndicatorGroupId);
+            Assert.Equal(releaseSubject.Subject.Id, savedIndicatorFootnote.SubjectId);
         }
     }
 

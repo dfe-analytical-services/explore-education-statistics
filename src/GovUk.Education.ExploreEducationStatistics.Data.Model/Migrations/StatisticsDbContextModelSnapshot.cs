@@ -136,9 +136,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("FilterId", "FootnoteId");
 
                     b.HasIndex("FootnoteId");
+
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("FilterFootnote");
                 });
@@ -171,9 +176,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("FilterGroupId", "FootnoteId");
 
                     b.HasIndex("FootnoteId");
+
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("FilterGroupFootnote");
                 });
@@ -206,9 +219,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("FilterGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FilterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("FilterItemId", "FootnoteId");
 
                     b.HasIndex("FootnoteId");
+
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("FilterItemFootnote");
                 });
@@ -283,9 +307,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("FootnoteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("IndicatorGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("IndicatorId", "FootnoteId");
 
                     b.HasIndex("FootnoteId");
+
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("IndicatorFootnote");
                 });

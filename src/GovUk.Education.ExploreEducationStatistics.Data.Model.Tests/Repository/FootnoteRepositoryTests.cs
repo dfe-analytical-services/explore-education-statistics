@@ -1158,26 +1158,26 @@ public class FootnoteRepositoryTests
             var footnoteFilters = results[0].Filters.ToList();
 
             Assert.Equal(2, footnoteSubjects.Count);
-            Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilters[1].Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilters[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilters[1].SubjectId);
 
             var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
             Assert.Equal(2, footnoteFilterGroups.Count);
-            Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilterGroups[1].FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterGroups[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilterGroups[1].SubjectId);
 
             var footnoteFilterItems = results[0].FilterItems.ToList();
 
             Assert.Equal(2, footnoteFilterItems.Count);
-            Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilterItems[1].FilterItem.FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterItems[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilterItems[1].SubjectId);
 
             var footnoteIndicators = results[0].Indicators.ToList();
 
             Assert.Equal(2, footnoteIndicators.Count);
-            Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
-            Assert.Equal(subject2.Id, footnoteIndicators[1].Indicator.IndicatorGroup.SubjectId);
+            Assert.Equal(subject1.Id, footnoteIndicators[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteIndicators[1].SubjectId);
         }
     }
 
@@ -1383,22 +1383,22 @@ public class FootnoteRepositoryTests
             var footnoteFilters = results[0].Filters.ToList();
 
             Assert.Single(footnoteFilters);
-            Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilters[0].SubjectId);
 
             var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
             Assert.Single(footnoteFilterGroups);
-            Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterGroups[0].SubjectId);
 
             var footnoteFilterItems = results[0].FilterItems.ToList();
 
             Assert.Single(footnoteFilterItems);
-            Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterItems[0].SubjectId);
 
             var footnoteIndicators = results[0].Indicators.ToList();
 
             Assert.Single(footnoteIndicators);
-            Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+            Assert.Equal(subject1.Id, footnoteIndicators[0].SubjectId);
         }
     }
 

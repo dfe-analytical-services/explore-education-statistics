@@ -346,6 +346,8 @@ public class StatisticsDbContext : DbContext
     {
         modelBuilder.Entity<FilterFootnote>().HasKey(item => new { item.FilterId, item.FootnoteId });
 
+        modelBuilder.Entity<FilterFootnote>().HasIndex(filterFootnote => filterFootnote.SubjectId);
+
         modelBuilder
             .Entity<FilterFootnote>()
             .HasOne(filterFootnote => filterFootnote.Filter)
@@ -365,6 +367,8 @@ public class StatisticsDbContext : DbContext
     {
         modelBuilder.Entity<FilterGroupFootnote>().HasKey(item => new { item.FilterGroupId, item.FootnoteId });
 
+        modelBuilder.Entity<FilterGroupFootnote>().HasIndex(filterGroupFootnote => filterGroupFootnote.SubjectId);
+
         modelBuilder
             .Entity<FilterGroupFootnote>()
             .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
@@ -383,6 +387,8 @@ public class StatisticsDbContext : DbContext
     private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FilterItemFootnote>().HasKey(item => new { item.FilterItemId, item.FootnoteId });
+
+        modelBuilder.Entity<FilterItemFootnote>().HasIndex(filterItemFootnote => filterItemFootnote.SubjectId);
 
         modelBuilder
             .Entity<FilterItemFootnote>()
@@ -420,6 +426,8 @@ public class StatisticsDbContext : DbContext
     private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<IndicatorFootnote>().HasKey(item => new { item.IndicatorId, item.FootnoteId });
+
+        modelBuilder.Entity<IndicatorFootnote>().HasIndex(indicatorFootnote => indicatorFootnote.SubjectId);
 
         modelBuilder
             .Entity<IndicatorFootnote>()

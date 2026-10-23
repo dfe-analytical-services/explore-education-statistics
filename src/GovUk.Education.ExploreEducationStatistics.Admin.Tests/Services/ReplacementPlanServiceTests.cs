@@ -359,25 +359,37 @@ public class ReplacementPlanServiceTests
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter",
-            filterFootnotes: new List<FilterFootnote> { new() { Filter = originalFilter } }
+            filterFootnotes: new List<FilterFootnote>
+            {
+                new() { Filter = originalFilter, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterGroup = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter group",
-            filterGroupFootnotes: new List<FilterGroupFootnote> { new() { FilterGroup = originalFilterGroup } }
+            filterGroupFootnotes: new List<FilterGroupFootnote>
+            {
+                new() { FilterGroup = originalFilterGroup, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterItem = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            filterItemFootnotes: new List<FilterItemFootnote> { new() { FilterItem = originalFilterItem } }
+            filterItemFootnotes: new List<FilterItemFootnote>
+            {
+                new() { FilterItem = originalFilterItem, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var dataSetMapping = _fixture
@@ -2047,25 +2059,37 @@ public class ReplacementPlanServiceTests
         var footnoteForFilter = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter",
-            filterFootnotes: new List<FilterFootnote> { new() { Filter = originalDefaultFilter } }
+            filterFootnotes: new List<FilterFootnote>
+            {
+                new() { Filter = originalDefaultFilter, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterGroup = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter group",
-            filterGroupFootnotes: new List<FilterGroupFootnote> { new() { FilterGroup = originalDefaultFilterGroup } }
+            filterGroupFootnotes: new List<FilterGroupFootnote>
+            {
+                new() { FilterGroup = originalDefaultFilterGroup, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForFilterItem = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            filterItemFootnotes: new List<FilterItemFootnote> { new() { FilterItem = originalDefaultFilterItem } }
+            filterItemFootnotes: new List<FilterItemFootnote>
+            {
+                new() { FilterItem = originalDefaultFilterItem, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicator } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var footnoteForSubject = CreateFootnote(
@@ -2658,7 +2682,10 @@ public class ReplacementPlanServiceTests
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { Indicator = originalIndicatorA, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
@@ -2951,7 +2978,10 @@ public class ReplacementPlanServiceTests
         var footnoteForIndicator = CreateFootnote(
             statsReleaseVersion,
             "Test footnote for Filter item",
-            indicatorFootnotes: new List<IndicatorFootnote> { new() { Indicator = originalIndicatorA } }
+            indicatorFootnotes: new List<IndicatorFootnote>
+            {
+                new() { Indicator = originalIndicatorA, SubjectId = originalReleaseSubject.Subject.Id },
+            }
         );
 
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
