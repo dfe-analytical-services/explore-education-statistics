@@ -1,0 +1,52 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+  - name: slotSwappingBehaviour
+    type: string
+    default: Default
+  - name: dependsOn
+    type: object
+    default: []
+
+jobs:
+  - deployment: DeployContentApi
+    displayName: Deploy Content API
+    dependsOn: ${{ parameters.dependsOn }}
+    environment: ${{ parameters.environment }}
+    variables:
+      templateFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/content-api/content-api-appsettings.bicep
+      paramFile: $(Build.SourcesDirectory)/infrastructure/templates/main-app-release/appsettings/content-api/parameters/appsettings-${{ parameters.bicepParamFile }}.bicepparam
+      bicepConfigDeployName: ContentApiBicepConfig$(Build.BuildNumber)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - download: MainBuild
+              displayName: Download Content API artifact
+              artifact: content-api
+
+            - template: ../tasks/get-new-appsettings.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Content API
+                templateFile: $(templateFile)
+                paramFile: $(paramFile)
+                bicepConfigDeployName: $(bicepConfigDeployName)
+
+            - template: ../tasks/deploy-app-service.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                displayNamePrefix: Content API
+                appName: $(subscription)-as-ees-content
+                resourceGroupName: $(resourceGroupName)
+                artifactZipPath: $(Pipeline.Workspace)/MainBuild/content-api/GovUk.Education.ExploreEducationStatistics.Content.Api.zip
+                appSettingsJson: $(appSettings)
+                deployedAt: $(deployedAt)
+                environment: ${{ parameters.environment }}
+                slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}

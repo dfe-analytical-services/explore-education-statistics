@@ -24,7 +24,14 @@ jobs:
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                
+
+            - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                keyVaultName: $(keyVaultName)
+                secretName: ees-public-api-data-processor-app-registration-client-id
+                variableName: dataProcessorAppRegistrationClientId
+
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.
@@ -66,7 +73,7 @@ jobs:
                     --settings \
                       "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that staging slot is healthy after updating appsettings
@@ -93,7 +100,7 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --slot staging
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Waiting for staging slot to start successfully
@@ -123,7 +130,7 @@ jobs:
                     --slot staging \
                     --target-slot production
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that production slot is healthy after slot swap

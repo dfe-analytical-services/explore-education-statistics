@@ -6,15 +6,8 @@ param environmentConfigParam = {
   domain: 'dev.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  enableSwagger: true
   prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
   publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-    overridesDurationInSeconds: 10
-  }
-  tableBuilderMaxTableCellsAllowed: 25000
   additionalAdminAllowedOrigins: [
     'https://localhost:5021'
     'http://localhost:5021'
@@ -26,18 +19,11 @@ param environmentConfigParam = {
   blobDeleteRetentionDays: 3
 }
 
-param adminConfigParam = {
-  preReleaseMinutesBeforeStart: 1440
-  enableThemeDeletion: true
-  enableEinPublishedPageDeletion: true
-}
-
 param notifierConfigParam = {
   appServiceSku: {
     tier: 'Basic'
     name: 'B1'
   }
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
 }
 
 param publisherConfigParam = {
@@ -45,13 +31,6 @@ param publisherConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
-}
-
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-dev'
 }
 
 param publicSiteConfigParam = {
@@ -59,6 +38,4 @@ param publicSiteConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  googleAnalyticsTrackingId: 'G-GRPHH2FN0L'
-  defaultCacheMaxAgeSeconds: 10
 }

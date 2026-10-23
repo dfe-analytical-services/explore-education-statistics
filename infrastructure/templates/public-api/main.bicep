@@ -120,12 +120,6 @@ param processorProdAppSettings object = {}
 @description('The existing app settings for the Data Processor Function App staging slot, fetched by the pipeline before deployment.')
 param processorStagingAppSettings object = {}
 
-@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Data Processor Function App.')
-param dataProcessorAppRegistrationClientId string = ''
-
-@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the API Container App.')
-param apiAppRegistrationClientId string = ''
-
 @description('Specifies the principal id of the Azure DevOps SPN.')
 @secure()
 param devopsServicePrincipalId string = ''
@@ -239,6 +233,10 @@ var maintenanceFirewallRules = [
   }
 ]
 
+resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
+  name: resourceNames.existingResources.keyVault
+}
+
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'virtualNetworkApplicationModuleDeploy'
   params: {
@@ -331,7 +329,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
   params: {
     location: location
     resourceNames: resourceNames
-    apiAppRegistrationClientId: apiAppRegistrationClientId
+    apiAppRegistrationClientId: keyVault.getSecret('ees-public-api-app-registration-client-id')
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
@@ -370,7 +368,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     location: location
     resourceNames: resourceNames
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
-    dataProcessorAppRegistrationClientId: dataProcessorAppRegistrationClientId
+    dataProcessorAppRegistrationClientId: keyVault.getSecret('ees-public-api-data-processor-app-registration-client-id')
     devopsServicePrincipalId: devopsServicePrincipalId
     storageFirewallRules: maintenanceIpRanges
     functionAppFirewallRules: union(

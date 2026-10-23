@@ -1,4 +1,5 @@
 import { abbreviations } from '../common/abbreviations.bicep'
+import { EnvironmentConfig } from 'configuration/environment-configuration.bicep'
 
 @export()
 type ResourceNames = {
@@ -87,6 +88,9 @@ type ResourceNames = {
   }
   keyVault: {
     keyVault: string
+    keys: {
+      dataProtection: string
+    }
     secrets: {
       acr: {
         dockerPullUsername: string
@@ -117,10 +121,21 @@ type ResourceNames = {
         govUkNotifyApiKey: string
         tokenSecretKey: string
       }
+      publicApi: {
+        apiAppRegistrationClientId: string
+        dataProcessorAppRegistrationClientId: string
+      }
+      publicSite: {
+        basicAuthUsername: string
+        basicAuthPassword: string
+      }
       publisher: {
         databaseUserPassword: string
         notifyApiKey: string
         publicDataDbConnectionString: string
+      }
+      screener: {
+        appRegistrationClientId: string
       }
       bauEmail: string
       coreStorageAccountConnectionString: string
@@ -149,7 +164,16 @@ type ResourceNames = {
   logAnalyticsWorkspace: string
 }
 
+// TODO EES-7502 - use standardised naming convention for Notifier storage.
 @export()
+func getResourceNamesForEnvironment(environmentConfig EnvironmentConfig) ResourceNames => getResourceNames(
+  environmentConfig.environmentIdentifier!,
+  '${environmentConfig.environmentIdentifier!}-ees-papi',
+  '${environmentConfig.environmentIdentifier!}-ees-sapi',
+  '${environmentConfig.environmentIdentifier!}-ees',
+  (environmentConfig.environmentName! == 'Test' || environmentConfig.environmentName! == 'Pre-Production') ? 'storage' : 'sa'
+)
+
 func getResourceNames(
   legacyResourcePrefix string,
   publicApiResourcePrefix string,
@@ -242,6 +266,9 @@ func getResourceNames(
   }
   keyVault: {
     keyVault: '${legacyResourcePrefix}-kv-ees-01'
+    keys: {
+      dataProtection: 'ees-dataprotection-key'
+    }
     secrets: {
       acr: {
         dockerPullUsername: 'DOCKER-REGISTRY-SERVER-USERNAME'
@@ -272,10 +299,21 @@ func getResourceNames(
         govUkNotifyApiKey: 'ees-notifier-govuknotify-api-key'
         tokenSecretKey: 'ees-notifier-token-secret-key'
       }
+      publicApi: {
+        apiAppRegistrationClientId: 'ees-public-api-app-registration-client-id'
+        dataProcessorAppRegistrationClientId: 'ees-public-api-data-processor-app-registration-client-id'
+      }
+      publicSite: {
+        basicAuthUsername: 'ees-public-site-basic-auth-username'
+        basicAuthPassword: 'ees-public-site-basic-auth-password'
+      }
       publisher: {
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
         publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
+      }
+      screener: {
+        appRegistrationClientId: 'ees-screener-app-registration-client-id'
       }
       publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       bauEmail: 'ees-bau-email'

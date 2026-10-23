@@ -7,10 +7,6 @@ param environmentConfigParam = {
   basicAuthEnabled: true
 }
 
-param adminConfigParam = {
-  enableThemeDeletion: true
-}
-
 param importerConfigParam = {
   appServiceSku: {
     tier: 'PremiumV2'
@@ -18,24 +14,9 @@ param importerConfigParam = {
   }
 }
 
-param notifierConfigParam = {
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
-}
-
-param publisherConfigParam = {
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
-}
-
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-preprod'
-}
-
 param publicSiteConfigParam = {
   appServiceSku: {
     tier: 'PremiumV2'
     name: 'P1V2'
   }
-  googleAnalyticsTrackingId: 'G-8FSLWXTV2W'
 }

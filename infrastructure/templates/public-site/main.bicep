@@ -1,3 +1,4 @@
+import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
@@ -20,56 +21,27 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
 
-@description('Public URL of the public site.')
-param publicAppUrl string
-
-@description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuth bool
-
-@description('Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthUsername string
-
-@secure()
-@description('Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)')
-param publicAppBasicAuthPassword string
-
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
+@description('Optional override of the existing Http401 rule. Omit to preserve current behaviour.')
+param http401Alert HttpStatusAlertConfig?
+
+@description('Optional override of the existing Http5xx rule. Omit to preserve current behaviour.')
+param http5xxAlert HttpStatusAlertConfig?
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-@description('Name fo the environment being deployed to e.g. Development, Test.')
-param environmentName string
-
-@description('Public hostname of the Content API.')
-param contentApiPublicHostname string
-
-@description('Public hostname of the Data API.')
-param dataApiPublicHostname string
-
-@description('Public hostname of the public API.')
-param publicApiPublicHostname string
-
-@description('URL for the ACR hosting Docker images for this App Service.')
-param dockerRegistryUrl string
-
 @secure()
-@description('Username for the user pulling Docker images for this App Service.')
-param dockerPullUsername string
-
-@secure()
-@description('Password for the user pulling Docker images for this App Service.')
-param dockerPullPassword string
-
-@description('GA tracking ID.')
-param googleAnalyticsTrackingId string
-
-@description('The default max age in seconds for content to be cached by Azure Front Door.')
-param defaultCacheMaxAgeSeconds int
+@description('''
+The existing appsettings for the production slot, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings back to their original values.
+''')
+param existingProdAppSettings object = {}
 
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'publicSiteAppServicePlanModule'
@@ -102,14 +74,6 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
   }
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
-  name: resourceNames.search.service
-}
-
-resource nlSearchFunctionApp 'Microsoft.Web/sites@2025-03-01' existing = {
-  name: resourceNames.nlSearch.functionApp
-}
-
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'publicSiteAppServiceModuleDeploy'
   params: {
@@ -128,38 +92,19 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     swapSlotEnabled: false
+    healthCheckPath: '/health'
     allowedOrigins: allowedOrigins
     alerts: deployAlerts ? {
       appServiceHealth: true
       httpErrors: true
+      http401: http401Alert
+      http5xx: http5xxAlert
       responseTimeSeconds: 12
       alertsGroupName: resourceNames.alertsGroup
     } : null
     websitePort: 3000
-    applicationAppSettings: {
-      APP_ENV: environmentName
-      AZURE_SEARCH_ENDPOINT: searchService.properties.endpoint
-      AZURE_SEARCH_INDEX: 'index-1'
-      AZURE_DATASETS_SEARCH_INDEX: 'nl-search-dataset-index'
-      AZURE_TABLE_TOOL_SEARCH_ENDPOINT: 'https://${nlSearchFunctionApp.properties.defaultHostName}/api/natural_language_search_function'
-      BASIC_AUTH: publicAppBasicAuth
-      BASIC_AUTH_USERNAME: publicAppBasicAuthUsername
-      BASIC_AUTH_PASSWORD: publicAppBasicAuthPassword
-      CONTENT_API_BASE_URL: 'https://${contentApiPublicHostname}/api'
-      DATA_API_BASE_URL: 'https://${dataApiPublicHostname}/api'
-      DOCKER_REGISTRY_SERVER_URL: dockerRegistryUrl
-      DOCKER_REGISTRY_SERVER_USERNAME: dockerPullUsername
-      DOCKER_REGISTRY_SERVER_PASSWORD: dockerPullPassword
-      NOTIFICATION_API_BASE_URL: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
-      GA_TRACKING_ID: googleAnalyticsTrackingId
-      NEXT_CONFIG_MODE: 'server'
-      NODE_ENV: 'production'
-      PUBLIC_URL: '${publicAppUrl}/'
-      PUBLIC_API_BASE_URL: 'https://${publicApiPublicHostname}'
-      PUBLIC_API_DOCS_URL: 'https://${publicApiPublicHostname}/docs'
-      DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
-      WEBSITES_DISABLE_CONTENT_COMPRESSION: true
-    }
+    applicationAppSettings: {}
+    existingProdAppSettings: existingProdAppSettings
     tagValues: tagValues
   }
 }
