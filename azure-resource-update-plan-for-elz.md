@@ -33,7 +33,7 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 7 | Naming | Child resources of the App Gateway use short `{workload}-{purpose}` names without the subscription prefix, e.g. `publicsite-backend`. Request routing rules and path rules end in `-rule`, e.g. `papi-routing-rule`, `papidocs-path-rule`. | Decided |
 | 8 | Naming | Key Vault certificates and secrets drop the `ees-` prefix and any subscription prefixes. The Key Vault is per-environment and EES-only, so the prefixes add nothing. They're named `{workload}-{purpose}`, using the same workload names as the resources (`publicsite`, `contentapi`, `dataapi`, `papi`, `papiprocessor`, ...), with `connection-string` always hyphenated. For example `publicsite-certificate`, `publicsite-basic-auth-username`, `admin-sql-password`, `publisher-publicdatadb-connection-string`. | Decided |
 | 9 | Naming | Storage connection-string secrets are named `{workload}-storage-connection-string`, e.g. `core-storage-connection-string`, `importer-storage-connection-string`. | Decided |
-| 10 | Mechanism | One `elz` flag selects ELZ names; per-environment ELZ values go in `parameters/elz/` param files, picked by one pipeline variable. | Decided |
+| 10 | Mechanism | One `elz` flag selects ELZ names. It's a pipeline variable in each environment's variable group (`elz: true`); unset or anything else means legacy. Pipelines then use the param files in `parameters/elz/`, which extend the legacy ones (Bicep `extends`), set `param elz = true` and override only what differs. | Decided |
 | 11 | Mechanism | Every pipeline reads names from `infrastructure/templates/common/resource-names.bicep` (Bicep) or `get-resource-names.yml` (YAML). | Done (stack #7429) |
 | 12 | Subscriptions | Remove all subscription-ID allow-lists (e.g. `frontDoor.bicep`'s `@allowed` list). s180 is no longer a target. | Decided |
 | 13 | Resource groups | The Container Registry and the pipeline agent VM scale sets move into their own resource group, separate from the Dev resource group but connected to it. Its name and network connection (e.g. VNet peering) are still to be decided. | Decided |
@@ -44,9 +44,9 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 18 | Hostnames | The Content API uses `cont.` in every environment: `cont.dev.`, `cont.test.`, `cont.pre-production.` and `cont.` for Prod, all on `explore-education-statistics.service.gov.uk`. Only Pre-Prod uses it today. See [section 6.11](#611-content-api-hostnames). | Decided |
 | 19 | Redundancy | The safest redundancy available without standing up failover infrastructure: zone redundancy within UK South wherever the service supports it, plus geo-redundant copies and backups that need no secondary deployment. No active secondary region. See [section 6.10](#610-redundancy). | Decided |
 | 20 | Durable Functions | The data processor keeps the Azure Storage backend for orchestration state, but connects to it with its managed identity instead of connection strings. See [section 6.12](#612-data-processor-durable-functions-storage). | Decided |
-| 21 | Network | Subnet layout: one integration subnet per App Service plan, two shared private endpoint subnets, dedicated App Gateway and Container Apps subnets. See [section 5](#5-subnet-migration). | Proposed / Blocked |
+| 21 | Network | Subnet layout: one integration subnet per App Service plan sized to twice its maximum instance count, one shared private endpoint subnet, dedicated App Gateway and Container Apps subnets, in a /21 per environment. See [section 5](#5-subnet-migration). | Decided |
 | 22 | Network | VNet and subnet address ranges come from the `.bicepparam` files (EES-7425). | Done |
-| 23 | Network | Actual ELZ IP ranges. | Decided (ranges received) |
+| 23 | Network | ELZ IP ranges. Allocated so far: Dev `10.226.192.0/24`, Test `10.221.192.0/24`, Pre-Prod `10.216.192.0/25`, Prod `10.216.192.128/25`. Too small for the layout in [section 5](#5-subnet-migration); requesting a /21 per environment (a /22 is the minimum). | Blocked (platform team) |
 | 24 | Secrets | Only store secrets that something reads. Storage account connection strings are only written to Key Vault when a `connectionStringSecretName` is supplied, and storage access keys are never stored. Anything that needs a key directly (e.g. Azure Files mounts) uses `listKeys()` at deploy time. Values that aren't sensitive (e.g. managed identity connection strings, internal URLs) are passed as plain values, not through Key Vault, where they can be derived by other means. | Decided |
 | 25 | Naming | The `01` instance number is only used on resources we could run two of for the same purpose (apps, plans, App Insights, Key Vault, SQL and PostgreSQL servers, VNet, App Gateway, Front Door profile and endpoint, Search, Container Apps environment, Data Factory, vaults, identities, alerts). Resources named by their purpose drop it: Event Grid topics and subscriptions, backup and WAF policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, subnets and file shares. e.g. `s292d01evgt-uks-publicationchanged`, `snet-uks-admin` (see decision 26 for the prefix). | Decided |
 | 26 | Naming | Policies and child resources drop the environment prefix too, since their names only need to be unique within their parent or resource group: `{type}-uks-{purpose}`. Covers WAF policies, backup policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, Event Grid subscriptions, subnets and file shares, e.g. `waf-uks-agwglobal`, `snet-uks-admin`, `fdfpuksees`. Event Grid topics keep the prefix because their endpoints must be unique within the region. Top-level resources keep it so they're distinguishable across environments in alerts, cost reports and Log Analytics. | Decided |
@@ -63,17 +63,17 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 3 | Move every pipeline (Bicep and YAML) onto the shared names, verified with identical snapshots | In progress | Stack #7429. YAML pipelines use `get-resource-names.yml` |
 | 4 | Add the `elz` flag to `ResourceNamingContext`, the ELZ abbreviations (`abbreviations-elz.bicep`) and `getElzResourceNames()` | In progress | Legacy output verified unchanged. ELZ output matches [section 4](#4-resource-naming) except the interim subnets |
 | 5 | Make the Robot UI tests job pick its Key Vault name from the `elz` flag | In progress | Interim Bash step; see [follow-up 1](#9-follow-up-work) |
-| 6 | Pass the `elz` flag into every pipeline's `main.bicep`, and create the `parameters/elz/` param files | To do | The flag comes from an `elz` variable in each environment's variable group |
-| 7 | Let `get-resource-names.yml` take the `elz` flag | To do | Set `RESOURCE_NAMES_ELZ=true` only when `$(elz)` is exactly `true` |
+| 6 | Pass the `elz` flag into every template's naming context, and create the `parameters/elz/` param files | In progress | All 14 templates take `param elz bool = false`. 56 ELZ param files each extend their legacy file and set `elz = true`. The new `use-elz-param-file.yml` step switches each deploy job's `$(paramFile)` to `elz/` when the variable group's `elz` is `true`. Verified by snapshot: legacy output unchanged; all 56 ELZ param files deploy-snapshot with ELZ names |
+| 7 | Let `get-resource-names.yml` take the `elz` flag | In progress | Sets `RESOURCE_NAMES_ELZ=true` only when the variable group's `elz` is exactly `true` |
 | 8 | Add `elz: true` and `subscription` to the s292 environments' variable groups | To do | Once the environments exist |
 | 9 | Send the questions in [section 8](#8-open-questions) to the platform team | To do | Draft message written |
-| 10 | Get the ELZ IP ranges | Done | Received from the platform team |
-| 10a | Put the ELZ IP ranges into the `parameters/elz/` param files, re-planning the subnet blocks per [section 5](#5-subnet-migration) | To do | |
+| 10 | Get ELZ IP ranges big enough for the [section 5](#5-subnet-migration) layout: a /21 per environment | Blocked | The /24s (Dev, Test) and /25s (Pre-Prod, Prod) allocated so far are too small. Reply sent to the platform team asking for /21s |
+| 10a | Put the ELZ IP ranges into the `parameters/elz/` param files, using the [section 5](#5-subnet-migration) layout | To do | Once action 10 is unblocked |
 | 11 | Apply naming decisions 7-9 (App Gateway child names, Key Vault certificate and secret names, storage connection-string secret names) in `getElzResourceNames()` | In progress | Core, public, Importer, Notifier, Publisher and Screener storage modules now take their connection-string secret name from `resourceNames`. Legacy output verified unchanged |
 | 11a | Move the Key Vault secret names that are still hardcoded into `resourceNames`, so they follow the `elz` flag | To do | About 15 in Bicep (e.g. `ees-alerts-slackconfig`, `ees-sql-admin-password`, `ees-publicapi-app-gateway-fuapi-header`) and the Robot tests and Public API pipeline YAML |
 | 11b | Stop storing unused secrets: `storage-account.bicep` takes `connectionStringSecretName` (was `connectionStringSecretNameOverride`), stores the connection string only when it's supplied, and never stores access keys | In progress | Removes 16 access-key secrets and 3 unused connection strings (Public API data, Analytics and screener logs storage) per environment. Verified by snapshot: nothing else changes |
 | 11c | Stop using Key Vault for values that aren't secret where they can be derived by other means: the three PostgreSQL connection strings (managed identity, no password) are built with `publicDataDbConnectionString()` in `common/functions.bicep`, and Admin reads the Public API's private URL from the Container App itself | In progress | Removes 4 secrets per environment, and `publisher.publicDataDbConnectionString` and `publicApiContainerAppPrivateUrl` from `resourceNames`. The data processor's pipeline sets its connection string from the new `dataProcessorPsqlConnectionString` output. Verified by snapshot: the apps' connection strings and the Admin private URL match what the secrets held |
-| 12 | Confirm the subnet layout, then change the `ResourceNames` subnets and the VNet module to match | Blocked | Needs answers to open questions 2 and 3. See [section 5](#5-subnet-migration) |
+| 12 | Change the `ResourceNames` subnets and the VNet module to the [section 5](#5-subnet-migration) layout (15 subnets, one shared `snet-uks-pep`) | To do | The layout is decided; doesn't need the IP ranges |
 | 13 | Move names still built inside modules into `resourceNames`: private endpoints, alerts, the private DNS VNet link, the resource group | To do | They won't follow the `elz` flag until then |
 | 14 | Remove the subscription allow-lists, e.g. the `@allowed` list in `frontDoor.bicep` | To do | Decision 12 |
 | 15 | Create the shared tooling resource group for the Container Registry and agent VMSS, and agree its name and network connection | To do | Decision 13; open question 6 |
@@ -299,36 +299,73 @@ Decision 8 drops the `ees-` prefix and puts the workload name first; decision 9 
 
 ## 5. Subnet migration
 
-Recommended on 15 Oct 2026. **Not yet confirmed** with the DfE platform team; see [Open questions](#8-open-questions).
+**Layout: Decided** ([decision 21](#1-key-decisions)). **Address ranges: Blocked**. The ranges allocated so far are too small for it ([decision 23](#1-key-decisions)).
 
-- **One integration subnet per App Service plan**, delegated and holding nothing else. About /26 each, inside a /24 block reserved per workload so a second app can be added later. Named by what the app does, not its resource type.
-- **Two shared private endpoint subnets** replace the 10 per-workload `-pep` subnets:
-  - `snet-uks-datapep`: SQL, PostgreSQL, storage, Key Vault, Event Grid, Search, SignalR, ACR.
-  - `snet-uks-appspep`: inbound private endpoints to the apps themselves.
-  - Set `privateEndpointNetworkPolicies` on both, put each private endpoint in an Application Security Group, and write NSG rules from each app's integration subnet to those groups.
-- **Dedicated subnets** kept for the App Gateway and the Container Apps environment.
+- **One integration subnet per App Service plan**, delegated to `Microsoft.Web/serverFarms` and holding nothing else, so NSG rules can tell the apps apart. Each is sized to twice the app's maximum instance count, because changing a plan's size briefly doubles its instances †:
+  - /26 (59 usable, up to 29 instances) for the apps capped at 15 instances: Content API, Data API and NL Search;
+  - /27 (27 usable, up to 13 instances) for the rest, which are capped at 2 or 5.
+- **One shared private endpoint subnet**, `snet-uks-pep`, replaces the 10 per-workload private endpoint subnets. Set `privateEndpointNetworkPolicies` on it and put each private endpoint in an Application Security Group, so NSG rules can still target individual endpoints.
+- **Dedicated subnets** for the App Gateway (/26, autoscale capped at 10) and the Container Apps environment (/24; it can't be resized once created).
+- **A /21 per environment.** The subnets use about half of it, and the rest is one continuous spare range for growth.
 
-**Open choice: one or two private endpoint subnets.** Two subnets separate the data tier from inbound app endpoints. That allows a different route table (e.g. sending app-to-app traffic through a hub firewall), a blanket NSG rule per tier, and fits a subnet-per-trust-zone policy. With network policies and an Application Security Group per endpoint, a single subnet gives the same per-resource control and is simpler, and the apps subnet would only hold about four endpoints. Decide using the answers to [open questions](#8-open-questions) 2 and 3: if either is yes, keep two. Endpoints have to be recreated to move subnet, so settle this before the build.
+† From Azure's App Service networking guidance as we understand it; check against current docs.
 
-23 subnets today become 16:
+### Layout
+
+Example using `10.226.0.0/21`. Each environment uses the same layout from the start of its own range. The maximum instance counts are the autoscale caps we intend to set.
+
+| Subnet | Resource type | CIDR | Start | End | Usable | Peak use | Max instances |
+|---|---|---|---|---|---|---|---|
+| `snet-uks-cae` | Container Apps environment (Public API) | `10.226.0.0/24` | 10.226.0.0 | 10.226.0.255 | 251 | All of it (assumed) | n/a: scales by node and replica within the subnet |
+| `snet-uks-pep` | Private endpoints: SQL Server, PostgreSQL, Storage Accounts, Key Vault, Event Grid, AI Search, SignalR, Function Apps (inbound) | `10.226.1.0/24` | 10.226.1.0 | 10.226.1.255 | 251 | 38 today (about 60 expected in ELZ) | 251 endpoints |
+| `snet-uks-agw` | Application Gateway v2 | `10.226.2.0/26` | 10.226.2.0 | 10.226.2.63 | 59 | 10 (autoscale max) | 59 |
+| `snet-uks-contentapi` | App Service | `10.226.2.64/26` | 10.226.2.64 | 10.226.2.127 | 59 | 15, 30 during scale-up | 29 |
+| `snet-uks-dataapi` | App Service | `10.226.2.128/26` | 10.226.2.128 | 10.226.2.191 | 59 | 15, 30 during scale-up | 29 |
+| `snet-uks-nlsearch` | Function App (Elastic Premium) | `10.226.2.192/26` | 10.226.2.192 | 10.226.2.255 | 59 | 15, 30 during scale-up | 29 |
+| `snet-uks-admin` | App Service | `10.226.3.0/27` | 10.226.3.0 | 10.226.3.31 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-publicsite` | App Service (Linux container) | `10.226.3.32/27` | 10.226.3.32 | 10.226.3.63 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-screener` | Function App (Elastic Premium, container) | `10.226.3.64/27` | 10.226.3.64 | 10.226.3.95 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-papiprocessor` | Function App (Elastic Premium, Durable Functions) | `10.226.3.96/27` | 10.226.3.96 | 10.226.3.127 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-analytics` | Function App (Elastic Premium) | `10.226.3.128/27` | 10.226.3.128 | 10.226.3.159 | 27 | 2, 4 during scale-up | 13 |
+| `snet-uks-searchdocs` | Function App (Elastic Premium) | `10.226.3.160/27` | 10.226.3.160 | 10.226.3.191 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-importer` | Function App (Dedicated plan) | `10.226.3.192/27` | 10.226.3.192 | 10.226.3.223 | 27 | 5, 10 during scale-up | 13 |
+| `snet-uks-notifier` | Function App (Dedicated plan) | `10.226.3.224/27` | 10.226.3.224 | 10.226.3.255 | 27 | 2, 4 during scale-up | 13 |
+| `snet-uks-publisher` | Function App (Dedicated plan) | `10.226.4.0/27` | 10.226.4.0 | 10.226.4.31 | 27 | 2, 4 during scale-up | 13 |
+| *spare* | | | 10.226.4.32 | 10.226.7.255 | 992 addresses | | |
+
+Totals: 1,056 of 2,048 addresses allocated to subnets. About 494 are in use in normal running and about 614 at peak, counting the 5 addresses Azure reserves in every subnet.
+
+### Why not the ranges allocated so far
+
+| Environment | Allocated | Addresses |
+|---|---|---|
+| Dev | `10.226.192.0/24` | 256 |
+| Test | `10.221.192.0/24` | 256 |
+| Pre-Prod | `10.216.192.0/25` | 128 |
+| Prod | `10.216.192.128/25` | 128 |
+
+Even at the smallest sizes Azure supports, the App Gateway, Container Apps, integration and private endpoint subnets need more than 256 addresses. A /22 is the practical minimum, with no room to grow. Pre-Prod and Prod, which need the most capacity, have been given the least.
+
+### Subnets: today and in ELZ
+
+23 subnets today become 15:
 
 | Group | Subnets |
 |---|---|
-| Integration (12) | `admin`, `contentapi`, `dataapi`, `publicsite` (new), `importer`, `notifier`, `publisher`, `screener`, `papiprocessor`, `nlsearch`, `searchdocs`, `analytics`. A second app in a workload (e.g. a screener UI) gets its own subnet from the same /24 block |
+| Integration (12) | `admin`, `contentapi`, `dataapi`, `publicsite` (new), `importer`, `notifier`, `publisher`, `screener`, `papiprocessor`, `nlsearch`, `searchdocs`, `analytics` |
 | Dedicated (2) | `agw`, `cae` |
-| Shared private endpoints (2) | `datapep`, `appspep` |
+| Private endpoints (1) | `pep` |
 
 All prefixed `snet-uks-`, with no environment prefix or `01` (decisions 25 and 26). New subnets with no current equivalent, to add to `resourceNames.vnet.subnets`:
 
 | Proposed `resourceNames` path | Type | Proposed (s292 Dev) | Notes |
 |---|---|---|---|
 | `vnet.subnets.publicSite` | Subnet (integration) | `snet-uks-publicsite` | The public site has no VNet integration today; it needs it once the Content API is private |
-| `vnet.subnets.dataPrivateEndpoints` | Subnet (private endpoints) | `snet-uks-datapep` | Replaces 6 subnets outright and takes the storage side of 4 more |
-| `vnet.subnets.appsPrivateEndpoints` | Subnet (private endpoints) | `snet-uks-appspep` | Takes the function apps' inbound PEs from 4 subnets |
+| `vnet.subnets.privateEndpoints` | Subnet (private endpoints) | `snet-uks-pep` | Replaces all 10 of today's private endpoint subnets |
 
 ### Existing subnets and where they go
 
-Until this layout is confirmed, `getElzResourceNames()` in `resource-names.bicep` keeps today's one-to-one set of subnets under ELZ names, so the VNet templates work unchanged. The private endpoint subnets are named `snet-uks-sqlpep`, `…-psql`, `…-evgtpep`, `…-papistpep`, `…-searchstpep`, `…-analyticsstpep`, `…-screenerpep`, `…-papiprocessorpep`, `…-nlsearchpep` and `…-searchdocspep`. Moving to the shared subnets below also means changing the `ResourceNames` type and the VNet module.
+Until this layout is confirmed, `getElzResourceNames()` in `resource-names.bicep` keeps today's one-to-one set of subnets under ELZ names, so the VNet templates work unchanged. The private endpoint subnets are named `snet-uks-sqlpep`, `…-psql`, `…-evgtpep`, `…-papistpep`, `…-searchstpep`, `…-analyticsstpep`, `…-screenerpep`, `…-papiprocessorpep`, `…-nlsearchpep` and `…-searchdocspep`. Moving to the layout above also means changing the `ResourceNames` type and the VNet module.
 
 | `resourceNames` path | Type | Current (Dev) | Proposed (s292 Dev) | Notes |
 |---|---|---|---|---|
@@ -345,16 +382,16 @@ Until this layout is confirmed, `getElzResourceNames()` in `resource-names.bicep
 | `vnet.subnets.nlSearchFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-nlsearch` | `snet-uks-nlsearch` | `fa` dropped |
 | `vnet.subnets.searchDocsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-searchdocs` | `snet-uks-searchdocs` | `fa` dropped |
 | `vnet.subnets.analyticsFunctionApp` | Subnet (integration) | `s101d01-ees-snet-fa-analytics` | `snet-uks-analytics` | `fa` dropped |
-| `vnet.subnets.sqlServerPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sqlsvr-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (both SQL servers) |
-| `vnet.subnets.psqlFlexibleServer` | Subnet (private endpoints) | `s101d01-ees-snet-psql-flexibleserver` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet. Not delegated today: it only holds the PostgreSQL private endpoint |
-| `vnet.subnets.eventGridCustomTopicPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-evgt-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (Event Grid topics) |
-| `vnet.subnets.publicApiStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-sa-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (Public API storage) |
-| `vnet.subnets.searchStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-search-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (search storage, Search service) |
-| `vnet.subnets.analyticsStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-anlyt-pep` | `snet-uks-datapep` | REMOVED: merged into the shared data PE subnet (analytics storage) |
-| `vnet.subnets.screenerStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-sapi-snet-sa-screener-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Storage PEs go to the data subnet; the screener function app's inbound PE goes to the apps subnet |
-| `vnet.subnets.publicApiDataProcessorPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-fa-processor-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Durable Functions storage PEs go to the data subnet; the processor's inbound PE goes to the apps subnet |
-| `vnet.subnets.nlSearchFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-nlsearch-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split. Function storage PEs go to the data subnet; the function app's inbound PE goes to the apps subnet |
-| `vnet.subnets.searchDocsFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-searchdocs-pep` | `snet-uks-datapep + snet-uks-appspep` | REMOVED: split, as above |
+| `vnet.subnets.sqlServerPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sqlsvr-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (both SQL servers) |
+| `vnet.subnets.psqlFlexibleServer` | Subnet (private endpoints) | `s101d01-ees-snet-psql-flexibleserver` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet. Not delegated today: it only holds the PostgreSQL private endpoint |
+| `vnet.subnets.eventGridCustomTopicPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-evgt-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (Event Grid topics) |
+| `vnet.subnets.publicApiStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-sa-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (Public API storage) |
+| `vnet.subnets.searchStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-search-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (search storage, Search service) |
+| `vnet.subnets.analyticsStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-sa-anlyt-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (analytics storage) |
+| `vnet.subnets.screenerStoragePrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-sapi-snet-sa-screener-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (storage and the function app's inbound endpoint) |
+| `vnet.subnets.publicApiDataProcessorPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-papi-snet-fa-processor-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (storage and the function app's inbound endpoint) |
+| `vnet.subnets.nlSearchFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-nlsearch-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet (storage and the function app's inbound endpoint) |
+| `vnet.subnets.searchDocsFunctionAppPrivateEndpoints` | Subnet (private endpoints) | `s101d01-ees-snet-fa-searchdocs-pep` | `snet-uks-pep` | REMOVED: merged into the shared private endpoint subnet |
 
 ## 6. Upgrading resources and amending resource types
 
@@ -525,7 +562,7 @@ These are hard to change once the environments exist, so they belong in the init
 
 For the DfE platform team. Their answers could change [section 5](#5-subnet-migration) and [section 7](#7-identity-and-network-access).
 
-1. ~~What IP range do we get?~~ Answered: ranges received.
+1. Can we have a /21 per environment? The ranges allocated (Dev `10.226.192.0/24`, Test `10.221.192.0/24`, Pre-Prod `10.216.192.0/25`, Prod `10.216.192.128/25`) can't hold our subnets; see [section 5](#5-subnet-migration).
 2. Is there a hub VNet, and does traffic between subnets go through a firewall (route tables)?
 3. Does policy require one subnet per trust zone, or NSGs on every subnet?
 4. Are private DNS zones central (managed by policy), or ours to create?

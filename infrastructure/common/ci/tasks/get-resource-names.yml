@@ -10,6 +10,9 @@
 # resource-names-outputs.bicepparam, which deploys no resources and simply returns the names as an output.
 # This takes a few seconds and needs no Azure connection, unlike a real deployment.
 #
+# When the environment's variable group sets "elz" to "true", the names follow the naming convention for the DfE
+# Enterprise Landing Zone (ELZ) subscriptions instead of the legacy one.
+#
 # Pipeline variables are scoped to the job that sets them, so any job needing resource names should include
 # this Task.
 #
@@ -29,6 +32,9 @@ parameters:
 steps:
   - task: Bash@3
     displayName: Get resource names
+    env:
+      # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ names.
+      ELZ: $(elz)
     inputs:
       targetType: inline
       script: |
@@ -61,6 +67,14 @@ steps:
 
         export RESOURCE_NAMES_ENVIRONMENT_IDENTIFIER='${{ parameters.environmentIdentifier }}'
         export RESOURCE_NAMES_ENVIRONMENT_NAME="$environmentName"
+
+        if [ "$ELZ" = "true" ]; then
+          export RESOURCE_NAMES_ELZ=true
+        else
+          export RESOURCE_NAMES_ELZ=false
+        fi
+
+        echo "Getting resource names for $environmentName (ELZ naming convention: $RESOURCE_NAMES_ELZ)"
 
         az bicep snapshot --file "$paramFile"
 
