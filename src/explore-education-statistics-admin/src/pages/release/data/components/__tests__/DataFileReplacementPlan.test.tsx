@@ -1147,6 +1147,47 @@ describe('DataReplacementPlan', () => {
     expect(screen.queryByText('Confirm data replacement')).toBeInTheDocument();
   });
 
+  test('renders overridden warning and confirm button when patch version with major changes has been finalised by BAU', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      apiDataSetVersionPlan: {
+        ...testValidReplacementPlan.apiDataSetVersionPlan!,
+        version: '1.0.1',
+        mappingStatus: {
+          locationsComplete: true,
+          filtersComplete: true,
+          indicatorsComplete: true,
+          isMajorVersionUpdate: true,
+          locationsHaveMajorChange: false,
+          filtersHaveMajorChange: true,
+          indicatorsHaveMajorChange: false,
+        },
+      },
+    });
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('API data set filters: OK')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('major-version-overridden-warning'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Confirm data replacement')).toBeInTheDocument();
+  });
+
   test('renders correctly with valid empty plan', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testValidReplacementPlan,

@@ -71,6 +71,7 @@ public class DataSetVersionsController(IDataSetVersionService dataSetVersionServ
         return await dataSetVersionService
             .CompleteNextVersionImport(
                 dataSetVersionId: nextDataSetVersionCompleteImportRequest.DataSetVersionId,
+                allowMajorVersionUpdate: nextDataSetVersionCompleteImportRequest.AllowMajorVersionUpdate,
                 cancellationToken: cancellationToken
             )
             .HandleFailuresOrOk();
