@@ -1,17 +1,17 @@
 [
   {
+    "publication_summary": "Performance data by age 16 to 19 in England. Includes qualification type, characteristic, geographic, provider, and subject breakdowns.",
+    "publication_title": "16 to 19 performance",
+    "published": "23 Apr 2026",
+    "release_type": "Accredited official statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
     "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-19 study in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "16-19 destination measures",
     "published": "15 Oct 2026",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
-  },
-  {
-    "publication_summary": "Attainment and retention data for A level and other qualifications by age 16-18 in England. Includes region, institution type, characteristics, and subject.",
-    "publication_title": "A level and other 16 to 18 results",
-    "published": "23 Apr 2026",
-    "release_type": "Accredited official statistics",
-    "theme": "School and college outcomes and performance"
   },
   {
     "publication_summary": "Annual release on academy transfers in England, including why academies transferred and any associated grant funding that was provided.",
