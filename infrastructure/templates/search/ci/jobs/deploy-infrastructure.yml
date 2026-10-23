@@ -54,6 +54,9 @@ jobs:
         deploy:
           steps:
             - checkout: self
+
+            - template: ../../../../common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml
+
             - download: none
 
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml

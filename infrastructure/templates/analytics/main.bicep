@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -46,6 +49,7 @@ var maintenanceFirewallRules = [
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
+  elz: elz
 })
 
 // Create an Application Insights resource for Analytics resources to use.

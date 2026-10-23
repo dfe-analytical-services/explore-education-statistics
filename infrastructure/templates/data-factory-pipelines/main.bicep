@@ -6,12 +6,16 @@ param subscription string = ''
 @description('Environment : Name of this environment e.g. Development, Test.')
 param environmentName string
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 @description('Slack channel to post alerts to.')
 param slackAlertsChannel string = ''
 
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
+  elz: elz
 })
 
 module linkedServicesModule 'application/configuration/linked-services.bicep' = {
