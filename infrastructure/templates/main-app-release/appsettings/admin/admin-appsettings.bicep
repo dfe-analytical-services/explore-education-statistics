@@ -1,11 +1,14 @@
 import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
 import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
-@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
-param environmentIdentifier string
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01. Supplied by the pipeline from the environment\'s variable group ("subscription").')
+param environmentIdentifier string = ''
 
 @description('Name of this environment e.g. Development, Test.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -61,13 +64,12 @@ pre-existing instances that haven't shut down yet.
 ''')
 param deployedAt string = ''
 
-// getResourceNamesForEnvironment only actually reads environmentIdentifier/environmentName,
-// but still expects something shaped like the shared EnvironmentConfig type - this plain
-// object literal satisfies that structurally, without this file needing to import the type
-// itself just to pass these two values through.
+// This plain object literal satisfies getResourceNamesForEnvironment's ResourceNamingContext type
+// structurally, without this file needing to import the type itself just to pass these values through.
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentIdentifier
   environmentName: environmentName
+  elz: elz
 })
 
 var adminHostname = 'admin.${domain}'
