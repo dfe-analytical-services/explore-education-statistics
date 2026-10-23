@@ -1223,4 +1223,135 @@ public class ReplacementServiceHelperTests
             IndicatorMappings = indicatorsMappings,
         };
     }
+
+    public class ReplacePairedIndicatorsTests
+    {
+        [Fact]
+        public void NoPairedIndicators_ReturnsNull()
+        {
+            var mapping = BuildIndicatorMapping((Guid.NewGuid(), Guid.NewGuid(), MapStatus.AutoSet));
+
+            Assert.Null(ReplacementServiceHelper.ReplacePairedIndicators(null, mapping));
+        }
+
+        [Fact]
+        public void BothIndicatorsMapped_PairIsCarriedForward()
+        {
+            var (originalParentId, replacementParentId) = (Guid.NewGuid(), Guid.NewGuid());
+            var (originalChildId, replacementChildId) = (Guid.NewGuid(), Guid.NewGuid());
+
+            var mapping = BuildIndicatorMapping(
+                (originalParentId, replacementParentId, MapStatus.AutoSet),
+                (originalChildId, replacementChildId, MapStatus.ManuallySet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [new PairedIndicatorEntry(originalParentId, originalChildId)],
+                mapping
+            );
+
+            var pair = Assert.Single(result!);
+            Assert.Equal(replacementParentId, pair.ParentIndicatorId);
+            Assert.Equal(replacementChildId, pair.ChildIndicatorId);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void OneIndicatorUnmapped_PairIsDropped(bool parentIsMapped)
+        {
+            var (originalParentId, originalChildId) = (Guid.NewGuid(), Guid.NewGuid());
+
+            var mapping = BuildIndicatorMapping(
+                (originalParentId, parentIsMapped ? Guid.NewGuid() : null, MapStatus.ManuallySet),
+                (originalChildId, parentIsMapped ? null : Guid.NewGuid(), MapStatus.ManuallySet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [new PairedIndicatorEntry(originalParentId, originalChildId)],
+                mapping
+            );
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void MixedPairs_OnlyFullyMappedPairsAreKeptInOrder()
+        {
+            var originalIds = Enumerable.Range(0, 6).Select(_ => Guid.NewGuid()).ToList();
+            var replacementIds = Enumerable.Range(0, 6).Select(_ => Guid.NewGuid()).ToList();
+
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementIds[0], MapStatus.AutoSet),
+                (originalIds[1], replacementIds[1], MapStatus.AutoSet),
+                (originalIds[2], replacementIds[2], MapStatus.AutoSet),
+                (originalIds[3], null, MapStatus.ManuallySet),
+                (originalIds[4], replacementIds[4], MapStatus.AutoSet),
+                (originalIds[5], replacementIds[5], MapStatus.AutoSet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[4], originalIds[5]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                ],
+                mapping
+            );
+
+            Assert.Equal(
+                [
+                    new PairedIndicatorEntry(replacementIds[4], replacementIds[5]),
+                    new PairedIndicatorEntry(replacementIds[0], replacementIds[1]),
+                ],
+                result
+            );
+        }
+
+        [Fact]
+        public void MappingWouldBreakPairingRules_InvalidPairsAreDropped()
+        {
+            var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+            var replacementId = Guid.NewGuid();
+            var otherReplacementId = Guid.NewGuid();
+
+            // Indicators 0 and 1 are both mapped to the same replacement indicator, so the first pair would become
+            // a self-link and is dropped
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementId, MapStatus.ManuallySet),
+                (originalIds[1], replacementId, MapStatus.ManuallySet),
+                (originalIds[2], otherReplacementId, MapStatus.AutoSet),
+                (originalIds[3], Guid.NewGuid(), MapStatus.AutoSet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                ],
+                mapping
+            );
+
+            var pair = Assert.Single(result!);
+            Assert.Equal(otherReplacementId, pair.ParentIndicatorId);
+        }
+
+        private static DataSetMapping BuildIndicatorMapping(
+            params (Guid OriginalId, Guid? ReplacementId, MapStatus Status)[] indicatorMappings
+        )
+        {
+            return new DataSetMapping
+            {
+                IndicatorMappings = indicatorMappings.ToDictionary(
+                    map => map.OriginalId,
+                    map => new IndicatorMapping
+                    {
+                        OriginalId = map.OriginalId,
+                        ReplacementId = map.ReplacementId,
+                        Status = map.Status,
+                    }
+                ),
+            };
+        }
+    }
 }
