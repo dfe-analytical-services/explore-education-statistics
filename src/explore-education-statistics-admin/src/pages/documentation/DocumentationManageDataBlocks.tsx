@@ -1,6 +1,11 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import {
+  documentationConfigureChartsRoute,
+  documentationManageContentRoute,
+  documentationManageDataRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageDataBlockCreate from './images/guidance/guidance-datablocks-create.png';
@@ -74,7 +79,7 @@ const DocumentationManageDataBlock = () => {
               </div>
               <p>
                 For detailed guidance on how to add data to your release{' '}
-                <Link to="/documentation/manage-data">
+                <Link to={documentationManageDataRoute.fullPath}>
                   Managing data: step by step
                 </Link>
                 .
@@ -263,7 +268,7 @@ const DocumentationManageDataBlock = () => {
                   <p>
                     For detailed guidance on how to configure charts within your
                     release{' '}
-                    <Link to="/documentation/configure-charts">
+                    <Link to={documentationConfigureChartsRoute.fullPath}>
                       Configuring charts: step by step
                     </Link>
                   </p>
@@ -298,7 +303,7 @@ const DocumentationManageDataBlock = () => {
               <p>
                 For detailed guidance on how to configure charts within your
                 release -{' '}
-                <Link to="/documentation/configure-charts">
+                <Link to={documentationConfigureChartsRoute.fullPath}>
                   Configuring charts: step by step
                 </Link>
               </p>
@@ -368,7 +373,7 @@ const DocumentationManageDataBlock = () => {
                   <p>
                     For detailed guidance on how to configure charts within your
                     release{' '}
-                    <Link to="/documentation/configure-charts">
+                    <Link to={documentationConfigureChartsRoute.fullPath}>
                       Configuring charts: step by step
                     </Link>
                   </p>
@@ -508,7 +513,7 @@ const DocumentationManageDataBlock = () => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <Link to="./manage-content">
+                <Link to={documentationManageContentRoute.fullPath}>
                   Managing content: step by step
                 </Link>
                 .

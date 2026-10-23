@@ -19,7 +19,7 @@ import SignInPage from '@admin/pages/sign-in/SignInPage';
 import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
 import ThemesPage from '@admin/pages/themes/ThemesPage';
-import administrationRoutes from '@admin/routes/administrationRoutes';
+import administrationPageRoutes from '@admin/routes/administrationPageRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
 import {
   preReleaseContentRoute,
@@ -69,7 +69,7 @@ export const publicRoutes: Record<string, PublicRouteProps> = {
 };
 
 const appRoutes: Record<string, ProtectedRouteProps> = {
-  ...administrationRoutes,
+  ...administrationPageRoutes,
   ...documentationRoutes,
   homeRoute: {
     ...homeRoute,
