@@ -49,12 +49,20 @@ resource nlSearchFunctionApp 'Microsoft.Web/sites@2025-03-01' existing = {
   name: resourceNames.nlSearch.functionApp
 }
 
-var secretNames = [
-  resourceNames.keyVault.secrets.acr.dockerPullUsername
-  resourceNames.keyVault.secrets.acr.dockerPullPassword
-  resourceNames.keyVault.secrets.publicSite.basicAuthUsername
-  resourceNames.keyVault.secrets.publicSite.basicAuthPassword
-]
+// The Basic Auth credentials are only looked up when Basic Auth is enabled, as Key Vault secrets
+// can't be blank and so won't exist in environments without Basic Auth e.g. Production.
+var secretNames = concat(
+  [
+    resourceNames.keyVault.secrets.acr.dockerPullUsername
+    resourceNames.keyVault.secrets.acr.dockerPullPassword
+  ],
+  basicAuthEnabled
+    ? [
+        resourceNames.keyVault.secrets.publicSite.basicAuthUsername
+        resourceNames.keyVault.secrets.publicSite.basicAuthPassword
+      ]
+    : []
+)
 
 resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
   name: '${keyVaultName}/${secretName}'
@@ -66,15 +74,13 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 var secretRefs = secretRefsFromSecrets(secrets)
 
 @description('Application-specific appsettings for the Public Site, applied ahead of each code deploy.')
-output appSettings object = {
+output appSettings object = union({
   APP_ENV: environmentName
   AZURE_SEARCH_ENDPOINT: searchService.properties.endpoint
   AZURE_SEARCH_INDEX: 'index-1'
   AZURE_DATASETS_SEARCH_INDEX: 'nl-search-dataset-index'
   AZURE_TABLE_TOOL_SEARCH_ENDPOINT: 'https://${nlSearchFunctionApp.properties.defaultHostName}/api/natural_language_search_function'
   BASIC_AUTH: basicAuthEnabled
-  BASIC_AUTH_USERNAME: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
-  BASIC_AUTH_PASSWORD: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
   CONTENT_API_BASE_URL: 'https://${contentApiPublicHostname}/api'
   DATA_API_BASE_URL: 'https://${dataApiPublicHostname}/api'
   NOTIFICATION_API_BASE_URL: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
@@ -90,4 +96,9 @@ output appSettings object = {
   NEXT_CONFIG_MODE: 'server'
   NODE_ENV: 'production'
   WEBSITES_DISABLE_CONTENT_COMPRESSION: true
-}
+}, basicAuthEnabled
+  ? {
+      BASIC_AUTH_USERNAME: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthUsername]
+      BASIC_AUTH_PASSWORD: secretRefs[resourceNames.keyVault.secrets.publicSite.basicAuthPassword]
+    }
+  : {})

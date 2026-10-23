@@ -6,9 +6,6 @@ param environmentConfigParam = {
   domain: 'test.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  basicAuthEnabled: true
 }
 
 param adminConfigParam = {

@@ -23,6 +23,8 @@ parameters:
   - name: deployAdminFirst
     type: boolean
     default: true
+  - name: publicSiteBasicAuthEnabled
+    type: boolean
 
 stages:
   - stage: ${{ parameters.stageName }}
@@ -58,6 +60,7 @@ stages:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+          basicAuthEnabled: ${{ parameters.publicSiteBasicAuthEnabled }}
           slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
@@ -95,6 +98,7 @@ stages:
           serviceConnection: ${{ parameters.serviceConnection }}
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
+          basicAuthEnabled: ${{ parameters.publicSiteBasicAuthEnabled }}
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
               - DeployAdmin
@@ -106,6 +110,7 @@ stages:
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
               testEnvironment: ${{ parameters.bicepParamFile }}
+              publicSiteBasicAuthEnabled: ${{ parameters.publicSiteBasicAuthEnabled }}
               dependsOn:
                 - DeployContentApi
                 - DeployDataApi
