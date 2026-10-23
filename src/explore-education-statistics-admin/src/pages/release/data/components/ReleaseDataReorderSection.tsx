@@ -1,3 +1,4 @@
+import PairedIndicatorsForm from '@admin/pages/release/data/components/PairedIndicatorsForm';
 import ReorderFiltersList, {
   UpdateFiltersRequest,
 } from '@admin/pages/release/data/components/ReorderFiltersList';
@@ -15,7 +16,9 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import adminTableBuilderService from '@admin/services/tableBuilderService';
+import adminTableBuilderService, {
+  PairedIndicators,
+} from '@admin/services/tableBuilderService';
 
 import React, { useState } from 'react';
 
@@ -60,9 +63,21 @@ const ReleaseDataReorderSection = ({
     setReorderingIndicators(undefined);
   };
 
+  const handleSavePairedIndicators = async (
+    subjectId: string,
+    pairedIndicators: PairedIndicators,
+  ) => {
+    await adminTableBuilderService.updatePairedIndicators(
+      releaseVersionId,
+      subjectId,
+      pairedIndicators,
+    );
+    setReorderingIndicators(undefined);
+  };
+
   return (
     <>
-      <h2>Reorder filters and indicators</h2>
+      <h2>Manage filters and indicators</h2>
       <InsetText>
         <h3>Before you start</h3>
         <p>
@@ -71,7 +86,12 @@ const ReleaseDataReorderSection = ({
           each item.
         </p>
         <p>
-          This order will be reflected in the table tool on the public website.
+          You can also pair indicators so that a child indicator is always
+          selected with its parent indicator.
+        </p>
+        <p>
+          These changes will be reflected in the table tool on the public
+          website.
         </p>
       </InsetText>
 
@@ -92,7 +112,7 @@ const ReleaseDataReorderSection = ({
                     <table className={styles.table}>
                       <caption className="govuk-visually-hidden">
                         Table showing data files in this release and buttons for
-                        reordering data file filters and indicators.
+                        managing data file filters and indicators.
                       </caption>
                       <thead>
                         <tr>
@@ -118,7 +138,7 @@ const ReleaseDataReorderSection = ({
                                       setReorderingFilters(subject)
                                     }
                                   >
-                                    Reorder filters
+                                    Manage filters
                                     <VisuallyHidden>
                                       {` for ${subject.name}`}
                                     </VisuallyHidden>
@@ -128,7 +148,7 @@ const ReleaseDataReorderSection = ({
                                       setReorderingIndicators(subject)
                                     }
                                   >
-                                    Reorder indicators
+                                    Manage indicators
                                     <VisuallyHidden>
                                       {` for ${subject.name}`}
                                     </VisuallyHidden>
@@ -154,12 +174,22 @@ const ReleaseDataReorderSection = ({
               />
             )}
             {reorderingIndicators && (
-              <ReorderIndicatorsList
-                releaseVersionId={releaseVersionId}
-                subject={reorderingIndicators}
-                onCancel={() => setReorderingIndicators(undefined)}
-                onSave={handleSaveIndicators}
-              />
+              <>
+                <ReorderIndicatorsList
+                  releaseVersionId={releaseVersionId}
+                  subject={reorderingIndicators}
+                  onCancel={() => setReorderingIndicators(undefined)}
+                  onSave={handleSaveIndicators}
+                />
+                <div className="govuk-!-margin-top-9">
+                  <PairedIndicatorsForm
+                    releaseVersionId={releaseVersionId}
+                    subject={reorderingIndicators}
+                    onCancel={() => setReorderingIndicators(undefined)}
+                    onSave={handleSavePairedIndicators}
+                  />
+                </div>
+              </>
             )}
           </div>
         </>
