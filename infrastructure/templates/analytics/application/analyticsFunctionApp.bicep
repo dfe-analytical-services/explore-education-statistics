@@ -90,6 +90,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     storageAccountName: resourceNames.analytics.functionStorageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.analyticsStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules

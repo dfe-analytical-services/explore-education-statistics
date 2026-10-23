@@ -34,20 +34,78 @@ jobs:
           Contents: .env.${{ parameters.testEnvironment }}
           TargetFolder: tests/robot-tests
 
+      # TODO EES-7502 - add Azure CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
+      # instead. Until then, this builds the Key Vault and secret names the same way as resource-names.bicep, using the
+      # "elz" flag from the environment's variable group to choose between the legacy and ELZ naming conventions.
+      - task: Bash@3
+        displayName: Get Key Vault and secret names
+        env:
+          # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ names.
+          ELZ: $(elz)
+          BASIC_AUTH_ENABLED: ${{ parameters.publicSiteBasicAuthEnabled }}
+        inputs:
+          targetType: inline
+          script: |
+            set -eo pipefail
+
+            if [ "$ELZ" = "true" ]; then
+              keyVaultName="$(subscription)kv-uks-ees01"
+              basicAuthUsernameSecret="publicsite-basic-auth-username"
+              basicAuthPasswordSecret="publicsite-basic-auth-password"
+            else
+              keyVaultName="$(subscription)-kv-ees-01"
+              basicAuthUsernameSecret="ees-public-site-basic-auth-username"
+              basicAuthPasswordSecret="ees-public-site-basic-auth-password"
+            fi
+
+            echo "Using Key Vault $keyVaultName"
+            echo "##vso[task.setvariable variable=keyVaultName]$keyVaultName"
+
+            # The Basic Auth secrets only exist in environments with Basic Auth enabled. Azure DevOps renders the
+            # boolean parameter as "True" or "False", hence the lowercasing with ",,".
+            secretsFilter="ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl"
+            if [ "${BASIC_AUTH_ENABLED,,}" = "true" ]; then
+              secretsFilter="$secretsFilter,$basicAuthUsernameSecret,$basicAuthPasswordSecret"
+            fi
+
+            echo "##vso[task.setvariable variable=keyVaultSecretsFilter]$secretsFilter"
+
       - task: AzureKeyVault@2
         displayName: Get secrets from Key Vault
         inputs:
           azureSubscription: ${{ parameters.serviceConnection }}
-          # TODO EES-7502 - pick the correct resource name based on target subscription.
-          # Ideally add AZ CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
-          # to get the correct Key Vault name for the target subscription.
-          KeyVaultName: $(subscription)-kv-ees-01
-          # The Basic Auth secrets only exist in environments with Basic Auth enabled.
-          ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
-            SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
-          ${{ else }}:
-            SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl
-          RunAsPreJob: true
+          KeyVaultName: $(keyVaultName)
+          SecretsFilter: $(keyVaultSecretsFilter)
+          # Runs as a normal step so that it can use the Key Vault and secret names worked out above.
+          RunAsPreJob: false
+
+      # The Key Vault task creates a variable named after each secret it fetches, so the basic auth secrets arrive under
+      # different variable names for the legacy and ELZ naming conventions. Copy whichever were fetched into fixed
+      # (still secret) variables for the tests to use.
+      - ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
+        - task: Bash@3
+          displayName: Set Public Site basic auth credentials
+          env:
+            ELZ: $(elz)
+            LEGACY_USERNAME: $(ees-public-site-basic-auth-username)
+            LEGACY_PASSWORD: $(ees-public-site-basic-auth-password)
+            ELZ_USERNAME: $(publicsite-basic-auth-username)
+            ELZ_PASSWORD: $(publicsite-basic-auth-password)
+          inputs:
+            targetType: inline
+            script: |
+              set -eo pipefail
+
+              if [ "$ELZ" = "true" ]; then
+                username="$ELZ_USERNAME"
+                password="$ELZ_PASSWORD"
+              else
+                username="$LEGACY_USERNAME"
+                password="$LEGACY_PASSWORD"
+              fi
+
+              echo "##vso[task.setvariable variable=publicSiteBasicAuthUsername;issecret=true]$username"
+              echo "##vso[task.setvariable variable=publicSiteBasicAuthPassword;issecret=true]$password"
 
       - task: Bash@3
         displayName: Public UI tests
@@ -64,8 +122,8 @@ jobs:
           SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
           TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
           ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
-            PUBLIC_AUTH_USER: $(ees-public-site-basic-auth-username)
-            PUBLIC_AUTH_PASSWORD: $(ees-public-site-basic-auth-password)
+            PUBLIC_AUTH_USER: $(publicSiteBasicAuthUsername)
+            PUBLIC_AUTH_PASSWORD: $(publicSiteBasicAuthPassword)
           ${{ else }}:
             PUBLIC_AUTH_USER:
             PUBLIC_AUTH_PASSWORD:
