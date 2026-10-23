@@ -7,7 +7,6 @@ public class FilterItem : IEquatable<FilterItem>
     public string Label { get; set; } = string.Empty;
     public FilterGroup FilterGroup { get; set; } = null!;
     public Guid FilterGroupId { get; set; }
-    public List<FilterItemFootnote> Footnotes { get; set; } = new();
 
     public FilterItem() { }
 
