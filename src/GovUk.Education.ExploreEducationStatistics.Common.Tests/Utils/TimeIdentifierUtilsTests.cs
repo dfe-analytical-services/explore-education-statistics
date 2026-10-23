@@ -4,7 +4,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-public class TimeIdentifierUtilTests
+public class TimeIdentifierUtilsTests
 {
     [Fact]
     public void GetIdentifiersUsingAcademicQuartersReturnsAcademicQuarters()
