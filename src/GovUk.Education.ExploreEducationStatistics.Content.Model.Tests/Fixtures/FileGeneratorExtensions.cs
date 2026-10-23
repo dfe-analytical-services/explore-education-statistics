@@ -42,6 +42,11 @@ public static class FileGeneratorExtensions
     public static Generator<File> WithType(this Generator<File> generator, FileType type) =>
         generator.ForInstance(s => s.SetType(type));
 
+    public static Generator<File> WithDataStorageVersion(
+        this Generator<File> generator,
+        DataStorageVersion? dataStorageVersion
+    ) => generator.ForInstance(s => s.SetDataStorageVersion(dataStorageVersion));
+
     public static Generator<File> WithDataSetFileId(this Generator<File> generator, Guid dataSetFileId) =>
         generator.ForInstance(s => s.SetDataSetFileId(dataSetFileId));
 
@@ -142,7 +147,15 @@ public static class FileGeneratorExtensions
     public static InstanceSetters<File> SetType(this InstanceSetters<File> setters, FileType type) =>
         setters
             .Set(f => f.Type, type)
-            .Set(f => f.DataStorageVersion, type == FileType.Data ? DataStorageVersion.StatsDB : null);
+            .Set(
+                f => f.DataStorageVersion,
+                (_, f) => type == FileType.Data ? f.DataStorageVersion ?? DataStorageVersion.StatsDB : null
+            );
+
+    public static InstanceSetters<File> SetDataStorageVersion(
+        this InstanceSetters<File> setters,
+        DataStorageVersion? dataStorageVersion
+    ) => setters.Set(f => f.DataStorageVersion, dataStorageVersion);
 
     public static InstanceSetters<File> SetDataSetFileId(this InstanceSetters<File> setters, Guid dataSetFileId) =>
         setters.Set(f => f.DataSetFileId, dataSetFileId);
