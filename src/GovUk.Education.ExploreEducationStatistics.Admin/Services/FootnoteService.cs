@@ -25,7 +25,7 @@ public class FootnoteService : IFootnoteService
 {
     private readonly StatisticsDbContext _context;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-    private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper; // for Footnotes only
+    private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
     private readonly IUserService _userService;
     private readonly IDataBlockService _dataBlockService;
     private readonly IFootnoteRepository _footnoteRepository;
@@ -249,11 +249,6 @@ public class FootnoteService : IFootnoteService
         return Unit.Instance;
     }
 
-    /// <summary>
-    /// Finds the subject of each of the given filters, filter groups, filter items and indicators among the
-    /// release version's data sets, failing if any of them, or any of the given subjects, are not linked to the
-    /// release version.
-    /// </summary>
     private async Task<Either<ActionResult, FootnoteLinks>> CreateFootnoteLinks(
         Guid releaseVersionId,
         IReadOnlySet<Guid> subjectIds,
