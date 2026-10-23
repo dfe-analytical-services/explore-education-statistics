@@ -16,6 +16,7 @@ export interface IndicatorOption extends FilterOption {
   unit: string;
   name: string;
   decimalPlaces?: number;
+  parentIndicatorId?: string;
 }
 
 export interface TimePeriodOption {
