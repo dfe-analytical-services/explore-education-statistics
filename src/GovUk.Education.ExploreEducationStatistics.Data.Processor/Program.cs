@@ -90,7 +90,8 @@ await host.RunAsync();
 return;
 
 // Caches the StatsDB's shared locations for StatisticsDbDataSetWriter. It isn't behind IStorageDataSetWriter
-// as it isn't scoped to a data set. It will be removed once data sets are parquet files with their own locations.
+// as it isn't scoped to a data set. It will be removed once data sets are parquet files with their own
+// per-data-set locations.
 void LoadLocationCache()
 {
     var dbContextSupplier = host.Services.GetRequiredService<IDbContextSupplier>();
