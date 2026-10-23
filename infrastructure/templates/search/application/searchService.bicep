@@ -79,12 +79,14 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
   name: 'searchStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.search.storageAccount
-    connectionStringSecretName: resourceNames.keyVault.secrets.searchStorageAccountConnectionString
+    connectionStringSecret: {
+      keyVaultName: keyVault.name
+      secretName: resourceNames.keyVault.secrets.searchStorageAccountConnectionString
+    }
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: keyVault.name
     alerts: {
       availability: true
       latency: false

@@ -39,7 +39,6 @@ module screenerLogsStorageAccountModule '../../common/components/storage/storage
     firewallRules: storageFirewallRules
     sku: storageAccountConfig.sku
     kind: storageAccountConfig.kind
-    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true

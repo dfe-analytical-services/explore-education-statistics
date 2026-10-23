@@ -184,9 +184,11 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: managementStorageAccountName
-    connectionStringSecretName: '${managementStorageAccountName}-connection-string'
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${managementStorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
@@ -205,9 +207,11 @@ module slot1StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot1StorageAccountName
-    connectionStringSecretName: '${slot1StorageAccountName}-connection-string'
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${slot1StorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       file: privateEndpoints.storageAccounts
@@ -241,9 +245,11 @@ module slot2StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot2StorageAccountName
-    connectionStringSecretName: '${slot2StorageAccountName}-connection-string'
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${slot2StorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       file: privateEndpoints.storageAccounts

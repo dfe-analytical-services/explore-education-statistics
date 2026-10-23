@@ -251,8 +251,10 @@ module storageAccountModule '../storage/storage-account.bicep' = {
     firewallRules: storageFirewallRules
     sku: storageAccountSku
     kind: 'StorageV2'
-    keyVaultName: keyVaultName
-    connectionStringSecretName: storageAccountConnectionStringSecretName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: storageAccountConnectionStringSecretName
+    }
     privateEndpointSubnetIds: privateEndpoints != null ? {
       blob: privateEndpoints!.storageAccounts
       file: privateEndpoints!.storageAccounts

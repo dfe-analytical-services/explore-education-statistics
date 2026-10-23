@@ -866,7 +866,8 @@ func getElzResourceNames(env string) ResourceNames => {
   keyVault: {
     keyVault: elzName(env, elzAbbreviations.keyVaultVaults, 'ees')
     keys: {
-      dataProtection: 'ees-dataprotection-key'
+      // Shared by the App Services (Admin, Content API, Data API) for their ASP.NET Core Data Protection key ring.
+      dataProtection: 'app-service-dataprotection-key'
     }
     // Certificates and secrets live in a Key Vault dedicated to EES in a single environment, so their names
     // need neither an "ees-" prefix nor an environment prefix. They are named "{workload}-{purpose}", using the

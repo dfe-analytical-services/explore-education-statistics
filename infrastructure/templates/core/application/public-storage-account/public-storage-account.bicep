@@ -48,8 +48,10 @@ module storageAccountModule '../../../common/components/storage/storage-account.
     kind: 'StorageV2'
     sku: 'Standard_LRS'
     publicNetworkAccessEnabled: true
-    keyVaultName: keyVaultName
-    connectionStringSecretName: connectionStringSecretName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: connectionStringSecretName
+    }
     firewallRules: firewallRules
     allowedSubnetIds: [
       subnets.admin.id

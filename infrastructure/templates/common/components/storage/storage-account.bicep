@@ -23,11 +23,14 @@ param kind StorageAccountKind = 'StorageV2'
 @description('The access tier for Blob access.')
 param accessTier 'Hot' | 'Cool' | 'Cold' | 'Premium' = 'Hot'
 
-@description('Name of the Key Vault in which to store the connection string secret, if connectionStringSecretName is supplied.')
-param keyVaultName string?
+@description('Key Vault secret in which to store this storage account\'s connection string. The connection string is only stored if this is supplied, so only supply it where something reads the secret.')
+param connectionStringSecret {
+  @description('Name of the Key Vault in which to store the secret.')
+  keyVaultName: string
 
-@description('Name of the Key Vault secret in which to store this storage account\'s connection string. The connection string is only stored if this is supplied, so only supply it where something reads the secret.')
-param connectionStringSecretName string?
+  @description('Name of the secret.')
+  secretName: string
+}?
 
 @description('Whether the storage account is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -168,15 +171,16 @@ module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && 
 var key = storageAccount.listKeys().keys[0].value
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
-module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null && connectionStringSecretName != null) {
+module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (connectionStringSecret != null) {
   name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
-    keyVaultName: keyVaultName!
-    secretName: connectionStringSecretName!
+    keyVaultName: connectionStringSecret!.keyVaultName
+    secretName: connectionStringSecret!.secretName
     secretValue: storageAccountConnectionString
   }
 }
 
 output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
-output connectionStringSecretName string? = connectionStringSecretName
+@description('Name of the Key Vault secret holding the connection string, or null if it isn\'t stored.')
+output connectionStringSecretName string? = connectionStringSecret.?secretName
