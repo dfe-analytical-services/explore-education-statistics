@@ -27,7 +27,6 @@ public class FootnoteRepository : IFootnoteRepository
     {
         var footnote = new Footnote
         {
-            Releases = new List<ReleaseFootnote> { new() { ReleaseVersionId = releaseVersionId } },
             ReleaseVersionId = releaseVersionId,
             Content = content,
             Order = order,
@@ -91,10 +90,8 @@ public class FootnoteRepository : IFootnoteRepository
             .Select(indicator => indicator.Id)
             .ToListAsync();
 
-        // A footnote must be linked to the release version id
-        var footnotesQueryable = _context.Footnote.Where(footnote =>
-            footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseVersionId == releaseVersionId)
-        );
+        // A footnote must belong to the release version
+        var footnotesQueryable = _context.Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId);
 
         // If the list of filter and indicator id's are empty,
         // return early with only footnotes that apply directly to this subject
@@ -199,9 +196,15 @@ public class FootnoteRepository : IFootnoteRepository
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async footnote =>
             {
-                if (await IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId))
+                if (
+                    await IsFootnoteLinkedToAnotherSubjectForThisRelease(
+                        footnoteId: footnote.Id,
+                        releaseVersionId: releaseVersionId,
+                        subjectId: subjectId
+                    )
+                )
                 {
-                    // Don't delete the footnote because it's linked to other subjects
+                    // Don't delete the footnote because it's linked to other subjects of this release version
 
                     // We can't rely on this subject being deleted after this method call because a subject isn't
                     // deleted if its linked to previous release versions.
@@ -236,110 +239,44 @@ public class FootnoteRepository : IFootnoteRepository
                     );
                     _context.SubjectFootnote.RemoveRange(subjectFootnoteLinks);
 
-                    if (
-                        !await IsFootnoteLinkedToAnotherSubjectForThisRelease(
-                            footnoteId: footnote.Id,
-                            releaseVersionId: releaseVersionId,
-                            subjectId: subjectId
-                        )
-                    )
-                    {
-                        // Footnote will become exclusive to subjects which are not linked to this release
-                        // so we can remove the footnote link to this release
-                        // TODO EES-2979 Remove this else block when a footnote can only belong to one release
-                        await DeleteReleaseFootnoteLink(releaseVersionId: releaseVersionId, footnoteId: footnote.Id);
-                    }
-
                     await _context.SaveChangesAsync();
                 }
                 else
                 {
-                    // It's safe to delete the footnote as it's not linked to any other subject
+                    // It's safe to delete the footnote as it's not linked to any other subject of this release version
                     await DeleteFootnote(releaseVersionId: releaseVersionId, footnoteId: footnote.Id);
                 }
             });
     }
 
-    /// <summary>
-    /// Deletes every Footnote linked to a ReleaseVersion, regardless of whether it is reachable through
-    /// any Subject, Filter or Indicator link.
-    /// </summary>
-    /// <remarks>
-    /// <see cref="DeleteFootnotesBySubject"/> only finds Footnotes that are linked to the Subject being
-    /// deleted, so it cannot see a Footnote whose only remaining link is its ReleaseFootnote, and it is not
-    /// called at all for a ReleaseVersion that has no ReleaseSubjects. Deleting the statistics ReleaseVersion
-    /// cascades those ReleaseFootnotes away, which would leave the Footnote rows behind with nothing
-    /// referencing them, so this sweeps up whatever is left before that happens.
-    /// </remarks>
-    public async Task DeleteFootnotesByReleaseVersion(Guid releaseVersionId)
-    {
-        var footnoteIds = await _context
-            .ReleaseFootnote.Where(releaseFootnote => releaseFootnote.ReleaseVersionId == releaseVersionId)
-            .Select(releaseFootnote => releaseFootnote.FootnoteId)
-            .ToListAsync();
-
-        foreach (var footnoteId in footnoteIds)
-        {
-            // Footnotes shared with another ReleaseVersion only lose their link to this one.
-            await DeleteFootnote(releaseVersionId: releaseVersionId, footnoteId: footnoteId);
-        }
-    }
-
     public async Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId)
     {
-        if (await IsFootnoteExclusiveToRelease(releaseVersionId: releaseVersionId, footnoteId: footnoteId))
+        var footnoteToRemove = await _context
+            .Footnote
+            // The database cascades the delete to these links, but the in-memory test provider only cascades to
+            // tracked entities, so these includes are only needed for tests
+            .Include(footnote => footnote.Subjects)
+            .Include(footnote => footnote.Filters)
+            .Include(footnote => footnote.FilterGroups)
+            .Include(footnote => footnote.FilterItems)
+            .Include(footnote => footnote.Indicators)
+            .SingleAsync(f => f.Id == footnoteId && f.ReleaseVersionId == releaseVersionId);
+
+        var footnotesToReorder = await _context
+            .Footnote.Where(f => f.ReleaseVersionId == releaseVersionId && f.Order > footnoteToRemove.Order)
+            .OrderBy(f => f.Order)
+            .ToListAsync();
+
+        _context.Footnote.Remove(footnoteToRemove);
+        _context.Footnote.UpdateRange(footnotesToReorder);
+        footnotesToReorder.ForEach(footnoteToReorder =>
         {
-            var footnoteToRemove = await _context
-                .Footnote
-                // These includes are necessary so that the related entities are marked for deletion
-                .Include(footnote => footnote.Releases)
-                .Include(footnote => footnote.Subjects)
-                .Include(footnote => footnote.Filters)
-                .Include(footnote => footnote.FilterGroups)
-                .Include(footnote => footnote.FilterItems)
-                .Include(footnote => footnote.Indicators)
-                .SingleAsync(f => f.Id == footnoteId);
-
-            var footnotesToReorder = await _context
-                .ReleaseFootnote.Include(rf => rf.Footnote)
-                .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.Footnote.Order > footnoteToRemove.Order)
-                .Select(rf => rf.Footnote)
-                .OrderBy(f => f.Order)
-                .ToListAsync();
-
-            _context.Footnote.Remove(footnoteToRemove);
-            _context.Footnote.UpdateRange(footnotesToReorder);
-            footnotesToReorder.ForEach(footnoteToReorder =>
+            if (footnoteToReorder.Order > 0)
             {
-                if (footnoteToReorder.Order > 0)
-                {
-                    footnoteToReorder.Order--;
-                }
-            });
-            await _context.SaveChangesAsync();
-        }
-        else
-        {
-            // TODO EES-2979 Remove this once a footnote can only belong to one release
-            // It's only be possible to reach this code if editing a very old draft release amendment,
-            // created circa September 2020 when we began copying footnotes when creating new versions.
-            await DeleteReleaseFootnoteLink(releaseVersionId: releaseVersionId, footnoteId: footnoteId);
-            await _context.SaveChangesAsync();
-
-            // TODO Because the footnote isn't deleted this could be leaving footnote links to subjects or
-            // filters/filter groups/filter items of subjects that only belong to this release.
-            // It seems unlikely we will need to fix this, but prioritise EES-2979 instead.
-        }
-    }
-
-    public async Task<bool> IsFootnoteExclusiveToRelease(Guid releaseVersionId, Guid footnoteId)
-    {
-        // TODO EES-2979 Remove this method
-        var otherFootnoteReferences = await _context.ReleaseFootnote.CountAsync(rf =>
-            rf.FootnoteId == footnoteId && rf.ReleaseVersionId != releaseVersionId
-        );
-
-        return otherFootnoteReferences == 0;
+                footnoteToReorder.Order--;
+            }
+        });
+        await _context.SaveChangesAsync();
     }
 
     public Task<Footnote> GetFootnote(Guid id)
@@ -362,11 +299,13 @@ public class FootnoteRepository : IFootnoteRepository
         var footnotes = await GetFootnotes(releaseVersionId, subjectsIdsForReleaseVersion);
 
         // Remove the below check as part of EES-2971
-        var releaseFootnotes = _context.ReleaseFootnote.Where(rf => rf.ReleaseVersionId == releaseVersionId).ToList();
-        if (footnotes.Count != releaseFootnotes.Count)
+        var releaseVersionFootnoteCount = await _context.Footnote.CountAsync(footnote =>
+            footnote.ReleaseVersionId == releaseVersionId
+        );
+        if (footnotes.Count != releaseVersionFootnoteCount)
         {
             throw new Exception(
-                $"Number of footnotes different from number of ReleaseFootnotes for ReleaseVersion {releaseVersionId}"
+                $"Number of footnotes linked to Subjects of ReleaseVersion {releaseVersionId} different from number of footnotes belonging to it"
             );
         }
 
@@ -377,14 +316,13 @@ public class FootnoteRepository : IFootnoteRepository
     {
         return (
             await GetBaseFootnoteQuery()
-                .Where(footnote =>
-                    footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseVersionId == releaseVersionId)
-                )
+                .Where(footnote => footnote.ReleaseVersionId == releaseVersionId)
                 .Select(f => new Footnote
                 {
                     Id = f.Id,
                     Content = f.Content,
                     Order = f.Order,
+                    ReleaseVersionId = f.ReleaseVersionId,
                     Filters = f
                         .Filters.Where(filterFootnote => subjectIds.Contains(filterFootnote.Filter.SubjectId))
                         .ToList(),
@@ -392,9 +330,6 @@ public class FootnoteRepository : IFootnoteRepository
                         .Indicators.Where(indicatorFootnote =>
                             subjectIds.Contains(indicatorFootnote.Indicator.IndicatorGroup.SubjectId)
                         )
-                        .ToList(),
-                    Releases = f
-                        .Releases.Where(releaseFootnote => releaseFootnote.ReleaseVersionId == releaseVersionId)
                         .ToList(),
                     FilterGroups = f
                         .FilterGroups.Where(filterGroupFootnote =>
@@ -429,7 +364,6 @@ public class FootnoteRepository : IFootnoteRepository
             .Include(footnote => footnote.Indicators)
                 .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
                     .ThenInclude(indicator => indicator.IndicatorGroup)
-            .Include(footnote => footnote.Releases)
             .Include(footnote => footnote.Subjects);
     }
 
@@ -456,25 +390,6 @@ public class FootnoteRepository : IFootnoteRepository
             )
             .Select(releaseSubject => releaseSubject.Subject)
             .ToListAsync();
-    }
-
-    public async Task DeleteReleaseFootnoteLink(Guid releaseVersionId, Guid footnoteId)
-    {
-        // TODO EES-2979 Remove this method
-        var releaseFootnote = await _context.ReleaseFootnote.FirstAsync(rf =>
-            rf.ReleaseVersionId == releaseVersionId && rf.FootnoteId == footnoteId
-        );
-        _context.ReleaseFootnote.Remove(releaseFootnote);
-    }
-
-    private async Task<bool> IsFootnoteLinkedToAnotherSubject(Guid footnoteId, Guid subjectId)
-    {
-        var footnote = await GetFootnote(footnoteId);
-        return footnote.Subjects.Any(subject => subject.SubjectId != subjectId)
-            || footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId)
-            || footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId)
-            || footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId)
-            || footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId);
     }
 
     private async Task<bool> IsFootnoteLinkedToAnotherSubjectForThisRelease(
