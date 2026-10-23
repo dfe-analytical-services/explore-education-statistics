@@ -33,6 +33,14 @@ jobs:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+              fetchDepth: 1
+              sparseCheckoutDirectories: infrastructure/templates/common
+
+            - template: get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - download: ${{ parameters.downloadPipeline }}
               displayName: Download ${{ parameters.functionAppName }} Function App artifact
               artifact: ${{ parameters.artifactName }}

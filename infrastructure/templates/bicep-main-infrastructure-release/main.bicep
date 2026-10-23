@@ -1,5 +1,5 @@
 import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
-import { getResourceNamesForEnvironment } from 'resource-names.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
@@ -168,7 +168,10 @@ param publicSiteProdAppSettings object = {}
 // Resource provisioning.
 //
 
-var resourceNames = getResourceNamesForEnvironment(environmentConfig)
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: environmentConfig.environmentIdentifier!
+  environmentName: environmentConfig.environmentName!
+})
 
 var minTlsVersion = '1.2'
 

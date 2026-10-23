@@ -1,16 +1,30 @@
-import { abbreviations } from '../../abbreviations.bicep'
 import { staticAverageLessThanHundred, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan, dynamicAverageLessThan } from '../alerts/dynamicAlertConfig.bicep'
 import { FrontDoorCertificateType } from 'types.bicep'
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
 
 @description('Name of the Key Vault instance in which to store certificates.')
 param keyVaultName string
 
 @description('Name of the resource.')
 param frontDoorProfileName string
+
+@description('Name of the Front Door endpoint.')
+param endpointName string
+
+@description('Name of the origin group.')
+param originGroupName string
+
+@description('Name of the origin.')
+param originName string
+
+@description('Name of the route.')
+param routeName string
+
+@description('Name of the Web Application Firewall policy, if deployed.')
+param wafPolicyName string
+
+@description('Name of the Web Application Firewall security policy, if deployed.')
+param wafSecurityPolicyName string
 
 @description('Hostname used to reach Azure Front Door and its protected origin.')
 param siteHostName string
@@ -78,7 +92,7 @@ resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' = {
 
 resource endpoints 'Microsoft.Cdn/profiles/afdendpoints@2025-04-15' = {
   parent: frontDoor
-  name: '${resourcePrefix}-${abbreviations.frontDoorEndpoints}'
+  name: endpointName
   location: 'global'
   tags: tagValues
   properties: {
@@ -88,7 +102,7 @@ resource endpoints 'Microsoft.Cdn/profiles/afdendpoints@2025-04-15' = {
 
 resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
   parent: frontDoor
-  name: '${resourcePrefix}-${abbreviations.frontDoorOriginGroups}'
+  name: originGroupName
   properties: {
     loadBalancingSettings: {
       sampleSize: 4
@@ -107,7 +121,7 @@ resource originGroup 'Microsoft.Cdn/profiles/origingroups@2025-04-15' = {
 
 resource origin 'Microsoft.Cdn/profiles/origingroups/origins@2025-04-15' = {
   parent: originGroup
-  name: '${resourcePrefix}-${abbreviations.frontDoorOrigins}'
+  name: originName
   properties: {
     hostName: originHostName
     httpPort: 80
@@ -159,8 +173,6 @@ resource customDomainWithoutCertificate 'Microsoft.Cdn/profiles/customdomains@20
   }
 }
 
-var wafPolicyName = '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafPolicies}'
-
 module wafPolicyModule 'wafPolicy.bicep' = if (deployWaf) {
   name: '${frontDoorProfileName}WafPolicyModule'
   params: {
@@ -172,7 +184,7 @@ module wafPolicyModule 'wafPolicy.bicep' = if (deployWaf) {
 module wafSecurityPolicyModule 'wafSecurityPolicy.bicep' = if (deployWaf && deployWafDomainAssociation) {
   name: '${frontDoorProfileName}WafSecurityPolicyModule'
   params: {
-    securityPolicyName: '${replace(frontDoorProfileName, '-', '')}${abbreviations.frontDoorWafSecurityPolicies}'
+    securityPolicyName: wafSecurityPolicyName
     wafPolicyName: wafPolicyName
     customDomainNames: [customDomainName]
     frontDoorProfileName: frontDoorProfileName
@@ -193,7 +205,7 @@ resource ruleSets 'Microsoft.Cdn/profiles/rulesets@2025-04-15' = [
 
 resource route 'Microsoft.Cdn/profiles/afdendpoints/routes@2025-04-15' = {
   parent: endpoints
-  name: '${resourcePrefix}-${abbreviations.frontDoorRoutes}'
+  name: routeName
   properties: {
     cacheConfiguration: {
       compressionSettings: {

@@ -16,7 +16,7 @@ jobs:
     dependsOn: ${{ parameters.dependsOn }}
     deploymentName: DeployAnalyticsFunction
     downloadPipeline: MainBuild
-    functionAppName: $(analyticsFunctionAppName)
+    functionAppName: $(resourceNames.analytics.functionApp)
     artifactName: analytics-function-app
     artifactZipName: GovUk.Education.ExploreEducationStatistics.Analytics.Consumer.zip
     healthCheckUrl: $(analyticsFunctionAppUrl)/api/HealthCheck

@@ -1,15 +1,11 @@
-import { abbreviations } from '../../../common/abbreviations.bicep'
-
-@description('Resource prefix for all resources.')
-param subscription string
+@description('Name of the Action Group.')
+param actionGroupName string
 
 @description('Specifies the name of the alerts logic app.')
 param alertsLogicAppName string
 
-var alertsActionGroupName = '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
-
 resource actionGroup 'Microsoft.Insights/actionGroups@2019-06-01' = {
-  name: alertsActionGroupName
+  name: actionGroupName
   location: 'global'
   properties: {
     groupShortName: 'alertAG'

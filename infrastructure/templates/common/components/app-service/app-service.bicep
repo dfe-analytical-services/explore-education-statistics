@@ -174,7 +174,7 @@ var infraAppSettings = union({
     resourceId('Microsoft.Insights/components', appInsightsName),
     '2020-02-02'
   ).InstrumentationKey
-  WEBSITE_NODE_DEFAULT_VERSION: '22.23.3'
+  WEBSITE_NODE_DEFAULT_VERSION: '22.23.4'
   ASPNETCORE_DETAILEDERRORS: detailedErrors
   WEBSITES_PORT: websitePort
 

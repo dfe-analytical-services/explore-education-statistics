@@ -23,6 +23,10 @@ jobs:
 
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - template: ../tasks/deploy-bicep.yml
               parameters:
                 displayName: Validate Bicep template
@@ -44,16 +48,16 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 slotName: deploy
                 apps:
-                  - appName: $(subscription)-as-ees-admin
+                  - appName: $(resourceNames.admin.appService)
                     stagingVariableName: adminStagingSlotAppSettings
                     prodVariableName: adminProdAppSettings
-                  - appName: $(subscription)-as-ees-content
+                  - appName: $(resourceNames.contentApi.appService)
                     stagingVariableName: contentApiStagingSlotAppSettings
                     prodVariableName: contentApiProdAppSettings
-                  - appName: $(subscription)-as-ees-data
+                  - appName: $(resourceNames.dataApi.appService)
                     stagingVariableName: dataApiStagingSlotAppSettings
                     prodVariableName: dataApiProdAppSettings
-                  - appName: $(subscription)-as-ees-public-site
+                  - appName: $(resourceNames.publicSite.appService)
                     prodVariableName: publicSiteProdAppSettings
 
             - template: ../../../../common/ci/tasks/get-current-appsettings.yml
@@ -63,11 +67,11 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
                 apps:
-                  - appName: $(subscription)-fa-ees-importer
+                  - appName: $(resourceNames.importer.functionApp)
                     prodVariableName: importerProdAppSettings
-                  - appName: $(subscription)-fa-ees-publisher
+                  - appName: $(resourceNames.publisher.functionApp)
                     prodVariableName: publisherProdAppSettings
-                  - appName: $(subscription)-fa-ees-notify
+                  - appName: $(resourceNames.notifier.functionApp)
                     prodVariableName: notifierProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml

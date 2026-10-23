@@ -1,4 +1,3 @@
-import { abbreviations } from '../common/abbreviations.bicep'
 import {
   ContainerAppResourceConfig
   PrincipalNameAndId
@@ -8,6 +7,7 @@ import {
 } from 'types.bicep'
 import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig } from '../common/components/storage/types.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -65,7 +65,10 @@ param postgreSqlAdminName string = ''
 @secure()
 param postgreSqlAdminPassword string?
 
+// Currently unused, as the Container App's ACR pull role assignment is commented out in publicApiAppIdentity.bicep,
+// but kept as the pipeline still supplies it.
 @description('ACR : Specifies the resource group in which the shared Container Registry lives.')
+#disable-next-line no-unused-params
 param acrResourceGroupName string = ''
 
 @description('Public API docs app : SKU to use.')
@@ -161,68 +164,10 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-//
-// Define our resource prefix.
-//
-
-// The resource prefix for anything specific to the Public API.
-var publicApiResourcePrefix = '${subscription}-ees-papi'
-
-// The resource prefix for anything not specific solely to the Public API but set up within Bicep.
-var commonResourcePrefix = '${subscription}-ees'
-
-// The resource prefix for resources created in the ARM template.
-var legacyResourcePrefix = subscription
-
-var resourceNames = {
-  existingResources: {
-    acr: 'eesacr'
-    acrResourceGroup: acrResourceGroupName
-    adminApp: '${legacyResourcePrefix}-as-ees-admin'
-    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
-    analyticsFileShare: '${commonResourcePrefix}-${abbreviations.fileShare}-anlyt'
-    analyticsStorageAccount: '${replace(commonResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
-    backupVault: {
-      vault: '${commonResourcePrefix}-${abbreviations.backupVaults}'
-      psqlFlexibleServerBackupPolicy: '${commonResourcePrefix}-psql-flexible-server-${abbreviations.backupVaultPolicies}'
-    }
-    // TODO EES-7502 - the Test Resource Group has broken from the naming convention of other environments for Core Storage
-    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
-      ? '${legacyResourcePrefix}storageeescore'
-      : '${legacyResourcePrefix}saeescore'
-    keyVault: '${legacyResourcePrefix}-kv-ees-01'
-    logAnalyticsWorkspace: '${commonResourcePrefix}-log'
-    publisherFunction: '${legacyResourcePrefix}-fa-ees-publisher'
-    subnets: {
-      adminApp: '${legacyResourcePrefix}-snet-ees-admin'
-      publisherFunction: '${legacyResourcePrefix}-snet-ees-publisher'
-      containerAppEnvironment: '${commonResourcePrefix}-snet-${abbreviations.appManagedEnvironments}-01'
-      dataProcessor: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor'
-      dataProcessorPrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.webSitesFunctions}-processor-pep'
-      storagePrivateEndpoints: '${publicApiResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-pep'
-      psqlFlexibleServer: '${commonResourcePrefix}-snet-${abbreviations.dBforPostgreSQLServers}'
-    }
-    vNet: '${legacyResourcePrefix}-vnet-ees'
-  }
-  sharedResources: {
-    containerAppEnvironment: '${commonResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
-    postgreSqlFlexibleServer: '${commonResourcePrefix}-${abbreviations.dBforPostgreSQLServers}'
-    recoveryVault: '${commonResourcePrefix}-${abbreviations.recoveryServicesVaults}'
-    searchService: '${commonResourcePrefix}-${abbreviations.searchSearchServices}'
-  }
-  publicApi: {
-    apiApp: '${publicApiResourcePrefix}-${abbreviations.appContainerApps}-api'
-    apiAppIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.appContainerApps}-api'
-    appInsights: '${publicApiResourcePrefix}-${abbreviations.insightsComponents}'
-    dataProcessor: '${publicApiResourcePrefix}-${abbreviations.webSitesFunctions}-processor'
-    dataProcessorIdentity: '${publicApiResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-${abbreviations.webSitesFunctions}-processor'
-    dataProcessorPlan: '${publicApiResourcePrefix}-${abbreviations.webServerFarms}-${abbreviations.webSitesFunctions}-processor'
-    dataProcessorStorageAccountsPrefix: '${subscription}eessaprocessor'
-    docsApp: '${publicApiResourcePrefix}-${abbreviations.staticWebApps}-docs'
-    publicApiFileShare: '${publicApiResourcePrefix}-${abbreviations.fileShare}-data'
-    publicApiStorageAccount: '${replace(publicApiResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}'
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+})
 
 var maintenanceFirewallRules = [
   for maintenanceIpRange in maintenanceIpRanges: {
@@ -234,20 +179,13 @@ var maintenanceFirewallRules = [
 ]
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 module vNetModule 'application/shared/virtualNetwork.bicep' = {
   name: 'virtualNetworkApplicationModuleDeploy'
   params: {
-    resourceNames: resourceNames
-  }
-}
-
-module coreStorage 'application/shared/coreStorage.bicep' = {
-  name: 'coreStorageApplicationModuleDeploy'
-  params: {
-    resourceNames: resourceNames
+    names: resourceNames.vnet
   }
 }
 
@@ -265,7 +203,7 @@ module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = 
 module searchServiceModule 'application/shared/searchService.bicep' = {
   name: 'searchServiceApplicationModuleDeploy'
   params: {
-    name: resourceNames.sharedResources.searchService
+    name: resourceNames.search.service
   }
 }
 
@@ -357,7 +295,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
   name: 'publicApiDocsModuleDeploy'
   params: {
     appSku: docsAppSku
-    resourceNames: resourceNames
+    names: resourceNames.publicApi
     tagValues: tagValues
   }
 }
@@ -418,8 +356,6 @@ output dataProcessorPublicApiDataFileShareMountPath string = deployDataProcessor
   ? dataProcessorModule!.outputs.publicApiDataFileShareMountPath
   : ''
 
-output coreStorageConnectionStringSecretKey string = coreStorage.outputs.coreStorageConnectionStringSecretKey
-output keyVaultName string = resourceNames.existingResources.keyVault
 
 output enableThemeDeletion bool = enableThemeDeletion
 

@@ -1,5 +1,5 @@
 import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
-import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
+import { ResourceNames } from '../common/resource-names.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
 

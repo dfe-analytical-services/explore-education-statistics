@@ -1,12 +1,8 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 import { IpRange } from '../../common/types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
-
-@description('Resource prefix for all resources.')
-param resourcePrefix string
 
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -18,15 +14,15 @@ param tagValues object
 param deployAlerts bool
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-11-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
-  name: resourceNames.existingResources.subnets.storagePrivateEndpoints
+  name: resourceNames.vnet.subnets.analyticsStoragePrivateEndpoints
   parent: vNet
 }
 
-var storageAccountName = '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlyt'
+var storageAccountName = resourceNames.analytics.storage.storageAccountName
 
 var storageAccountConfig = {
   kind: 'FileStorage'
@@ -37,7 +33,7 @@ var storageAccountConfig = {
   }
 }
 
-var fileShareName = '${resourcePrefix}-${abbreviations.fileShare}-anlyt'
+var fileShareName = resourceNames.analytics.storage.fileShareName
 
 module analyticsStorageAccountModule '../../common/components/storage/storage-account.bicep' = {
   name: 'analyticsStorageAccountDeploy'
@@ -47,11 +43,11 @@ module analyticsStorageAccountModule '../../common/components/storage/storage-ac
     firewallRules: storageFirewallRules
     sku: storageAccountConfig.sku
     kind: storageAccountConfig.kind
-    keyVaultName: resourceNames.existingResources.keyVault
+    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     privateEndpointSubnetIds: {
       file: storagePrivateEndpointSubnet.id
@@ -71,7 +67,7 @@ module analyticsFileShareModule '../../common/components/storage/fileShare.bicep
       availability: true
       latency: true
       capacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
   }

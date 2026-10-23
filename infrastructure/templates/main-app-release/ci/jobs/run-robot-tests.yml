@@ -33,9 +33,12 @@ jobs:
           TargetFolder: tests/robot-tests
 
       - task: AzureKeyVault@2
-        displayName: Azure Key Vault - $(subscription)-kv-ees-01
+        displayName: Get secrets from Key Vault
         inputs:
           azureSubscription: ${{ parameters.serviceConnection }}
+          # TODO EES-7502 - pick the correct resource name based on target subscription.
+          # Ideally add AZ CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
+          # to get the correct Key Vault name for the target subscription.
           KeyVaultName: $(subscription)-kv-ees-01
           SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
           RunAsPreJob: true
