@@ -13,6 +13,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
 
@@ -134,6 +137,7 @@ var tagValues = union(resourceTags ?? {}, {
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
+  elz: elz
 })
 
 module vNetModule 'application/virtual-network/virtual-network.bicep' = {
