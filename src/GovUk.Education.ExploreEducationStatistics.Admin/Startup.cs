@@ -57,8 +57,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Options;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -605,10 +608,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             return new LoggingNotificationClient(logger);
         });
 
-        services.AddTransient<ISqlStatementsHelper, SqlStatementsHelper>();
-        services.AddTransient<IRawSqlExecutor, RawSqlExecutor>();
-        services.AddTransient<ITemporaryTableCreator, TemporaryTableCreator>();
-
         services.AddSingleton<IDbContextSupplier, DbContextSupplier>();
         services.AddSingleton<IDatabaseHelper, DatabaseHelper>();
 
@@ -618,28 +617,13 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IEmailTemplateService, EmailTemplateService>();
         services.AddTransient<ITableBuilderService, TableBuilderService>();
         services.AddTransient<ITableBuilderQueryOptimiser, TableBuilderQueryOptimiser>();
-        services.AddTransient<IFilterRepository, FilterRepository>();
-        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-        services.AddTransient<
-            ISparseObservationsMatchedFilterItemsStrategy,
-            SparseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<
-            IDenseObservationsMatchedFilterItemsStrategy,
-            DenseObservationsMatchedFilterItemsStrategy
-        >();
-        services.AddTransient<IAllObservationsMatchedFilterItemsStrategy, AllObservationsMatchedFilterItemsStrategy>();
+        services.AddStorageDataSets();
         services.AddTransient<IFootnoteService, FootnoteService>();
         services.AddTransient<IFootnoteRepository, FootnoteRepository>();
         services.AddTransient<IBoundaryDataRepository, BoundaryDataRepository>();
         services.AddTransient<IGlossaryService, GlossaryService>();
-        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-        services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
-        services.AddTransient<IObservationService, ObservationService>();
-        services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IOrganisationsService, OrganisationsService>();
         services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
         services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
@@ -657,17 +641,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ITimePeriodService, TimePeriodService>();
         services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
         services.AddTransient<ISubjectMetaService, SubjectMetaService>(provider => new SubjectMetaService(
-            statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
             contentDbContext: provider.GetRequiredService<ContentDbContext>(),
             cacheService: provider.GetRequiredService<IPrivateBlobCacheService>(),
             releaseSubjectService: provider.GetRequiredService<IReleaseSubjectService>(),
-            filterRepository: provider.GetRequiredService<IFilterRepository>(),
-            filterItemRepository: provider.GetRequiredService<IFilterItemRepository>(),
-            indicatorGroupRepository: provider.GetRequiredService<IIndicatorGroupRepository>(),
-            locationRepository: provider.GetRequiredService<ILocationRepository>(),
+            storageDataSetResolver: provider.GetRequiredService<IStorageDataSetResolver>(),
             logger: provider.GetRequiredService<ILogger<SubjectMetaService>>(),
-            observationService: provider.GetRequiredService<IObservationService>(),
-            timePeriodService: provider.GetRequiredService<ITimePeriodService>(),
             userService: provider.GetRequiredService<IUserService>(),
             locationOptions: provider.GetRequiredService<IOptions<LocationsOptions>>()
         ));
