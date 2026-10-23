@@ -43,7 +43,7 @@ steps:
           --resource-group $(resourceGroupName) \
           --template-file ${{ parameters.templateFile }} \
           --parameters ${{ parameters.paramFile }} \
-          --parameters deployedAt="$deployedAt" ${{ parameters.additionalParameters }}
+          --parameters deployedAt="$deployedAt"
 
   - template: ../../../../common/ci/tasks/bicep-output-variables.yml
     parameters:
