@@ -52,6 +52,8 @@ public class ImporterMetaService : IImporterMetaService
         var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, dataSet.SubjectId);
         var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, dataSet.SubjectId);
 
+        // These load every filter and indicator group only to check whether there are any. A possible performance
+        // improvement is to add HasFilters and HasIndicatorGroups to IStorageDataSet.
         var filtersAlreadyImported = filtersAndMeta.Count > 0 && (await dataSet.ListFilters()).Count > 0;
 
         var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && (await dataSet.ListIndicatorGroups()).Count > 0;
