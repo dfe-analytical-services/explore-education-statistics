@@ -2,8 +2,10 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.StatsDb;
 
 public abstract class StatisticsDbDataSetWriterTests
 {
+    private static readonly DataFixture Fixture = new();
+
     private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
 
     public class WriteFiltersAndIndicatorsTests : StatisticsDbDataSetWriterTests
@@ -196,6 +200,154 @@ public abstract class StatisticsDbDataSetWriterTests
                 .WriteObservations(observations);
 
             VerifyAllMocks(observationBatchImporter);
+        }
+    }
+
+    public class CountObservationsTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task ObservationsForSubjectOnlyCounted()
+        {
+            var subjectId = Guid.NewGuid();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.Observation.AddRange(
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = subjectId },
+                    new Observation { SubjectId = Guid.NewGuid() }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Assert.Equal(2, await BuildWriter(subjectId).CountObservations());
+        }
+    }
+
+    public class ListFilterItemRelationshipsTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task ParentAndChildFilterItemsOnSameObservation_ReturnedAsDistinctPairs()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+
+            Filter parentFilter = Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2).WithSubject(subject);
+            Filter childFilter = Fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2).WithSubject(subject);
+
+            var parentItems = parentFilter.FilterGroups[0].FilterItems;
+            var childItems = childFilter.FilterGroups[0].FilterItems;
+
+            var observations = new List<Observation>
+            {
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[0], childItems[0]]),
+                // Same pair as above, which should only be returned once
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[0], childItems[0]]),
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[1], childItems[0]]),
+                Fixture.DefaultObservation().WithSubject(subject).WithFilterItems([parentItems[1], childItems[1]]),
+            };
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(parentFilter, childFilter);
+                statisticsDbContext.Observation.AddRange(observations);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var result = await BuildWriter(subject.Id)
+                .ListFilterItemRelationships(parentFilterId: parentFilter.Id, childFilterId: childFilter.Id);
+
+            Assert.Equal(
+                new HashSet<(Guid, Guid)>
+                {
+                    (parentItems[0].Id, childItems[0].Id),
+                    (parentItems[1].Id, childItems[0].Id),
+                    (parentItems[1].Id, childItems[1].Id),
+                },
+                result.ToHashSet()
+            );
+        }
+
+        [Fact]
+        public async Task FiltersBelongToOtherSubject_ReturnsEmpty()
+        {
+            var otherSubject = new Subject { Id = Guid.NewGuid() };
+
+            Filter parentFilter = Fixture
+                .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                .WithSubject(otherSubject);
+            Filter childFilter = Fixture
+                .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                .WithSubject(otherSubject);
+
+            Observation observation = Fixture
+                .DefaultObservation()
+                .WithSubject(otherSubject)
+                .WithFilterItems([
+                    parentFilter.FilterGroups[0].FilterItems[0],
+                    childFilter.FilterGroups[0].FilterItems[0],
+                ]);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.Filter.AddRange(parentFilter, childFilter);
+                statisticsDbContext.Observation.Add(observation);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var result = await BuildWriter(Guid.NewGuid())
+                .ListFilterItemRelationships(parentFilterId: parentFilter.Id, childFilterId: childFilter.Id);
+
+            Assert.Empty(result);
+        }
+    }
+
+    public class ListGeographicLevelsTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task ReturnsDistinctGeographicLevelsForSubject()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+            var otherSubject = new Subject { Id = Guid.NewGuid() };
+
+            var regions = Fixture
+                .DefaultLocation()
+                .WithGeographicLevel(GeographicLevel.Region)
+                .WithPresetRegion()
+                .GenerateList(2);
+            var localAuthority = Fixture
+                .DefaultLocation()
+                .WithGeographicLevel(GeographicLevel.LocalAuthority)
+                .WithPresetRegionAndLocalAuthority()
+                .Generate();
+            var country = Fixture.DefaultLocation().WithGeographicLevel(GeographicLevel.Country).Generate();
+
+            var subjectObservations = Fixture
+                .DefaultObservation()
+                .WithSubject(subject)
+                .ForRange(..2, o => o.SetLocation(regions[0]))
+                .ForRange(2..3, o => o.SetLocation(regions[1]))
+                .ForRange(3..4, o => o.SetLocation(localAuthority))
+                .GenerateList(4);
+
+            var otherSubjectObservations = Fixture
+                .DefaultObservation()
+                .WithSubject(otherSubject)
+                .WithLocation(country)
+                .GenerateList(2);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.Observation.AddRange(subjectObservations.Concat(otherSubjectObservations));
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var result = await BuildWriter(subject.Id).ListGeographicLevels();
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal(
+                new HashSet<GeographicLevel> { GeographicLevel.Region, GeographicLevel.LocalAuthority },
+                result.ToHashSet()
+            );
         }
     }
 
