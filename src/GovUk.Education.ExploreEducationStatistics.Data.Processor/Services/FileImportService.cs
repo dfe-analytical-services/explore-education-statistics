@@ -74,7 +74,7 @@ public class FileImportService(
         await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, dataSetWriter);
     }
 
-    public async Task CompleteImport(DataImport import, IStorageDataSet dataSet)
+    public async Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         if (import.Status.IsFinished())
         {
@@ -102,7 +102,7 @@ public class FileImportService(
             return;
         }
 
-        var observationCount = await dataSet.CountObservations();
+        var observationCount = await dataSetWriter.CountObservations();
         if (observationCount != import.ExpectedImportedRows)
         {
             await dataImportService.FailImport(
