@@ -328,6 +328,7 @@ Check updated footnote is displayed in release content page
 
     user scrolls to element    ${section}
 
+    user waits until element contains    testid:footnotes    ${FOOTNOTE_UPDATED}
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}
 
