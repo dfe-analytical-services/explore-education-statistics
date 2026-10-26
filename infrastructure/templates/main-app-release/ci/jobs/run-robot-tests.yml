@@ -3,6 +3,8 @@ parameters:
     type: string
   - name: testEnvironment
     type: string
+  - name: publicSiteBasicAuthEnabled
+    type: boolean
   - name: dependsOn
     type: object
     default: []
@@ -40,7 +42,11 @@ jobs:
           # Ideally add AZ CLI support to the "ees-ubuntu2604-large-v2" runners and use "get-resource-names.yml"
           # to get the correct Key Vault name for the target subscription.
           KeyVaultName: $(subscription)-kv-ees-01
-          SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
+          # The Basic Auth secrets only exist in environments with Basic Auth enabled.
+          ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
+            SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl,ees-public-site-basic-auth-username,ees-public-site-basic-auth-password
+          ${{ else }}:
+            SecretsFilter: ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl
           RunAsPreJob: true
 
       - task: Bash@3
@@ -57,8 +63,12 @@ jobs:
         env:
           SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
           TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
-          PUBLIC_AUTH_USER: $(ees-public-site-basic-auth-username)
-          PUBLIC_AUTH_PASSWORD: $(ees-public-site-basic-auth-password)
+          ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
+            PUBLIC_AUTH_USER: $(ees-public-site-basic-auth-username)
+            PUBLIC_AUTH_PASSWORD: $(ees-public-site-basic-auth-password)
+          ${{ else }}:
+            PUBLIC_AUTH_USER:
+            PUBLIC_AUTH_PASSWORD:
           TIMEOUT: 60
           IMPLICIT_WAIT: 15
           WAIT_MEDIUM: 45

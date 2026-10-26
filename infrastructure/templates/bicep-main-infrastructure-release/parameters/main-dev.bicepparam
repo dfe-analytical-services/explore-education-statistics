@@ -6,8 +6,6 @@ param environmentConfigParam = {
   domain: 'dev.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
   additionalAdminAllowedOrigins: [
     'https://localhost:5021'
     'http://localhost:5021'
@@ -15,7 +13,6 @@ param environmentConfigParam = {
   additionalPublicAllowedOrigins: [
     'http://localhost:3000'
   ]
-  basicAuthEnabled: true
   blobDeleteRetentionDays: 3
 }
 

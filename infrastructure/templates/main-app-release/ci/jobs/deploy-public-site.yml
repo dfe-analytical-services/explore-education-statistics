@@ -5,6 +5,8 @@ parameters:
     type: string
   - name: bicepParamFile
     type: string
+  - name: basicAuthEnabled
+    type: boolean
   - name: dependsOn
     type: object
     default: []
@@ -39,6 +41,7 @@ jobs:
                 templateFile: $(templateFile)
                 paramFile: $(paramFile)
                 bicepConfigDeployName: $(bicepConfigDeployName)
+                additionalParameters: basicAuthEnabled=${{ parameters.basicAuthEnabled }}
 
             # The container image is updated BEFORE the appsettings below, so that by the time the
             # app restarts with this deploy's "deployedAt" marker, it is already configured to run the
@@ -75,5 +78,3 @@ jobs:
                 resourceGroupName: $(resourceGroupName)
                 healthCheckPath: /health
                 deployedAt: $(deployedAt)
-                pollingDelaySeconds: 1
-                maxAttempts: 60

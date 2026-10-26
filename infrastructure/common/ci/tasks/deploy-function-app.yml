@@ -56,7 +56,7 @@ jobs:
 
             - task: AzureCLI@2
               displayName: 'Deploy ${{ parameters.functionAppName }} Function App'
-              retryCountOnTaskFailure: 1
+              retryCountOnTaskFailure: 5
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
                 scriptType: 'bash'

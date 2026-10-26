@@ -9,6 +9,10 @@ parameters:
     type: string
   - name: bicepConfigDeployName
     type: string
+  # Space-separated key=value parameters supplementing those in the bicepparam file.
+  - name: additionalParameters
+    type: string
+    default: ''
 
 steps:
   - task: AzureCLI@2
@@ -39,7 +43,7 @@ steps:
           --resource-group $(resourceGroupName) \
           --template-file ${{ parameters.templateFile }} \
           --parameters ${{ parameters.paramFile }} \
-          --parameters deployedAt="$deployedAt"
+          --parameters deployedAt="$deployedAt" ${{ parameters.additionalParameters }}
 
   - template: ../../../../common/ci/tasks/bicep-output-variables.yml
     parameters:
