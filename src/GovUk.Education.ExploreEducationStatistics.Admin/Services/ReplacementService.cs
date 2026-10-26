@@ -745,13 +745,16 @@ public class ReplacementService(
             .FilterGroupFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id);
 
+        var replacementFilterGroupId = plan.TargetValue;
+        var replacementFilterId = filterIdsByFilterGroupId[replacementFilterGroupId];
+
         statisticsDbContext.Remove(filterGroupFootnote);
         await statisticsDbContext.FilterGroupFootnote.AddAsync(
             new FilterGroupFootnote
             {
                 FootnoteId = footnoteId,
-                FilterGroupId = plan.TargetValue,
-                FilterId = filterIdsByFilterGroupId[plan.TargetValue],
+                FilterGroupId = replacementFilterGroupId,
+                FilterId = replacementFilterId,
                 SubjectId = replacementSubjectId,
             }
         );
@@ -769,16 +772,18 @@ public class ReplacementService(
             .FilterItemFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.FilterItemId == plan.Id);
 
-        var replacementFilterGroupId = filterGroupIdsByFilterItemId[plan.TargetValue];
+        var replacementFilterItemId = plan.TargetValue;
+        var replacementFilterGroupId = filterGroupIdsByFilterItemId[replacementFilterItemId];
+        var replacementFilterId = filterIdsByFilterGroupId[replacementFilterGroupId];
 
         statisticsDbContext.Remove(filterItemFootnote);
         await statisticsDbContext.FilterItemFootnote.AddAsync(
             new FilterItemFootnote
             {
                 FootnoteId = footnoteId,
-                FilterItemId = plan.TargetValue,
+                FilterItemId = replacementFilterItemId,
                 FilterGroupId = replacementFilterGroupId,
-                FilterId = filterIdsByFilterGroupId[replacementFilterGroupId],
+                FilterId = replacementFilterId,
                 SubjectId = replacementSubjectId,
             }
         );
@@ -795,13 +800,16 @@ public class ReplacementService(
             .IndicatorFootnote.AsQueryable()
             .SingleAsync(f => f.FootnoteId == footnoteId && f.IndicatorId == plan.Id);
 
+        var replacementIndicatorId = plan.TargetValue;
+        var replacementIndicatorGroupId = indicatorGroupIdsByIndicatorId[replacementIndicatorId];
+
         statisticsDbContext.Remove(indicatorFootnote);
         await statisticsDbContext.IndicatorFootnote.AddAsync(
             new IndicatorFootnote
             {
                 FootnoteId = footnoteId,
-                IndicatorId = plan.TargetValue,
-                IndicatorGroupId = indicatorGroupIdsByIndicatorId[plan.TargetValue],
+                IndicatorId = replacementIndicatorId,
+                IndicatorGroupId = replacementIndicatorGroupId,
                 SubjectId = replacementSubjectId,
             }
         );
