@@ -95,8 +95,7 @@ public interface IStorageDataSet
     Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Locations by id, or all locations for the data set (the distinct locations referenced by its observations) if
-    /// <paramref name="locationIds" /> is null. Unknown ids are ignored.
+    /// Locations by id, or all locations if <paramref name="locationIds" /> is null. Unknown ids are ignored.
     /// </summary>
     Task<List<Location>> ListLocations(
         IEnumerable<Guid>? locationIds = null,
