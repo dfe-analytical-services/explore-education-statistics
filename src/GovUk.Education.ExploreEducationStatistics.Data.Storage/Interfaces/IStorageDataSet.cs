@@ -16,8 +16,9 @@ public interface IStorageDataSet
     Guid SubjectId { get; }
 
     /// <summary>
-    /// Observations at the given locations within the time period that have every one of the given filter items,
-    /// with their Location and FilterItems populated.
+    /// Observations at the given locations within the time period that have at least one of the given filter items
+    /// for each filter, with their Location and FilterItems populated. If no arguments are provided, all observations
+    /// for the data set are returned.
     /// </summary>
     Task<List<Observation>> ListObservations(
         IEnumerable<Guid> filterItemIds,
@@ -65,13 +66,13 @@ public interface IStorageDataSet
 
     /// <summary>
     /// All filters for the data set. Their FilterGroups and FilterItems are only populated when
-    /// <paramref name="includeItems" /> is true, as filter items can be numerous.
+    /// <paramref name="includeItems" /> is true.
     /// </summary>
     Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
-    /// observation. Filters belonging to other data sets yield no pairs.
+    /// observation.
     /// </summary>
     Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
         Guid parentFilterId,
@@ -81,8 +82,7 @@ public interface IStorageDataSet
 
     /// <summary>
     /// Indicators for the data set restricted to the given ids, or all indicators for the data set if
-    /// <paramref name="indicatorIds" /> is null. Ids belonging to other data sets are excluded, and an empty set of
-    /// ids yields no indicators.
+    /// <paramref name="indicatorIds" /> is null.
     /// </summary>
     Task<List<Indicator>> ListIndicators(
         IEnumerable<Guid>? indicatorIds = null,
@@ -96,8 +96,7 @@ public interface IStorageDataSet
 
     /// <summary>
     /// Locations by id, or all locations for the data set (the distinct locations referenced by its observations) if
-    /// <paramref name="locationIds" /> is null. Unknown ids are ignored. `locationIds` are expected to belong to the
-    /// data set, but might be returned even if they belong to a different data set.
+    /// <paramref name="locationIds" /> is null. Unknown ids are ignored.
     /// </summary>
     Task<List<Location>> ListLocations(
         IEnumerable<Guid>? locationIds = null,
@@ -105,14 +104,15 @@ public interface IStorageDataSet
     );
 
     /// <summary>
-    /// The distinct geographic levels of the locations referenced by the data set's observations.
+    /// The geographic levels of the locations referenced by the data set's observations. This is used to
+    /// populate the data set's DataSetFileVersionGeographicLevels when it is imported - it shouldn't be used in other
+    /// circumstances!
     /// </summary>
     Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The distinct time periods across the data set's observations at the given locations, or across all the data
+    /// The time periods across the data set's observations at the given locations, or across all the data
     /// set's observations if <paramref name="locationIds" /> is null, ordered by year and then time identifier.
-    /// Location ids not referenced by the data set's observations are ignored.
     /// </summary>
     Task<List<(int Year, TimeIdentifier TimeIdentifier)>> ListTimePeriods(
         IEnumerable<Guid>? locationIds = null,
