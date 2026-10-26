@@ -229,6 +229,7 @@ function Plan({
     hasMajorFilterMapping,
     hasMajorIndicatorMapping,
     hasMajorLocationMapping,
+    hasDataBlockAndReplacementHasAdditionalFilter,
     isNotReadyToPublish,
     isPatch,
   } = useMemo(() => {
@@ -250,6 +251,8 @@ function Plan({
         !!plan.apiDataSetVersionPlan?.mappingStatus?.filtersHaveMajorChange,
       hasMajorIndicatorMapping:
         !!plan.apiDataSetVersionPlan?.mappingStatus?.indicatorsHaveMajorChange,
+      hasDataBlockAndReplacementHasAdditionalFilter:
+        plan.hasDataBlockAndReplacementHasAdditionalFilter,
       isNotReadyToPublish: !plan.apiDataSetVersionPlan?.readyToPublish,
       isPatch: isPatchVersion(plan.apiDataSetVersionPlan?.version),
     };
@@ -343,11 +346,27 @@ function Plan({
         reloadPlan={onMappingUpdate}
       />
 
+      {hasDataBlockAndReplacementHasAdditionalFilter && (
+        <WarningMessage>
+          The replacement data file has more filter columns than the original
+          file and so can not be mapped. To complete the data replacement,
+          reupload a replacement without the additional filter or remove all
+          data blocks associated with the original data set.
+        </WarningMessage>
+      )}
+
       <div className="dfe-position--relative ">
         <LoadingSpinner loading={isFetchingPlan} overlay />
         <h3 className="govuk-heading-m">
-          <Tag colour={hasInvalidDataBlocks ? 'red' : 'green'}>
-            {`Data blocks: ${hasInvalidDataBlocks ? 'ERROR' : 'OK'}`}
+          <Tag
+            colour={
+              hasInvalidDataBlocks ||
+              hasDataBlockAndReplacementHasAdditionalFilter
+                ? 'red'
+                : 'green'
+            }
+          >
+            {`Data blocks: ${hasInvalidDataBlocks || hasDataBlockAndReplacementHasAdditionalFilter ? 'ERROR' : 'OK'}`}
           </Tag>
         </h3>
 
