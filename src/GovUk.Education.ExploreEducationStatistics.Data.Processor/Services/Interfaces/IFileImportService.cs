@@ -10,5 +10,5 @@ public interface IFileImportService
 
     Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, IStorageDataSetWriter dataSetWriter);
 
-    Task CompleteImport(DataImport import, IStorageDataSet dataSet);
+    Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter);
 }

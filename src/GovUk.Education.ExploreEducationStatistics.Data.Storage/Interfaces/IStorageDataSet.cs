@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
@@ -41,11 +40,6 @@ public interface IStorageDataSet
     );
 
     /// <summary>
-    /// The number of observations in the data set.
-    /// </summary>
-    Task<long> CountObservations(CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Filter items (with their FilterGroup and Filter) that are present on the observations at the given
     /// locations within the time period.
     /// </summary>
@@ -71,16 +65,6 @@ public interface IStorageDataSet
     Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
-    /// observation.
-    /// </summary>
-    Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
-        Guid parentFilterId,
-        Guid childFilterId,
-        CancellationToken cancellationToken = default
-    );
-
-    /// <summary>
     /// Indicators for the data set restricted to the given ids, or all indicators for the data set if
     /// <paramref name="indicatorIds" /> is null.
     /// </summary>
@@ -101,13 +85,6 @@ public interface IStorageDataSet
         IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     );
-
-    /// <summary>
-    /// The geographic levels of the locations referenced by the data set's observations. This is used to
-    /// populate the data set's DataSetFileVersionGeographicLevels when it is imported - it shouldn't be used in other
-    /// circumstances!
-    /// </summary>
-    Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// The time periods across the data set's observations at the given locations, or across all the data

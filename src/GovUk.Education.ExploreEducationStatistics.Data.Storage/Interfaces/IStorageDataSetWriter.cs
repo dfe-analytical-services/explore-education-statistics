@@ -1,11 +1,12 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
-/// Storage-agnostic write access to a single data set while it is being imported: its filters, indicators,
-/// locations and observations. Reads go through <see cref="IStorageDataSet" />.
+/// Storage-agnostic methods used to write, or to support the writing of, a single data set's data while it is being
+/// imported. Other reads go through <see cref="IStorageDataSet" />.
 ///
 /// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
@@ -14,7 +15,8 @@ public interface IStorageDataSetWriter
     Guid SubjectId { get; }
 
     /// <summary>
-    /// Writes the data set's filters, and its indicators together with their IndicatorGroups.
+    /// Writes the data set's filters (not their groups and items), and its indicators together with their
+    /// IndicatorGroups.
     /// </summary>
     Task WriteFiltersAndIndicators(
         IReadOnlyList<Filter> filters,
@@ -47,4 +49,25 @@ public interface IStorageDataSetWriter
     /// Writes a batch of observations together with their ObservationFilterItems.
     /// </summary>
     Task WriteObservations(IReadOnlyList<Observation> observations, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The number of observations in the data set.
+    /// </summary>
+    Task<long> CountObservations(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Distinct pairs of filter items from the given parent and child filters that occur together on the same
+    /// observation, used to generate the data set's FilterHierarchies. Once imported, read them from there instead.
+    /// </summary>
+    Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
+        Guid parentFilterId,
+        Guid childFilterId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// The geographic levels of the locations referenced by the data set's observations, used to populate the data
+    /// set's DataSetFileVersionGeographicLevels. Once imported, read them from there instead.
+    /// </summary>
+    Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 }

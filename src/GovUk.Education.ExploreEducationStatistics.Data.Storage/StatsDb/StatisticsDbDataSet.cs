@@ -78,11 +78,6 @@ public class StatisticsDbDataSet(
         }
     }
 
-    public Task<long> CountObservations(CancellationToken cancellationToken = default)
-    {
-        return context.Observation.LongCountAsync(o => o.SubjectId == SubjectId, cancellationToken);
-    }
-
     public async Task<List<FilterItem>> ListFilterItemsForQuery(
         IEnumerable<Guid> locationIds,
         TimePeriodQuery? timePeriod,
@@ -129,39 +124,6 @@ public class StatisticsDbDataSet(
         }
 
         return await filters.ToListAsync(cancellationToken);
-    }
-
-    public async Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
-        Guid parentFilterId,
-        Guid childFilterId,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var pairs = await context
-            .FilterItem.AsNoTracking()
-            .Where(fi => fi.FilterGroup.Filter.SubjectId == SubjectId)
-            .Where(fi => fi.FilterGroup.FilterId == parentFilterId)
-            .SelectMany(parentFilterItem =>
-                context
-                    .ObservationFilterItem.AsNoTracking()
-                    .Where(childOfi =>
-                        childOfi.FilterId == childFilterId
-                        && context.ObservationFilterItem.Any(parentOfi =>
-                            childOfi.ObservationId == parentOfi.ObservationId
-                            && parentOfi.FilterItemId == parentFilterItem.Id
-                        )
-                    )
-                    .Select(childOfi => new
-                    {
-                        ParentFilterItemId = parentFilterItem.Id,
-                        ChildFilterItemId = childOfi.FilterItem.Id,
-                    })
-                    .ToList()
-            )
-            .Distinct()
-            .ToListAsync(cancellationToken);
-
-        return pairs.Select(pair => (pair.ParentFilterItemId, pair.ChildFilterItemId)).ToList();
     }
 
     public async Task<List<Indicator>> ListIndicators(
@@ -211,16 +173,6 @@ public class StatisticsDbDataSet(
         return await context
             .Location.AsNoTracking()
             .Where(location => locationIdList.Contains(location.Id))
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default)
-    {
-        return await context
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == SubjectId)
-            .Select(observation => observation.Location.GeographicLevel)
-            .Distinct()
             .ToListAsync(cancellationToken);
     }
 

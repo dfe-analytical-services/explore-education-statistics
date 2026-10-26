@@ -69,7 +69,7 @@ public class ProcessorService(
             await fileImportService.ImportObservations(import, dataSet, dataSetWriter);
 
             var completedImport = await dataImportService.GetImport(import.Id);
-            await fileImportService.CompleteImport(completedImport, dataSet);
+            await fileImportService.CompleteImport(completedImport, dataSetWriter);
         }
         catch (Exception e)
         {

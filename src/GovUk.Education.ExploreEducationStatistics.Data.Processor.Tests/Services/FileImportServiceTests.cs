@@ -55,16 +55,16 @@ public class FileImportServiceTests
             .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
             .Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(
             dataImportService: dataImportService.Object,
             dataSetMappingService: dataSetMappingService.Object
         );
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -87,13 +87,13 @@ public class FileImportServiceTests
 
         dataImportService.Setup(s => s.UpdateStatus(import.Id, FAILED, 100)).Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -123,13 +123,13 @@ public class FileImportServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        var dataSet = new Mock<IStorageDataSet>(Strict);
-        dataSet.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSet.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        VerifyAllMocks(dataImportService, dataSet);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class FileImportServiceTests
                 };
 
                 var service = BuildFileImportService();
-                await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict));
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
             });
     }
 
@@ -190,7 +190,7 @@ public class FileImportServiceTests
                     .Returns(Task.CompletedTask);
 
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict));
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
 
                 VerifyAllMocks(dataImportService);
             });

@@ -179,6 +179,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -407,6 +408,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -555,6 +557,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -718,6 +721,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -870,6 +874,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1052,6 +1057,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1208,6 +1214,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1336,6 +1343,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1504,6 +1512,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1691,6 +1700,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
