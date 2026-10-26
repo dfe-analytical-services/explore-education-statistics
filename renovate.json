@@ -3,6 +3,7 @@
   "dependencyDashboard": true,
   "extends": ["config:recommended"],
   "timezone": "Europe/London",
+  "rebaseWhen": "conflicted",
   "recreateWhen": "never",
   "azure-pipelines": {
     "enabled": false
@@ -23,21 +24,29 @@
       "enabled": false
     },
     {
+      "matchDatasources": ["nuget", "dotnet-version"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "extends": ["schedule:earlyMondays"],
       "matchDatasources": ["nuget"],
       "matchUpdateTypes": ["patch"],
-      "automerge": true
+      "automerge": true,
+      "rebaseWhen": "auto"
     },
     {
+      "extends": ["schedule:monthly"],
       "matchDatasources": ["nuget"],
       "groupName": "Backend packages (minor)",
-      "matchUpdateTypes": ["minor"],
-      "schedule": ["every month"]
+      "groupSlug": "minor-backend-packages",
+      "matchUpdateTypes": ["minor"]
     },
     {
+      "extends": ["schedule:quarterly"],
       "matchDatasources": ["nuget"],
-      "groupName": "Backend packages (major)",
-      "matchUpdateTypes": ["major"],
-      "schedule": ["every 3 months"]
+      "groupName": "Backend packages",
+      "groupSlug": "backend-packages",
+      "matchUpdateTypes": ["major"]
     },
     {
       "description": "Disable DuckDB.NET.Data.Full and InterpolatedSql.Dapper related to issue EES-6079",
@@ -77,7 +86,6 @@
       "description": "Disable packages which need their major versions to be in sync with the .NET version or the EF Core version",
       "matchDatasources": ["nuget"],
       "matchUpdateTypes": ["major"],
-      "enabled": false,
       "matchPackageNames": [
         "Microsoft.AspNetCore{/,}**",
         "Microsoft.EntityFrameworkCore{/,}**",
@@ -90,7 +98,8 @@
         "linq2db.EntityFrameworkCore{/,}**",
         "Asp.Versioning.Mvc{/,}**",
         "Asp.Versioning.Mvc.ApiExplorer{/,}**"
-      ]
+      ],
+      "enabled": false
     },
     {
       "matchDatasources": ["pypi"],
@@ -102,7 +111,10 @@
     },
     {
       "matchDatasources": ["dotnet-version"],
-      "enabled": false
+      "matchDepNames": ["dotnet-sdk"],
+      "allowedVersions": "<11.0.0",
+      "automerge": true,
+      "rebaseWhen": "auto"
     },
     {
       "matchDatasources": ["npm"],
@@ -117,6 +129,7 @@
       "enabled": false
     },
     {
+      "extends": ["schedule:monthly"],
       "matchDatasources": ["rubygems"],
       "groupName": "Ruby dependencies"
     },
