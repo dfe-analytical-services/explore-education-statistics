@@ -16,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 public class DataImportService(
     IDbContextSupplier dbContextSupplier,
     IStorageDataSetResolver storageDataSetResolver,
+    IStorageDataSetWriterResolver storageDataSetWriterResolver,
     ILogger<DataImportService> logger
 ) : IDataImportService
 {
@@ -140,8 +141,9 @@ public class DataImportService(
 
         var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
         var dataSet = storageDataSetResolver.Resolve(file);
+        var dataSetWriter = storageDataSetWriterResolver.Resolve(file);
 
-        var importedGeographicLevels = await dataSet.ListGeographicLevels();
+        var importedGeographicLevels = await dataSetWriter.ListGeographicLevels();
 
         var timePeriods = (await dataSet.ListTimePeriods())
             .Select(tp => new TimePeriodRangeBoundMeta
@@ -197,13 +199,13 @@ public class DataImportService(
             .ToList();
         contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 
-        file.FilterHierarchies = await GenerateFilterHierarchies(dataSet, filters);
+        file.FilterHierarchies = await GenerateFilterHierarchies(dataSetWriter, filters);
 
         await contentDbContext.SaveChangesAsync();
     }
 
     public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
-        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter,
         List<Filter> filters
     )
     {
@@ -216,7 +218,7 @@ public class DataImportService(
 
         foreach (var rootFilter in rootFilters)
         {
-            var hierarchy = await GenerateFilterHierarchy(dataSet, rootFilter, filters);
+            var hierarchy = await GenerateFilterHierarchy(dataSetWriter, rootFilter, filters);
             hierarchies.Add(hierarchy);
         }
 
@@ -224,7 +226,7 @@ public class DataImportService(
     }
 
     private static async Task<DataSetFileFilterHierarchy> GenerateFilterHierarchy(
-        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter,
         Filter rootFilter,
         List<Filter> filters
     )
@@ -248,7 +250,7 @@ public class DataImportService(
         {
             filterIds.Add(childFilter.Id);
 
-            var filterItemRelationships = await dataSet.ListFilterItemRelationships(
+            var filterItemRelationships = await dataSetWriter.ListFilterItemRelationships(
                 parentFilterId: parentFilter.Id,
                 childFilterId: childFilter.Id
             );

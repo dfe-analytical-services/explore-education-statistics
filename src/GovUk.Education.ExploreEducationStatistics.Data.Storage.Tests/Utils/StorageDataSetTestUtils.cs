@@ -91,6 +91,25 @@ public static class StorageDataSetTestUtils
         IObservationBatchImporter? observationBatchImporter = null
     )
     {
+        return new StorageDataSetWriterResolver(
+            BuildStatisticsDbDataSetWriterFactory(
+                statisticsDbContext,
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
+        );
+    }
+
+    public static StatisticsDbDataSetWriterFactory BuildStatisticsDbDataSetWriterFactory(
+        StatisticsDbContext statisticsDbContext,
+        IDatabaseHelper databaseHelper,
+        IImporterLocationCache? importerLocationCache = null,
+        IGuidGenerator? guidGenerator = null,
+        IObservationBatchImporter? observationBatchImporter = null
+    )
+    {
         var services = new ServiceCollection()
             .AddSingleton(statisticsDbContext)
             .AddSingleton(databaseHelper)
@@ -100,7 +119,7 @@ public static class StorageDataSetTestUtils
             .AddTransient<ImporterLocationService>()
             .AddSingleton(Mock.Of<ILogger<ImporterLocationCache>>());
 
-        return new StorageDataSetWriterResolver(new StatisticsDbDataSetWriterFactory(services.BuildServiceProvider()));
+        return new StatisticsDbDataSetWriterFactory(services.BuildServiceProvider());
     }
 
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)

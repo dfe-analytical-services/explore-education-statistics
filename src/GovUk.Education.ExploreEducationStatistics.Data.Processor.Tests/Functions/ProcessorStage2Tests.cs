@@ -239,6 +239,7 @@ public class ProcessorStage2Tests
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<IStorageDataSetResolver>(Strict),
+            Mock.Of<IStorageDataSetWriterResolver>(Strict),
             Mock.Of<ILogger<DataImportService>>()
         );
 
