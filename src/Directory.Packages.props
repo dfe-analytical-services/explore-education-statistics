@@ -148,7 +148,7 @@
     <PackageVersion Include="Generator.Equals" Version="4.0.1" />
     <PackageVersion Include="GeoJSON.Net" Version="1.4.1" />
     <PackageVersion Include="GovukNotify" Version="7.2.0" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.13.0" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.13.1" />
     <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageVersion Include="Medo.Uuid7" Version="3.2.0" />
     <PackageVersion Include="Mime" Version="3.8.0" />
