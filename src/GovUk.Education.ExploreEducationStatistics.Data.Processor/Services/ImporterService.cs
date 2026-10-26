@@ -355,12 +355,13 @@ public class ImporterService : IImporterService
     )
     {
         var observationId = _guidGenerator.NewGuid();
+        var location = fixedInformationReader.GetLocation(rowValues);
 
         return new Observation
         {
             Id = observationId,
             FilterItems = GetFilterItems(rowValues, filters, filterAndIndicatorReader, observationId),
-            LocationId = dataSetWriter.GetLocationId(fixedInformationReader.GetLocation(rowValues)),
+            LocationId = dataSetWriter.GetLocationId(location),
             Measures = filterAndIndicatorReader.GetMeasures(rowValues),
             SubjectId = subjectId,
             TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
