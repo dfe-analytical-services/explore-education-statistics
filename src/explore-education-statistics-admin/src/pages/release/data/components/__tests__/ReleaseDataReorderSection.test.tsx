@@ -5,7 +5,7 @@ import _tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@admin/services/tableBuilderService');
@@ -103,15 +103,10 @@ describe('ReleaseDataReorderSection', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('managing indicators shows the reorder list and paired indicators form, and saving pairs returns to the data sets', async () => {
+  test('managing indicators shows a read-only view, and back returns to the data sets', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [
-        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
-      ],
-    });
-    adminTableBuilderService.updatePairedIndicators.mockResolvedValue({
       pairedIndicators: [
         { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
       ],
@@ -132,33 +127,27 @@ describe('ReleaseDataReorderSection', () => {
 
     expect(
       await screen.findByRole('heading', {
-        name: 'Reorder indicators for Subject 2',
+        name: 'Manage indicators for Subject 2',
       }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole('heading', {
-        name: 'Pair indicators for Subject 2',
-      }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+      screen.queryByRole('table', { name: /data files in this release/ }),
+    ).not.toBeInTheDocument();
+
+    // Neither form is shown until one is chosen
+    expect(
+      screen.queryByRole('button', { name: 'Save order' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Save paired indicators' }),
+    ).not.toBeInTheDocument();
 
     await user.click(
-      await screen.findByRole('button', { name: 'Save paired indicators' }),
+      screen.getByRole('button', { name: 'Back to data files' }),
     );
 
-    await waitFor(() =>
-      expect(
-        adminTableBuilderService.updatePairedIndicators,
-      ).toHaveBeenCalledWith('release-version-id', 'subject-2', {
-        pairedIndicators: [
-          {
-            parentIndicatorId: 'indicator-1',
-            childIndicatorId: 'indicator-2',
-          },
-        ],
-      }),
-    );
-
-    expect(await screen.findByRole('table')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('table', { name: /data files in this release/ }),
+    ).toBeInTheDocument();
   });
 });
