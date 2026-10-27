@@ -1,10 +1,7 @@
-import PairedIndicatorsForm from '@admin/pages/release/data/components/PairedIndicatorsForm';
+import ManageIndicators from '@admin/pages/release/data/components/ManageIndicators';
 import ReorderFiltersList, {
   UpdateFiltersRequest,
 } from '@admin/pages/release/data/components/ReorderFiltersList';
-import ReorderIndicatorsList, {
-  UpdateIndicatorsRequest,
-} from '@admin/pages/release/data/components/ReorderIndicatorsList';
 import styles from '@admin/pages/release/data/components/ReleaseDataReorderSection.module.scss';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import tableBuilderService, {
@@ -16,9 +13,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import adminTableBuilderService, {
-  PairedIndicators,
-} from '@admin/services/tableBuilderService';
+import adminTableBuilderService from '@admin/services/tableBuilderService';
 
 import React, { useState } from 'react';
 
@@ -49,30 +44,6 @@ const ReleaseDataReorderSection = ({
       updatedFilters,
     );
     setReorderingFilters(undefined);
-  };
-
-  const handleSaveIndicators = async (
-    subjectId: string,
-    updatedIndicators: UpdateIndicatorsRequest,
-  ) => {
-    await adminTableBuilderService.updateIndicators(
-      releaseVersionId,
-      subjectId,
-      updatedIndicators,
-    );
-    setReorderingIndicators(undefined);
-  };
-
-  const handleSavePairedIndicators = async (
-    subjectId: string,
-    pairedIndicators: PairedIndicators,
-  ) => {
-    await adminTableBuilderService.updatePairedIndicators(
-      releaseVersionId,
-      subjectId,
-      pairedIndicators,
-    );
-    setReorderingIndicators(undefined);
   };
 
   return (
@@ -174,22 +145,11 @@ const ReleaseDataReorderSection = ({
               />
             )}
             {reorderingIndicators && (
-              <>
-                <ReorderIndicatorsList
-                  releaseVersionId={releaseVersionId}
-                  subject={reorderingIndicators}
-                  onCancel={() => setReorderingIndicators(undefined)}
-                  onSave={handleSaveIndicators}
-                />
-                <div className="govuk-!-margin-top-9">
-                  <PairedIndicatorsForm
-                    releaseVersionId={releaseVersionId}
-                    subject={reorderingIndicators}
-                    onCancel={() => setReorderingIndicators(undefined)}
-                    onSave={handleSavePairedIndicators}
-                  />
-                </div>
-              </>
+              <ManageIndicators
+                releaseVersionId={releaseVersionId}
+                subject={reorderingIndicators}
+                onBack={() => setReorderingIndicators(undefined)}
+              />
             )}
           </div>
         </>

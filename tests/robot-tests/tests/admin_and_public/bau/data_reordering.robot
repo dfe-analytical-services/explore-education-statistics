@@ -169,6 +169,8 @@ Cancel reordering filters
 
 Check the initial order of indicator groups
     user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 1
@@ -195,10 +197,14 @@ Reorder indicator group 1's indicators
 
 Save reordered indicator groups and indicators
     user clicks button    Save order
-    user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
+    user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Back to data files    id:reordering
 
 Check the saved order of indicator groups
     user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
@@ -221,6 +227,7 @@ Check the saved order of indicator group 2's indicators remains untouched
 Cancel reordering indicators
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
 
 Replace subject data
     user clicks link    Data uploads
@@ -352,6 +359,8 @@ Cancel reordering filters after data replacement
 Check the order of indicator groups after data replacement
     # 'Indicator group 3' is new in the replacement so should be appended
     user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
@@ -381,6 +390,7 @@ Check the order of indicator group 3's indicators after data replacement
 Cancel reordering indicators after data replacement
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
 
 Add data guidance to subject
     user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
