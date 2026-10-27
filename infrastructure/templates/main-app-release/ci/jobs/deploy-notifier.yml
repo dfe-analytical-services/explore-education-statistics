@@ -54,7 +54,9 @@ jobs:
                     --resource-group $(resourceGroupName) \
                     --template-file $(templateFile) \
                     --parameters $(paramFile) \
-                    --parameters deployedAt="$deployedAt"
+                    --parameters \
+                        environmentIdentifier='$(subscription)' \
+                        deployedAt="$deployedAt"
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
