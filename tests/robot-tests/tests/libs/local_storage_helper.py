@@ -1,3 +1,4 @@
+import datetime
 import json
 import os.path
 
@@ -16,7 +17,9 @@ def get_local_storage_json_from_browser(driver) -> dict:
 
     local_storage_json = json.loads(local_storage_string)
     encryption_cookie = driver.get_cookie("msal.cache.encryption")
+    expires = datetime.datetime.now() + datetime.timedelta(minutes=15)
     local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE"] = encryption_cookie["value"]
+    local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES"] = expires.isoformat()
 
     return local_storage_json
 
@@ -82,6 +85,14 @@ def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
 def get_access_token_from_file(user: str) -> str:
     local_storage_json = read_local_storage_json_from_file(user)
     return get_access_token_from_local_storage_json(local_storage_json)
+
+
+def has_encryption_cookie_expired(usr: str) -> bool:
+    local_storage_json = read_local_storage_json_from_file(usr)
+    expires = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES")
+    if expires:
+        return datetime.datetime.now() > datetime.datetime.fromisoformat(expires)
+    return True
 
 
 def write_auth_encryption_to_cookie(local_storage_json: dict, driver):
