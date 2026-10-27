@@ -13,7 +13,8 @@ steps:
   - task: Bash@3
     displayName: Select param file
     env:
-      # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ.
+      # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" (in any case)
+      # opts in to ELZ.
       ELZ: $(elz)
       PARAM_FILE: $(paramFile)
     inputs:
@@ -21,7 +22,7 @@ steps:
       script: |
         set -eo pipefail
 
-        if [ "$ELZ" != "true" ]; then
+        if [ "${ELZ,,}" != "true" ]; then
           echo "Using legacy param file $PARAM_FILE"
           exit 0
         fi

@@ -33,7 +33,8 @@ steps:
   - task: Bash@3
     displayName: Get resource names
     env:
-      # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ names.
+      # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" (in any case)
+      # opts in to ELZ names.
       ELZ: $(elz)
     inputs:
       targetType: inline
@@ -68,7 +69,7 @@ steps:
         export RESOURCE_NAMES_ENVIRONMENT_IDENTIFIER='${{ parameters.environmentIdentifier }}'
         export RESOURCE_NAMES_ENVIRONMENT_NAME="$environmentName"
 
-        if [ "$ELZ" = "true" ]; then
+        if [ "${ELZ,,}" = "true" ]; then
           export RESOURCE_NAMES_ELZ=true
         else
           export RESOURCE_NAMES_ELZ=false
