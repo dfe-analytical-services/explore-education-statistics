@@ -86,6 +86,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     functionAppName: resourceNames.notifier.functionApp
     appServicePlanName: resourceNames.notifier.appServicePlan
     storageAccountName: resourceNames.notifier.storageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true

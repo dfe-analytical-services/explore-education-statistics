@@ -96,7 +96,6 @@ var secretNames = [
   resourceNames.keyVault.secrets.importerStorageAccountConnectionString
   resourceNames.keyVault.secrets.publicStorageAccountConnectionString
   resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl
   resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId
   resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId
   resourceNames.keyVault.secrets.screener.appRegistrationClientId
@@ -108,6 +107,10 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 }]
 
 var secretRefs = secretRefsFromSecrets(secrets)
+
+resource publicApiContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
+  name: resourceNames.publicApi.apiApp
+}
 
 @description('Application-specific appsettings for Admin, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
@@ -158,7 +161,7 @@ output appSettings object = {
   PublicApp__Url: 'https://${domain}'
   PublicDataDbExists: true
   PublicDataApi__PublicUrl: 'https://${publicApiUrl}'
-  PublicDataApi__PrivateUrl: secretRefs[resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl]
+  PublicDataApi__PrivateUrl: 'https://${publicApiContainerApp.properties.configuration.ingress.fqdn}'
   PublicDataApi__DocsUrl: 'https://${publicApiUrl}/docs'
   PublicDataApi__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId]
   PublicDataProcessor__Url: 'https://${resourceNames.publicApi.processor.functionApp}.azurewebsites.net'

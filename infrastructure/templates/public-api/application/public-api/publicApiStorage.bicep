@@ -34,7 +34,6 @@ module publicApiStorageAccountModule '../../../common/components/storage/storage
     firewallRules: storageFirewallRules
     sku: config.sku
     kind: config.kind
-    keyVaultName: resourceNames.keyVault.keyVault
     alerts: deployAlerts ? {
       availability: true
       latency: true
@@ -76,5 +75,3 @@ module publicApiStorageBackupModule '../../../common/components/recovery-service
 }
 
 output storageAccountName string = publicApiStorageAccountModule.outputs.storageAccountName
-output connectionStringSecretName string = publicApiStorageAccountModule.outputs.connectionStringSecretName
-output accessKeySecretName string = publicApiStorageAccountModule.outputs.accessKeySecretName
