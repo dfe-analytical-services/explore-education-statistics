@@ -1309,19 +1309,18 @@ public class ReplacementServiceHelperTests
         }
 
         [Fact]
-        public void MappingWouldBreakPairingRules_InvalidPairsAreDropped()
+        public void MappingWouldPairIndicatorWithItself_PairIsDropped()
         {
             var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
-            var replacementId = Guid.NewGuid();
-            var otherReplacementId = Guid.NewGuid();
+            var replacementIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
 
-            // Indicators 0 and 1 are both mapped to the same replacement indicator, so the first pair would become
-            // a self-link and is dropped
+            // Indicators 0 and 1 (parent and child of the first pair) are both mapped to the same replacement
+            // indicator, so the first pair would pair that indicator with itself and is dropped
             var mapping = BuildIndicatorMapping(
-                (originalIds[0], replacementId, MapStatus.ManuallySet),
-                (originalIds[1], replacementId, MapStatus.ManuallySet),
-                (originalIds[2], otherReplacementId, MapStatus.AutoSet),
-                (originalIds[3], Guid.NewGuid(), MapStatus.AutoSet)
+                (originalIds[0], replacementIds[0], MapStatus.ManuallySet),
+                (originalIds[1], replacementIds[0], MapStatus.ManuallySet),
+                (originalIds[2], replacementIds[2], MapStatus.AutoSet),
+                (originalIds[3], replacementIds[3], MapStatus.AutoSet)
             );
 
             var result = ReplacementServiceHelper.ReplacePairedIndicators(
@@ -1332,8 +1331,111 @@ public class ReplacementServiceHelperTests
                 mapping
             );
 
-            var pair = Assert.Single(result!);
-            Assert.Equal(otherReplacementId, pair.ParentIndicatorId);
+            Assert.Equal([new PairedIndicatorEntry(replacementIds[2], replacementIds[3])], result);
+        }
+
+        [Fact]
+        public void MappingWouldGiveParentMultipleChildren_LaterPairIsDropped()
+        {
+            var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+            var replacementIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+
+            // Indicators 0 and 2 (parents of both pairs) are both mapped to the same replacement indicator,
+            // so it would become the parent of two children and the second pair is dropped
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementIds[0], MapStatus.ManuallySet),
+                (originalIds[1], replacementIds[1], MapStatus.AutoSet),
+                (originalIds[2], replacementIds[0], MapStatus.ManuallySet),
+                (originalIds[3], replacementIds[3], MapStatus.AutoSet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                ],
+                mapping
+            );
+
+            Assert.Equal([new PairedIndicatorEntry(replacementIds[0], replacementIds[1])], result);
+        }
+
+        [Fact]
+        public void MappingWouldGiveChildMultipleParents_LaterPairIsDropped()
+        {
+            var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+            var replacementIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+
+            // Indicators 1 and 3 (children of both pairs) are both mapped to the same replacement indicator,
+            // so it would become the child of two parents and the second pair is dropped
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementIds[0], MapStatus.AutoSet),
+                (originalIds[1], replacementIds[1], MapStatus.ManuallySet),
+                (originalIds[2], replacementIds[2], MapStatus.AutoSet),
+                (originalIds[3], replacementIds[1], MapStatus.ManuallySet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                ],
+                mapping
+            );
+
+            Assert.Equal([new PairedIndicatorEntry(replacementIds[0], replacementIds[1])], result);
+        }
+
+        [Fact]
+        public void MappingWouldMakeChildAParent_LaterPairIsDropped()
+        {
+            var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+            var replacementIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+
+            // Indicator 1 (child of the first pair) and indicator 2 (parent of the second pair) are both mapped
+            // to the same replacement indicator, so the pairs would form a chain and the second pair is dropped
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementIds[0], MapStatus.AutoSet),
+                (originalIds[1], replacementIds[1], MapStatus.ManuallySet),
+                (originalIds[2], replacementIds[1], MapStatus.ManuallySet),
+                (originalIds[3], replacementIds[3], MapStatus.AutoSet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                ],
+                mapping
+            );
+
+            Assert.Equal([new PairedIndicatorEntry(replacementIds[0], replacementIds[1])], result);
+        }
+
+        [Fact]
+        public void MappingWouldMakeParentAChild_LaterPairIsDropped()
+        {
+            var originalIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+            var replacementIds = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToList();
+
+            // Indicator 0 (parent of the first pair) and indicator 3 (child of the second pair) are both mapped
+            // to the same replacement indicator, so the pairs would form a chain and the second pair is dropped
+            var mapping = BuildIndicatorMapping(
+                (originalIds[0], replacementIds[0], MapStatus.ManuallySet),
+                (originalIds[1], replacementIds[1], MapStatus.AutoSet),
+                (originalIds[2], replacementIds[2], MapStatus.AutoSet),
+                (originalIds[3], replacementIds[0], MapStatus.ManuallySet)
+            );
+
+            var result = ReplacementServiceHelper.ReplacePairedIndicators(
+                [
+                    new PairedIndicatorEntry(originalIds[0], originalIds[1]),
+                    new PairedIndicatorEntry(originalIds[2], originalIds[3]),
+                ],
+                mapping
+            );
+
+            Assert.Equal([new PairedIndicatorEntry(replacementIds[0], replacementIds[1])], result);
         }
 
         private static DataSetMapping BuildIndicatorMapping(
