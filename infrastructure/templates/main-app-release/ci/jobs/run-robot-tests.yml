@@ -40,7 +40,8 @@ jobs:
       - task: Bash@3
         displayName: Get Key Vault and secret names
         env:
-          # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" opts in to ELZ names.
+          # Left as the literal text "$(elz)" if the variable group doesn't define it, so only "true" (in any case)
+          # opts in to ELZ names.
           ELZ: $(elz)
           BASIC_AUTH_ENABLED: ${{ parameters.publicSiteBasicAuthEnabled }}
         inputs:
@@ -48,7 +49,7 @@ jobs:
           script: |
             set -eo pipefail
 
-            if [ "$ELZ" = "true" ]; then
+            if [ "${ELZ,,}" = "true" ]; then
               keyVaultName="$(subscription)kv-uks-ees01"
               basicAuthUsernameSecret="publicsite-basic-auth-username"
               basicAuthPasswordSecret="publicsite-basic-auth-password"
@@ -96,7 +97,7 @@ jobs:
             script: |
               set -eo pipefail
 
-              if [ "$ELZ" = "true" ]; then
+              if [ "${ELZ,,}" = "true" ]; then
                 username="$ELZ_USERNAME"
                 password="$ELZ_PASSWORD"
               else
