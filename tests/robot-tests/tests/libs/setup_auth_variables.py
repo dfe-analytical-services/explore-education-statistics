@@ -50,6 +50,10 @@ def setup_auth_variables(user, email, password, identity_provider, clear_existin
             authenticated = False
             logger.warning("Found invalid authentication information in local files!")
 
+        if local_storage_helper.has_encryption_cookie_expired(user):
+            logger.warning("Found invalid authentication information in local files! (cookie out of date)")
+            authenticated = False
+
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")
         local_storage_json = get_local_storage_identity_json(
