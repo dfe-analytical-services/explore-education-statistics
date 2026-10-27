@@ -15,7 +15,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     private readonly DataFixture _fixture = new();
 
     [Fact]
-    public async Task SharedFootnote_ForkedForEveryReleaseVersionButFirst()
+    public async Task UnshareFootnotes_SharedFootnote_ForkedForEveryReleaseVersionButFirst()
     {
         // Arrange
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(3);
@@ -55,14 +55,11 @@ public class FootnoteReleaseVersionMigrationControllerTests
             var controller = BuildController(context);
 
             // Act
-            var result = await controller.MigrateFootnoteReleaseVersions(dryRun: false);
+            var result = await controller.UnshareFootnotes(dryRun: false);
 
             // Assert
             Assert.False(result.IsDryRun);
             Assert.Equal(2, result.ForkedFootnotes);
-            Assert.Equal(0, result.DeletedOrphanedFootnotes);
-            Assert.Equal(1, result.ReleaseVersionIdsSet);
-            Assert.Equal(0, result.Remaining);
         }
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
@@ -80,16 +77,14 @@ public class FootnoteReleaseVersionMigrationControllerTests
             Assert.Contains(savedFootnotes, f => f.Id == footnote.Id);
             Assert.Equal(
                 releaseVersions.Select(rv => rv.Id).Order(),
-                savedFootnotes.Select(f => f.ReleaseVersionId!.Value).Order()
+                savedFootnotes.Select(f => Assert.Single(f.Releases).ReleaseVersionId).Order()
             );
 
             Assert.All(
                 savedFootnotes,
                 savedFootnote =>
                 {
-                    var releaseFootnote = Assert.Single(savedFootnote.Releases);
-                    Assert.Equal(releaseFootnote.ReleaseVersionId, savedFootnote.ReleaseVersionId);
-
+                    Assert.Null(savedFootnote.ReleaseVersionId);
                     Assert.Equal(footnote.Content, savedFootnote.Content);
                     Assert.Equal(footnote.Order, savedFootnote.Order);
                     Assert.Equal(footnote.Created, savedFootnote.Created);
@@ -115,7 +110,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task FootnoteWithoutReleaseVersionId_ReleaseVersionIdSet()
+    public async Task MigrateFootnoteReleaseVersions_FootnoteWithoutReleaseVersionId_ReleaseVersionIdSet()
     {
         // Arrange
         ReleaseFootnote releaseFootnote = _fixture
@@ -139,8 +134,6 @@ public class FootnoteReleaseVersionMigrationControllerTests
             var result = await controller.MigrateFootnoteReleaseVersions(dryRun: false);
 
             // Assert
-            Assert.Equal(0, result.ForkedFootnotes);
-            Assert.Equal(0, result.DeletedOrphanedFootnotes);
             Assert.Equal(1, result.ReleaseVersionIdsSet);
             Assert.Equal(0, result.Remaining);
         }
@@ -154,7 +147,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task FootnoteWithWrongReleaseVersionId_ReleaseVersionIdSet()
+    public async Task MigrateFootnoteReleaseVersions_FootnoteWithWrongReleaseVersionId_ReleaseVersionIdSet()
     {
         // Arrange
         ReleaseFootnote releaseFootnote = _fixture
@@ -190,7 +183,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task FootnoteAlreadyMigrated_Unchanged()
+    public async Task MigrateFootnoteReleaseVersions_FootnoteAlreadyMigrated_Unchanged()
     {
         // Arrange
         ReleaseFootnote releaseFootnote = _fixture
@@ -216,8 +209,6 @@ public class FootnoteReleaseVersionMigrationControllerTests
             var result = await controller.MigrateFootnoteReleaseVersions(dryRun: false);
 
             // Assert
-            Assert.Equal(0, result.ForkedFootnotes);
-            Assert.Equal(0, result.DeletedOrphanedFootnotes);
             Assert.Equal(0, result.ReleaseVersionIdsSet);
             Assert.Equal(0, result.Remaining);
         }
@@ -231,7 +222,47 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task OrphanedFootnote_Deleted()
+    public async Task MigrateFootnoteReleaseVersions_SharedFootnote_ReleaseVersionIdNotSet()
+    {
+        // Arrange
+        var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
+
+        Footnote sharedFootnote = _fixture.DefaultFootnote();
+
+        var releaseFootnotes = _fixture
+            .DefaultReleaseFootnote()
+            .ForIndex(0, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(sharedFootnote))
+            .ForIndex(1, s => s.SetReleaseVersion(releaseVersions[1]).SetFootnote(sharedFootnote))
+            .GenerateList();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseFootnote.AddRange(releaseFootnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var controller = BuildController(context);
+
+            // Act
+            var result = await controller.MigrateFootnoteReleaseVersions(dryRun: false);
+
+            // Assert
+            Assert.Equal(0, result.ReleaseVersionIdsSet);
+            Assert.Equal(0, result.Remaining);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Null(Assert.Single(context.Footnote).ReleaseVersionId);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteOrphanedFootnotes_OrphanedFootnote_Deleted()
     {
         // Arrange
         Subject subject = _fixture.DefaultSubject();
@@ -251,7 +282,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
             var controller = BuildController(context);
 
             // Act
-            var result = await controller.MigrateFootnoteReleaseVersions(dryRun: false);
+            var result = await controller.DeleteOrphanedFootnotes(dryRun: false);
 
             // Assert
             Assert.Equal(1, result.DeletedOrphanedFootnotes);
@@ -265,7 +296,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task MoreFootnotesToSetThanNum_SetsNumAndReportsRemaining()
+    public async Task MigrateFootnoteReleaseVersions_MoreFootnotesToSetThanNum_SetsNumAndReportsRemaining()
     {
         // Arrange
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
@@ -304,7 +335,7 @@ public class FootnoteReleaseVersionMigrationControllerTests
     }
 
     [Fact]
-    public async Task DryRun_ReportsChangesWithoutApplyingThem()
+    public async Task UnshareFootnotes_DryRun_ReportsChangesWithoutApplyingThem()
     {
         // Arrange
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
@@ -315,17 +346,81 @@ public class FootnoteReleaseVersionMigrationControllerTests
             .DefaultReleaseFootnote()
             .ForIndex(0, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(sharedFootnote))
             .ForIndex(1, s => s.SetReleaseVersion(releaseVersions[1]).SetFootnote(sharedFootnote))
-            .ForIndex(2, s => s.SetReleaseVersion(releaseVersions[0]).SetFootnote(_fixture.DefaultFootnote()))
             .GenerateList();
-
-        Footnote orphanedFootnote = _fixture.DefaultFootnote();
 
         var contextId = Guid.NewGuid().ToString();
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
             context.ReleaseFootnote.AddRange(releaseFootnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var controller = BuildController(context);
+
+            // Act
+            var result = await controller.UnshareFootnotes();
+
+            // Assert
+            Assert.True(result.IsDryRun);
+            Assert.Equal(1, result.ForkedFootnotes);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Single(context.Footnote);
+            Assert.Equal(2, context.ReleaseFootnote.Count());
+        }
+    }
+
+    [Fact]
+    public async Task DeleteOrphanedFootnotes_DryRun_ReportsChangesWithoutApplyingThem()
+    {
+        // Arrange
+        Footnote orphanedFootnote = _fixture.DefaultFootnote();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
             context.Footnote.Add(orphanedFootnote);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var controller = BuildController(context);
+
+            // Act
+            var result = await controller.DeleteOrphanedFootnotes();
+
+            // Assert
+            Assert.True(result.IsDryRun);
+            Assert.Equal(1, result.DeletedOrphanedFootnotes);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Single(context.Footnote);
+        }
+    }
+
+    [Fact]
+    public async Task MigrateFootnoteReleaseVersions_DryRun_ReportsChangesWithoutApplyingThem()
+    {
+        // Arrange
+        ReleaseFootnote releaseFootnote = _fixture
+            .DefaultReleaseFootnote()
+            .WithReleaseVersion(_fixture.DefaultStatsReleaseVersion())
+            .WithFootnote(_fixture.DefaultFootnote());
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseFootnote.Add(releaseFootnote);
             await context.SaveChangesAsync();
         }
 
@@ -338,17 +433,13 @@ public class FootnoteReleaseVersionMigrationControllerTests
 
             // Assert
             Assert.True(result.IsDryRun);
-            Assert.Equal(1, result.ForkedFootnotes);
-            Assert.Equal(1, result.DeletedOrphanedFootnotes);
-            Assert.Equal(2, result.ReleaseVersionIdsSet);
+            Assert.Equal(1, result.ReleaseVersionIdsSet);
             Assert.Equal(0, result.Remaining);
         }
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            Assert.Equal(3, context.Footnote.Count());
-            Assert.All(context.Footnote, f => Assert.Null(f.ReleaseVersionId));
-            Assert.Equal(3, context.ReleaseFootnote.Count());
+            Assert.Null(Assert.Single(context.Footnote).ReleaseVersionId);
         }
     }
 

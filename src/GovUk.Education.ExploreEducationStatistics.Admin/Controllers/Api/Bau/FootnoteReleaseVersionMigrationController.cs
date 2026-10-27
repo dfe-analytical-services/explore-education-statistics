@@ -15,19 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 [Authorize(Roles = RoleNames.BauUser)]
 public class FootnoteReleaseVersionMigrationController(StatisticsDbContext statisticsDbContext) : ControllerBase
 {
-    public class MigrationResult
-    {
-        public bool IsDryRun { get; set; }
-
-        public int ForkedFootnotes { get; set; }
-
-        public int DeletedOrphanedFootnotes { get; set; }
-
-        public int ReleaseVersionIdsSet { get; set; }
-
-        public int Remaining { get; set; }
-    }
-
     public class SharedFootnotesResult
     {
         public int SharedFootnotes { get; set; }
@@ -35,6 +22,29 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
         public int FootnotesWithoutReleaseVersionId { get; set; }
 
         public int OrphanedFootnotes { get; set; }
+    }
+
+    public class UnshareFootnotesResult
+    {
+        public bool IsDryRun { get; set; }
+
+        public int ForkedFootnotes { get; set; }
+    }
+
+    public class DeleteOrphanedFootnotesResult
+    {
+        public bool IsDryRun { get; set; }
+
+        public int DeletedOrphanedFootnotes { get; set; }
+    }
+
+    public class MigrationResult
+    {
+        public bool IsDryRun { get; set; }
+
+        public int ReleaseVersionIdsSet { get; set; }
+
+        public int Remaining { get; set; }
     }
 
     /// <summary>
@@ -61,36 +71,18 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
     /// <summary>
     /// Gives every Footnote shared by more than one ReleaseVersion a copy of its own for every ReleaseVersion but the
-    /// first, deletes Footnotes which belong to no ReleaseVersion, and sets the ReleaseVersionId of up to
-    /// <paramref name="num"/> Footnotes from their ReleaseFootnote.
+    /// first.
     /// </summary>
-    [HttpPut("migrate-footnote-release-versions")]
-    public async Task<MigrationResult> MigrateFootnoteReleaseVersions(
+    [HttpPut("unshare-footnotes")]
+    public async Task<UnshareFootnotesResult> UnshareFootnotes(
         [FromQuery] bool dryRun = true,
-        [FromQuery] int num = 1000,
         CancellationToken cancellationToken = default
     )
     {
-        // Copying and backfilling footnotes doesn't change them, so they keep their Created and Updated timestamps
+        // Copying footnotes doesn't change them, so they keep their Created and Updated timestamps
         statisticsDbContext.ChangeTracker.StateChanged -= DbContextUtils.UpdateTimestamps;
         statisticsDbContext.ChangeTracker.Tracked -= DbContextUtils.UpdateTimestamps;
 
-        var result = new MigrationResult { IsDryRun = dryRun };
-
-        await ForkSharedFootnotes(result, cancellationToken);
-        await DeleteOrphanedFootnotes(result, cancellationToken);
-        await SetReleaseVersionIds(result, num, cancellationToken);
-
-        if (!dryRun)
-        {
-            await statisticsDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        return result;
-    }
-
-    private async Task ForkSharedFootnotes(MigrationResult result, CancellationToken cancellationToken)
-    {
         var sharedFootnotes = await statisticsDbContext
             .Footnote.Include(footnote => footnote.Subjects)
             .Include(footnote => footnote.Filters)
@@ -101,19 +93,18 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
             .Where(footnote => footnote.Releases.Count > 1)
             .ToListAsync(cancellationToken);
 
+        var forkedFootnotes = 0;
+
         foreach (var footnote in sharedFootnotes)
         {
+            // The existing footnote keeps the first ReleaseFootnote, and a copy of the footnote is created for each
+            // of the remaining ReleaseFootnotes
             var releaseFootnotes = footnote
                 .Releases.OrderBy(releaseFootnote => releaseFootnote.ReleaseVersionId)
+                .Skip(1)
                 .ToList();
 
-            // The existing footnote takes the first ReleaseFootnote ReleaseVersionId, and a copy of the footnote is
-            // created for each of the remaining ReleaseFootnotes ReleaseVersionIds
-            var firstReleaseFootnote = releaseFootnotes[0];
-            footnote.ReleaseVersionId = firstReleaseFootnote.ReleaseVersionId;
-            result.ReleaseVersionIdsSet++;
-
-            foreach (var releaseFootnote in releaseFootnotes.Skip(1))
+            foreach (var releaseFootnote in releaseFootnotes)
             {
                 var fork = new Footnote
                 {
@@ -122,7 +113,6 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
                     Order = footnote.Order,
                     Created = footnote.Created,
                     Updated = footnote.Updated,
-                    ReleaseVersionId = releaseFootnote.ReleaseVersionId,
                     Releases = [new ReleaseFootnote { ReleaseVersionId = releaseFootnote.ReleaseVersionId }],
                     Subjects = footnote
                         .Subjects.Select(link => new SubjectFootnote { SubjectId = link.SubjectId })
@@ -141,12 +131,26 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
 
                 statisticsDbContext.ReleaseFootnote.Remove(releaseFootnote);
                 statisticsDbContext.Footnote.Add(fork);
-                result.ForkedFootnotes++;
+                forkedFootnotes++;
             }
         }
+
+        if (!dryRun)
+        {
+            await statisticsDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return new UnshareFootnotesResult { IsDryRun = dryRun, ForkedFootnotes = forkedFootnotes };
     }
 
-    private async Task DeleteOrphanedFootnotes(MigrationResult result, CancellationToken cancellationToken)
+    /// <summary>
+    /// Deletes Footnotes which belong to no ReleaseVersion.
+    /// </summary>
+    [HttpPut("delete-orphaned-footnotes")]
+    public async Task<DeleteOrphanedFootnotesResult> DeleteOrphanedFootnotes(
+        [FromQuery] bool dryRun = true,
+        CancellationToken cancellationToken = default
+    )
     {
         // These orphaned footnotes aren't created by this migration - but we still want to remove them so we can
         // update Footnote.ReleaseVersionId to be non-nullable later
@@ -155,11 +159,34 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
             .ToListAsync(cancellationToken);
 
         statisticsDbContext.Footnote.RemoveRange(orphanedFootnotes);
-        result.DeletedOrphanedFootnotes = orphanedFootnotes.Count;
+
+        if (!dryRun)
+        {
+            await statisticsDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return new DeleteOrphanedFootnotesResult
+        {
+            IsDryRun = dryRun,
+            DeletedOrphanedFootnotes = orphanedFootnotes.Count,
+        };
     }
 
-    private async Task SetReleaseVersionIds(MigrationResult result, int num, CancellationToken cancellationToken)
+    /// <summary>
+    /// Sets the ReleaseVersionId of up to <paramref name="num"/> Footnotes from their ReleaseFootnote. Footnotes
+    /// shared by more than one ReleaseVersion are skipped until they've been unshared.
+    /// </summary>
+    [HttpPut("migrate-footnote-release-versions")]
+    public async Task<MigrationResult> MigrateFootnoteReleaseVersions(
+        [FromQuery] bool dryRun = true,
+        [FromQuery] int num = 1000,
+        CancellationToken cancellationToken = default
+    )
     {
+        // Backfilling footnotes doesn't change them, so they keep their Created and Updated timestamps
+        statisticsDbContext.ChangeTracker.StateChanged -= DbContextUtils.UpdateTimestamps;
+        statisticsDbContext.ChangeTracker.Tracked -= DbContextUtils.UpdateTimestamps;
+
         var footnotesToSet = statisticsDbContext.Footnote.Where(footnote =>
             footnote.Releases.Count == 1
             && footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseVersionId != footnote.ReleaseVersionId)
@@ -178,7 +205,16 @@ public class FootnoteReleaseVersionMigrationController(StatisticsDbContext stati
             footnote.ReleaseVersionId = footnote.Releases[0].ReleaseVersionId;
         }
 
-        result.ReleaseVersionIdsSet += footnotes.Count;
-        result.Remaining = footnotesToSetCount - footnotes.Count;
+        if (!dryRun)
+        {
+            await statisticsDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return new MigrationResult
+        {
+            IsDryRun = dryRun,
+            ReleaseVersionIdsSet = footnotes.Count,
+            Remaining = footnotesToSetCount - footnotes.Count,
+        };
     }
 }
