@@ -52,7 +52,8 @@ var searchStoragePrivateEndpointsSubnetName = vnetNames.subnets.searchStoragePri
 var analyticsFunctionAppSubnetName = vnetNames.subnets.analyticsFunctionApp
 var analyticsStoragePrivateEndpointsSubnetName = vnetNames.subnets.analyticsStoragePrivateEndpoints
 
-var subnets = deploySubnets ? [{
+// One definition per subnet role.
+var subnetDefinitions = [{
   name: adminSubnetName
   properties: {
     addressPrefix: addressRanges.subnets.admin
@@ -132,7 +133,7 @@ var subnets = deploySubnets ? [{
 {
   name: publicApiDataProcessorPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.publicApiDataProcessorPrivateEndpoints
+    addressPrefix: addressRanges.subnets.?publicApiDataProcessorPrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
@@ -152,19 +153,19 @@ var subnets = deploySubnets ? [{
 {
   name: publicApiStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.publicApiStoragePrivateEndpoints
+    addressPrefix: addressRanges.subnets.?publicApiStoragePrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
   name: psqlFlexibleServerSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.psqlFlexibleServer
+    addressPrefix: addressRanges.subnets.?psqlFlexibleServer ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
   name: searchStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.searchStoragePrivateEndpoints
+    addressPrefix: addressRanges.subnets.?searchStoragePrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
@@ -178,13 +179,13 @@ var subnets = deploySubnets ? [{
 {
   name: searchDocsFunctionAppPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.searchDocsFunctionAppPrivateEndpoints
+    addressPrefix: addressRanges.subnets.?searchDocsFunctionAppPrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
   name: analyticsStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.analyticsStoragePrivateEndpoints
+    addressPrefix: addressRanges.subnets.?analyticsStoragePrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
@@ -198,7 +199,7 @@ var subnets = deploySubnets ? [{
 {
   name: screenerStoragePrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.screenerStoragePrivateEndpoints
+    addressPrefix: addressRanges.subnets.?screenerStoragePrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
@@ -212,13 +213,13 @@ var subnets = deploySubnets ? [{
 {
   name: eventGridCustomTopicPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.eventGridCustomTopicPrivateEndpoints
+    addressPrefix: addressRanges.subnets.?eventGridCustomTopicPrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
   name: nlSearchFunctionAppPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.nlSearchFunctionAppPrivateEndpoints
+    addressPrefix: addressRanges.subnets.?nlSearchFunctionAppPrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
 }
 {
@@ -232,9 +233,16 @@ var subnets = deploySubnets ? [{
 {
   name: sqlServerPrivateEndpointsSubnetName
   properties: {
-    addressPrefix: addressRanges.subnets.sqlServerPrivateEndpoints
+    addressPrefix: addressRanges.subnets.?sqlServerPrivateEndpoints ?? addressRanges.subnets.privateEndpoints!
   }
-}] : null
+}]
+
+// Several roles can share a subnet (in the ELZ subscriptions, every private endpoint role uses the one private endpoints
+// subnet), so only the first definition of each subnet name is kept. In the legacy subscriptions every role has its own
+// subnet, so nothing is dropped.
+var subnets = deploySubnets
+  ? filter(subnetDefinitions, (subnet, index) => indexOf(map(subnetDefinitions, definition => definition.name), subnet.name) == index)
+  : null
 
 module vNetModule '../../../common/components/virtual-network/virtual-network.bicep' = {
   name: '${vNetName}ModuleDeploy'

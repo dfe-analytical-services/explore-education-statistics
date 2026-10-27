@@ -820,14 +820,15 @@ func getElzResourceNames(env string) ResourceNames => {
     public: elzStorageAccountName(env, 'public')
     logging: elzStorageAccountName(env, 'logging')
   }
-  // TODO EES-7502 - these keep the existing one-to-one set of subnets for now. See "Subnet migration" in
-  // azure-resource-update-plan-for-elz.md for the proposed consolidation into shared private endpoint subnets.
+  // Each entry names the subnet a resource uses. Integration subnets stay one per App Service plan, but all private
+  // endpoints share one subnet, so every private endpoint role below returns the same name. See "Subnet migration" in
+  // azure-resource-update-plan-for-elz.md.
   vnet: {
     vnet: elzName(env, elzAbbreviations.networkVirtualNetworks, 'ees')
     subnets: {
       // Core shared infrastructure subnets.
       applicationGateway: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'agw')
-      eventGridCustomTopicPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'evgtpep')
+      eventGridCustomTopicPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // Core application subnets.
       admin: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'admin')
@@ -836,31 +837,31 @@ func getElzResourceNames(env string) ResourceNames => {
       importer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'importer')
       notifier: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'notifier')
       publisher: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'publisher')
-      sqlServerPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'sqlpep')
+      sqlServerPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // Screener subnets.
       screenerFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screener')
-      screenerStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screenerpep')
+      screenerStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // Public API subnets.
       publicApiDataProcessor: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessor')
-      publicApiDataProcessorPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessorpep')
-      publicApiStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papistpep')
+      publicApiDataProcessorPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
+      publicApiStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
       containerAppEnvironment: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'cae')
-      psqlFlexibleServer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'psql')
+      psqlFlexibleServer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // NL Search subnets.
       nlSearchFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearch')
-      nlSearchFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearchpep')
+      nlSearchFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // Search subnets.
       searchDocsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocs')
-      searchDocsFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocspep')
-      searchStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchstpep')
+      searchDocsFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
+      searchStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
 
       // Analytics subnets.
       analyticsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analytics')
-      analyticsStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analyticsstpep')
+      analyticsStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'pep')
     }
   }
   keyVault: {
