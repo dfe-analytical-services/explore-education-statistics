@@ -4,12 +4,12 @@ using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-public class FullSearchableDocumentResetterMockBuilder
+public class FullReleaseDocumentResetterMockBuilder
 {
-    private readonly Mock<IFullSearchableDocumentResetter> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IFullReleaseDocumentResetter> _mock = new(MockBehavior.Strict);
     private PublicationInfo[]? _publicationInfos;
 
-    public IFullSearchableDocumentResetter Build()
+    public IFullReleaseDocumentResetter Build()
     {
         _mock
             .Setup(m => m.PerformReset(It.IsAny<CancellationToken>()))
@@ -18,7 +18,7 @@ public class FullSearchableDocumentResetterMockBuilder
         return _mock.Object;
     }
 
-    public FullSearchableDocumentResetterMockBuilder WherePublicationsReturnedAre(PublicationInfo[] publications)
+    public FullReleaseDocumentResetterMockBuilder WherePublicationsReturnedAre(PublicationInfo[] publications)
     {
         _publicationInfos = publications;
         return this;
@@ -26,7 +26,7 @@ public class FullSearchableDocumentResetterMockBuilder
 
     public Asserter Assert => new(_mock);
 
-    public class Asserter(Mock<IFullSearchableDocumentResetter> mock)
+    public class Asserter(Mock<IFullReleaseDocumentResetter> mock)
     {
         public void PerformResetWasCalled()
         {

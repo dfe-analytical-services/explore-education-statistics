@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 
-public interface IFullSearchableDocumentResetter
+public interface IFullReleaseDocumentResetter
 {
     /// <summary>
     /// Delete all Searchable Documents from Azure storage, and return a list of all live publications.

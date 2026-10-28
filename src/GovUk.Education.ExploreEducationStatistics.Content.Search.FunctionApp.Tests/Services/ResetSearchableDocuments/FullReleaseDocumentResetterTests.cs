@@ -5,23 +5,23 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.ResetSearchableDocuments;
 
-public class FullSearchableDocumentResetterTests
+public class FullReleaseDocumentResetterTests
 {
     private readonly ContentApiClientMockBuilder _contentApi = new();
     private readonly ReleaseDocumentRemoverMockBuilder _releaseDocumentRemover = new();
 
-    private IFullSearchableDocumentResetter GetSut() =>
-        new FullSearchableDocumentResetter(
+    private IFullReleaseDocumentResetter GetSut() =>
+        new FullReleaseDocumentResetter(
             _contentApi.Build(),
             _releaseDocumentRemover.Build(),
-            new NullLogger<FullSearchableDocumentResetter>()
+            new NullLogger<FullReleaseDocumentResetter>()
         );
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenPerformReset_ThenAllSearchableDocumentsAreRemoved()
+    public async Task WhenPerformReset_ThenAllReleaseDocumentsAreRemoved()
     {
         // Arrange
         var sut = GetSut();

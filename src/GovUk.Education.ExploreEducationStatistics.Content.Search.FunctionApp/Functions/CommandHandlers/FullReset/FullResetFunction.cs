@@ -7,10 +7,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
 
-public class FullResetFunction(
-    IFullSearchableDocumentResetter fullSearchableDocumentResetter,
-    ICommandHandler commandHandler
-)
+public class FullResetFunction(IFullReleaseDocumentResetter fullReleaseDocumentResetter, ICommandHandler commandHandler)
 {
     [Function(nameof(FullSearchableDocumentsReset))]
     [QueueOutput("%RefreshReleaseDocumentQueueName%")]
@@ -22,7 +19,7 @@ public class FullResetFunction(
 
     private async Task<RefreshReleaseDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
     {
-        var response = await fullSearchableDocumentResetter.PerformReset(cancellationToken);
+        var response = await fullReleaseDocumentResetter.PerformReset(cancellationToken);
 
         return response
             .AllPublications.Select(publication => new RefreshReleaseDocumentMessageDto
