@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Events;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
