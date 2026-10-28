@@ -1,12 +1,11 @@
 name: Notify expired API docs
 on:
-  # Schedule disabled until a notification channel is configured (EES-7608).
-  # schedule:
-  #   - cron: '5 12 * * 1-5'  # 12:05 UTC, Monday to Friday
+  schedule:
+    - cron: '5 12 * * 1-5'  # 12:05 UTC, Monday to Friday
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Dry run (logs the message that would be sent; no notification channel is configured yet)
+        description: Dry run (does not send Teams notification)
         required: false
         default: true
         type: boolean
@@ -27,3 +26,5 @@ jobs:
         run: bundle exec rake notify:expired
         env:
           HOST_URL: ${{ vars.API_DOCS_URL }}
+          REALLY_POST_TO_TEAMS: ${{ (github.event_name == 'schedule') && 1 || (github.event.inputs.dry_run == 'false') && 1 || 0 }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_API_DOCS_WEBHOOK_URL }}
