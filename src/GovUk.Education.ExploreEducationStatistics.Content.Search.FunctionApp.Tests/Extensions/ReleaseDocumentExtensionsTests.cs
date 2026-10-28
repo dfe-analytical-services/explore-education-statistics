@@ -5,12 +5,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 
-public class ReleaseSearchableDocumentExtensionsTests
+public class ReleaseDocumentExtensionsTests
 {
     [Fact]
     public void BuildMetadataShouldReturnExpectedMetadataKeysAndValues()
     {
-        var releaseSearchableDocument = new ReleaseSearchableDocument
+        var releaseDocument = new ReleaseDocument
         {
             ReleaseId = new Guid("76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
             ReleaseVersionId = new Guid("5cd3ae70-ff32-409b-aa6b-363b380eb4c8"),
@@ -37,36 +37,33 @@ public class ReleaseSearchableDocumentExtensionsTests
         };
 
         // ACT
-        var actual = releaseSearchableDocument.BuildMetadata();
+        var actual = releaseDocument.BuildMetadata();
 
         // ASSERT
         Assert.Equal(14, actual.Keys.Count);
         AssertAll([
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseId, "76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.ReleaseId, "76640d46-3f02-4b08-a4d9-c1fbf1bdd502"),
             AssertMetadata(
-                SearchableDocumentAzureBlobMetadataKeys.ReleaseVersionId,
+                ReleaseDocumentAzureBlobMetadataKeys.ReleaseVersionId,
                 "5cd3ae70-ff32-409b-aa6b-363b380eb4c8"
             ),
-            AssertMetadata(
-                SearchableDocumentAzureBlobMetadataKeys.PublicationId,
-                "caf751b8-5f8c-4526-8b5f-7fd28199866b"
-            ),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeId, "4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.Published, "2025-02-21T18:24:01Z"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseType, "Official Statistics"),
-            AssertMetadata(SearchableDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Summary, "This is a summary."),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.ThemeTitle, "Theme Title"),
-            AssertEncodedMetadata(SearchableDocumentAzureBlobMetadataKeys.Title, "Publication Title"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.PublicationId, "caf751b8-5f8c-4526-8b5f-7fd28199866b"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.ThemeId, "4625ca38-68aa-4d73-a1f9-2aab732aecc2"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.Published, "2025-02-21T18:24:01Z"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.ReleaseType, "Official Statistics"),
+            AssertMetadata(ReleaseDocumentAzureBlobMetadataKeys.TypeBoost, "10"),
+            AssertEncodedMetadata(ReleaseDocumentAzureBlobMetadataKeys.PublicationSlug, "publication-slug"),
+            AssertEncodedMetadata(ReleaseDocumentAzureBlobMetadataKeys.ReleaseSlug, "release-slug"),
+            AssertEncodedMetadata(ReleaseDocumentAzureBlobMetadataKeys.Summary, "This is a summary."),
+            AssertEncodedMetadata(ReleaseDocumentAzureBlobMetadataKeys.ThemeTitle, "Theme Title"),
+            AssertEncodedMetadata(ReleaseDocumentAzureBlobMetadataKeys.Title, "Publication Title"),
             AssertJsonArrayMetadata(
-                SearchableDocumentAzureBlobMetadataKeys.PublishingOrganisationIds,
+                ReleaseDocumentAzureBlobMetadataKeys.PublishingOrganisationIds,
                 "7cbcfe03-9f7e-478a-8512-a1a5e0ca793b",
                 "7c3252c6-6e94-4a34-8762-ff52aae5c0c0"
             ),
             AssertJsonArrayMetadata(
-                SearchableDocumentAzureBlobMetadataKeys.PublishingOrganisationTitles,
+                ReleaseDocumentAzureBlobMetadataKeys.PublishingOrganisationTitles,
                 "Department for Education",
                 "Ofsted"
             ),
@@ -84,13 +81,11 @@ public class ReleaseSearchableDocumentExtensionsTests
     [Fact]
     public void GivenSummaryWithExtraSpaces_WhenBuildingMetadata_ThenSummaryIsTrimmed()
     {
-        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
-            .WithSummary("  extra spaces either side ")
-            .Build();
+        var releaseSearchViewModel = new ReleaseDocumentBuilder().WithSummary("  extra spaces either side ").Build();
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Summary]);
+        AssertEncodedMetadataValue("extra spaces either side", actual[ReleaseDocumentAzureBlobMetadataKeys.Summary]);
     }
 
     /// <summary>
@@ -99,16 +94,11 @@ public class ReleaseSearchableDocumentExtensionsTests
     [Fact]
     public void GivenThemeTitleWithExtraSpaces_WhenBuildingMetadata_ThenThemeTitleIsTrimmed()
     {
-        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
-            .WithThemeTitle("  extra spaces either side ")
-            .Build();
+        var releaseSearchViewModel = new ReleaseDocumentBuilder().WithThemeTitle("  extra spaces either side ").Build();
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue(
-            "extra spaces either side",
-            actual[SearchableDocumentAzureBlobMetadataKeys.ThemeTitle]
-        );
+        AssertEncodedMetadataValue("extra spaces either side", actual[ReleaseDocumentAzureBlobMetadataKeys.ThemeTitle]);
     }
 
     /// <summary>
@@ -117,19 +107,17 @@ public class ReleaseSearchableDocumentExtensionsTests
     [Fact]
     public void GivenTitleWithExtraSpaces_WhenBuildingMetadata_ThenTitleIsTrimmed()
     {
-        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
-            .WithTitle("  extra spaces either side ")
-            .Build();
+        var releaseSearchViewModel = new ReleaseDocumentBuilder().WithTitle("  extra spaces either side ").Build();
 
         var actual = releaseSearchViewModel.BuildMetadata();
 
-        AssertEncodedMetadataValue("extra spaces either side", actual[SearchableDocumentAzureBlobMetadataKeys.Title]);
+        AssertEncodedMetadataValue("extra spaces either side", actual[ReleaseDocumentAzureBlobMetadataKeys.Title]);
     }
 
     [Fact]
     public void GivenPublishingOrganisationTitlesWithUnicode_WhenBuildingMetadata_ThenJsonMetadataIsAsciiAndPreservesValues()
     {
-        var releaseSearchViewModel = new ReleaseSearchableDocumentBuilder()
+        var releaseSearchViewModel = new ReleaseDocumentBuilder()
             .WithPublishingOrganisations(
                 new PublishingOrganisation { Id = Guid.NewGuid(), Title = "Department for Education" },
                 new PublishingOrganisation { Id = Guid.NewGuid(), Title = "Y Grŵp Addysg, Diwylliant a’r Gymraeg" } // Welsh for "The Education, Culture and Welsh Language Group", containing Unicode characters 'Latin small w with circumflex' (U+0175) and 'Right Single Quotation Mark' (U+2019)
@@ -137,7 +125,7 @@ public class ReleaseSearchableDocumentExtensionsTests
             .Build();
 
         var actual = releaseSearchViewModel.BuildMetadata();
-        var titlesJson = actual[SearchableDocumentAzureBlobMetadataKeys.PublishingOrganisationTitles];
+        var titlesJson = actual[ReleaseDocumentAzureBlobMetadataKeys.PublishingOrganisationTitles];
 
         // Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
         // Verify that JsonSerializer.Serialize turns the non-ASCII characters into Unicode escape sequences like \u0175 and \u2019.

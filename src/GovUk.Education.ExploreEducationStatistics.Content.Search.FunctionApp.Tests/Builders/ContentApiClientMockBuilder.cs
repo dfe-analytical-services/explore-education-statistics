@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class ContentApiClientMockBuilder
 {
     private readonly Mock<IContentApiClient> _mock = new(MockBehavior.Strict);
-    private readonly ReleaseSearchableDocumentBuilder _releaseSearchableDocumentBuilder = new();
-    private ReleaseSearchableDocument? _releaseSearchableDocument;
+    private readonly ReleaseDocumentBuilder _releaseDocumentBuilder = new();
+    private ReleaseDocument? _releaseDocument;
     private PublicationInfo[]? _publicationsForTheme;
     private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
@@ -22,7 +22,7 @@ internal class ContentApiClientMockBuilder
             .Setup(m =>
                 m.GetPublicationLatestReleaseSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>())
             )
-            .ReturnsAsync(() => _releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
+            .ReturnsAsync(() => _releaseDocument ?? _releaseDocumentBuilder.Build());
 
         _mock
             .Setup(m => m.GetPublicationsForTheme(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
@@ -58,19 +58,17 @@ internal class ContentApiClientMockBuilder
         return _mock.Object;
     }
 
-    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        ReleaseSearchableDocument releaseSearchableDocument
-    )
+    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(ReleaseDocument releaseDocument)
     {
-        _releaseSearchableDocument = releaseSearchableDocument;
+        _releaseDocument = releaseDocument;
         return this;
     }
 
     public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        Func<ReleaseSearchableDocumentBuilder, ReleaseSearchableDocumentBuilder> modifyReleaseSearchViewModel
+        Func<ReleaseDocumentBuilder, ReleaseDocumentBuilder> modifyReleaseSearchViewModel
     )
     {
-        modifyReleaseSearchViewModel(_releaseSearchableDocumentBuilder);
+        modifyReleaseSearchViewModel(_releaseDocumentBuilder);
         return this;
     }
 

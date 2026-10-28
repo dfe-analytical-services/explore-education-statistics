@@ -24,16 +24,16 @@ internal class ReleaseDocumentCreator(
         CancellationToken cancellationToken = default
     )
     {
-        var releaseSearchableDocument = await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
+        var releaseDocument = await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
             request.PublicationSlug,
             cancellationToken
         );
 
-        var blobName = releaseSearchableDocument.ReleaseId.ToString();
+        var blobName = releaseDocument.ReleaseId.ToString();
         await azureBlobStorageClient.UploadBlob(
             containerName: appOptions.Value.ReleaseDocumentsContainerName,
             blobName: blobName,
-            blob: new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
+            blob: new Blob(releaseDocument.HtmlContent, releaseDocument.BuildMetadata()),
             contentType: MediaTypeNames.Text.Html,
             cancellationToken: cancellationToken
         );
@@ -41,9 +41,9 @@ internal class ReleaseDocumentCreator(
         return new CreatePublicationLatestReleaseDocumentResponse
         {
             PublicationSlug = request.PublicationSlug,
-            ReleaseId = releaseSearchableDocument.ReleaseId,
-            ReleaseSlug = releaseSearchableDocument.ReleaseSlug,
-            ReleaseVersionId = releaseSearchableDocument.ReleaseVersionId,
+            ReleaseId = releaseDocument.ReleaseId,
+            ReleaseSlug = releaseDocument.ReleaseSlug,
+            ReleaseVersionId = releaseDocument.ReleaseVersionId,
             BlobName = blobName,
         };
     }

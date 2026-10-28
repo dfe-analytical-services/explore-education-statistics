@@ -3,7 +3,7 @@ using Generator.Equals;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 [Equatable]
-public partial record ReleaseSearchableDocument
+public partial record ReleaseDocument
 {
     public required Guid ReleaseId { get; init; }
 

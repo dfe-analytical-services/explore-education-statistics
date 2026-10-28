@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
-public class ReleaseSearchableDocumentBuilder
+public class ReleaseDocumentBuilder
 {
     private string? _summary;
     private string? _title;
@@ -13,7 +13,7 @@ public class ReleaseSearchableDocumentBuilder
     private string? _themeTitle;
     private PublishingOrganisation[]? _publishingOrganisations;
 
-    public ReleaseSearchableDocument Build() =>
+    public ReleaseDocument Build() =>
         new()
         {
             ReleaseId = _releaseId ?? new Guid("08228000-71de-4a1a-9adf-35f3d2bd061a"),
@@ -46,51 +46,49 @@ public class ReleaseSearchableDocumentBuilder
             HtmlContent = "<p>This is some Html Content</p>",
         };
 
-    public ReleaseSearchableDocumentBuilder WithSummary(string summary)
+    public ReleaseDocumentBuilder WithSummary(string summary)
     {
         _summary = summary;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithTitle(string title)
+    public ReleaseDocumentBuilder WithTitle(string title)
     {
         _title = title;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithReleaseVersionId(Guid releaseVersionId)
+    public ReleaseDocumentBuilder WithReleaseVersionId(Guid releaseVersionId)
     {
         _releaseVersionId = releaseVersionId;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithReleaseId(Guid releaseId)
+    public ReleaseDocumentBuilder WithReleaseId(Guid releaseId)
     {
         _releaseId = releaseId;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithPublicationId(Guid publicationId)
+    public ReleaseDocumentBuilder WithPublicationId(Guid publicationId)
     {
         _publicationId = publicationId;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithThemeId(Guid themeId)
+    public ReleaseDocumentBuilder WithThemeId(Guid themeId)
     {
         _themeId = themeId;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithThemeTitle(string themeTitle)
+    public ReleaseDocumentBuilder WithThemeTitle(string themeTitle)
     {
         _themeTitle = themeTitle;
         return this;
     }
 
-    public ReleaseSearchableDocumentBuilder WithPublishingOrganisations(
-        params PublishingOrganisation[] publishingOrganisations
-    )
+    public ReleaseDocumentBuilder WithPublishingOrganisations(params PublishingOrganisation[] publishingOrganisations)
     {
         _publishingOrganisations = publishingOrganisations;
         return this;
