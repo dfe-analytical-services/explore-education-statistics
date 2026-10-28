@@ -26,7 +26,7 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies, I
         // Execute strategies sequentially so as not to interleave the logs.
         var results = await strategies
             .ToAsyncEnumerable()
-            .SelectAwait(async strategy => await Run(strategy))
+            .Select(async (strategy, ct) => await Run(strategy, ct))
             .Select(result => (HealthCheckResultViewModel)result)
             .ToArrayAsync(cancellationToken: cancellationToken);
 
@@ -36,11 +36,11 @@ public class HealthCheckFunction(IEnumerable<IHealthCheckStrategy> strategies, I
             ? new OkObjectResult(healthCheckResponse)
             : new ObjectResult(healthCheckResponse) { StatusCode = StatusCodes.Status500InternalServerError };
 
-        async Task<HealthCheckResult> Run(IHealthCheckStrategy strategy)
+        async Task<HealthCheckResult> Run(IHealthCheckStrategy strategy, CancellationToken ct)
         {
             try
             {
-                return await strategy.Run(cancellationToken);
+                return await strategy.Run(ct);
             }
             catch (Exception e)
             {
