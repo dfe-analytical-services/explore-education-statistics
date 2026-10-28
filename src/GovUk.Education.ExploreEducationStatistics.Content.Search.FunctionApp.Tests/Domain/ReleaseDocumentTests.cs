@@ -3,15 +3,15 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Domain;
 
-public abstract class ReleaseSearchableDocumentTests
+public abstract class ReleaseDocumentTests
 {
-    public class EqualsTests : ReleaseSearchableDocumentTests
+    public class EqualsTests : ReleaseDocumentTests
     {
         [Fact]
         public void PublishingOrganisationsWithSameContent_AreEqual()
         {
             // Verify that equality compares publishing organisations by value rather than reference.
-            var first = new ReleaseSearchableDocumentBuilder()
+            var first = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {
@@ -26,7 +26,7 @@ public abstract class ReleaseSearchableDocumentTests
                 )
                 .Build();
 
-            var second = new ReleaseSearchableDocumentBuilder()
+            var second = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {
@@ -47,7 +47,7 @@ public abstract class ReleaseSearchableDocumentTests
         [Fact]
         public void PublishingOrganisationsWithDifferentContent_AreNotEqual()
         {
-            var first = new ReleaseSearchableDocumentBuilder()
+            var first = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {
@@ -57,7 +57,7 @@ public abstract class ReleaseSearchableDocumentTests
                 )
                 .Build();
 
-            var second = new ReleaseSearchableDocumentBuilder()
+            var second = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {
@@ -73,7 +73,7 @@ public abstract class ReleaseSearchableDocumentTests
         [Fact]
         public void PublishingOrganisationsWithDifferentOrder_AreNotEqual()
         {
-            var first = new ReleaseSearchableDocumentBuilder()
+            var first = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {
@@ -88,7 +88,7 @@ public abstract class ReleaseSearchableDocumentTests
                 )
                 .Build();
 
-            var second = new ReleaseSearchableDocumentBuilder()
+            var second = new ReleaseDocumentBuilder()
                 .WithPublishingOrganisations(
                     new PublishingOrganisation
                     {

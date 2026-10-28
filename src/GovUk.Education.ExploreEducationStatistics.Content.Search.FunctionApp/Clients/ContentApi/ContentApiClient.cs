@@ -71,7 +71,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             : new GetResponse<TResponse>.Success(responseData);
     }
 
-    public async Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
+    public async Task<ReleaseDocument> GetPublicationLatestReleaseSearchableDocument(
         string publicationSlug,
         CancellationToken cancellationToken
     )

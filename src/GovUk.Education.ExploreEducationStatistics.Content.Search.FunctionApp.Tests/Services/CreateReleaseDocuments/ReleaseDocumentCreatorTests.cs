@@ -88,8 +88,8 @@ public class ReleaseDocumentCreatorTests
         public async Task Should_upload_searchable_document_blob()
         {
             // ARRANGE
-            var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
-            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
+            var releaseDocument = new ReleaseDocumentBuilder().Build();
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
             var sut = GetSut();
 
             // ACT
@@ -98,7 +98,7 @@ public class ReleaseDocumentCreatorTests
             );
 
             // ASSERT
-            var expected = new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata());
+            var expected = new Blob(releaseDocument.HtmlContent, releaseDocument.BuildMetadata());
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
                 contentType: MediaTypeNames.Text.Html,
                 whereBlob: blob => blob == expected
@@ -109,8 +109,8 @@ public class ReleaseDocumentCreatorTests
         public async Task Should_return_information_in_response()
         {
             // ARRANGE
-            var releaseSearchableDocument = new ReleaseSearchableDocumentBuilder().Build();
-            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseSearchableDocument);
+            var releaseDocument = new ReleaseDocumentBuilder().Build();
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
             var sut = GetSut();
 
             // ACT
@@ -119,8 +119,8 @@ public class ReleaseDocumentCreatorTests
             );
 
             // ASSERT
-            Assert.Equal(releaseSearchableDocument.ReleaseVersionId, response.ReleaseVersionId);
-            Assert.Equal(releaseSearchableDocument.ReleaseId.ToString(), response.BlobName);
+            Assert.Equal(releaseDocument.ReleaseVersionId, response.ReleaseVersionId);
+            Assert.Equal(releaseDocument.ReleaseId.ToString(), response.BlobName);
         }
     }
 }
