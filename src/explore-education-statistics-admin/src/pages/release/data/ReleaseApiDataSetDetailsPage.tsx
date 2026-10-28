@@ -295,21 +295,24 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverrideRequired =
     hasMajorPatchChanges && !majorPatchVersionOverridden;
 
-  // Only BAU users can override the block on major changes in a patch version.
+  const mappingActionsRequired =
+    !!dataSet?.draftVersion?.mappingStatus && !mappingComplete;
+
+  // Only BAU users can override the block on major changes in a patch version,
+  // and only once mapping has been completed.
   const canOverrideMajorVersion =
-    majorVersionOverrideRequired && !!user?.permissions.isBauUser;
+    majorVersionOverrideRequired &&
+    !mappingActionsRequired &&
+    !!user?.permissions.isBauUser;
 
   const majorVersionRejected =
-    majorVersionOverrideRequired && !user?.permissions.isBauUser;
+    majorVersionOverrideRequired && !canOverrideMajorVersion;
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
-
-  const mappingActionsRequired =
-    !!dataSet?.draftVersion?.mappingStatus && !mappingComplete;
 
   const readyToFinalise =
     !!mappingComplete && dataSet?.draftVersion?.status === 'Mapping';
