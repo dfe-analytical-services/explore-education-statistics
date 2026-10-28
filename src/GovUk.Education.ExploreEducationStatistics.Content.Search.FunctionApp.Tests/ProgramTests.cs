@@ -18,7 +18,7 @@ public class ProgramTests
          {
              "App": {
                  "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                 "SearchDocumentsContainerName": "search-documents-container-name"
+                 "ReleaseDocumentsContainerName": "release-documents-container-name"
              },
              "ContentApi": {
                  "Url": "http://contentapi.test.url:8123"
@@ -165,7 +165,7 @@ public class ProgramTests
                     {
                        "App": {
                             "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                            "SearchDocumentsContainerName": "search-documents-container-name"
+                            "ReleaseDocumentsContainerName": "release-documents-container-name"
                        }
                     }
                     """
@@ -193,7 +193,7 @@ public class ProgramTests
                         {
                            "App": {
                                 "SearchStorageConnectionString": null,
-                                "SearchDocumentsContainerName": "search-documents-container-name"
+                                "ReleaseDocumentsContainerName": "release-documents-container-name"
                            }
                         }
                         """
@@ -218,7 +218,7 @@ public class ProgramTests
                         {
                            "App": {
                                 "SearchStorageConnectionString": "UseDevelopmentStorage=true",
-                                "SearchDocumentsContainerName": null
+                                "ReleaseDocumentsContainerName": null
                            }
                         }
                         """
@@ -274,7 +274,7 @@ public class ProgramTests
                 Assert.NotNull(options.Value);
                 Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
                 Assert.Null(options.Value.SearchServiceAccessKey);
-                Assert.Equal(string.Empty, options.Value.IndexerName);
+                Assert.Equal(string.Empty, options.Value.ReleaseIndexerName);
             }
         }
 
