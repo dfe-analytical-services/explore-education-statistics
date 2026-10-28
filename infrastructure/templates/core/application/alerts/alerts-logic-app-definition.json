@@ -14,9 +14,6 @@
     },
     "teamsPowerAutomateWebhookUrl": {
       "type": "securestring"
-    },
-    "slackAlertsConfig": {
-      "type": "securestring"
     }
   },
   "triggers": {
@@ -148,7 +145,6 @@
         "outsideThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{outputs('variables')?['metricValue']}, which is @{outputs('variables')?['operator']} the threshold of @{outputs('variables')?['threshold']}",
         "withinThresholdMessage": "The @{outputs('variables')?['timeAggregation']} of @{outputs('variables')?['metricName']} is at @{if(empty(outputs('variables')?['metricValue']), 'an acceptable value again', concat(outputs('variables')?['metricValue'], ' and is no longer ', outputs('variables')?['operator'], ' the ', outputs('variables')?['threshold'], ' threshold'))}",
         "severityDisplay": "@{if(equals(outputs('variables')?['severity'], 'Sev0'), 'CRITICAL!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev1'), 'Error!', '')}@{if(equals(outputs('variables')?['severity'], 'Sev2'), 'Warning', '')}@{if(equals(outputs('variables')?['severity'], 'Sev3'), 'Information', '')}@{if(equals(outputs('variables')?['severity'], 'Sev4'), 'Verbose', '')}",
-        "severityColourSlack": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'danger',    if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
         "severityColourTeams": "@{if(or(equals(outputs('variables')?['severity'], 'Sev0'), equals(outputs('variables')?['severity'], 'Sev1')), 'attention', if(equals(outputs('variables')?['severity'], 'Sev2'), 'warning', 'good'))}",
         "alertRuleUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertId']}",
         "alertTargetResourceUrl": "https://portal.azure.com/#@platform.education.gov.uk/resource@{triggerBody()?['data']?['essentials']?['alertTargetIDs'][0]}"
@@ -161,15 +157,13 @@
         ]
       },
       "type": "Compose",
-      "description": "Create the textual field values for the messages being sent to Slack and Teams.",
+      "description": "Create the textual field values for the message being sent to Teams.",
       "inputs": {
         "alertTime": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), convertTimeZone(triggerBody()?['data']?['essentials']?['resolvedDateTime'], 'UTC', 'GMT Standard Time', 'dd/MM/yyyy h:mm:sstt'), convertTimeZone(triggerBody()?['data']?['essentials']?['firedDateTime'], 'UTC', 'GMT Standard Time', 'dd/MM/yyyy h:mm:sstt'))} UK time",
-        "colourSlack": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourSlack'])}",
         "colourTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'good', outputs('fragments')?['severityColourTeams'])}",
         "severity": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), 'Resolved', outputs('fragments')?['severityDisplay'])}",
         "windowStart": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], null), '', concat(convertTimeZone(triggerBody()?['data']?['alertContext']?['condition']?['windowStartTime'], 'UTC', 'GMT Standard Time', 'dd/MM/yyyy h:mm:sstt'), ' UK time'))}",
         "windowEnd": "@{if(equals(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], null), '', concat(convertTimeZone(triggerBody()?['data']?['alertContext']?['condition']?['windowEndTime'], 'UTC', 'GMT Standard Time', 'dd/MM/yyyy h:mm:sstt'), ' UK time'))}",
-        "titleSlack": "*Alert @{outputs('variables')?['monitorCondition']}!*\n@{outputs('variables')?['alertName']}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n<@{outputs('fragments')?['alertRuleUrl']}|Link to alert>\n<@{outputs('fragments')?['alertTargetResourceUrl']}|Link to resource>",
         "titleTeams": "@{concat('Alert ', outputs('variables')?['alertName'], ' ', toLower(outputs('variables')?['monitorCondition']), if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', '!'))}",
         "alertLinkTeams": "@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), '', concat(triggerBody()?['data']?['essentials']?['description'], '\n'))}\n@{if(equals(outputs('variables')?['monitorCondition'], 'Resolved'), outputs('fragments')?['withinThresholdMessage'], outputs('fragments')?['outsideThresholdMessage'])}\n[Link to alert](@{outputs('fragments')?['alertRuleUrl']})\n[Link to resource](@{outputs('fragments')?['alertTargetResourceUrl']})"
       }
@@ -248,168 +242,6 @@
       "runtimeConfiguration": {
         "contentTransfer": {
           "transferMode": "Chunked"
-        }
-      }
-    },
-    "Initialise Slack failures": {
-      "runAfter": {
-        "fields": [
-          "Succeeded"
-        ]
-      },
-      "type": "InitializeVariable",
-      "description": "Collects any channel that Slack accepted over HTTP but refused to post to.",
-      "inputs": {
-        "variables": [
-          {
-            "name": "slackFailures",
-            "type": "Array"
-          }
-        ]
-      }
-    },
-    "Post to Slack workspaces": {
-      "runAfter": {
-        "Initialise Slack failures": [
-          "Succeeded"
-        ]
-      },
-      "type": "Foreach",
-      "description": "Outer loop over each Slack workspace in the ees-alerts-slackconfig secret. The workspace carries the app token used by every channel inside it.",
-      "foreach": "@json(parameters('slackAlertsConfig'))",
-      "runtimeConfiguration": {
-        "concurrency": {
-          "repetitions": 1
-        }
-      },
-      "actions": {
-        "Post to channels": {
-          "type": "Foreach",
-          "description": "Inner loop over the channels belonging to the current workspace.",
-          "foreach": "@items('Post to Slack workspaces')?['channels']",
-          "runtimeConfiguration": {
-            "concurrency": {
-              "repetitions": 1
-            }
-          },
-          "actions": {
-            "Post message to Slack": {
-              "type": "Http",
-              "inputs": {
-                "method": "POST",
-                "uri": "https://slack.com/api/chat.postMessage",
-                "body": {
-                  "channel": "@items('Post to channels')",
-                  "text": "@outputs('fields')?['titleSlack']",
-                  "attachments": [
-                    {
-                      "color": "@outputs('fields')?['colourSlack']",
-                      "fields": [
-                        {
-                          "title": "Alert",
-                          "value": "@outputs('variables')?['alertName']",
-                          "short": true
-                        },
-                        {
-                          "title": "Severity",
-                          "value": "@outputs('fields')?['severity']",
-                          "short": true
-                        },
-                        {
-                          "title": "@{outputs('variables')?['monitorCondition']} at",
-                          "value": "@outputs('fields')?['alertTime']",
-                          "short": false
-                        },
-                        {
-                          "title": "Window start",
-                          "value": "@outputs('fields')?['windowStart']",
-                          "short": true
-                        },
-                        {
-                          "title": "Window end",
-                          "value": "@outputs('fields')?['windowEnd']",
-                          "short": true
-                        },
-                        {
-                          "title": "Logic App workflow version",
-                          "value": "1.0",
-                          "short": true
-                        }
-                      ]
-                    }
-                  ]
-                },
-                "headers": {
-                  "Content-Type": "application/json",
-                  "Authorization": "@{concat('Bearer ', items('Post to Slack workspaces')?['authToken'])}"
-                }
-              },
-              "runtimeConfiguration": {
-                "secureData": {
-                  "properties": [
-                    "inputs",
-                    "outputs"
-                  ]
-                }
-              }
-            },
-            "Record rejected Slack post": {
-              "runAfter": {
-                "Post message to Slack": [
-                  "Succeeded"
-                ]
-              },
-              "type": "If",
-              "description": "chat.postMessage returns HTTP 200 with ok=false when the token lacks chat:write or the app is not in the channel, so a rejected message must be detected from the body.",
-              "expression": {
-                "not": {
-                  "equals": [
-                    "@body('Post message to Slack')?['ok']",
-                    true
-                  ]
-                }
-              },
-              "actions": {
-                "Append rejected channel": {
-                  "type": "AppendToArrayVariable",
-                  "inputs": {
-                    "name": "slackFailures",
-                    "value": "@{items('Post to channels')} (@{coalesce(body('Post message to Slack')?['error'], 'unknown error')})"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Fail if any Slack post was rejected": {
-      "runAfter": {
-        "Post to Slack workspaces": [
-          "Succeeded"
-        ],
-        "Post message to Teams": [
-          "Succeeded"
-        ]
-      },
-      "type": "If",
-      "description": "Fails the run so that dropped alerts surface in the WorkflowRuntime diagnostic logs instead of passing silently.",
-      "expression": {
-        "greater": [
-          "@length(variables('slackFailures'))",
-          0
-        ]
-      },
-      "actions": {
-        "Terminate as failed": {
-          "type": "Terminate",
-          "inputs": {
-            "runStatus": "Failed",
-            "runError": {
-              "code": "SlackPostRejected",
-              "message": "Slack rejected the alert for: @{join(variables('slackFailures'), '; ')}"
-            }
-          }
         }
       }
     }

@@ -8,14 +8,6 @@ param alertsLogicAppName string
 param logAnalyticsWorkspaceId string
 
 @secure()
-@description('''
-JSON array of the Slack workspaces to post alerts to, each entry taking the form
-`{ "channels": ["<channel id>"], "authToken": "<app token>" }`. Held in the `ees-alerts-slackconfig`
-Key Vault secret so that each workspace's channels travel with the token that can post to them.
-''')
-param slackAlertsConfig string
-
-@secure()
 @description('The Power Automate Webhook URL used to post messages to Teams.')
 param teamsPowerAutomateWebhookUrl string
 
@@ -33,10 +25,6 @@ resource alertsLogicApp 'Microsoft.Logic/workflows@2019-05-01' = {
         type: 'string'
         value: resourceGroup().name
       }
-      slackAlertsConfig: {
-        type: 'securestring'
-        value: slackAlertsConfig
-      }
       teamsPowerAutomateWebhookUrl: {
         type: 'securestring'
         value: teamsPowerAutomateWebhookUrl
@@ -47,6 +35,7 @@ resource alertsLogicApp 'Microsoft.Logic/workflows@2019-05-01' = {
 }
 
 resource alertsLogicAppDiagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  // Legacy name kept: renaming would add a second diagnostic setting rather than replace this one.
   name: 'Slack webhook logic app diagnostic setting'
   scope: alertsLogicApp
   properties: {

@@ -70,7 +70,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 10 | Get ELZ IP ranges big enough for the [section 5](#5-subnet-migration) layout: a /21 per environment | Blocked | The /24s (Dev, Test) and /25s (Pre-Prod, Prod) allocated so far are too small. Reply sent to the platform team asking for /21s |
 | 10a | Put the ELZ IP ranges into the `parameters/elz/` param files, using the [section 5](#5-subnet-migration) layout | To do | Once action 10 is unblocked |
 | 11 | Apply naming decisions 7-9 (App Gateway child names, Key Vault certificate and secret names, storage connection-string secret names) in `getElzResourceNames()` | In progress | Core, public, Importer, Notifier, Publisher and Screener storage modules now take their connection-string secret name from `resourceNames`. Legacy output verified unchanged |
-| 11a | Move the Key Vault secret names that are still hardcoded into `resourceNames`, so they follow the `elz` flag | To do | About 15 in Bicep (e.g. `ees-alerts-slackconfig`, `ees-sql-admin-password`, `ees-publicapi-app-gateway-fuapi-header`) and the Robot tests and Public API pipeline YAML |
+| 11a | Move the Key Vault secret names that are still hardcoded into `resourceNames`, so they follow the `elz` flag | To do | About 15 in Bicep (e.g. `ees-alerts-teamswebhookurl`, `ees-sql-admin-password`, `ees-publicapi-app-gateway-fuapi-header`) and the Robot tests and Public API pipeline YAML |
 | 11b | Stop storing unused secrets: `storage-account.bicep` takes `connectionStringSecretName` (was `connectionStringSecretNameOverride`), stores the connection string only when it's supplied, and never stores access keys | In progress | Removes 16 access-key secrets and 3 unused connection strings (Public API data, Analytics and screener logs storage) per environment. Verified by snapshot: nothing else changes |
 | 11c | Stop using Key Vault for values that aren't secret where they can be derived by other means: the three PostgreSQL connection strings (managed identity, no password) are built with `publicDataDbConnectionString()` in `common/functions.bicep`, and Admin reads the Public API's private URL from the Container App itself | In progress | Removes 4 secrets per environment, and `publisher.publicDataDbConnectionString` and `publicApiContainerAppPrivateUrl` from `resourceNames`. The data processor's pipeline sets its connection string from the new `dataProcessorPsqlConnectionString` output. Verified by snapshot: the apps' connection strings and the Admin private URL match what the secrets held |
 | 12 | Change the `ResourceNames` subnets and the VNet module to the [section 5](#5-subnet-migration) layout (15 subnets, one shared `snet-uks-pep`) | To do | The layout is decided; doesn't need the IP ranges |
@@ -149,7 +149,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `keyVault.certificates.contentApiFrontDoor` | Key Vault certificate | `s101d01-as-ees-content-afd-certificate` | `contentapi-afd-certificate` | Decision 8: no `ees-` or subscription prefix |
 | `keyVault.certificates.publicApiAppGateway` | Key Vault certificate | `s101d01-ees-papi-certificate` | `papi-agw-certificate` | Decision 8: no `ees-` or subscription prefix |
 | `alertsGroup` | Action Group | `s101d01-ag-ees-alertedusers` | `s292d01ag-uks-alertedusers01` |  |
-| `alertsLogicApp` | Logic App | `s101d01-la-ees-slackwebhook` | `s292d01logic-uks-alerts01` | `la`→`logic` (or drop it with the Slack webhooks, EES-7608) |
+| `alertsLogicApp` | Logic App | `s101d01-la-ees-slackwebhook` | `s292d01logic-uks-alerts01` | `la`→`logic`. Slack posting was removed in EES-7608 but the Logic App still posts alerts to Teams, so it stays |
 | `databases.coreSqlServer` | SQL Server | `s101d01-sqlsvr-ees-01` | `s292d01sql-uks-core01` | Named by purpose |
 | `databases.publicSqlServer` | SQL Server | `s101d01-sqlsvr-ees-02` | `s292d01sql-uks-public01` | Named by purpose |
 | `databases.contentDb` | SQL Database | `content` | `content` | NEW. Unchanged |
@@ -474,7 +474,7 @@ The function apps and the Public API Container App already use connection string
 | Key Vault | standard; `enableRbacAuthorization` not set | Set it explicitly to `true` ([section 7](#7-identity-and-network-access)) |
 | Container Apps environment | Workload profiles; `internal: true` | Keep. The `internal` setting and the subnet can't be changed later. |
 | Static Web App (API docs) | Free; Standard on Prod | Keep. Private endpoints need Standard †. |
-| Logic App (Slack alerts) | Consumption | Drop it if the Slack webhooks are removed (EES-7608) |
+| Logic App (Teams alerts) | Consumption | Keep. It posts alerts to Teams only since EES-7608; the legacy `slackwebhook` name goes with the ELZ rename |
 | Recovery Services and Backup vaults | Geo-redundant | Keep |
 | Unused Basic ACR module | [public-api/components/containerRegistry.bicep](infrastructure/templates/public-api/components/containerRegistry.bicep) isn't referenced | Delete |
 

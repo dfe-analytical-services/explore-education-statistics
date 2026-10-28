@@ -611,6 +611,7 @@ func getResourceNames(
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
+  // Posts to Teams only since EES-7608. Renaming it would replace the Logic App, so the name changes with the ELZ move.
   alertsLogicApp: '${legacyResourcePrefix}-${abbreviations.logicWorkflows}-ees-slackwebhook'
     databases: {
     coreSqlServer: '${legacyResourcePrefix}-sqlsvr-ees-01'
