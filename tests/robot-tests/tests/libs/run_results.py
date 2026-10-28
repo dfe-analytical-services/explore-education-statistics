@@ -10,7 +10,6 @@ the merged report cannot say what was still failing when the run finished.
 import os
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 from xml.etree import ElementTree
@@ -122,20 +121,6 @@ class RunResults:
     @property
     def flakiness(self) -> str:
         return flakiness(self.merged, self.final, self.run_attempts)
-
-    @property
-    def attach_archive(self) -> bool:
-        """
-        Archive the reports when there is something to investigate, i.e. a failure or a
-        rerun that identifies a flaky test.
-        """
-        return bool(self.failed_suites) or self.run_attempts > 1
-
-    @property
-    def archive_name(self) -> str:
-        suite = re.sub(r"[^A-Za-z0-9._-]+", "-", self.suite_label).strip("-")
-        date = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-        return f"UI-test-report-{suite}-{self.environment}-{date}.zip"
 
 
 def read_run_results(

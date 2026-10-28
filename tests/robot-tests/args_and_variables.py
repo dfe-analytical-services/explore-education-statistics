@@ -97,12 +97,6 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="choose to print out keywords as they are started",
     )
     parser.add_argument(
-        "--enable-slack-notifications",
-        dest="enable_slack_notifications",
-        action="store_true",
-        help="enable Slack notifications to be sent for test reports",
-    )
-    parser.add_argument(
         "--prompt-to-continue",
         dest="prompt_to_continue",
         action="store_true",

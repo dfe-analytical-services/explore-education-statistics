@@ -8,7 +8,6 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SNAPSHOTS_WEBHOOK_URL }}
   TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_SNAPSHOTS_WEBHOOK_URL }}
   PYTHON_VERSION: 3.14.6
 
@@ -44,7 +43,6 @@ jobs:
         working-directory: tests/robot-tests
         run: >-
           pipenv run python scripts/create_snapshots.py --ci
-          --slack-webhook-url "${{ env.SLACK_WEBHOOK_URL }}"
           --teams-webhook-url "${{ env.TEAMS_WEBHOOK_URL }}"
 
       - name: Set output variables
@@ -84,34 +82,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           token: ${{ env.GH_TOKEN }}
-
-      - name: Slack Notification
-        uses: slackapi/slack-github-action@v1.27.1
-        with:
-          payload: |
-            {
-              "text": "Workflow ${{ needs.test.result }}",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":x: Workflow ${{ needs.test.result }}",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Workflow*: <https://github.com/dfe-analytical-services/explore-education-statistics/actions/workflows/validate-snapshots.yml|${{ github.workflow }}>\n*Details*: Notification from action run `${{ github.run_number }}`, which ran against commit `${{ github.sha }}` from branch `${{ github.ref_name }}` of the `${{ github.repository }}` repository."
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Teams Notification
         if: ${{ always() && env.TEAMS_WEBHOOK_URL != '' }}

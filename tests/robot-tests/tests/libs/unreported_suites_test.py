@@ -101,13 +101,7 @@ class UnreportedSuitesNotificationTests(unittest.TestCase):
     def test_title_names_the_environment(self):
         self.assertEqual("❌ UI test suites did not report on preprod", self.notification.title)
 
-    def test_slack_blocks_list_the_suites(self):
-        listed = self.notification.to_slack_blocks()[4]["elements"][0]["elements"]
-
-        self.assertEqual("Admin — job status: Canceled", listed[0]["elements"][0]["text"])
-        self.assertEqual("Public — job status: Failed", listed[1]["elements"][0]["text"])
-
-    def test_teams_card_lists_the_same_suites(self):
+    def test_teams_card_lists_suites(self):
         body = self.notification.to_teams_card()["attachments"][0]["content"]["body"]
 
         self.assertEqual("Suites that did not report (2)", body[2]["text"])

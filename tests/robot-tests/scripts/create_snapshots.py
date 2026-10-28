@@ -29,7 +29,6 @@ Optional flags:
   * --public-url "public URL"
   * --validate
   * --ci
-  * --slack-webhook-url "slack webhook URL"
   * --teams-webhook-url "teams webhook URL"
 """
 
@@ -309,15 +308,6 @@ if __name__ == "__main__":
         )
 
         ap.add_argument(
-            "--slack-webhook-url",
-            dest="slack_webhook_url",
-            default=None,
-            help="URL for Slack webhook to send notifications when snapshot differences are found during validation",
-            type=str,
-            required=False,
-        )
-
-        ap.add_argument(
             "--teams-webhook-url",
             dest="teams_webhook_url",
             default=None,
@@ -337,10 +327,7 @@ if __name__ == "__main__":
 
         args = ap.parse_args()
 
-        notifier = SnapshotNotifier(
-            slack_webhook_url=args.slack_webhook_url,
-            teams_webhook_url=args.teams_webhook_url,
-        )
+        notifier = SnapshotNotifier(teams_webhook_url=args.teams_webhook_url)
 
         assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
