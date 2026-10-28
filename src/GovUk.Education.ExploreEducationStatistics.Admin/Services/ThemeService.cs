@@ -199,9 +199,10 @@ public class ThemeService(
 
         var deletePublicationResults = await publicationIds
             .ToAsyncEnumerable()
-            .SelectAwait(async publicationId =>
-                await DeleteMethodologiesForPublication(publicationId, cancellationToken)
-                    .OnSuccess(() => DeletePublication(publicationId, cancellationToken))
+            .Select(
+                async (publicationId, ct) =>
+                    await DeleteMethodologiesForPublication(publicationId, ct)
+                        .OnSuccess(() => DeletePublication(publicationId, ct))
             )
             .ToListAsync(cancellationToken);
 
@@ -252,12 +253,14 @@ public class ThemeService(
 
         var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
             .ToAsyncEnumerable()
-            .SelectAwait(async rv =>
-            {
-                var dataSetVersions = await dataSetVersionRepository.GetDataSetVersions(rv.Id);
+            .Select(
+                async (ReleaseVersion rv, CancellationToken _) =>
+                {
+                    var dataSetVersions = await dataSetVersionRepository.GetDataSetVersions(rv.Id);
 
-                return new ReleaseVersionAndDataSetVersions(ReleaseVersion: rv, DataSetVersions: dataSetVersions);
-            })
+                    return new ReleaseVersionAndDataSetVersions(ReleaseVersion: rv, DataSetVersions: dataSetVersions);
+                }
+            )
             .ToListAsync(cancellationToken);
 
         var releaseVersionIdsInDeleteOrder = releaseVersionsAndDataSetVersions
