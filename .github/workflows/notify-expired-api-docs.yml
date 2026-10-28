@@ -1,17 +1,18 @@
 name: Notify expired API docs
 on:
-  schedule:
-    - cron: '5 12 * * 1-5'  # 12:05 UTC, Monday to Friday
+  # Schedule disabled until a notification channel is configured (EES-7608).
+  # schedule:
+  #   - cron: '5 12 * * 1-5'  # 12:05 UTC, Monday to Friday
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Dry run (does not send Slack notification)
+        description: Dry run (logs the message that would be sent; no notification channel is configured yet)
         required: false
         default: true
         type: boolean
 
 jobs:
-  slack-notification:
+  notify-expired-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -26,6 +27,3 @@ jobs:
         run: bundle exec rake notify:expired
         env:
           HOST_URL: ${{ vars.API_DOCS_URL }}
-          REALLY_POST_TO_SLACK: ${{ (github.event_name == 'schedule') && 1 || (github.event.inputs.dry_run == 'false') && 1 || 0 }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
-          OVERRIDE_SLACK_MESSAGE_PREFIX: Please ensure that the Public API documentation is up to date.
