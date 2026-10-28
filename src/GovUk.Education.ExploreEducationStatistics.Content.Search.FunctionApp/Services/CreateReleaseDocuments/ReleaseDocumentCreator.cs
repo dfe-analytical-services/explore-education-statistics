@@ -6,21 +6,21 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Opti
 using Microsoft.Extensions.Options;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 
 /// <summary>
 /// We provide a searchable version of a Release for the Azure AI Search Indexers to ingest.
 /// The contents of a Release along with its metadata are retrieved from the ContentAPI and uploaded
 /// to Azure Blob storage
 /// </summary>
-internal class SearchableDocumentCreator(
+internal class ReleaseDocumentCreator(
     IContentApiClient contentApiClient,
     IAzureBlobStorageClient azureBlobStorageClient,
     IOptions<AppOptions> appOptions
-) : ISearchableDocumentCreator
+) : IReleaseDocumentCreator
 {
-    public async Task<CreatePublicationLatestReleaseSearchableDocumentResponse> CreatePublicationLatestReleaseSearchableDocument(
-        CreatePublicationLatestReleaseSearchableDocumentRequest request,
+    public async Task<CreatePublicationLatestReleaseDocumentResponse> CreatePublicationLatestReleaseDocument(
+        CreatePublicationLatestReleaseDocumentRequest request,
         CancellationToken cancellationToken = default
     )
     {
@@ -38,7 +38,7 @@ internal class SearchableDocumentCreator(
             cancellationToken: cancellationToken
         );
 
-        return new CreatePublicationLatestReleaseSearchableDocumentResponse
+        return new CreatePublicationLatestReleaseDocumentResponse
         {
             PublicationSlug = request.PublicationSlug,
             ReleaseId = releaseSearchableDocument.ReleaseId,

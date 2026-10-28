@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class FullSearchableDocumentResetterTests
 {
     private readonly ContentApiClientMockBuilder _contentApi = new();
-    private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemover = new();
+    private readonly ReleaseDocumentRemoverMockBuilder _releaseDocumentRemover = new();
 
     private IFullSearchableDocumentResetter GetSut() =>
         new FullSearchableDocumentResetter(
             _contentApi.Build(),
-            _searchableDocumentRemover.Build(),
+            _releaseDocumentRemover.Build(),
             new NullLogger<FullSearchableDocumentResetter>()
         );
 
@@ -30,7 +30,7 @@ public class FullSearchableDocumentResetterTests
         await sut.PerformReset();
 
         // Assert
-        _searchableDocumentRemover.Assert.AllSearchableDocumentsRemoved();
+        _releaseDocumentRemover.Assert.AllReleaseDocumentsRemoved();
     }
 
     [Theory]

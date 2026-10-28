@@ -1,6 +1,6 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 
-public record CreatePublicationLatestReleaseSearchableDocumentResponse
+public record CreatePublicationLatestReleaseDocumentResponse
 {
     public required string PublicationSlug { get; init; }
     public required Guid ReleaseId { get; init; }

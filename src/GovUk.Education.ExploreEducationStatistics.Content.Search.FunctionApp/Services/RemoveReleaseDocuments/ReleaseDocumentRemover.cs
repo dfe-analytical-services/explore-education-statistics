@@ -3,19 +3,19 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using Microsoft.Extensions.Options;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 
 /// <summary>
 /// This service provides a way of deleting all searchable documents that may exist for a publication.
 /// </summary>
-internal class SearchableDocumentRemover(
+internal class ReleaseDocumentRemover(
     IContentApiClient contentApiClient,
     IAzureBlobStorageClient azureBlobStorageClient,
     IOptions<AppOptions> appOptions
-) : ISearchableDocumentRemover
+) : IReleaseDocumentRemover
 {
-    public async Task<RemovePublicationSearchableDocumentsResponse> RemovePublicationSearchableDocuments(
-        RemovePublicationSearchableDocumentsRequest request,
+    public async Task<RemovePublicationReleaseDocumentsResponse> RemovePublicationReleaseDocuments(
+        RemovePublicationReleaseDocumentsRequest request,
         CancellationToken cancellationToken = default
     )
     {
@@ -25,18 +25,18 @@ internal class SearchableDocumentRemover(
 
         foreach (var releaseId in releaseIds)
         {
-            var result = await RemoveSearchableDocument(
-                new RemoveSearchableDocumentRequest { ReleaseId = releaseId },
+            var result = await RemoveReleaseDocument(
+                new RemoveReleaseDocumentRequest { ReleaseId = releaseId },
                 cancellationToken
             );
             results[releaseId] = result.Success;
         }
 
-        return new RemovePublicationSearchableDocumentsResponse(results);
+        return new RemovePublicationReleaseDocumentsResponse(results);
     }
 
-    public async Task<RemoveSearchableDocumentResponse> RemoveSearchableDocument(
-        RemoveSearchableDocumentRequest request,
+    public async Task<RemoveReleaseDocumentResponse> RemoveReleaseDocument(
+        RemoveReleaseDocumentRequest request,
         CancellationToken cancellationToken = default
     )
     {
@@ -48,10 +48,10 @@ internal class SearchableDocumentRemover(
             cancellationToken
         );
 
-        return new RemoveSearchableDocumentResponse(success);
+        return new RemoveReleaseDocumentResponse(success);
     }
 
-    public async Task RemoveAllSearchableDocuments(CancellationToken cancellationToken = default)
+    public async Task RemoveAllReleaseDocuments(CancellationToken cancellationToken = default)
     {
         await azureBlobStorageClient.DeleteAllBlobsFromContainer(
             appOptions.Value.ReleaseDocumentsContainerName,

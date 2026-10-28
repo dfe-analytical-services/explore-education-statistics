@@ -1,6 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 
@@ -8,10 +8,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RefreshReleaseDocumentFunctionTests
 {
-    private readonly SearchableDocumentCreatorMockBuilder _searchableDocumentCreatorMockBuilder = new();
+    private readonly ReleaseDocumentCreatorMockBuilder _releaseDocumentCreatorMockBuilder = new();
 
     private RefreshReleaseDocumentFunction GetSut() =>
-        new(_searchableDocumentCreatorMockBuilder.Build(), new TestableCommandHandler());
+        new(_releaseDocumentCreatorMockBuilder.Build(), new TestableCommandHandler());
 
     [Fact]
     public void Can_instantiate_SUT() => Assert.NotNull(GetSut());
@@ -28,7 +28,7 @@ public class RefreshReleaseDocumentFunctionTests
         await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        _searchableDocumentCreatorMockBuilder.Assert.CreateSearchableDocumentCalledFor(publicationSlug);
+        _releaseDocumentCreatorMockBuilder.Assert.CreateReleaseDocumentCalledFor(publicationSlug);
     }
 
     [Theory]
@@ -43,7 +43,7 @@ public class RefreshReleaseDocumentFunctionTests
         await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        _searchableDocumentCreatorMockBuilder.Assert.CreateSearchableDocumentNotCalled();
+        _releaseDocumentCreatorMockBuilder.Assert.CreateReleaseDocumentNotCalled();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class RefreshReleaseDocumentFunctionTests
         var sut = GetSut();
         var publicationSlug = "publication-slug";
         var command = new RefreshReleaseDocumentMessageDto { PublicationSlug = publicationSlug };
-        var expectedResponse = new CreatePublicationLatestReleaseSearchableDocumentResponse
+        var expectedResponse = new CreatePublicationLatestReleaseDocumentResponse
         {
             PublicationSlug = publicationSlug,
             ReleaseId = Guid.NewGuid(),
@@ -61,7 +61,7 @@ public class RefreshReleaseDocumentFunctionTests
             ReleaseVersionId = Guid.NewGuid(),
             BlobName = "blob name",
         };
-        _searchableDocumentCreatorMockBuilder.WhereResponseIs(expectedResponse);
+        _releaseDocumentCreatorMockBuilder.WhereResponseIs(expectedResponse);
 
         // ACT
         var response = await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());

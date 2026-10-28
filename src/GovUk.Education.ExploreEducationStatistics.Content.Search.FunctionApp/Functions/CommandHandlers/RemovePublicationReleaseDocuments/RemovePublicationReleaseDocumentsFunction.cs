@@ -1,6 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RemovePublicationReleaseDocumentsFunction(
     ILogger<RemovePublicationReleaseDocumentsFunction> logger,
-    ISearchableDocumentRemover searchableDocumentRemover,
+    IReleaseDocumentRemover releaseDocumentRemover,
     ICommandHandler commandHandler
 )
 {
@@ -28,8 +28,8 @@ public class RemovePublicationReleaseDocumentsFunction(
             return;
         }
 
-        var response = await searchableDocumentRemover.RemovePublicationSearchableDocuments(
-            new RemovePublicationSearchableDocumentsRequest { PublicationSlug = message.PublicationSlug },
+        var response = await releaseDocumentRemover.RemovePublicationReleaseDocuments(
+            new RemovePublicationReleaseDocumentsRequest { PublicationSlug = message.PublicationSlug },
             cancellationToken
         );
 

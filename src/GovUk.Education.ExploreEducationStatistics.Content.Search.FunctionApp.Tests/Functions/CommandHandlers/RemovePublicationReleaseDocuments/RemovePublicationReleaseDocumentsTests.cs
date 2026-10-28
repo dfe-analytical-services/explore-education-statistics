@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class RemovePublicationReleaseDocumentsTests
 {
-    private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
+    private readonly ReleaseDocumentRemoverMockBuilder _releaseDocumentRemoverMockBuilder = new();
 
     private RemovePublicationReleaseDocumentsFunction GetSut() =>
         new(
             new NullLogger<RemovePublicationReleaseDocumentsFunction>(),
-            _searchableDocumentRemoverMockBuilder.Build(),
+            _releaseDocumentRemoverMockBuilder.Build(),
             new TestableCommandHandler()
         );
 
@@ -27,9 +27,7 @@ public class RemovePublicationReleaseDocumentsTests
 
         await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 
-        _searchableDocumentRemoverMockBuilder.Assert.RemovePublicationSearchableDocumentsCalledFor(
-            command.PublicationSlug
-        );
+        _releaseDocumentRemoverMockBuilder.Assert.RemovePublicationReleaseDocumentsCalledFor(command.PublicationSlug);
     }
 
     [Theory]
@@ -40,6 +38,6 @@ public class RemovePublicationReleaseDocumentsTests
 
         await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 
-        _searchableDocumentRemoverMockBuilder.Assert.RemovePublicationSearchableDocumentsNotCalled();
+        _releaseDocumentRemoverMockBuilder.Assert.RemovePublicationReleaseDocumentsNotCalled();
     }
 }
