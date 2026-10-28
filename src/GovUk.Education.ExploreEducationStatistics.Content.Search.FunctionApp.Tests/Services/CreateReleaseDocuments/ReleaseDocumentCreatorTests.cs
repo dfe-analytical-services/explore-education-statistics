@@ -1,32 +1,32 @@
 using System.Net.Mime;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CreateSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CreateReleaseDocuments;
 
-public class SearchableDocumentCreatorTests
+public class ReleaseDocumentCreatorTests
 {
     private readonly ContentApiClientMockBuilder _contentApiClientMockBuilder = new();
     private readonly AzureBlobStorageClientMockBuilder _azureBlobStorageClientMockBuilder = new();
     private AppOptions _appOptions = new();
 
-    private SearchableDocumentCreator GetSut() =>
+    private ReleaseDocumentCreator GetSut() =>
         new(
             _contentApiClientMockBuilder.Build(),
             _azureBlobStorageClientMockBuilder.Build(),
             Microsoft.Extensions.Options.Options.Create(_appOptions)
         );
 
-    public class BasicTests : SearchableDocumentCreatorTests
+    public class BasicTests : ReleaseDocumentCreatorTests
     {
         [Fact]
         public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
     }
 
-    public class CreatingSearchableDocument : SearchableDocumentCreatorTests
+    public class CreatingReleaseDocument : ReleaseDocumentCreatorTests
     {
         [Fact]
         public async Task Should_load_searchable_document_from_ContentApi()
@@ -35,8 +35,8 @@ public class SearchableDocumentCreatorTests
             var sut = GetSut();
 
             // ACT
-            await sut.CreatePublicationLatestReleaseSearchableDocument(
-                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" }
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
             );
 
             // ASSERT
@@ -56,8 +56,8 @@ public class SearchableDocumentCreatorTests
             var sut = GetSut();
 
             // ACT
-            await sut.CreatePublicationLatestReleaseSearchableDocument(
-                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" }
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
             );
 
             // ASSERT
@@ -76,8 +76,8 @@ public class SearchableDocumentCreatorTests
             var sut = GetSut();
 
             // ACT
-            await sut.CreatePublicationLatestReleaseSearchableDocument(
-                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" }
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
             );
 
             // ASSERT
@@ -93,8 +93,8 @@ public class SearchableDocumentCreatorTests
             var sut = GetSut();
 
             // ACT
-            await sut.CreatePublicationLatestReleaseSearchableDocument(
-                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" }
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
             );
 
             // ASSERT
@@ -114,8 +114,8 @@ public class SearchableDocumentCreatorTests
             var sut = GetSut();
 
             // ACT
-            var response = await sut.CreatePublicationLatestReleaseSearchableDocument(
-                new CreatePublicationLatestReleaseSearchableDocumentRequest { PublicationSlug = "publication-slug" }
+            var response = await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
             );
 
             // ASSERT

@@ -1,12 +1,12 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument;
 
 public class RefreshReleaseDocumentFunction(
-    ISearchableDocumentCreator searchableDocumentCreator,
+    IReleaseDocumentCreator releaseDocumentCreator,
     ICommandHandler commandHandler
 )
 {
@@ -28,15 +28,9 @@ public class RefreshReleaseDocumentFunction(
         }
 
         // Create Searchable Document
-        var request = new CreatePublicationLatestReleaseSearchableDocumentRequest
-        {
-            PublicationSlug = message.PublicationSlug,
-        };
+        var request = new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = message.PublicationSlug };
 
-        var response = await searchableDocumentCreator.CreatePublicationLatestReleaseSearchableDocument(
-            request,
-            cancellationToken
-        );
+        var response = await releaseDocumentCreator.CreatePublicationLatestReleaseDocument(request, cancellationToken);
 
         return
         [
