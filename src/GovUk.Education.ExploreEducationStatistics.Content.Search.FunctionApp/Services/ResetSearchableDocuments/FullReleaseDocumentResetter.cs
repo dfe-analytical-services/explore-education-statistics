@@ -12,15 +12,15 @@ public class FullReleaseDocumentResetter(
 {
     public async Task<PerformResetResponse> PerformReset(CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Executing Full Searchable Document Reset");
+        logger.LogInformation("Executing Full Release Document Reset");
 
-        // Delete all searchable documents
+        // Delete all release documents
         await releaseDocumentRemover.RemoveAllReleaseDocuments(cancellationToken);
 
         // Get list of all live publications
         var allPublications = await contentApiClient.GetAllLivePublicationInfos(cancellationToken);
 
-        // Return list of slugs to send to the Searchable Document creator
+        // Return list of slugs to send to the Release Document creator
         return new PerformResetResponse { AllPublications = allPublications };
     }
 }

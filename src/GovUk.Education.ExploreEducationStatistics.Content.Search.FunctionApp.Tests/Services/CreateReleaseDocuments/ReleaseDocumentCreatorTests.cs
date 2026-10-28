@@ -29,7 +29,7 @@ public class ReleaseDocumentCreatorTests
     public class CreatingReleaseDocument : ReleaseDocumentCreatorTests
     {
         [Fact]
-        public async Task Should_load_searchable_document_from_ContentApi()
+        public async Task Should_load_release_document_from_ContentApi()
         {
             // ARRANGE
             var sut = GetSut();
@@ -44,7 +44,7 @@ public class ReleaseDocumentCreatorTests
         }
 
         [Fact]
-        public async Task Should_upload_searchable_document_to_expected_AzureBlobStorage_container()
+        public async Task Should_upload_release_document_to_expected_AzureBlobStorage_container()
         {
             // ARRANGE
             _appOptions = new AppOptions
@@ -67,7 +67,7 @@ public class ReleaseDocumentCreatorTests
         }
 
         [Fact]
-        public async Task Should_upload_searchable_document_to_blob_with_releaseId_as_blob_name()
+        public async Task Should_upload_release_document_to_blob_with_releaseId_as_blob_name()
         {
             // ARRANGE
             var releaseId = new Guid("11223344-5566-7788-9900-123456789abc");
@@ -85,7 +85,7 @@ public class ReleaseDocumentCreatorTests
         }
 
         [Fact]
-        public async Task Should_upload_searchable_document_blob()
+        public async Task Should_upload_release_document_blob()
         {
             // ARRANGE
             var releaseDocument = new ReleaseDocumentBuilder().Build();

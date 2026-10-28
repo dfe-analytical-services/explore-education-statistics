@@ -66,10 +66,10 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        // The searchable documents are keyed on the latest Release Id.
-        // If the newly published release version is for a different release then the new searchable
+        // The release documents are keyed on the latest Release Id.
+        // If the newly published release version is for a different release then the new release
         // document will be created using its new ReleaseId.
-        // Therefore, the existing, previously latest searchable document needs to be removed.
+        // Therefore, the existing, previously latest release document needs to be removed.
         Assert.Equal(
             [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
             response.RemoveReleaseDocuments

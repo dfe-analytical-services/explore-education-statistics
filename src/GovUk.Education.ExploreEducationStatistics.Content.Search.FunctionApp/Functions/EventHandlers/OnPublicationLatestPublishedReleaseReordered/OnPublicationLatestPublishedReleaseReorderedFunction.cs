@@ -28,10 +28,10 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
                     return Task.FromResult(OnPublicationLatestPublishedReleaseReorderedOutput.Empty);
                 }
 
-                // Create searchable document for the release version that has become the latest version
+                // Create release document for the release version that has become the latest version
                 RefreshReleaseDocumentMessageDto[] newReleaseDocuments = [new() { PublicationSlug = payload.Slug }];
 
-                // Remove the previous "latest" release version's searchable document
+                // Remove the previous "latest" release version's release document
                 RemoveReleaseDocumentDto[] removeReleaseDocuments = !payload.PreviousReleaseId.IsBlank()
                     ? [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousReleaseId.Value }]
                     : [];

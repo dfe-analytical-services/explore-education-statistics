@@ -36,7 +36,7 @@ public class FullResetFunctionTests
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]
-    public async Task WhenFullSearchableDocumentsReset_ThenResetPublicationSearchableDocumentCommandsReturned(
+    public async Task WhenFullSearchableDocumentsReset_ThenRefreshReleaseDocumentCommandsReturned(
         int numberOfPublications
     )
     {

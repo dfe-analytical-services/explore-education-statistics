@@ -22,12 +22,12 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
         );
 
     /// <summary>
-    /// Builds a removal command for every Release of the deleted Publication that could have a searchable
+    /// Builds a removal command for every Release of the deleted Publication that could have a release
     /// document.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// A Publication is normally represented by a single searchable document, named after its latest
+    /// A Publication is normally represented by a single release document, named after its latest
     /// published Release, and the document for the Release it supersedes is removed as that changes. A stale
     /// document is left behind whenever the removal half of that exchange does not happen, which is why
     /// archiving a Publication sweeps all of its Releases rather than only the latest one - see

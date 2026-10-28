@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Doma
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
 /// <summary>
-/// The Metadata Keys used to enrich a Searchable Document blob
+/// The Metadata Keys used to enrich a Release Document blob
 /// </summary>
 public static class ReleaseDocumentAzureBlobMetadataKeys
 {
