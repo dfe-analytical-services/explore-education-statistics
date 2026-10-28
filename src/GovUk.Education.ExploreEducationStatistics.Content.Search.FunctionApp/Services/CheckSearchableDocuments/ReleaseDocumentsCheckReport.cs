@@ -1,6 +1,6 @@
 ﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
-public record CheckSearchableDocumentsReport
+public record ReleaseDocumentsCheckReport
 {
     public required int OkBlobCount { get; init; }
     public required int TotalBlobCount { get; init; }

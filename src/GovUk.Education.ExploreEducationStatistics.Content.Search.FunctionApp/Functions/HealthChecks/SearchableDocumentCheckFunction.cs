@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class SearchableDocumentCheckFunction(SearchableDocumentChecker searchableDocumentChecker)
+public class SearchableDocumentCheckFunction(ReleaseDocumentChecker releaseDocumentChecker)
 {
     [Function(nameof(SearchableDocumentCheck))]
     [Produces("application/json")]
@@ -15,7 +15,7 @@ public class SearchableDocumentCheckFunction(SearchableDocumentChecker searchabl
         CancellationToken cancellationToken
     )
     {
-        var report = await searchableDocumentChecker.RunCheck(cancellationToken);
+        var report = await releaseDocumentChecker.RunCheck(cancellationToken);
         return new OkObjectResult(report);
     }
 }

@@ -67,8 +67,8 @@ public static class HostBuilderExtension
                     // Services
                     .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
                     .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
-                    .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
-                    .AddSearchDocumentChecker()
+                    .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
+                    .AddReleaseDocumentChecker()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
                     .AddTransient<ICommandHandler, CommandHandler>()

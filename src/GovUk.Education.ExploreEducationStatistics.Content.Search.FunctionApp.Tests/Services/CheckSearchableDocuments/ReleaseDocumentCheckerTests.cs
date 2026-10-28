@@ -3,12 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Serv
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CheckSearchableDocuments;
 
-public class SearchableDocumentCheckerTests
+public class ReleaseDocumentCheckerTests
 {
     private readonly ReleaseVersionSummaryRetrieverMockBuilder _releaseVersionSummaryRetrieverMockBuilder = new();
     private readonly BlobNameListerMockBuilder _blobNameListerMockBuilder = new();
 
-    private SearchableDocumentChecker GetSut() =>
+    private ReleaseDocumentChecker GetSut() =>
         new(_blobNameListerMockBuilder.Build(), _releaseVersionSummaryRetrieverMockBuilder.Build());
 
     [Fact]

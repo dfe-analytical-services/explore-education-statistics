@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 
-public class FullSearchableDocumentResetter(
+public class FullReleaseDocumentResetter(
     IContentApiClient contentApiClient,
     IReleaseDocumentRemover releaseDocumentRemover,
-    ILogger<FullSearchableDocumentResetter> logger
-) : IFullSearchableDocumentResetter
+    ILogger<FullReleaseDocumentResetter> logger
+) : IFullReleaseDocumentResetter
 {
     public async Task<PerformResetResponse> PerformReset(CancellationToken cancellationToken = default)
     {
