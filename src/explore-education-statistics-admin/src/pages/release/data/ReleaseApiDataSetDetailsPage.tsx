@@ -364,7 +364,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverrideWarning = (
     <WarningMessage testId="major-version-override-warning">
       This data file has resulted in a major version update which is not
-      normally allowed in release amendments. As a Super user you can override
+      normally allowed in release amendments. As a Super User you can override
       this, but this patch version will contain breaking changes for users of
       this API data set.
     </WarningMessage>
@@ -373,7 +373,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverriddenWarning = (
     <WarningMessage testId="major-version-overridden-warning">
       This patch version contains major changes which have been approved by a
-      Super user. These are breaking changes for users of this API data set.
+      Super User. These are breaking changes for users of this API data set.
     </WarningMessage>
   );
 

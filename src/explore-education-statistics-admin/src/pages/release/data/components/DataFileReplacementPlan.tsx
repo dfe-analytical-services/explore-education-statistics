@@ -342,7 +342,7 @@ function Plan({
           {majorPatchVersionOverride && (
             <WarningMessage testId="major-version-overridden-warning">
               This API data set patch version contains major changes which have
-              been approved by a Super user. These are breaking changes for
+              been approved by a Super User. These are breaking changes for
               users of this API data set.
             </WarningMessage>
           )}
