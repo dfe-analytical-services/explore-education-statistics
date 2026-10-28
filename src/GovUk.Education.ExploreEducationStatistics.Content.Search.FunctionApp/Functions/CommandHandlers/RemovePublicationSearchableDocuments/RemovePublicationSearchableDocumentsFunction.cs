@@ -14,8 +14,7 @@ public class RemovePublicationSearchableDocumentsFunction(
 {
     [Function(nameof(RemovePublicationSearchableDocuments))]
     public async Task RemovePublicationSearchableDocuments(
-        [QueueTrigger("%RemovePublicationSearchableDocumentsQueueName%")]
-            RemovePublicationSearchableDocumentsDto message,
+        [QueueTrigger("%RemovePublicationReleaseDocumentsQueueName%")] RemovePublicationSearchableDocumentsDto message,
         FunctionContext context
     ) => await commandHandler.Handle(RemovePublicationSearchableDocuments, message, context.CancellationToken);
 

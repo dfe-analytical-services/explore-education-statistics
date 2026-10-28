@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnReleaseSlugChangedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnReleaseSlugChangedEvent))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnReleaseSlugChangedEvent(
         [QueueTrigger("%ReleaseSlugChangedQueueName%")] EventGridEvent eventDto,
         FunctionContext context

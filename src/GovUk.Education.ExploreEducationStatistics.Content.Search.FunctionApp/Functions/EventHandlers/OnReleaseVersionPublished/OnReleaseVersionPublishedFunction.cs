@@ -46,10 +46,10 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
 
 public record OnReleaseVersionPublishedOutput
 {
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
     public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocumentMessages { get; init; } = [];
 
-    [QueueOutput("%RemoveSearchableDocumentQueueName%")]
+    [QueueOutput("%RemoveReleaseDocumentQueueName%")]
     public RemoveSearchableDocumentDto[] RemoveSearchableDocuments { get; init; } = [];
 
     public static OnReleaseVersionPublishedOutput Empty => new();

@@ -11,9 +11,9 @@ public class RefreshSearchableDocumentFunction(
 )
 {
     [Function(nameof(RefreshSearchableDocument))]
-    [QueueOutput("%SearchableDocumentCreatedQueueName%")]
+    [QueueOutput("%ReleaseDocumentCreatedQueueName%")]
     public async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
-        [QueueTrigger("%RefreshSearchableDocumentQueueName%")] RefreshSearchableDocumentMessageDto message,
+        [QueueTrigger("%RefreshReleaseDocumentQueueName%")] RefreshSearchableDocumentMessageDto message,
         FunctionContext context
     ) => await commandHandler.Handle(RefreshSearchableDocument, message, context.CancellationToken);
 

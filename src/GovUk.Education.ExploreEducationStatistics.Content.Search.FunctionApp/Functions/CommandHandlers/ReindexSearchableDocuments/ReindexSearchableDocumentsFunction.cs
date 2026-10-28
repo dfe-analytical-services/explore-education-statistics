@@ -13,7 +13,7 @@ public class ReindexSearchableDocumentsFunction(
 {
     [Function(nameof(ReindexSearchableDocuments))]
     public async Task ReindexSearchableDocuments(
-        [QueueTrigger("%SearchableDocumentCreatedQueueName%")] SearchableDocumentCreatedMessageDto ignored, //  The binding name _ is invalid
+        [QueueTrigger("%ReleaseDocumentCreatedQueueName%")] SearchableDocumentCreatedMessageDto ignored, //  The binding name _ is invalid
         FunctionContext context
     ) => await commandHandler.Handle(searchIndexerClient.RunIndexer, context.CancellationToken);
 }

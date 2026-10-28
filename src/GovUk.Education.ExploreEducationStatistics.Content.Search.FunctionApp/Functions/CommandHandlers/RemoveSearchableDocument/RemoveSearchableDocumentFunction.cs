@@ -15,7 +15,7 @@ public class RemoveSearchableDocumentFunction(
 {
     [Function(nameof(RemoveSearchableDocument))]
     public async Task RemoveSearchableDocument(
-        [QueueTrigger("%RemoveSearchableDocumentQueueName%")] RemoveSearchableDocumentDto message,
+        [QueueTrigger("%RemoveReleaseDocumentQueueName%")] RemoveSearchableDocumentDto message,
         FunctionContext context
     ) => await commandHandler.Handle(RemoveSearchableDocument, message, context.CancellationToken);
 

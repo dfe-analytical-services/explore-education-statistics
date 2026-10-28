@@ -13,7 +13,7 @@ public class FullResetFunction(
 )
 {
     [Function(nameof(FullSearchableDocumentsReset))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> FullSearchableDocumentsReset(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
             HttpRequest ignored, //  The binding name _ is invalid

@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnPublicationRestoredFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnPublicationRestored))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnPublicationRestored(
         [QueueTrigger("%PublicationRestoredQueueName%")] EventGridEvent eventDto,
         FunctionContext context
