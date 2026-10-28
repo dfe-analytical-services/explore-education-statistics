@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 internal class AzureSearchHealthCheckStrategy(
     Func<ISearchIndexerClient> searchIndexerClientFactory,
-    ILogger<AzureBlobStorageHealthCheckStrategy> logger,
+    ILogger<AzureSearchHealthCheckStrategy> logger,
     IOptions<AzureSearchOptions> azureSearchOptions
 ) : IHealthCheckStrategy
 {
