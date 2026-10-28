@@ -1,6 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 
-public record SearchableDocumentCreatedMessageDto
+public record ReleaseDocumentCreatedMessageDto
 {
     public string? PublicationSlug { get; init; }
     public Guid? ReleaseId { get; init; }

@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationLatestPublishedReleaseReordered;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationLatestPublishedReleaseReordered.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -18,7 +18,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshSearchableDocumentsReturned(
+    public async Task GivenEvent_WhenPayloadContainsSlugAndPublicationIsNotArchived_ThenRefreshReleaseDocumentsReturned(
         bool? isPublicationArchived
     )
     {
@@ -41,7 +41,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 
         // ASSERT
         Assert.NotNull(response);
-        var actual = Assert.Single(response.RefreshSearchableDocuments);
+        var actual = Assert.Single(response.RefreshReleaseDocuments);
         Assert.NotNull(actual);
         Assert.Equal(payload.Slug, actual.PublicationSlug);
     }
@@ -49,7 +49,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseId_ThenRemoveSearchableDocumentReturned(
+    public async Task GivenEvent_OnlyWhenPayloadContainsPreviousReleaseId_ThenRemoveReleaseDocumentReturned(
         bool hasPreviousReleaseId
     )
     {
@@ -77,10 +77,10 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         // ASSERT
         Assert.NotNull(response);
 
-        RemoveSearchableDocumentDto[] expected = hasPreviousReleaseId
-            ? [new RemoveSearchableDocumentDto { ReleaseId = previousReleaseId! }]
+        RemoveReleaseDocumentDto[] expected = hasPreviousReleaseId
+            ? [new RemoveReleaseDocumentDto { ReleaseId = previousReleaseId! }]
             : [];
-        Assert.Equal(expected, response.RemoveSearchableDocuments);
+        Assert.Equal(expected, response.RemoveReleaseDocuments);
     }
 
     [Theory]

@@ -1,18 +1,18 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RemovePublicationSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RemovePublicationReleaseDocuments;
 
-public class RemovePublicationSearchableDocumentsTests
+public class RemovePublicationReleaseDocumentsTests
 {
     private readonly SearchableDocumentRemoverMockBuilder _searchableDocumentRemoverMockBuilder = new();
 
-    private RemovePublicationSearchableDocumentsFunction GetSut() =>
+    private RemovePublicationReleaseDocumentsFunction GetSut() =>
         new(
-            new NullLogger<RemovePublicationSearchableDocumentsFunction>(),
+            new NullLogger<RemovePublicationReleaseDocumentsFunction>(),
             _searchableDocumentRemoverMockBuilder.Build(),
             new TestableCommandHandler()
         );
@@ -23,9 +23,9 @@ public class RemovePublicationSearchableDocumentsTests
     [Fact]
     public async Task WhenMessageContainsSlug_ThenDocumentRemoverCalled()
     {
-        var command = new RemovePublicationSearchableDocumentsDto { PublicationSlug = "publication-slug" };
+        var command = new RemovePublicationReleaseDocumentsDto { PublicationSlug = "publication-slug" };
 
-        await GetSut().RemovePublicationSearchableDocuments(command, new FunctionContextMockBuilder().Build());
+        await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 
         _searchableDocumentRemoverMockBuilder.Assert.RemovePublicationSearchableDocumentsCalledFor(
             command.PublicationSlug
@@ -36,9 +36,9 @@ public class RemovePublicationSearchableDocumentsTests
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageDoesNotContainSlug_ThenDocumentRemoverNotCalled(string? publicationSlug)
     {
-        var command = new RemovePublicationSearchableDocumentsDto { PublicationSlug = publicationSlug };
+        var command = new RemovePublicationReleaseDocumentsDto { PublicationSlug = publicationSlug };
 
-        await GetSut().RemovePublicationSearchableDocuments(command, new FunctionContextMockBuilder().Build());
+        await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 
         _searchableDocumentRemoverMockBuilder.Assert.RemovePublicationSearchableDocumentsNotCalled();
     }

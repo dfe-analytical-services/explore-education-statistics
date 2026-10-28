@@ -1,25 +1,25 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments;
 
-public class RemovePublicationSearchableDocumentsFunction(
-    ILogger<RemovePublicationSearchableDocumentsFunction> logger,
+public class RemovePublicationReleaseDocumentsFunction(
+    ILogger<RemovePublicationReleaseDocumentsFunction> logger,
     ISearchableDocumentRemover searchableDocumentRemover,
     ICommandHandler commandHandler
 )
 {
-    [Function(nameof(RemovePublicationSearchableDocuments))]
-    public async Task RemovePublicationSearchableDocuments(
-        [QueueTrigger("%RemovePublicationReleaseDocumentsQueueName%")] RemovePublicationSearchableDocumentsDto message,
+    [Function(nameof(RemovePublicationReleaseDocuments))]
+    public async Task RemovePublicationReleaseDocuments(
+        [QueueTrigger("%RemovePublicationReleaseDocumentsQueueName%")] RemovePublicationReleaseDocumentsDto message,
         FunctionContext context
-    ) => await commandHandler.Handle(RemovePublicationSearchableDocuments, message, context.CancellationToken);
+    ) => await commandHandler.Handle(RemovePublicationReleaseDocuments, message, context.CancellationToken);
 
-    private async Task RemovePublicationSearchableDocuments(
-        RemovePublicationSearchableDocumentsDto message,
+    private async Task RemovePublicationReleaseDocuments(
+        RemovePublicationReleaseDocumentsDto message,
         CancellationToken cancellationToken
     )
     {

@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -11,14 +11,14 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
 {
     [Function(nameof(OnPublicationDeleted))]
     [QueueOutput("%RemoveReleaseDocumentQueueName%")]
-    public async Task<RemoveSearchableDocumentDto[]> OnPublicationDeleted(
+    public async Task<RemoveReleaseDocumentDto[]> OnPublicationDeleted(
         [QueueTrigger("%PublicationDeletedQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<PublicationDeletedEventDto, RemoveSearchableDocumentDto[]>(
+        await eventGridEventHandler.Handle<PublicationDeletedEventDto, RemoveReleaseDocumentDto[]>(
             context,
             eventDto,
-            (payload, _) => Task.FromResult(BuildRemoveSearchableDocumentCommands(payload))
+            (payload, _) => Task.FromResult(BuildRemoveReleaseDocumentCommands(payload))
         );
 
     /// <summary>
@@ -31,7 +31,7 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
     /// published Release, and the document for the Release it supersedes is removed as that changes. A stale
     /// document is left behind whenever the removal half of that exchange does not happen, which is why
     /// archiving a Publication sweeps all of its Releases rather than only the latest one - see
-    /// RemovePublicationSearchableDocumentsFunction.
+    /// RemovePublicationReleaseDocumentsFunction.
     /// </para>
     /// <para>
     /// Deletion cannot sweep the same way, as that command resolves a Publication's Release ids through the
@@ -39,9 +39,7 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
     /// travel on the event itself. Removing a document that was never there is a no-op.
     /// </para>
     /// </remarks>
-    private static RemoveSearchableDocumentDto[] BuildRemoveSearchableDocumentCommands(
-        PublicationDeletedEventDto payload
-    )
+    private static RemoveReleaseDocumentDto[] BuildRemoveReleaseDocumentCommands(PublicationDeletedEventDto payload)
     {
         var releaseIds = new List<Guid?>(payload.ReleaseIds?.Cast<Guid?>() ?? []);
 
@@ -53,7 +51,7 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
             .. releaseIds
                 .Where(releaseId => !releaseId.IsBlank())
                 .Distinct()
-                .Select(releaseId => new RemoveSearchableDocumentDto { ReleaseId = releaseId }),
+                .Select(releaseId => new RemoveReleaseDocumentDto { ReleaseId = releaseId }),
         ];
     }
 }

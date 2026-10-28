@@ -1,16 +1,16 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RefreshSearchableDocument;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Functions.CommandHandlers.RefreshReleaseDocument;
 
-public class RefreshSearchableDocumentFunctionTests
+public class RefreshReleaseDocumentFunctionTests
 {
     private readonly SearchableDocumentCreatorMockBuilder _searchableDocumentCreatorMockBuilder = new();
 
-    private RefreshSearchableDocumentFunction GetSut() =>
+    private RefreshReleaseDocumentFunction GetSut() =>
         new(_searchableDocumentCreatorMockBuilder.Build(), new TestableCommandHandler());
 
     [Fact]
@@ -22,10 +22,10 @@ public class RefreshSearchableDocumentFunctionTests
         // ARRANGE
         var sut = GetSut();
         var publicationSlug = "publication-slug";
-        var command = new RefreshSearchableDocumentMessageDto { PublicationSlug = publicationSlug };
+        var command = new RefreshReleaseDocumentMessageDto { PublicationSlug = publicationSlug };
 
         // ACT
-        await sut.RefreshSearchableDocument(command, new FunctionContextMockBuilder().Build());
+        await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
         _searchableDocumentCreatorMockBuilder.Assert.CreateSearchableDocumentCalledFor(publicationSlug);
@@ -37,10 +37,10 @@ public class RefreshSearchableDocumentFunctionTests
     {
         // ARRANGE
         var sut = GetSut();
-        var command = new RefreshSearchableDocumentMessageDto { PublicationSlug = blankPublicationSlug };
+        var command = new RefreshReleaseDocumentMessageDto { PublicationSlug = blankPublicationSlug };
 
         // ACT
-        await sut.RefreshSearchableDocument(command, new FunctionContextMockBuilder().Build());
+        await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
         _searchableDocumentCreatorMockBuilder.Assert.CreateSearchableDocumentNotCalled();
@@ -52,7 +52,7 @@ public class RefreshSearchableDocumentFunctionTests
         // ARRANGE
         var sut = GetSut();
         var publicationSlug = "publication-slug";
-        var command = new RefreshSearchableDocumentMessageDto { PublicationSlug = publicationSlug };
+        var command = new RefreshReleaseDocumentMessageDto { PublicationSlug = publicationSlug };
         var expectedResponse = new CreatePublicationLatestReleaseSearchableDocumentResponse
         {
             PublicationSlug = publicationSlug,
@@ -64,7 +64,7 @@ public class RefreshSearchableDocumentFunctionTests
         _searchableDocumentCreatorMockBuilder.WhereResponseIs(expectedResponse);
 
         // ACT
-        var response = await sut.RefreshSearchableDocument(command, new FunctionContextMockBuilder().Build());
+        var response = await sut.RefreshReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
         // ASSERT
         Assert.NotNull(response);

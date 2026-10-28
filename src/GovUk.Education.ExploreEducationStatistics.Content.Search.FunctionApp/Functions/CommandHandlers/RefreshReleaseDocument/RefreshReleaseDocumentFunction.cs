@@ -1,24 +1,24 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using Microsoft.Azure.Functions.Worker;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument;
 
-public class RefreshSearchableDocumentFunction(
+public class RefreshReleaseDocumentFunction(
     ISearchableDocumentCreator searchableDocumentCreator,
     ICommandHandler commandHandler
 )
 {
-    [Function(nameof(RefreshSearchableDocument))]
+    [Function(nameof(RefreshReleaseDocument))]
     [QueueOutput("%ReleaseDocumentCreatedQueueName%")]
-    public async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
-        [QueueTrigger("%RefreshReleaseDocumentQueueName%")] RefreshSearchableDocumentMessageDto message,
+    public async Task<ReleaseDocumentCreatedMessageDto[]> RefreshReleaseDocument(
+        [QueueTrigger("%RefreshReleaseDocumentQueueName%")] RefreshReleaseDocumentMessageDto message,
         FunctionContext context
-    ) => await commandHandler.Handle(RefreshSearchableDocument, message, context.CancellationToken);
+    ) => await commandHandler.Handle(RefreshReleaseDocument, message, context.CancellationToken);
 
-    private async Task<SearchableDocumentCreatedMessageDto[]> RefreshSearchableDocument(
-        RefreshSearchableDocumentMessageDto message,
+    private async Task<ReleaseDocumentCreatedMessageDto[]> RefreshReleaseDocument(
+        RefreshReleaseDocumentMessageDto message,
         CancellationToken cancellationToken
     )
     {
@@ -40,7 +40,7 @@ public class RefreshSearchableDocumentFunction(
 
         return
         [
-            new SearchableDocumentCreatedMessageDto
+            new ReleaseDocumentCreatedMessageDto
             {
                 PublicationSlug = response.PublicationSlug,
                 ReleaseId = response.ReleaseId,

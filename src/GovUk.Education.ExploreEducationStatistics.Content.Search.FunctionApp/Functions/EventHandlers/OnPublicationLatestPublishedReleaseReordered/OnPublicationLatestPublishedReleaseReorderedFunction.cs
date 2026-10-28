@@ -1,7 +1,7 @@
 using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationLatestPublishedReleaseReordered.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -29,21 +29,18 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
                 }
 
                 // Create searchable document for the release version that has become the latest version
-                RefreshSearchableDocumentMessageDto[] newSearchableDocuments =
-                [
-                    new() { PublicationSlug = payload.Slug },
-                ];
+                RefreshReleaseDocumentMessageDto[] newReleaseDocuments = [new() { PublicationSlug = payload.Slug }];
 
                 // Remove the previous "latest" release version's searchable document
-                RemoveSearchableDocumentDto[] removeSearchableDocuments = !payload.PreviousReleaseId.IsBlank()
-                    ? [new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousReleaseId.Value }]
+                RemoveReleaseDocumentDto[] removeReleaseDocuments = !payload.PreviousReleaseId.IsBlank()
+                    ? [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousReleaseId.Value }]
                     : [];
 
                 return Task.FromResult(
                     new OnPublicationLatestPublishedReleaseReorderedOutput
                     {
-                        RefreshSearchableDocuments = newSearchableDocuments,
-                        RemoveSearchableDocuments = removeSearchableDocuments,
+                        RefreshReleaseDocuments = newReleaseDocuments,
+                        RemoveReleaseDocuments = removeReleaseDocuments,
                     }
                 );
             }

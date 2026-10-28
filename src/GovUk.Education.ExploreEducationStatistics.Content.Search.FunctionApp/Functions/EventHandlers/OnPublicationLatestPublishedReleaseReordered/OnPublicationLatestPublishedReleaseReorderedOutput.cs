@@ -1,5 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationLatestPublishedReleaseReordered;
@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public record OnPublicationLatestPublishedReleaseReorderedOutput
 {
     [QueueOutput("%RefreshReleaseDocumentQueueName%")]
-    public RefreshSearchableDocumentMessageDto[] RefreshSearchableDocuments { get; init; } = [];
+    public RefreshReleaseDocumentMessageDto[] RefreshReleaseDocuments { get; init; } = [];
 
     [QueueOutput("%RemoveReleaseDocumentQueueName%")]
-    public RemoveSearchableDocumentDto[] RemoveSearchableDocuments { get; init; } = [];
+    public RemoveReleaseDocumentDto[] RemoveReleaseDocuments { get; init; } = [];
 
     public static OnPublicationLatestPublishedReleaseReorderedOutput Empty => new();
 }

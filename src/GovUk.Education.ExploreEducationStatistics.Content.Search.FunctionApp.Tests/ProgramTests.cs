@@ -1,7 +1,7 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
@@ -233,29 +233,29 @@ public class ProgramTests
             }
         }
 
-        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
+        public class ReindexReleaseDocumentsFunctionTests : ProgramTests
         {
             [Fact]
-            public void Should_resolve_ReindexSearchableDocumentsFunction()
+            public void Should_resolve_ReindexReleaseDocumentsFunction()
             {
                 // ARRANGE
                 var sut = GetSut();
 
                 // ACT
-                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+                var actual = ActivatorUtilities.CreateInstance<ReindexReleaseDocumentsFunction>(sut.Services);
 
                 // ASSERT
                 Assert.NotNull(actual);
             }
 
             [Fact]
-            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            public void GivenNotConfigured_WhenResolvingReindexReleaseDocumentsFunction_ThenShouldResolve()
             {
                 // ARRANGE
                 var sut = GetSutWithConfig("{}");
 
                 // ACT
-                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexReleaseDocumentsFunction>>();
 
                 // ASSERT
                 Assert.NotNull(actual);
