@@ -4,13 +4,6 @@ param dataFactoryName string
 @description('Name of the Statistics database linked service.')
 param statisticsDbLinkedServiceName string
 
-@description('Slack channel to post Azure alerts to.')
-param slackAlertsChannel string
-
-@secure()
-@description('Token to securely post to the Slack channel.')
-param slackAppToken string
-
 @secure()
 @description('The Power Automate Webhook URL used to post messages to Teams.')
 param teamsPowerAutomateWebhookUrl string
@@ -387,66 +380,6 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
                   }
                 }
                 {
-                  name: 'Report successful timeout'
-                  description: 'Messages Slack to inform that the timeout has been handled successfully'
-                  type: 'WebActivity'
-                  dependsOn: [
-                    {
-                      activity: 'Kill index reorganizes after timeout'
-                      dependencyConditions: [
-                        'Succeeded'
-                      ]
-                    }
-                  ]
-                  policy: {
-                    timeout: '0.00:10:00'
-                    retry: 0
-                    retryIntervalInSeconds: 30
-                    secureOutput: false
-                    secureInput: false
-                  }
-                  userProperties: []
-                  typeProperties: {
-                    method: 'POST'
-                    headers: {
-                      'Content-Type': 'application/json'
-                      Authorization: 'Bearer ${slackAppToken}'
-                    }
-                    url: 'https://slack.com/api/chat.postMessage'
-                    body: {
-                      channel: slackAlertsChannel
-                      text: 'Data Factory timeout handled successfully.'
-                      attachments: [
-                        {
-                          color: 'good'
-                          fields: [
-                            {
-                              title: 'Data Factory'
-                              value: '@{pipeline().DataFactory}'
-                              short: true
-                            }
-                            {
-                              title: 'Pipeline'
-                              value: '@{pipeline().Pipeline}'
-                              short: true
-                            }
-                            {
-                              title: 'Details'
-                              value: 'Any resumable index rebuilds have been paused.\nAny reorganizations have been killed.'
-                              short: true
-                            }
-                            {
-                              title: 'Duration'
-                              value: '@{activity(\'Rebuild indexes\').Duration}'
-                              short: true
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                }
-                {
                   name: 'Report successful timeout to Teams'
                   type: 'WebActivity'
                   dependsOn: [
@@ -519,65 +452,6 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
                   }
                 }
                 {
-                  name: 'Report rebuild pause error'
-                  type: 'WebActivity'
-                  dependsOn: [
-                    {
-                      activity: 'Pause resumable index rebuilds after timeout'
-                      dependencyConditions: [
-                        'Failed'
-                      ]
-                    }
-                  ]
-                  policy: {
-                    timeout: '0.00:10:00'
-                    retry: 0
-                    retryIntervalInSeconds: 30
-                    secureOutput: false
-                    secureInput: false
-                  }
-                  userProperties: []
-                  typeProperties: {
-                    method: 'POST'
-                    headers: {
-                      'Content-Type': 'application/json'
-                      Authorization: 'Bearer ${slackAppToken}'
-                    }
-                    url: 'https://slack.com/api/chat.postMessage'
-                    body: {
-                      channel: slackAlertsChannel
-                      text: 'Data Factory failure! Problem encountered when pausing resumable index rebuilds.'
-                      attachments: [
-                        {
-                          color: 'warning'
-                          fields: [
-                            {
-                              title: 'Data Factory'
-                              value: '@{pipeline().DataFactory}'
-                              short: true
-                            }
-                            {
-                              title: 'Pipeline'
-                              value: '@{pipeline().Pipeline}'
-                              short: true
-                            }
-                            {
-                              title: 'Activity'
-                              value: '@{activity(\'Pause resumable index rebuilds after timeout\').Error.message}'
-                              short: true
-                            }
-                            {
-                              title: 'Duration'
-                              value: '@{activity(\'Rebuild indexes\').Duration}'
-                              short: true
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                }
-                {
                   name: 'Report rebuild pause error to Teams'
                   type: 'WebActivity'
                   dependsOn: [
@@ -644,65 +518,6 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
                               }
                             ]
                           }
-                        }
-                      ]
-                    }
-                  }
-                }
-                {
-                  name: 'Report index reorganization kill error'
-                  type: 'WebActivity'
-                  dependsOn: [
-                    {
-                      activity: 'Kill index reorganizes after timeout'
-                      dependencyConditions: [
-                        'Failed'
-                      ]
-                    }
-                  ]
-                  policy: {
-                    timeout: '0.00:10:00'
-                    retry: 0
-                    retryIntervalInSeconds: 30
-                    secureOutput: false
-                    secureInput: false
-                  }
-                  userProperties: []
-                  typeProperties: {
-                    method: 'POST'
-                    headers: {
-                      'Content-Type': 'application/json'
-                      Authorization: 'Bearer ${slackAppToken}'
-                    }
-                    url: 'https://slack.com/api/chat.postMessage'
-                    body: {
-                      channel: slackAlertsChannel
-                      text: 'Data Factory failure! Problem encountered when killing index reorganizations.'
-                      attachments: [
-                        {
-                          color: 'warning'
-                          fields: [
-                            {
-                              title: 'Data Factory'
-                              value: '@{pipeline().DataFactory}'
-                              short: true
-                            }
-                            {
-                              title: 'Pipeline'
-                              value: '@{pipeline().Pipeline}'
-                              short: true
-                            }
-                            {
-                              title: 'Activity'
-                              value: '@{activity(\'Kill index reorganizes after timeout\').Error.message}'
-                              short: true
-                            }
-                            {
-                              title: 'Duration'
-                              value: '@{activity(\'Rebuild indexes\').Duration}'
-                              short: true
-                            }
-                          ]
                         }
                       ]
                     }
@@ -786,53 +601,6 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
               value: 'No failures'
               activities: [
                 {
-                  name: 'Report reindex success'
-                  type: 'WebActivity'
-                  dependsOn: []
-                  policy: {
-                    timeout: '0.00:10:00'
-                    retry: 0
-                    retryIntervalInSeconds: 30
-                    secureOutput: false
-                    secureInput: false
-                  }
-                  userProperties: []
-                  typeProperties: {
-                    url: 'https://slack.com/api/chat.postMessage'
-                    method: 'POST'
-                    headers: {
-                      'Content-Type': 'application/json'
-                      Authorization: 'Bearer ${slackAppToken}'
-                    }
-                    body: {
-                      channel: slackAlertsChannel
-                      text: 'Data Factory Success! All fragmented indexes rebuilt.'
-                      attachments: [
-                        {
-                          color: 'good'
-                          fields: [
-                            {
-                              title: 'Data Factory'
-                              value: '@{pipeline().DataFactory}'
-                              short: true
-                            }
-                            {
-                              title: 'Pipeline'
-                              value: '@{pipeline().Pipeline}'
-                              short: true
-                            }
-                            {
-                              title: 'Duration'
-                              value: '@{activity(\'Rebuild indexes\').Duration}'
-                              short: true
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                }
-                {
                   name: 'Report reindex success to Teams'
                   type: 'WebActivity'
                   dependsOn: []
@@ -897,58 +665,6 @@ resource pipeline 'Microsoft.DataFactory/factories/pipelines@2018-06-01' = {
             }
           ]
           defaultActivities: [
-            {
-              name: 'Report failure'
-              type: 'WebActivity'
-              dependsOn: []
-              policy: {
-                timeout: '0.00:10:00'
-                retry: 0
-                retryIntervalInSeconds: 30
-                secureOutput: false
-                secureInput: false
-              }
-              userProperties: []
-              typeProperties: {
-                method: 'POST'
-                headers: {
-                  'Content-Type': 'application/json'
-                  Authorization: 'Bearer ${slackAppToken}'
-                }
-                url: 'https://slack.com/api/chat.postMessage'
-                body: {
-                  channel: slackAlertsChannel
-                  text: 'Data Factory Failure!'
-                  attachments: [
-                    {
-                      color: 'warning'
-                      fields: [
-                        {
-                          title: 'Data Factory'
-                          value: '@{pipeline().DataFactory}'
-                          short: true
-                        }
-                        {
-                          title: 'Pipeline'
-                          value: '@{pipeline().Pipeline}'
-                          short: true
-                        }
-                        {
-                          title: 'Error'
-                          value: '@variables(\'storedProcedureActivityFailureMessage\')'
-                          short: true
-                        }
-                        {
-                          title: 'Duration'
-                          value: '@{activity(\'Rebuild indexes\').Duration}'
-                          short: true
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
             {
               name: 'Report failure to Teams'
               type: 'WebActivity'
