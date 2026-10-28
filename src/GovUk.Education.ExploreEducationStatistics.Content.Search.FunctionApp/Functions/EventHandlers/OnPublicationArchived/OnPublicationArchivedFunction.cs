@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnPublicationArchived))]
-    [QueueOutput("%RemovePublicationSearchableDocumentsQueueName%")]
+    [QueueOutput("%RemovePublicationReleaseDocumentsQueueName%")]
     public async Task<RemovePublicationSearchableDocumentsDto[]> OnPublicationArchived(
         [QueueTrigger("%PublicationArchivedQueueName%")] EventGridEvent eventDto,
         FunctionContext context

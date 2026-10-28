@@ -43,12 +43,12 @@ param storageQueueNames SearchStorageQueueNames = {
   publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
-  refreshSearchableDocument: 'refresh-searchable-document-queue'
+  refreshReleaseDocument: 'refresh-release-document-queue'
+  releaseDocumentCreated: 'release-document-created-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
-  removePublicationSearchableDocuments: 'remove-publication-searchable-documents-queue'
-  removeSearchableDocument: 'remove-searchable-document-queue'
-  searchableDocumentCreated: 'search-document-created-queue'
+  removePublicationReleaseDocuments: 'remove-publication-release-documents-queue'
+  removeReleaseDocument: 'remove-release-document-queue'
   themeUpdated: 'theme-updated-queue'
 }
 
@@ -139,8 +139,12 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.publicationRestored
       }
       {
-        name: 'RefreshSearchableDocumentQueueName'
-        value: storageQueueNames.refreshSearchableDocument
+        name: 'RefreshReleaseDocumentQueueName'
+        value: storageQueueNames.refreshReleaseDocument
+      }
+      {
+        name: 'ReleaseDocumentCreatedQueueName'
+        value: storageQueueNames.releaseDocumentCreated
       }
       {
         name: 'ReleaseSlugChangedQueueName'
@@ -151,16 +155,12 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.releaseVersionPublished
       }
       {
-        name: 'RemovePublicationSearchableDocumentsQueueName'
-        value: storageQueueNames.removePublicationSearchableDocuments
+        name: 'RemovePublicationReleaseDocumentsQueueName'
+        value: storageQueueNames.removePublicationReleaseDocuments
       }
       {
-        name: 'RemoveSearchableDocumentQueueName'
-        value: storageQueueNames.removeSearchableDocument
-      }
-      {
-        name: 'SearchableDocumentCreatedQueueName'
-        value: storageQueueNames.searchableDocumentCreated
+        name: 'RemoveReleaseDocumentQueueName'
+        value: storageQueueNames.removeReleaseDocument
       }
       {
         name: 'ThemeUpdatedQueueName'

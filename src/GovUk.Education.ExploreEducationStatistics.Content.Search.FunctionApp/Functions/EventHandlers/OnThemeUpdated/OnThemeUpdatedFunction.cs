@@ -15,7 +15,7 @@ public class OnThemeUpdatedFunction(
 )
 {
     [Function(nameof(OnThemeUpdated))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
     public async Task<RefreshSearchableDocumentMessageDto[]> OnThemeUpdated(
         [QueueTrigger("%ThemeUpdatedQueueName%")] EventGridEvent eventDto,
         FunctionContext context

@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnPublicationDeleted))]
-    [QueueOutput("%RemoveSearchableDocumentQueueName%")]
+    [QueueOutput("%RemoveReleaseDocumentQueueName%")]
     public async Task<RemoveSearchableDocumentDto[]> OnPublicationDeleted(
         [QueueTrigger("%PublicationDeletedQueueName%")] EventGridEvent eventDto,
         FunctionContext context

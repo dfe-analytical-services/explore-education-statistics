@@ -11,18 +11,18 @@ type SearchStorageQueueNames = {
   publicationLatestPublishedReleaseReordered: string
   @description('Queue name for when an archived publication is restored.')
   publicationRestored: string
-  @description('Queue name for when a searchable document requires a refresh.')
-  refreshSearchableDocument: string
+  @description('Queue name for when a release document requires a refresh.')
+  refreshReleaseDocument: string
+  @description('Queue name for when a release document is created.')
+  releaseDocumentCreated: string
   @description('Queue name for when a release slug is changed.')
   releaseSlugChanged: string
   @description('Queue name for when a release version is published.')
   releaseVersionPublished: string
-  @description('Queue name for removing searchable documents associated with a publication.')
-  removePublicationSearchableDocuments: string
-  @description('Queue name for removing a single searchable document.')
-  removeSearchableDocument: string
-  @description('Queue name for when a searchable document is created.')
-  searchableDocumentCreated: string
+  @description('Queue name for removing release documents associated with a publication.')
+  removePublicationReleaseDocuments: string
+  @description('Queue name for removing a single release document.')
+  removeReleaseDocument: string
   @description('Queue name for when a theme is updated.')
   themeUpdated: string
 }
