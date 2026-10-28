@@ -425,16 +425,7 @@ public class ThemeServiceTests
                 adminEventRaiser.Assert.OnPublicationDeletedWasRaised(
                     publication.Id,
                     publication.Slug,
-                    publication.LatestPublishedReleaseVersion != null
-                        ? new LatestPublishedReleaseInfo
-                        {
-                            LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
-                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
-                        }
-                        : null,
-                    // Every Release id has to travel on the event, as the searchable document for any of
-                    // them is unreachable once the Publication is gone.
-                    publication.Releases.Select(release => release.Id).ToList()
+                    [.. publication.Releases.Select(release => release.Id)]
                 );
             }
         }

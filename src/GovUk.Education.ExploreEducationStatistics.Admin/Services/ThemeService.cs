@@ -230,8 +230,7 @@ public class ThemeService(
     )
     {
         var publication = await contentDbContext
-            .Publications.Include(p => p.LatestPublishedReleaseVersion)
-            .Include(p => p.Contact)
+            .Publications.Include(p => p.Contact)
             .FirstAsync(p => p.Id == publicationId, cancellationToken);
 
         // Publications superseded by this one may live in a Theme that is not being deleted, so their
@@ -239,17 +238,6 @@ public class ThemeService(
         // SQL Server cannot do this for us, as it rejects cascading actions on self-referencing foreign
         // keys, so load them here and let EF's ClientSetNull behaviour null them when changes are saved.
         await contentDbContext.Publications.Where(p => p.SupersededById == publicationId).LoadAsync(cancellationToken);
-
-        // Capture details of the latest published release before it is deleted
-        // so that they can be used to raise an event after the publication is deleted.
-        var latestPublicationRelease =
-            publication.LatestPublishedReleaseVersion != null
-                ? new LatestPublishedReleaseInfo
-                {
-                    LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion!.ReleaseId,
-                    LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
-                }
-                : null;
 
         // Some Content Db Releases may be soft-deleted and therefore not visible.
         // Ignore the query filter to make sure they are found
@@ -259,6 +247,9 @@ public class ThemeService(
             .Include(rv => rv.Release)
             .Where(rv => rv.Release.PublicationId == publicationId)
             .ToListAsync(cancellationToken);
+
+        // Capture the release Ids so that they can be used to raise an event after the publication is deleted.
+        var releaseIds = releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList();
 
         var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
             .ToAsyncEnumerable()
@@ -287,12 +278,7 @@ public class ThemeService(
 
                 await publicationCacheService.RemovePublication(publication.Slug);
 
-                await eventRaiser.OnPublicationDeleted(
-                    publication.Id,
-                    publication.Slug,
-                    latestPublicationRelease,
-                    releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList()
-                );
+                await eventRaiser.OnPublicationDeleted(publication.Id, publication.Slug, releaseIds);
             });
     }
 

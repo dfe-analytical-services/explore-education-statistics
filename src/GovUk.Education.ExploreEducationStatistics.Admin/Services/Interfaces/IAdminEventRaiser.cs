@@ -20,12 +20,7 @@ public interface IAdminEventRaiser
 
     Task OnPublicationChanged(Publication publication);
 
-    Task OnPublicationDeleted(
-        Guid publicationId,
-        string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease,
-        IReadOnlyList<Guid> releaseIds
-    );
+    Task OnPublicationDeleted(Guid publicationId, string publicationSlug, IReadOnlyList<Guid> releaseIds);
 
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,

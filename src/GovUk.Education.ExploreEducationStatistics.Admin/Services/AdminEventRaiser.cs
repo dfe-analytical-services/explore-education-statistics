@@ -79,20 +79,10 @@ public class AdminEventRaiser(IEventRaiser eventRaiser) : IAdminEventRaiser
     /// </summary>
     /// <param name="publicationId">The unique identifier of the publication that has been deleted.</param>
     /// <param name="publicationSlug">The slug of the publication that has been deleted.</param>
-    /// <param name="latestPublishedRelease">
-    /// Details of the latest published release associated with the publication that has been deleted.
-    /// </param>
-    /// <param name="releaseIds">The ids of every release that belonged to the publication.</param>
-    public async Task OnPublicationDeleted(
-        Guid publicationId,
-        string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease,
-        IReadOnlyList<Guid> releaseIds
-    )
+    /// <param name="releaseIds">The unique identifiers of the releases of the publication that has been deleted.</param>
+    public async Task OnPublicationDeleted(Guid publicationId, string publicationSlug, IReadOnlyList<Guid> releaseIds)
     {
-        await eventRaiser.RaiseEvent(
-            new PublicationDeletedEvent(publicationId, publicationSlug, latestPublishedRelease, releaseIds)
-        );
+        await eventRaiser.RaiseEvent(new PublicationDeletedEvent(publicationId, publicationSlug, releaseIds));
     }
 
     /// <summary>
