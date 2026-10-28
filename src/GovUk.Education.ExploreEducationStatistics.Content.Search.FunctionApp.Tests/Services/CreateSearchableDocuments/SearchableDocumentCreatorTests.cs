@@ -50,7 +50,7 @@ public class SearchableDocumentCreatorTests
             _appOptions = new AppOptions
             {
                 SearchStorageConnectionString = "azure storage connection string",
-                SearchDocumentsContainerName = "search-documents-container-name",
+                ReleaseDocumentsContainerName = "release-documents-container-name",
             };
 
             var sut = GetSut();
@@ -62,7 +62,7 @@ public class SearchableDocumentCreatorTests
 
             // ASSERT
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
-                containerName: _appOptions.SearchDocumentsContainerName
+                containerName: _appOptions.ReleaseDocumentsContainerName
             );
         }
 

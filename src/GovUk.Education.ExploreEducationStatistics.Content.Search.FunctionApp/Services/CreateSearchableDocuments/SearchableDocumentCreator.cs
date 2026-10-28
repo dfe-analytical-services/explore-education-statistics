@@ -31,7 +31,7 @@ internal class SearchableDocumentCreator(
 
         var blobName = releaseSearchableDocument.ReleaseId.ToString();
         await azureBlobStorageClient.UploadBlob(
-            containerName: appOptions.Value.SearchDocumentsContainerName,
+            containerName: appOptions.Value.ReleaseDocumentsContainerName,
             blobName: blobName,
             blob: new Blob(releaseSearchableDocument.HtmlContent, releaseSearchableDocument.BuildMetadata()),
             contentType: MediaTypeNames.Text.Html,

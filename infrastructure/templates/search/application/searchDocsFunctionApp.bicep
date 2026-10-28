@@ -11,8 +11,8 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
-param searchServiceSearchIndexerName string
+@description('Name of the indexer associated with the release documents (\'Search\') index in Azure AI Search.')
+param releaseIndexerName string
 
 @description('Specifies the Azure AI Search service name.')
 param searchServiceName string
@@ -24,8 +24,8 @@ param searchStorageAccountName string
 @secure()
 param searchStorageAccountConnectionStringSecretName string
 
-@description('Storage container name for search documents in the Search storage account.')
-param searchDocumentsContainerName string
+@description('Storage container name for release documents in the Search storage account.')
+param releaseDocumentsContainerName string
 
 @description('The IP address ranges that can access the Search Docs Function App storage account.')
 param storageFirewallRules IpRange[]
@@ -82,9 +82,9 @@ resource searchBlobStorage 'Microsoft.Storage/storageAccounts/blobServices@2023-
   parent: searchStorageAccount
 }
 
-resource searchDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+resource releaseDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
   parent: searchBlobStorage
-  name: searchDocumentsContainerName
+  name: releaseDocumentsContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -103,16 +103,16 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
       }
       {
-        name: 'App__SearchDocumentsContainerName'
-        value: searchDocumentsContainer.name
+        name: 'App__ReleaseDocumentsContainerName'
+        value: releaseDocumentsContainer.name
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
         value: searchService.properties.endpoint
       }
       {
-        name: 'AzureSearch__IndexerName'
-        value: searchServiceSearchIndexerName
+        name: 'AzureSearch__ReleaseIndexerName'
+        value: releaseIndexerName
       }
       {
         name: 'ContentApi__Url'

@@ -117,11 +117,11 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
       maintenanceFirewallRules
     )
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
-    searchServiceSearchIndexerName: searchServiceSearchIndexerName
+    releaseIndexerName: searchServiceSearchIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
     searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
-    searchDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
+    releaseDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues

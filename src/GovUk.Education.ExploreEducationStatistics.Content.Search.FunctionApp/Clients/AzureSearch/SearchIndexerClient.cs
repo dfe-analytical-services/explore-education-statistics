@@ -14,7 +14,7 @@ public class SearchIndexerClient(
 ) : ISearchIndexerClient
 {
     private const int IndexerAlreadyRunning = 409;
-    private readonly string _indexerName = searchOptions.Value.IndexerName;
+    private readonly string _indexerName = searchOptions.Value.ReleaseIndexerName;
 
     public async Task RunIndexer(CancellationToken cancellationToken = default)
     {

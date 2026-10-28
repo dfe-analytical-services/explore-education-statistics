@@ -53,7 +53,7 @@ public class SearchableDocumentRemoverTests
             _appOptions = new AppOptions
             {
                 SearchStorageConnectionString = "azure storage connection string",
-                SearchDocumentsContainerName = "search-documents-container-name",
+                ReleaseDocumentsContainerName = "release-documents-container-name",
             };
 
             Guid[] releaseIds = [Guid.NewGuid()];
@@ -63,7 +63,7 @@ public class SearchableDocumentRemoverTests
             await GetSut().RemovePublicationSearchableDocuments(request);
 
             _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(
-                containerName: _appOptions.SearchDocumentsContainerName
+                containerName: _appOptions.ReleaseDocumentsContainerName
             );
         }
 
@@ -105,7 +105,7 @@ public class SearchableDocumentRemoverTests
             _appOptions = new AppOptions
             {
                 SearchStorageConnectionString = "azure storage connection string",
-                SearchDocumentsContainerName = "search-documents-container-name",
+                ReleaseDocumentsContainerName = "release-documents-container-name",
             };
 
             var releaseId = Guid.NewGuid();
@@ -117,7 +117,7 @@ public class SearchableDocumentRemoverTests
 
             // Assert
             _azureBlobStorageClientMockBuilder.Assert.BlobWasDeleted(
-                containerName: _appOptions.SearchDocumentsContainerName
+                containerName: _appOptions.ReleaseDocumentsContainerName
             );
         }
 
@@ -159,11 +159,11 @@ public class SearchableDocumentRemoverTests
         public async Task ShouldDeleteBlobsFromExpectedStorageContainer()
         {
             // Arrange
-            var searchDocumentsContainerName = "search-documents-container-name";
+            var releaseDocumentsContainerName = "release-documents-container-name";
             _appOptions = new AppOptions
             {
                 SearchStorageConnectionString = "azure storage connection string",
-                SearchDocumentsContainerName = searchDocumentsContainerName,
+                ReleaseDocumentsContainerName = releaseDocumentsContainerName,
             };
             var sut = GetSut();
 
@@ -171,7 +171,7 @@ public class SearchableDocumentRemoverTests
             await sut.RemoveAllSearchableDocuments();
 
             // Assert
-            _azureBlobStorageClientMockBuilder.Assert.AllBlobsWereDeleted(searchDocumentsContainerName);
+            _azureBlobStorageClientMockBuilder.Assert.AllBlobsWereDeleted(releaseDocumentsContainerName);
         }
     }
 }
