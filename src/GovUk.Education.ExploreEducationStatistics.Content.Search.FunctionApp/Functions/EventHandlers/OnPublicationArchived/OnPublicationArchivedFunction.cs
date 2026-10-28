@@ -1,5 +1,5 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationArchived.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -10,18 +10,18 @@ public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEvent
 {
     [Function(nameof(OnPublicationArchived))]
     [QueueOutput("%RemovePublicationReleaseDocumentsQueueName%")]
-    public async Task<RemovePublicationSearchableDocumentsDto[]> OnPublicationArchived(
+    public async Task<RemovePublicationReleaseDocumentsDto[]> OnPublicationArchived(
         [QueueTrigger("%PublicationArchivedQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<PublicationArchivedEventDto, RemovePublicationSearchableDocumentsDto[]>(
+        await eventGridEventHandler.Handle<PublicationArchivedEventDto, RemovePublicationReleaseDocumentsDto[]>(
             context,
             eventDto,
             (payload, _) =>
-                Task.FromResult<RemovePublicationSearchableDocumentsDto[]>(
+                Task.FromResult<RemovePublicationReleaseDocumentsDto[]>(
                     string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug }]
+                        : [new RemovePublicationReleaseDocumentsDto { PublicationSlug = payload.PublicationSlug }]
                 )
         );
 }

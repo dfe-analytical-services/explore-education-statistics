@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.AspNetCore.Http;
@@ -14,20 +14,18 @@ public class FullResetFunction(
 {
     [Function(nameof(FullSearchableDocumentsReset))]
     [QueueOutput("%RefreshReleaseDocumentQueueName%")]
-    public async Task<RefreshSearchableDocumentMessageDto[]> FullSearchableDocumentsReset(
+    public async Task<RefreshReleaseDocumentMessageDto[]> FullSearchableDocumentsReset(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
             HttpRequest ignored, //  The binding name _ is invalid
         FunctionContext context
     ) => await commandHandler.Handle(ResetSearchableDocument, context.CancellationToken);
 
-    private async Task<RefreshSearchableDocumentMessageDto[]> ResetSearchableDocument(
-        CancellationToken cancellationToken
-    )
+    private async Task<RefreshReleaseDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
     {
         var response = await fullSearchableDocumentResetter.PerformReset(cancellationToken);
 
         return response
-            .AllPublications.Select(publication => new RefreshSearchableDocumentMessageDto
+            .AllPublications.Select(publication => new RefreshReleaseDocumentMessageDto
             {
                 PublicationSlug = publication.PublicationSlug,
             })

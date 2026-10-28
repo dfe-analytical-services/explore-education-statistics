@@ -1,5 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnReleaseVersionPublished;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnReleaseVersionPublished.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -53,7 +53,7 @@ public class OnReleaseVersionPublishedFunctionTests
     }
 
     [Fact]
-    public async Task GivenEvent_WhenPublishedReleaseVersionIsADifferentRelease_ThenPreviousReleaseSearchableDocumentIsRemoved()
+    public async Task GivenEvent_WhenPublishedReleaseVersionIsADifferentRelease_ThenPreviousReleaseDocumentIsRemoved()
     {
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease;
@@ -71,13 +71,13 @@ public class OnReleaseVersionPublishedFunctionTests
         // document will be created using its new ReleaseId.
         // Therefore, the existing, previously latest searchable document needs to be removed.
         Assert.Equal(
-            [new RemoveSearchableDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
-            response.RemoveSearchableDocuments
+            [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
+            response.RemoveReleaseDocuments
         );
     }
 
     [Fact]
-    public async Task GivenPublicationIsArchived_WhenPublishedReleaseVersionIsADifferentRelease_ThenNoReleaseSearchableDocumentIsRemoved()
+    public async Task GivenPublicationIsArchived_WhenPublishedReleaseVersionIsADifferentRelease_ThenNoReleaseDocumentIsRemoved()
     {
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease with
@@ -93,11 +93,11 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveSearchableDocuments);
+        Assert.Empty(response.RemoveReleaseDocuments);
     }
 
     [Fact]
-    public async Task GivenEvent_WhenPublishedReleaseVersionIsSameRelease_ThenNoSearchableDocumentIsRemoved()
+    public async Task GivenEvent_WhenPublishedReleaseVersionIsSameRelease_ThenNoReleaseDocumentIsRemoved()
     {
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsForSameRelease;
@@ -110,11 +110,11 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveSearchableDocuments);
+        Assert.Empty(response.RemoveReleaseDocuments);
     }
 
     [Fact]
-    public async Task GivenEvent_WhenPublishedReleaseVersionIsTheFirstRelease_ThenNoSearchableDocumentIsRemoved()
+    public async Task GivenEvent_WhenPublishedReleaseVersionIsTheFirstRelease_ThenNoReleaseDocumentIsRemoved()
     {
         // ARRANGE
         var payload = NewReleaseVersionPublishedEvents.NewlyPublishedIsTheFirstRelease;
@@ -127,12 +127,12 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveSearchableDocuments);
+        Assert.Empty(response.RemoveReleaseDocuments);
     }
 
     [Theory]
-    [MemberData(nameof(EventsThatRefreshSearchableDocument))]
-    public async Task WhenReleaseVersionPublished_ThenSearchableDocumentIsRefreshed(
+    [MemberData(nameof(EventsThatRefreshReleaseDocument))]
+    public async Task WhenReleaseVersionPublished_ThenReleaseDocumentIsRefreshed(
         ReleaseVersionPublishedEventDto payload
     )
     {
@@ -145,13 +145,13 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        RefreshSearchableDocumentMessageDto[] expected = [new() { PublicationSlug = payload.PublicationSlug }];
-        Assert.Equal(expected, response.RefreshSearchableDocumentMessages);
+        RefreshReleaseDocumentMessageDto[] expected = [new() { PublicationSlug = payload.PublicationSlug }];
+        Assert.Equal(expected, response.RefreshReleaseDocumentMessages);
     }
 
     [Theory]
-    [MemberData(nameof(EventsThatRefreshSearchableDocument))]
-    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenNoSearchableDocumentIsRefreshed(
+    [MemberData(nameof(EventsThatRefreshReleaseDocument))]
+    public async Task GivenPublicationIsArchived_WhenReleaseVersionPublished_ThenNoReleaseDocumentIsRefreshed(
         ReleaseVersionPublishedEventDto payload
     )
     {
@@ -166,10 +166,10 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RefreshSearchableDocumentMessages);
+        Assert.Empty(response.RefreshReleaseDocumentMessages);
     }
 
-    public static TheoryData<ReleaseVersionPublishedEventDto> EventsThatRefreshSearchableDocument =>
+    public static TheoryData<ReleaseVersionPublishedEventDto> EventsThatRefreshReleaseDocument =>
         [
             NewReleaseVersionPublishedEvents.NewlyPublishedIsForNewLatestRelease,
             NewReleaseVersionPublishedEvents.NewlyPublishedIsForSameRelease,

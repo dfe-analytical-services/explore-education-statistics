@@ -1,5 +1,5 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -10,18 +10,18 @@ public class OnPublicationDeletedFunction(IEventGridEventHandler eventGridEventH
 {
     [Function(nameof(OnPublicationDeleted))]
     [QueueOutput("%RemoveReleaseDocumentQueueName%")]
-    public async Task<RemoveSearchableDocumentDto[]> OnPublicationDeleted(
+    public async Task<RemoveReleaseDocumentDto[]> OnPublicationDeleted(
         [QueueTrigger("%PublicationDeletedQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<PublicationDeletedEventDto, RemoveSearchableDocumentDto[]>(
+        await eventGridEventHandler.Handle<PublicationDeletedEventDto, RemoveReleaseDocumentDto[]>(
             context,
             eventDto,
             (payload, _) =>
                 Task.FromResult(
                     payload
                         .ReleaseIds?.Distinct()
-                        .Select(releaseId => new RemoveSearchableDocumentDto { ReleaseId = releaseId })
+                        .Select(releaseId => new RemoveReleaseDocumentDto { ReleaseId = releaseId })
                         .ToArray()
                         ?? []
                 )

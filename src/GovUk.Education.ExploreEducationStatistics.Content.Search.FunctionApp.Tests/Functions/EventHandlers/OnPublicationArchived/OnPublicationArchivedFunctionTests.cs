@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationArchived;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationArchived.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -21,7 +21,7 @@ public class OnPublicationArchivedFunctionTests
     {
         var payload = new PublicationArchivedEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
-        var expected = new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug };
+        var expected = new RemovePublicationReleaseDocumentsDto { PublicationSlug = payload.PublicationSlug };
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
 
