@@ -34,7 +34,7 @@ public class RemovePublicationReleaseDocumentsFunction(
         );
 
         logger.LogInformation(
-            """Removed searchable documents for publication "{PublicationSlug}". Response: {@response}""",
+            """Removed release documents for publication "{PublicationSlug}". Response: {@response}""",
             message.PublicationSlug,
             response
         );

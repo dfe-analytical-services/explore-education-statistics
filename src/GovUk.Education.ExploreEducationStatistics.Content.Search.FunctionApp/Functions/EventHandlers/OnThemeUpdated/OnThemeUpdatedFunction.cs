@@ -31,7 +31,7 @@ public class OnThemeUpdatedFunction(
                 var publicationsForTheme = await contentApiClient.GetPublicationsForTheme(themeId, ct);
 
                 logger.LogInformation(
-                    "Refreshing Searchable Documents for Theme {ThemeId}: Publications {@PublicationInfos}",
+                    "Refreshing Release Documents for Theme {ThemeId}: Publications {@PublicationInfos}",
                     themeId,
                     publicationsForTheme
                 );

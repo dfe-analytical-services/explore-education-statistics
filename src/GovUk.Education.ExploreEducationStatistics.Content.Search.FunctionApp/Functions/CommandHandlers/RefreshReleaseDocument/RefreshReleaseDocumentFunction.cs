@@ -27,7 +27,7 @@ public class RefreshReleaseDocumentFunction(
             return [];
         }
 
-        // Create Searchable Document
+        // Create Release Document
         var request = new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = message.PublicationSlug };
 
         var response = await releaseDocumentCreator.CreatePublicationLatestReleaseDocument(request, cancellationToken);

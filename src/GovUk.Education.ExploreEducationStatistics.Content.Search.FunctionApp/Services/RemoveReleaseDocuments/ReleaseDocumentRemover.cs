@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 
 /// <summary>
-/// This service provides a way of deleting all searchable documents that may exist for a publication.
+/// This service provides a way of deleting all release documents that may exist for a publication.
 /// </summary>
 internal class ReleaseDocumentRemover(
     IContentApiClient contentApiClient,

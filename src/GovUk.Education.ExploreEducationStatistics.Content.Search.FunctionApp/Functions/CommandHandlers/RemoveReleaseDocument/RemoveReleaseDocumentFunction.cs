@@ -32,10 +32,6 @@ public class RemoveReleaseDocumentFunction(
             cancellationToken
         );
 
-        logger.LogInformation(
-            """Removed searchable document "{ReleaseId}". Response: {@response}""",
-            releaseId,
-            response
-        );
+        logger.LogInformation("""Removed release document "{ReleaseId}". Response: {@response}""", releaseId, response);
     }
 }
