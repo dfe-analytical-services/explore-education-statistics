@@ -1,7 +1,8 @@
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import logger from '@common/services/logger';
-import { ReleaseVersionHomeContent } from '@common/services/publicationService';
-import getSsrDataBlocks from '@frontend/modules/find-statistics/utils/getSsrDataBlocks';
+import getSsrDataBlocks, {
+  SsrDataBlocksHomeContent,
+} from '@frontend/modules/find-statistics/utils/getSsrDataBlocks';
 import { dehydrate, DehydratedState, QueryClient } from '@tanstack/react-query';
 
 // Bounds how long these fetches can delay the page. Anything still pending is
@@ -9,7 +10,7 @@ import { dehydrate, DehydratedState, QueryClient } from '@tanstack/react-query';
 const defaultTimeoutMs = 2000;
 
 interface Options {
-  homeContent: Pick<ReleaseVersionHomeContent, 'keyStatistics'>;
+  homeContent: SsrDataBlocksHomeContent;
   releaseVersionId: string;
   timeoutMs?: number;
 }
@@ -31,19 +32,28 @@ export default async function prefetchSsrDataBlocks({
   // other data is already passed as props.
   const queryClient = new QueryClient();
 
-  const { keyStatIds } = getSsrDataBlocks(homeContent);
+  const { keyStatIds, tableIds } = getSsrDataBlocks(homeContent);
+
+  const fetches = [
+    ...keyStatIds.map(dataBlockId =>
+      queryClient.fetchQuery(
+        tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId),
+      ),
+    ),
+    ...tableIds.map(dataBlockId =>
+      queryClient.fetchQuery(
+        tableBuilderQueries.getDataBlockTable(releaseVersionId, dataBlockId),
+      ),
+    ),
+  ];
 
   let timeout: ReturnType<typeof setTimeout> | undefined;
 
   await Promise.race([
     Promise.all(
-      keyStatIds.map(dataBlockId =>
-        queryClient
-          .fetchQuery(
-            tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId),
-          )
-          // The page's `getServerSideProps` turns any error into a 404.
-          .catch(error => logger.error(error)),
+      fetches.map(request =>
+        // The page's `getServerSideProps` turns any error into a 404.
+        request.catch(error => logger.error(error)),
       ),
     ),
     new Promise(resolve => {

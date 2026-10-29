@@ -1,5 +1,8 @@
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
-import { KeyStatistic } from '@common/services/publicationService';
+import {
+  DataBlockViewModel,
+  KeyStatistic,
+} from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
@@ -27,7 +30,27 @@ describe('prefetchSsrDataBlocks', () => {
     },
   ];
 
-  // Only the parts `tableBuilderQueries.getKeyStat` reads.
+  const testHomeContent = ({
+    content = [],
+    keyStatistics: testKeyStatistics = [],
+  }: {
+    content?: DataBlockViewModel[];
+    keyStatistics?: KeyStatistic[];
+  }) => ({
+    content: [{ id: 'section-1', heading: 'Section 1', content }],
+    keyStatistics: testKeyStatistics,
+    keyStatisticsSecondarySection: { id: 'secondary-section', content: [] },
+  });
+
+  const testDataBlock = (dataBlockId: string): DataBlockViewModel => ({
+    id: `content-block-${dataBlockId}`,
+    type: 'DataBlockVersionLink',
+    dataBlockVersion: {
+      dataBlockId,
+      table: {},
+    } as DataBlockViewModel['dataBlockVersion'],
+  });
+
   const testTableData = (value: string) =>
     ({
       subjectMeta: {
@@ -47,6 +70,11 @@ describe('prefetchSsrDataBlocks', () => {
   const keyStatKey = (dataBlockId: string) =>
     tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId).queryKey;
 
+  // The same key `DataBlockTabs` reads, so it renders from the cache.
+  const tableKey = (dataBlockId: string) =>
+    tableBuilderQueries.getDataBlockTable(releaseVersionId, dataBlockId)
+      .queryKey;
+
   const getQueryKeys = (state: DehydratedState) =>
     state.queries.map(query => query.queryKey);
 
@@ -56,7 +84,7 @@ describe('prefetchSsrDataBlocks', () => {
       .mockResolvedValueOnce(testTableData('2000'));
 
     const state = await prefetchSsrDataBlocks({
-      homeContent: { keyStatistics },
+      homeContent: testHomeContent({ keyStatistics }),
       releaseVersionId,
     });
 
@@ -79,6 +107,46 @@ describe('prefetchSsrDataBlocks', () => {
     });
   });
 
+  test('returns the fetched data block tables', async () => {
+    const tableData = testTableData('1000');
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(tableData);
+
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({
+        content: [testDataBlock('data-block-1')],
+      }),
+      releaseVersionId,
+    });
+
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
+      releaseVersionId,
+      'data-block-1',
+    );
+
+    expect(getQueryKeys(state)).toEqual([tableKey('data-block-1')]);
+    expect(state.queries[0].state.data).toEqual(tableData);
+  });
+
+  test('returns key stats and tables together', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableData('1000'),
+    );
+
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({
+        content: [testDataBlock('data-block-3')],
+        keyStatistics,
+      }),
+      releaseVersionId,
+    });
+
+    expect(getQueryKeys(state)).toEqual([
+      keyStatKey('data-block-1'),
+      keyStatKey('data-block-2'),
+      tableKey('data-block-3'),
+    ]);
+  });
+
   test('does not throw or return a key stat whose fetch fails', async () => {
     const error = new Error('Something went wrong');
 
@@ -91,7 +159,7 @@ describe('prefetchSsrDataBlocks', () => {
 
     try {
       const state = await prefetchSsrDataBlocks({
-        homeContent: { keyStatistics },
+        homeContent: testHomeContent({ keyStatistics }),
         releaseVersionId,
       });
 
@@ -108,7 +176,7 @@ describe('prefetchSsrDataBlocks', () => {
       .mockReturnValueOnce(new Promise(noop));
 
     const state = await prefetchSsrDataBlocks({
-      homeContent: { keyStatistics },
+      homeContent: testHomeContent({ keyStatistics }),
       releaseVersionId,
       timeoutMs: 10,
     });
@@ -116,9 +184,9 @@ describe('prefetchSsrDataBlocks', () => {
     expect(getQueryKeys(state)).toEqual([keyStatKey('data-block-1')]);
   });
 
-  test('does not fetch anything when there are no data block key stats', async () => {
+  test('does not fetch anything when there are no data blocks', async () => {
     const state = await prefetchSsrDataBlocks({
-      homeContent: {
+      homeContent: testHomeContent({
         keyStatistics: [
           {
             type: 'KeyStatisticText',
@@ -127,7 +195,7 @@ describe('prefetchSsrDataBlocks', () => {
             statistic: '100',
           },
         ],
-      },
+      }),
       releaseVersionId,
     });
 
