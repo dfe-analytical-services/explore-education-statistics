@@ -11,3 +11,6 @@ param publicStorageAccountSku = 'Standard_ZRS'
 
 // Copy file share backups into the geo-redundant Recovery Services Vault.
 param vaultedFileShareBackups = true
+
+// Allow Backup Vault backups to be restored in the paired region.
+param backupVaultCrossRegionRestore = true
