@@ -1,5 +1,6 @@
 import ChartExportMenu from '@common/modules/charts/components/ChartExportMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
+import useMounted from '@common/hooks/useMounted';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -58,6 +59,7 @@ function ChartRenderer({
   showExportMenu = true,
 }: ChartRendererProps) {
   const { data, meta, subtitle, title, type } = chart;
+  const { isMounted } = useMounted();
   const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
@@ -142,7 +144,7 @@ function ChartRenderer({
             </figcaption>
           )}
 
-          {chartComponent}
+          {isMounted && chartComponent}
 
           <FigureFootnotes
             footnotes={footnotes}

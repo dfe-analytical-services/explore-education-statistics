@@ -6,6 +6,7 @@ import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import { DataBlock } from '@common/services/types/blocks';
+import logger from '@common/services/logger';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -75,50 +76,81 @@ export default function useDataBlock({
   );
 
   const fullTable = useMemo(() => {
-    if (!tableData || isGeoJsonInitialLoading) return undefined;
-    return mapFullTable({
-      ...tableData,
-      subjectMeta: {
-        ...tableData.subjectMeta,
-        locations:
-          selectedBoundaryLevel && geoJson
-            ? geoJson
-            : tableData.subjectMeta.locations,
-      },
-    });
-  }, [tableData, isGeoJsonInitialLoading, selectedBoundaryLevel, geoJson]);
+    if (!tableData) return undefined;
+    try {
+      return mapFullTable(tableData);
+    } catch (error) {
+      logger.error(error);
+      return undefined;
+    }
+  }, [tableData]);
+
+  const chartFullTable = useMemo(() => {
+    if (!tableData || !fullTable || isGeoJsonInitialLoading) return undefined;
+    if (!selectedBoundaryLevel || !geoJson) return fullTable;
+    try {
+      return mapFullTable({
+        ...tableData,
+        subjectMeta: {
+          ...tableData.subjectMeta,
+          locations: geoJson,
+        },
+      });
+    } catch (error) {
+      logger.error(error);
+      return undefined;
+    }
+  }, [
+    tableData,
+    isGeoJsonInitialLoading,
+    selectedBoundaryLevel,
+    geoJson,
+    fullTable,
+  ]);
+
+  // Mapping errors are caught and logged above, so are reported as errors
+  // here rather than leaving the table or chart to silently not render.
+  const isTableMappingError = !!tableData && !fullTable;
+  const isGeoJsonMappingError =
+    !!fullTable && !isGeoJsonInitialLoading && !chartFullTable;
 
   const chartProps = useMemo<RenderableChart | undefined>(() => {
-    if (!fullTable || !chart) return undefined;
+    if (!chartFullTable || !chart) return undefined;
     if (chart.type === 'infographic') {
       return {
         ...chart,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
+        data: chartFullTable.results,
+        meta: chartFullTable.subjectMeta,
         getInfographic: getInfographic ?? getChartFile,
       };
     }
     if (chart.type === 'map') {
       return {
         ...chart,
-        data: fullTable.results,
-        meta: fullTable.subjectMeta,
+        data: chartFullTable.results,
+        meta: chartFullTable.subjectMeta,
         onBoundaryLevelChange,
       };
     }
     return {
       ...chart,
-      data: fullTable.results,
-      meta: fullTable.subjectMeta,
+      data: chartFullTable.results,
+      meta: chartFullTable.subjectMeta,
     };
-  }, [chart, fullTable, getInfographic, onBoundaryLevelChange, getChartFile]);
+  }, [
+    chart,
+    chartFullTable,
+    getInfographic,
+    onBoundaryLevelChange,
+    getChartFile,
+  ]);
 
   return {
     chart: chartProps,
     isTableDataLoading,
-    isTableDataError,
+    isTableDataError: isTableDataError || isTableMappingError,
     fullTable,
-    isGeoJsonError,
+    isGeoJsonError: isGeoJsonError || isGeoJsonMappingError,
     isGeoJsonInitialLoading,
   };
 }

@@ -8,6 +8,7 @@ import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { screen } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -58,6 +59,29 @@ describe('ChartRenderer', () => {
       onBoundaryLevelChange: async () => undefined,
     },
   };
+
+  test('server-renders descriptions without running chart geometry calculations', () => {
+    const container = document.createElement('div');
+    container.innerHTML = renderToStaticMarkup(
+      <ChartRenderer
+        source="Test source"
+        chart={{
+          type: 'line',
+          title: 'Aggregated results chart',
+          alt: 'Test description',
+          height: 300,
+          axes: undefined!,
+          legend: { items: [] },
+          data: testFullTableMeta.results,
+          meta: testFullTableMeta.subjectMeta,
+        }}
+      />,
+    );
+
+    expect(container).toHaveTextContent('Aggregated results chart');
+    expect(container).toHaveTextContent('Source: Test source');
+    expect(container.querySelector('svg')).toBeNull();
+  });
 
   test('renders auto-generated boundary level footnote successfully', async () => {
     render(<ChartRenderer {...testMapChartRenderer} />);
