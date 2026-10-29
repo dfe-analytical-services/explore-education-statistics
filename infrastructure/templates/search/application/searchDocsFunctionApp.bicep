@@ -11,7 +11,7 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Name of the indexer associated with the release documents (\'Search\') index in Azure AI Search.')
+@description('Name of the indexer associated with the \'Release\' index in Azure AI Search.')
 param releaseIndexerName string
 
 @description('Specifies the Azure AI Search service name.')
