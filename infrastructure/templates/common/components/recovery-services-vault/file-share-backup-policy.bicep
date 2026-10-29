@@ -63,13 +63,93 @@ param yearlySnapshotRetention {
   yearsToRetain: int
 }?
 
+@description('''
+Copies each daily backup into the vault, rather than keeping backups only as snapshots in the storage account. The
+retention settings then apply to the vault copies, and snapshots are kept for this many days for quick restores (at
+most 30). A policy can't move between the snapshot and vault tiers in place.
+''')
+param vaultTier {
+  snapshotRetentionDays: int
+}?
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
+
+// How long each backup is kept. Under the vault tier, this applies to the copies in the vault.
+var retentionPolicy = {
+  retentionPolicyType: 'LongTermRetentionPolicy'
+  dailySchedule: {
+    retentionTimes: [
+      '2025-01-01T${dailyBackupTimeUtc}:00Z'
+    ]
+    retentionDuration: {
+      count: daysToRetainDailyBackups
+      durationType: 'Days'
+    }
+  }
+  weeklySchedule: weeklySnapshotRetention != null
+    ? {
+        daysOfTheWeek: [
+          weeklySnapshotRetention!.targetBackupDay
+        ]
+        retentionTimes: [
+          '2025-01-01T${dailyBackupTimeUtc}:00Z'
+        ]
+        retentionDuration: {
+          count: weeklySnapshotRetention!.weeksToRetain
+          durationType: 'Weeks'
+        }
+      }
+    : null
+  monthlySchedule: monthlySnapshotRetention != null
+    ? {
+        retentionScheduleFormatType: 'Weekly'
+        retentionScheduleWeekly: {
+          daysOfTheWeek: [
+            monthlySnapshotRetention!.targetBackupDay
+          ]
+          weeksOfTheMonth: [
+            monthlySnapshotRetention!.targetBackupWeek
+          ]
+        }
+        retentionTimes: [
+          '2025-01-01T${dailyBackupTimeUtc}:00Z'
+        ]
+        retentionDuration: {
+          count: monthlySnapshotRetention!.monthsToRetain
+          durationType: 'Months'
+        }
+      }
+    : null
+  yearlySchedule: yearlySnapshotRetention != null
+    ? {
+        retentionScheduleFormatType: 'Weekly'
+        monthsOfYear: [
+          yearlySnapshotRetention!.targetBackupMonth
+        ]
+        retentionScheduleWeekly: {
+          daysOfTheWeek: [
+            yearlySnapshotRetention!.targetBackupDay
+          ]
+          weeksOfTheMonth: [
+            yearlySnapshotRetention!.targetBackupWeek
+          ]
+        }
+        retentionTimes: [
+          '2025-01-01T${dailyBackupTimeUtc}:00Z'
+        ]
+        retentionDuration: {
+          count: yearlySnapshotRetention!.yearsToRetain
+          durationType: 'Years'
+        }
+      }
+    : null
+}
 
 resource policy 'Microsoft.RecoveryServices/vaults/backupPolicies@2026-07-01' = {
   name: '${vaultName}/${policyName}'
   location: location
-  properties: {
+  properties: union({
     backupManagementType: 'AzureStorage'
     workLoadType: 'AzureFileShare'
     schedulePolicy: {
@@ -79,76 +159,14 @@ resource policy 'Microsoft.RecoveryServices/vaults/backupPolicies@2026-07-01' = 
         '2025-01-01T${dailyBackupTimeUtc}:00Z'
       ]
     }
-    retentionPolicy: {
-      retentionPolicyType: 'LongTermRetentionPolicy'
-      dailySchedule: {
-        retentionTimes: [
-          '2025-01-01T${dailyBackupTimeUtc}:00Z'
-        ]
-        retentionDuration: {
-          count: daysToRetainDailyBackups
-          durationType: 'Days'
-        }
-      }
-      weeklySchedule: weeklySnapshotRetention != null
-        ? {
-            daysOfTheWeek: [
-              weeklySnapshotRetention!.targetBackupDay
-            ]
-            retentionTimes: [
-              '2025-01-01T${dailyBackupTimeUtc}:00Z'
-            ]
-            retentionDuration: {
-              count: weeklySnapshotRetention!.weeksToRetain
-              durationType: 'Weeks'
-            }
-          }
-        : null
-      monthlySchedule: monthlySnapshotRetention != null
-        ? {
-            retentionScheduleFormatType: 'Weekly'
-            retentionScheduleWeekly: {
-              daysOfTheWeek: [
-                monthlySnapshotRetention!.targetBackupDay
-              ]
-              weeksOfTheMonth: [
-                monthlySnapshotRetention!.targetBackupWeek
-              ]
-            }
-            retentionTimes: [
-              '2025-01-01T${dailyBackupTimeUtc}:00Z'
-            ]
-            retentionDuration: {
-              count: monthlySnapshotRetention!.monthsToRetain
-              durationType: 'Months'
-            }
-          }
-        : null
-      yearlySchedule: yearlySnapshotRetention != null
-        ? {
-            retentionScheduleFormatType: 'Weekly'
-            monthsOfYear: [
-              yearlySnapshotRetention!.targetBackupMonth
-            ]
-            retentionScheduleWeekly: {
-              daysOfTheWeek: [
-                yearlySnapshotRetention!.targetBackupDay
-              ]
-              weeksOfTheMonth: [
-                yearlySnapshotRetention!.targetBackupWeek
-              ]
-            }
-            retentionTimes: [
-              '2025-01-01T${dailyBackupTimeUtc}:00Z'
-            ]
-            retentionDuration: {
-              count: yearlySnapshotRetention!.yearsToRetain
-              durationType: 'Years'
-            }
-          }
-        : null
-    }
     timeZone: 'UTC'
-  }
+  }, vaultTier == null
+    ? { retentionPolicy: retentionPolicy }
+    : {
+        vaultRetentionPolicy: {
+          snapshotRetentionInDays: vaultTier!.snapshotRetentionDays
+          vaultRetention: retentionPolicy
+        }
+      })
   tags: tagValues
 }

@@ -1,4 +1,5 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('The IP address ranges that can access the Analytics Function App endpoints.')
@@ -9,6 +10,9 @@ param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Name of the shared analytics storage account.')
 param analyticsStorageAccountName string
@@ -90,6 +94,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     functionAppRuntime: 'dotnet-isolated'
     linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     storageAccountName: resourceNames.analytics.functionStorageAccount
+    storageAccountSku: storageAccountSku
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.analyticsStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

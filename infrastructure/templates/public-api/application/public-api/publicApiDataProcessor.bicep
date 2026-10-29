@@ -1,8 +1,12 @@
 import { IpRange, FirewallRule } from '../../../common/types.bicep'
+import { StorageAccountSku } from '../../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Specifies the location for all resources.')
 param location string
@@ -78,6 +82,7 @@ resource privateEndpointsSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-
 module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
+    storageAccountSku: storageAccountSku
     functionAppName: resourceNames.publicApi.processor.functionApp
     appServicePlanName: resourceNames.publicApi.processor.appServicePlan
     storageAccountsNamePrefix: resourceNames.publicApi.processor.storageAccountsPrefix

@@ -15,6 +15,9 @@ param deployRecoveryServicesVault bool
 @description('Should the Recovery Services Vault be set to immutable?')
 param recoveryServicesVaultImmutable bool
 
+@description('Whether file share backups are copied to the vault, rather than kept only as snapshots in the storage account.')
+param vaultedFileShareBackups bool
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -50,6 +53,7 @@ module recoveryServicesVaultModule 'recovery-services-vault.bicep' = if (deployR
     location: location
     vaultName: backupsNames.recoveryServicesVault
     immutable: recoveryServicesVaultImmutable
+    vaultedFileShareBackups: vaultedFileShareBackups
     tagValues: tagValues
   }
 }

@@ -1,4 +1,5 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
@@ -32,6 +33,9 @@ param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
@@ -189,6 +193,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     deployQueueRoleAssignment: true
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: resourceNames.searchDocs.functionStorageAccount
+    storageAccountSku: storageAccountSku
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.searchDocsStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

@@ -1,8 +1,12 @@
+import { StorageAccountSku } from '../../../common/components/storage/types.bicep'
 import { IpRange } from '../../../common/types.bicep'
 import { VNetSubnets } from '../virtual-network/types.bicep'
 
 @description('Name of the storage account.')
 param storageAccountName string
+
+@description('Storage account SKU, which sets its redundancy.')
+param sku StorageAccountSku
 
 @description('Name of the Key Vault secret holding the storage account\'s connection string.')
 param connectionStringSecretName string
@@ -46,7 +50,7 @@ module storageAccountModule '../../../common/components/storage/storage-account.
   params: {
     storageAccountName: storageAccountName
     kind: 'StorageV2'
-    sku: 'Standard_RAGRS'
+    sku: sku
     publicNetworkAccessEnabled: true
     connectionStringSecret: {
       keyVaultName: keyVaultName

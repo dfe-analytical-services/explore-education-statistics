@@ -1,8 +1,12 @@
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 import { IpRange } from '../../common/types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
@@ -24,7 +28,7 @@ resource storagePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets
 
 var storageAccountConfig = {
   kind: 'StorageV2'
-  sku: 'Standard_LRS'
+  sku: storageAccountSku
   fileShare: {
     quotaGbs: 1
     accessTier: 'Hot'
