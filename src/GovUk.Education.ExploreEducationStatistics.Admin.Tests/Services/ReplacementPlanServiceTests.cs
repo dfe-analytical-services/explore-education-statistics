@@ -3769,6 +3769,203 @@ public class ReplacementPlanServiceTests
         }
     }
 
+    [Fact]
+    public async Task GetReplacementPlan_PairedIndicatorsMapped_ReplacementValid()
+    {
+        var originalGroup = _fixture.DefaultIndicatorGroup(indicatorCount: 2).Generate();
+        var replacementGroup = _fixture.DefaultIndicatorGroup(indicatorCount: 2).Generate();
+        var (parent, child) = (originalGroup.Indicators[0], originalGroup.Indicators[1]);
+
+        var replacementPlan = await GetReplacementPlanWithPairedIndicators(
+            pairedIndicators: [new PairedIndicatorEntry(parent.Id, child.Id)],
+            indicatorMappings: new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    parent.Id,
+                    CreateIndicatorMapping(
+                        parent,
+                        originalGroup,
+                        replacementGroup.Indicators[0],
+                        replacementGroup,
+                        MapStatus.AutoSet
+                    )
+                },
+                {
+                    child.Id,
+                    CreateIndicatorMapping(
+                        child,
+                        originalGroup,
+                        replacementGroup.Indicators[1],
+                        replacementGroup,
+                        MapStatus.ManuallySet
+                    )
+                },
+            }
+        );
+
+        var pairedIndicator = Assert.Single(replacementPlan.PairedIndicators);
+
+        Assert.Equal(parent.Id, pairedIndicator.Parent.Id);
+        Assert.Equal(parent.Label, pairedIndicator.Parent.Label);
+        Assert.Equal(replacementGroup.Indicators[0].Id, pairedIndicator.Parent.Target);
+        Assert.Equal(child.Id, pairedIndicator.Child.Id);
+        Assert.Equal(child.Label, pairedIndicator.Child.Label);
+        Assert.Equal(replacementGroup.Indicators[1].Id, pairedIndicator.Child.Target);
+
+        var indicatorGroup = Assert.Single(pairedIndicator.IndicatorGroups).Value;
+        Assert.Equal(originalGroup.Id, indicatorGroup.Id);
+        Assert.Equal(
+            new[] { parent.Id, child.Id }.Order(),
+            indicatorGroup.Indicators.Select(indicator => indicator.Id).Order()
+        );
+
+        Assert.True(pairedIndicator.Valid);
+        Assert.True(replacementPlan.Valid);
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_PairedIndicatorUnmapped_ReplacementInvalid()
+    {
+        var originalGroup = _fixture.DefaultIndicatorGroup(indicatorCount: 2).Generate();
+        var replacementGroup = _fixture.DefaultIndicatorGroup(indicatorCount: 1).Generate();
+        var (parent, child) = (originalGroup.Indicators[0], originalGroup.Indicators[1]);
+
+        var replacementPlan = await GetReplacementPlanWithPairedIndicators(
+            pairedIndicators: [new PairedIndicatorEntry(parent.Id, child.Id)],
+            indicatorMappings: new Dictionary<Guid, IndicatorMapping>
+            {
+                {
+                    parent.Id,
+                    CreateIndicatorMapping(
+                        parent,
+                        originalGroup,
+                        replacementGroup.Indicators[0],
+                        replacementGroup,
+                        MapStatus.AutoSet
+                    )
+                },
+                { child.Id, CreateIndicatorMapping(child, originalGroup) },
+            }
+        );
+
+        var pairedIndicator = Assert.Single(replacementPlan.PairedIndicators);
+
+        Assert.True(pairedIndicator.Parent.Valid);
+        Assert.False(pairedIndicator.Child.Valid);
+        Assert.Null(pairedIndicator.Child.Target);
+        Assert.False(pairedIndicator.Valid);
+
+        Assert.False(replacementPlan.Valid);
+        Assert.Single(replacementPlan.ToSummary().PairedIndicators);
+    }
+
+    [Fact]
+    public async Task GetReplacementPlan_NoPairedIndicators_ReplacementValid()
+    {
+        var replacementPlan = await GetReplacementPlanWithPairedIndicators(
+            pairedIndicators: null,
+            indicatorMappings: []
+        );
+
+        Assert.Empty(replacementPlan.PairedIndicators);
+        Assert.True(replacementPlan.Valid);
+    }
+
+    private async Task<DataReplacementPlanViewModel> GetReplacementPlanWithPairedIndicators(
+        List<PairedIndicatorEntry>? pairedIndicators,
+        Dictionary<Guid, IndicatorMapping> indicatorMappings
+    )
+    {
+        var releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease()).Generate();
+
+        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
+
+        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(statsReleaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalReleaseSubject.SubjectId,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementReleaseSubject.SubjectId,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = releaseVersion,
+            File = originalFile,
+            PairedIndicators = pairedIndicators,
+        };
+
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+        timePeriodService
+            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
+        releaseFileRepository
+            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
+            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
+            contentDbContext.DataSetMappings.Add(
+                _fixture
+                    .DefaultDataSetMapping()
+                    .WithOriginalDataFile(originalFile)
+                    .WithReplacementDataFile(replacementFile)
+                    .WithIndicatorMappings(indicatorMappings)
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using var serviceContentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        await using var serviceStatisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
+
+        var replacementPlanService = BuildReplacementPlanService(
+            serviceContentDbContext,
+            serviceStatisticsDbContext,
+            timePeriodService: timePeriodService.Object,
+            releaseFileRepository: releaseFileRepository.Object
+        );
+
+        var result = await replacementPlanService.GetReplacementPlan(
+            releaseVersionId: releaseVersion.Id,
+            originalFileId: originalFile.Id
+        );
+
+        VerifyAllMocks(timePeriodService, releaseFileRepository);
+
+        return result.AssertRight();
+    }
+
     private static Footnote CreateFootnote(
         ReleaseVersion releaseVersion,
         string content,

@@ -90,6 +90,7 @@ const testReplacementPlan: DataReplacementPlan = {
   originalSubjectId: 'subId',
   replacementSubjectId: 'repId',
   valid: false,
+  pairedIndicators: [],
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
@@ -288,6 +289,7 @@ const testReplacementPlanWithLocation: DataReplacementPlan = {
   originalSubjectId: 'subId',
   replacementSubjectId: 'repId',
   valid: false,
+  pairedIndicators: [],
   hasDataBlockAndReplacementHasAdditionalFilter: false,
   footnotes: [],
   mapping: {
@@ -557,6 +559,73 @@ describe('DataFileReplacementDifferences', () => {
 
     const locationsTable = screen.queryByTestId(`${locationsTableId}`);
     expect(locationsTable).not.toBeInTheDocument();
+  });
+
+  test('includes paired indicators in the indicator mappings, merged with groups of the same label', async () => {
+    render(
+      <DataFileReplacementDifferences
+        replacementFileId="replacementFileId"
+        reloadPlan={jest.fn}
+        fileId="fileId"
+        releaseVersionId="releaseVersionId"
+        plan={{
+          ...testReplacementPlan,
+          pairedIndicators: [
+            {
+              parent: {
+                id: 'enrolments',
+                name: 'Enrolments',
+                label: 'Enrolments',
+                valid: false,
+              },
+              child: {
+                id: 'sess_possible',
+                name: 'Number of possible sessions',
+                label: 'Number of possible sessions',
+                valid: true,
+              },
+              indicatorGroups: {
+                '1': {
+                  id: '1',
+                  label: 'Enrolment Group',
+                  indicators: [
+                    {
+                      id: 'enrolments',
+                      name: 'Enrolments',
+                      label: 'Enrolments',
+                      valid: false,
+                    },
+                    {
+                      id: 'sess_possible',
+                      name: 'Number of possible sessions',
+                      label: 'Number of possible sessions',
+                      valid: true,
+                    },
+                  ],
+                  valid: false,
+                },
+              },
+              valid: false,
+            },
+          ],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId(indicatorsTableId)).toBeInTheDocument();
+    });
+
+    const { calls } = (DataFileReplacementDifferencesTable as jest.Mock).mock;
+    const { replacementGroups } = calls[0][0];
+
+    expect(replacementGroups).toHaveLength(1);
+    expect(replacementGroups[0].label).toBe('Enrolment Group');
+    expect(
+      replacementGroups[0].indicators.map(
+        (indicator: { id: string }) => indicator.id,
+      ),
+    ).toEqual(['enrolments_again', 'enrolments', 'sess_possible']);
   });
 
   test('renders differences/mappings table with options and available actions', async () => {

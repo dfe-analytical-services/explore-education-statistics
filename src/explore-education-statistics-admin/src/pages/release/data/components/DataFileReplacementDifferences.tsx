@@ -10,6 +10,7 @@ import dataReplacementService, {
   ReplacementMapping,
   UpdateMappingPayload,
 } from '@admin/services/dataReplacementService';
+import uniqBy from 'lodash/uniqBy';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 import DataFileReplacementFilterDifferencesTable from '@admin/pages/release/data/components/DataFileReplacementFilterDifferencesTable';
@@ -79,16 +80,41 @@ export default function DataFileReplacementDifferences({
 
   // instead of passing the datablocks down to the tables, it seems better to handle this here
   const indicatorReplacementGroups = useMemo(() => {
-    // combine all indicator groups from data blocks and footnotes and then dedupe by label
-    return [
+    // combine all indicator groups from data blocks, footnotes and paired indicators,
+    // merging groups with the same label so none of their indicators are lost
+    const groups = [
       ...plan.dataBlocks.flatMap(block =>
         Object.values(block.indicatorGroups || {}),
       ),
       ...plan.footnotes.flatMap(footnote =>
         Object.values(footnote.indicatorGroups || {}),
       ),
+      ...plan.pairedIndicators.flatMap(pair =>
+        Object.values(pair.indicatorGroups || {}),
+      ),
     ];
-  }, [plan.dataBlocks, plan.footnotes]);
+
+    const groupsByLabel = new Map<string, IndicatorGroupReplacement>();
+
+    groups.forEach(group => {
+      const existing = groupsByLabel.get(group.label);
+
+      groupsByLabel.set(
+        group.label,
+        existing
+          ? {
+              ...existing,
+              indicators: uniqBy(
+                [...existing.indicators, ...group.indicators],
+                indicator => indicator.id,
+              ),
+            }
+          : group,
+      );
+    });
+
+    return Array.from(groupsByLabel.values());
+  }, [plan.dataBlocks, plan.footnotes, plan.pairedIndicators]);
 
   const locationReplacementGroups = useMemo(() => {
     return plan.dataBlocks.flatMap(block =>
@@ -273,7 +299,7 @@ export default function DataFileReplacementDifferences({
 
       <p>
         The following items were not found in the replacement data and were
-        previously used in existing datablocks or footnotes.
+        previously used in existing datablocks, footnotes or paired indicators.
         <br /> Please map these items to new items that appear in the
         replacement data or select "No mapping" for items that are no longer
         represented.

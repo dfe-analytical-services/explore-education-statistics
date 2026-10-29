@@ -93,6 +93,7 @@ describe('ReleaseDataFileReplacePage', () => {
 
   const testValidReplacementPlan: DataReplacementPlan = {
     valid: true,
+    pairedIndicators: [],
     hasDataBlockAndReplacementHasAdditionalFilter: false,
     dataBlocks: [],
     footnotes: [],

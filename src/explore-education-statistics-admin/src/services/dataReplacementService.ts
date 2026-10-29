@@ -88,6 +88,13 @@ export interface FootnoteReplacementPlan {
   indicatorGroups: Dictionary<IndicatorGroupReplacement>;
 }
 
+export interface PairedIndicatorReplacementPlan {
+  parent: IndicatorReplacement;
+  child: IndicatorReplacement;
+  indicatorGroups: Dictionary<IndicatorGroupReplacement>;
+  valid: boolean;
+}
+
 export interface DataBlockReplacementPlan {
   id: string;
   name: string;
@@ -222,6 +229,7 @@ export interface DataReplacementPlan {
   replacementSubjectId: string;
   dataBlocks: DataBlockReplacementPlan[];
   footnotes: FootnoteReplacementPlan[];
+  pairedIndicators: PairedIndicatorReplacementPlan[];
   apiDataSetVersionPlan?: ApiDataSetVersionPlan;
   mapping: PlanMappings;
   // a replacement is invalid if a data blocks exist and an additional filter has been added to the replacement, as

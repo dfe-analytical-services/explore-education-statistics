@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using IndicatorMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.IndicatorMapping;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -137,6 +138,8 @@ public class ReplacementPlanService(
                     mapping
                 );
 
+                var pairedIndicators = ValidatePairedIndicators(originalReleaseFile, mapping);
+
                 var apiDataSetVersionPlan = replacementApiDataSetVersion is null
                     ? null
                     : await GetApiVersionPlanViewModel(replacementApiDataSetVersion, cancellationToken);
@@ -169,6 +172,7 @@ public class ReplacementPlanService(
                 {
                     DataBlocks = dataBlocks,
                     Footnotes = footnotes,
+                    PairedIndicators = pairedIndicators,
                     ApiDataSetVersionPlan = apiDataSetVersionPlan,
                     OriginalSubjectId = originalSubjectId,
                     ReplacementSubjectId = replacementSubjectId,
@@ -257,6 +261,33 @@ public class ReplacementPlanService(
     {
         var footnotes = await footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId, subjectId: subjectId);
         return footnotes.Select(footnote => ValidateFootnote(footnote, mapping)).ToList();
+    }
+
+    private static List<PairedIndicatorReplacementPlanViewModel> ValidatePairedIndicators(
+        ReleaseFile originalReleaseFile,
+        DataSetMapping mapping
+    )
+    {
+        return (originalReleaseFile.PairedIndicators ?? [])
+            .Where(pair =>
+                mapping.IndicatorMappings.ContainsKey(pair.ParentIndicatorId)
+                && mapping.IndicatorMappings.ContainsKey(pair.ChildIndicatorId)
+            )
+            .Select(pair =>
+            {
+                var parentMapping = mapping.IndicatorMappings[pair.ParentIndicatorId];
+                var childMapping = mapping.IndicatorMappings[pair.ChildIndicatorId];
+
+                return new PairedIndicatorReplacementPlanViewModel(
+                    parent: CreateIndicatorReplacementViewModel(parentMapping),
+                    child: CreateIndicatorReplacementViewModel(childMapping),
+                    indicatorGroups: CreateIndicatorGroupReplacementViewModel(
+                        [pair.ParentIndicatorId, pair.ChildIndicatorId],
+                        mapping
+                    )
+                );
+            })
+            .ToList();
     }
 
     private static FootnoteReplacementPlanViewModel ValidateFootnote(Footnote footnote, DataSetMapping mapping)
@@ -514,13 +545,18 @@ public class ReplacementPlanService(
                     label: group.Key.GroupLabel,
                     indicators: group
                         .OrderBy(map => map.OriginalLabel, LabelComparer)
-                        .Select(map => new IndicatorReplacementViewModel(
-                            id: map.OriginalId,
-                            name: map.OriginalColumnName,
-                            label: map.OriginalLabel,
-                            target: map.ReplacementId
-                        ))
+                        .Select(CreateIndicatorReplacementViewModel)
                 )
             );
+    }
+
+    private static IndicatorReplacementViewModel CreateIndicatorReplacementViewModel(IndicatorMapping map)
+    {
+        return new IndicatorReplacementViewModel(
+            id: map.OriginalId,
+            name: map.OriginalColumnName,
+            label: map.OriginalLabel,
+            target: map.ReplacementId
+        );
     }
 }

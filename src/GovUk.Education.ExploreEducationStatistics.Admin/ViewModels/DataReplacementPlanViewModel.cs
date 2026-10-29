@@ -12,6 +12,7 @@ public class DataReplacementPlanViewModel
 {
     public IEnumerable<DataBlockReplacementPlanViewModel> DataBlocks { get; init; } = [];
     public IEnumerable<FootnoteReplacementPlanViewModel> Footnotes { get; init; } = [];
+    public IEnumerable<PairedIndicatorReplacementPlanViewModel> PairedIndicators { get; init; } = [];
     public ReplaceApiDataSetVersionPlanViewModel? ApiDataSetVersionPlan { get; init; }
     public ReplacementPlanMappingViewModel Mapping { get; init; } = new();
 
@@ -29,6 +30,7 @@ public class DataReplacementPlanViewModel
         !HasDataBlockAndReplacementHasAdditionalFilter
         && DataBlocks.All(info => info.Valid)
         && Footnotes.All(info => info.Valid)
+        && PairedIndicators.All(info => info.Valid)
         && (ApiDataSetVersionPlan?.Valid ?? true);
 
     // Trimmed down version of the data replacement plan that only shows full replacement details for invalid items.
@@ -40,6 +42,7 @@ public class DataReplacementPlanViewModel
         {
             DataBlocks = DataBlocks.Select(block => block.ToSummary()),
             Footnotes = Footnotes.Select(footnote => footnote.ToSummary()),
+            PairedIndicators = PairedIndicators,
             ApiDataSetVersionPlan = ApiDataSetVersionPlan,
             OriginalSubjectId = OriginalSubjectId,
             ReplacementSubjectId = ReplacementSubjectId,
@@ -111,6 +114,22 @@ public class FootnoteReplacementPlanViewModel(
     {
         return Valid ? new FootnoteReplacementPlanViewModel(Id, Content, indicatorGroups: IndicatorGroups) : this;
     }
+}
+
+public class PairedIndicatorReplacementPlanViewModel(
+    IndicatorReplacementViewModel parent,
+    IndicatorReplacementViewModel child,
+    Dictionary<Guid, IndicatorGroupReplacementViewModel> indicatorGroups
+)
+{
+    public IndicatorReplacementViewModel Parent { get; } = parent;
+    public IndicatorReplacementViewModel Child { get; } = child;
+
+    // The parent and child grouped by their original indicator group, so the frontend can include them in the
+    // indicator mappings alongside those used by data blocks and footnotes
+    public Dictionary<Guid, IndicatorGroupReplacementViewModel> IndicatorGroups { get; } = indicatorGroups;
+
+    public bool Valid => Parent.Valid && Child.Valid;
 }
 
 public class FootnoteFilterReplacementViewModel(Guid id, string label, Guid? target)

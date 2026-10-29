@@ -6,6 +6,7 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
+import _tableBuilderService from '@admin/services/tableBuilderService';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -16,9 +17,13 @@ jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/footnoteService');
 jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
+>;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
 >;
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
@@ -344,6 +349,7 @@ describe('DataReplacementPlan', () => {
     originalSubjectId: 'subject-1',
     replacementSubjectId: 'subject-2',
     valid: false,
+    pairedIndicators: [],
     hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
@@ -412,6 +418,7 @@ describe('DataReplacementPlan', () => {
       valid: true,
     },
     valid: true,
+    pairedIndicators: [],
     hasDataBlockAndReplacementHasAdditionalFilter: false,
     mapping: {
       indicators: { candidates: {}, mappings: {} },
@@ -1098,6 +1105,7 @@ describe('DataReplacementPlan', () => {
   test('renders correctly with notice when replacement data contains more filter columns than original data', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue({
       ...testValidReplacementPlan,
+      pairedIndicators: [],
       hasDataBlockAndReplacementHasAdditionalFilter: true,
     });
 
@@ -1245,6 +1253,10 @@ describe('DataReplacementPlan', () => {
 
     expect(screen.getByText('No data blocks to replace.')).toBeInTheDocument();
     expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
+    expect(screen.getByText('Paired indicators: OK')).toBeInTheDocument();
+    expect(
+      screen.getByText('No paired indicators to replace.'),
+    ).toBeInTheDocument();
 
     expect(screen.queryAllByRole('group')).toHaveLength(0);
 
@@ -1587,6 +1599,150 @@ describe('DataReplacementPlan', () => {
     expect(
       screen.queryByRole('button', { name: /Footnote 1/ }),
     ).not.toBeInTheDocument();
+  });
+
+  const testInvalidPairedIndicatorsPlan: DataReplacementPlan = {
+    ...testValidReplacementPlan,
+    dataBlocks: [],
+    footnotes: [],
+    valid: false,
+    pairedIndicators: [
+      {
+        parent: {
+          id: 'indicator-1',
+          name: 'progress_measure',
+          label: 'Progress measure',
+          target: 'replacement-indicator-1',
+          valid: true,
+        },
+        child: {
+          id: 'indicator-2',
+          name: 'progress_flag',
+          label: 'Progress flag',
+          valid: false,
+        },
+        indicatorGroups: {},
+        valid: false,
+      },
+    ],
+  };
+
+  test('renders invalid paired indicators and hides the confirm button', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testInvalidPairedIndicatorsPlan,
+    );
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByText('Paired indicators: ERROR'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /One or more paired indicators will be invalidated by this data replacement/,
+      ),
+    ).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /Progress measure \/ Progress flag/ }),
+    );
+
+    const pair = within(screen.getByRole('group'));
+
+    expect(pair.getByText('Parent indicator')).toBeInTheDocument();
+    expect(pair.getByText('Child indicator')).toBeInTheDocument();
+    expect(pair.getAllByText('not present')).toHaveLength(1);
+    expect(
+      pair.getByRole('button', { name: 'Remove pair' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Confirm data replacement' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('removing a paired indicator updates the pairs and reloads replacement plan', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue(
+      testInvalidPairedIndicatorsPlan,
+    );
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [
+        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+        { parentIndicatorId: 'indicator-3', childIndicatorId: 'indicator-4' },
+      ],
+    });
+    tableBuilderService.updatePairedIndicators.mockResolvedValue({
+      pairedIndicators: [
+        { parentIndicatorId: 'indicator-3', childIndicatorId: 'indicator-4' },
+      ],
+    });
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(
+      await screen.findByRole('button', {
+        name: /Progress measure \/ Progress flag/,
+      }),
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Remove pair' }));
+
+    expect(
+      await screen.findByText(/Are you sure you want to remove the pair/),
+    ).toBeInTheDocument();
+    expect(tableBuilderService.updatePairedIndicators).not.toHaveBeenCalled();
+
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testInvalidPairedIndicatorsPlan,
+      pairedIndicators: [],
+      valid: true,
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(tableBuilderService.updatePairedIndicators).toHaveBeenCalledWith(
+        'release-1',
+        testInvalidPairedIndicatorsPlan.originalSubjectId,
+        {
+          pairedIndicators: [
+            {
+              parentIndicatorId: 'indicator-3',
+              childIndicatorId: 'indicator-4',
+            },
+          ],
+        },
+      );
+    });
+
+    expect(tableBuilderService.getPairedIndicators).toHaveBeenCalledWith(
+      'release-1',
+      testInvalidPairedIndicatorsPlan.originalSubjectId,
+    );
+
+    expect(
+      await screen.findByText('No paired indicators to replace.'),
+    ).toBeInTheDocument();
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(2);
   });
 
   test('calls service to replace data when confirming replacement', async () => {

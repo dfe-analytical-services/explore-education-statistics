@@ -14,6 +14,7 @@ import dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import footnoteService from '@admin/services/footnoteService';
+import tableBuilderService from '@admin/services/tableBuilderService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
@@ -213,6 +214,8 @@ function Plan({
   const isMounted = useMountedRef();
   const { user } = useAuthContext();
 
+  const { pairedIndicators } = plan;
+
   const {
     hasDataSetVersionPlan,
     hasIncompleteFilterMapping,
@@ -220,6 +223,7 @@ function Plan({
     hasIncompleteLocationMapping,
     hasInvalidDataBlocks,
     hasInvalidFootnotes,
+    hasInvalidPairedIndicators,
     hasMajorFilterMapping,
     hasMajorIndicatorMapping,
     hasMajorLocationMapping,
@@ -233,6 +237,7 @@ function Plan({
         plan.dataBlocks.some(block => !block.valid) ?? false,
       hasInvalidFootnotes:
         plan.footnotes.some(footnote => !footnote.valid) ?? false,
+      hasInvalidPairedIndicators: pairedIndicators.some(pair => !pair.valid),
       hasDataSetVersionPlan: !!plan.apiDataSetVersionPlan,
       hasIncompleteLocationMapping:
         !plan.apiDataSetVersionPlan?.mappingStatus?.locationsComplete,
@@ -257,7 +262,7 @@ function Plan({
         !!plan.apiDataSetVersionPlan?.readyToPublish &&
         !!plan.apiDataSetVersionPlan?.mappingStatus?.isMajorVersionUpdate,
     };
-  }, [plan]);
+  }, [plan, pairedIndicators]);
 
   const dataSetId = plan.apiDataSetVersionPlan?.dataSetId;
 
@@ -673,6 +678,97 @@ function Plan({
             </Details>
           );
         })}
+      </div>
+
+      <div className="dfe-position--relative ">
+        <LoadingSpinner loading={isFetchingPlan} overlay />
+        <h3 className="govuk-heading-m govuk-!-padding-top-4">
+          <Tag colour={hasInvalidPairedIndicators ? 'red' : 'green'}>
+            {`Paired indicators: ${hasInvalidPairedIndicators ? 'ERROR' : 'OK'}`}
+          </Tag>
+        </h3>
+
+        {hasInvalidPairedIndicators ? (
+          <p>
+            One or more paired indicators will be invalidated by this data
+            replacement. Map the indicators that are not present in the
+            replacement data above, or remove the pair if you wish to continue
+            with this data replacement.
+          </p>
+        ) : (
+          <p>
+            {pairedIndicators.length > 0
+              ? 'All existing paired indicators can be replaced by this data replacement.'
+              : 'No paired indicators to replace.'}
+          </p>
+        )}
+
+        {pairedIndicators.map(pair => (
+          <Details
+            key={`${pair.parent.id}-${pair.child.id}`}
+            summary={`${pair.parent.label} / ${pair.child.label}`}
+            summaryAfter={
+              <Tag
+                className="govuk-!-margin-left-2"
+                colour={pair.valid ? 'green' : 'red'}
+              >
+                <VisuallyHidden>:</VisuallyHidden>
+                {pair.valid ? ' OK' : ' ERROR'}
+              </Tag>
+            }
+          >
+            {pair.valid ? (
+              <p>This pair has no conflicts and can be replaced.</p>
+            ) : (
+              <>
+                <SummaryList smallKey>
+                  <SummaryListItem term="Parent indicator">
+                    {pair.parent.label}
+                    {!pair.parent.valid && notPresentTag}
+                  </SummaryListItem>
+                  <SummaryListItem term="Child indicator">
+                    {pair.child.label}
+                    {!pair.child.valid && notPresentTag}
+                  </SummaryListItem>
+                </SummaryList>
+
+                <ModalConfirm
+                  title="Remove paired indicators"
+                  triggerButton={<Button variant="warning">Remove pair</Button>}
+                  onConfirm={async () => {
+                    const { pairedIndicators: currentPairs } =
+                      await tableBuilderService.getPairedIndicators(
+                        releaseVersionId,
+                        plan.originalSubjectId,
+                      );
+
+                    await tableBuilderService.updatePairedIndicators(
+                      releaseVersionId,
+                      plan.originalSubjectId,
+                      {
+                        pairedIndicators: currentPairs.filter(
+                          currentPair =>
+                            currentPair.parentIndicatorId !== pair.parent.id ||
+                            currentPair.childIndicatorId !== pair.child.id,
+                        ),
+                      },
+                    );
+                    refetchPlan();
+                  }}
+                >
+                  <p>
+                    Are you sure you want to remove the pair{' '}
+                    <strong>
+                      '{pair.parent.label}' / '{pair.child.label}'
+                    </strong>
+                    ? Selecting the parent indicator in the table tool will no
+                    longer select the child indicator.
+                  </p>
+                </ModalConfirm>
+              </>
+            )}
+          </Details>
+        ))}
       </div>
 
       <ButtonGroup className="govuk-!-margin-top-8">
