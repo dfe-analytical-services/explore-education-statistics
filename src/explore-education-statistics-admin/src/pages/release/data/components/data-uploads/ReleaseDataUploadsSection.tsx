@@ -16,6 +16,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
 import React, { useCallback, useMemo } from 'react';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import DataFilesTable from './DataFilesTable';
 import DataUploadsGuidance from './DataUploadsGuidance';
 import DataFileUploadForm from './DataFileUploadForm';
@@ -62,6 +63,49 @@ export default function ReleaseDataUploadsSection({
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+  const { data: apiDataSets = [] } = useQuery(
+    apiDataSetQueries.list(publicationId),
+  );
+
+  const dataFilesWithApiStatus = useMemo(
+    () =>
+      importStageDataFiles.map(dataFile => {
+        const { publicApiDataSetId, publicApiDataSetVersion } = dataFile;
+
+        if (!publicApiDataSetId || !publicApiDataSetVersion) {
+          return dataFile;
+        }
+
+        const dataSet = apiDataSets.find(
+          item => item.id === publicApiDataSetId,
+        );
+
+        const draft = dataSet?.draftVersion;
+        const live = dataSet?.latestLiveVersion;
+
+        let apiStatus: DataFile['apiStatus'];
+
+        if (draft && draft.version === publicApiDataSetVersion) {
+          if (draft.status === 'Draft') {
+            apiStatus = 'API READY';
+          } else if (draft.status !== 'Cancelled') {
+            apiStatus = 'API DRAFT';
+          }
+        } else if (
+          live &&
+          live.version === publicApiDataSetVersion &&
+          live.status !== 'Withdrawn'
+        ) {
+          apiStatus = 'API LIVE';
+        }
+
+        return {
+          ...dataFile,
+          apiStatus,
+        };
+      }),
+    [importStageDataFiles, apiDataSets],
+  );
 
   const newDataSetUploads = useMemo(
     () => preImportDataSetUploads.filter(upload => !upload.replacingFileId),
@@ -74,14 +118,26 @@ export default function ReleaseDataUploadsSection({
   );
 
   const dataFilesWithoutImportedReplacements = useMemo(
-    () => importStageDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
-    [importStageDataFiles],
+    () =>
+      dataFilesWithApiStatus.filter(dataFile => !dataFile.replacedByDataFile),
+    [dataFilesWithApiStatus],
   );
 
   const dataFilesWithImportedReplacements = useMemo(
-    () => importStageDataFiles.filter(dataFile => dataFile.replacedByDataFile),
-    [importStageDataFiles],
+    () =>
+      dataFilesWithApiStatus.filter(dataFile => dataFile.replacedByDataFile),
+    [dataFilesWithApiStatus],
   );
+
+  // const dataFilesWithoutImportedReplacements = useMemo(
+  //   () => importStageDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
+  //   [importStageDataFiles],
+  // );
+
+  // const dataFilesWithImportedReplacements = useMemo(
+  //   () => importStageDataFiles.filter(dataFile => dataFile.replacedByDataFile),
+  //   [importStageDataFiles],
+  // );
 
   const dataFilesWithValidReplacements =
     dataFilesWithImportedReplacements.filter(
@@ -111,6 +167,8 @@ export default function ReleaseDataUploadsSection({
       ),
     [releaseVersionId, queryClient],
   );
+
+  const { data: apiDatasets } = useQuery(apiDataSetQueries.list(publicationId));
 
   const refreshDataFileLists = useCallback(async () => {
     await Promise.all([refetchDataFiles(), refetchDataSetUploads()]);

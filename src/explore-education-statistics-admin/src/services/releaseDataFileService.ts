@@ -83,6 +83,7 @@ export interface DataFile {
   publicApiCompatible?: boolean;
   publicApiDataSetId?: string;
   publicApiDataSetVersion?: string;
+  apiStatus?: 'API DRAFT' | 'API READY' | 'API LIVE';
 }
 
 export interface ReplacementDataFile extends DataFile {

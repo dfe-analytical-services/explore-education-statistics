@@ -56,6 +56,9 @@ export default function DataFileTableRow({
           releaseVersionId={releaseVersionId}
           onStatusChange={onStatusChange}
         />
+        {dataFile.apiStatus && (
+          <div className="govuk-!!-margin-top-1">{dataFile.apiStatus}</div>
+        )}
       </td>
       <td data-testid={`${dataFile.title}-actions`}>
         <ButtonGroup className={styles.actions}>
