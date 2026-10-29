@@ -17,6 +17,8 @@ parameters:
     type: string
   - name: searchServiceReleaseIndexerName
     type: string
+  - name: searchServiceDatasetIndexerName
+    type: string
 
 steps:
   - task: AzureCLI@2
@@ -40,4 +42,5 @@ steps:
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               searchServiceFilterIndexName=${{ parameters.searchServiceFilterIndexName }} \
               searchServiceDatasetIndexName=${{ parameters.searchServiceDatasetIndexName }} \
-              searchServiceReleaseIndexerName=${{ parameters.searchServiceReleaseIndexerName }}
+              searchServiceReleaseIndexerName=${{ parameters.searchServiceReleaseIndexerName }} \
+              searchServiceDatasetIndexerName=${{ parameters.searchServiceDatasetIndexerName }}
