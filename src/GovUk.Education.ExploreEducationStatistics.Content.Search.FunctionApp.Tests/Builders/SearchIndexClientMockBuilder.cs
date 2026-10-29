@@ -9,7 +9,7 @@ public class SearchIndexClientMockBuilder
 
     public ISearchIndexerClient Build()
     {
-        _mock.Setup(m => m.RunIndexer(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _mock.Setup(m => m.RunIndexer(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         return _mock.Object;
     }
@@ -18,6 +18,7 @@ public class SearchIndexClientMockBuilder
 
     public class Asserter(Mock<ISearchIndexerClient> mock)
     {
-        public void IndexerRun() => mock.Verify(m => m.RunIndexer(It.IsAny<CancellationToken>()), Times.Once);
+        public void IndexerRun(string indexerName) =>
+            mock.Verify(m => m.RunIndexer(indexerName, It.IsAny<CancellationToken>()), Times.Once);
     }
 }
