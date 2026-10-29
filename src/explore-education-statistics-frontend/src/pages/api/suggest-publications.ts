@@ -2,6 +2,7 @@ import withMethods from '@frontend/middleware/api/withMethods';
 import logger from '@common/services/logger';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { initialiseAzurePublicationsSearchClient } from '@frontend/modules/api/search/initialiseAzureSearchClient';
+import buildPublicationSearchFilter from '@frontend/modules/api/search/buildPublicationSearchFilter';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import {
   AzurePublicationListRequest,
@@ -26,7 +27,8 @@ export default withMethods({
     const azureSearchClient = initialiseAzurePublicationsSearchClient();
 
     try {
-      const { filter, search = '' } = searchOptions;
+      const { releaseType, search = '', themeId } = searchOptions;
+      const filter = buildPublicationSearchFilter({ releaseType, themeId });
 
       const suggestResults =
         search?.length > 2
