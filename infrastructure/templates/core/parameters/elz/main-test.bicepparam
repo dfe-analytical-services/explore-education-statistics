@@ -5,9 +5,9 @@ extends '../main-test.bicepparam'
 
 param elz = true
 
-// Zone-redundant storage, with a readable geo copy.
-param coreStorageAccountSku = 'Standard_RAGZRS'
-param publicStorageAccountSku = 'Standard_RAGZRS'
+// Zone-redundant storage.
+param coreStorageAccountSku = 'Standard_ZRS'
+param publicStorageAccountSku = 'Standard_ZRS'
 
 // Copy file share backups into the geo-redundant Recovery Services Vault.
 param vaultedFileShareBackups = true
