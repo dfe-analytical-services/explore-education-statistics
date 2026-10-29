@@ -11,74 +11,87 @@ internal class AzureBlobStorageHealthCheckStrategy(
     IOptions<AppOptions> appOptions
 ) : IHealthCheckStrategy
 {
-    public string Description => "Release Documents Azure Blob Storage container check";
+    public string Description => "Azure Blob Storage containers check";
 
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Running Release Documents Azure Blob Storage container health check");
+        logger.LogInformation("Running Azure Blob Storage containers health check");
 
         if (!appOptions.Value.IsValid(out var errorMessage))
         {
             logger.LogWarning(
-                "Release Documents Azure Blob Storage container health check failed: Provider options are not valid. {@Options}",
+                "Azure Blob Storage containers health check failed: Provider options are not valid. {@Options}",
                 appOptions.Value
             );
             return new HealthCheckResult(this, false, errorMessage);
         }
 
-        var containerName = appOptions.Value.ReleaseDocumentsContainerName;
-        if (string.IsNullOrWhiteSpace(containerName))
+        (string Description, string ContainerName)[] containers =
+        [
+            ("Release Documents", appOptions.Value.ReleaseDocumentsContainerName),
+            ("Dataset Documents", appOptions.Value.DatasetDocumentsContainerName),
+        ];
+
+        var azureBlobStorageClient = azureBlobStorageClientFactory();
+
+        var results = new List<(bool IsHealthy, string Message)>();
+        foreach (var (description, containerName) in containers)
         {
-            logger.LogWarning(
-                "Release Documents Azure Blob Storage container health check failed: Release Documents container name is not specified in configuration."
-            );
-            return new HealthCheckResult(
-                this,
-                false,
-                $"Release Documents Azure Blob Storage container name is not specified in {AppOptions.Section}.{nameof(AppOptions.ReleaseDocumentsContainerName)}"
-            );
+            results.Add(await CheckContainer(azureBlobStorageClient, description, containerName, cancellationToken));
         }
 
+        return new HealthCheckResult(
+            this,
+            results.All(result => result.IsHealthy),
+            string.Join(" ", results.Select(result => result.Message))
+        );
+    }
+
+    private async Task<(bool IsHealthy, string Message)> CheckContainer(
+        IAzureBlobStorageClient azureBlobStorageClient,
+        string description,
+        string containerName,
+        CancellationToken cancellationToken
+    )
+    {
         try
         {
             logger.LogInformation(
-                "Attempting to connect to Release Documents Azure Blob Storage container '{ContainerName}'...",
+                "Attempting to connect to {Description} Azure Blob Storage container '{ContainerName}'...",
+                description,
                 containerName
             );
-            var azureBlobStorageClient = azureBlobStorageClientFactory();
             var containerExists = await azureBlobStorageClient.ContainerExists(containerName, cancellationToken);
             if (!containerExists)
             {
                 logger.LogWarning(
-                    "Release Documents Azure Blob Storage container '{ContainerName}' is not found.",
+                    "{Description} Azure Blob Storage container '{ContainerName}' is not found.",
+                    description,
                     containerName
                 );
-                return new HealthCheckResult(
-                    this,
-                    false,
-                    $"Release Documents Azure Blob Storage container '{containerName}' is not found"
-                );
+                return (false, $"{description} Azure Blob Storage container '{containerName}' is not found.");
             }
         }
         catch (Exception e)
         {
             logger.LogError(
                 e,
-                "Error occurred whilst trying to check for Release Documents Azure Blob Storage container '{ContainerName}': {Message}",
+                "Error occurred whilst trying to check for {Description} Azure Blob Storage container '{ContainerName}': {Message}",
+                description,
                 containerName,
                 e.Message
             );
-            return new HealthCheckResult(
-                this,
+            return (
                 false,
-                $"Error occurred whilst trying to check for Release Documents Azure Blob Storage container '{containerName}': {e.Message}"
+                $"Error occurred whilst trying to check for {description} Azure Blob Storage container '{containerName}': {e.Message}"
             );
         }
 
         logger.LogInformation(
-            "Health check was successful: Release Documents Azure Blob Storage container '{ContainerName}' is found.",
+            "Health check was successful: {Description} Azure Blob Storage container '{ContainerName}' is found.",
+            description,
             containerName
         );
-        return new HealthCheckResult(this, true, "Connection to Release Documents Azure Blob Storage container:OK");
+        return (true, $"Connection to {description} Azure Blob Storage container '{containerName}':OK.");
     }
 }
