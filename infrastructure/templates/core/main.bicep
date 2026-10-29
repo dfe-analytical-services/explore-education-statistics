@@ -53,6 +53,9 @@ param publicStorageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('Whether the file share backup policy copies backups into the Recovery Services Vault, rather than keeping them as snapshots only. A policy can\'t move from the snapshot tier to the vault tier in place, so only the param files in "parameters/elz" turn this on.')
 param vaultedFileShareBackups bool = false
 
+@description('Whether Backup Vault backups (PostgreSQL and blobs) can be restored in the paired region.')
+param backupVaultCrossRegionRestore bool = false
+
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
 
@@ -205,6 +208,7 @@ module backupsModule 'application/backups/backups.bicep' = {
     deployRecoveryServicesVault: deployRecoveryServicesVault
     recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
     vaultedFileShareBackups: vaultedFileShareBackups
+    backupVaultCrossRegionRestore: backupVaultCrossRegionRestore
     tagValues: tagValues
   }
 }
