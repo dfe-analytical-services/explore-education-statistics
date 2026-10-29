@@ -70,6 +70,7 @@ jobs:
                 searchServiceFilterIndexName: ${{ variables.searchServiceFilterIndexName }}
                 searchServiceDatasetIndexName: ${{ variables.searchServiceDatasetIndexName }}
                 searchServiceReleaseIndexerName: ${{ variables.searchServiceReleaseIndexerName }}
+                searchServiceDatasetIndexerName: ${{ variables.searchServiceDatasetIndexerName }}
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -80,6 +81,7 @@ jobs:
                 searchServiceFilterIndexName: ${{ variables.searchServiceFilterIndexName }}
                 searchServiceDatasetIndexName: ${{ variables.searchServiceDatasetIndexName }}
                 searchServiceReleaseIndexerName: ${{ variables.searchServiceReleaseIndexerName }}
+                searchServiceDatasetIndexerName: ${{ variables.searchServiceDatasetIndexerName }}
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:

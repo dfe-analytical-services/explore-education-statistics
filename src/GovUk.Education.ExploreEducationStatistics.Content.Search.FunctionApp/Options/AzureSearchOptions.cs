@@ -16,6 +16,8 @@ public class AzureSearchOptions
 
     public string ReleaseIndexerName { get; init; } = string.Empty;
 
+    public string DatasetIndexerName { get; init; } = string.Empty;
+
     public bool IsValid([NotNullWhen(false)] out string? errorMessage)
     {
         if (string.IsNullOrWhiteSpace(SearchServiceEndpoint))
@@ -29,6 +31,13 @@ public class AzureSearchOptions
         {
             errorMessage =
                 $"Azure Search Release Indexer Name is not configured. Ensure the {Section}:{nameof(ReleaseIndexerName)} is set.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(DatasetIndexerName))
+        {
+            errorMessage =
+                $"Azure Search Dataset Indexer Name is not configured. Ensure the {Section}:{nameof(DatasetIndexerName)} is set.";
             return false;
         }
 

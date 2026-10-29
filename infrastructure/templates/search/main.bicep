@@ -41,6 +41,9 @@ param searchServiceDatasetIndexName string = ''
 @description('Name of the indexer associated with the \'Release\' index in Azure AI Search.')
 param searchServiceReleaseIndexerName string = ''
 
+@description('Name of the indexer associated with the \'Dataset\' index in Azure AI Search.')
+param searchServiceDatasetIndexerName string = ''
+
 @description('Indicates whether API keys are permitted for authentication to Azure AI Search in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
 param searchServiceLocalAuthEnabled bool = false
 
@@ -105,6 +108,8 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   params: {
     resourceNames: resourceNames
     contentApiUrl: contentApiUrl
+    datasetDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.datasetDocuments
+    datasetIndexerName: searchServiceDatasetIndexerName
     functionAppFirewallRules: union(
       [
         {
