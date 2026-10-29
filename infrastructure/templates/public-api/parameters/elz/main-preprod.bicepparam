@@ -4,3 +4,6 @@ using '../../main.bicep'
 extends '../main-preprod.bicepparam'
 
 param elz = true
+
+// Zone-redundant storage for the Data Processor. The data file share keeps its Premium_ZRS default.
+param storageAccountSku = 'Standard_ZRS'

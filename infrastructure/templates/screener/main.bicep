@@ -1,4 +1,5 @@
 import { IpRange } from '../common/types.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
@@ -13,6 +14,9 @@ param environmentName string
 
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
+
+@description('SKU of the Function App storage accounts, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -95,6 +99,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
 module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
   name: 'screenerLogsStorageModuleDeploy'
   params: {
+    storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     tagValues: tagValues
@@ -105,6 +110,7 @@ module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionModuleDeploy'
   params: {
+    storageAccountSku: storageAccountSku
     location: location
     functionAppImageName: 'ees-screener-api'
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
