@@ -86,7 +86,7 @@ param sqlAzureAdministratorLogin string = ''
 param sqlAzureAdministratorSid string = ''
 
 @description('Whether or not public access is enabled for the Core and Public SQL Servers.')
-param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
+param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Disabled'
 
 @description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[] = []
