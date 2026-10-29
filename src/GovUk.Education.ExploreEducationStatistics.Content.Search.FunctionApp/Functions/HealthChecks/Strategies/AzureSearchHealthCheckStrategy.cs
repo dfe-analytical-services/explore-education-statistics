@@ -32,7 +32,7 @@ internal class AzureSearchHealthCheckStrategy(
                 azureSearchOptions.Value
             );
             var client = searchIndexerClientFactory();
-            if (!await client.IndexerExists(cancellationToken))
+            if (!await client.IndexerExists(azureSearchOptions.Value.ReleaseIndexerName, cancellationToken))
             {
                 logger.LogWarning("Azure Search Indexer is not found.");
                 return new HealthCheckResult(this, false, $"Azure Search Indexer is not found");

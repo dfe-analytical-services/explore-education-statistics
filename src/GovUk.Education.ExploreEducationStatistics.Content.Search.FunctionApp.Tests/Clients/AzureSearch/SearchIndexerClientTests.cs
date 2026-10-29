@@ -10,12 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public abstract class SearchIndexerClientTests
 {
     private AzureSearchOptions AzureSearchOptions =>
-        new()
-        {
-            SearchServiceEndpoint = _searchServiceEndpoint,
-            SearchServiceAccessKey = _searchServiceAccessKey,
-            ReleaseIndexerName = _indexerName,
-        };
+        new() { SearchServiceEndpoint = _searchServiceEndpoint, SearchServiceAccessKey = _searchServiceAccessKey };
 
     private string _searchServiceEndpoint = "https://example.search.windows.net/";
     private string? _searchServiceAccessKey = "my-access-key";
@@ -25,7 +20,6 @@ public abstract class SearchIndexerClientTests
     {
         return new SearchIndexerClient(
             new AzureSearchIndexerClientFactory(Microsoft.Extensions.Options.Options.Create(AzureSearchOptions)),
-            Microsoft.Extensions.Options.Options.Create(AzureSearchOptions),
             logger ?? new NullLogger<SearchIndexerClient>()
         );
     }
@@ -61,7 +55,7 @@ public abstract class SearchIndexerClientTests
             var sut = GetSut();
 
             // ACT
-            Assert.True(await sut.IndexerExists());
+            Assert.True(await sut.IndexerExists(_indexerName));
         }
 
         [Fact(Skip = "Integration test is disabled")]
@@ -72,21 +66,21 @@ public abstract class SearchIndexerClientTests
             var sut = GetSut();
 
             // ACT
-            Assert.False(await sut.IndexerExists());
+            Assert.False(await sut.IndexerExists(_indexerName));
         }
 
         [Fact(Skip = "Integration test is disabled")]
         public async Task Run_indexer()
         {
             var sut = GetSut();
-            await sut.RunIndexer();
+            await sut.RunIndexer(_indexerName);
         }
 
         [Fact(Skip = "Integration test is disabled")]
         public async Task Reset_indexer()
         {
             var sut = GetSut();
-            await sut.ResetIndexer();
+            await sut.ResetIndexer(_indexerName);
         }
 
         [Fact(Skip = "Integration test is disabled")]
@@ -96,7 +90,7 @@ public abstract class SearchIndexerClientTests
             var tasks = new List<Task>();
             for (var i = 0; i < 10; i++)
             {
-                tasks.Add(sut.RunIndexer());
+                tasks.Add(sut.RunIndexer(_indexerName));
                 await Task.Delay(TimeSpan.FromMilliseconds(50));
             }
             await Task.WhenAll(tasks);
