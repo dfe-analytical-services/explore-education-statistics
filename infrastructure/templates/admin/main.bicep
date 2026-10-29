@@ -17,6 +17,9 @@ param databaseUserPassword string
 @description('App Service Plan SKU.')
 param appServiceSku AppServicePlanSku
 
+@description('The operating system to host the App Service on.')
+param operatingSystem 'Windows' | 'Linux'
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -60,8 +63,8 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: appServiceSku
-    kind: 'app'
-    operatingSystem: 'Windows'
+    kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
+    operatingSystem: operatingSystem
     alerts: deployAlerts ? {
       alertsGroupName: resourceNames.alertsGroup
       cpuPercentage: true
@@ -90,8 +93,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     appServiceName: resourceNames.admin.appService
-    kind: 'app'
-    operatingSystem: 'Windows'
+    kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
+    operatingSystem: operatingSystem
     minTlsVersion: minTlsVersion
     appServicePlanId: appServicePlanModule.outputs.planId
     keyVaultRoles: {
