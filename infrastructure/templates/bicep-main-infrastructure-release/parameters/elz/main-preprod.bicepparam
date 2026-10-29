@@ -4,3 +4,6 @@ using '../../main.bicep'
 extends '../main-preprod.bicepparam'
 
 param elz = true
+
+// Host every App Service and Function App on Linux.
+param appOperatingSystem = 'Linux'

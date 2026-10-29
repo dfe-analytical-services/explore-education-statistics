@@ -13,8 +13,9 @@ param sku AppServicePlanSku
 @description('The operating system to use to host App Services.')
 param operatingSystem 'Windows' | 'Linux'
 
-@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
-param kind 'app' | 'app,linux,container'
+@description('''The kind of plan to create. Use "app" with the "Windows" operating system for code on Windows, "app,linux"
+with "Linux" for code on Linux, and "app,linux,container" with "Linux" for Docker.''')
+param kind 'app' | 'app,linux' | 'app,linux,container'
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {

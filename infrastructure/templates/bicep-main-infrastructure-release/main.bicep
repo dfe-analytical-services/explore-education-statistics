@@ -43,6 +43,9 @@ param environmentConfigParam EnvironmentConfig = {}
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
 
+@description('The operating system to host every App Service and Function App on. An App Service plan can\'t change operating system in place, so only the param files in "parameters/elz" set Linux.')
+param appOperatingSystem 'Windows' | 'Linux' = 'Windows'
+
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 
@@ -221,6 +224,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
     http401Alert: http401Alerts.?importer
@@ -238,6 +242,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   name: 'notifierModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: notifierConfig.appServiceSku!
     allowedOrigins: publicSiteAllowedOrigins
     minTlsVersion: minTlsVersion
@@ -257,6 +262,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   name: 'publisherModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: publisherConfig.appServiceSku!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -280,6 +286,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: adminConfig.appServiceSku!
     signalRAllowedOrigins: adminSiteAllowedOrigins
     signalRSku: adminConfig.signalRSku!
@@ -306,6 +313,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
   name: 'contentApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: contentApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
@@ -328,6 +336,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: dataApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
