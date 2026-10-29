@@ -104,8 +104,8 @@ stages:
               - DeployAdmin
 
       # Run the public UI tests against the environment when all of the applications that support
-      # the front end are up and running. Skipped for Test as it is nit yet seesded with test data.
-      - ${{ if ne(parameters.environment, 'Test') }}:
+      # the front end are up and running. Skipped for Dev and Test as they are not yet seeded with test data.
+      - ${{ if notIn(parameters.environment, 'Dev', 'Test') }}:
           - template: ../jobs/run-robot-tests.yml
             parameters:
               serviceConnection: ${{ parameters.serviceConnection }}
