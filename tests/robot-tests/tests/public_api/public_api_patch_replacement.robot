@@ -100,10 +100,11 @@ Verify the pending data replacement summary results in errors
     user waits until h3 is visible    API data set has to be finalized: ERROR
     user waits until parent contains element    id:main-content    text:Cancel data replacement
 
-Validate error summary for major versions is displayed on Api Data Set Details page
+Validate major version override is required on Api Data Set Details page
     user clicks link    go to the API data sets tab
-    user waits until h2 is visible
-    ...    This API data set can not be published because it has major changes that are not allowed.
+    user waits until page contains element    testid:major-version-override-warning
+    user checks checkbox input is not checked    id:majorChangesAcknowledged
+    user checks element is disabled    xpath://button[text()="Finalise this data set version"]
 
 Cancel data replacement which results in major API version
     user clicks link    Data and files

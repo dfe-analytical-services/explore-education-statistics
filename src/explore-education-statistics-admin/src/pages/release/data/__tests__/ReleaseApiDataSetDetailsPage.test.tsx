@@ -1862,6 +1862,37 @@ describe('ReleaseApiDataSetDetailsPage', () => {
       });
     });
 
+    test('BAU user sees incomplete mapping error summary and cannot override until mapping is complete', async () => {
+      apiDataSetService.getDataSet.mockResolvedValue({
+        ...testDataSet,
+        draftVersion: {
+          ...testPatchDraftVersion,
+          status: 'Mapping',
+          mappingStatus: {
+            ...majorMappingStatus,
+            indicatorsComplete: false,
+          },
+        },
+      });
+
+      renderPage();
+
+      expect(
+        await screen.findByRole('heading', {
+          level: 2,
+          name: 'This API data set can not be published until mapping has been completed.',
+        }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId('major-version-override-warning'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText(
+          'I understand this patch version contains major (breaking) changes',
+        ),
+      ).not.toBeInTheDocument();
+    });
+
     test('non-BAU user cannot override major changes', async () => {
       apiDataSetService.getDataSet.mockResolvedValue({
         ...testDataSet,
