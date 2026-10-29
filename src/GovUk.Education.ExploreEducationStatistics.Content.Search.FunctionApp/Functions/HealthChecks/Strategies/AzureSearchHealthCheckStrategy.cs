@@ -11,7 +11,7 @@ internal class AzureSearchHealthCheckStrategy(
     IOptions<AzureSearchOptions> azureSearchOptions
 ) : IHealthCheckStrategy
 {
-    public string Description => "Azure Search Indexer check";
+    public string Description => "Azure Search Indexers check";
 
     public async Task<HealthCheckResult> Run(CancellationToken cancellationToken)
     {
@@ -25,30 +25,71 @@ internal class AzureSearchHealthCheckStrategy(
             return new HealthCheckResult(this, false, errorMessage);
         }
 
+        (string Description, string IndexerName)[] indexers =
+        [
+            ("Release", azureSearchOptions.Value.ReleaseIndexerName),
+            ("Dataset", azureSearchOptions.Value.DatasetIndexerName),
+        ];
+
+        var client = searchIndexerClientFactory();
+
+        var results = new List<(bool IsHealthy, string Message)>();
+        foreach (var (description, indexerName) in indexers)
+        {
+            results.Add(await CheckIndexer(client, description, indexerName, cancellationToken));
+        }
+
+        return new HealthCheckResult(
+            this,
+            results.All(result => result.IsHealthy),
+            string.Join(" ", results.Select(result => result.Message))
+        );
+    }
+
+    private async Task<(bool IsHealthy, string Message)> CheckIndexer(
+        ISearchIndexerClient client,
+        string description,
+        string indexerName,
+        CancellationToken cancellationToken
+    )
+    {
         try
         {
             logger.LogInformation(
-                "Attempting to connect to Azure Search Indexer. {@Options}...",
-                azureSearchOptions.Value
+                "Attempting to connect to {Description} Azure Search Indexer '{IndexerName}'...",
+                description,
+                indexerName
             );
-            var client = searchIndexerClientFactory();
-            if (!await client.IndexerExists(azureSearchOptions.Value.ReleaseIndexerName, cancellationToken))
+            if (!await client.IndexerExists(indexerName, cancellationToken))
             {
-                logger.LogWarning("Azure Search Indexer is not found.");
-                return new HealthCheckResult(this, false, $"Azure Search Indexer is not found");
+                logger.LogWarning(
+                    "{Description} Azure Search Indexer '{IndexerName}' is not found.",
+                    description,
+                    indexerName
+                );
+                return (false, $"{description} Azure Search Indexer '{indexerName}' is not found.");
             }
         }
         catch (Exception e)
         {
-            logger.LogWarning(e, "Could not connect to Azure Search Indexer: {Message}", e.Message);
-            return new HealthCheckResult(
-                this,
+            logger.LogWarning(
+                e,
+                "Could not connect to {Description} Azure Search Indexer '{IndexerName}': {Message}",
+                description,
+                indexerName,
+                e.Message
+            );
+            return (
                 false,
-                $"Error occurred whilst trying to run health check for Azure Search Indexer: {e.Message}"
+                $"Error occurred whilst trying to run health check for {description} Azure Search Indexer '{indexerName}': {e.Message}"
             );
         }
 
-        logger.LogInformation("Health check was successful: Azure Search Indexer is found.");
-        return new HealthCheckResult(this, true, "Connection to Azure Search Indexer:OK");
+        logger.LogInformation(
+            "Health check was successful: {Description} Azure Search Indexer '{IndexerName}' is found.",
+            description,
+            indexerName
+        );
+        return (true, $"Connection to {description} Azure Search Indexer '{indexerName}':OK.");
     }
 }
