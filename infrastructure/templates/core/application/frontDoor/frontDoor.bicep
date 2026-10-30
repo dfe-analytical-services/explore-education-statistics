@@ -35,7 +35,7 @@ param keyVaultName string
 param publisherFunctionName string
 
 @description('Whether to grant the Publisher Function App\'s system-assigned identity its roles here.')
-param deployPublisherRoleAssignments bool
+param deploySystemAssignedIdentityRoleAssignments bool
 
 @description('The Id of the Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
@@ -105,7 +105,7 @@ module contentApiFrontDoorModule 'content-api-front-door.bicep' = {
     contentApiHostName: contentApiHostName
     contentApiOriginHostName: '${contentApiAppServiceName}.azurewebsites.net'
     publisherFunctionName: publisherFunctionName
-    deployPublisherRoleAssignments: deployPublisherRoleAssignments
+    deploySystemAssignedIdentityRoleAssignments: deploySystemAssignedIdentityRoleAssignments
   }
   dependsOn: [
     frontDoorModule
