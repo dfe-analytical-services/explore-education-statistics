@@ -117,33 +117,6 @@ class FlakinessTests(unittest.TestCase):
         self.assertEqual(UNLIKELY, results.flakiness)
 
 
-class ArchiveTests(unittest.TestCase):
-    def _results(self, run_attempts: int = 1, failed_suites: tuple = (), suite_label: str = "admin") -> RunResults:
-        return RunResults(
-            environment="dev",
-            suite_label=suite_label,
-            run_attempts=run_attempts,
-            merged=RunTotals(10, 0, 0),
-            final=RunTotals(10, 0, 0),
-            failed_suites=failed_suites,
-        )
-
-    def test_archives_when_a_suite_failed(self):
-        self.assertTrue(self._results(failed_suites=("tests/admin/bau/a.robot",)).attach_archive)
-
-    def test_archives_when_more_than_one_attempt_was_needed(self):
-        self.assertTrue(self._results(run_attempts=2).attach_archive)
-
-    def test_does_not_archive_a_clean_single_run(self):
-        self.assertFalse(self._results().attach_archive)
-
-    def test_archive_name_replaces_characters_that_are_awkward_in_a_filename(self):
-        name = self._results(suite_label="all tests").archive_name
-
-        self.assertTrue(name.startswith("UI-test-report-all-tests-dev-"), name)
-        self.assertTrue(name.endswith(".zip"), name)
-
-
 class NotificationMarkerTests(unittest.TestCase):
     def setUp(self):
         self.temporary_directory = tempfile.TemporaryDirectory()

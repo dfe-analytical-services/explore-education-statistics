@@ -30,7 +30,7 @@ def run_tests_pipeline():
     subprocess.check_call("pip install pipenv", shell=True)
     subprocess.check_call("pipenv install", shell=True)
 
-    run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --noinvite-pass {args.noinvite_pass} --pendinginvite-pass {args.pendinginvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
+    run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --noinvite-pass {args.noinvite_pass} --pendinginvite-pass {args.pendinginvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes}"
 
     if args.rerun_attempts:
         run_tests_command += f" --rerun-attempts {str(args.rerun_attempts)}"
