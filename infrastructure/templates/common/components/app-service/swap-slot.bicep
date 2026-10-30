@@ -41,6 +41,9 @@ param vnetLink {
 @description('File Shares to mount on this App Service slot.')
 param azureFileShares AzureFileShareMount[]?
 
+@description('The resource id of an existing user-assigned managed identity for the slot to use instead of a system-assigned one, shared with the owning App Service.')
+param userAssignedIdentityId string = ''
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -57,10 +60,17 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
   kind: kind
   location: resourceGroup().location
   tags: tagValues
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
+  identity: !empty(userAssignedIdentityId)
+    ? {
+        type: 'UserAssigned'
+        userAssignedIdentities: {
+          '${userAssignedIdentityId}': {}
+        }
+      }
+    : {
+        type: 'SystemAssigned'
+      }
+  properties: union({
     serverFarmId: appServicePlanId
     httpsOnly: true
     reserved: operatingSystem == 'Linux'
@@ -79,7 +89,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
       healthCheckPath: healthCheckPath
       connectionStrings: connectionStrings
     })
-  }
+  }, !empty(userAssignedIdentityId) ? { keyVaultReferenceIdentity: userAssignedIdentityId } : {})
 }
 
 module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site-slot.bicep' = {
@@ -91,4 +101,5 @@ module azureStorageAccountsConfigModule '../storage/file-share-mounts-for-site-s
   }
 }
 
-output slotIdentityPrincipalId string = stagingSlot.identity.principalId
+// Only set for a system-assigned identity.
+output slotIdentityPrincipalId string = empty(userAssignedIdentityId) ? stagingSlot.identity.principalId : ''

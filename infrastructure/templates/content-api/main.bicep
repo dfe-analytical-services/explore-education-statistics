@@ -30,6 +30,9 @@ param autoscaleAppServices bool
 @description('Whether to spread the App Service plan\'s instances across availability zones.')
 param zoneRedundant bool
 
+@description('Whether the App Service and its deploy slot use their user-assigned managed identity rather than system-assigned ones.')
+param useUserAssignedIdentity bool = false
+
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
 
@@ -125,6 +128,7 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'contentApiAppServiceModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.contentApi.identity : ''
     appServiceName: resourceNames.contentApi.appService
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem

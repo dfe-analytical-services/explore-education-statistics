@@ -10,3 +10,6 @@ param storageAccountSku = 'Standard_ZRS'
 
 // Spread the Container App Environment across availability zones.
 param containerAppEnvironmentZoneRedundant = true
+
+// Admin calls this pipeline's apps with its user-assigned identity.
+param adminUsesUserAssignedIdentity = true

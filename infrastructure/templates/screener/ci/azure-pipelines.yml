@@ -1,3 +1,10 @@
+# In a new environment, the infrastructure pipelines must first run in this order, as each uses resources that the
+# earlier ones create, such as the main apps' user-assigned identities:
+#   1. Core (infrastructure/templates/core/ci/azure-pipelines.yml).
+#   2. Main (infrastructure/templates/bicep-main-infrastructure-release/ci/azure-pipelines.yml).
+#   3. The area-specific pipelines, in any order: Public API, Screener, Search, Analytics and Data Factory pipelines.
+# This is the Screener pipeline, so it runs after Core and Main.
+
 trigger:
   branches:
     include:

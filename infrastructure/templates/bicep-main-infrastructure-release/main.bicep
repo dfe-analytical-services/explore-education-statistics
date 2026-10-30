@@ -330,6 +330,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
 module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -349,6 +350,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
+    appIdentitiesModule
     // Admin is dependent on Importer's storage account being available
     // in order to reference its connection string secret in Key Vault.
     importerModuleDeploy
@@ -358,6 +360,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
 module contentApiModuleDeploy '../content-api/main.bicep' = {
   name: 'contentApiModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -377,11 +380,15 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     existingStagingSlotAppSettings: contentApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -400,11 +407,15 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     existingStagingSlotAppSettings: dataApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module publicSiteModuleDeploy '../public-site/main.bicep' = {
   name: 'publicSiteModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     appServiceSku: publicSiteConfig.appServiceSku!
@@ -419,4 +430,7 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     existingProdAppSettings: publicSiteProdAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }

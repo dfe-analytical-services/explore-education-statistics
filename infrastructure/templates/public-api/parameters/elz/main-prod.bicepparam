@@ -20,3 +20,6 @@ param publicApiContainerAppConfig = {
   scaleAtConcurrentHttpRequests: 10
   workloadProfileName: 'Consumption'
 }
+
+// Admin calls this pipeline's apps with its user-assigned identity.
+param adminUsesUserAssignedIdentity = true
