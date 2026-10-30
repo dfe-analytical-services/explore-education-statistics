@@ -12,6 +12,9 @@ param storageAccountSku StorageAccountSku
 @description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
 param useUserAssignedIdentity bool = false
 
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -100,6 +103,11 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
   name: 'default'
 }
 
+// TODO EES-7502 - only look up Admin's user-assigned identity once every environment has moved to the ELZ.
+resource adminUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (adminUsesUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
 resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.screener.logsStorageAccount
 }
@@ -141,7 +149,9 @@ var startScreeningUserAssignedIdentityAppSettings = [
   }
 ]
 
-var adminAppClientId = adminAppServiceIdentity.properties.clientId
+var adminAppClientId = adminUsesUserAssignedIdentity
+  ? adminUserAssignedIdentity!.properties.clientId
+  : adminAppServiceIdentity.properties.clientId
 var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoint, '/')
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
   : coreStorageBlobEndpoint

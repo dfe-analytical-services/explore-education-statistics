@@ -7,3 +7,6 @@ param elz = true
 
 // Zone-redundant storage for the Data Processor. The data file share keeps its Premium_ZRS default.
 param storageAccountSku = 'Standard_ZRS'
+
+// Admin calls this pipeline's apps with its user-assigned identity.
+param adminUsesUserAssignedIdentity = true
