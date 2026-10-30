@@ -3,7 +3,6 @@ import adminTableBuilderService, {
 } from '@admin/services/tableBuilderService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldset } from '@common/components/form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormProvider from '@common/components/form/FormProvider';
@@ -18,7 +17,7 @@ import { Dictionary } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import get from 'lodash/get';
-import React, { useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 
@@ -226,37 +225,45 @@ function PairedIndicatorsFields({
       )}
 
       {fields.map((field, index) => (
-        <FormFieldset
-          key={field.id}
-          id={`pairedIndicators-${index}`}
-          legend={`Pair ${index + 1}`}
-          legendSize="s"
-        >
-          <FormFieldSelect<FormValues>
-            name={`pairedIndicators.${index}.parentIndicatorId`}
-            label="Parent indicator"
-            optGroups={indicatorOptGroups}
-            placeholder="Select an indicator"
-          />
-          <FormFieldSelect<FormValues>
-            name={`pairedIndicators.${index}.childIndicatorId`}
-            label="Child indicator"
-            hint="Selected automatically when the parent indicator is selected"
-            optGroups={indicatorOptGroups}
-            placeholder="Select an indicator"
-          />
-          <ButtonText onClick={() => remove(index)}>
-            Remove pair
-            <VisuallyHidden>{` ${index + 1}`}</VisuallyHidden>
-          </ButtonText>
-        </FormFieldset>
+        <Fragment key={field.id}>
+          <FormFieldset
+            id={`pairedIndicators-${index}`}
+            legend={`Pair ${index + 1}`}
+            legendSize="s"
+            formGroupClass="govuk-!-margin-bottom-0"
+          >
+            <FormFieldSelect<FormValues>
+              name={`pairedIndicators.${index}.parentIndicatorId`}
+              label="Parent indicator"
+              optGroups={indicatorOptGroups}
+              placeholder="Select an indicator"
+            />
+            <FormFieldSelect<FormValues>
+              name={`pairedIndicators.${index}.childIndicatorId`}
+              label="Child indicator"
+              hint="Selected automatically when the parent indicator is selected"
+              optGroups={indicatorOptGroups}
+              placeholder="Select an indicator"
+            />
+            <Button
+              className="govuk-!-margin-top-6 govuk-!-margin-bottom-0"
+              variant="secondary"
+              onClick={() => remove(index)}
+            >
+              Remove pair
+              <VisuallyHidden>{` ${index + 1}`}</VisuallyHidden>
+            </Button>
+          </FormFieldset>
+
+          <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+        </Fragment>
       ))}
 
       <Button
         variant="secondary"
         onClick={() => append({ parentIndicatorId: '', childIndicatorId: '' })}
       >
-        Add pair
+        {fields.length > 0 ? 'Add another pair' : 'Add pair'}
       </Button>
     </FormFieldset>
   );
