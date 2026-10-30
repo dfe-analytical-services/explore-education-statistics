@@ -90,7 +90,6 @@ public class FootnoteRepository : IFootnoteRepository
             .Select(indicator => indicator.Id)
             .ToListAsync();
 
-        // A footnote must belong to the release version
         var footnotesQueryable = _context.Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId);
 
         // If the list of filter and indicator id's are empty,
@@ -298,14 +297,13 @@ public class FootnoteRepository : IFootnoteRepository
 
         var footnotes = await GetFootnotes(releaseVersionId, subjectsIdsForReleaseVersion);
 
-        // Remove the below check as part of EES-2971
         var releaseVersionFootnoteCount = await _context.Footnote.CountAsync(footnote =>
             footnote.ReleaseVersionId == releaseVersionId
         );
         if (footnotes.Count != releaseVersionFootnoteCount)
         {
             throw new Exception(
-                $"Number of footnotes linked to Subjects of ReleaseVersion {releaseVersionId} different from number of footnotes belonging to it"
+                $"ReleaseVersion {releaseVersionId} has footnotes not attached to any of its subjects, filters, filter groups, filter items or indicators"
             );
         }
 
