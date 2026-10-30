@@ -15,3 +15,6 @@ param vaultedFileShareBackups = true
 // Allow Backup Vault PostgreSQL backups to be restored in the paired region, which the current subscription's
 // param file turns off.
 param backupVaultCrossRegionRestore = true
+
+// The release pipeline grants the Publisher's user-assigned identity its roles instead.
+param deployPublisherRoleAssignments = false
