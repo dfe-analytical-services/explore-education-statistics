@@ -8,50 +8,21 @@ require_relative './notification/expired'
 require_relative './notification/will_expire_by'
 
 class Notifier
-  def initialize(notification, pages_url, slack_url, live, limit = -1)
+  def initialize(notification, pages_url, limit = -1)
     @notification = notification
     @pages_url = pages_url
-    @slack_url = slack_url
-    @live = !!live
     @limit = limit
   end
 
   def run
-    payloads = message_payloads(pages_per_channel)
+    message = build_message(matching_pages)
 
-    return if payloads.empty?
+    return if message.nil?
 
-    puts "== JSON Payload:"
-    puts JSON.pretty_generate(payloads)
+    puts "== Message"
+    puts message
 
-    if Date.today.saturday? || Date.today.sunday?
-      puts "SKIPPING POST: Not posting anything, this is not a working day"
-      return
-    end
-
-    unless post_to_slack?
-      puts "SKIPPING POST: Not posting anything, this is a dry run"
-      return
-    end
-
-    payloads.each do |message_payload|
-      if ENV.has_key? "SLACK_TOKEN"
-        response = HTTP
-          .auth("Bearer #{ENV['SLACK_TOKEN']}")
-          .post("https://slack.com/api/chat.postMessage", json: message_payload)
-          .parse
-
-        if !response["ok"] then
-          if response["error"] == "invalid_auth" then
-            raise "Unable to post to Slack: SLACK_TOKEN is not valid"
-          else
-            puts "Unable to post to Slack: #{response['error']}"
-          end
-        end
-      else
-        HTTP.post(@slack_url, body: JSON.dump(message_payload))
-      end
-    end
+    puts "SKIPPING POST: No notification channel is configured, this is a dry run"
   end
 
   def pages
@@ -67,53 +38,29 @@ class Notifier
     end
   end
 
-  def pages_per_channel
+  def matching_pages
     pages
       .reject { |page| page.review_by.nil? }
       .select { |page| @notification.include?(page) }
-      .group_by { |page| page.owner }
-      .map do |owner, pages|
-        [owner, pages.sort_by { |page| page.review_by }]
-      end
+      .sort_by { |page| page.review_by }
   end
 
-  def message_payloads(grouped_pages)
-    grouped_pages.map do |channel, pages|
+  def build_message(pages)
+    return nil if pages.empty?
 
-      page_count = @limit == -1 ? pages.size : [pages.size, @limit].min
-      notification_message = page_count == 1 ? @notification.singular_message : @notification.multiple_message
-      number_of = notification_message % [page_count]
+    page_count = @limit == -1 ? pages.size : [pages.size, @limit].min
+    notification_message = page_count == 1 ? @notification.singular_message : @notification.multiple_message
+    number_of = notification_message % [page_count]
 
-      page_lines = pages[0..page_count-1].map do |page|
-        @notification.line_for(page)
-      end
-
-      message_prefix = ENV.fetch('OVERRIDE_SLACK_MESSAGE_PREFIX', "Hello :paw_prints:, this is your friendly manual spaniel.")
-      message = <<~doc
-        #{message_prefix} #{number_of}:
-
-        #{page_lines.join("\n")}
-      doc
-
-      channel = ENV.fetch('OVERRIDE_SLACK_CHANNEL', channel)
-      username = ENV.fetch('OVERRIDE_SLACK_USERNAME', "Daniel the Manual Spaniel")
-      icon_emoji = ENV.fetch('OVERRIDE_SLACK_ICON_EMOJI', ":daniel-the-manual-spaniel:")
-
-      puts "== Message to #{channel}"
-      puts message
-
-      {
-        username: username,
-        icon_emoji: icon_emoji,
-        text: message,
-        mrkdwn: true,
-        channel: channel,
-      }
+    page_lines = pages[0..page_count-1].map do |page|
+      @notification.line_for(page)
     end
-  end
 
-  def post_to_slack?
-    @live
+    <<~doc
+      Please ensure that the Public API documentation is up to date. #{number_of}:
+
+      #{page_lines.join("\n")}
+    doc
   end
 
   private
@@ -136,5 +83,3 @@ class Notifier
 end
   end
 end
-
-

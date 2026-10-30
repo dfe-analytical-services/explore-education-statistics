@@ -127,6 +127,7 @@ bundle exec rake notify:expires
 
 ### Automated GitHub workflow
 
-A GitHub workflow has been configured to run the `notify:expired` task on a scheduled cron (see 
-`.github/workflows/notify-expired-api-docs.yml`). This has been set up to send notifications to
-the Slack channel configured in `config/tech_docs.yml`.
+A GitHub workflow has been configured to run the `notify:expired` task (see
+`.github/workflows/notify-expired-api-docs.yml`). It currently has no notification channel, so its
+scheduled trigger is disabled and it can only be run manually as a dry run, which logs the message
+that would be sent.
