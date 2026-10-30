@@ -227,7 +227,7 @@ function Plan({
   const { user } = useAuthContext();
 
   const {
-    value: originalPairedIndicators = [],
+    value: originalPairedIndicators,
     isLoading: isLoadingPairedIndicators,
   } = useAsyncHandledRetry(
     async () =>
@@ -240,12 +240,16 @@ function Plan({
     [releaseVersionId, plan.originalSubjectId],
   );
 
+  // Left undefined until the paired indicators have loaded, so the
+  // replacement can't be confirmed without knowing what happens to them.
   const pairedIndicators = useMemo(
     () =>
-      getReplacementPairedIndicators(
-        originalPairedIndicators,
-        plan.mapping.indicators,
-      ),
+      originalPairedIndicators
+        ? getReplacementPairedIndicators(
+            originalPairedIndicators,
+            plan.mapping.indicators,
+          )
+        : undefined,
     [originalPairedIndicators, plan.mapping.indicators],
   );
 
@@ -718,15 +722,19 @@ function Plan({
             releaseVersionId,
             subjectId: plan.originalSubjectId,
           })}
-          pairedIndicators={pairedIndicators}
+          pairedIndicators={pairedIndicators ?? []}
         />
       </LoadingSpinner>
 
       <ButtonGroup className="govuk-!-margin-top-8">
         {plan.valid && (
           <Button
-            disabled={isSubmitting}
+            disabled={isSubmitting || !pairedIndicators}
             onClick={async () => {
+              if (!pairedIndicators) {
+                return;
+              }
+
               toggleSubmitting.on();
 
               await dataReplacementService.replaceData(releaseVersionId, [
