@@ -1,9 +1,3 @@
-import { abbreviations } from 'abbreviations.bicep'
-
-@export()
-func buildFullyQualifiedTopicName(resourcePrefix string, topicName string) string =>
-  '${resourcePrefix}-${abbreviations.eventGridTopics}-${topicName}'
-
 @export()
 @description('Returns a percentage of a number.')
 func percentage(number int, percent int) int => int((number * percent) / 100)
@@ -29,5 +23,25 @@ func removeMultiple(input string, removals string[]) string =>
   }))
 
 @export()
-func keyVaultRef(vaultUri string, secretName string) string => 
+@description('Builds the connection string for an app to reach a PostgreSQL database with its managed identity.')
+func publicDataDbConnectionString(postgreSqlServerName string, managedIdentityName string) string =>
+  'Server=${postgreSqlServerName}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${managedIdentityName}'
+
+@export()
+func keyVaultRef(vaultUri string, secretName string) string =>
   '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/${secretName}/)'
+
+@export()
+@description('''
+Like keyVaultRef, but pins the reference to a specific secret version (e.g. a secret resource's
+properties.secretUriWithVersion) rather than "latest". This ensures the resulting appsetting value
+changes whenever the secret is rotated, because the appsettings update has a definite change
+in values.
+''')
+func keyVaultRefFromVersionedUri(secretUriWithVersion string) string =>
+  '@Microsoft.KeyVault(SecretUri=${secretUriWithVersion})'
+
+@export()
+@description('Builds a map of secret names to secret versioned URIs')
+func secretRefsFromSecrets(secrets object[]) object =>
+  toObject(secrets, s => last(split(s.id, '/')), s => keyVaultRefFromVersionedUri(s.properties.secretUriWithVersion))

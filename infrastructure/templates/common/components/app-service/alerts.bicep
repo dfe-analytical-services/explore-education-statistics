@@ -1,3 +1,4 @@
+import { HttpStatusAlertConfig, httpStatusAlertOverride } from '../alerts/httpStatusAlertConfig.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero, staticAverageGreaterThanZero } from '../alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../alerts/dynamicAlertConfig.bicep'
 
@@ -8,6 +9,8 @@ param appServiceName string
 param alerts {
   appServiceHealth: bool
   httpErrors: bool
+  http401: HttpStatusAlertConfig?
+  http5xx: HttpStatusAlertConfig?
   responseTimeSeconds: int?
   alertsGroupName: string
 }
@@ -45,6 +48,7 @@ module unexpectedHttpStatusCodeAlerts '../alerts/staticMetricAlert.bicep' = [
       }
       config: {
         ...staticMinGreaterThanZero
+        ...httpStatusAlertOverride(httpStatusCode == 'Http401' ? alerts!.?http401 : alerts!.?http5xx)
         nameSuffix: toLower(httpStatusCode)
       }
       alertsGroupName: alerts!.alertsGroupName

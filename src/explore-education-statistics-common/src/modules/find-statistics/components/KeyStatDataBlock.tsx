@@ -8,6 +8,7 @@ export interface KeyStatDataBlockProps {
   children?: ReactNode;
   releaseVersionId: string;
   dataBlockId: string;
+  dataBlockStaleTime?: number;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
@@ -18,6 +19,7 @@ export default function KeyStatDataBlock({
   children,
   releaseVersionId,
   dataBlockId,
+  dataBlockStaleTime,
   trend,
   guidanceTitle = 'Help',
   guidanceText,
@@ -27,7 +29,10 @@ export default function KeyStatDataBlock({
     data: dataBlock,
     isLoading,
     error,
-  } = useQuery(tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId));
+  } = useQuery({
+    ...tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId),
+    staleTime: dataBlockStaleTime,
+  });
 
   const title = dataBlock?.title;
   const statistic = dataBlock?.value;

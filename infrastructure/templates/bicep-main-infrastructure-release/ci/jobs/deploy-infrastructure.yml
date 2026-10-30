@@ -1,0 +1,96 @@
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: bicepParamFile
+    type: string
+
+jobs:
+  - deployment: DeployMainInfrastructure
+    displayName: Deploy Main infrastructure
+    environment: ${{ parameters.environment }}
+    variables:
+      templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/bicep-main-infrastructure-release
+      templateFile: $(templateDirectory)/main.bicep
+      paramDirectory: $(templateDirectory)/parameters
+      paramFile: $(paramDirectory)/main-${{ parameters.bicepParamFile }}.bicepparam
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - template: ../../../../common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml
+
+            - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Validate Bicep template
+                action: validate
+                serviceConnection: ${{ parameters.serviceConnection }}
+                subscriptionId: $(subscriptionId)
+                resourceGroupName: $(resourceGroupName)
+                parameterFile: $(paramFile)
+
+            # Fetch the existing application-specific appsettings for each App Service and its
+            # staging slot, so that this infrastructure deploy can merge them with its own
+            # infrastructure-specific appsettings rather than resetting them back to their
+            # bootstrap values. See app-service.bicep for how these are merged.
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
+              parameters:
+                displayName: Get existing production and staging app settings for slot-swapping app services
+                appType: webApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                slotName: deploy
+                apps:
+                  - appName: $(resourceNames.admin.appService)
+                    stagingVariableName: adminStagingSlotAppSettings
+                    prodVariableName: adminProdAppSettings
+                  - appName: $(resourceNames.contentApi.appService)
+                    stagingVariableName: contentApiStagingSlotAppSettings
+                    prodVariableName: contentApiProdAppSettings
+                  - appName: $(resourceNames.dataApi.appService)
+                    stagingVariableName: dataApiStagingSlotAppSettings
+                    prodVariableName: dataApiProdAppSettings
+                  - appName: $(resourceNames.publicSite.appService)
+                    prodVariableName: publicSiteProdAppSettings
+
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
+              parameters:
+                displayName: Get existing app settings for Function Apps
+                appType: functionApp
+                serviceConnection: ${{ parameters.serviceConnection }}
+                resourceGroupName: $(resourceGroupName)
+                apps:
+                  - appName: $(resourceNames.importer.functionApp)
+                    prodVariableName: importerProdAppSettings
+                  - appName: $(resourceNames.publisher.functionApp)
+                    prodVariableName: publisherProdAppSettings
+                  - appName: $(resourceNames.notifier.functionApp)
+                    prodVariableName: notifierProdAppSettings
+
+            - template: ../tasks/deploy-bicep.yml
+              parameters:
+                displayName: Deploy Bicep template
+                action: create
+                serviceConnection: ${{ parameters.serviceConnection }}
+                subscriptionId: $(subscriptionId)
+                resourceGroupName: $(resourceGroupName)
+                parameterFile: $(paramFile)
+                adminProdAppSettings: $(adminProdAppSettings)
+                adminStagingSlotAppSettings: $(adminStagingSlotAppSettings)
+                contentApiProdAppSettings: $(contentApiProdAppSettings)
+                contentApiStagingSlotAppSettings: $(contentApiStagingSlotAppSettings)
+                dataApiProdAppSettings: $(dataApiProdAppSettings)
+                dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
+                publicSiteProdAppSettings: $(publicSiteProdAppSettings)
+                importerProdAppSettings: $(importerProdAppSettings)
+                publisherProdAppSettings: $(publisherProdAppSettings)
+                notifierProdAppSettings: $(notifierProdAppSettings)

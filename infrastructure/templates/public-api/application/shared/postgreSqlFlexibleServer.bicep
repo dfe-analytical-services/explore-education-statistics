@@ -1,6 +1,6 @@
 import { IpRange } from '../../../common/types.bicep'
-import { ResourceNames, PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
-import { replaceMultiple } from '../../../common/functions.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
+import { PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -44,13 +44,7 @@ var formattedFirewallRules = map(firewallRules, rule => {
   cidr: rule.cidr
 })
 
-var serverName = resourceNames.sharedResources.postgreSqlFlexibleServer
-
-func createManagedIdentityConnectionString(templateString string, identityName string) string =>
-  replaceMultiple(templateString, {
-    '[database_name]': 'public_data'
-    '[managed_identity_name]': identityName
-  })
+var serverName = resourceNames.databases.postgreSqlFlexibleServer
 
 module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
@@ -77,14 +71,14 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
       capacity: true
       failedConnections: true
       deadlocks: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
   }
 }
 
 resource backupVault 'Microsoft.DataProtection/backupVaults@2022-05-01' existing = {
-  name: resourceNames.existingResources.backupVault.vault
+  name: resourceNames.backups.backupVault
 }
 
 module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible-server/roleAssignment.bicep' = if (deployBackupVaultRoleAssignment) {
@@ -97,59 +91,14 @@ module backupVaultRoleAssignmentModule '../../../common/components/psql-flexible
 }
 
 module backupInstanceModule '../../../common/components/data-protection/postgresql-backup-vault-instance.bicep' = if (deployBackupVaultRegistration) {
-  name: '${resourceNames.sharedResources.postgreSqlFlexibleServer}BackupInstanceDeploy'
+  name: '${resourceNames.databases.postgreSqlFlexibleServer}BackupInstanceDeploy'
   params: {
-    vaultName: resourceNames.existingResources.backupVault.vault
+    vaultName: resourceNames.backups.backupVault
     instanceName: 'PostgreSQLBackupInstance'
     resourceId: postgreSqlServerModule.outputs.databaseRef
     resourceLocation: location
-    backupPolicyName: resourceNames.existingResources.backupVault.psqlFlexibleServerBackupPolicy
+    backupPolicyName: resourceNames.backups.backupVaultPsqlFlexibleServerPolicy
     tagValues: tagValues
   }
 }
 
-var connectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
-
-var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
-
-module storeDataProcessorPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storeDataProcessorPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.publicApi.dataProcessorIdentity
-    )
-  }
-}
-
-var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
-
-module storePublisherPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storePublisherPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    secretName: publisherPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.existingResources.publisherFunction
-    )
-  }
-}
-
-var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
-
-module storeAdminPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storeAdminPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    secretName: adminPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.existingResources.adminApp
-    ) 
-  }
-}
-
-output managedIdentityConnectionStringTemplate string = connectionStringTemplate

@@ -1,4 +1,6 @@
-import { ResourceNames, ContainerAppResourceConfig, SearchServiceConfig } from '../../types.bicep'
+import { ResourceNames } from '../../../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../../../common/functions.bicep'
+import { ContainerAppResourceConfig, SearchServiceConfig } from '../../types.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -24,6 +26,7 @@ param publicSiteUrl string
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@secure()
 @description('Specifies the Application (Client) Id of the App Registration used to represent the API Container App.')
 param apiAppRegistrationClientId string
 
@@ -50,7 +53,7 @@ var analyticsFileShareMountPath = '/data/analytics'
 var dataFilesFileShareMountPath = '/data/public-api-data'
 
 resource adminAppService 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: resourceNames.existingResources.adminApp
+  name: resourceNames.admin.appService
 }
 
 resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-31' existing = {
@@ -62,7 +65,7 @@ var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
@@ -89,7 +92,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
         'http://127.0.0.1'
       ]
     }
-    vnetName: resourceNames.existingResources.vNet
+    vnetName: resourceNames.vnet.vnet
     volumeMounts: [
       {
         volumeName: 'analytics-file-share-mount'
@@ -104,18 +107,18 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       {
         name: 'analytics-file-share-mount'
         storageType: 'AzureFile'
-        storageName: resourceNames.existingResources.analyticsFileShare
+        storageName: resourceNames.analytics.storage.fileShareName
       }
       {
         name: 'public-api-file-share-mount'
         storageType: 'AzureFile'
-        storageName: resourceNames.publicApi.publicApiFileShare
+        storageName: resourceNames.publicApi.storage.fileShare
       }
     ]
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
-        value: 'Server=${resourceNames.sharedResources.postgreSqlFlexibleServer}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${resourceNames.publicApi.apiAppIdentity}'
+        value: publicDataDbConnectionString(resourceNames.databases.postgreSqlFlexibleServer, resourceNames.publicApi.apiAppIdentity)
       }
       {
         // This settings allows the Container App to identify which user-assigned identity it should use in order to
@@ -199,18 +202,9 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       connectionTimeouts: true
       requestRetries: true
       requestTimeouts: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
-  }
-}
-
-module storePublicApiContainerAppPrivateUrl '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storePublicApiContainerAppPrivateUrl'
-  params: {
-    keyVaultName: resourceNames.existingResources.keyVault
-    secretName: 'ees-publicapi-public-api-containerapp-private-url'
-    secretValue: 'https://${apiContainerAppModule.outputs.containerAppFqdn}'
   }
 }
 

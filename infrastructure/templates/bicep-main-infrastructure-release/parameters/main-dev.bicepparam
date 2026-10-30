@@ -6,15 +6,6 @@ param environmentConfigParam = {
   domain: 'dev.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  enableSwagger: true
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-    overridesDurationInSeconds: 10
-  }
-  tableBuilderMaxTableCellsAllowed: 25000
   additionalAdminAllowedOrigins: [
     'https://localhost:5021'
     'http://localhost:5021'
@@ -22,14 +13,7 @@ param environmentConfigParam = {
   additionalPublicAllowedOrigins: [
     'http://localhost:3000'
   ]
-  basicAuthEnabled: true
   blobDeleteRetentionDays: 3
-}
-
-param adminConfigParam = {
-  preReleaseMinutesBeforeStart: 1440
-  enableThemeDeletion: true
-  enableEinPublishedPageDeletion: true
 }
 
 param notifierConfigParam = {
@@ -37,7 +21,6 @@ param notifierConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
 }
 
 param publisherConfigParam = {
@@ -45,13 +28,6 @@ param publisherConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
-}
-
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-dev'
 }
 
 param publicSiteConfigParam = {
@@ -59,6 +35,55 @@ param publicSiteConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  googleAnalyticsTrackingId: 'G-GRPHH2FN0L'
-  defaultCacheMaxAgeSeconds: 10
+}
+
+// Starter thresholds from 30 days of production App Insights request data (15-minute windows).
+// Each fires on a Total strictly greater than the threshold. Services not listed (importer,
+// publisher, notifier) keep the default Minimum > 0 rule.
+param http5xxAlerts = {
+  publicSite: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  dataApi: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  contentApi: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  admin: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+}
+
+param http401Alerts = {
+  admin: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  publicSite: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
 }

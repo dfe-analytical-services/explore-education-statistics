@@ -9,9 +9,8 @@ import InfographicBlock, {
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import MapBlock, {
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import ClientOnlyMapBlock from '@common/modules/charts/components/ClientOnlyMapBlock';
+import type { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
@@ -75,7 +74,7 @@ function ChartRenderer({
         return <HorizontalBarBlock {...chart} />;
       case 'map':
         return (
-          <MapBlock
+          <ClientOnlyMapBlock
             {...chart}
             onBoundaryLevelChange={number => {
               setSelectedBoundaryLevelId(number);

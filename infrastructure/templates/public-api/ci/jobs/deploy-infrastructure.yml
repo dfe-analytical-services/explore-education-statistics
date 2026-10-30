@@ -21,7 +21,13 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml
+
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -37,22 +43,17 @@ jobs:
                 processorProdAppSettings: '{}'
                 processorStagingAppSettings: '{}'
 
-            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
+            - template: ../../../../common/ci/tasks/get-current-appsettings.yml
               parameters:
-                displayName: Get existing Data Processor production app settings
+                displayName: Get existing Data Processor app settings
+                appType: functionApp
                 serviceConnection: ${{ parameters.serviceConnection }}
                 resourceGroupName: $(resourceGroupName)
-                functionAppName: $(dataProcessorFunctionAppName)
-                variableName: processorProdAppSettings
-
-            - template: ../../../../common/ci/tasks/get-function-app-appsettings.yml
-              parameters:
-                displayName: Get existing Data Processor staging app settings
-                serviceConnection: ${{ parameters.serviceConnection }}
-                resourceGroupName: $(resourceGroupName)
-                functionAppName: $(dataProcessorFunctionAppName)
-                variableName: processorStagingAppSettings
                 slotName: staging
+                apps:
+                  - appName: $(resourceNames.publicApi.processor.functionApp)
+                    stagingVariableName: processorStagingAppSettings
+                    prodVariableName: processorProdAppSettings
 
             - template: ../tasks/deploy-bicep.yml
               parameters:

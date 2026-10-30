@@ -1,4 +1,4 @@
-import { abbreviations } from '../common/abbreviations.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -9,6 +9,9 @@ param location string = resourceGroup().location
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -43,29 +46,17 @@ var maintenanceFirewallRules = [
   }
 ]
 
-var resourcePrefix = '${subscription}-ees'
-
-var resourceNames = {
-  existingResources: {
-    alertsGroup: '${subscription}-ag-ees-alertedusers'
-    keyVault: '${subscription}-kv-ees-01'
-    logAnalyticsWorkspace: '${resourcePrefix}-log'
-    recoveryVault: '${resourcePrefix}-${abbreviations.recoveryServicesVaults}'
-    recoveryVaultFileShareBackupPolicy: 'DailyPolicy'
-    subnets: {
-      analyticsFunctionApp: '${resourcePrefix}-snet-${abbreviations.webSitesFunctions}-analytics'
-      storagePrivateEndpoints: '${resourcePrefix}-snet-${abbreviations.storageStorageAccounts}-anlyt-${abbreviations.privateEndpoints}'
-    }
-    vNet: '${subscription}-vnet-ees'
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+  elz: elz
+})
 
 // Create an Application Insights resource for Analytics resources to use.
 module applicationInsightsModule 'application/analyticsApplicationInsights.bicep' = {
   name: 'analyticsApplicationInsightsModule'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
   }
@@ -74,7 +65,6 @@ module applicationInsightsModule 'application/analyticsApplicationInsights.bicep
 module analyticsStorageModule 'application/analyticsStorage.bicep' = {
   name: 'analyticsStorageAccountApplicationModuleDeploy'
   params: {
-    resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: true
@@ -85,8 +75,8 @@ module analyticsStorageModule 'application/analyticsStorage.bicep' = {
 module analyticsStorageBackupModule '../common/components/recovery-services-vault/file-share-registration.bicep' = {
   name: 'analyticsStorageBackupModuleDeploy'
   params: {
-    vaultName: resourceNames.existingResources.recoveryVault
-    backupPolicyName: resourceNames.existingResources.recoveryVaultFileShareBackupPolicy
+    vaultName: resourceNames.backups.recoveryServicesVault
+    backupPolicyName: 'DailyPolicy'
     storageAccountName: analyticsStorageModule.outputs.storageAccountName
     fileShareName: analyticsStorageModule.outputs.fileShareName
     tagValues: tagValues
@@ -97,7 +87,6 @@ module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
   name: 'analyticsFunctionAppModule'
   params: {
     resourceNames: resourceNames
-    resourcePrefix: resourcePrefix
     functionAppFirewallRules: union(
       [
         {

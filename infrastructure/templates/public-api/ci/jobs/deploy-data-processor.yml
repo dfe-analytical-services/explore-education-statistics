@@ -17,14 +17,31 @@ jobs:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+              fetchDepth: 1
+              sparseCheckoutDirectories: infrastructure/templates/common
+
+            - template: ../../../../common/ci/tasks/get-resource-names.yml
+              parameters:
+                environment: ${{ parameters.environment }}
+
             - download: MainBuild
               displayName: Download Public API Data Processor artifact
               artifact: public-api-data-processor
 
+            # Provides outputs of the infrastructure deploy used below, e.g. the Data Processor's URLs and
+            # managed identity client id.
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
-                
+
+            - template: ../../../../common/ci/tasks/get-key-vault-secret.yml
+              parameters:
+                serviceConnection: ${{ parameters.serviceConnection }}
+                keyVaultName: $(resourceNames.keyVault.keyVault)
+                secretName: ees-public-api-data-processor-app-registration-client-id
+                variableName: dataProcessorAppRegistrationClientId
+
             # We do config updates out of Bicep template so we can implement slot swapping.
             # Changes are first deployed to the staging slot and combined with a fresh
             # code deploy prior to being swapped with the production slot.
@@ -39,34 +56,34 @@ jobs:
                   set -e
                   
                   az functionapp config appsettings set \
-                    --name $(dataProcessorFunctionAppName) \
+                    --name $(resourceNames.publicApi.processor.functionApp) \
                     --resource-group $(resourceGroupName) \
                     --slot staging \
                     --settings \
                       "App__MetaInsertBatchSize=1000" \
                       "App__EnableThemeDeletion=$(enableThemeDeletion)" \
-                      "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))" \
+                      "App__PrivateStorageConnectionString=@Microsoft.KeyVault(VaultName=$(resourceNames.keyVault.keyVault); SecretName=$(resourceNames.keyVault.secrets.coreStorageAccountConnectionString))" \
                       "AZURE_CLIENT_ID=$(dataProcessorFunctionAppManagedIdentityClientId)" \
                       "AzureWebJobs.TriggerLongRunningOrchestration.Disabled=true" \
                       "DataFiles__BasePath=$(dataProcessorPublicApiDataFileShareMountPath)"
                   
                   az webapp config connection-string set \
-                    --name $(dataProcessorFunctionAppName) \
+                    --name $(resourceNames.publicApi.processor.functionApp) \
                     --resource-group $(resourceGroupName) \
                     --connection-string-type SQLAzure \
                     --slot staging \
                     --settings \
-                      "ContentDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
+                      "ContentDb=@Microsoft.KeyVault(VaultName=$(resourceNames.keyVault.keyVault); SecretName=$(dataProcessorContentDbConnectionStringSecretKey))"
                   
                   az webapp config connection-string set \
-                    --name $(dataProcessorFunctionAppName) \
+                    --name $(resourceNames.publicApi.processor.functionApp) \
                     --resource-group $(resourceGroupName) \
                     --connection-string-type PostgreSQL \
                     --slot staging \
                     --settings \
-                      "PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))"
+                      "PublicDataDb=$(dataProcessorPsqlConnectionString)"
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that staging slot is healthy after updating appsettings
@@ -89,11 +106,11 @@ jobs:
                   set -e
                   az functionapp deployment source config-zip \
                     --src '$(Pipeline.Workspace)/MainBuild/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                    --name $(dataProcessorFunctionAppName) \
+                    --name $(resourceNames.publicApi.processor.functionApp) \
                     --resource-group $(resourceGroupName) \
                     --slot staging
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Waiting for staging slot to start successfully
@@ -118,12 +135,12 @@ jobs:
                 inlineScript: |
                   set -e
                   az functionapp deployment slot swap \
-                    --name $(dataProcessorFunctionAppName) \
+                    --name $(resourceNames.publicApi.processor.functionApp) \
                     --resource-group $(resourceGroupName) \
                     --slot staging \
                     --target-slot production
 
-            - template: ../tasks/wait-for-endpoint-success.yml
+            - template: ../tasks/wait-for-endpoint-result.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 displayName: Checking that production slot is healthy after slot swap

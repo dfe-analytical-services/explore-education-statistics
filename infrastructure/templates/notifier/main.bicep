@@ -1,6 +1,6 @@
-import { ResourceNames } from '../bicep-main-infrastructure-release/resource-names.bicep'
+import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
+import { ResourceNames } from '../common/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
-import { keyVaultRef } from '../common/functions.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Names of resources in this deploy.')
@@ -25,26 +25,28 @@ param maintenanceIpRanges IpRange[]
 @description('Number of days to retain blobs after delete.')
 param blobDeleteRetentionDays int
 
-@description('Replaces Notify exceptions with logged messages only when team-only API keys are used and a recipient email address is not valid for that key.')
-param suppressExceptionsForTeamOnlyApiKeyErrors bool
-
-@description('The public-facing URL of the public site.')
-param publicAppUrl string
-
 @description('The origins supported for CORS calls to this Function App.')
 param allowedOrigins string[]
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
+@description('Optional override of the existing Http401 rule. Omit to preserve current behaviour.')
+param http401Alert HttpStatusAlertConfig?
+
+@description('Optional override of the existing Http5xx rule. Omit to preserve current behaviour.')
+param http5xxAlert HttpStatusAlertConfig?
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: resourceNames.keyVault.keyVault
-}
-
-var vaultUri = keyVault.properties.vaultUri
+@secure()
+@description('''
+The existing appsettings for this Function App, fetched by the pipeline before deployment. Used to
+prevent infrastructure deploys from overriding application-specific appsettings that the code
+deployment pipeline has since applied - see notifier-appsettings.bicep.
+''')
+param existingAppSettings object = {}
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
@@ -84,6 +86,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     functionAppName: resourceNames.notifier.functionApp
     appServicePlanName: resourceNames.notifier.appServicePlan
     storageAccountName: resourceNames.notifier.storageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true
@@ -103,6 +106,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountAllowedSubnetIds: [publisherSubnet.id]
     storageFirewallRules: maintenanceIpRanges
     storageAccountPublicNetworkAccessEnabled: true
+    ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
     minTlsVersion: minTlsVersion
     connectionStrings: [
@@ -116,6 +120,8 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       cpuPercentage: true
       functionAppHealth: true
       httpErrors: true
+      http401: http401Alert
+      http5xx: http5xxAlert
       memoryPercentage: true
       storageAccountAvailability: false
       storageLatency: false
@@ -124,38 +130,10 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       fileServiceCapacity: false
       alertsGroupName: resourceNames.alertsGroup
     } : null
-    healthCheckPath: '/'
+    healthCheckPath: '/api/health'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    appSettings: [
-      {
-        name: 'App__EmailEnabled'
-        value: 'true'
-      }
-      {
-        name: 'App__SuppressExceptionsForTeamOnlyApiKeyErrors'
-        value: string(suppressExceptionsForTeamOnlyApiKeyErrors)
-      }
-      {
-        name: 'App__Url'
-        value: 'https://${resourceNames.notifier.functionApp}.azurewebsites.net/api'
-      }
-      {
-        name: 'App__PublicAppUrl'
-        value: publicAppUrl
-      }
-      {
-        name: 'App__NotifierStorageConnectionString'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifierStorageAccountConnectionString)
-      }
-      {
-        name: 'App__TokenSecretKey'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifier.tokenSecretKey)
-      }
-      {
-        name: 'GovUkNotify__ApiKey'
-        value: keyVaultRef(vaultUri, resourceNames.keyVault.secrets.notifier.govUkNotifyApiKey)
-      }
-    ]
+    appSettings: []
+    existingAppSettings: existingAppSettings
     tagValues: tagValues
   }
 }

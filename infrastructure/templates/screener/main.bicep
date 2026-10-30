@@ -1,5 +1,5 @@
 import { IpRange } from '../common/types.bicep'
-import { abbreviations } from '../common/abbreviations.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -23,9 +26,6 @@ param resourceTags {
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
-
-@description('Specifies the Application (Client) Id of a pre-existing App Registration used to represent the Screener Function App.')
-param screenerAppRegistrationClientId string = ''
 
 @description('Specifies the principal id of the Azure DevOps SPN.')
 @secure()
@@ -63,7 +63,7 @@ param screenerFunctionAppSku FunctionAppServicePlanSku = {
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 var maintenanceFirewallRules = [
@@ -80,7 +80,6 @@ module applicationInsightsModule 'application/screenerApplicationInsights.bicep'
   name: 'screenerApplicationInsightsModule'
   params: {
     location: location
-    resourcePrefix: screenerResourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
   }
@@ -89,7 +88,7 @@ module applicationInsightsModule 'application/screenerApplicationInsights.bicep'
 module coreStorage 'application/shared/coreStorage.bicep' = {
   name: 'coreStorageApplicationModuleDeploy'
   params: {
-    resourceNames: resourceNames
+    names: resourceNames.storageAccounts
   }
 }
 
@@ -109,8 +108,8 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     location: location
     functionAppImageName: 'ees-screener-api'
     coreStorageBlobEndpoint: coreStorage.outputs.coreStorageBlobEndpoint
-    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
-    screenerAppRegistrationClientId: screenerAppRegistrationClientId
+    acrLoginServer: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerRegistryServerDomain)
+    screenerAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.screener.appRegistrationClientId)
     devopsServicePrincipalId: devopsServicePrincipalId
     includeDataDictionaryChecks: includeDataDictionaryChecks
     logScreeningResults: logScreeningResults
@@ -146,39 +145,10 @@ var tagValues = union(resourceTags ?? {}, {
   DateProvisioned: dateProvisioned
 })
 
-// The resource prefix for resources created in the ARM template.
-var legacyResourcePrefix = subscription
-
-// The resource prefix for more recent resources created in Bicep templates.
-var resourcePrefix = '${subscription}-ees'
-
-// The resource prefix for anything specific to the Screener API.
-var screenerResourcePrefix = '${subscription}-ees-sapi'
-
-var screenerFunctionAppName = '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
-
-var resourceNames = {
-  existingResources: {
-    adminApp: '${legacyResourcePrefix}-as-ees-admin'
-    keyVault: '${legacyResourcePrefix}-kv-ees-01'
-    logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    vNet: '${legacyResourcePrefix}-vnet-ees'
-    alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
-    subnets: {
-      adminApp: '${legacyResourcePrefix}-snet-ees-admin'
-      screenerFunction: '${screenerResourcePrefix}-snet-${abbreviations.webSitesFunctions}-screener'
-      screenerFunctionPrivateEndpoints: '${screenerResourcePrefix}-snet-${abbreviations.storageStorageAccounts}-screener-pep'
-    }
-    coreStorageAccount: subscription == 's101t01' || subscription == 's101p02'
-      ? '${legacyResourcePrefix}storageeescore'
-      : '${legacyResourcePrefix}saeescore'
-  }
-  screener: {
-    screenerFunction: screenerFunctionAppName
-    screenerFunctionStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}fn'
-    screenerLogsStorageAccount: '${replace(screenerResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}logs'
-    screenerLogsFileShare: '${screenerFunctionAppName}-logs-${abbreviations.fileShare}'
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+  elz: elz
+})
 
 output screenerFunctionAppUrl string = screenerFunctionAppModule.outputs.functionAppUrl

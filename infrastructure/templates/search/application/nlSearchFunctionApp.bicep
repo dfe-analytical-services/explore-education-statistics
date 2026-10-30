@@ -1,6 +1,5 @@
-import { abbreviations } from '../../common/abbreviations.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { ResourceNames } from '../types.bicep'
+import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('The URL of the Data API.')
 param dataApiUrl string
@@ -26,9 +25,6 @@ param storageFirewallRules IpRange[]
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
-@description('Resource prefix for all resources.')
-param resourcePrefix string
-
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
@@ -36,20 +32,20 @@ param applicationInsightsConnectionString string = ''
 param tagValues object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
-  name: resourceNames.existingResources.keyVault
+  name: resourceNames.keyVault.keyVault
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
-  name: resourceNames.existingResources.vNet
+  name: resourceNames.vnet.vnet
 }
 
 resource outboundVnetSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.nlSearchFunctionApp
+  name: resourceNames.vnet.subnets.nlSearchFunctionApp
   parent: vNet
 }
 
 resource nlSearchFunctionAppPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  name: resourceNames.existingResources.subnets.nlSearchFunctionAppPrivateEndpoints
+  name: resourceNames.vnet.subnets.nlSearchFunctionAppPrivateEndpoints
   parent: vNet
 }
 
@@ -63,9 +59,9 @@ var azureOpenAIApiKeySecretName = 'nlsearch-azure-openai-api-subscription-key'
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
-    functionAppName: '${resourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
+    functionAppName: resourceNames.nlSearch.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
-    appServicePlanName: '${resourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
+    appServicePlanName: resourceNames.nlSearch.appServicePlan
     appSettings: [
       {
         name: 'AZURE_SEARCH_ENDPOINT'
@@ -124,7 +120,8 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     functionAppRuntime: 'python'
     linuxFxVersion: 'Python|3.14'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    storageAccountName: '${replace(resourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
+    storageAccountName: resourceNames.nlSearch.functionStorageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.nlSearchStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
@@ -144,7 +141,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       fileServiceAvailability: true
       fileServiceLatency: false
       fileServiceCapacity: true
-      alertsGroupName: resourceNames.existingResources.alertsGroup
+      alertsGroupName: resourceNames.alertsGroup
     }
     tagValues: tagValues
   }

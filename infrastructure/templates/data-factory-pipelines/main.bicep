@@ -1,40 +1,44 @@
-import { abbreviations } from '../common/abbreviations.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 
 @description('Environment : Subscription name. Used as a prefix for created resources.')
 param subscription string = ''
 
+@description('Environment : Name of this environment e.g. Development, Test.')
+param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 @description('Slack channel to post alerts to.')
 param slackAlertsChannel string = ''
 
-var resourceNames = {
-  existingResources: {
-    coreSqlServerName: '${subscription}-sqlsvr-ees-01'
-    dataFactoryName: '${subscription}-${abbreviations.dataFactoryFactories}-ees-release'
-    keyVaultName: '${subscription}-${abbreviations.keyVaultVaults}-ees-01'
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+  elz: elz
+})
 
 module linkedServicesModule 'application/configuration/linked-services.bicep' = {
   name: 'dataFactoryLinkedServicesModuleDeploy'
   params: {
-    dataFactoryName: resourceNames.existingResources.dataFactoryName
+    dataFactoryName: resourceNames.dataFactory
   }
 }
 
 module privateEndpointsModule 'application/configuration/private-endpoints.bicep' = {
   name: 'dataFactoryPrivateEndpointsModuleDeploy'
   params: {
-    dataFactoryName: resourceNames.existingResources.dataFactoryName
-    coreSqlServerName: resourceNames.existingResources.coreSqlServerName
+    dataFactoryName: resourceNames.dataFactory
+    coreSqlServerName: resourceNames.databases.coreSqlServer
   }
 }
 
 module purgeSoftDeletedSubjectsPipelineModule 'application/pipelines/database-maintenance/purge-soft-deleted-subjects/pipeline-and-triggers.bicep' = {
   name: 'purgeSoftDeletedSubjectsPipelineAndTriggersModuleDeploy'
   params: {
-    dataFactoryName: resourceNames.existingResources.dataFactoryName
+    dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
-    keyVaultName: resourceNames.existingResources.keyVaultName
+    keyVaultName: resourceNames.keyVault.keyVault
     slackAlertsChannel: slackAlertsChannel
   }
 }
@@ -42,9 +46,9 @@ module purgeSoftDeletedSubjectsPipelineModule 'application/pipelines/database-ma
 module rebuildStatisticsIndexesPipelineModule 'application/pipelines/database-maintenance/rebuild-statistics-indexes/pipeline-and-triggers.bicep' = {
   name: 'rebuildStatisticsIndexesPipelineAndTriggersModuleDeploy'
   params: {
-    dataFactoryName: resourceNames.existingResources.dataFactoryName
+    dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
-    keyVaultName: resourceNames.existingResources.keyVaultName
+    keyVaultName: resourceNames.keyVault.keyVault
     slackAlertsChannel: slackAlertsChannel
   }
 }

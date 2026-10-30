@@ -1095,6 +1095,36 @@ describe('DataReplacementPlan', () => {
     ).toBeInTheDocument();
   });
 
+  test('renders correctly with notice when replacement data contains more filter columns than original data', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      hasDataBlockAndReplacementHasAdditionalFilter: true,
+    });
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
+      expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(
+        /The replacement data file has more filter columns than the original file and so can not be mapped. To complete the data replacement, reupload a replacement without the additional filter or remove all data blocks associated with the original data set./,
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('renders confirm button when user is not bau and replacement is linked to an API', async () => {
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -1145,6 +1175,47 @@ describe('DataReplacementPlan', () => {
     });
 
     expect(screen.queryByText('Confirm data replacement')).toBeInTheDocument();
+  });
+
+  test('renders overridden warning and confirm button when patch version with major changes has been finalised by BAU', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      apiDataSetVersionPlan: {
+        ...testValidReplacementPlan.apiDataSetVersionPlan!,
+        version: '1.0.1',
+        mappingStatus: {
+          locationsComplete: true,
+          filtersComplete: true,
+          indicatorsComplete: true,
+          isMajorVersionUpdate: true,
+          locationsHaveMajorChange: false,
+          filtersHaveMajorChange: true,
+          indicatorsHaveMajorChange: false,
+        },
+      },
+    });
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('API data set filters: OK')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('major-version-overridden-warning'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Confirm data replacement')).toBeInTheDocument();
   });
 
   test('renders correctly with valid empty plan', async () => {

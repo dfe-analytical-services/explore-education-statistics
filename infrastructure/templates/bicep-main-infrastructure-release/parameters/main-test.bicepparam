@@ -6,14 +6,9 @@ param environmentConfigParam = {
   domain: 'test.explore-education-statistics.service.gov.uk'
   detailedErrors: true
   autoscaleAppServices: false
-  enableSwagger: true
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 0 * * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 * * * *'
-  basicAuthEnabled: true
 }
 
 param adminConfigParam = {
-  enableThemeDeletion: true
   appServiceSku: {
     tier: 'Standard'
     name: 'S1'
@@ -50,7 +45,6 @@ param notifierConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  suppressExceptionsForTeamOnlyApiKeyErrors: true
 }
 
 param publisherConfigParam = {
@@ -58,13 +52,6 @@ param publisherConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  prepareScheduledReleaseVersionsNowEnabled: true
-  publishScheduledReleaseVersionsNowEnabled: true
-  frontDoorCachePurgeEnabled: true
-}
-
-param publicApiConfigParam = {
-  publicUrl: 'pp-api.education.gov.uk/statistics-test'
 }
 
 param publicSiteConfigParam = {
@@ -72,5 +59,55 @@ param publicSiteConfigParam = {
     tier: 'Basic'
     name: 'B1'
   }
-  googleAnalyticsTrackingId: 'G-ZQ5V7CBWMJ'
+}
+
+// Starter thresholds from 30 days of production App Insights request data (15-minute windows).
+// Each fires on a Total strictly greater than the threshold. Services not listed (importer,
+// publisher, notifier) keep the default Minimum > 0 rule.
+param http5xxAlerts = {
+  publicSite: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  dataApi: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  contentApi: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  admin: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+}
+
+param http401Alerts = {
+  admin: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
+  publicSite: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
 }

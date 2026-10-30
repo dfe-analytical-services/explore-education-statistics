@@ -20,19 +20,6 @@ type AdminConfig = {
   preReleaseMinutesBeforeStart: int?
 }
 
-@export()
-type AdminPipelineVariables = {
-
-  @description('Client ID of the public API Container App app registration in Entra ID.')
-  apiAppRegistrationClientId: string?
-
-  @description('Client ID of the public API processor app registration in Entra ID.')
-  publicDataProcessorAppRegistrationClientId: string?
-
-  @description('Client ID of the Screener API Function App app registration in Entra ID.')
-  screenerAppRegistrationClientId: string?
-}
-
 var defaultConfig = {
   appServiceSku: {
     tier: 'PremiumV2'

@@ -36,10 +36,6 @@ stages:
     condition: ${{ parameters.condition }}
     variables:
       - group: Common - ${{ parameters.environment }}
-      - name: naturalLanguageSearchFunctionAppName
-        value: $(subscription)-ees-fa-nlsearch
-      - name: searchDocsFunctionAppName
-        value: $(subscription)-ees-fa-searchdocs
       - name: infraDeployName
         value: SearchInfrastructure$(Build.BuildNumber)
     jobs:
@@ -57,7 +53,7 @@ stages:
           dependsOn: DeploySearchInfrastructure
           deploymentName: DeploySearchDocsFunction
           downloadPipeline: SearchBuild
-          functionAppName: $(searchDocsFunctionAppName)
+          functionAppName: $(resourceNames.searchDocs.functionApp)
           artifactName: drop
           artifactZipName: GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.zip
           healthCheckUrl: $(searchDocsFunctionAppUrl)/api/HealthCheck

@@ -1,4 +1,6 @@
 #nullable enable
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Extensions;
@@ -65,6 +67,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -135,6 +139,28 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
 
         services.AddHealthChecks();
+
+        // If operating within Azure, keys are stored centrally (rather than on local disk, the
+        // framework default) because local disk storage isn't safe to share across this App
+        // Service's deployment slots - see app-service.bicep for details.
+        if (hostEnvironment.IsProduction())
+        {
+            var dataProtectionSecretClient = new SecretClient(
+                new Uri(configuration.GetRequiredValue("DataProtection:KeyVaultUri")),
+                new DefaultAzureCredential()
+            );
+            services
+                .AddDataProtection()
+                .PersistKeysToAzureKeyVaultSecrets(dataProtectionSecretClient, "ees-admin-dataprotection-")
+                .ProtectKeysWithAzureKeyVault(
+                    new Uri(configuration.GetRequiredValue("DataProtection:KeyVaultKeyUri")),
+                    new DefaultAzureCredential()
+                );
+        }
+        else
+        {
+            services.AddDataProtection();
+        }
 
         /*
          * Logging
@@ -808,7 +834,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseSpaStaticFiles();
         app.UseCookiePolicy();
         app.UseRouting();
-        app.UseHealthChecks("/api/health");
+        app.UseHealthChecks("/api/health", new HealthCheckOptions().IncludeDeployedAt());
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -978,6 +1004,7 @@ internal class NoOpDataSetVersionService : IDataSetVersionService
 
     public Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
+        bool allowMajorVersionUpdate = false,
         CancellationToken cancellationToken = default
     ) => throw new NotImplementedException();
 

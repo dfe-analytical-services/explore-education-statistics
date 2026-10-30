@@ -1,4 +1,4 @@
-import { abbreviations } from '../common/abbreviations.bicep'
+import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { IpRange } from '../common/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
@@ -9,6 +9,9 @@ param location string = resourceGroup().location
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -66,29 +69,16 @@ var maintenanceFirewallRules = [
   }
 ]
 
-var resourcePrefix = '${subscription}-ees'
-
-var resourceNames = {
-  existingResources: {
-    logAnalyticsWorkspace: '${resourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
-    keyVault: '${subscription}-${abbreviations.keyVaultVaults}-ees-01'
-    vNet: '${subscription}-${abbreviations.networkVirtualNetworks}-ees'
-    alertsGroup: '${subscription}-${abbreviations.insightsActionGroups}-ees-alertedusers'
-    subnets: {
-      nlSearchFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch'
-      nlSearchFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-nlsearch-pep'
-      searchDocsFunctionApp: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs'
-      searchDocsFunctionAppPrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.webSitesFunctions}-searchdocs-pep'
-      searchStoragePrivateEndpoints: '${resourcePrefix}-${abbreviations.networkVirtualNetworksSubnets}-${abbreviations.storageStorageAccounts}-search-pep'
-    }
-  }
-}
+var resourceNames = getResourceNamesForEnvironment({
+  environmentIdentifier: subscription
+  environmentName: environmentName
+  elz: elz
+})
 
 module monitoringModule 'application/monitoring.bicep' = {
   name: 'monitoringModuleDeploy'
   params: {
     location: location
-    resourcePrefix: resourcePrefix
     resourceNames: resourceNames
     tagValues: tagValues
   }
@@ -98,7 +88,6 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
-    resourcePrefix: resourcePrefix
     dataApiUrl: dataApiUrl
     functionAppFirewallRules: []
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
@@ -115,7 +104,6 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
     resourceNames: resourceNames
-    resourcePrefix: resourcePrefix
     contentApiUrl: contentApiUrl
     functionAppFirewallRules: union(
       [
@@ -143,7 +131,7 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
 module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctionEventSubscriptions.bicep' = {
   name: 'searchDocsFunctionEventSubscriptionsModuleDeploy'
   params: {
-    resourcePrefix: resourcePrefix
+    resourceNames: resourceNames
     searchDocsFunctionAppStorageAccountName: searchDocsFunctionAppModule.outputs.functionAppStorageAccountName
     storageQueueNames: searchDocsFunctionAppModule.outputs.storageQueueNames
   }
@@ -154,7 +142,6 @@ module searchServiceModule 'application/searchService.bicep' = {
   params: {
     location: location
     resourceNames: resourceNames
-    resourcePrefix: resourcePrefix
     searchServiceLocalAuthEnabled: searchServiceLocalAuthEnabled
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
