@@ -479,6 +479,135 @@ public abstract class DataSetSearchableDocumentsServiceTests
         }
     }
 
+    public class GetPublicationDataSetSearchableDocumentsTests : DataSetSearchableDocumentsServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationHasReleases_ReturnsDataSetsOfLatestPublishedVersionOfEachRelease()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
+                    ]
+                );
+            var release2020 = publication.Releases.Single(r => r.Year == 2020);
+            var release2021 = publication.Releases.Single(r => r.Year == 2021);
+            var release2022 = publication.Releases.Single(r => r.Year == 2022);
+            publication.LatestPublishedReleaseVersion = release2021.Versions[0];
+
+            Publication otherPublication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var release2020Version0ReleaseFiles = GenerateDataSetReleaseFiles(release2020.Versions[0]);
+            var release2020Version1ReleaseFiles = GenerateDataSetReleaseFiles(release2020.Versions[1]);
+            var release2021Version0ReleaseFiles = GenerateDataSetReleaseFiles(release2021.Versions[0]);
+            var release2021DraftReleaseFiles = GenerateDataSetReleaseFiles(release2021.Versions[1]);
+            var release2022DraftReleaseFiles = GenerateDataSetReleaseFiles(release2022.Versions[0]);
+            var otherPublicationReleaseFiles = GenerateDataSetReleaseFiles(otherPublication.Releases[0].Versions[0]);
+
+            var contextId = await SeedDatabase(
+                [publication, otherPublication],
+                [
+                    .. release2020Version0ReleaseFiles,
+                    .. release2020Version1ReleaseFiles,
+                    .. release2021Version0ReleaseFiles,
+                    .. release2021DraftReleaseFiles,
+                    .. release2022DraftReleaseFiles,
+                    .. otherPublicationReleaseFiles,
+                ]
+            );
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationDataSetSearchableDocuments(publication.Slug);
+
+            // Assert
+            var actual = outcome.AssertRight();
+            Assert.Equal(
+                release2020Version1ReleaseFiles.Concat(release2021Version0ReleaseFiles).Select(rf => rf.FileId).Order(),
+                actual.Select(document => document.FileId).Order()
+            );
+            Assert.All(
+                actual.Where(document => document.ReleaseId == release2020.Id),
+                document => Assert.False(document.LatestData)
+            );
+            Assert.All(
+                actual.Where(document => document.ReleaseId == release2021.Id),
+                document => Assert.True(document.LatestData)
+            );
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoDataSets_ReturnsEmpty()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            var contextId = await SeedDatabase([publication], []);
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationDataSetSearchableDocuments(publication.Slug);
+
+            // Assert
+            Assert.Empty(outcome.AssertRight());
+        }
+
+        [Fact]
+        public async Task WhenPublicationDoesNotExist_ReturnsNotFound()
+        {
+            // Arrange
+            var contextId = await SeedDatabase([], []);
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationDataSetSearchableDocuments("unknown-publication");
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task WhenPublicationHasNoPublishedRelease_ReturnsNotFound()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var contextId = await SeedDatabase(
+                [publication],
+                GenerateDataSetReleaseFiles(publication.Releases[0].Versions[0])
+            );
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var outcome = await sut.GetPublicationDataSetSearchableDocuments(publication.Slug);
+
+            // Assert
+            outcome.AssertNotFound();
+        }
+    }
+
     private List<ReleaseFile> GenerateDataSetReleaseFiles(ReleaseVersion releaseVersion, int numberOfDataSets = 2) =>
         _dataFixture
             .DefaultReleaseFile()
