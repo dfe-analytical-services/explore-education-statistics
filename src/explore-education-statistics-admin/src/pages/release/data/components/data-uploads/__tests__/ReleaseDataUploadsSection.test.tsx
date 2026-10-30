@@ -1,4 +1,8 @@
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/data-uploads/ReleaseDataUploadsSection';
+import _apiDataSetService, {
+  ApiDataSetSummary,
+  DataSetDraftVersionStatus,
+} from '@admin/services/apiDataSetService';
 import _releaseDataFileService, {
   DataFileImportStatus,
   DataFile,
@@ -26,10 +30,12 @@ import { testRelease } from '@admin/pages/release/__data__/testRelease';
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
 jest.mock('@admin/services/dataReplacementService');
+jest.mock('@admin/services/apiDataSetService');
 
 const releaseDataFileService = jest.mocked(_releaseDataFileService);
 const permissionService = jest.mocked(_permissionService);
 const dataReplacementService = jest.mocked(_dataReplacementService);
+const apiDataSetService = jest.mocked(_apiDataSetService);
 
 describe('ReleaseDataUploadsSection', () => {
   beforeEach(() => {
@@ -173,6 +179,7 @@ describe('ReleaseDataUploadsSection', () => {
 
   beforeEach(() => {
     releaseDataFileService.getDataSetUploads.mockResolvedValue([]);
+    apiDataSetService.listDataSets.mockResolvedValue([]);
   });
 
   test('renders uploaded but not yet imported data files in the uploaded data files table', async () => {
@@ -350,6 +357,150 @@ describe('ReleaseDataUploadsSection', () => {
     expect(fileTableRow2.getByTestId('Test data 2-status')).toHaveTextContent(
       'Complete',
     );
+  });
+
+  describe('API upload status', () => {
+    const linkedDataFile: DataFile = {
+      ...testDataFiles[0],
+      publicApiCompatible: true,
+      publicApiDataSetId: 'api-dataset-1',
+      publicApiDataSetVersion: '1.0',
+    };
+
+    function makeApiDataSet(
+      status: DataSetDraftVersionStatus | 'Published',
+    ): ApiDataSetSummary {
+      const dataSet: ApiDataSetSummary = {
+        id: 'api-dataset-1',
+        title: 'Test aata 1',
+        summary: 'Test summary',
+        status: status === 'Published' ? 'Published' : 'Draft',
+        previousReleaseIds: [],
+      };
+
+      if (status === 'Published') {
+        return {
+          ...dataSet,
+          latestLiveVersion: {
+            id: 'api-version-1',
+            version: '1.0',
+            type: 'Major',
+            status: 'Published',
+            file: {
+              id: 'data-1',
+              title: 'Test data 1',
+            },
+            published: '2026-10-01',
+            releaseVersion: {
+              id: 'release-1',
+              title: 'Test release',
+            },
+          },
+        };
+      }
+
+      return {
+        ...dataSet,
+        draftVersion: {
+          id: 'api-version-1',
+          version: '1.0',
+          type: 'Major',
+          status,
+        },
+      };
+    }
+
+    function renderUploads() {
+      return renderWithTestConfig(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseVersionId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+    }
+
+    test.each([
+      ['Processing', 'API DRAFT'],
+      ['Draft', 'API READY'],
+      ['Published', 'API LIVE'],
+    ] as const)(
+      'displays %s API versions as %s',
+      async (versionStatus, expectedStatus) => {
+        releaseDataFileService.getDataFiles.mockResolvedValue([
+          linkedDataFile,
+          testDataFiles[1],
+        ]);
+
+        apiDataSetService.listDataSets.mockResolvedValue([
+          makeApiDataSet(versionStatus),
+        ]);
+
+        renderUploads();
+
+        expect(await screen.findByText(expectedStatus)).toBeInTheDocument();
+
+        expect(apiDataSetService.listDataSets).toHaveBeenCalledWith(
+          'publication-1',
+        );
+
+        const linkedStatusCell = screen.getByTestId('Test data 1-status');
+
+        expect(linkedStatusCell).toHaveTextContent('Complete');
+        expect(linkedStatusCell).toHaveTextContent(expectedStatus);
+
+        const unlinkedStatusCell = screen.getByTestId('Test data 2-status');
+
+        expect(unlinkedStatusCell).toHaveTextContent('Complete');
+        expect(unlinkedStatusCell).not.toHaveTextContent('API');
+      },
+    );
+
+    test('does not display an API status for compatible but unlinked data files', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        {
+          ...testDataFiles[0],
+          publicApiCompatible: true,
+        },
+      ]);
+
+      apiDataSetService.listDataSets.mockResolvedValue([
+        makeApiDataSet('Draft'),
+      ]);
+
+      renderUploads();
+
+      expect(await screen.findByTestId('Test data 1-status')).toHaveTextContent(
+        'Complete',
+      );
+
+      expect(screen.queryByText('API READY')).not.toBeInTheDocument();
+      expect(screen.queryByText('API DRAFT')).not.toBeInTheDocument();
+      expect(screen.queryByText('API LIVE')).not.toBeInTheDocument();
+    });
+
+    test('does not display a status when the API version does not match', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([
+        {
+          ...linkedDataFile,
+          publicApiDataSetVersion: '2.0',
+        },
+      ]);
+
+      apiDataSetService.listDataSets.mockResolvedValue([
+        makeApiDataSet('Draft'),
+      ]);
+
+      renderUploads();
+
+      expect(await screen.findByTestId('Test data 1-status')).toHaveTextContent(
+        'Complete',
+      );
+
+      expect(screen.queryByText('API READY')).not.toBeInTheDocument();
+    });
   });
 
   test('renders data files replacements table with uploaded but not yet imported replacements', async () => {

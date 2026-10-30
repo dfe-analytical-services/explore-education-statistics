@@ -129,16 +129,6 @@ export default function ReleaseDataUploadsSection({
     [dataFilesWithApiStatus],
   );
 
-  // const dataFilesWithoutImportedReplacements = useMemo(
-  //   () => importStageDataFiles.filter(dataFile => !dataFile.replacedByDataFile),
-  //   [importStageDataFiles],
-  // );
-
-  // const dataFilesWithImportedReplacements = useMemo(
-  //   () => importStageDataFiles.filter(dataFile => dataFile.replacedByDataFile),
-  //   [importStageDataFiles],
-  // );
-
   const dataFilesWithValidReplacements =
     dataFilesWithImportedReplacements.filter(
       originalFile =>
@@ -167,8 +157,6 @@ export default function ReleaseDataUploadsSection({
       ),
     [releaseVersionId, queryClient],
   );
-
-  const { data: apiDatasets } = useQuery(apiDataSetQueries.list(publicationId));
 
   const refreshDataFileLists = useCallback(async () => {
     await Promise.all([refetchDataFiles(), refetchDataSetUploads()]);
