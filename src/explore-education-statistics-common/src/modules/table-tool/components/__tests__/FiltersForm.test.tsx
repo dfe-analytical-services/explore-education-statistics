@@ -844,29 +844,92 @@ describe('FiltersForm', () => {
     });
 
     test('keeps the analyst ordering when the child indicator is not next to its parent indicator', () => {
-      const testSubjectMetaChildFirst = produce(
-        testSubjectMetaPairedIndicators,
-        draft => {
-          draft.indicators.AbsenceByReason.options.reverse();
-        },
-      );
+      // The analyst ordering isn't alphabetical, and an unpaired indicator
+      // separates the child indicator from its parent indicator
+      const testSubjectMetaAnalystOrdering = produce(testSubjectMeta, draft => {
+        draft.filters = {};
+        draft.indicators.AbsenceFields.options = [
+          {
+            label: 'Unauthorised absence rate',
+            unit: '%',
+            value: 'unauthorised-absence-rate',
+            name: 'sess_unauthorised_percent',
+          },
+          {
+            label: 'Number of overall absence sessions',
+            unit: '',
+            value: 'number-overall-absence-sessions',
+            name: 'sess_overall',
+          },
+          {
+            label: 'Authorised absence rate',
+            unit: '%',
+            value: 'authorised-absence-rate',
+            name: 'sess_authorised_percent',
+            parentIndicatorId: 'unauthorised-absence-rate',
+          },
+        ];
+      });
 
       render(
         <FiltersForm
           {...testWizardStepProps}
           stepTitle="Choose your filters"
           subject={testSubject}
-          subjectMeta={testSubjectMetaChildFirst}
+          subjectMeta={testSubjectMetaAnalystOrdering}
           onSubmit={noop}
         />,
       );
 
       const checkboxes = within(
-        screen.getByRole('group', { name: 'Absence by reason' }),
+        screen.getByRole('group', { name: 'Absence fields' }),
       ).getAllByRole('checkbox');
 
-      expect(checkboxes[0]).toHaveAccessibleName(childLabel);
-      expect(checkboxes[1]).toHaveAccessibleName(parentLabel);
+      expect(checkboxes).toHaveLength(3);
+      expect(checkboxes[0]).toHaveAccessibleName('Unauthorised absence rate');
+      expect(checkboxes[1]).toHaveAccessibleName(
+        'Number of overall absence sessions',
+      );
+      expect(checkboxes[2]).toHaveAccessibleName('Authorised absence rate');
+    });
+
+    test('keeps the indicator group ordering when the child indicator is in a group before its parent indicator', () => {
+      // Pairs can span groups. Groups are ordered by their `order`, and the
+      // child indicator stays in its own group
+      const testSubjectMetaChildGroupFirst = produce(testSubjectMeta, draft => {
+        draft.filters = {};
+        draft.indicators.AbsenceByReason.order = 1;
+        draft.indicators.AbsenceFields.order = 0;
+        draft.indicators.AbsenceByReason.options[1].parentIndicatorId =
+          'authorised-absence-rate';
+      });
+
+      render(
+        <FiltersForm
+          {...testWizardStepProps}
+          stepTitle="Choose your filters"
+          subject={testSubject}
+          subjectMeta={testSubjectMetaChildGroupFirst}
+          onSubmit={noop}
+        />,
+      );
+
+      const groups = screen
+        .getAllByRole('group')
+        .filter(group =>
+          ['Absence fields', 'Absence by reason'].includes(
+            group.querySelector('legend')?.textContent ?? '',
+          ),
+        );
+
+      expect(
+        groups.map(group => group.querySelector('legend')?.textContent),
+      ).toEqual(['Absence fields', 'Absence by reason']);
+
+      expect(
+        within(groups[0]).getByLabelText('Authorised absence rate'),
+      ).toBeEnabled();
+      expect(within(groups[1]).getByLabelText(childLabel)).toBeDisabled();
     });
 
     test('checking and unchecking the parent indicator also checks and unchecks the child indicator', async () => {
