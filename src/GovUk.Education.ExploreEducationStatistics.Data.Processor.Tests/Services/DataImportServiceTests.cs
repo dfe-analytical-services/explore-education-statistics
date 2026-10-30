@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -15,6 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -56,8 +59,8 @@ public class DataImportServiceTests
     {
         var import = new DataImport
         {
-            File = new File(),
-            MetaFile = new File(),
+            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata },
             Status = STAGE_1,
         };
 
@@ -88,8 +91,8 @@ public class DataImportServiceTests
         var import = new DataImport
         {
             Errors = new List<DataImportError> { new("error 1"), new("error 2") },
-            File = new File(),
-            MetaFile = new File(),
+            File = new File { Type = FileType.Data, DataStorageVersion = DataStorageVersion.StatsDB },
+            MetaFile = new File { Type = FileType.Metadata },
             Status = STAGE_1,
         };
 
@@ -325,6 +328,119 @@ public class DataImportServiceTests
     }
 
     [Fact]
+    public async Task WriteDataSetMetaFile_TwoRootFilters_HierarchiesOrderedByRootFilterLabel()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var file = _fixture
+            .DefaultFile(FileType.Data)
+            .WithDataSetFileMeta(null)
+            .WithDataSetFileVersionGeographicLevels([])
+            .WithSubjectId(subject.Id)
+            .Generate();
+
+        // Root filter B is added before root filter A so that the hierarchies aren't in label order by chance
+        var rootFilterB = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Root filter B",
+            Name = "root_filter_b",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "RootFilterBItem0" }] },
+            ],
+        };
+
+        var childFilterB = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Child filter B",
+            Name = "child_filter_b",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "ChildFilterBItem0" }] },
+            ],
+            ParentFilter = "root_filter_b",
+        };
+
+        var rootFilterA = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Root filter A",
+            Name = "root_filter_a",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "RootFilterAItem0" }] },
+            ],
+        };
+
+        var childFilterA = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Child filter A",
+            Name = "child_filter_a",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "ChildFilterAItem0" }] },
+            ],
+            ParentFilter = "root_filter_a",
+        };
+
+        var observationB = _fixture
+            .DefaultObservation()
+            .WithSubject(subject)
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
+            .WithTimePeriod(2000, April)
+            .WithFilterItems([rootFilterB.FilterGroups[0].FilterItems[0], childFilterB.FilterGroups[0].FilterItems[0]])
+            .Generate();
+
+        var observationA = _fixture
+            .DefaultObservation()
+            .WithSubject(subject)
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
+            .WithTimePeriod(2000, April)
+            .WithFilterItems([rootFilterA.FilterGroups[0].FilterItems[0], childFilterA.FilterGroups[0].FilterItems[0]])
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Files.Add(file);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.Filter.AddRange(rootFilterB, childFilterB, rootFilterA, childFilterA);
+            statisticsDbContext.Observation.AddRange(observationB, observationA);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
+
+        var import = new DataImport
+        {
+            FileId = file.Id,
+            SubjectId = subject.Id,
+            TotalRows = 2,
+            GeographicLevels = [GeographicLevel.Country],
+        };
+
+        await service.WriteDataSetFileMeta(import);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var updatedFile = contentDbContext.Files.Single(f => f.SubjectId == subject.Id);
+
+            Assert.NotNull(updatedFile.FilterHierarchies);
+            Assert.Equal(2, updatedFile.FilterHierarchies.Count);
+            Assert.Equal([rootFilterA.Id, childFilterA.Id], updatedFile.FilterHierarchies[0].FilterIds);
+            Assert.Equal([rootFilterB.Id, childFilterB.Id], updatedFile.FilterHierarchies[1].FilterIds);
+        }
+    }
+
+    [Fact]
     public async Task GenerateFilterHierarchies_Success()
     {
         var subject = new Subject { Id = Guid.NewGuid() };
@@ -451,19 +567,13 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(
-                statisticsDbContext,
-                filters
-                    .Select(f => new FilterMeta
-                    {
-                        Id = f.Id,
-                        Label = f.Label,
-                        Hint = f.Hint,
-                        ColumnName = f.Name,
-                        ParentFilter = f.ParentFilter,
-                    })
-                    .ToList()
-            );
+            var dataSetWriter = BuildStatisticsDbDataSetWriterFactory(
+                    statisticsDbContext,
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSetWriter, filters);
 
             var hierarchy = Assert.Single(results);
             Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
@@ -581,19 +691,13 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(
-                statisticsDbContext,
-                filters
-                    .Select(f => new FilterMeta
-                    {
-                        Id = f.Id,
-                        Label = f.Label,
-                        Hint = f.Hint,
-                        ColumnName = f.Name,
-                        ParentFilter = f.ParentFilter,
-                    })
-                    .ToList()
-            );
+            var dataSetWriter = BuildStatisticsDbDataSetWriterFactory(
+                    statisticsDbContext,
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSetWriter, filters);
 
             Assert.Equal(2, results.Count);
 
@@ -626,11 +730,22 @@ public class DataImportServiceTests
         string? statisticsDbContextId = null
     )
     {
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId ?? Guid.NewGuid().ToString(),
-            statisticsDbContextId ?? Guid.NewGuid().ToString()
-        );
+        contentDbContextId ??= Guid.NewGuid().ToString();
+        statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        return new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>(Strict));
+        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
+
+        return new DataImportService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(contentDbContextId),
+                InMemoryStatisticsDbContext(statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(statisticsDbContextId),
+                new InMemoryDatabaseHelper(dbContextSupplier)
+            ),
+            Mock.Of<ILogger<DataImportService>>(Strict)
+        );
     }
 }

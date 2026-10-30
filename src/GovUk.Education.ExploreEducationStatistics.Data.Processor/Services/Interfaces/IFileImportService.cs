@@ -1,14 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 
 public interface IFileImportService
 {
-    Task ImportObservations(DataImport import, StatisticsDbContext context);
+    Task ImportObservations(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter);
 
-    Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context);
+    Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, IStorageDataSetWriter dataSetWriter);
 
-    Task CompleteImport(DataImport import, StatisticsDbContext context);
+    Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter);
 }

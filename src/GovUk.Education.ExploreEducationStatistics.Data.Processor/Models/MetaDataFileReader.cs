@@ -47,7 +47,7 @@ public class MetaDataFileReader
         };
     }
 
-    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(IEnumerable<MetaRow> metaRows, Subject subject)
+    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(IEnumerable<MetaRow> metaRows, Guid subjectId)
     {
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
@@ -61,7 +61,7 @@ public class MetaDataFileReader
                         parentFilter: filterMetaRow.ParentFilter,
                         autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
                         // NOTE: AutoSelectFilterItemId is set later, after filter items are created
-                        subjectId: subject.Id
+                        subjectId: subjectId
                     ),
                     column: filterMetaRow.ColumnName
                 )
@@ -71,7 +71,7 @@ public class MetaDataFileReader
 
     public List<(Indicator Indicator, string Column)> ReadIndicatorsFromCsv(
         IEnumerable<MetaRow> metaRows,
-        Subject subject
+        Guid subjectId
     )
     {
         var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
@@ -86,7 +86,7 @@ public class MetaDataFileReader
 
         var indicatorGroups = indicatorRows
             .GroupBy(row => row.IndicatorGrouping!)
-            .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subject.Id));
+            .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subjectId));
 
         return indicatorRows
             .Select(row =>
