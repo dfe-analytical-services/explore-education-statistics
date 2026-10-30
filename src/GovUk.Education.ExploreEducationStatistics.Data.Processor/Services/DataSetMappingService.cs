@@ -128,7 +128,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
                 {
                     // If none matching on every attribute, check if any matching by GeogLvl + Code. We don't check by
                     // Name to preserve behaviour from before location mapping was introduced (which allowed analysts
-                    // to change/fix location names with replacements).
+                    // to change/fix location names with replacements without manual mapping).
                     matchingReplacements = replacementLocationsByLevelAndCode[
                         (originalLocation.GeographicLevel, originalLocation.ToLocationAttribute().GetCodeOrFallback())
                     ]
