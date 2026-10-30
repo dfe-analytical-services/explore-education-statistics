@@ -7,3 +7,6 @@ param elz = true
 
 // Zone-redundant storage.
 param storageAccountSku = 'Standard_ZRS'
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
