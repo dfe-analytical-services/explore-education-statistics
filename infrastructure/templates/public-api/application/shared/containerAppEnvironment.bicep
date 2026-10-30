@@ -13,6 +13,9 @@ param applicationInsightsKey string
 @description('Specifies the workload profiles for this Container App Environment - the default Consumption plan is always included')
 param workloadProfiles ContainerAppWorkloadProfile[] = []
 
+@description('Whether to spread the Container App Environment across availability zones.')
+param zoneRedundant bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -58,6 +61,7 @@ module containerAppEnvironmentModule '../../components/containerAppEnvironment.b
       }
     ]
     workloadProfiles: workloadProfiles
+    zoneRedundant: zoneRedundant
     tagValues: tagValues
   }
 }

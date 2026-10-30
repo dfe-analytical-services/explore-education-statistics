@@ -42,7 +42,7 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 16 | Identity | Managed identity instead of connection strings and keys wherever the service supports it. | Decided |
 | 17 | Monitoring | Every app sends telemetry to Application Insights by connection string; the remaining instrumentation-key uses are removed as part of the move. See [section 6.6](#66-monitoring). | Decided |
 | 18 | Hostnames | The Content API uses `cont.` in every environment: `cont.dev.`, `cont.test.`, `cont.pre-production.` and `cont.` for Prod, all on `explore-education-statistics.service.gov.uk`. Only Pre-Prod uses it today. See [section 6.11](#611-content-api-hostnames). | Decided |
-| 19 | Redundancy | The safest redundancy available without standing up failover infrastructure: zone redundancy within UK South wherever the service supports it, plus geo-redundant copies and backups that need no secondary deployment. No active secondary region. See [section 6.10](#610-redundancy). | Decided |
+| 19 | Redundancy | No failover as the service doesn't demand it. Geo-redundant copies and backups that need no secondary deployment, and zone redundancy within UK South only where it costs little, in Pre-Prod and Prod. No active secondary region. See [section 6.10](#610-redundancy). | Decided |
 | 20 | Durable Functions | The data processor keeps the Azure Storage backend for orchestration state, but connects to it with its managed identity instead of connection strings. See [section 6.12](#612-data-processor-durable-functions-storage). | Decided |
 | 21 | Network | Subnet layout: one integration subnet per App Service plan sized to twice its maximum instance count, one shared private endpoint subnet, dedicated App Gateway and Container Apps subnets, in a /21 per environment. See [section 5](#5-subnet-migration). | Decided |
 | 22 | Network | VNet and subnet address ranges come from the `.bicepparam` files (EES-7425). | Done |
@@ -81,7 +81,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 17 | Move the Windows apps to Linux: publish flags, `linuxFxVersion`, app settings, testing | Done | [Section 6.2](#62-windows--linux). Done under the `elz` flag (EES-7802). Still to test on Linux: the Importer's `libmagic` dependency and case-sensitive file paths. |
 | 18 | Replace the remaining App Insights instrumentation keys with connection strings | To do | [Section 6.6](#66-monitoring) |
 | 19 | Connect the data processor's Durable Functions storage with managed identity | To do | [Section 6.12](#612-data-processor-durable-functions-storage) |
-| 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. Vaults done: both geo-redundant in every environment, and cross-region restore turned on for the Backup vault (the Recovery Services vault already had it). SQL, PostgreSQL, App Service plans, Container Apps and Search still to do. |
+| 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. Vaults done: both geo-redundant in every environment, and cross-region restore turned on for the Backup vault (the Recovery Services vault already had it). App Service plans and Container Apps done: zone redundancy on the Admin, Content API, Data API and Public Site plans and the Container Apps environment, in Pre-Prod and Prod only. SQL, PostgreSQL, Search and the function app plans are deliberately left without zone redundancy. |
 | 21 | Move the Content API to `cont.` hostnames, keeping `content.` on Prod for a transition period | To do | [Section 6.11](#611-content-api-hostnames) |
 | 22 | Identity and access groundwork: user-assigned identities per app, SQL Entra-only, Key Vault RBAC, split key-based storage from identity-only | To do | [Section 7](#7-identity-and-network-access) |
 | 23 | Tidy-ups: retire `infrastructure/infrastructure-pipeline.yml`, delete the unused Basic ACR module, update preview API versions | To do | [Section 6.9](#69-api-versions-and-leftovers) |
@@ -492,23 +492,25 @@ Low priority, but cheap to do while every template is being touched:
 - **The legacy `infrastructure/infrastructure-pipeline.yml`** still runs on `windows-latest` and publishes an `arm-template` artifact, but no ARM templates deploy resources any more. Retire it.
 
 ### 6.10 Redundancy
-**Decided** ([decision 19](#1-key-decisions)): zone redundancy within UK South wherever it's supported, and geo-redundant copies and backups that need no secondary deployment. A zone outage is handled automatically. A full region outage means restoring from geo-redundant backups or storage copies, not failing over to a standing secondary.
+**Decided** ([decision 19](#1-key-decisions)): no failover, as the service doesn't demand it. Geo-redundant copies and backups that need no secondary deployment, and zone redundancy within UK South only where it costs little, in Pre-Prod and Prod. A zone outage is handled automatically where zone redundancy is on; elsewhere the affected service waits for the zone to recover. A full region outage means restoring from geo-redundant backups or storage copies, not failing over to a standing secondary.
+
+Zone redundancy isn't failover. Azure spreads a resource's instances across UK South's three availability zones, so the others keep serving if one zone fails, with nothing for anyone to do. It doesn't help with a whole-region outage.
 
 | Resource | ELZ setting | Cost and constraints |
 |---|---|---|
 | Storage accounts | See [section 6.4](#64-storage-redundancy-and-access) | None of note |
-| Azure SQL databases | `zoneRedundant: true`; keep geo-redundant backup storage | Needs vCore, not DTU Standard † |
-| PostgreSQL | Zone-redundant HA; keep geo-redundant backups (already on in Pre-Prod and Prod) | Needs General Purpose, not Burstable †; standby doubles compute |
-| App Service plans | Zone redundant (`zoneRedundant: true`) | Premium tiers only, and at least 2 instances †. Notifier and Publisher (B1/S1 today) would need Premium. Set at creation |
-| Elastic Premium function plans | Zone redundant | Minimum instance count applies †; set at creation |
-| Container Apps environment | `zoneRedundant: true` | Set at creation only; needs the VNet-integrated environment we already use |
+| Azure SQL databases | Not zone redundant; keep geo-redundant backup storage | Zone redundancy would add a compute surcharge, and needs vCore rather than DTU Standard †. It can be turned on later |
+| PostgreSQL | No high availability; keep geo-redundant backups (already on in Pre-Prod and Prod) | Zone-redundant HA would need General Purpose rather than Burstable †, and its standby doubles compute |
+| App Service plans | **Done.** Admin, Content API, Data API and Public Site: zone redundant in Pre-Prod and Prod (`zoneRedundantAppServicePlans` in the release pipeline's `parameters/elz` files). Importer, Notifier and Publisher: not zone redundant | Premium v2 to v4 only, and at least 2 instances †. The four web plans already run Premium with autoscaling from 2 instances, so it costs little. The Importer would need a second instance, and Notifier and Publisher (B1/S1) would need Premium. It can be switched on for an existing Premium plan by a deploy, as long as the plan's scale unit supports zones, which the zone-redundant web plans in the same resource group make sure of |
+| Elastic Premium function plans (Data Processor, Analytics, Screener) | Not zone redundant | Would need at least 2 always-ready instances †. Can only be set at creation: adding it later means a new plan and app side by side. Their work is queue, timer or orchestration driven, with zone-redundant storage, so a zone outage delays it rather than losing it |
+| Container Apps environment | **Done.** Zone redundant in Pre-Prod and Prod (`containerAppEnvironmentZoneRedundant` in the Public API pipeline's `parameters/elz` files) | No charge for the environment itself. Set at creation only; needs the VNet-integrated environment we already use. The Public API container app needs at least 2 replicas to benefit, and runs a minimum of 1 in Prod and 0 in Pre-Prod today |
 | Application Gateway and public IP | Zones 1-3 | Already the case today |
-| AI Search | 2 replicas or more, which spreads across zones automatically † | Each replica is billed |
+| AI Search | 1 replica, not zone redundant | 2 replicas or more would spread across zones automatically †, but each replica is billed |
 | Container Registry | Zone redundancy † | Moves to the shared tooling group |
 | Key Vault, Event Grid, Front Door, Log Analytics | Built in, nothing to set † | |
 | Recovery Services and Backup vaults | Geo-redundant, cross-region restore on, in every environment. Done: the Recovery Services vault already had both; the Backup vault gets cross-region restore from `backupVaultCrossRegionRestore` in the core `parameters/elz` files | Vault redundancy can't change once items are protected †. Cross-region restore costs extra, and secondary-region restore points lag by up to 36 hours |
 
-**Open (Proposed):** which environments get this. Zone redundancy multiplies instance counts, and PostgreSQL HA needs a bigger tier. The suggestion is Prod and Pre-Prod (so it's rehearsed), with Dev and Test on the cheaper non-redundant settings. The creation-only settings (App Service plans, Container Apps environment, vaults) are then set correctly from day one where they matter.
+**Decided:** zone redundancy goes in Pre-Prod and Prod (so it's rehearsed), and not in Dev or Test.
 
 ### 6.11 Content API hostnames
 **Decided** ([decision 18](#1-key-decisions)). Today:

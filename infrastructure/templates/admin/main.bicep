@@ -36,6 +36,9 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
 
+@description('Whether to spread the App Service plan\'s instances across availability zones.')
+param zoneRedundant bool
+
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
 
@@ -63,6 +66,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.admin.appServicePlan
     sku: appServiceSku
+    zoneRedundant: zoneRedundant
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem
     alerts: deployAlerts ? {
