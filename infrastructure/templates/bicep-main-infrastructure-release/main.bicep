@@ -65,6 +65,9 @@ param notifierStorageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('SKU of the Publisher Function App\'s storage account, which holds the release publishing statuses.')
 param publisherStorageAccountSku StorageAccountSku = 'Standard_GZRS'
 
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param deployAppIdentities bool = false
+
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
 var tagValues = union(tags, {
   Environment: environmentConfig.environmentName!
@@ -230,6 +233,22 @@ resource dataProtectionKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
       'wrapKey'
       'unwrapKey'
     ]
+  }
+}
+
+module appIdentitiesModule '../common/components/managed-identity/user-assigned-identities.bicep' = if (deployAppIdentities) {
+  name: 'appIdentitiesModuleDeploy'
+  params: {
+    identityNames: [
+      resourceNames.admin.identity
+      resourceNames.contentApi.identity
+      resourceNames.dataApi.identity
+      resourceNames.publicSite.identity
+      resourceNames.importer.identity
+      resourceNames.notifier.identity
+      resourceNames.publisher.identity
+    ]
+    tagValues: tagValues
   }
 }
 

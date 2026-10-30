@@ -83,7 +83,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 19 | Connect the data processor's Durable Functions storage with managed identity | To do | [Section 6.12](#612-data-processor-durable-functions-storage) |
 | 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. Vaults done: both geo-redundant in every environment, and cross-region restore turned on for the Backup vault (the Recovery Services vault already had it). App Service plans and Container Apps done: zone redundancy on the Admin, Content API, Data API and Public Site plans and the Container Apps environment, in Pre-Prod and Prod only. SQL, PostgreSQL, Search and the function app plans are deliberately left without zone redundancy. |
 | 21 | Move the Content API to `cont.` hostnames, keeping `content.` on Prod for a transition period | To do | [Section 6.11](#611-content-api-hostnames) |
-| 22 | Identity and access groundwork: user-assigned identities per app, SQL Entra-only, Key Vault RBAC, split key-based storage from identity-only | To do | [Section 7](#7-identity-and-network-access) |
+| 22 | Identity and access groundwork: user-assigned identities per app, SQL Entra-only, Key Vault RBAC, split key-based storage from identity-only | In progress | [Section 7](#7-identity-and-network-access). User-assigned identities: created in ELZ by each app's own pipeline (`deployAppIdentities` in the release, Search, Analytics and Screener pipelines; EES-7805 part 1). The apps don't use them yet. |
 | 23 | Tidy-ups: retire `infrastructure/infrastructure-pipeline.yml`, delete the unused Basic ACR module, update preview API versions | To do | [Section 6.9](#69-api-versions-and-leftovers) |
 
 ## 3. Approach
@@ -169,27 +169,34 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `admin.appServicePlan` | App Service Plan | `s101d01-asp-ees-admin` | `s292d01plan-uks-admin01` |  |
 | `admin.appInsights` | Application Insights | `s101d01-ai-ees-admin` | `s292d01appi-uks-admin01` |  |
 | `admin.signalRName` | SignalR | `s101d01-sr-ees-admin` | `s292d01sigr-uks-admin01` |  |
+| `admin.identity` | Managed Identity | `s101d01-id-ees-admin` | `s292d01id-uks-admin01` | New. Only created in ELZ, by the app's own pipeline |
 | `contentApi.appService` | App Service | `s101d01-as-ees-content` | `s292d01app-uks-contentapi01` |  |
 | `contentApi.appServicePlan` | App Service Plan | `s101d01-asp-ees-content` | `s292d01plan-uks-contentapi01` |  |
 | `contentApi.appInsights` | Application Insights | `s101d01-ai-ees-content` | `s292d01appi-uks-contentapi01` |  |
+| `contentApi.identity` | Managed Identity | `s101d01-id-ees-content` | `s292d01id-uks-contentapi01` | New. Only created in ELZ, by the app's own pipeline |
 | `dataApi.appService` | App Service | `s101d01-as-ees-data` | `s292d01app-uks-dataapi01` |  |
 | `dataApi.appServicePlan` | App Service Plan | `s101d01-asp-ees-data` | `s292d01plan-uks-dataapi01` |  |
 | `dataApi.appInsights` | Application Insights | `s101d01-ai-ees-data` | `s292d01appi-uks-dataapi01` |  |
+| `dataApi.identity` | Managed Identity | `s101d01-id-ees-data` | `s292d01id-uks-dataapi01` | New. Only created in ELZ, by the app's own pipeline |
 | `importer.functionApp` | Function App | `s101d01-fa-ees-importer` | `s292d01func-uks-importer01` |  |
 | `importer.appServicePlan` | App Service Plan | `s101d01-asp-ees-importer` | `s292d01plan-uks-importer01` |  |
 | `importer.appInsights` | Application Insights | `s101d01-ai-ees-importer` | `s292d01appi-uks-importer01` |  |
 | `importer.storageAccount` | Storage Account | `s101d01eessaimporter` | `s292d01stuksimporter` |  |
+| `importer.identity` | Managed Identity | `s101d01-id-ees-importer` | `s292d01id-uks-importer01` | New. Only created in ELZ, by the app's own pipeline |
 | `notifier.functionApp` | Function App | `s101d01-fa-ees-notify` | `s292d01func-uks-notifier01` | `notify`→`notifier` |
 | `notifier.appServicePlan` | App Service Plan | `s101d01-asp-ees-notify` | `s292d01plan-uks-notifier01` |  |
 | `notifier.appInsights` | Application Insights | `s101d01-ai-ees-notify` | `s292d01appi-uks-notifier01` |  |
 | `notifier.storageAccount` | Storage Account | `s101d01saeesnotify` (Test/Pre-Prod `s101t01storageeesnotify`) | `s292d01stuksnotifier` | Test/Pre-Prod `storage` special case removed |
+| `notifier.identity` | Managed Identity | `s101d01-id-ees-notify` | `s292d01id-uks-notifier01` | New. Only created in ELZ, by the app's own pipeline |
 | `publicSite.appService` | App Service | `s101d01-as-ees-public-site` | `s292d01app-uks-publicsite01` |  |
 | `publicSite.appServicePlan` | App Service Plan | `s101d01-asp-ees-public-site` | `s292d01plan-uks-publicsite01` |  |
 | `publicSite.appInsights` | Application Insights | `s101d01-ai-ees-public-site` | `s292d01appi-uks-publicsite01` |  |
+| `publicSite.identity` | Managed Identity | `s101d01-id-ees-public-site` | `s292d01id-uks-publicsite01` | New. Only created in ELZ, by the app's own pipeline |
 | `publisher.functionApp` | Function App | `s101d01-fa-ees-publisher` | `s292d01func-uks-publisher01` |  |
 | `publisher.appServicePlan` | App Service Plan | `s101d01-asp-ees-publisher` | `s292d01plan-uks-publisher01` |  |
 | `publisher.appInsights` | Application Insights | `s101d01-ai-ees-publisher` | `s292d01appi-uks-publisher01` |  |
 | `publisher.storageAccount` | Storage Account | `s101d01saeespublisher` | `s292d01stukspublisher` |  |
+| `publisher.identity` | Managed Identity | `s101d01-id-ees-publisher` | `s292d01id-uks-publisher01` | New. Only created in ELZ, by the app's own pipeline |
 
 ### Public API (`papi`)
 
@@ -216,6 +223,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `screener.functionStorageAccount` | Storage Account | `s101d01eessapisafn` | `s292d01stuksscreenerfn` |  |
 | `screener.logsStorageAccount` | Storage Account | `s101d01eessapisalogs` | `s292d01stuksscreenerlogs` | Exactly 24 chars |
 | `screener.logsFileShare` | File Share | `s101d01-ees-sapi-fa-screener-logs-share` | `share-uks-screenerlogs` |  |
+| `screener.identity` | Managed Identity | `s101d01-ees-sapi-id-screener` | `s292d01id-uks-screener01` | New. Only created in ELZ, by the app's own pipeline |
 
 ### Search
 
@@ -224,6 +232,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `nlSearch.functionApp` | Function App | `s101d01-ees-fa-nlsearch` | `s292d01func-uks-nlsearch01` |  |
 | `nlSearch.appServicePlan` | App Service Plan | `s101d01-ees-asp-nlsearch` | `s292d01plan-uks-nlsearch01` |  |
 | `nlSearch.functionStorageAccount` | Storage Account | `s101d01eessanlsearchfn` | `s292d01stuksnlsearchfn` |  |
+| `nlSearch.identity` | Managed Identity | `s101d01-ees-id-nlsearch` | `s292d01id-uks-nlsearch01` | New. Only created in ELZ, by the app's own pipeline |
 | `search.service` | Search Service | `s101d01-ees-srch` | `s292d01srch-uks-ees01` |  |
 | `search.storageAccount` | Storage Account | `s101d01eessasearch` | `s292d01stukssearch` |  |
 | `search.appInsights` | Application Insights | `s101d01-ees-ai-search` | `s292d01appi-uks-search01` | Shared by nlSearch and searchDocs |
@@ -238,6 +247,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `searchDocs.functionApp` | Function App | `s101d01-ees-fa-searchdocs` | `s292d01func-uks-searchdocs01` |  |
 | `searchDocs.appServicePlan` | App Service Plan | `s101d01-ees-asp-searchdocs` | `s292d01plan-uks-searchdocs01` |  |
 | `searchDocs.functionStorageAccount` | Storage Account | `s101d01eessasearchdocsfn` | `s292d01stukssearchdocsfn` | Exactly 24 chars |
+| `searchDocs.identity` | Managed Identity | `s101d01-ees-id-searchdocs` | `s292d01id-uks-searchdocs01` | New. Only created in ELZ, by the app's own pipeline |
 
 ### Analytics
 
@@ -249,6 +259,7 @@ Names that aren't in `resourceNames` yet, so aren't listed here: the private DNS
 | `analytics.functionStorageAccount` | Storage Account | `s101d01eessaanlytfa` | `s292d01stuksanalyticsfn` | `fa`→`fn`, matching the other function storage accounts |
 | `analytics.storage.storageAccountName` | Storage Account | `s101d01eessaanlyt` | `s292d01stuksanalytics` |  |
 | `analytics.storage.fileShareName` | File Share | `s101d01-ees-share-anlyt` | `share-uks-analytics` | Child of the storage account, so the prefix is optional |
+| `analytics.identity` | Managed Identity | `s101d01-ees-id-analytics` | `s292d01id-uks-analytics01` | New. Only created in ELZ, by the app's own pipeline |
 
 ### Key Vault secrets named after a storage account today
 
@@ -583,3 +594,4 @@ Shortcuts taken along the way that need revisiting.
 |---|---|---|---|
 | 1 | Make the Robot UI tests job use `get-resource-names.yml` for its Key Vault name, instead of building the name in its own Bash step. Remove the hand-built legacy and ELZ names, and the `TODO EES-7502`, when doing so. | `infrastructure/templates/main-app-release/ci/jobs/run-robot-tests.yml` | `get-resource-names.yml` needs the Azure CLI, which isn't installed on the self-hosted `ees-ubuntu2604-large-v2` agents the job runs on. Needs the CLI added to `infrastructure/scripts/vmss-agent-bootstrap.sh` and the scale sets reimaged first. |
 | 2 | Delete the secrets that are no longer written from the existing legacy Key Vaults: the `*-access-key` secrets; the Public API data, Analytics and screener logs storage connection strings; `ees-admin-connectionstring-publicdatadb`, `ees-publisher-connectionstring-publicdatadb`, `ees-publicapi-data-processor-connectionstring-publicdatadb` and `ees-publicapi-public-api-containerapp-private-url`. | Each environment's `s101…-kv-ees-01` | Bicep doesn't delete secrets it stops managing. They'd be left holding storage keys that are no longer refreshed. Check first that nobody uses them by hand. |
+| 3 | Create every user-assigned managed identity through the shared `common/components/managed-identity/user-assigned-identities.bicep`, instead of each template declaring its own `Microsoft.ManagedIdentity/userAssignedIdentities` resource. This also moves them from API version `2023-01-31` to `2024-11-30`. | `public-api/application/public-api/publicApiAppIdentity.bicep` (Public API container app), `public-api/application/public-api/publicApiDataProcessor.bicep` (Data Processor), `common/components/application-gateway/appGateway.bicep` (App Gateway) | The shared module was added with the per-app identities (EES-7805 part 1). Switching these over changes legacy deployments too, as the identities already exist there, so it's kept as a separate PR with its own snapshot checks. It's a tidy-up only: the identities keep their names, so nothing that uses them is affected. |

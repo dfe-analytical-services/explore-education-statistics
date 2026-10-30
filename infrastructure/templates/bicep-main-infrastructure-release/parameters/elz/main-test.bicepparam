@@ -12,3 +12,6 @@ param publisherStorageAccountSku = 'Standard_ZRS'
 
 // Host every App Service and Function App on Linux.
 param appOperatingSystem = 'Linux'
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
