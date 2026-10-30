@@ -295,21 +295,24 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverrideRequired =
     hasMajorPatchChanges && !majorPatchVersionOverridden;
 
-  // Only BAU users can override the block on major changes in a patch version.
+  const mappingActionsRequired =
+    !!dataSet?.draftVersion?.mappingStatus && !mappingComplete;
+
+  // Only BAU users can override the block on major changes in a patch version,
+  // and only once mapping has been completed.
   const canOverrideMajorVersion =
-    majorVersionOverrideRequired && !!user?.permissions.isBauUser;
+    majorVersionOverrideRequired &&
+    !mappingActionsRequired &&
+    !!user?.permissions.isBauUser;
 
   const majorVersionRejected =
-    majorVersionOverrideRequired && !user?.permissions.isBauUser;
+    majorVersionOverrideRequired && !canOverrideMajorVersion;
 
   const showDraftVersionTasks =
     finalisingStatus !== 'finalising' &&
     dataSet?.draftVersion?.mappingStatus &&
     (dataSet?.draftVersion?.status === 'Draft' ||
       dataSet?.draftVersion?.status === 'Mapping');
-
-  const mappingActionsRequired =
-    !!dataSet?.draftVersion?.mappingStatus && !mappingComplete;
 
   const readyToFinalise =
     !!mappingComplete && dataSet?.draftVersion?.status === 'Mapping';
@@ -364,7 +367,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverrideWarning = (
     <WarningMessage testId="major-version-override-warning">
       This data file has resulted in a major version update which is not
-      normally allowed in release amendments. As a BAU user you can override
+      normally allowed in release amendments. As a Super User you can override
       this, but this patch version will contain breaking changes for users of
       this API data set.
     </WarningMessage>
@@ -373,7 +376,7 @@ export default function ReleaseApiDataSetDetailsPage() {
   const majorVersionOverriddenWarning = (
     <WarningMessage testId="major-version-overridden-warning">
       This patch version contains major changes which have been approved by a
-      BAU user. These are breaking changes for users of this API data set.
+      Super User. These are breaking changes for users of this API data set.
     </WarningMessage>
   );
 
@@ -493,7 +496,7 @@ export default function ReleaseApiDataSetDetailsPage() {
             {dataSet.draftVersion?.publicApiCompatible === false && (
               <WarningMessage testId="api-incompatible-warning">
                 The data file for the draft version failed the API compatibility
-                checks during screening. It has been added to the API by a BAU
+                checks during screening. It has been added to the API by a Super
                 user.
               </WarningMessage>
             )}

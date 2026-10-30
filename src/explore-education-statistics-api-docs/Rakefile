@@ -13,12 +13,11 @@ namespace :notify do
   limits = {
   }
 
-  live = ENV.fetch("REALLY_POST_TO_SLACK", 0) == "1"
-  slack_url = ENV["SLACK_WEBHOOK_URL"]
-  slack_token = ENV["SLACK_TOKEN"]
+  live = ENV.fetch("REALLY_POST_TO_TEAMS", "0") == "1"
+  teams_webhook_url = ENV["TEAMS_WEBHOOK_URL"]
 
-  if live && (!slack_url && !slack_token)
-    fail "If you want to post to Slack you need to set SLACK_TOKEN or SLACK_WEBHOOK_URL"
+  if live && (teams_webhook_url.nil? || teams_webhook_url.empty?)
+    fail "If you want to post to Teams you need to set TEAMS_WEBHOOK_URL"
   end
 
   desc "Notifies of all pages which have expired"
@@ -28,7 +27,7 @@ namespace :notify do
     pages_urls.each do |page_url|
       puts "== #{page_url}"
 
-      Notifier.new(notification, page_url, slack_url, live, limits.fetch(page_url, -1)).run
+      Notifier.new(notification, page_url, teams_webhook_url, live, limits.fetch(page_url, -1)).run
     end
   end
 
@@ -41,7 +40,7 @@ namespace :notify do
     pages_urls.each do |page_url|
       puts "== #{page_url}"
 
-      Notifier.new(notification, page_url, slack_url, live).run
+      Notifier.new(notification, page_url, teams_webhook_url, live).run
     end
   end
 end

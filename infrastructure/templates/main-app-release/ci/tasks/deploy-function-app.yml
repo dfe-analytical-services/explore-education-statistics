@@ -62,12 +62,9 @@ steps:
           resourceGroupName: ${{ parameters.resourceGroupName }}
           healthCheckPath: ${{ parameters.healthCheckPath }}
           deployedAt: ${{ parameters.deployedAt }}
-          pollingDelaySeconds: 1
-          maxAttempts: 60
   - ${{ else }}:
       - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
           displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
           endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
-          maxAttempts: 20

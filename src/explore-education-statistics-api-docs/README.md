@@ -127,6 +127,16 @@ bundle exec rake notify:expires
 
 ### Automated GitHub workflow
 
-A GitHub workflow has been configured to run the `notify:expired` task on a scheduled cron (see 
-`.github/workflows/notify-expired-api-docs.yml`). This has been set up to send notifications to
-the Slack channel configured in `config/tech_docs.yml`.
+A GitHub workflow has been configured to run the `notify:expired` task (see
+`.github/workflows/notify-expired-api-docs.yml`) at 12:05 UTC every weekday. It posts an Adaptive
+Card to a Microsoft Teams channel via the incoming webhook stored in the
+`TEAMS_API_DOCS_WEBHOOK_URL` repository secret.
+
+The workflow can also be run manually. Manual runs are dry runs by default, which log the card
+payload without posting it.
+
+By default, the Rake tasks are dry runs. To post to Teams locally, set both of these:
+
+```shell
+REALLY_POST_TO_TEAMS=1 TEAMS_WEBHOOK_URL=<webhook url> bundle exec rake notify:expired
+```

@@ -62,4 +62,11 @@ param http401Alerts = {
     evaluationFrequency: 'PT5M'
     severity: 'Warning'
   }
+  publicSite: {
+    threshold: 10
+    aggregation: 'Total'
+    windowSize: 'PT15M'
+    evaluationFrequency: 'PT5M'
+    severity: 'Warning'
+  }
 }

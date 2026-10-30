@@ -44,7 +44,7 @@ jobs:
             # Database migrations run as part of Admin's startup, so by the time the staging
             # slot (or production, on the direct path) reports healthy here, they've already
             # run successfully. This job intentionally stops right after that health check -
-            # see SwapAdminIntoProduction below - so that services waiting on Admin (via
+            # see SwapAdminIntoMainSlot below - so that services waiting on Admin (via
             # deployAdminFirst) can start as soon as migrations are done, without also waiting
             # for the slot swap itself to complete.
             - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
@@ -76,8 +76,8 @@ jobs:
   # in the staging slot (and has therefore run any migrations it needed to run), rather than having
   # to wait for Admin's deploy to fully complete before starting their own.
   - ${{ if or(eq(parameters.slotSwappingBehaviour, 'Swap'), and(ne(parameters.slotSwappingBehaviour, 'No swap'), or(eq(parameters.environment, 'Pre-Prod'), eq(parameters.environment, 'Prod')))) }}:
-      - deployment: SwapAdminIntoProduction
-        displayName: Swap Admin Into Production
+      - deployment: SwapAdminIntoMainSlot
+        displayName: Swap Admin into main slot
         dependsOn: DeployAdmin
         environment: ${{ parameters.environment }}
         strategy:

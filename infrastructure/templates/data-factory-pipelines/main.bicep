@@ -9,9 +9,6 @@ param environmentName string
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
 
-@description('Slack channel to post alerts to.')
-param slackAlertsChannel string = ''
-
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
@@ -39,7 +36,6 @@ module purgeSoftDeletedSubjectsPipelineModule 'application/pipelines/database-ma
     dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
     keyVaultName: resourceNames.keyVault.keyVault
-    slackAlertsChannel: slackAlertsChannel
   }
 }
 
@@ -49,6 +45,5 @@ module rebuildStatisticsIndexesPipelineModule 'application/pipelines/database-ma
     dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
     keyVaultName: resourceNames.keyVault.keyVault
-    slackAlertsChannel: slackAlertsChannel
   }
 }

@@ -56,5 +56,3 @@ steps:
       resourceGroupName: ${{ parameters.resourceGroupName }}
       healthCheckPath: ${{ parameters.healthCheckPath }}
       deployedAt: ${{ parameters.deployedAt }}
-      pollingDelaySeconds: 1
-      maxAttempts: 60

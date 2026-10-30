@@ -8,49 +8,31 @@ require_relative './notification/expired'
 require_relative './notification/will_expire_by'
 
 class Notifier
-  def initialize(notification, pages_url, slack_url, live, limit = -1)
+  def initialize(notification, pages_url, teams_webhook_url, live, limit = -1)
     @notification = notification
     @pages_url = pages_url
-    @slack_url = slack_url
+    @teams_webhook_url = teams_webhook_url
     @live = !!live
     @limit = limit
   end
 
   def run
-    payloads = message_payloads(pages_per_channel)
+    payload = build_payload(matching_pages)
 
-    return if payloads.empty?
+    return if payload.nil?
 
     puts "== JSON Payload:"
-    puts JSON.pretty_generate(payloads)
+    puts JSON.pretty_generate(payload)
 
-    if Date.today.saturday? || Date.today.sunday?
-      puts "SKIPPING POST: Not posting anything, this is not a working day"
-      return
-    end
-
-    unless post_to_slack?
+    unless post_to_teams?
       puts "SKIPPING POST: Not posting anything, this is a dry run"
       return
     end
 
-    payloads.each do |message_payload|
-      if ENV.has_key? "SLACK_TOKEN"
-        response = HTTP
-          .auth("Bearer #{ENV['SLACK_TOKEN']}")
-          .post("https://slack.com/api/chat.postMessage", json: message_payload)
-          .parse
+    response = HTTP.post(@teams_webhook_url, json: payload)
 
-        if !response["ok"] then
-          if response["error"] == "invalid_auth" then
-            raise "Unable to post to Slack: SLACK_TOKEN is not valid"
-          else
-            puts "Unable to post to Slack: #{response['error']}"
-          end
-        end
-      else
-        HTTP.post(@slack_url, body: JSON.dump(message_payload))
-      end
+    unless response.status.success?
+      raise "Unable to post to Teams: #{response.status} #{response.body}"
     end
   end
 
@@ -67,56 +49,54 @@ class Notifier
     end
   end
 
-  def pages_per_channel
+  def matching_pages
     pages
       .reject { |page| page.review_by.nil? }
       .select { |page| @notification.include?(page) }
-      .group_by { |page| page.owner }
-      .map do |owner, pages|
-        [owner, pages.sort_by { |page| page.review_by }]
-      end
+      .sort_by { |page| page.review_by }
   end
 
-  def message_payloads(grouped_pages)
-    grouped_pages.map do |channel, pages|
+  def build_payload(pages)
+    return nil if pages.empty?
 
-      page_count = @limit == -1 ? pages.size : [pages.size, @limit].min
-      notification_message = page_count == 1 ? @notification.singular_message : @notification.multiple_message
-      number_of = notification_message % [page_count]
+    page_count = @limit == -1 ? pages.size : [pages.size, @limit].min
+    notification_message = page_count == 1 ? @notification.singular_message : @notification.multiple_message
+    number_of = notification_message % [page_count]
 
-      page_lines = pages[0..page_count-1].map do |page|
-        @notification.line_for(page)
-      end
-
-      message_prefix = ENV.fetch('OVERRIDE_SLACK_MESSAGE_PREFIX', "Hello :paw_prints:, this is your friendly manual spaniel.")
-      message = <<~doc
-        #{message_prefix} #{number_of}:
-
-        #{page_lines.join("\n")}
-      doc
-
-      channel = ENV.fetch('OVERRIDE_SLACK_CHANNEL', channel)
-      username = ENV.fetch('OVERRIDE_SLACK_USERNAME', "Daniel the Manual Spaniel")
-      icon_emoji = ENV.fetch('OVERRIDE_SLACK_ICON_EMOJI', ":daniel-the-manual-spaniel:")
-
-      puts "== Message to #{channel}"
-      puts message
-
-      {
-        username: username,
-        icon_emoji: icon_emoji,
-        text: message,
-        mrkdwn: true,
-        channel: channel,
-      }
+    page_lines = pages[0..page_count-1].map do |page|
+      @notification.line_for(page)
     end
+
+    {
+      type: "message",
+      attachments: [{
+        contentType: "application/vnd.microsoft.card.adaptive",
+        content: {
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.4",
+          body: [
+            { type: "TextBlock", size: "Large", weight: "Bolder", text: "Please ensure that the Public API documentation is up to date", style: "heading", color: "attention", wrap: true },
+            { type: "TextBlock", text: "#{number_of}:\n\n#{page_lines.join("\n")}", wrap: true }
+          ],
+          actions: [
+            { type: "Action.OpenUrl", title: "View Public API documentation", url: docs_url }
+          ]
+        }
+      }]
+    }
   end
 
-  def post_to_slack?
+  def post_to_teams?
     @live
   end
 
   private
+
+  def docs_url
+    # pages.json lives at <docs root>/api/pages.json
+    get_absolute_url("../")
+  end
 
   def get_absolute_url url
     target_uri = URI(url)
@@ -136,5 +116,3 @@ class Notifier
 end
   end
 end
-
-
