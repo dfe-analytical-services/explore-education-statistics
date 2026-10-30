@@ -151,7 +151,7 @@ param allowedOrigins array = []
 @description('Specifies an optional URL for Azure to use to monitor the health of this resource')
 param healthCheckPath string?
 
-@description('The name of a user-assigned managed identity to assign to the resource.')
+@description('The name of an existing user-assigned managed identity for the Function App to use instead of a system-assigned one, for Key Vault references, its own storage account and the app code. Its Key Vault and storage roles are granted to this identity.')
 param userAssignedIdentityName string = ''
 
 @description('Specifies the SKU for the Function App hosting plan.')
@@ -212,7 +212,7 @@ var fileServiceAlerts = alerts != null
   }
 : null
 
-var identityType = !empty(userAssignedIdentityName) ? 'SystemAssigned, UserAssigned' : 'SystemAssigned'
+var identityType = !empty(userAssignedIdentityName) ? 'UserAssigned' : 'SystemAssigned'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
@@ -281,11 +281,6 @@ var infraAppSettings = [
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
     value: applicationInsightsConnectionString
   }
-  // Use managed identity to access the storage account rather than key based access with a connection string
-  {
-    name: 'AzureWebJobsStorage__accountName'
-    value: storageAccountModule.outputs.storageAccountName
-  }
   {
     name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
     value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName!)
@@ -327,11 +322,50 @@ var infraAppSettings = [
   }
 ]
 
+// The host connects to its storage account with a managed identity rather than a connection string. With a system-assigned
+// identity, the account name is enough. With only a user-assigned identity, the connections must also say which identity
+// to use, and the app code picks it up from AZURE_CLIENT_ID.
+// TODO EES-7502 - remove systemAssignedIdentityAppSettings once every environment has moved to the ELZ, leaving only the
+// user-assigned identity settings.
+var systemAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobsStorage__accountName'
+    value: storageAccountModule.outputs.storageAccountName
+  }
+]
+
+var userAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobsStorage__accountName'
+    value: storageAccountModule.outputs.storageAccountName
+  }
+  {
+    name: 'AzureWebJobsStorage__credential'
+    value: 'managedidentity'
+  }
+  {
+    name: 'AzureWebJobsStorage__clientId'
+    value: userAssignedIdentity!.properties.clientId
+  }
+  {
+    name: 'AZURE_CLIENT_ID'
+    value: userAssignedIdentity!.properties.clientId
+  }
+]
+
+var identityAppSettings = !empty(userAssignedIdentityName)
+  ? userAssignedIdentityAppSettings
+  : systemAssignedIdentityAppSettings
+
 // Flatten the array-based infra/application appsettings into object form so they can be merged
 // key-by-key with existingAppSettings, applied below via a separate "config/appsettings" child
 // resource (which takes a flat object directly) rather than inline on the site resource itself.
 var applicationAppSettingsObject = reduce(appSettings, {}, (cur, next) => union(cur, { '${next.name}': next.value }))
-var infraAppSettingsObject = reduce(infraAppSettings, {}, (cur, next) => union(cur, { '${next.name}': next.value }))
+var infraAppSettingsObject = reduce(
+  concat(infraAppSettings, identityAppSettings),
+  {},
+  (cur, next) => union(cur, { '${next.name}': next.value })
+)
 
 // Combine the appsettings supplied by the caller of this template with any appsettings under the control
 // of the application deploy pipeline, and finally with the infrastructure appsettings from this template.
@@ -351,7 +385,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     type: identityType
     userAssignedIdentities: !empty(userAssignedIdentityName) ? { '${userAssignedIdentity.id}': {} } : null
   }
-  properties: {
+  properties: union({
     containerSize: elasticCapacity.?instanceMemoryMB ?? null
     reserved: operatingSystem == 'Linux'
     serverFarmId: appServicePlanModule.outputs.planId
@@ -387,9 +421,14 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       scmIpSecurityRestrictionsUseMain: false
     }
     httpsOnly: true
-  }
+  }, !empty(userAssignedIdentityName) ? { keyVaultReferenceIdentity: userAssignedIdentity.id } : {})
   tags: tagValues
 }
+
+// The identity that the Function App uses, to which its roles are granted.
+var functionAppPrincipalId = !empty(userAssignedIdentityName)
+  ? userAssignedIdentity!.properties.principalId
+  : functionApp.identity.principalId
 
 resource functionAppSettings 'Microsoft.Web/sites/config@2025-03-01' = {
   parent: functionApp
@@ -409,10 +448,10 @@ module secretsUserRoleAssignmentModule '../../../common/components/key-vault/key
   name: '${functionApp.name}KeyVaultSecretsUserRole'
   params: {
     keyVaultName: keyVaultName
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${functionApp.name}')
       : null
-    principalIds: [functionApp.identity.principalId]
+    principalIds: [functionAppPrincipalId]
     role: 'Secrets User'
   }
 }
@@ -421,10 +460,10 @@ module certificateUserRoleAssignmentModule '../../../common/components/key-vault
   name: '${functionApp.name}KeyVaultCertificateUserRole'
   params: {
     keyVaultName: keyVaultName
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultName), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${functionApp.name}')
       : null
-    principalIds: [functionApp.identity.principalId]
+    principalIds: [functionAppPrincipalId]
     role: 'Certificate User'
   }
 }
@@ -433,7 +472,7 @@ module certificateUserRoleAssignmentModule '../../../common/components/key-vault
 module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = {
   name: '${storageAccountName}BlobRoleAssignmentModuleDeploy'
   params: {
-    principalIds: [functionApp.identity.principalId]
+    principalIds: [functionAppPrincipalId]
     storageAccountName: storageAccountModule.outputs.storageAccountName
     role: 'Storage Blob Data Owner'
   }
@@ -442,7 +481,7 @@ module storageAccountBlobRoleAssignmentModule '../storageAccountRoleAssignment.b
 module storageAccountQueueRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = if (deployQueueRoleAssignment) {
   name: '${storageAccountName}QueueRoleAssignmentModuleDeploy'
   params: {
-    principalIds: [functionApp.identity.principalId]
+    principalIds: [functionAppPrincipalId]
     storageAccountName: storageAccountModule.outputs.storageAccountName
     role: 'Storage Queue Data Contributor'
   }
@@ -532,5 +571,5 @@ module diagnosticSetting '../monitoring/functionAppDiagnosticSetting.bicep' = {
 
 output name string = functionApp.name
 output url string = 'https://${functionApp.name}.azurewebsites.net'
-output functionAppIdentityPrincipalId string = functionApp.identity.principalId
+output functionAppIdentityPrincipalId string = functionAppPrincipalId
 output storageAccountName string = storageAccountModule.outputs.storageAccountName

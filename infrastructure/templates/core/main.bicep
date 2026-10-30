@@ -86,6 +86,11 @@ param deployRecoveryServicesVault bool = false
 @description('Whether or not to deploy the Container Registry.')
 param deployContainerRegistry bool = false
 
+// TODO EES-7502 - remove once every environment has moved to the ELZ, along with the core grants it controls and the
+// lines that turn it off in "parameters/elz".
+@description('Whether to grant the Publisher Function App\'s system-assigned identity permission to send Event Grid events and purge the Front Door cache. In ELZ, the release pipeline grants these roles to the Publisher\'s user-assigned identity instead, so the param files in "parameters/elz" turn this off.')
+param deployPublisherRoleAssignments bool = true
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -227,6 +232,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
         eventGridCustomTopicPrivateEndpoints: vNetModule.outputs.eventGridCustomTopicPrivateEndpointsSubnetName
       }
     }
+    deployPublisherRoleAssignments: deployPublisherRoleAssignments
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
@@ -245,6 +251,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
     publicSiteUrl: publicSiteUrl
     contentApiUrl: contentApiUrl
     publisherFunctionName: resourceNames.publisher.functionApp
+    deployPublisherRoleAssignments: deployPublisherRoleAssignments
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis

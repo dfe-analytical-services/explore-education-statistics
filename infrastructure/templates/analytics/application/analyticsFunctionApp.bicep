@@ -14,6 +14,9 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('Name of the shared analytics storage account.')
 param analyticsStorageAccountName string
 
@@ -60,6 +63,7 @@ var fileShareMountPath = '/data/analytics'
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'analyticsFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.analytics.identity : ''
     functionAppName: resourceNames.analytics.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspace.id
