@@ -153,10 +153,9 @@ public class DataImportService(
             })
             .ToList();
 
-        var filters = await dataSet.ListFilters(includeItems: true);
+        var filters = (await dataSet.ListFilters(includeItems: true)).OrderBy(f => f.Label).ToList();
 
         var filterMetas = filters
-            .OrderBy(f => f.Label)
             .Select(f => new FilterMeta
             {
                 Id = f.Id,
