@@ -15,7 +15,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import adminTableBuilderService from '@admin/services/tableBuilderService';
 
-import React, { useState } from 'react';
+import useQueryParams from '@admin/hooks/useQueryParams';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   releaseVersionId: string;
@@ -33,6 +34,18 @@ const ReleaseDataReorderSection = ({
     );
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
+
+  // Allows linking straight to managing a data set's indicators,
+  // e.g. from the data replacement page.
+  const { manageIndicators } = useQueryParams<{ manageIndicators?: string }>();
+
+  useEffect(() => {
+    const subject = subjects?.find(s => s.id === manageIndicators);
+
+    if (subject) {
+      setReorderingIndicators(subject);
+    }
+  }, [subjects, manageIndicators]);
 
   const handleSaveFilters = async (
     subjectId: string,

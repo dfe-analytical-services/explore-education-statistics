@@ -5,6 +5,7 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _permissionService from '@admin/services/permissionService';
+import _tableBuilderService from '@admin/services/tableBuilderService';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
@@ -18,6 +19,7 @@ import { AuthContext } from '@admin/contexts/AuthContext';
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
+jest.mock('@admin/services/tableBuilderService');
 
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
@@ -29,8 +31,15 @@ const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
 
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
+
 describe('ReleaseDataFileReplacePage', () => {
   beforeEach(() => {
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
     permissionService.getDataFilePermissions.mockResolvedValue({
       canCancelImport: false,
     });

@@ -6,6 +6,7 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
+import _tableBuilderService from '@admin/services/tableBuilderService';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -16,6 +17,7 @@ jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/footnoteService');
 jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
@@ -23,11 +25,20 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
 >;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
 const footnoteService = _footnoteService as jest.Mocked<
   typeof _footnoteService
 >;
 
 describe('DataReplacementPlan', () => {
+  beforeEach(() => {
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
+  });
+
   const testReplacementPlan: DataReplacementPlan = {
     dataBlocks: [
       {
@@ -1245,6 +1256,15 @@ describe('DataReplacementPlan', () => {
 
     expect(screen.getByText('No data blocks to replace.')).toBeInTheDocument();
     expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'No indicators have been paired for this data set.',
+      ),
+    ).toBeInTheDocument();
+    expect(tableBuilderService.getPairedIndicators).toHaveBeenCalledWith(
+      'release-1',
+      'subject-1',
+    );
 
     expect(screen.queryAllByRole('group')).toHaveLength(0);
 

@@ -1,6 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
+import DataFileReplacementPairedIndicators from '@admin/pages/release/data/components/DataFileReplacementPairedIndicators';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
 import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQueries';
 import {
@@ -674,6 +675,13 @@ function Plan({
           );
         })}
       </div>
+
+      <DataFileReplacementPairedIndicators
+        indicatorMappings={plan.mapping.indicators}
+        publicationId={publicationId}
+        releaseVersionId={releaseVersionId}
+        subjectId={plan.originalSubjectId}
+      />
 
       <ButtonGroup className="govuk-!-margin-top-8">
         {plan.valid && (
