@@ -17,6 +17,9 @@ param operatingSystem 'Windows' | 'Linux'
 with "Linux" for code on Linux, and "app,linux,container" with "Linux" for Docker.''')
 param kind 'app' | 'app,linux' | 'app,linux,container'
 
+@description('Whether to spread the plan\'s instances across availability zones. Needs a Premium v2 to v4 SKU, and runs at least 2 instances.')
+param zoneRedundant bool = false
+
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
   cpuPercentage: bool
@@ -38,9 +41,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
       ServiceType: 'App Service plan'
     }
   ) 
-  properties: {
+  properties: union({
     reserved: operatingSystem == 'Linux'
-  }
+  }, zoneRedundant ? { zoneRedundant: true } : {})
 }
 
 module cpuPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {

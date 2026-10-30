@@ -13,3 +13,7 @@ param publisherStorageAccountSku = 'Standard_RAGZRS'
 
 // Host every App Service and Function App on Linux.
 param appOperatingSystem = 'Linux'
+
+// Spread the Admin, Content API, Data API and Public Site instances across availability zones. These plans already run
+// Premium SKUs with at least 2 instances, so this costs little.
+param zoneRedundantAppServicePlans = true

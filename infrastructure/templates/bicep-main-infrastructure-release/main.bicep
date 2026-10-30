@@ -53,6 +53,9 @@ param elz bool = false
 @description('The operating system to host every App Service and Function App on. An App Service plan can\'t change operating system in place, so only the param files in "parameters/elz" set Linux.')
 param appOperatingSystem 'Windows' | 'Linux' = 'Windows'
 
+@description('Whether the Admin, Content API, Data API and Public Site App Service plans spread their instances across availability zones. Needs Premium SKUs, and runs at least 2 instances. Only the Pre-Production and Production param files in "parameters/elz" turn this on.')
+param zoneRedundantAppServicePlans bool = false
+
 @description('SKU of the Importer Function App\'s storage account.')
 param importerStorageAccountSku StorageAccountSku = 'Standard_LRS'
 
@@ -299,6 +302,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
+    zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
     appServiceSku: adminConfig.appServiceSku!
     signalRAllowedOrigins: adminSiteAllowedOrigins
@@ -326,6 +330,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
   name: 'contentApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
     appServiceSku: contentApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
@@ -349,6 +354,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
     appServiceSku: dataApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
@@ -371,6 +377,7 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
   name: 'publicSiteModuleDeploy'
   params: {
     resourceNames: resourceNames
+    zoneRedundant: zoneRedundantAppServicePlans
     appServiceSku: publicSiteConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins

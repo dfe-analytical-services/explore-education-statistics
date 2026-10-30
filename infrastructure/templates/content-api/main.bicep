@@ -27,6 +27,9 @@ param detailedErrors bool
 @description('Whether or not to enable autoscaling of App Services in this environment.')
 param autoscaleAppServices bool
 
+@description('Whether to spread the App Service plan\'s instances across availability zones.')
+param zoneRedundant bool
+
 @description('The origins supported for CORS calls to this App Service.')
 param allowedOrigins string[]
 
@@ -92,6 +95,7 @@ module appServicePlanModule '../common/components/app-service-plan/app-service-p
   params: {
     planName: resourceNames.contentApi.appServicePlan
     sku: appServiceSku
+    zoneRedundant: zoneRedundant
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem
     alerts: deployAlerts ? {
