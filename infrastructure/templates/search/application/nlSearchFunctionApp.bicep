@@ -13,11 +13,11 @@ param logAnalyticsWorkspaceId string
 @description('Specifies the Azure AI Search service name.')
 param searchServiceName string
 
-@description('Name of the \'Natural language search filter\' index in Azure AI Search.')
-param searchServiceNLSearchFilterIndexName string
+@description('Name of the \'Filter\' index in Azure AI Search.')
+param searchServiceFilterIndexName string
 
-@description('Name of the \'Natural language search dataset\' index in Azure AI Search.')
-param searchServiceNLSearchDatasetIndexName string
+@description('Name of the \'Dataset\' index in Azure AI Search.')
+param searchServiceDatasetIndexName string
 
 @description('The IP address ranges that can access the Natural Language Search Function App storage account.')
 param storageFirewallRules IpRange[]
@@ -69,11 +69,11 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       }
       {
         name: 'AZURE_SEARCH_FILTER_INDEX'
-        value: searchServiceNLSearchFilterIndexName
+        value: searchServiceFilterIndexName
       }
       {
         name: 'AZURE_SEARCH_DATASET_INDEX'
-        value: searchServiceNLSearchDatasetIndexName
+        value: searchServiceDatasetIndexName
       }
       {
         name: 'AZURE_OPENAI_ENDPOINT'

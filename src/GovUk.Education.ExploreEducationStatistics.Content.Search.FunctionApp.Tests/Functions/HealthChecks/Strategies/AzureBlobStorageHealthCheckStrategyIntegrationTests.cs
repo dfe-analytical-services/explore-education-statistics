@@ -17,7 +17,8 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
 
     private static AzureBlobStorageHealthCheckStrategy GetSUT(
         string? searchStorageConnectionString = null,
-        string? releaseDocumentsContainerName = null
+        string? releaseDocumentsContainerName = null,
+        string? datasetDocumentsContainerName = null
     ) =>
         new(
             CreateAzureBlobStorageClientFactory(),
@@ -28,6 +29,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
                     SearchStorageConnectionString =
                         searchStorageConnectionString ?? IntegrationTestStorageAccountConnectionString,
                     ReleaseDocumentsContainerName = releaseDocumentsContainerName ?? IntegrationTestContainerName,
+                    DatasetDocumentsContainerName = datasetDocumentsContainerName ?? IntegrationTestContainerName,
                 }
             )
         );
@@ -69,6 +71,24 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.Contains("not found", healthCheckResult.Message);
     }
 
+    [Fact(Skip = "Complete StorageAccountName and StorageAccountAccessKey to run this integration test")]
+    public async Task WhenDatasetDocumentsContainerNotFound_ThenShouldRespondIsUnhealthy()
+    {
+        //  ARRANGE
+        var sut = GetSUT(datasetDocumentsContainerName: "some-unknown-container-name");
+
+        // ACT
+        var healthCheckResult = await sut.Run(CancellationToken.None);
+
+        // ASSERT
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
+        Assert.Contains(
+            "Dataset Documents Azure Blob Storage container 'some-unknown-container-name' is not found",
+            healthCheckResult.Message
+        );
+    }
+
     [Fact]
     public async Task WhenContainerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
     {
@@ -84,6 +104,24 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
             "Release Documents Azure Blob Storage container name is not configured.",
+            healthCheckResult.Message
+        );
+    }
+
+    [Fact]
+    public async Task WhenDatasetDocumentsContainerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
+    {
+        //  ARRANGE
+        var sut = GetSUT(datasetDocumentsContainerName: string.Empty);
+
+        // ACT
+        var healthCheckResult = await sut.Run(CancellationToken.None);
+
+        // ASSERT
+        Assert.NotNull(healthCheckResult);
+        Assert.False(healthCheckResult.IsHealthy);
+        Assert.Contains(
+            "Dataset Documents Azure Blob Storage container name is not configured.",
             healthCheckResult.Message
         );
     }
