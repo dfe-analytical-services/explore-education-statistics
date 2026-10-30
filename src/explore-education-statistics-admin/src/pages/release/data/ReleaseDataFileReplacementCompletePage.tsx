@@ -5,12 +5,18 @@ import {
   ReleaseDataFileReplaceRouteParams,
   releaseFootnotesRoute,
 } from '@admin/routes/releaseRoutes';
+import { DataReplacementResult } from '@admin/pages/release/data/components/DataFileReplacementPlan';
+import {
+  getManageIndicatorsPath,
+  ReplacementPairedIndicator,
+} from '@admin/pages/release/data/utils/replacementPairedIndicators';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
+import partition from 'lodash/partition';
 import React from 'react';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useLocation, useParams } from 'react-router';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 
 const ReleaseDataFileReplacementCompletePage = () => {
@@ -28,6 +34,15 @@ const ReleaseDataFileReplacementCompletePage = () => {
         fileId,
       ),
     [releaseVersionId, fileId],
+  );
+
+  // Only set when arriving straight from confirming the replacement
+  const replacementResult = useLocation().state as
+    DataReplacementResult | undefined;
+
+  const [maintainedPairs, droppedPairs] = partition(
+    replacementResult?.pairedIndicators ?? [],
+    pair => pair.maintained,
   );
 
   const dataFilePath = generatePath(releaseDataFileReplaceRoute.fullPath, {
@@ -121,6 +136,55 @@ const ReleaseDataFileReplacementCompletePage = () => {
             ) : (
               <p>There are no footnotes to check.</p>
             )}
+
+            <h3>Paired indicators</h3>
+
+            {replacementResult ? (
+              <>
+                {replacementResult.pairedIndicators.length === 0 && (
+                  <p>There are no paired indicators to check.</p>
+                )}
+
+                {maintainedPairs.length > 0 && (
+                  <>
+                    <p>The following paired indicators were maintained:</p>
+                    <PairedIndicatorsList
+                      pairs={maintainedPairs}
+                      testId="maintained-paired-indicators"
+                    />
+                  </>
+                )}
+
+                {droppedPairs.length > 0 && (
+                  <>
+                    <p>
+                      The following paired indicators were dropped because their
+                      parent or child indicator was not mapped. Their indicators
+                      can now be selected independently in the table tool:
+                    </p>
+                    <PairedIndicatorsList
+                      pairs={droppedPairs}
+                      testId="dropped-paired-indicators"
+                    />
+                  </>
+                )}
+              </>
+            ) : (
+              <p>Please check the paired indicators for this data set.</p>
+            )}
+
+            <p>
+              <Link
+                unvisited
+                to={getManageIndicatorsPath({
+                  publicationId,
+                  releaseVersionId,
+                  subjectId: replacementResult?.replacementSubjectId,
+                })}
+              >
+                Manage paired indicators
+              </Link>
+            </p>
           </>
         )}
       </LoadingSpinner>
@@ -131,5 +195,23 @@ const ReleaseDataFileReplacementCompletePage = () => {
     </>
   );
 };
+
+function PairedIndicatorsList({
+  pairs,
+  testId,
+}: {
+  pairs: ReplacementPairedIndicator[];
+  testId: string;
+}) {
+  return (
+    <ul className="govuk-list govuk-list--bullet" data-testid={testId}>
+      {pairs.map(pair => (
+        <li key={`${pair.parentIndicatorId}-${pair.childIndicatorId}`}>
+          {`${pair.parentLabel}, paired with ${pair.childLabel}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default ReleaseDataFileReplacementCompletePage;

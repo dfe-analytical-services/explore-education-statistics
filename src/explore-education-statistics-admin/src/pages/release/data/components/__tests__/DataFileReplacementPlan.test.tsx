@@ -1273,6 +1273,87 @@ describe('DataReplacementPlan', () => {
     ).toBeInTheDocument();
   });
 
+  test('confirming the replacement passes on the maintained and dropped paired indicators', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      dataBlocks: [],
+      footnotes: [],
+      mapping: {
+        ...testValidReplacementPlan.mapping,
+        indicators: {
+          candidates: {},
+          mappings: {
+            'indicator-1': {
+              source: { id: 'indicator-1', label: 'Indicator 1', name: 'i1' },
+              type: 'AutoSet',
+              candidateKey: 'new-indicator-1',
+            },
+            'indicator-2': {
+              source: { id: 'indicator-2', label: 'Indicator 2', name: 'i2' },
+              type: 'AutoSet',
+              candidateKey: 'new-indicator-2',
+            },
+            'indicator-3': {
+              source: { id: 'indicator-3', label: 'Indicator 3', name: 'i3' },
+              type: 'Unset',
+            },
+          },
+        },
+      },
+    });
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [
+        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+        { parentIndicatorId: 'indicator-2', childIndicatorId: 'indicator-3' },
+      ],
+    });
+    dataReplacementService.replaceData.mockResolvedValue();
+
+    const handleReplacement = jest.fn();
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+          onReplacement={handleReplacement}
+        />
+      </MemoryRouter>,
+      true,
+    );
+
+    expect(await screen.findByText('Dropped')).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(handleReplacement).toHaveBeenCalledWith({
+        replacementSubjectId: testValidReplacementPlan.replacementSubjectId,
+        pairedIndicators: [
+          {
+            parentIndicatorId: 'indicator-1',
+            parentLabel: 'Indicator 1',
+            childIndicatorId: 'indicator-2',
+            childLabel: 'Indicator 2',
+            maintained: true,
+          },
+          {
+            parentIndicatorId: 'indicator-2',
+            parentLabel: 'Indicator 2',
+            childIndicatorId: 'indicator-3',
+            childLabel: 'Indicator 3',
+            maintained: false,
+          },
+        ],
+      });
+    });
+  });
+
   test('renders error message if there is an error loading replacement plan', async () => {
     dataReplacementService.getReplacementPlan.mockRejectedValue(
       new Error('Something went wrong'),
