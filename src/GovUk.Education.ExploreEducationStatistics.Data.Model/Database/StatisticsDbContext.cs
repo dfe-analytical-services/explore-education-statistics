@@ -131,7 +131,6 @@ public class StatisticsDbContext : DbContext
         ConfigureFilterFootnote(modelBuilder);
         ConfigureFilterGroupFootnote(modelBuilder);
         ConfigureFilterItemFootnote(modelBuilder);
-        ConfigureFootnote(modelBuilder);
         ConfigureIdTempTable(modelBuilder);
         ConfigureIndicatorFootnote(modelBuilder);
         ConfigureLocation(modelBuilder);
@@ -405,16 +404,6 @@ public class StatisticsDbContext : DbContext
             isKeyless: false,
             builder => builder.HasKey(idTempTable => idTempTable.Id)
         );
-    }
-
-    private static void ConfigureFootnote(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .Entity<Footnote>()
-            .HasOne(footnote => footnote.ReleaseVersion)
-            .WithMany()
-            .HasForeignKey(footnote => footnote.ReleaseVersionId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
