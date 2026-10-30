@@ -1,8 +1,12 @@
 import { IpRange } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Location for all resources.')
 param location string
@@ -85,7 +89,7 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
     }
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
     alerts: {
       availability: true

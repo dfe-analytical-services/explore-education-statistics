@@ -1,6 +1,6 @@
 import { EntraIdAuthentication} from '../types.bicep'
 import { IpRange, FirewallRule } from '../../common/types.bicep'
-import { AzureFileShareMount } from '../../common/components/storage/types.bicep'
+import { AzureFileShareMount, StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { FunctionAppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
 import { staticAverageLessThanHundred, staticMinGreaterThanZero } from '../../common/components/alerts/staticAlertConfig.bicep'
 import { dynamicAverageGreaterThan } from '../../common/components/alerts/dynamicAlertConfig.bicep'
@@ -78,6 +78,9 @@ param entraIdAuthentication EntraIdAuthentication?
 
 @description('Specifies the SKU for the Function App hosting plan')
 param sku FunctionAppServicePlanSku
+
+@description('SKU of the Function App\'s storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
@@ -184,6 +187,7 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: managementStorageAccountName
+    sku: storageAccountSku
     connectionStringSecret: {
       keyVaultName: keyVaultName
       secretName: '${managementStorageAccountName}-connection-string'
@@ -207,6 +211,7 @@ module slot1StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot1StorageAccountName
+    sku: storageAccountSku
     connectionStringSecret: {
       keyVaultName: keyVaultName
       secretName: '${slot1StorageAccountName}-connection-string'
@@ -245,6 +250,7 @@ module slot2StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot2StorageAccountName
+    sku: storageAccountSku
     connectionStringSecret: {
       keyVaultName: keyVaultName
       secretName: '${slot2StorageAccountName}-connection-string'

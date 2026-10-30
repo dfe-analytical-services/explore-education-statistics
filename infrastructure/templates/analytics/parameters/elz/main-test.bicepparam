@@ -4,3 +4,6 @@ using '../../main.bicep'
 extends '../main-test.bicepparam'
 
 param elz = true
+
+// Zone-redundant storage.
+param storageAccountSku = 'Standard_ZRS'

@@ -1,5 +1,6 @@
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
 import { IpRange } from '../common/types.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -12,6 +13,9 @@ param environmentName string
 
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
+
+@description('SKU of the Function App storage accounts, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -86,6 +90,7 @@ module analyticsStorageBackupModule '../common/components/recovery-services-vaul
 module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
   name: 'analyticsFunctionAppModule'
   params: {
+    storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     functionAppFirewallRules: union(
       [

@@ -81,7 +81,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 17 | Move the Windows apps to Linux: publish flags, `linuxFxVersion`, app settings, testing | To do | [Section 6.2](#62-windows--linux) |
 | 18 | Replace the remaining App Insights instrumentation keys with connection strings | To do | [Section 6.6](#66-monitoring) |
 | 19 | Connect the data processor's Durable Functions storage with managed identity | To do | [Section 6.12](#612-data-processor-durable-functions-storage) |
-| 20 | Apply the redundancy settings, and decide which environments get them | To do | [Section 6.10](#610-redundancy) |
+| 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. SQL, PostgreSQL, App Service plans, Container Apps and Search still to do. |
 | 21 | Move the Content API to `cont.` hostnames, keeping `content.` on Prod for a transition period | To do | [Section 6.11](#611-content-api-hostnames) |
 | 22 | Identity and access groundwork: user-assigned identities per app, SQL Entra-only, Key Vault RBAC, split key-based storage from identity-only | To do | [Section 7](#7-identity-and-network-access) |
 | 23 | Tidy-ups: retire `infrastructure/infrastructure-pipeline.yml`, delete the unused Basic ACR module, update preview API versions | To do | [Section 6.9](#69-api-versions-and-leftovers) |
@@ -441,9 +441,13 @@ Changes needed:
 | Core | StorageV2, Standard_RAGRS | **Standard_RAGZRS**: zone-redundant, plus a readable geo copy in UK West that needs no infrastructure of ours |
 | Public | StorageV2, Standard_LRS | **Standard_RAGZRS**, as core |
 | Logging (SQL audit) | StorageV2, Standard_GZRS | Keep GZRS |
-| All function app storage (Importer, Notifier, Publisher, Analytics, NL Search, Search Docs, Screener, Data Processor) | StorageV2, Standard_LRS (Publisher GZRS) | **Standard_ZRS**. Runtime state only, so a geo copy adds nothing. |
+| Notifier function app storage | StorageV2, Standard_LRS | **Standard_RAGZRS**, as core. It holds the email subscriptions (`Subscriptions`, `PendingSubscriptions`, `ApiSubscriptions` tables). |
+| Publisher function app storage | StorageV2, Standard_GZRS | **Standard_RAGZRS**, as core. It holds the release publishing statuses. |
+| Other function app storage (Importer, Analytics, NL Search, Search Docs, Screener, Data Processor) | StorageV2, Standard_LRS | **Standard_ZRS**. Runtime state only, so a geo copy adds nothing. |
 | Screener logs, search docs storage | StorageV2, Standard_LRS | **Standard_ZRS** |
-| Public API data files, Analytics file share | FileStorage, Premium_ZRS | Keep Premium_ZRS. Premium file shares can't be geo-redundant. |
+| Public API data files, Analytics file share | FileStorage, Premium_ZRS | Keep Premium_ZRS. Premium file shares can't be geo-redundant, so the file share backup policy (`DailyPolicy`) uses the vault tier instead: each daily backup is copied into the geo-redundant Recovery Services vault, with 7 days of snapshots kept in the account for quick restores. Today's backups are snapshots only, which stay in the same account. |
+
+**Dev and Test** keep zone redundancy everywhere, but core, public, Notifier and Publisher use **Standard_ZRS** rather than RAGZRS. Most of the extra cost is in the geo copy. Adding it, or removing it, is a SKU change that a normal deploy can make, so these environments can add it later. Moving between LRS and ZRS can't be done by a deploy, so zone redundancy is set from the start. Pre-Production keeps RAGZRS to match Production for DR testing. The vaulted file share backups apply in every environment, because a policy can't change tier in place and it lets restores be tested in Dev. The SKUs are set in each pipeline's `parameters/elz` files.
 
 Also:
 - **Set `allowBlobPublicAccess: false` explicitly.** No template sets it, so the Azure default applies.

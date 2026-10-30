@@ -5,5 +5,10 @@ extends '../main-dev.bicepparam'
 
 param elz = true
 
+// Zone-redundant storage.
+param importerStorageAccountSku = 'Standard_ZRS'
+param notifierStorageAccountSku = 'Standard_ZRS'
+param publisherStorageAccountSku = 'Standard_ZRS'
+
 // Host every App Service and Function App on Linux.
 param appOperatingSystem = 'Linux'

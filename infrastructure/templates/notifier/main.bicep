@@ -1,4 +1,5 @@
 import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 import { ResourceNames } from '../common/resource-names.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { IpRange } from '../common/types.bicep'
@@ -14,6 +15,9 @@ param appServiceSku FunctionAppServicePlanSku
 
 @description('The operating system to host the Function App on.')
 param operatingSystem 'Windows' | 'Linux'
+
+@description('SKU of the Function App\'s storage account, which sets its redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -89,6 +93,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     functionAppName: resourceNames.notifier.functionApp
     appServicePlanName: resourceNames.notifier.appServicePlan
     storageAccountName: resourceNames.notifier.storageAccount
+    storageAccountSku: storageAccountSku
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {

@@ -3,7 +3,7 @@ import {
   IpRange
 } from '../../types.bicep'
 
-import { AzureFileShareMount } from '../storage/types.bicep'
+import { AzureFileShareMount, StorageAccountSku } from '../storage/types.bicep'
 
 import { EntraIdAuthentication } from '../../../public-api/types.bicep'
 
@@ -73,6 +73,9 @@ param applicationInsightsConnectionString string
 
 @description('Specifies the SKU for the Function App hosting plan')
 param sku FunctionAppServicePlanSku
+
+@description('SKU of the Function App\'s storage account, which sets its redundancy.')
+param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('The minimum number of instances for the function app.')
 param minimumInstanceCount int = 1
@@ -205,7 +208,7 @@ module deploymentStorageAccountModule '../../components/storage/storage-account.
   params: {
     storageAccountName: deploymentStorageAccountName
     firewallRules: storageFirewallRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
     connectionStringSecret: {
       keyVaultName: keyVaultName

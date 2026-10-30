@@ -1,5 +1,6 @@
 import { FrontDoorCertificateType } from '../common/components/front-door/types.bicep'
 import { IpRange } from '../common/types.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 import { AzureSqlDatabaseConfig } from '../common/components/azure-sql/types.bicep'
 import { VNetAddressRanges } from 'application/virtual-network/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
@@ -42,6 +43,15 @@ param recoveryServicesVaultImmutable bool = false
 
 @description('Retention of storage account blobs in days.')
 param blobDeleteRetentionDays int = 90
+
+@description('SKU of the core storage account, which sets its redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
+param coreStorageAccountSku StorageAccountSku = 'Standard_RAGRS'
+
+@description('SKU of the public storage account, which sets its redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
+param publicStorageAccountSku StorageAccountSku = 'Standard_LRS'
+
+@description('Whether the file share backup policy copies backups into the Recovery Services Vault, rather than keeping them as snapshots only. A policy can\'t move from the snapshot tier to the vault tier in place, so only the param files in "parameters/elz" turn this on.')
+param vaultedFileShareBackups bool = false
 
 @description('Provides access to resources for specific IP address ranges used for service maintenance.')
 param maintenanceIpRanges IpRange[] = []
@@ -194,6 +204,7 @@ module backupsModule 'application/backups/backups.bicep' = {
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
     deployRecoveryServicesVault: deployRecoveryServicesVault
     recoveryServicesVaultImmutable: recoveryServicesVaultImmutable
+    vaultedFileShareBackups: vaultedFileShareBackups
     tagValues: tagValues
   }
 }
@@ -290,6 +301,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.core
+    sku: coreStorageAccountSku
     connectionStringSecretName: resourceNames.keyVault.secrets.coreStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
@@ -307,6 +319,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   name: 'publicStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.public
+    sku: publicStorageAccountSku
     connectionStringSecretName: resourceNames.keyVault.secrets.publicStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName

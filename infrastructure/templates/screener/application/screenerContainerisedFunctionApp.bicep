@@ -1,9 +1,13 @@
 import { FirewallRule, IpRange } from '../../common/types.bicep'
 import { FunctionAppServicePlanSku } from '../../common/components/app-service-plan/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Specifies the location for all resources.')
 param location string
@@ -105,6 +109,7 @@ var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoi
 module containerisedFunctionAppModule '../../common/components/function-app/containerised-function-app.bicep' = {
   name: 'screenerContainerisedFunctionAppModuleDeploy'
   params: {
+    storageAccountSku: storageAccountSku
     operatingSystem: operatingSystem
     sku: sku
     functionAppName: resourceNames.screener.functionApp
