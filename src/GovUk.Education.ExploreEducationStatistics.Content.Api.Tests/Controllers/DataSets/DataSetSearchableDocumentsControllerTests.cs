@@ -59,5 +59,49 @@ public abstract class DataSetSearchableDocumentsControllerTests
         }
     }
 
+    public class GetPublicationDataSetSearchableDocumentsTests : DataSetSearchableDocumentsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsSearchableDocuments_ReturnsOk()
+        {
+            // Arrange
+            var searchableDocuments = new[]
+            {
+                new DataSetSearchableDocumentDtoBuilder().WithTitle("Data set 1").Build(),
+                new DataSetSearchableDocumentDtoBuilder().WithTitle("Data set 2").Build(),
+            };
+            _dataSetSearchableDocumentsService.WhereHasSearchableDocuments(searchableDocuments);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationDataSetSearchableDocuments(PublicationSlug);
+
+            // Assert
+            _dataSetSearchableDocumentsService.Assert.GetPublicationDataSetSearchableDocumentsWasCalled(
+                PublicationSlug
+            );
+            result.AssertOkResult(searchableDocuments);
+        }
+
+        [Fact]
+        public async Task WhenServiceReturnsNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            _dataSetSearchableDocumentsService.WhereGetPublicationDataSetSearchableDocumentsReturnsNotFound();
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetPublicationDataSetSearchableDocuments(PublicationSlug);
+
+            // Assert
+            _dataSetSearchableDocumentsService.Assert.GetPublicationDataSetSearchableDocumentsWasCalled(
+                PublicationSlug
+            );
+            result.AssertNotFoundResult();
+        }
+    }
+
     private DataSetSearchableDocumentsController BuildController() => new(_dataSetSearchableDocumentsService.Build());
 }
