@@ -124,8 +124,8 @@ Follow the link to manage paired indicators
 
 Confirm data replacement
     user clicks link    Data uploads
-    user waits until page contains data uploads table
-    user waits until page contains element    testid:Data file replacements table
+    # The subject is being replaced, so only the replacements table is shown
+    user waits until page contains data uploads replacements table
     user clicks link in table cell    1    4    View details    testid:Data file replacements table
     user waits until h3 is visible    Paired indicators    %{WAIT_MEDIUM}
     user clicks button    Confirm data replacement
