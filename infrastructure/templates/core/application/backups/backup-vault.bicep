@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool
 
+@description('Whether backups can be restored in the paired region.')
+param crossRegionRestoreEnabled bool
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -16,6 +19,7 @@ module backupVaultModule '../../../common/components/data-protection/backupVault
     name: vaultName
     location: location
     vaultStorageRedundancy: 'GeoRedundant'
+    crossRegionRestoreEnabled: crossRegionRestoreEnabled
     tagValues: tagValues
   }
 }

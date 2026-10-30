@@ -9,6 +9,9 @@ param location string = resourceGroup().location
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool
 
+@description('Whether Backup Vault backups can be restored in the paired region.')
+param backupVaultCrossRegionRestore bool
+
 @description('Whether or not to create or update Recovery Services Vault and policies.')
 param deployRecoveryServicesVault bool
 
@@ -27,6 +30,7 @@ module backupVaultModule 'backup-vault.bicep' = {
     location: location
     vaultName: backupsNames.backupVault
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    crossRegionRestoreEnabled: backupVaultCrossRegionRestore
     tagValues: tagValues
   }
 }

@@ -9,6 +9,9 @@ param name string
 ])
 param vaultStorageRedundancy string = 'GeoRedundant'
 
+@description('Whether backups can be restored in the paired region. Needs geo-redundant storage. Once protection has started, the vault can\'t then move off geo-redundant storage.')
+param crossRegionRestoreEnabled bool = false
+
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
@@ -21,14 +24,22 @@ resource vault 'Microsoft.DataProtection/backupVaults@2026-06-01' = {
   identity: {
     type: 'systemAssigned'
   }
-  properties: {
+  properties: union({
     storageSettings: [
       {
         datastoreType: 'VaultStore'
         type: vaultStorageRedundancy
       }
     ]
-  }
+  }, crossRegionRestoreEnabled
+    ? {
+        featureSettings: {
+          crossRegionRestoreSettings: {
+            state: 'Enabled'
+          }
+        }
+      }
+    : {})
   tags: tagValues
 }
 
