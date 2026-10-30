@@ -135,7 +135,7 @@ describe('PairedIndicatorsForm', () => {
 
     await screen.findByRole('group', { name: 'Pair 1' });
 
-    await user.click(screen.getByRole('button', { name: 'Add pair' }));
+    await user.click(screen.getByRole('button', { name: 'Add another pair' }));
 
     const pair2 = screen.getByRole('group', { name: 'Pair 2' });
     await user.selectOptions(
