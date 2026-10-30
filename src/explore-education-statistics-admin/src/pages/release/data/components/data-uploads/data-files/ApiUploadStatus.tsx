@@ -20,7 +20,7 @@ export default function ApiUploadStatus({ status }: Props) {
   }
 
   return (
-    <div className="govuk-!-margin-top-1">
+    <div className="govuk-!-padding-top-2">
       <Tag colour={statusColours[status]}>{status}</Tag>
     </div>
   );
