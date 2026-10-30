@@ -1,9 +1,14 @@
-# In a new environment, the infrastructure pipelines must first run in this order, as each uses resources that the
-# earlier ones create, such as the main apps' user-assigned identities:
-#   1. Core (infrastructure/templates/core/ci/azure-pipelines.yml).
-#   2. Main (infrastructure/templates/bicep-main-infrastructure-release/ci/azure-pipelines.yml).
-#   3. The area-specific pipelines, in any order: Public API, Screener, Search, Analytics and Data Factory pipelines.
-# This is the Search pipeline, so it runs after Core and Main.
+# In a new environment, the infrastructure pipelines must first run in this order, as each uses resources that earlier
+# ones create, such as file shares to mount and the main apps' user-assigned identities:
+#   1. Core, with Front Door (and Data Factory) but not Application Gateway.
+#   2. Analytics and Search, in either order.
+#   3. Public API, with the PostgreSQL Flexible Server but not the Container App or Data Processor, which allow
+#      calls from Admin's identity. Then add the PostgreSQL users manually.
+#   4. Main (bicep-main-infrastructure-release), which mounts the Analytics and Public API file shares.
+#   5. Public API again, with the Container App and Data Processor.
+#   6. Screener, Data Factory pipelines, and Core again with Application Gateway, which routes to the Public API
+#      Container App.
+# This is the Search pipeline: step 2.
 
 trigger:
   branches:
