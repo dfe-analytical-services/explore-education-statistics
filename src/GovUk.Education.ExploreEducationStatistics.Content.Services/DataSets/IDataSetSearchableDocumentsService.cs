@@ -16,4 +16,8 @@ public interface IDataSetSearchableDocumentsService
         string publicationSlug,
         CancellationToken cancellationToken = default
     );
+
+    Task<DataSetSearchableDocumentKeyDto[]> GetDataSetSearchableDocumentKeys(
+        CancellationToken cancellationToken = default
+    );
 }

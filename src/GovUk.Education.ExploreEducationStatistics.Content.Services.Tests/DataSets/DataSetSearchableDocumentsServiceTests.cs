@@ -6,9 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.DataSets;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.DataSets.Dtos;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.DataSets;
 
@@ -689,6 +689,101 @@ public abstract class DataSetSearchableDocumentsServiceTests
 
             // Assert
             outcome.AssertNotFound();
+        }
+    }
+
+    public class GetDataSetSearchableDocumentKeysTests : DataSetSearchableDocumentsServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationsHaveDataSets_ReturnsKeysOfDataSetsOfLatestPublishedVersionOfEachRelease()
+        {
+            // Arrange
+            Publication publication1 = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                    ]
+                );
+            var publication1Release2020 = publication1.Releases.Single(r => r.Year == 2020);
+            var publication1Release2021 = publication1.Releases.Single(r => r.Year == 2021);
+
+            Publication publication2 = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var publication2Release = publication2.Releases[0];
+
+            Publication unpublishedPublication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            var publication1Release2020Version1ReleaseFiles = GenerateDataSetReleaseFiles(
+                publication1Release2020.Versions[1]
+            );
+            var publication1Release2021Version0ReleaseFiles = GenerateDataSetReleaseFiles(
+                publication1Release2021.Versions[0]
+            );
+            var publication2ReleaseFiles = GenerateDataSetReleaseFiles(publication2Release.Versions[0]);
+
+            ReleaseFile ancillaryReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(publication2Release.Versions[0])
+                .WithFile(_dataFixture.DefaultFile(FileType.Ancillary));
+
+            var contextId = await SeedDatabase(
+                [publication1, publication2, unpublishedPublication],
+                [
+                    .. GenerateDataSetReleaseFiles(publication1Release2020.Versions[0]),
+                    .. publication1Release2020Version1ReleaseFiles,
+                    .. publication1Release2021Version0ReleaseFiles,
+                    .. GenerateDataSetReleaseFiles(publication1Release2021.Versions[1]),
+                    .. publication2ReleaseFiles,
+                    .. GenerateDataSetReleaseFiles(unpublishedPublication.Releases[0].Versions[0]),
+                    ancillaryReleaseFile,
+                ]
+            );
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var actual = await sut.GetDataSetSearchableDocumentKeys();
+
+            // Assert
+            DataSetSearchableDocumentKeyDto[] expected =
+            [
+                .. publication1Release2020Version1ReleaseFiles
+                    .Concat(publication1Release2021Version0ReleaseFiles)
+                    .Concat(publication2ReleaseFiles)
+                    .Select(rf => new DataSetSearchableDocumentKeyDto
+                    {
+                        PublicationId = rf.ReleaseVersion.Release.PublicationId,
+                        ReleaseId = rf.ReleaseVersion.ReleaseId,
+                        FileId = rf.FileId,
+                    }),
+            ];
+
+            Assert.Equivalent(expected, actual, strict: true);
+        }
+
+        [Fact]
+        public async Task WhenNoDataSets_ReturnsEmpty()
+        {
+            // Arrange
+            var contextId = await SeedDatabase([], []);
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var actual = await sut.GetDataSetSearchableDocumentKeys();
+
+            // Assert
+            Assert.Empty(actual);
         }
     }
 

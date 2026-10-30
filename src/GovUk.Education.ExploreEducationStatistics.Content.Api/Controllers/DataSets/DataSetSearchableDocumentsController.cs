@@ -33,4 +33,9 @@ public class DataSetSearchableDocumentsController(IDataSetSearchableDocumentsSer
         await dataSetSearchableDocumentsService
             .GetPublicationDataSetSearchableDocuments(publicationSlug, cancellationToken)
             .HandleFailuresOrOk();
+
+    [HttpGet("data-sets/searchable/keys")]
+    public async Task<DataSetSearchableDocumentKeyDto[]> GetDataSetSearchableDocumentKeys(
+        CancellationToken cancellationToken = default
+    ) => await dataSetSearchableDocumentsService.GetDataSetSearchableDocumentKeys(cancellationToken);
 }
