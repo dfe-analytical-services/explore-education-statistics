@@ -1,0 +1,126 @@
+using System.Net.Mime;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Blob = GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage.Blob;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CreateReleaseDocuments;
+
+public class ReleaseDocumentCreatorTests
+{
+    private readonly ContentApiClientMockBuilder _contentApiClientMockBuilder = new();
+    private readonly AzureBlobStorageClientMockBuilder _azureBlobStorageClientMockBuilder = new();
+    private AppOptions _appOptions = new();
+
+    private ReleaseDocumentCreator GetSut() =>
+        new(
+            _contentApiClientMockBuilder.Build(),
+            _azureBlobStorageClientMockBuilder.Build(),
+            Microsoft.Extensions.Options.Options.Create(_appOptions)
+        );
+
+    public class BasicTests : ReleaseDocumentCreatorTests
+    {
+        [Fact]
+        public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
+    }
+
+    public class CreatingReleaseDocument : ReleaseDocumentCreatorTests
+    {
+        [Fact]
+        public async Task Should_load_release_document_from_ContentApi()
+        {
+            // ARRANGE
+            var sut = GetSut();
+
+            // ACT
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
+            );
+
+            // ASSERT
+            _contentApiClientMockBuilder.Assert.ContentWasLoadedFor("publication-slug");
+        }
+
+        [Fact]
+        public async Task Should_upload_release_document_to_expected_AzureBlobStorage_container()
+        {
+            // ARRANGE
+            _appOptions = new AppOptions
+            {
+                SearchStorageConnectionString = "azure storage connection string",
+                ReleaseDocumentsContainerName = "release-documents-container-name",
+            };
+
+            var sut = GetSut();
+
+            // ACT
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
+            );
+
+            // ASSERT
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
+                containerName: _appOptions.ReleaseDocumentsContainerName
+            );
+        }
+
+        [Fact]
+        public async Task Should_upload_release_document_to_blob_with_releaseId_as_blob_name()
+        {
+            // ARRANGE
+            var releaseId = new Guid("11223344-5566-7788-9900-123456789abc");
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(builder => builder.WithReleaseId(releaseId));
+
+            var sut = GetSut();
+
+            // ACT
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
+            );
+
+            // ASSERT
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(blobName: releaseId.ToString());
+        }
+
+        [Fact]
+        public async Task Should_upload_release_document_blob()
+        {
+            // ARRANGE
+            var releaseDocument = new ReleaseDocumentBuilder().Build();
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
+            var sut = GetSut();
+
+            // ACT
+            await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
+            );
+
+            // ASSERT
+            var expected = new Blob(releaseDocument.HtmlContent, releaseDocument.BuildMetadata());
+            _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
+                contentType: MediaTypeNames.Text.Html,
+                whereBlob: blob => blob == expected
+            );
+        }
+
+        [Fact]
+        public async Task Should_return_information_in_response()
+        {
+            // ARRANGE
+            var releaseDocument = new ReleaseDocumentBuilder().Build();
+            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
+            var sut = GetSut();
+
+            // ACT
+            var response = await sut.CreatePublicationLatestReleaseDocument(
+                new CreatePublicationLatestReleaseDocumentRequest { PublicationSlug = "publication-slug" }
+            );
+
+            // ASSERT
+            Assert.Equal(releaseDocument.ReleaseVersionId, response.ReleaseVersionId);
+            Assert.Equal(releaseDocument.ReleaseId.ToString(), response.BlobName);
+        }
+    }
+}

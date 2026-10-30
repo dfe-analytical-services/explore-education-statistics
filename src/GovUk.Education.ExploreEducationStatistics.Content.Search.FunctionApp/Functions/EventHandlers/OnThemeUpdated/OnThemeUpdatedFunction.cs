@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.EventGrid;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnThemeUpdated.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -15,12 +15,12 @@ public class OnThemeUpdatedFunction(
 )
 {
     [Function(nameof(OnThemeUpdated))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
-    public async Task<RefreshSearchableDocumentMessageDto[]> OnThemeUpdated(
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
+    public async Task<RefreshReleaseDocumentMessageDto[]> OnThemeUpdated(
         [QueueTrigger("%ThemeUpdatedQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<ThemeUpdatedEventDto, RefreshSearchableDocumentMessageDto[]>(
+        await eventGridEventHandler.Handle<ThemeUpdatedEventDto, RefreshReleaseDocumentMessageDto[]>(
             context,
             eventDto,
             async (_, ct) =>
@@ -31,13 +31,13 @@ public class OnThemeUpdatedFunction(
                 var publicationsForTheme = await contentApiClient.GetPublicationsForTheme(themeId, ct);
 
                 logger.LogInformation(
-                    "Refreshing Searchable Documents for Theme {ThemeId}: Publications {@PublicationInfos}",
+                    "Refreshing Release Documents for Theme {ThemeId}: Publications {@PublicationInfos}",
                     themeId,
                     publicationsForTheme
                 );
 
                 return publicationsForTheme
-                    .Select(p => new RefreshSearchableDocumentMessageDto { PublicationSlug = p.PublicationSlug })
+                    .Select(p => new RefreshReleaseDocumentMessageDto { PublicationSlug = p.PublicationSlug })
                     .ToArray();
             }
         );

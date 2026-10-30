@@ -1,5 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -28,7 +28,7 @@ public class OnPublicationDeletedFunctionTests
             },
         };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
-        var expected = new RemoveSearchableDocumentDto
+        var expected = new RemoveReleaseDocumentDto
         {
             ReleaseId = payload.LatestPublishedRelease.LatestPublishedReleaseId,
         };
@@ -62,9 +62,9 @@ public class OnPublicationDeletedFunctionTests
         // The latest published Release appears in both fields, but is only removed once.
         Assert.Equal(
             [
-                new RemoveSearchableDocumentDto { ReleaseId = latestPublishedReleaseId },
-                new RemoveSearchableDocumentDto { ReleaseId = supersededReleaseId },
-                new RemoveSearchableDocumentDto { ReleaseId = neverPublishedReleaseId },
+                new RemoveReleaseDocumentDto { ReleaseId = latestPublishedReleaseId },
+                new RemoveReleaseDocumentDto { ReleaseId = supersededReleaseId },
+                new RemoveReleaseDocumentDto { ReleaseId = neverPublishedReleaseId },
             ],
             response
         );

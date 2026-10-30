@@ -17,7 +17,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
 
     private static AzureBlobStorageHealthCheckStrategy GetSUT(
         string? searchStorageConnectionString = null,
-        string? searchDocumentsContainerName = null
+        string? releaseDocumentsContainerName = null
     ) =>
         new(
             CreateAzureBlobStorageClientFactory(),
@@ -27,7 +27,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
                 {
                     SearchStorageConnectionString =
                         searchStorageConnectionString ?? IntegrationTestStorageAccountConnectionString,
-                    SearchDocumentsContainerName = searchDocumentsContainerName ?? IntegrationTestContainerName,
+                    ReleaseDocumentsContainerName = releaseDocumentsContainerName ?? IntegrationTestContainerName,
                 }
             )
         );
@@ -57,7 +57,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     public async Task WhenContainerNotFound_ThenShouldRespondIsUnhealthy()
     {
         //  ARRANGE
-        var sut = GetSUT(searchDocumentsContainerName: "some-unknown-container-name");
+        var sut = GetSUT(releaseDocumentsContainerName: "some-unknown-container-name");
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);
@@ -74,7 +74,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     {
         //  ARRANGE
         // Missing container name
-        var sut = GetSUT(searchDocumentsContainerName: string.Empty);
+        var sut = GetSUT(releaseDocumentsContainerName: string.Empty);
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);
@@ -83,7 +83,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.NotNull(healthCheckResult);
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            "Search Documents Azure Blob Storage container name is not configured.",
+            "Release Documents Azure Blob Storage container name is not configured.",
             healthCheckResult.Message
         );
     }

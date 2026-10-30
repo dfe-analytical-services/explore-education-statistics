@@ -5,8 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,10 +65,10 @@ public static class HostBuilderExtension
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
                     .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
                     // Services
-                    .AddTransient<ISearchableDocumentCreator, SearchableDocumentCreator>()
-                    .AddTransient<ISearchableDocumentRemover, SearchableDocumentRemover>()
-                    .AddTransient<IFullSearchableDocumentResetter, FullSearchableDocumentResetter>()
-                    .AddSearchDocumentChecker()
+                    .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
+                    .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
+                    .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
+                    .AddReleaseDocumentChecker()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()
                     .AddTransient<ICommandHandler, CommandHandler>()

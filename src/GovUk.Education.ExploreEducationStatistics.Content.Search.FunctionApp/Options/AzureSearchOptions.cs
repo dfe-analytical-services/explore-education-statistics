@@ -14,7 +14,7 @@ public class AzureSearchOptions
 
     public string? SearchServiceAccessKey { get; init; }
 
-    public string IndexerName { get; init; } = string.Empty;
+    public string ReleaseIndexerName { get; init; } = string.Empty;
 
     public bool IsValid([NotNullWhen(false)] out string? errorMessage)
     {
@@ -25,10 +25,10 @@ public class AzureSearchOptions
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(IndexerName))
+        if (string.IsNullOrWhiteSpace(ReleaseIndexerName))
         {
             errorMessage =
-                $"Azure Search Indexer Name is not configured. Ensure the {Section}:{nameof(IndexerName)} is set.";
+                $"Azure Search Release Indexer Name is not configured. Ensure the {Section}:{nameof(ReleaseIndexerName)} is set.";
             return false;
         }
 

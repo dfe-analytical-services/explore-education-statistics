@@ -14,7 +14,7 @@ public abstract class SearchIndexerClientTests
         {
             SearchServiceEndpoint = _searchServiceEndpoint,
             SearchServiceAccessKey = _searchServiceAccessKey,
-            IndexerName = _indexerName,
+            ReleaseIndexerName = _indexerName,
         };
 
     private string _searchServiceEndpoint = "https://example.search.windows.net/";

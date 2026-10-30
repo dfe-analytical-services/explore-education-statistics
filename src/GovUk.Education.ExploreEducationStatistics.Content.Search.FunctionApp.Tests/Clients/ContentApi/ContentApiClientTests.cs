@@ -161,7 +161,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
 
                 // ASSERT
                 Assert.NotNull(actual);
-                var expected = new ReleaseSearchableDocument
+                var expected = new ReleaseDocument
                 {
                     ReleaseId = new Guid("2ae1f7b1-0088-4fd1-c78a-08dec542c3bb"),
                     ReleaseVersionId = new Guid("90f5ae5d-0eec-4029-f805-08dec542c394"),

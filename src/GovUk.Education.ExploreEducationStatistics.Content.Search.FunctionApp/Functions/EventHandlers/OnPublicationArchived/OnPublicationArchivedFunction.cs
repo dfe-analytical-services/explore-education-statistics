@@ -1,5 +1,5 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationSearchableDocuments.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemovePublicationReleaseDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationArchived.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -9,19 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnPublicationArchivedFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnPublicationArchived))]
-    [QueueOutput("%RemovePublicationSearchableDocumentsQueueName%")]
-    public async Task<RemovePublicationSearchableDocumentsDto[]> OnPublicationArchived(
+    [QueueOutput("%RemovePublicationReleaseDocumentsQueueName%")]
+    public async Task<RemovePublicationReleaseDocumentsDto[]> OnPublicationArchived(
         [QueueTrigger("%PublicationArchivedQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<PublicationArchivedEventDto, RemovePublicationSearchableDocumentsDto[]>(
+        await eventGridEventHandler.Handle<PublicationArchivedEventDto, RemovePublicationReleaseDocumentsDto[]>(
             context,
             eventDto,
             (payload, _) =>
-                Task.FromResult<RemovePublicationSearchableDocumentsDto[]>(
+                Task.FromResult<RemovePublicationReleaseDocumentsDto[]>(
                     string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RemovePublicationSearchableDocumentsDto { PublicationSlug = payload.PublicationSlug }]
+                        : [new RemovePublicationReleaseDocumentsDto { PublicationSlug = payload.PublicationSlug }]
                 )
         );
 }
