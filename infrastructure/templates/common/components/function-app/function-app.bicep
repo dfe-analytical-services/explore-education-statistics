@@ -154,6 +154,10 @@ param healthCheckPath string?
 @description('The name of an existing user-assigned managed identity for the Function App to use instead of a system-assigned one, for Key Vault references, its own storage account and the app code. Its Key Vault and storage roles are granted to this identity.')
 param userAssignedIdentityName string = ''
 
+// TODO EES-7502 - remove once the Publisher logs in to PostgreSQL with its user-assigned identity.
+@description('Whether to keep a system-assigned identity alongside the user-assigned one, for anything that still needs it. Only applies when userAssignedIdentityName is supplied.')
+param keepSystemAssignedIdentity bool = false
+
 @description('Specifies the SKU for the Function App hosting plan.')
 param sku FunctionAppServicePlanSku
 
@@ -212,7 +216,9 @@ var fileServiceAlerts = alerts != null
   }
 : null
 
-var identityType = !empty(userAssignedIdentityName) ? 'UserAssigned' : 'SystemAssigned'
+var identityType = !empty(userAssignedIdentityName)
+  ? (keepSystemAssignedIdentity ? 'SystemAssigned, UserAssigned' : 'UserAssigned')
+  : 'SystemAssigned'
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName

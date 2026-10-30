@@ -93,6 +93,12 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
   name: 'publisherFunctionAppModuleDeploy'
   params: {
     userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.publisher.identity : ''
+    // TODO EES-7502 - stop keeping the system-assigned identity, and remove PsqlUseSystemAssignedIdentity below, once
+    // the Publisher logs in to PostgreSQL with its user-assigned identity. This needs a PostgreSQL role named after
+    // resourceNames.publisher.identity, and the connection string's User Id changing to match.
+    //
+    // This would best be done when data is fully migrated into ELZ and the service switched over.
+    keepSystemAssignedIdentity: true
     functionAppName: resourceNames.publisher.functionApp
     appServicePlanName: resourceNames.publisher.appServicePlan
     storageAccountName: resourceNames.publisher.storageAccount
@@ -169,7 +175,15 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         mountPath: publicApiFileshareMountPath
       }
     ]
-    appSettings: []
+    // Log in to PostgreSQL with the system-assigned identity, whose PostgreSQL role is named after the Function App.
+    appSettings: useUserAssignedIdentity
+      ? [
+          {
+            name: 'PsqlUseSystemAssignedIdentity'
+            value: 'true'
+          }
+        ]
+      : []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
   }

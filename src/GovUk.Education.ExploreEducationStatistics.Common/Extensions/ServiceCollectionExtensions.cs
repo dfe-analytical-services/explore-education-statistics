@@ -62,6 +62,21 @@ public static class ServiceCollectionExtensions
     )
         where TDbContext : DbContext
     {
+        // TODO EES-7502 - remove once the Publisher logs in to PostgreSQL with its user-assigned identity.
+        // A Function App with both a system-assigned and a user-assigned identity can set this to keep
+        // logging in to PostgreSQL with its system-assigned identity, while "AZURE_CLIENT_ID" selects
+        // the user-assigned identity for everything else.
+        //
+        // This would best be done after all data is migrated to the ELZ and the service switched over.
+        if (configuration.GetValue<bool>("PsqlUseSystemAssignedIdentity"))
+        {
+            return services.RegisterManagedIdentityPsqlDbContext<TDbContext>(
+                connectionString,
+                optionsConfiguration: optionsConfiguration,
+                accessTokenProvider: new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned)
+            );
+        }
+
         // Unlike Container Apps and App Services, DefaultAzureCredential does not pick up
         // the "AZURE_CLIENT_ID" environment variable automatically when operating within
         // a Function App.  We therefore provide it manually.
@@ -114,11 +129,12 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string connectionString,
         string? managedIdentityClientId = null,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null,
+        TokenCredential? accessTokenProvider = null
     )
         where TDbContext : DbContext
     {
-        var accessTokenProvider =
+        accessTokenProvider ??=
             managedIdentityClientId != null
                 ? new DefaultAzureCredential(
                     new DefaultAzureCredentialOptions { ManagedIdentityClientId = managedIdentityClientId }
