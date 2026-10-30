@@ -6,11 +6,11 @@ import useCurrentPng from '@common/components/ChartsToPNG';
 import useCopySuccess from '@common/hooks/useCopySuccess';
 import usePngDownload from '@common/hooks/usePngDownload';
 import logger from '@common/services/logger';
-import removeExportIgnoredElements from '@common/utils/dom/removeExportIgnoredElements';
 import { Options as HTML2CanvasOptions } from 'html2canvas';
 
 const pngOptions: Partial<HTML2CanvasOptions> = {
-  onclone: (_, element) => removeExportIgnoredElements(element),
+  ignoreElements: element =>
+    element.matches('details:not([open]) > :not(summary)'),
 };
 
 interface Props {
