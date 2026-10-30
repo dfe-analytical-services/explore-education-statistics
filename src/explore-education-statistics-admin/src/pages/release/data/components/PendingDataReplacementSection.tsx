@@ -108,13 +108,16 @@ const PendingDataReplacementSection: React.FC<{
           releaseVersionId={releaseVersionId}
           fileId={dataFileId}
           replacementFileId={replacementDataFile.id}
-          onReplacement={() => {
+          onReplacement={result => {
             navigate(
               generatePath(releaseDataFileReplacementCompleteRoute.fullPath, {
                 publicationId,
                 releaseVersionId,
                 fileId: replacementDataFile.id,
               }),
+              // The original data set's paired indicators no longer exist
+              // after the replacement, so pass on what happened to them.
+              { state: result },
             );
           }}
         />

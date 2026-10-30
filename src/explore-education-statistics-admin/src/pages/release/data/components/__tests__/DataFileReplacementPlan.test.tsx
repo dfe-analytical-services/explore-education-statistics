@@ -6,9 +6,13 @@ import _dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
+import _tableBuilderService, {
+  PairedIndicators,
+} from '@admin/services/tableBuilderService';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
@@ -16,6 +20,7 @@ jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/footnoteService');
 jest.mock('@admin/services/releaseDataFileService');
+jest.mock('@admin/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
@@ -23,11 +28,20 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const dataReplacementService = _dataReplacementService as jest.Mocked<
   typeof _dataReplacementService
 >;
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
 const footnoteService = _footnoteService as jest.Mocked<
   typeof _footnoteService
 >;
 
 describe('DataReplacementPlan', () => {
+  beforeEach(() => {
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
+  });
+
   const testReplacementPlan: DataReplacementPlan = {
     dataBlocks: [
       {
@@ -1245,12 +1259,188 @@ describe('DataReplacementPlan', () => {
 
     expect(screen.getByText('No data blocks to replace.')).toBeInTheDocument();
     expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'No indicators have been paired for this data set.',
+      ),
+    ).toBeInTheDocument();
+    expect(tableBuilderService.getPairedIndicators).toHaveBeenCalledWith(
+      'release-1',
+      'subject-1',
+    );
 
     expect(screen.queryAllByRole('group')).toHaveLength(0);
 
     expect(
       screen.getByRole('button', { name: 'Confirm data replacement' }),
     ).toBeInTheDocument();
+  });
+
+  test('confirming the replacement passes on the maintained and dropped paired indicators', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      dataBlocks: [],
+      footnotes: [],
+      mapping: {
+        ...testValidReplacementPlan.mapping,
+        indicators: {
+          candidates: {},
+          mappings: {
+            'indicator-1': {
+              source: { id: 'indicator-1', label: 'Indicator 1', name: 'i1' },
+              type: 'AutoSet',
+              candidateKey: 'new-indicator-1',
+            },
+            'indicator-2': {
+              source: { id: 'indicator-2', label: 'Indicator 2', name: 'i2' },
+              type: 'AutoSet',
+              candidateKey: 'new-indicator-2',
+            },
+            'indicator-3': {
+              source: { id: 'indicator-3', label: 'Indicator 3', name: 'i3' },
+              type: 'Unset',
+            },
+          },
+        },
+      },
+    });
+    tableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [
+        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+        { parentIndicatorId: 'indicator-2', childIndicatorId: 'indicator-3' },
+      ],
+    });
+    dataReplacementService.replaceData.mockResolvedValue();
+
+    const handleReplacement = jest.fn();
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+          onReplacement={handleReplacement}
+        />
+      </MemoryRouter>,
+      true,
+    );
+
+    expect(await screen.findByText('Dropped')).toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    );
+
+    await waitFor(() => {
+      expect(handleReplacement).toHaveBeenCalledWith({
+        replacementSubjectId: testValidReplacementPlan.replacementSubjectId,
+        pairedIndicators: [
+          {
+            parentIndicatorId: 'indicator-1',
+            parentLabel: 'Indicator 1',
+            childIndicatorId: 'indicator-2',
+            childLabel: 'Indicator 2',
+            maintained: true,
+          },
+          {
+            parentIndicatorId: 'indicator-2',
+            parentLabel: 'Indicator 2',
+            childIndicatorId: 'indicator-3',
+            childLabel: 'Indicator 3',
+            maintained: false,
+          },
+        ],
+      });
+    });
+  });
+
+  test('cannot confirm the replacement until the paired indicators have loaded', async () => {
+    dataReplacementService.getReplacementPlan.mockResolvedValue({
+      ...testValidReplacementPlan,
+      dataBlocks: [],
+      footnotes: [],
+      mapping: {
+        ...testValidReplacementPlan.mapping,
+        indicators: {
+          candidates: {},
+          mappings: {
+            'indicator-1': {
+              source: { id: 'indicator-1', label: 'Indicator 1', name: 'i1' },
+              type: 'AutoSet',
+              candidateKey: 'new-indicator-1',
+            },
+            'indicator-2': {
+              source: { id: 'indicator-2', label: 'Indicator 2', name: 'i2' },
+              type: 'Unset',
+            },
+          },
+        },
+      },
+    });
+
+    let resolvePairedIndicators: (value: PairedIndicators) => void = noop;
+    tableBuilderService.getPairedIndicators.mockReturnValue(
+      new Promise(resolve => {
+        resolvePairedIndicators = resolve;
+      }),
+    );
+    dataReplacementService.replaceData.mockResolvedValue();
+
+    const handleReplacement = jest.fn();
+
+    renderWithTestConfig(
+      <MemoryRouter>
+        <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
+          publicationId="publication-1"
+          releaseVersionId="release-1"
+          fileId="file-1"
+          replacementFileId="file-2"
+          onReplacement={handleReplacement}
+        />
+      </MemoryRouter>,
+      true,
+    );
+
+    const confirmButton = await screen.findByRole('button', {
+      name: 'Confirm data replacement',
+    });
+    expect(confirmButton).toBeAriaDisabled();
+
+    await userEvent.click(confirmButton);
+
+    expect(dataReplacementService.replaceData).not.toHaveBeenCalled();
+    expect(handleReplacement).not.toHaveBeenCalled();
+
+    resolvePairedIndicators({
+      pairedIndicators: [
+        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+      ],
+    });
+
+    await waitFor(() => {
+      expect(confirmButton).not.toBeAriaDisabled();
+    });
+
+    await userEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(handleReplacement).toHaveBeenCalledWith({
+        replacementSubjectId: testValidReplacementPlan.replacementSubjectId,
+        pairedIndicators: [
+          {
+            parentIndicatorId: 'indicator-1',
+            parentLabel: 'Indicator 1',
+            childIndicatorId: 'indicator-2',
+            childLabel: 'Indicator 2',
+            maintained: false,
+          },
+        ],
+      });
+    });
   });
 
   test('renders error message if there is an error loading replacement plan', async () => {

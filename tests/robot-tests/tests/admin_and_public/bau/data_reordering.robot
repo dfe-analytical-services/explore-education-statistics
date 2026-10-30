@@ -34,8 +34,8 @@ Upload subject to release
     ...    grouped-filters-and-indicators.meta.csv
 
 Open reorder filters and indicators tab
-    user clicks link    Reorder filters and indicators
-    user waits until h2 is visible    Reorder filters and indicators
+    user clicks link    Manage filters and indicators
+    user waits until h2 is visible    Manage filters and indicators
 
 Check reordering table contains subject row
     user waits until table is visible    id:reordering
@@ -43,11 +43,11 @@ Check reordering table contains subject row
     user checks table body has x rows    1    id:reordering
 
     user checks table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
-    user checks table cell contains    1    2    Reorder filters    id:reordering
-    user checks table cell contains    1    2    Reorder indicators    id:reordering
+    user checks table cell contains    1    2    Manage filters    id:reordering
+    user checks table cell contains    1    2    Manage indicators    id:reordering
 
 Check the initial order of filters
-    user clicks button in table cell    1    2    Reorder filters    id:reordering
+    user clicks button in table cell    1    2    Manage filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 1
@@ -105,7 +105,7 @@ Save reordered filters, filter groups and filter items
     user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
 
 Check the saved order of filters
-    user clicks button in table cell    1    2    Reorder filters    id:reordering
+    user clicks button in table cell    1    2    Manage filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 2
@@ -168,7 +168,9 @@ Cancel reordering filters
     user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
 
 Check the initial order of indicator groups
-    user clicks button in table cell    1    2    Reorder indicators    id:reordering
+    user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 1
@@ -195,10 +197,14 @@ Reorder indicator group 1's indicators
 
 Save reordered indicator groups and indicators
     user clicks button    Save order
-    user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
+    user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Back to data files    id:reordering
 
 Check the saved order of indicator groups
-    user clicks button in table cell    1    2    Reorder indicators    id:reordering
+    user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
@@ -221,6 +227,7 @@ Check the saved order of indicator group 2's indicators remains untouched
 Cancel reordering indicators
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
 
 Replace subject data
     user clicks link    Data uploads
@@ -261,8 +268,8 @@ Confirm data replacement
 
 Open reorder filters and indicators tab after data replacement
     user clicks link    Data and files
-    user clicks link    Reorder filters and indicators
-    user waits until h2 is visible    Reorder filters and indicators
+    user clicks link    Manage filters and indicators
+    user waits until h2 is visible    Manage filters and indicators
 
 Check reordering table contains subject row after data replacement
     user waits until table is visible    id:reordering
@@ -270,12 +277,12 @@ Check reordering table contains subject row after data replacement
     user checks table body has x rows    1    id:reordering
 
     user checks table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
-    user checks table cell contains    1    2    Reorder filters    id:reordering
-    user checks table cell contains    1    2    Reorder indicators    id:reordering
+    user checks table cell contains    1    2    Manage filters    id:reordering
+    user checks table cell contains    1    2    Manage indicators    id:reordering
 
 Check the order of filters after data replacement
     # Filters are identical in the replacement so the previous order should be retained
-    user clicks button in table cell    1    2    Reorder filters    id:reordering
+    user clicks button in table cell    1    2    Manage filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-filters
     ...    Filter 2
@@ -351,7 +358,9 @@ Cancel reordering filters after data replacement
 
 Check the order of indicator groups after data replacement
     # 'Indicator group 3' is new in the replacement so should be appended
-    user clicks button in table cell    1    2    Reorder indicators    id:reordering
+    user clicks button in table cell    1    2    Manage indicators    id:reordering
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
+    user clicks button    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
     user checks list contains exact items in order    testid:reorder-indicators
     ...    Indicator group 2
@@ -381,6 +390,7 @@ Check the order of indicator group 3's indicators after data replacement
 Cancel reordering indicators after data replacement
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+    user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
 
 Add data guidance to subject
     user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
