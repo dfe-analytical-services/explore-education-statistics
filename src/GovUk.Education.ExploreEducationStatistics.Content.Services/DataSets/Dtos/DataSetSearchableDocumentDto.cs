@@ -142,3 +142,10 @@ public record DataSetSearchableDocumentTimePeriodRangeDto
     public required string From { get; init; }
     public required string To { get; init; }
 }
+
+public record DataSetSearchableDocumentKeyDto
+{
+    public required Guid PublicationId { get; init; }
+    public required Guid ReleaseId { get; init; }
+    public required Guid FileId { get; init; }
+}
