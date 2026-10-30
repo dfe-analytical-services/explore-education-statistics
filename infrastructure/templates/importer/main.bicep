@@ -12,6 +12,9 @@ param minTlsVersion string
 @description('App Service Plan SKU.')
 param appServiceSku FunctionAppServicePlanSku
 
+@description('The operating system to host the Function App on.')
+param operatingSystem 'Windows' | 'Linux'
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -87,8 +90,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     }
     sku: appServiceSku
     functionAppRuntime: 'dotnet-isolated'
-    operatingSystem: 'Windows'
-    netFrameworkVersion: 'v10.0'
+    operatingSystem: operatingSystem
+    netFrameworkVersion: operatingSystem == 'Windows' ? 'v10.0' : null
+    linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     alwaysOn: true
     deployQueueRoleAssignment: true
     healthCheckPath: '/api/health'

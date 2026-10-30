@@ -328,7 +328,7 @@ var commonSiteProperties = {
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
   name: functionAppName
   location: location
-  kind: 'functionapp'
+  kind: operatingSystem == 'Linux' ? 'functionapp,linux' : 'functionapp'
   identity: identity
   properties: commonSiteProperties
   tags: tagValues
