@@ -23,6 +23,10 @@ public class DataSetSearchableDocumentsServiceMockBuilder
                 )
             )
             .ReturnsAsync(() => _searchableDocuments ?? [new DataSetSearchableDocumentDtoBuilder().Build()]);
+
+        _mock
+            .Setup(m => m.GetPublicationDataSetSearchableDocuments(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _searchableDocuments ?? [new DataSetSearchableDocumentDtoBuilder().Build()]);
     }
 
     public IDataSetSearchableDocumentsService Build() => _mock.Object;
@@ -50,6 +54,15 @@ public class DataSetSearchableDocumentsServiceMockBuilder
         return this;
     }
 
+    public DataSetSearchableDocumentsServiceMockBuilder WhereGetPublicationDataSetSearchableDocumentsReturnsNotFound()
+    {
+        _mock
+            .Setup(m => m.GetPublicationDataSetSearchableDocuments(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new NotFoundResult());
+
+        return this;
+    }
+
     public Asserter Assert => new(_mock);
 
     public class Asserter(Mock<IDataSetSearchableDocumentsService> mock)
@@ -64,6 +77,18 @@ public class DataSetSearchableDocumentsServiceMockBuilder
                     m.GetReleaseDataSetSearchableDocuments(
                         It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
                         It.Is<string>(actual => releaseSlug == null || actual == releaseSlug),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+        }
+
+        public void GetPublicationDataSetSearchableDocumentsWasCalled(string? publicationSlug = null)
+        {
+            mock.Verify(
+                m =>
+                    m.GetPublicationDataSetSearchableDocuments(
+                        It.Is<string>(actual => publicationSlug == null || actual == publicationSlug),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Once

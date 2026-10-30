@@ -31,6 +31,20 @@ public class DataSetSearchableDocumentsService(ContentDbContext contentDbContext
                 )
             );
 
+    public async Task<Either<ActionResult, DataSetSearchableDocumentDto[]>> GetPublicationDataSetSearchableDocuments(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await GetPublicationBySlug(publicationSlug, cancellationToken)
+            .OnSuccess(publication =>
+                GetDataSetSearchableDocuments(
+                    DataSetReleaseFilesOf(
+                        contentDbContext.ReleaseVersions.LatestReleaseVersions(publication.Id, publishedOnly: true)
+                    ),
+                    cancellationToken
+                )
+            );
+
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
         CancellationToken cancellationToken
@@ -44,6 +58,9 @@ public class DataSetSearchableDocumentsService(ContentDbContext contentDbContext
         contentDbContext
             .ReleaseFiles.AsNoTracking()
             .Where(rf => rf.File.Type == FileType.Data && rf.File.ReplacingId == null);
+
+    private IQueryable<ReleaseFile> DataSetReleaseFilesOf(IQueryable<ReleaseVersion> releaseVersions) =>
+        DataSetReleaseFiles().Join(releaseVersions, rf => rf.ReleaseVersionId, rv => rv.Id, (rf, _) => rf);
 
     private static async Task<DataSetSearchableDocumentDto[]> GetDataSetSearchableDocuments(
         IQueryable<ReleaseFile> releaseFiles,

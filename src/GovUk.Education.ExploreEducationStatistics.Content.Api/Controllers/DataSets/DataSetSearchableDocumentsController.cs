@@ -24,4 +24,13 @@ public class DataSetSearchableDocumentsController(IDataSetSearchableDocumentsSer
         await dataSetSearchableDocumentsService
             .GetReleaseDataSetSearchableDocuments(publicationSlug, releaseSlug, cancellationToken)
             .HandleFailuresOrOk();
+
+    [HttpGet("publications/{publicationSlug}/data-sets/searchable")]
+    public async Task<ActionResult<DataSetSearchableDocumentDto[]>> GetPublicationDataSetSearchableDocuments(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    ) =>
+        await dataSetSearchableDocumentsService
+            .GetPublicationDataSetSearchableDocuments(publicationSlug, cancellationToken)
+            .HandleFailuresOrOk();
 }
