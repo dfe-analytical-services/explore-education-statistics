@@ -128,7 +128,7 @@ bundle exec rake notify:expires
 ### Automated GitHub workflow
 
 A GitHub workflow has been configured to run the `notify:expired` task (see
-`.github/workflows/notify-expired-api-docs.yml`) at 12:05 UTC every weekday. It posts an Adaptive
+`.github/workflows/notify-expired-api-docs.yml`) on a cron schedule. It posts an Adaptive
 Card to a Microsoft Teams channel via the incoming webhook stored in the
 `TEAMS_API_DOCS_WEBHOOK_URL` repository secret.
 
