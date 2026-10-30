@@ -328,6 +328,119 @@ public class DataImportServiceTests
     }
 
     [Fact]
+    public async Task WriteDataSetMetaFile_TwoRootFilters_HierarchiesOrderedByRootFilterLabel()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var file = _fixture
+            .DefaultFile(FileType.Data)
+            .WithDataSetFileMeta(null)
+            .WithDataSetFileVersionGeographicLevels([])
+            .WithSubjectId(subject.Id)
+            .Generate();
+
+        // Root filter B is added before root filter A so that the hierarchies aren't in label order by chance
+        var rootFilterB = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Root filter B",
+            Name = "root_filter_b",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "RootFilterBItem0" }] },
+            ],
+        };
+
+        var childFilterB = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Child filter B",
+            Name = "child_filter_b",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "ChildFilterBItem0" }] },
+            ],
+            ParentFilter = "root_filter_b",
+        };
+
+        var rootFilterA = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Root filter A",
+            Name = "root_filter_a",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "RootFilterAItem0" }] },
+            ],
+        };
+
+        var childFilterA = new Filter
+        {
+            SubjectId = subject.Id,
+            Label = "Child filter A",
+            Name = "child_filter_a",
+            FilterGroups =
+            [
+                new FilterGroup { Label = "Default", FilterItems = [new FilterItem { Label = "ChildFilterAItem0" }] },
+            ],
+            ParentFilter = "root_filter_a",
+        };
+
+        var observationB = _fixture
+            .DefaultObservation()
+            .WithSubject(subject)
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
+            .WithTimePeriod(2000, April)
+            .WithFilterItems([rootFilterB.FilterGroups[0].FilterItems[0], childFilterB.FilterGroups[0].FilterItems[0]])
+            .Generate();
+
+        var observationA = _fixture
+            .DefaultObservation()
+            .WithSubject(subject)
+            .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
+            .WithTimePeriod(2000, April)
+            .WithFilterItems([rootFilterA.FilterGroups[0].FilterItems[0], childFilterA.FilterGroups[0].FilterItems[0]])
+            .Generate();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Files.Add(file);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.Filter.AddRange(rootFilterB, childFilterB, rootFilterA, childFilterA);
+            statisticsDbContext.Observation.AddRange(observationB, observationA);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var service = BuildDataImportService(contentDbContextId, statisticsDbContextId);
+
+        var import = new DataImport
+        {
+            FileId = file.Id,
+            SubjectId = subject.Id,
+            TotalRows = 2,
+            GeographicLevels = [GeographicLevel.Country],
+        };
+
+        await service.WriteDataSetFileMeta(import);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var updatedFile = contentDbContext.Files.Single(f => f.SubjectId == subject.Id);
+
+            Assert.NotNull(updatedFile.FilterHierarchies);
+            Assert.Equal(2, updatedFile.FilterHierarchies.Count);
+            Assert.Equal([rootFilterA.Id, childFilterA.Id], updatedFile.FilterHierarchies[0].FilterIds);
+            Assert.Equal([rootFilterB.Id, childFilterB.Id], updatedFile.FilterHierarchies[1].FilterIds);
+        }
+    }
+
+    [Fact]
     public async Task GenerateFilterHierarchies_Success()
     {
         var subject = new Subject { Id = Guid.NewGuid() };
