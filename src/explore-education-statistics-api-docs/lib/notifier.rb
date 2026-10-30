@@ -8,21 +8,32 @@ require_relative './notification/expired'
 require_relative './notification/will_expire_by'
 
 class Notifier
-  def initialize(notification, pages_url, limit = -1)
+  def initialize(notification, pages_url, teams_webhook_url, live, limit = -1)
     @notification = notification
     @pages_url = pages_url
+    @teams_webhook_url = teams_webhook_url
+    @live = !!live
     @limit = limit
   end
 
   def run
-    message = build_message(matching_pages)
+    payload = build_payload(matching_pages)
 
-    return if message.nil?
+    return if payload.nil?
 
-    puts "== Message"
-    puts message
+    puts "== JSON Payload:"
+    puts JSON.pretty_generate(payload)
 
-    puts "SKIPPING POST: No notification channel is configured, this is a dry run"
+    unless post_to_teams?
+      puts "SKIPPING POST: Not posting anything, this is a dry run"
+      return
+    end
+
+    response = HTTP.post(@teams_webhook_url, json: payload)
+
+    unless response.status.success?
+      raise "Unable to post to Teams: #{response.status} #{response.body}"
+    end
   end
 
   def pages
@@ -45,7 +56,7 @@ class Notifier
       .sort_by { |page| page.review_by }
   end
 
-  def build_message(pages)
+  def build_payload(pages)
     return nil if pages.empty?
 
     page_count = @limit == -1 ? pages.size : [pages.size, @limit].min
@@ -56,14 +67,36 @@ class Notifier
       @notification.line_for(page)
     end
 
-    <<~doc
-      Please ensure that the Public API documentation is up to date. #{number_of}:
+    {
+      type: "message",
+      attachments: [{
+        contentType: "application/vnd.microsoft.card.adaptive",
+        content: {
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.4",
+          body: [
+            { type: "TextBlock", size: "Large", weight: "Bolder", text: "Please ensure that the Public API documentation is up to date", style: "heading", color: "attention", wrap: true },
+            { type: "TextBlock", text: "#{number_of}:\n\n#{page_lines.join("\n")}", wrap: true }
+          ],
+          actions: [
+            { type: "Action.OpenUrl", title: "View Public API documentation", url: docs_url }
+          ]
+        }
+      }]
+    }
+  end
 
-      #{page_lines.join("\n")}
-    doc
+  def post_to_teams?
+    @live
   end
 
   private
+
+  def docs_url
+    # pages.json lives at <docs root>/api/pages.json
+    get_absolute_url("../")
+  end
 
   def get_absolute_url url
     target_uri = URI(url)
