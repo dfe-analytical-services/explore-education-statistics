@@ -116,6 +116,12 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
             originalLocation => originalLocation.Id,
             originalLocation =>
             {
+                // @MarkFix Matching by Id only works while locations are shared between data sets in the StatsDB.
+                // Per-data-set parquet locations never share ids, so everything falls through to the GeogLvl + Code
+                // match below, which leaves duplicates (e.g. blank codes, the same LA under two regions) Unset.
+                // Replace this with a match on all location attributes, using the same key the StatsDB importer
+                // dedupes on (ImporterLocationCache.GetLocationCacheKey), so StatsDB-to-StatsDB auto-mapping is
+                // unchanged.
                 replacementIdToLocationMap.TryGetValue(originalLocation.Id, out var replacementLocation);
                 if (replacementLocation == null)
                 {
