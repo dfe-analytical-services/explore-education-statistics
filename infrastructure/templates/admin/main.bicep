@@ -3,6 +3,7 @@ import { ResourceNames } from '../common/resource-names.bicep'
 import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { SignalRSku } from '../common/components/signalr/types.bicep'
+import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -38,6 +39,9 @@ param autoscaleAppServices bool
 
 @description('Whether to spread the App Service plan\'s instances across availability zones.')
 param zoneRedundant bool
+
+@description('Whether the App Service and its deploy slot use their user-assigned managed identity rather than system-assigned ones.')
+param useUserAssignedIdentity bool = false
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
@@ -96,6 +100,7 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.admin.identity : ''
     appServiceName: resourceNames.admin.appService
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem
@@ -147,6 +152,25 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     tagValues: tagValues
   }
 }
+
+// When Admin uses its user-assigned identity, grant it here the role that the core pipeline grants its system-assigned
+// identity. The core pipeline can then deploy before Admin's identity exists.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+// Allow Admin to send events to the Event Grid topics.
+module eventGridTopicRoleAssignmentModule '../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+  for (topicName, index) in map(items(resourceNames.eventGrid.topics), item => item.value): if (useUserAssignedIdentity) {
+    name: 'adminTopicRoleAssignmentModuleDeploy-${index}'
+    params: {
+      principalId: adminIdentity!.properties.principalId
+      roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
+      topicName: topicName
+    }
+  }
+]
 
 module adminSignalRService '../common/components/signalr/signalr.bicep' = {
   name: 'adminSignalRServiceDeploy'

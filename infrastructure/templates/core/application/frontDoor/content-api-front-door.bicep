@@ -25,7 +25,7 @@ param contentApiOriginHostName string
 param publisherFunctionName string
 
 @description('Whether to grant the Publisher Function App\'s system-assigned identity its roles here.')
-param deployPublisherRoleAssignments bool
+param deploySystemAssignedIdentityRoleAssignments bool
 
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
@@ -41,9 +41,9 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
 }
 
 // TODO EES-7502 - remove this grant, the publisherFunction lookup and the publisherFunctionName and
-// deployPublisherRoleAssignments params once every environment has moved to the ELZ, where the release pipeline grants
-// this role to the Publisher's user-assigned identity instead.
-module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = if (deployPublisherRoleAssignments) {
+// deploySystemAssignedIdentityRoleAssignments params once every environment has moved to the ELZ, where the release
+// pipeline grants this role to the Publisher's user-assigned identity instead.
+module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = if (deploySystemAssignedIdentityRoleAssignments) {
   name: 'contentApiPublisherRoleAssignmentModuleDeploy'
   params: {
     frontDoorProfileName: frontDoorProfileName
