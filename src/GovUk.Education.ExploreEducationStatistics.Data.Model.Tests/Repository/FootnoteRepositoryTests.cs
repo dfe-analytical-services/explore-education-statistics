@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -15,7 +16,7 @@ public class FootnoteRepositoryTests
     private readonly DataFixture _fixture = new();
 
     [Fact]
-    public async Task GetFilteredFootnotes()
+    public async Task GetFootnotesForSelection()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -98,15 +99,14 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             //  Get the footnotes applying to subject 1 or any of its filter items or indicators
             var filter1Group1Item1Id = subject1.Filters[0].FilterGroups[0].FilterItems[0].Id;
             var filter2Group1Item1Id = subject1.Filters[1].FilterGroups[0].FilterItems[0].Id;
             var filter3Group1Item1Id = subject1.Filters[2].FilterGroups[0].FilterItems[0].Id;
             var indicatorGroup1Item1Id = subject1.IndicatorGroups[0].Indicators[0].Id;
 
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
@@ -143,7 +143,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FilterBySubject()
+    public async Task GetFootnotesForSelection_FilterBySubject()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -226,13 +226,12 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             // This test makes sure that all footnotes which apply exclusively to subjects other than the one
             // requested are excluded
 
             //  Get the footnotes applying to subject 1 or any of its filter items or indicators
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
@@ -263,7 +262,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FilterByFiltersAndIndicators()
+    public async Task GetFootnotesForSelection_FilterByFiltersAndIndicators()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -372,10 +371,9 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             //  Get the footnotes applying to filter item 1 and indicator 1
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
                 filterItemIds: ListOf(filter.FilterGroups[0].FilterItems[0].Id),
@@ -412,7 +410,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FilterByFilterItems()
+    public async Task GetFootnotesForSelection_FilterByFilterItems()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -539,11 +537,10 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             // Get the footnotes applying to filter 1 group 1 item 1 or filter 1 group 1 item 2
             // or the filter item id's of filter 2
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
                 filterItemIds: ListOf(
@@ -603,7 +600,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FilterByIndicators()
+    public async Task GetFootnotesForSelection_FilterByIndicators()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -656,10 +653,9 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             //  Get the footnotes applying to indicator 1 or indicator 2
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: releaseSubject.SubjectId,
                 filterItemIds: ListOf<Guid>(),
@@ -680,7 +676,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FootnotesApplyToMultipleSubjects()
+    public async Task GetFootnotesForSelection_FootnotesApplyToMultipleSubjects()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -760,13 +756,12 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             // This test makes sure that applying footnotes to more than one subject doesn't exclude them from the
             // result.
 
             // Get the footnotes applying to subject 1 or any of its filter items or indicators
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
@@ -800,7 +795,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
+    public async Task GetFootnotesForSelection_FilterByEmptyListOfFiltersAndIndicators()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -870,10 +865,9 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             //  Get footnotes applying directly to subject 1 using empty lists of filter item and indicator id's
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject1.Id,
                 filterItemIds: ListOf<Guid>(),
@@ -890,7 +884,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
+    public async Task GetFootnotesForSelection_IgnoresFootnotesUnrelatedToRelease()
     {
         // Create one release with footnotes and another without
         var releaseVersions = _fixture.DefaultStatsReleaseVersion().GenerateList(2);
@@ -955,8 +949,6 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             // This test covers a case where a subject is shared by multiple releases. It makes sure that when other
             // releases have footnotes for the subject, that there's no way of retrieving those footnotes that
             // belong to other releases by specifying the subject id and filter item and indicator id's of the subject.
@@ -966,7 +958,8 @@ public class FootnoteRepositoryTests
             var filter3Group1Item1Id = subject.Filters[2].FilterGroups[0].FilterItems[0].Id;
             var indicatorGroup1Item1Id = subject.IndicatorGroups[0].Indicators[0].Id;
 
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersions[1].Id, // release 2 has no footnotes
                 subjectId: subject.Id,
                 filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
@@ -979,7 +972,7 @@ public class FootnoteRepositoryTests
     }
 
     [Fact]
-    public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
+    public async Task GetFootnotesForSelection_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
@@ -1055,11 +1048,10 @@ public class FootnoteRepositoryTests
 
         await using (var context = InMemoryStatisticsDbContext(contextId))
         {
-            var repository = BuildFootnoteRepository(context);
-
             // Get footnotes applying to subject 2
             // but also include filter item and indicator id's from subject 1
-            var results = await repository.GetFilteredFootnotes(
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
                 releaseVersionId: releaseVersion.Id,
                 subjectId: subject2.Id,
                 filterItemIds: ListOf(
@@ -1083,6 +1075,99 @@ public class FootnoteRepositoryTests
 
             Assert.Equal(footnotes[6].Id, results[1].Id);
             Assert.Equal("Applies to subject 2 indicator 1", results[1].Content);
+        }
+    }
+
+    [Fact]
+    public async Task GetFootnotesForSelection_IgnoresRequestedFilterItemsAndIndicatorsLinkedToFootnoteForAnotherSubject()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(1))
+                    .WithIndicatorGroups(_ =>
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .GenerateList(1)
+                    )
+                    .Generate(2)
+            )
+            .GenerateList();
+
+        var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
+
+        var footnotes = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .ForIndex(0, s => s.SetContent("Applies to subject 2").SetSubjects(ListOf(subject2)))
+            .ForIndex(
+                1,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 and subject 2 filter 1")
+                        .SetFilters(ListOf(subject1.Filters[0], subject2.Filters[0]))
+            )
+            .ForIndex(
+                2,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 group 1 and subject 2 filter 1 group 1")
+                        .SetFilterGroups(
+                            ListOf(subject1.Filters[0].FilterGroups[0], subject2.Filters[0].FilterGroups[0])
+                        )
+            )
+            .ForIndex(
+                3,
+                s =>
+                    s.SetContent("Applies to subject 1 filter 1 group 1 item 1 and subject 2 filter 1 group 1 item 1")
+                        .SetFilterItems(
+                            ListOf(
+                                subject1.Filters[0].FilterGroups[0].FilterItems[0],
+                                subject2.Filters[0].FilterGroups[0].FilterItems[0]
+                            )
+                        )
+            )
+            .ForIndex(
+                4,
+                s =>
+                    s.SetContent("Applies to subject 1 indicator 1 and subject 2 indicator 1")
+                        .SetIndicators(
+                            ListOf(subject1.IndicatorGroups[0].Indicators[0], subject2.IndicatorGroups[0].Indicators[0])
+                        )
+            )
+            .GenerateList();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.Subject.AddRange(subject1, subject2);
+            context.Filter.AddRange(subject1.Filters.Concat(subject2.Filters));
+            context.IndicatorGroup.AddRange(subject1.IndicatorGroups[0], subject2.IndicatorGroups[0]);
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseSubject.AddRange(releaseSubjects);
+            context.Footnote.AddRange(footnotes);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            // Get footnotes applying to subject 2 but only include filter item and indicator id's from subject 1
+            var results = await GetFootnotesForFilterItemsAndIndicators(
+                context,
+                releaseVersionId: releaseVersion.Id,
+                subjectId: subject2.Id,
+                filterItemIds: ListOf(subject1.Filters[0].FilterGroups[0].FilterItems[0].Id),
+                indicatorIds: ListOf(subject1.IndicatorGroups[0].Indicators[0].Id)
+            );
+
+            // Footnotes linked to subject 2 data should not be matched by the links they also have to subject 1 data
+            var result = Assert.Single(results);
+            Assert.Equal(footnotes[0].Id, result.Id);
         }
     }
 
@@ -1657,6 +1742,28 @@ public class FootnoteRepositoryTests
     private static Tuple<Subject, Subject, Subject> GetSubjectsTuple3(List<ReleaseSubject> releaseSubjects)
     {
         return releaseSubjects.Select(rs => rs.Subject).ToTuple3();
+    }
+
+    private static async Task<List<Footnote>> GetFootnotesForFilterItemsAndIndicators(
+        StatisticsDbContext context,
+        Guid releaseVersionId,
+        Guid subjectId,
+        List<Guid> filterItemIds,
+        List<Guid> indicatorIds
+    )
+    {
+        var filterItems = await context
+            .FilterItem.Include(fi => fi.FilterGroup)
+            .Where(fi => filterItemIds.Contains(fi.Id))
+            .ToListAsync();
+
+        return await BuildFootnoteRepository(context)
+            .GetFootnotesForSelection(
+                releaseVersionId: releaseVersionId,
+                subjectId: subjectId,
+                filterItems: filterItems,
+                indicatorIds: indicatorIds
+            );
     }
 
     private static FootnoteRepository BuildFootnoteRepository(StatisticsDbContext context)
