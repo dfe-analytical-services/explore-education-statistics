@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.DataSets;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations;
@@ -215,6 +216,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseContentService, ReleaseContentService>();
         services.AddTransient<IReleaseDataContentService, ReleaseDataContentService>();
         services.AddTransient<IReleaseSearchableDocumentsService, ReleaseSearchableDocumentsService>();
+        services.AddTransient<IDataSetSearchableDocumentsService, DataSetSearchableDocumentsService>();
         services.AddTransient<IReleaseVersionsService, ReleaseVersionsService>();
         services.AddTransient<IReleaseUpdatesService, ReleaseUpdatesService>();
         services.AddTransient<IEducationInNumbersService, EducationInNumbersService>();
