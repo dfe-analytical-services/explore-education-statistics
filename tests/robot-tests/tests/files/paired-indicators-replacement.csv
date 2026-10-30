@@ -1,0 +1,28 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,school_type,enrolments,sess_overall,sess_authorised,sess_unauthorised,sess_overall_percent,sess_auth_percent
+202122,Academic year,National,E92000001,England,,,,Primary,367520,6954347,4266587,2687760,5.91,3.63
+202122,Academic year,National,E92000001,England,,,,Secondary,431120,8315383,5247146,3068237,6.03,3.8
+202122,Academic year,National,E92000001,England,,,,Special,392800,7343532,4839969,2503563,5.84,3.85
+202122,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Primary,1079,19157,15318,3839,5.55,4.44
+202122,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Secondary,1039,22566,14277,8289,6.79,4.29
+202122,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Special,903,19628,13855,5773,6.79,4.79
+202122,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Primary,18470,304487,228585,75902,5.15,3.87
+202122,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Secondary,18208,350373,244234,106139,6.01,4.19
+202122,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Special,21568,363986,264504,99482,5.27,3.83
+202223,Academic year,National,E92000001,England,,,,Primary,427240,9252886,6574460,2678426,6.77,4.81
+202223,Academic year,National,E92000001,England,,,,Secondary,384360,7474923,4668571,2806352,6.08,3.8
+202223,Academic year,National,E92000001,England,,,,Special,420960,9542356,6512224,3030132,7.08,4.83
+202223,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Primary,942,21573,14970,6603,7.16,4.97
+202223,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Secondary,974,20862,15300,5562,6.69,4.91
+202223,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Special,977,19073,12476,6597,6.1,3.99
+202223,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Primary,19660,320291,241393,78898,5.09,3.84
+202223,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Secondary,21674,378773,248307,130466,5.46,3.58
+202223,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Special,19386,337064,225893,111171,5.43,3.64
+202324,Academic year,National,E92000001,England,,,,Primary,366160,6154032,4820902,1333130,5.25,4.11
+202324,Academic year,National,E92000001,England,,,,Secondary,369880,7686231,5203547,2482684,6.49,4.4
+202324,Academic year,National,E92000001,England,,,,Special,367080,7358095,4755004,2603091,6.26,4.05
+202324,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Primary,959,17531,12702,4829,5.71,4.14
+202324,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Secondary,1083,18873,14076,4797,5.45,4.06
+202324,Academic year,Local authority,E92000001,England,201,E09000001,City of London,Special,911,15979,12329,3650,5.48,4.23
+202324,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Primary,21768,424793,303845,120948,6.1,4.36
+202324,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Secondary,19690,378096,255172,122924,6.0,4.05
+202324,Academic year,Local authority,E92000001,England,330,E08000025,Birmingham,Special,20868,361196,267276,93920,5.41,4.0
