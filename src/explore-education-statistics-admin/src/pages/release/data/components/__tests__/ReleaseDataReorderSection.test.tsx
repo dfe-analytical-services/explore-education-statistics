@@ -7,6 +7,7 @@ import _tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/tableBuilderService');
 jest.mock('@common/services/tableBuilderService');
@@ -55,10 +56,12 @@ describe('ReleaseDataReorderSection', () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(
-      <ReleaseDataReorderSection
-        releaseVersionId="release-version-id"
-        canUpdateRelease
-      />,
+      <MemoryRouter>
+        <ReleaseDataReorderSection
+          releaseVersionId="release-version-id"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     expect(
@@ -89,10 +92,12 @@ describe('ReleaseDataReorderSection', () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(
-      <ReleaseDataReorderSection
-        releaseVersionId="release-version-id"
-        canUpdateRelease={false}
-      />,
+      <MemoryRouter>
+        <ReleaseDataReorderSection
+          releaseVersionId="release-version-id"
+          canUpdateRelease={false}
+        />
+      </MemoryRouter>,
     );
 
     expect(
@@ -113,10 +118,12 @@ describe('ReleaseDataReorderSection', () => {
     });
 
     const { user } = render(
-      <ReleaseDataReorderSection
-        releaseVersionId="release-version-id"
-        canUpdateRelease
-      />,
+      <MemoryRouter>
+        <ReleaseDataReorderSection
+          releaseVersionId="release-version-id"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
     );
 
     await user.click(
@@ -149,5 +156,31 @@ describe('ReleaseDataReorderSection', () => {
     expect(
       await screen.findByRole('table', { name: /data files in this release/ }),
     ).toBeInTheDocument();
+  });
+
+  test('opens managing indicators for the data set in the manageIndicators query param', async () => {
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/data?manageIndicators=subject-2']}>
+        <ReleaseDataReorderSection
+          releaseVersionId="release-version-id"
+          canUpdateRelease
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Manage indicators for Subject 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('table', { name: /data files in this release/ }),
+    ).not.toBeInTheDocument();
   });
 });
