@@ -56,7 +56,6 @@ public class StatisticsDbDataSetWriter(
                 {
                     var filterItem = autoSelectFilterItemsByFilterId[filter.Id];
                     filter.AutoSelectFilterItemId = filterItem?.Id;
-                    // If filter item Total is found, AutoSelectFilterItemLabel wouldn't be set, so set it
                     filter.AutoSelectFilterItemLabel = filterItem?.Label;
                 }
 
@@ -67,6 +66,8 @@ public class StatisticsDbDataSetWriter(
 
     public Task WriteLocations(IReadOnlyCollection<Location> locations, CancellationToken cancellationToken = default)
     {
+        // In the StatsDB, Locations are shared between data sets - i.e. one location can belong to multiple data sets.
+        //
         // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent
         // import processes reaching this stage will wait before adding their own new Locations, if any.
         //

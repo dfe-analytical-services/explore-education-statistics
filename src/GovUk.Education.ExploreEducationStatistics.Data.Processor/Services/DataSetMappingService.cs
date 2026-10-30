@@ -121,7 +121,7 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
                 {
                     // If none matching by Id, check if any matching by GeogLvl + Code. We don't check by Name to
                     // preserve behaviour from before location mapping was introduced (which allowed analysts to
-                    // change/fix location names with replacements).
+                    // change/fix location names with replacements without manual mapping).
                     var matchingReplacements = replacementIdToLocationMap
                         .Values.Where(location =>
                             location.GeographicLevel == originalLocation.GeographicLevel
