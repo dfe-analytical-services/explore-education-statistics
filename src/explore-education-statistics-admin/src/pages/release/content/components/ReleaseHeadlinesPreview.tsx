@@ -26,9 +26,14 @@ const ReleaseHeadlinesRedesign = ({
   const { headlinesSection, keyStatistics, keyStatisticsSecondarySection } =
     release;
 
+  const hasExportableContent =
+    !!keyStatistics?.length || headlinesSection.content.length > 0;
+
   const summaryTab = (
     <>
-      <KeyStatsExportMenu containerRef={containerRef} />
+      {hasExportableContent && (
+        <KeyStatsExportMenu containerRef={containerRef} />
+      )}
       <div ref={containerRef}>
         <KeyStatContainer>
           {keyStatistics?.map(keyStat => {

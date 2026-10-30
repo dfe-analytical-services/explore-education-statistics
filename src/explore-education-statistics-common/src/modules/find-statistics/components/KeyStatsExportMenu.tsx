@@ -1,10 +1,10 @@
 import ButtonText from '@common/components/ButtonText';
 import ExportMenu from '@common/components/ExportMenu';
-import downloadFile from '@common/utils/file/downloadFile';
-import React, { RefObject, useCallback, useEffect } from 'react';
+import React, { RefObject, useCallback } from 'react';
 import copyElementToClipboard from '@common/utils/copyElementToClipboard';
 import useCurrentPng from '@common/components/ChartsToPNG';
-import useToggle from '@common/hooks/useToggle';
+import useCopySuccess from '@common/hooks/useCopySuccess';
+import usePngDownload from '@common/hooks/usePngDownload';
 import logger from '@common/services/logger';
 import removeExportIgnoredElements from '@common/utils/dom/removeExportIgnoredElements';
 import { Options as HTML2CanvasOptions } from 'html2canvas';
@@ -22,37 +22,21 @@ export default function KeyStatsExportMenu({ containerRef }: Props) {
     options: pngOptions,
     ref: containerRef,
   });
-  const [copySuccess, setCopySuccess] = useToggle(false);
+  const [copySuccess, showCopySuccess] = useCopySuccess();
 
-  useEffect(() => {
-    const resetTimeout = setTimeout(setCopySuccess.off, 5000);
-
-    return () => {
-      if (copySuccess) {
-        clearTimeout(resetTimeout);
-      }
-    };
-  }, [copySuccess, setCopySuccess]);
-
-  const handlePngDownload = useCallback(async () => {
-    const png = await getClipboardPng();
-    if (png) {
-      downloadFile({
-        file: png,
-        extension: 'png',
-        fileName: 'Key Statistics Summary',
-      });
-    }
-  }, [getClipboardPng]);
+  const handlePngDownload = usePngDownload(
+    getClipboardPng,
+    'Key Statistics Summary',
+  );
 
   const handleCopyToClipboard = useCallback(async () => {
     try {
       await copyElementToClipboard(containerRef);
-      setCopySuccess.on();
+      showCopySuccess();
     } catch (error) {
       logger.error(error);
     }
-  }, [containerRef, setCopySuccess]);
+  }, [containerRef, showCopySuccess]);
 
   return (
     <ExportMenu title="headlines">

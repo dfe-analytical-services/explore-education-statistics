@@ -9,6 +9,9 @@ const exportIgnoreSelector = [
   // Content of closed details elements isn't visible,
   // so shouldn't be included in exports either.
   'details:not([open]) > :not(summary)',
+  // Visually hidden text relies on CSS clipping that
+  // html2canvas doesn't support, so would otherwise be drawn.
+  '.govuk-visually-hidden',
 ].join(', ');
 
 /**

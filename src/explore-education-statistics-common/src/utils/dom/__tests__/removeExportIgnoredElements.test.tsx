@@ -67,4 +67,18 @@ describe('removeExportIgnoredElements', () => {
     expect(screen.queryByText('Content')).not.toBeInTheDocument();
     expect(screen.queryByText('Close')).not.toBeInTheDocument();
   });
+
+  test('removes visually hidden elements', () => {
+    const { container } = render(
+      <Details summary="Summary" hiddenText="for Key stat" open>
+        <p>Content</p>
+      </Details>,
+    );
+
+    removeExportIgnoredElements(container);
+
+    expect(screen.getByText('Summary')).toBeInTheDocument();
+    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(screen.queryByText('for Key stat')).not.toBeInTheDocument();
+  });
 });
