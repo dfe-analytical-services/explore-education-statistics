@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import { documentationCreateReleaseRoute } from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageCreatePublication from './images/guidance/guidance-publication-create.png';
@@ -258,7 +259,7 @@ const DocumentationCreateNewRelease = () => {
               <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to create a new release -{' '}
-                <Link to="./create-new-release">
+                <Link to={documentationCreateReleaseRoute.fullPath}>
                   Creating a new release: step by step
                 </Link>
               </p>

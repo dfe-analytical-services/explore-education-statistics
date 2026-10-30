@@ -1,6 +1,11 @@
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 import React from 'react';
+import {
+  documentationContentStandardsRoute,
+  documentationEditReleaseRoute,
+  documentationStyleGuideRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 
@@ -57,11 +62,11 @@ const DocumentationManageContent = () => {
               <p>
                 Make sure your content is written and formatted to the standards
                 set out in our{' '}
-                <Link to="/documentation/content-design-standards-guide">
+                <Link to={documentationContentStandardsRoute.fullPath}>
                   Content design standards guide
                 </Link>{' '}
                 and{' '}
-                <Link to="/documentation/style-guide">
+                <Link to={documentationStyleGuideRoute.fullPath}>
                   Content design style guide
                 </Link>
                 .
@@ -219,12 +224,12 @@ const DocumentationManageContent = () => {
               </p>
               <ul className="govuk-list govuk-list--bullet">
                 <li>
-                  <Link to="/documentation/content-design-standards-guide">
+                  <Link to={documentationContentStandardsRoute.fullPath}>
                     Content design standards guide
                   </Link>
                 </li>
                 <li>
-                  <Link to="/documentation/style-guide">
+                  <Link to={documentationStyleGuideRoute.fullPath}>
                     Content design style guide
                   </Link>
                 </li>
@@ -325,7 +330,7 @@ const DocumentationManageContent = () => {
                   <p>
                     Read and refer to the guidance and tips about 'Key
                     indicators' in our{' '}
-                    <Link to="/documentation/style-guide">
+                    <Link to={documentationStyleGuideRoute.fullPath}>
                       Content design style guide
                     </Link>
                   </p>
@@ -450,12 +455,12 @@ const DocumentationManageContent = () => {
                   </p>
                   <ul className="govuk-list govuk-list--bullet">
                     <li>
-                      <Link to="/documentation/content-design-standards-guide">
+                      <Link to={documentationContentStandardsRoute.fullPath}>
                         Content design standards guide
                       </Link>
                     </li>
                     <li>
-                      <Link to="/documentation/style-guide">
+                      <Link to={documentationStyleGuideRoute.fullPath}>
                         Content design style guide
                       </Link>
                     </li>
@@ -628,7 +633,7 @@ const DocumentationManageContent = () => {
               </p>
               <p>
                 For detailed guidance on how to update a release's status -{' '}
-                <Link to="./edit-release">
+                <Link to={documentationEditReleaseRoute.fullPath}>
                   Updating release status: step by step.
                 </Link>
               </p>

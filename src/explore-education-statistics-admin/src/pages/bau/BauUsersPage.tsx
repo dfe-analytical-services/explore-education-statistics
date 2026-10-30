@@ -9,6 +9,11 @@ import logger from '@common/services/logger';
 import ModalConfirm from '@common/components/ModalConfirm';
 import ButtonText from '@common/components/ButtonText';
 import { globalRoleLabels } from '@admin/services/types/GlobalRole';
+import {
+  administrationIndexRoute,
+  administrationUserManageRoute,
+} from '@admin/routes/administrationRoutes';
+import { generatePath } from 'react-router';
 import styles from './BauUsersPage.module.scss';
 
 const BauUsersPage = () => {
@@ -65,7 +70,10 @@ const BauUsersPage = () => {
                     <td>
                       <Link
                         className={styles.manageUserLink}
-                        to={`/administration/users/${user.id}`}
+                        to={generatePath(
+                          administrationUserManageRoute.fullPath,
+                          { userId: user.id },
+                        )}
                       >
                         Manage
                       </Link>
@@ -95,7 +103,10 @@ const BauUsersPage = () => {
         </div>
       </LoadingSpinner>
       <p>
-        <Link to="/administration/" className="govuk-back-link">
+        <Link
+          to={administrationIndexRoute.fullPath}
+          className="govuk-back-link"
+        >
           Back
         </Link>
       </p>

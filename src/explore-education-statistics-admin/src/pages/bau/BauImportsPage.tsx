@@ -4,6 +4,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 import importStatusService from '@admin/services/importStatusService';
+import { releaseDataRoute } from '@admin/routes/releaseRoutes';
+import { generatePath } from 'react-router';
 
 const BauImportsPage = () => {
   const { value, isLoading } = useAsyncRetry(() =>
@@ -46,7 +48,10 @@ const BauImportsPage = () => {
                     <td>{subject.percentageComplete}%</td>
                     <td>
                       <Link
-                        to={`/publication/${subject.publicationId}/release/${subject.releaseId}/data`}
+                        to={generatePath(releaseDataRoute.fullPath, {
+                          publicationId: subject.publicationId,
+                          releaseVersionId: subject.releaseId,
+                        })}
                       >
                         {subject.publicationTitle} {subject.releaseTitle}
                       </Link>

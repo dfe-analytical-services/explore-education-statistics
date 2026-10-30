@@ -9,6 +9,11 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import logger from '@common/services/logger';
 import { useQuery } from '@tanstack/react-query';
 import preReleaseUsersQueries from '@admin/queries/user-management/preReleaseUsersQueries';
+import {
+  administrationIndexRoute,
+  administrationUserManageRoute,
+} from '@admin/routes/administrationRoutes';
+import { generatePath } from 'react-router';
 
 const PreReleaseUsersPage = () => {
   const {
@@ -62,7 +67,9 @@ const PreReleaseUsersPage = () => {
                   <td>
                     <Link
                       className={styles.manageUserLink}
-                      to={`/administration/users/${preReleaseUser.id}`}
+                      to={generatePath(administrationUserManageRoute.fullPath, {
+                        userId: preReleaseUser.id,
+                      })}
                     >
                       Manage
                     </Link>
@@ -91,7 +98,10 @@ const PreReleaseUsersPage = () => {
         </LoadingSpinner>
       </table>
       <p>
-        <Link to="/administration/" className="govuk-back-link">
+        <Link
+          to={administrationIndexRoute.fullPath}
+          className="govuk-back-link"
+        >
           Back
         </Link>
       </p>
