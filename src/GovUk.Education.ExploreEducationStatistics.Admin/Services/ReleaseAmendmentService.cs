@@ -546,16 +546,38 @@ public class ReleaseAmendmentService(
             .ToAsyncEnumerable()
             .SelectAwait(async originalFootnote =>
             {
-                var filterIds = originalFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId).ToHashSet();
-                var filterGroupIds = originalFootnote
-                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
-                    .ToHashSet();
-                var filterItemIds = originalFootnote
-                    .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItemId)
-                    .ToHashSet();
-                var indicatorIds = originalFootnote
-                    .Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
-                    .ToHashSet();
+                var filterLinks = originalFootnote
+                    .Filters.Select(filterFootnote => new FilterFootnote
+                    {
+                        FilterId = filterFootnote.FilterId,
+                        SubjectId = filterFootnote.SubjectId,
+                    })
+                    .ToList();
+                var filterGroupLinks = originalFootnote
+                    .FilterGroups.Select(filterGroupFootnote => new FilterGroupFootnote
+                    {
+                        FilterGroupId = filterGroupFootnote.FilterGroupId,
+                        FilterId = filterGroupFootnote.FilterId,
+                        SubjectId = filterGroupFootnote.SubjectId,
+                    })
+                    .ToList();
+                var filterItemLinks = originalFootnote
+                    .FilterItems.Select(filterItemFootnote => new FilterItemFootnote
+                    {
+                        FilterItemId = filterItemFootnote.FilterItemId,
+                        FilterGroupId = filterItemFootnote.FilterGroupId,
+                        FilterId = filterItemFootnote.FilterId,
+                        SubjectId = filterItemFootnote.SubjectId,
+                    })
+                    .ToList();
+                var indicatorLinks = originalFootnote
+                    .Indicators.Select(indicatorFootnote => new IndicatorFootnote
+                    {
+                        IndicatorId = indicatorFootnote.IndicatorId,
+                        IndicatorGroupId = indicatorFootnote.IndicatorGroupId,
+                        SubjectId = indicatorFootnote.SubjectId,
+                    })
+                    .ToList();
                 var subjectIds = originalFootnote
                     .Subjects.Select(subjectFootnote => subjectFootnote.SubjectId)
                     .ToHashSet();
@@ -563,10 +585,10 @@ public class ReleaseAmendmentService(
                 return await footnoteRepository.CreateFootnote(
                     amendmentReleaseVersionId,
                     originalFootnote.Content,
-                    filterIds: filterIds,
-                    filterGroupIds: filterGroupIds,
-                    filterItemIds: filterItemIds,
-                    indicatorIds: indicatorIds,
+                    filterLinks: filterLinks,
+                    filterGroupLinks: filterGroupLinks,
+                    filterItemLinks: filterItemLinks,
+                    indicatorLinks: indicatorLinks,
                     subjectIds: subjectIds,
                     originalFootnote.Order
                 );
