@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers.DataSets;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.DataSets;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.DataSets.Dtos;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers.DataSets;
@@ -100,6 +101,40 @@ public abstract class DataSetSearchableDocumentsControllerTests
                 PublicationSlug
             );
             result.AssertNotFoundResult();
+        }
+    }
+
+    public class GetDataSetSearchableDocumentKeysTests : DataSetSearchableDocumentsControllerTests
+    {
+        [Fact]
+        public async Task WhenServiceReturnsSearchableDocumentKeys_ReturnsOk()
+        {
+            // Arrange
+            var searchableDocumentKeys = new[]
+            {
+                new DataSetSearchableDocumentKeyDto
+                {
+                    PublicationId = Guid.NewGuid(),
+                    ReleaseId = Guid.NewGuid(),
+                    FileId = Guid.NewGuid(),
+                },
+                new DataSetSearchableDocumentKeyDto
+                {
+                    PublicationId = Guid.NewGuid(),
+                    ReleaseId = Guid.NewGuid(),
+                    FileId = Guid.NewGuid(),
+                },
+            };
+            _dataSetSearchableDocumentsService.WhereHasSearchableDocumentKeys(searchableDocumentKeys);
+
+            var sut = BuildController();
+
+            // Act
+            var result = await sut.GetDataSetSearchableDocumentKeys();
+
+            // Assert
+            _dataSetSearchableDocumentsService.Assert.GetDataSetSearchableDocumentKeysWasCalled();
+            result.AssertOkResult(searchableDocumentKeys);
         }
     }
 

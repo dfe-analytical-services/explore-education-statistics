@@ -47,6 +47,25 @@ public class DataSetSearchableDocumentsService(ContentDbContext contentDbContext
                 )
             );
 
+    public async Task<Either<ActionResult, DataSetSearchableDocumentKeyDto[]>> GetDataSetSearchableDocumentKeys(
+        CancellationToken cancellationToken = default
+    ) =>
+        await DataSetReleaseFiles()
+            .HavingLatestPublishedReleaseVersions(
+                contentDbContext.ReleaseVersions.LatestReleaseVersions(publishedOnly: true),
+                latestOnly: false
+            )
+            .Select(rf => new DataSetSearchableDocumentKeyDto
+            {
+                PublicationId = rf.ReleaseVersion.Release.PublicationId,
+                ReleaseId = rf.ReleaseVersion.ReleaseId,
+                FileId = rf.FileId,
+            })
+            .OrderBy(key => key.PublicationId)
+            .ThenBy(key => key.ReleaseId)
+            .ThenBy(key => key.FileId)
+            .ToArrayAsync(cancellationToken);
+
     private async Task<Either<ActionResult, Publication>> GetPublicationBySlug(
         string publicationSlug,
         CancellationToken cancellationToken
