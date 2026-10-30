@@ -14,3 +14,6 @@ param vaultedFileShareBackups = true
 
 // Allow Backup Vault backups to be restored in the paired region, as the Recovery Services Vault already does.
 param backupVaultCrossRegionRestore = true
+
+// The release pipeline grants the Publisher's user-assigned identity its roles instead.
+param deployPublisherRoleAssignments = false

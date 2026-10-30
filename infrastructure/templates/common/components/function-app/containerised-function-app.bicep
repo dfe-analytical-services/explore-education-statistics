@@ -17,6 +17,7 @@ param userAssignedManagedIdentityParams {
   id: string
   name: string
   principalId: string
+  clientId: string
 }?
 
 @description('Specifies the Function App name')
@@ -260,6 +261,43 @@ module storageAccountQueueDataContributorRoleAssignmentModule '../storageAccount
   }
 }
 
+// The host connects to its storage account with a managed identity rather than a connection string. With a system-assigned
+// identity, the account name is enough. With only a user-assigned identity, the connections must also say which identity
+// to use, and the app code picks it up from AZURE_CLIENT_ID.
+// TODO EES-7502 - remove systemAssignedIdentityAppSettings once every environment has moved to the ELZ, leaving only the
+// user-assigned identity settings.
+var systemAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobsStorage__accountName'
+    value: deploymentStorageAccountModule.outputs.storageAccountName
+  }
+]
+
+var userAssignedIdentityAppSettings = userAssignedManagedIdentityParams != null
+  ? [
+      {
+        name: 'AzureWebJobsStorage__accountName'
+        value: deploymentStorageAccountModule.outputs.storageAccountName
+      }
+      {
+        name: 'AzureWebJobsStorage__credential'
+        value: 'managedidentity'
+      }
+      {
+        name: 'AzureWebJobsStorage__clientId'
+        value: userAssignedManagedIdentityParams!.clientId
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: userAssignedManagedIdentityParams!.clientId
+      }
+    ]
+  : []
+
+var identityAppSettings = userAssignedManagedIdentityParams != null
+  ? userAssignedIdentityAppSettings
+  : systemAssignedIdentityAppSettings
+
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
 var identity = userAssignedManagedIdentityParams != null
@@ -314,11 +352,9 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
             name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
             value: applicationInsightsConnectionString
           }
-          // Use managed identity to access the storage account rather than key based access with a connection string
-          {
-            name: 'AzureWebJobsStorage__accountName'
-            value: deploymentStorageAccountModule.outputs.storageAccountName
-          }
+        ],
+        identityAppSettings,
+        [
           {
             name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
             value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${deploymentStorageAccountModule.outputs.connectionStringSecretName!})'

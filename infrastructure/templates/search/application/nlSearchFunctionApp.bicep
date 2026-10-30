@@ -29,6 +29,9 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
@@ -63,6 +66,7 @@ var azureOpenAIApiKeySecretName = 'nlsearch-azure-openai-api-subscription-key'
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'nlSearchFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.nlSearch.identity : ''
     functionAppName: resourceNames.nlSearch.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.nlSearch.appServicePlan

@@ -19,6 +19,9 @@ param operatingSystem 'Windows' | 'Linux'
 @description('SKU of the Function App\'s storage account, which sets its redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -83,6 +86,7 @@ resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' exis
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'importerFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.importer.identity : ''
     functionAppName: resourceNames.importer.functionApp
     appServicePlanName: resourceNames.importer.appServicePlan
     storageAccountName: resourceNames.importer.storageAccount

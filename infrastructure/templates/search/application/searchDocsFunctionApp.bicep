@@ -37,6 +37,9 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
@@ -98,6 +101,7 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.searchDocs.identity : ''
     functionAppName: resourceNames.searchDocs.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.searchDocs.appServicePlan

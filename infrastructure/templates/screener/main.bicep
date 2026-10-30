@@ -18,7 +18,7 @@ param elz bool = false
 @description('SKU of the Function App storage accounts, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
-@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
 param deployAppIdentities bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
@@ -124,6 +124,7 @@ module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     location: location
     functionAppImageName: 'ees-screener-api'
@@ -156,6 +157,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     deployAlerts: deployAlerts
   }
   dependsOn: [
+    appIdentitiesModule
     screenerLogsStorageModule
   ]
 }

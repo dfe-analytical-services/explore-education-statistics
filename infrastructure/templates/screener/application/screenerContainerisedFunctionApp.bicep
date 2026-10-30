@@ -9,6 +9,9 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -101,6 +104,43 @@ resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-
   name: resourceNames.screener.logsStorageAccount
 }
 
+resource screenerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.screener.identity
+}
+
+// The StartScreening queue trigger connects to the Function App's storage account with a managed identity. With a
+// system-assigned identity, the queue URI and credential type are enough. With only a user-assigned identity, the
+// trigger must also say which identity to use.
+// TODO EES-7502 - remove startScreeningSystemAssignedIdentityAppSettings once every environment has moved to the ELZ,
+// leaving only the user-assigned identity settings.
+var startScreeningQueueServiceUri = 'https://${resourceNames.screener.functionStorageAccount}.queue.core.windows.net'
+
+var startScreeningSystemAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobs_StartScreening__queueServiceUri'
+    value: startScreeningQueueServiceUri
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__credential'
+    value: 'managedidentity'
+  }
+]
+
+var startScreeningUserAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobs_StartScreening__queueServiceUri'
+    value: startScreeningQueueServiceUri
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__credential'
+    value: 'managedidentity'
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__clientId'
+    value: screenerIdentity!.properties.clientId
+  }
+]
+
 var adminAppClientId = adminAppServiceIdentity.properties.clientId
 var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoint, '/')
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
@@ -122,7 +162,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     minimumInstanceCount: minimumInstanceCount
     maximumInstanceCount: maximumInstanceCount
     appServicePlanName: resourceNames.screener.appServicePlan
-    appSettings: [
+    appSettings: concat([
       {
         name: 'STORAGE_URL'
         value: coreStorageBlobEndpointWithoutTrailingSlash
@@ -147,16 +187,18 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
           name: 'CONCURRENT_R_WORKERS'
           value: '${concurrentRWorkers}'
       }
-      {
-        name: 'AzureWebJobs_StartScreening__queueServiceUri'
-        value: 'https://${resourceNames.screener.functionStorageAccount}.queue.core.windows.net'
-      }
-      {
-        name: 'AzureWebJobs_StartScreening__credential'
-        value: 'managedidentity'
-      }
-    ]
+    ], useUserAssignedIdentity
+      ? startScreeningUserAssignedIdentityAppSettings
+      : startScreeningSystemAssignedIdentityAppSettings)
     keyVaultName: keyVault.name
+    userAssignedManagedIdentityParams: useUserAssignedIdentity
+      ? {
+          id: screenerIdentity.id
+          name: screenerIdentity.name
+          principalId: screenerIdentity!.properties.principalId
+          clientId: screenerIdentity!.properties.clientId
+        }
+      : null
     entraIdAuthentication: {
       appRegistrationClientId: screenerAppRegistrationClientId
       allowedClientIds: [
