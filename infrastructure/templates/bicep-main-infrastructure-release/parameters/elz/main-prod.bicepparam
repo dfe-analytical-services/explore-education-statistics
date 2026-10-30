@@ -17,3 +17,6 @@ param appOperatingSystem = 'Linux'
 // Spread the Admin, Content API, Data API and Public Site instances across availability zones. These plans already run
 // Premium SKUs with at least 2 instances, so this costs little.
 param zoneRedundantAppServicePlans = true
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
