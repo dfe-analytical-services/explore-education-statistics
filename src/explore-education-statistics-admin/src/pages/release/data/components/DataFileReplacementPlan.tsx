@@ -3,6 +3,11 @@ import Link from '@admin/components/Link';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import DataFileReplacementPairedIndicators from '@admin/pages/release/data/components/DataFileReplacementPairedIndicators';
 import mergeReplacementFootnoteFilters from '@admin/pages/release/data/components/utils/mergeReplacementFootnoteFilters';
+import {
+  getManageIndicatorsPath,
+  getReplacementPairedIndicators,
+  ReplacementPairedIndicator,
+} from '@admin/pages/release/data/utils/replacementPairedIndicators';
 import dataFileReplacementQueries from '@admin/queries/dataFileReplacementQueries';
 import {
   releaseApiDataSetDetailsRoute,
@@ -15,6 +20,7 @@ import dataReplacementService, {
   DataReplacementPlan,
 } from '@admin/services/dataReplacementService';
 import footnoteService from '@admin/services/footnoteService';
+import tableBuilderService from '@admin/services/tableBuilderService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import CollapsibleList from '@common/components/CollapsibleList';
@@ -27,6 +33,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
@@ -37,13 +44,18 @@ import React, { ReactNode, useCallback, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import DataFileReplacementDifferences from './DataFileReplacementDifferences';
 
+export interface DataReplacementResult {
+  pairedIndicators: ReplacementPairedIndicator[];
+  replacementSubjectId: string;
+}
+
 interface Props {
   cancelButton: ReactNode;
   fileId: string;
   publicationId: string;
   releaseVersionId: string;
   replacementFileId: string;
-  onReplacement?: () => void;
+  onReplacement?: (result: DataReplacementResult) => void;
 }
 
 const DataFileReplacementPlan = ({
@@ -213,6 +225,29 @@ function Plan({
   const [isSubmitting, toggleSubmitting] = useToggle(false);
   const isMounted = useMountedRef();
   const { user } = useAuthContext();
+
+  const {
+    value: originalPairedIndicators = [],
+    isLoading: isLoadingPairedIndicators,
+  } = useAsyncHandledRetry(
+    async () =>
+      (
+        await tableBuilderService.getPairedIndicators(
+          releaseVersionId,
+          plan.originalSubjectId,
+        )
+      ).pairedIndicators,
+    [releaseVersionId, plan.originalSubjectId],
+  );
+
+  const pairedIndicators = useMemo(
+    () =>
+      getReplacementPairedIndicators(
+        originalPairedIndicators,
+        plan.mapping.indicators,
+      ),
+    [originalPairedIndicators, plan.mapping.indicators],
+  );
 
   const {
     hasDataSetVersionPlan,
@@ -676,12 +711,16 @@ function Plan({
         })}
       </div>
 
-      <DataFileReplacementPairedIndicators
-        indicatorMappings={plan.mapping.indicators}
-        publicationId={publicationId}
-        releaseVersionId={releaseVersionId}
-        subjectId={plan.originalSubjectId}
-      />
+      <LoadingSpinner loading={isLoadingPairedIndicators}>
+        <DataFileReplacementPairedIndicators
+          manageIndicatorsPath={getManageIndicatorsPath({
+            publicationId,
+            releaseVersionId,
+            subjectId: plan.originalSubjectId,
+          })}
+          pairedIndicators={pairedIndicators}
+        />
+      </LoadingSpinner>
 
       <ButtonGroup className="govuk-!-margin-top-8">
         {plan.valid && (
@@ -695,7 +734,10 @@ function Plan({
               ]);
 
               if (onReplacement) {
-                onReplacement();
+                onReplacement({
+                  pairedIndicators,
+                  replacementSubjectId: plan.replacementSubjectId,
+                });
               }
               if (isMounted.current) {
                 toggleSubmitting.off();
