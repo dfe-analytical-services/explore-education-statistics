@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -9,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseDataSetService(
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ISubjectDeleter subjectDeleter
+    IStorageDataSetResolver storageDataSetResolver
 ) : IReleaseDataSetService
 {
     public async Task Delete(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedDataSet = true)
@@ -58,18 +59,25 @@ public class ReleaseDataSetService(
             return;
         }
 
-        if (!softDelete)
+        var subject = await statisticsDbContext
+            .Subject.IgnoreQueryFilters()
+            .SingleOrDefaultAsync(s => s.Id == subjectId);
+
+        if (subject == null)
         {
-            subjectDeleter.Delete(subjectId);
             return;
         }
 
-        var subject = await statisticsDbContext.Subject.SingleOrDefaultAsync(s => s.Id == subjectId);
+        var dataSet = await storageDataSetResolver.Resolve(subjectId);
 
-        if (subject != null)
+        await dataSet.Delete(softDelete: softDelete);
+
+        if (softDelete)
         {
-            subject.SoftDeleted = true;
-            await statisticsDbContext.SaveChangesAsync();
+            return;
         }
+
+        statisticsDbContext.Subject.Remove(subject);
+        await statisticsDbContext.SaveChangesAsync();
     }
 }

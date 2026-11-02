@@ -597,6 +597,187 @@ public class FootnoteServiceTests
     }
 
     [Fact]
+    public async Task CreateFootnote_IdsLinkedToDifferentSubjects_CreatesLinksWithEachIdsSubject()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var subject1FilterItem = _fixture.DefaultFilterItem().Generate();
+        var subject1FilterGroup = _fixture
+            .DefaultFilterGroup()
+            .WithFilterItems(new List<FilterItem> { subject1FilterItem })
+            .Generate();
+        var subject1Filter = _fixture
+            .DefaultFilter()
+            .WithFilterGroups(new List<FilterGroup> { subject1FilterGroup })
+            .Generate();
+        var subject1Indicator = _fixture.DefaultIndicator().Generate();
+        var subject1IndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { subject1Indicator })
+            .Generate();
+        var subject1 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { subject1Filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { subject1IndicatorGroup })
+            .Generate();
+        var subject2FilterItem = _fixture.DefaultFilterItem().Generate();
+        var subject2FilterGroup = _fixture
+            .DefaultFilterGroup()
+            .WithFilterItems(new List<FilterItem> { subject2FilterItem })
+            .Generate();
+        var subject2Filter = _fixture
+            .DefaultFilter()
+            .WithFilterGroups(new List<FilterGroup> { subject2FilterGroup })
+            .Generate();
+        var subject2Indicator = _fixture.DefaultIndicator().Generate();
+        var subject2IndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { subject2Indicator })
+            .Generate();
+        var subject2 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { subject2Filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { subject2IndicatorGroup })
+            .Generate();
+        var releaseSubject1 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject1)
+            .Generate();
+        var releaseSubject2 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject2)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject1, subject2),
+            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
+        );
+
+        // Each subject has ids still to link whichever subject is read first
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(subject1Filter.Id),
+            filterGroupIds: SetOf(subject2FilterGroup.Id),
+            filterItemIds: SetOf(subject1FilterItem.Id, subject2FilterItem.Id),
+            indicatorIds: SetOf(subject2Indicator.Id)
+        );
+
+        var footnote = result.AssertRight();
+
+        var filterFootnote = Assert.Single(footnote.Filters);
+        Assert.Equal(subject1Filter.Id, filterFootnote.FilterId);
+        Assert.Equal(subject1.Id, filterFootnote.SubjectId);
+
+        var filterGroupFootnote = Assert.Single(footnote.FilterGroups);
+        Assert.Equal(subject2FilterGroup.Id, filterGroupFootnote.FilterGroupId);
+        Assert.Equal(subject2Filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(subject2.Id, filterGroupFootnote.SubjectId);
+
+        Assert.Equal(2, footnote.FilterItems.Count);
+        var subject1FilterItemFootnote = Assert.Single(
+            footnote.FilterItems,
+            fi => fi.FilterItemId == subject1FilterItem.Id
+        );
+        Assert.Equal(subject1FilterGroup.Id, subject1FilterItemFootnote.FilterGroupId);
+        Assert.Equal(subject1Filter.Id, subject1FilterItemFootnote.FilterId);
+        Assert.Equal(subject1.Id, subject1FilterItemFootnote.SubjectId);
+        var subject2FilterItemFootnote = Assert.Single(
+            footnote.FilterItems,
+            fi => fi.FilterItemId == subject2FilterItem.Id
+        );
+        Assert.Equal(subject2FilterGroup.Id, subject2FilterItemFootnote.FilterGroupId);
+        Assert.Equal(subject2Filter.Id, subject2FilterItemFootnote.FilterId);
+        Assert.Equal(subject2.Id, subject2FilterItemFootnote.SubjectId);
+
+        var indicatorFootnote = Assert.Single(footnote.Indicators);
+        Assert.Equal(subject2Indicator.Id, indicatorFootnote.IndicatorId);
+        Assert.Equal(subject2IndicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
+        Assert.Equal(subject2.Id, indicatorFootnote.SubjectId);
+    }
+
+    [Fact]
+    public async Task CreateFootnote_OnlyFilterIdsUnlinkedAfterFirstSubject_ReadsRemainingSubjectsFiltersWithoutItems()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var subject1FilterItem = _fixture.DefaultFilterItem().Generate();
+        var subject1FilterGroup = _fixture
+            .DefaultFilterGroup()
+            .WithFilterItems(new List<FilterItem> { subject1FilterItem })
+            .Generate();
+        var subject1Filter = _fixture
+            .DefaultFilter()
+            .WithFilterGroups(new List<FilterGroup> { subject1FilterGroup })
+            .Generate();
+        var subject1 = _fixture.DefaultSubject().WithFilters(new List<Filter> { subject1Filter }).Generate();
+        var subject2Filter = _fixture.DefaultFilter().Generate();
+        var subject2 = _fixture.DefaultSubject().WithFilters(new List<Filter> { subject2Filter }).Generate();
+        var releaseSubject1 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject1)
+            .Generate();
+        var releaseSubject2 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject2)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject1, subject2),
+            releaseSubjects: ListOf(releaseSubject1, releaseSubject2)
+        );
+
+        var subject1DataSet = new Mock<IStorageDataSet>(Strict);
+        subject1DataSet
+            .Setup(ds => ds.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(subject1Filter));
+
+        // Only a filter id is left to link once subject1's filter item is linked
+        var subject2DataSet = new Mock<IStorageDataSet>(Strict);
+        subject2DataSet
+            .Setup(ds => ds.ListFilters(includeItems: false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ListOf(subject2Filter));
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
+        storageDataSetResolver
+            .Setup(r => r.Resolve(subject1.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subject1DataSet.Object);
+        storageDataSetResolver
+            .Setup(r => r.Resolve(subject2.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(subject2DataSet.Object);
+
+        var result = await CreateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            contextId,
+            filterIds: SetOf(subject2Filter.Id),
+            filterItemIds: SetOf(subject1FilterItem.Id),
+            storageDataSetResolver: storageDataSetResolver.Object
+        );
+
+        VerifyAllMocks(subject1DataSet, subject2DataSet, storageDataSetResolver);
+
+        var footnote = result.AssertRight();
+
+        var filterFootnote = Assert.Single(footnote.Filters);
+        Assert.Equal(subject2Filter.Id, filterFootnote.FilterId);
+        Assert.Equal(subject2.Id, filterFootnote.SubjectId);
+
+        var filterItemFootnote = Assert.Single(footnote.FilterItems);
+        Assert.Equal(subject1FilterItem.Id, filterItemFootnote.FilterItemId);
+        Assert.Equal(subject1.Id, filterItemFootnote.SubjectId);
+    }
+
+    [Fact]
     public async Task CreateFootnote_OnlyFilterIdsSpecified_ReadsFiltersWithoutItems()
     {
         var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
@@ -1088,6 +1269,114 @@ public class FootnoteServiceTests
         Assert.Equal(filterGroup.Id, filterItemFootnote.FilterGroupId);
         Assert.Equal(filter.Id, filterItemFootnote.FilterId);
         Assert.Equal(indicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
+    }
+
+    [Fact]
+    public async Task UpdateFootnote_IdsLinkedToDifferentSubjects_CreatesLinksWithEachIdsSubject()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+        var footnote = _fixture.DefaultFootnote().WithReleaseVersion(releaseVersion).Generate();
+        var subject1FilterItem = _fixture.DefaultFilterItem().Generate();
+        var subject1FilterGroup = _fixture
+            .DefaultFilterGroup()
+            .WithFilterItems(new List<FilterItem> { subject1FilterItem })
+            .Generate();
+        var subject1Filter = _fixture
+            .DefaultFilter()
+            .WithFilterGroups(new List<FilterGroup> { subject1FilterGroup })
+            .Generate();
+        var subject1Indicator = _fixture.DefaultIndicator().Generate();
+        var subject1IndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { subject1Indicator })
+            .Generate();
+        var subject1 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { subject1Filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { subject1IndicatorGroup })
+            .Generate();
+        var subject2FilterItem = _fixture.DefaultFilterItem().Generate();
+        var subject2FilterGroup = _fixture
+            .DefaultFilterGroup()
+            .WithFilterItems(new List<FilterItem> { subject2FilterItem })
+            .Generate();
+        var subject2Filter = _fixture
+            .DefaultFilter()
+            .WithFilterGroups(new List<FilterGroup> { subject2FilterGroup })
+            .Generate();
+        var subject2Indicator = _fixture.DefaultIndicator().Generate();
+        var subject2IndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithIndicators(new List<Indicator> { subject2Indicator })
+            .Generate();
+        var subject2 = _fixture
+            .DefaultSubject()
+            .WithFilters(new List<Filter> { subject2Filter })
+            .WithIndicatorGroups(new List<IndicatorGroup> { subject2IndicatorGroup })
+            .Generate();
+        var releaseSubject1 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject1)
+            .Generate();
+        var releaseSubject2 = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(subject2)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await SeedDatabase(
+            contextId,
+            releaseVersion,
+            subjects: ListOf(subject1, subject2),
+            releaseSubjects: ListOf(releaseSubject1, releaseSubject2),
+            footnotes: ListOf(footnote)
+        );
+
+        // Each subject has ids still to link whichever subject is read first
+        var result = await UpdateFootnoteWithConfiguration(
+            releaseVersion.Id,
+            footnote.Id,
+            contextId,
+            filterIds: SetOf(subject1Filter.Id),
+            filterGroupIds: SetOf(subject2FilterGroup.Id),
+            filterItemIds: SetOf(subject1FilterItem.Id, subject2FilterItem.Id),
+            indicatorIds: SetOf(subject2Indicator.Id)
+        );
+
+        var updatedFootnote = result.AssertRight();
+
+        var filterFootnote = Assert.Single(updatedFootnote.Filters);
+        Assert.Equal(subject1Filter.Id, filterFootnote.FilterId);
+        Assert.Equal(subject1.Id, filterFootnote.SubjectId);
+
+        var filterGroupFootnote = Assert.Single(updatedFootnote.FilterGroups);
+        Assert.Equal(subject2FilterGroup.Id, filterGroupFootnote.FilterGroupId);
+        Assert.Equal(subject2Filter.Id, filterGroupFootnote.FilterId);
+        Assert.Equal(subject2.Id, filterGroupFootnote.SubjectId);
+
+        Assert.Equal(2, updatedFootnote.FilterItems.Count);
+        var subject1FilterItemFootnote = Assert.Single(
+            updatedFootnote.FilterItems,
+            fi => fi.FilterItemId == subject1FilterItem.Id
+        );
+        Assert.Equal(subject1FilterGroup.Id, subject1FilterItemFootnote.FilterGroupId);
+        Assert.Equal(subject1Filter.Id, subject1FilterItemFootnote.FilterId);
+        Assert.Equal(subject1.Id, subject1FilterItemFootnote.SubjectId);
+        var subject2FilterItemFootnote = Assert.Single(
+            updatedFootnote.FilterItems,
+            fi => fi.FilterItemId == subject2FilterItem.Id
+        );
+        Assert.Equal(subject2FilterGroup.Id, subject2FilterItemFootnote.FilterGroupId);
+        Assert.Equal(subject2Filter.Id, subject2FilterItemFootnote.FilterId);
+        Assert.Equal(subject2.Id, subject2FilterItemFootnote.SubjectId);
+
+        var indicatorFootnote = Assert.Single(updatedFootnote.Indicators);
+        Assert.Equal(subject2Indicator.Id, indicatorFootnote.IndicatorId);
+        Assert.Equal(subject2IndicatorGroup.Id, indicatorFootnote.IndicatorGroupId);
+        Assert.Equal(subject2.Id, indicatorFootnote.SubjectId);
     }
 
     [Theory]
