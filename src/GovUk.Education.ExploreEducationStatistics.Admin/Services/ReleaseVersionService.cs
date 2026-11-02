@@ -167,16 +167,11 @@ public class ReleaseVersionService(
             })
             .OnSuccess(releaseVersion =>
                 DoDeleteReleaseVersion(
-                        releaseVersion: releaseVersion,
-                        forceDeleteRelatedData: true,
-                        hardDeleteContentReleaseVersion: true,
-                        cancellationToken
-                    )
-                    // A data set is only soft deleted once its ReleaseSubject has been removed and no other
-                    // ReleaseSubject links to it, so data sets removed from this release version earlier can't be
-                    // found through its ReleaseSubjects. Find them by the release version recorded when they
-                    // were soft deleted instead.
-                    .OnSuccessDo(() => releaseDataSetService.DeleteSoftDeleted(releaseVersion.Id))
+                    releaseVersion: releaseVersion,
+                    forceDeleteRelatedData: true,
+                    hardDeleteContentReleaseVersion: true,
+                    cancellationToken
+                )
             );
     }
 
