@@ -1703,6 +1703,12 @@ public abstract class ReleaseVersionServiceTests
 
             releaseDataFilesService
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataSetService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .ReturnsAsync(Unit.Instance);
 
             releaseFileService
@@ -2596,6 +2602,12 @@ public abstract class ReleaseVersionServiceTests
 
             releaseDataFilesService
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataSetService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .ReturnsAsync(Unit.Instance);
 
             releaseFileService

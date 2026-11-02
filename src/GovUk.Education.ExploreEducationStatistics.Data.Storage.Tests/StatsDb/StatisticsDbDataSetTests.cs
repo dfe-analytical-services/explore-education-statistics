@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Thinktecture.EntityFrameworkCore.TempTables;
@@ -1085,6 +1086,39 @@ public abstract class StatisticsDbDataSetTests
                 Assert.Equal((2000, Week2), result[0]);
                 Assert.Equal((2000, Week20), result[1]);
                 Assert.Equal((2001, Week1), result[2]);
+            }
+        }
+    }
+
+    public class DeleteTests : StatisticsDbDataSetTests
+    {
+        [Fact]
+        public async Task SoftDelete_SoftDeletesOnlyThisDataSetsSubject()
+        {
+            var subject = new Subject { Id = Guid.NewGuid() };
+            var otherSubject = new Subject { Id = Guid.NewGuid() };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.Subject.AddRange(subject, otherSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
+
+                await dataSet.Delete(softDelete: true);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToDictionary(s => s.Id);
+
+                Assert.True(subjects[subject.Id].SoftDeleted);
+                Assert.False(subjects[otherSubject.Id].SoftDeleted);
             }
         }
     }
