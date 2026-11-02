@@ -195,19 +195,6 @@ public class FootnoteRepository : IFootnoteRepository
             });
     }
 
-    public async Task DeleteFootnoteLinksBySubject(Guid subjectId)
-    {
-        _context.FilterFootnote.RemoveRange(_context.FilterFootnote.Where(link => link.SubjectId == subjectId));
-        _context.FilterGroupFootnote.RemoveRange(
-            _context.FilterGroupFootnote.Where(link => link.SubjectId == subjectId)
-        );
-        _context.FilterItemFootnote.RemoveRange(_context.FilterItemFootnote.Where(link => link.SubjectId == subjectId));
-        _context.IndicatorFootnote.RemoveRange(_context.IndicatorFootnote.Where(link => link.SubjectId == subjectId));
-        _context.SubjectFootnote.RemoveRange(_context.SubjectFootnote.Where(link => link.SubjectId == subjectId));
-
-        await _context.SaveChangesAsync();
-    }
-
     public async Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId)
     {
         var footnoteToRemove = await _context
