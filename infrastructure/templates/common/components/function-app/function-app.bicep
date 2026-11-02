@@ -52,8 +52,11 @@ param linuxFxVersion string?
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
 
-@description('Name of the Key Vault secret in which to store the storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING).')
+@description('Name of the Key Vault secret in which to store the storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING), when it has one.')
 param storageAccountConnectionStringSecretName string
+
+@description('Whether to create a file share in the storage account for the Function App\'s content, and point the Function App at it. Elastic Premium and Consumption plans need one, but Dedicated plans don\'t, as they keep the content in the App Service plan\'s own storage.')
+param deployContentShare bool = true
 
 @description('Storage Account SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
@@ -275,7 +278,7 @@ module storageAccountModule '../storage/storage-account.bicep' = {
   }
 }
 
-module fileShareModule '../../components/storage/fileShare.bicep' = {
+module fileShareModule '../../components/storage/fileShare.bicep' = if (deployContentShare) {
   name: '${storageAccountName}FileShareModuleDeploy'
   params: {
     storageAccountName: storageAccountModule.outputs.storageAccountName
@@ -285,18 +288,32 @@ module fileShareModule '../../components/storage/fileShare.bicep' = {
   }
 }
 
-var infraAppSettings = [
+var contentShareAppSettings = deployContentShare
+  ? [
+      {
+        name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+        value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName!)
+      }
+      {
+        name: 'WEBSITE_CONTENTSHARE'
+        value: fileShareModule!.outputs.fileShareName
+      }
+      // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
+      // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront
+      // deployment-time validation for a simpler template - a broken content share reference would instead surface as a
+      // runtime failure.
+      // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
+      {
+        name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
+        value: '1'
+      }
+    ]
+  : []
+
+var infraAppSettings = concat([
   {
     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
     value: applicationInsightsConnectionString
-  }
-  {
-    name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-    value: keyVaultRef(vaultUri, storageAccountModule.outputs.connectionStringSecretName!)
-  }
-  {
-    name: 'WEBSITE_CONTENTSHARE'
-    value: fileShareModule.outputs.fileShareName
   }
   {
     name: 'FUNCTIONS_EXTENSION_VERSION'
@@ -315,21 +332,13 @@ var infraAppSettings = [
     name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
     value: 'false'
   }
-  // Key Vault references for WEBSITE_CONTENTAZUREFILECONNECTIONSTRING can't be validated at deploy time when the
-  // content share doesn't already resolve, so we always skip that pre-flight check. This trades an upfront deployment-time
-  // validation for a simpler template - a broken content share reference would instead surface as a runtime failure.
-  // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
-  {
-    name: 'WEBSITE_SKIP_CONTENTSHARE_VALIDATION'
-    value: '1'
-  }
   // Enable the Function App to access file shares over the VNet if
   // file shares are available for this Function App.
   {
     name: 'WEBSITE_CONTENTOVERVNET'
     value: length(azureFileShares ?? []) > 0 ? '1' : null
   }
-]
+], contentShareAppSettings)
 
 // The host connects to its storage account with a managed identity rather than a connection string. With a system-assigned
 // identity, the account name is enough. With only a user-assigned identity, the connections must also say which identity
