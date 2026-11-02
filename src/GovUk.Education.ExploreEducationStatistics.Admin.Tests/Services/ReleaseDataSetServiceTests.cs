@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -64,8 +63,6 @@ public class ReleaseDataSetServiceTests
             Assert.Single(subjects);
             Assert.Equal(subject.Id, subjects[0].Id);
             Assert.True(subjects[0].SoftDeleted);
-            Assert.Equal(releaseSubject.ReleaseVersionId, subjects[0].SoftDeletedReleaseVersionId);
-            Assert.Equal(DataStorageVersion.StatsDB, subjects[0].SoftDeletedDataStorageVersion);
         }
     }
 
@@ -282,15 +279,11 @@ public class ReleaseDataSetServiceTests
 
             var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
             Assert.Equal(2, subjects.Count);
-            Assert.All(
-                subjects,
-                subject =>
-                {
-                    Assert.True(subject.SoftDeleted);
-                    Assert.Equal(releaseVersion.Id, subject.SoftDeletedReleaseVersionId);
-                    Assert.Equal(DataStorageVersion.StatsDB, subject.SoftDeletedDataStorageVersion);
-                }
-            );
+            Assert.Equal(releaseSubject1.SubjectId, subjects[0].Id);
+            Assert.True(subjects[0].SoftDeleted);
+
+            Assert.Equal(releaseSubject2.SubjectId, subjects[1].Id);
+            Assert.True(subjects[1].SoftDeleted);
         }
     }
 
@@ -359,75 +352,6 @@ public class ReleaseDataSetServiceTests
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-        }
-    }
-
-    [Fact]
-    public async Task DeleteSoftDeleted()
-    {
-        var releaseVersionId = Guid.NewGuid();
-
-        var subject = _fixture
-            .DefaultSubject()
-            .WithSoftDeleted(releaseVersionId, DataStorageVersion.StatsDB)
-            .Generate();
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            statisticsDbContext.Subject.Add(subject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-        footnoteRepository.Setup(mock => mock.DeleteFootnoteLinksBySubject(subject.Id)).Returns(Task.CompletedTask);
-
-        var subjectDeleter = new Mock<ReleaseDataSetService.SubjectDeleter>(MockBehavior.Strict);
-
-        subjectDeleter.Setup(mock => mock.Delete(subject.Id, It.IsAny<StatisticsDbContext>()));
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var service = BuildService(
-                statisticsDbContext,
-                footnoteRepository: footnoteRepository.Object,
-                subjectDeleter: subjectDeleter.Object
-            );
-
-            await service.DeleteSoftDeleted(releaseVersionId);
-
-            MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
-        }
-    }
-
-    [Fact]
-    public async Task DeleteSoftDeleted_IgnoresOtherSubjects()
-    {
-        var releaseVersionId = Guid.NewGuid();
-
-        var subjects = new List<Subject>
-        {
-            // Soft deleted from another release version
-            _fixture.DefaultSubject().WithSoftDeleted(Guid.NewGuid(), DataStorageVersion.StatsDB),
-            // Not soft deleted
-            _fixture.DefaultSubject(),
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            statisticsDbContext.Subject.AddRange(subjects);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-        {
-            var service = BuildService(statisticsDbContext);
-
-            await service.DeleteSoftDeleted(releaseVersionId);
         }
     }
 
