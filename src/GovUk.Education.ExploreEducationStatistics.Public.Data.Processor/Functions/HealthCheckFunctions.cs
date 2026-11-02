@@ -1,4 +1,4 @@
-using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
@@ -91,7 +91,7 @@ public class HealthCheckFunctions(
         try
         {
             var connectionString = appOptions.Value.PrivateStorageConnectionString;
-            var blobClient = new BlobServiceClient(connectionString);
+            var blobClient = StorageClientFactory.CreateBlobServiceClient(connectionString);
             var response = await blobClient.GetAccountInfoAsync();
             return response.HasValue
                 ? HealthCheckSummary.Healthy()
