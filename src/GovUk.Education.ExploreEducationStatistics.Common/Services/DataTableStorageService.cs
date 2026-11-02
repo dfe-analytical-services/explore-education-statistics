@@ -9,7 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class DataTableStorageService(string tableStorageConnectionString) : IDataTableStorageService
 {
-    private readonly TableServiceClient _client = new(tableStorageConnectionString);
+    private readonly TableServiceClient _client = StorageClientFactory.CreateTableServiceClient(
+        tableStorageConnectionString
+    );
 
     /// <summary>
     /// Gets a list of tables from the storage account
