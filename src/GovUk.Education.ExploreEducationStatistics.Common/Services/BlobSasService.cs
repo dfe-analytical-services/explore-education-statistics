@@ -86,7 +86,26 @@ public class BlobSasService(
             );
     }
 
-    private async Task<Uri> CreateSasUrl(
+    public Task<Uri> CreateContainerReadSasUri(
+        BlobServiceClient blobServiceClient,
+        BlobContainerClient containerClient,
+        TimeSpan expiryDuration,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return CreateReadSasUri(
+            blobServiceClient: blobServiceClient,
+            getResourceUri: () => containerClient.Uri,
+            containerName: containerClient.Name,
+            blobName: null,
+            canGenerateSasUri: containerClient.CanGenerateSasUri,
+            generateSasUri: containerClient.GenerateSasUri,
+            expiryDuration: expiryDuration,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private Task<Uri> CreateSasUrl(
         BlobServiceClient blobServiceClient,
         BlobClient client,
         string containerName,
@@ -94,22 +113,56 @@ public class BlobSasService(
         CancellationToken cancellationToken
     )
     {
-        // Create a read-only SAS token for just this blob that's valid for a very short time. It's scoped to the blob,
-        // not the container, so that the token can't be used to read any other blob in the container.
+        return CreateReadSasUri(
+            blobServiceClient: blobServiceClient,
+            getResourceUri: () => client.Uri,
+            containerName: containerName,
+            blobName: client.Name,
+            canGenerateSasUri: client.CanGenerateSasUri,
+            generateSasUri: client.GenerateSasUri,
+            expiryDuration: expiryDuration,
+            cancellationToken: cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// Creates a read-only SAS for a single blob, or for a whole container if no blob name is given, appended to the
+    /// URI of that blob or container. The URI is only needed when signing with a user delegation key.
+    /// </summary>
+    private async Task<Uri> CreateReadSasUri(
+        BlobServiceClient blobServiceClient,
+        Func<Uri> getResourceUri,
+        string containerName,
+        string? blobName,
+        bool canGenerateSasUri,
+        Func<BlobSasBuilder, Uri> generateSasUri,
+        TimeSpan expiryDuration,
+        CancellationToken cancellationToken
+    )
+    {
+        // Create a read-only SAS token that's valid for a very short time. A SAS for a single blob can't be used to
+        // read any other blob in the container.
         var sasBuilder = new BlobSasBuilder
         {
             BlobContainerName = containerName,
-            BlobName = client.Name,
-            Resource = "b",
+            BlobName = blobName ?? string.Empty,
+            Resource = blobName is null ? "c" : "b",
             ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
         };
 
-        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+        if (blobName is null)
+        {
+            sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+        }
+        else
+        {
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+        }
 
         // A client authorised with the account key signs the SAS with that key.
-        if (client.CanGenerateSasUri)
+        if (canGenerateSasUri)
         {
-            return client.GenerateSasUri(sasBuilder);
+            return generateSasUri(sasBuilder);
         }
 
         // A client authorised with a managed identity has no account key, so signs the SAS with a user delegation key
@@ -120,7 +173,7 @@ public class BlobSasService(
             cancellationToken: cancellationToken
         );
 
-        var uriBuilder = new BlobUriBuilder(client.Uri)
+        var uriBuilder = new BlobUriBuilder(getResourceUri())
         {
             Sas = sasBuilder.ToSasQueryParameters(userDelegationKey, blobServiceClient.AccountName),
         };

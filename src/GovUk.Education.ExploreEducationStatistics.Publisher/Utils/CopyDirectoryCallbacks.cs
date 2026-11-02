@@ -1,6 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -8,26 +7,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 
 public static class CopyDirectoryCallbacks
 {
-#pragma warning disable 1998
-    public static async Task<bool> TransferBlobIfFileExistsCallback(
-        object source,
-#pragma warning restore 1998
+    public static bool TransferBlobIfFileExistsCallback(
+        string sourcePath,
         List<File> files,
         IBlobContainer sourceContainerName,
         ILogger logger
     )
     {
-        if (source is not CloudBlockBlob item)
-        {
-            return false;
-        }
-
-        if (files.Exists(file => file.Path() == item.Name))
+        if (files.Exists(file => file.Path() == sourcePath))
         {
             return true;
         }
 
-        logger.LogInformation("Not transferring {0}/{1}", sourceContainerName, item.Name);
+        logger.LogInformation("Not transferring {0}/{1}", sourceContainerName, sourcePath);
         return false;
     }
 }
