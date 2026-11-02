@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 using Thinktecture;
 
@@ -456,11 +455,5 @@ public class StatisticsDbContext : DbContext
     private static void ConfigureSubject(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Subject>().HasQueryFilter(s => !s.SoftDeleted);
-
-        modelBuilder
-            .Entity<Subject>()
-            .Property(s => s.SoftDeletedDataStorageVersion)
-            .HasConversion(new EnumToStringConverter<DataStorageVersion>())
-            .HasMaxLength(25);
     }
 }

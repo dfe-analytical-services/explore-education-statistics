@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +18,7 @@ public class ReleaseDataSetService(
     {
         await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
         await footnoteRepository.DeleteFootnotesBySubject(releaseVersionId: releaseVersionId, subjectId: subjectId);
-        await DeleteDataSetIfOrphaned(
-            releaseVersionId: releaseVersionId,
-            subjectId: subjectId,
-            softDelete: softDeleteOrphanedDataSet
-        );
+        await DeleteDataSetIfOrphaned(subjectId: subjectId, softDelete: softDeleteOrphanedDataSet);
     }
 
     public async Task DeleteAll(Guid releaseVersionId, bool softDeleteOrphanedDataSets = true)
@@ -43,20 +38,6 @@ public class ReleaseDataSetService(
         }
     }
 
-    public async Task DeleteSoftDeleted(Guid releaseVersionId)
-    {
-        var subjectIds = await statisticsDbContext
-            .Subject.IgnoreQueryFilters()
-            .Where(s => s.SoftDeleted && s.SoftDeletedReleaseVersionId == releaseVersionId)
-            .Select(s => s.Id)
-            .ToListAsync();
-
-        foreach (var subjectId in subjectIds)
-        {
-            await HardDelete(subjectId);
-        }
-    }
-
     private async Task DeleteReleaseSubjectIfExists(Guid releaseVersionId, Guid subjectId)
     {
         var releaseSubject = await statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(rs =>
@@ -72,7 +53,7 @@ public class ReleaseDataSetService(
         }
     }
 
-    private async Task DeleteDataSetIfOrphaned(Guid releaseVersionId, Guid subjectId, bool softDelete)
+    private async Task DeleteDataSetIfOrphaned(Guid subjectId, bool softDelete)
     {
         if (await statisticsDbContext.ReleaseSubject.AnyAsync(rs => rs.SubjectId == subjectId))
         {
@@ -91,8 +72,6 @@ public class ReleaseDataSetService(
         if (softDelete)
         {
             subject.SoftDeleted = true;
-            subject.SoftDeletedReleaseVersionId = releaseVersionId;
-            subject.SoftDeletedDataStorageVersion = DataStorageVersion.StatsDB;
             await statisticsDbContext.SaveChangesAsync();
             return;
         }
