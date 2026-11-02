@@ -256,4 +256,18 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
   }
 }
 
+// Allow Admin's user-assigned identity to send messages to the StartScreening queue.
+// TODO EES-7502 - grant this to Admin's identity unconditionally once every environment has moved to the ELZ.
+module adminStorageAccountRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = if (adminUsesUserAssignedIdentity) {
+  name: 'screenerAdminStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.screener.functionStorageAccount
+    principalIds: [adminUserAssignedIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
+  }
+  dependsOn: [
+    containerisedFunctionAppModule
+  ]
+}
+
 output functionAppUrl string = containerisedFunctionAppModule.outputs.url

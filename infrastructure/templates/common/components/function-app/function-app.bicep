@@ -104,6 +104,9 @@ param diagnosticSettingsLogAnalyticsWorkspaceId string
 @description('Specifies whether to grant the Function App role-based access to storage account queue data.')
 param deployQueueRoleAssignment bool = false
 
+@description('Specifies whether to grant the Function App role-based access to storage account table data.')
+param deployTableRoleAssignment bool = false
+
 @description('Scaling and capacity configuration for use with Elastic Plans.')
 param elasticCapacity {
   
@@ -490,6 +493,15 @@ module storageAccountQueueRoleAssignmentModule '../storageAccountRoleAssignment.
     principalIds: [functionAppPrincipalId]
     storageAccountName: storageAccountModule.outputs.storageAccountName
     role: 'Storage Queue Data Contributor'
+  }
+}
+
+module storageAccountTableRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = if (deployTableRoleAssignment) {
+  name: '${storageAccountName}TableRoleAssignmentModuleDeploy'
+  params: {
+    principalIds: [functionAppPrincipalId]
+    storageAccountName: storageAccountModule.outputs.storageAccountName
+    role: 'Storage Table Data Contributor'
   }
 }
 

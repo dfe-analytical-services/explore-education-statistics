@@ -252,6 +252,17 @@ module functionAppIdentityRoleAssignmentModule '../../common/components/search/s
   }
 }
 
+// Allow the Function App to write and delete the search documents in the search storage account.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+module searchStorageAccountRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'searchDocsSearchStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: searchStorageAccount.name
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Storage Blob Data Contributor'
+  }
+}
+
 module functionAppStorageAccountQueueServiceModule '../../common/components/queueService.bicep' = {
   name: 'searchDocsFunctionAppStorageAccountQueueServiceModuleDeploy'
   params: {

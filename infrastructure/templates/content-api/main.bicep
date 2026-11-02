@@ -187,3 +187,14 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     tagValues: tagValues
   }
 }
+
+// Allow the Content API to read files from the public storage account, and to write cached files.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+module publicStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'contentApiPublicStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.storageAccounts.public
+    principalIds: [appServiceModule.outputs.appServiceIdentityPrincipalId]
+    role: 'Storage Blob Data Contributor'
+  }
+}
