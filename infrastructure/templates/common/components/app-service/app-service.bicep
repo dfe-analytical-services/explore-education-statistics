@@ -31,6 +31,10 @@ param keyVaultRoles {
 @description('The name of an existing user-assigned managed identity for the App Service and its deploy slot to use instead of system-assigned ones, for Key Vault references and the app code. Its Key Vault roles are granted to this identity.')
 param userAssignedIdentityName string = ''
 
+// TODO EES-7502 - remove once Admin logs in to PostgreSQL with its user-assigned identity.
+@description('Whether the App Service and its deploy slot keep system-assigned identities alongside the user-assigned one, for anything that still needs them. Only applies with userAssignedIdentityName.')
+param keepSystemAssignedIdentity bool = false
+
 @description('Minimum TLS version supported.')
 param minTlsVersion string
 
@@ -140,7 +144,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
 
 var identity = !empty(userAssignedIdentityName)
   ? {
-      type: 'UserAssigned'
+      type: keepSystemAssignedIdentity ? 'SystemAssigned, UserAssigned' : 'UserAssigned'
       userAssignedIdentities: {
         '${userAssignedIdentity.id}': {}
       }
@@ -295,6 +299,7 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     healthCheckPath: healthCheckPath
     connectionStrings: connectionStrings
     userAssignedIdentityId: !empty(userAssignedIdentityName) ? userAssignedIdentity.id : ''
+    keepSystemAssignedIdentity: keepSystemAssignedIdentity
   }
 }
 

@@ -101,6 +101,10 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
     userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.admin.identity : ''
+    // TODO EES-7502 - stop keeping the system-assigned identities, and remove PsqlUseSystemAssignedIdentity below, once
+    // Admin logs in to PostgreSQL with its user-assigned identity. This needs a PostgreSQL role named after
+    // resourceNames.admin.identity, and the connection string's User Id changing to match.
+    keepSystemAssignedIdentity: true
     appServiceName: resourceNames.admin.appService
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem
@@ -146,7 +150,12 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     } : null
     // Application-specific appsettings are controlled in the application release pipeline
     // rather than in the infrastructure rollout so that we can support slot swapping.
-    applicationAppSettings: {}
+    // Log in to PostgreSQL with the system-assigned identity, whose PostgreSQL role is named after the App Service.
+    applicationAppSettings: useUserAssignedIdentity
+      ? {
+          PsqlUseSystemAssignedIdentity: 'true'
+        }
+      : {}
     existingProdAppSettings: existingProdAppSettings
     existingStagingSlotAppSettings: existingStagingSlotAppSettings
     tagValues: tagValues
