@@ -80,10 +80,14 @@ public static class HostBuilderExtension
                     .AddAzureClientsInline(clientBuilder =>
                     {
                         clientBuilder.AddClient<BlobServiceClient, BlobClientOptions>(
-                            (_, _, serviceProvider) =>
+                            (options, credential, serviceProvider) =>
                             {
                                 var appOptions = serviceProvider.GetRequiredService<IOptions<AppOptions>>().Value;
-                                return new BlobServiceClient(appOptions.SearchStorageConnectionString);
+                                return BlobServiceClientFactory.Create(
+                                    appOptions.SearchStorageConnectionString,
+                                    credential,
+                                    options
+                                );
                             }
                         );
                         clientBuilder.UseCredential(new DefaultAzureCredential());
