@@ -192,6 +192,27 @@ public class StatisticsDbDataSet(
         return TimePeriodQueryUtils.ListDistinctTimePeriods(observations, cancellationToken);
     }
 
+    public async Task SoftDelete(CancellationToken cancellationToken = default)
+    {
+        var subject = await context.Subject.SingleOrDefaultAsync(s => s.Id == SubjectId, cancellationToken);
+
+        if (subject != null)
+        {
+            subject.SoftDeleted = true;
+            await context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task Delete(CancellationToken cancellationToken = default)
+    {
+        // These rely on the database's cascading deletes to remove each observation's ObservationFilterItems, each
+        // filter's FilterGroups and FilterItems, and each indicator group's Indicators.
+        // Observations go first as their ObservationFilterItems restrict the deletion of FilterItems and Filters.
+        await context.Observation.Where(o => o.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+        await context.Filter.Where(f => f.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+        await context.IndicatorGroup.Where(ig => ig.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+    }
+
     /// <summary>
     /// Populates the #MatchedObservation temporary table with the ids of the matching observations and returns a
     /// queryable over the corresponding observations. The query is not executed here, allowing callers to either

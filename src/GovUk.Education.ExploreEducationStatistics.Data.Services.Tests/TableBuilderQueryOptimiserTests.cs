@@ -61,6 +61,54 @@ public class TableBuilderQueryOptimiserTests
         Assert.True(result);
     }
 
+    [Theory]
+    [InlineData(240, false)]
+    [InlineData(239, true)]
+    public async Task IsCroppingRequired_FilterItemsAcrossFilters_MultipliesCountsPerFilter(
+        int maxTableCellsAllowed,
+        bool expectedCroppingRequired
+    )
+    {
+        // Arrange
+        var query = new FullTableQueryBuilder().Build();
+        var filterItemIds = query.GetFilterItemIds();
+
+        // Filter A has 5 items across two groups, filter B has 3 and filter C has 2:
+        // 2 indicators x 2 locations x 2 time periods x (5 x 3 x 2) filter items = 240
+        var filterAId = Guid.NewGuid();
+        var filterAGroup1 = new FilterGroup { FilterId = filterAId };
+        var filterAGroup2 = new FilterGroup { FilterId = filterAId };
+        var filterBGroup = new FilterGroup { FilterId = Guid.NewGuid() };
+        var filterCGroup = new FilterGroup { FilterId = Guid.NewGuid() };
+
+        var filterGroups = new[]
+        {
+            filterAGroup1,
+            filterAGroup1,
+            filterAGroup1,
+            filterAGroup2,
+            filterAGroup2,
+            filterBGroup,
+            filterBGroup,
+            filterBGroup,
+            filterCGroup,
+            filterCGroup,
+        };
+
+        SetupListFilterItems(
+            query,
+            filterItemIds.Zip(filterGroups, (id, group) => new FilterItem { Id = id, FilterGroup = group }).ToList()
+        );
+
+        var optimiser = BuildTableBuilderQueryOptimiser(maxTableCellsAllowed);
+
+        // Act
+        var result = await optimiser.IsCroppingRequired(query);
+
+        // Assert
+        Assert.Equal(expectedCroppingRequired, result);
+    }
+
     [Fact]
     public async Task IsCroppingRequired_FilterItemsNotFound_Throws()
     {

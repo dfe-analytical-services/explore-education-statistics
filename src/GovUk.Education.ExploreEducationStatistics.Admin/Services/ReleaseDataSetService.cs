@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -9,11 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseDataSetService(
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ReleaseDataSetService.SubjectDeleter? subjectDeleter = null
+    IStorageDataSetResolver storageDataSetResolver
 ) : IReleaseDataSetService
 {
-    private readonly SubjectDeleter _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
-
     public async Task Delete(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedDataSet = true)
     {
         await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
@@ -69,26 +68,17 @@ public class ReleaseDataSetService(
             return;
         }
 
+        var dataSet = await storageDataSetResolver.Resolve(subjectId);
+
         if (softDelete)
         {
-            subject.SoftDeleted = true;
-            await statisticsDbContext.SaveChangesAsync();
+            await dataSet.SoftDelete();
             return;
         }
 
-        _subjectDeleter.Delete(subjectId, statisticsDbContext);
-    }
+        await dataSet.Delete();
 
-    // Separate this into a separate class
-    // for ease of mocking in tests.
-    public class SubjectDeleter
-    {
-        public virtual void Delete(Guid subjectId, StatisticsDbContext context)
-        {
-            // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
-            // N.B. This delete will be slow if there are a large number of observations but this is only
-            // executed by the tests when the theme is torn down so ensure files used are < 1000 rows.
-            context.Database.ExecuteSqlInterpolated($"DELETE FROM Subject WHERE Id = {subjectId}");
-        }
+        statisticsDbContext.Subject.Remove(subject);
+        await statisticsDbContext.SaveChangesAsync();
     }
 }
