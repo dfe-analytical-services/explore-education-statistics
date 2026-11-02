@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
 using Xunit;
@@ -752,7 +751,6 @@ public class MethodologyServiceTests
         return new(
             contentDbContext,
             contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-            MapperUtils.ContentMapper(contentDbContext),
             methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
         );
     }

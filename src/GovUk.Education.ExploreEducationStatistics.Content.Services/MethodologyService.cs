@@ -1,4 +1,3 @@
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -16,19 +15,16 @@ public class MethodologyService : IMethodologyService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IMapper _mapper;
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
     public MethodologyService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IMapper mapper,
         IMethodologyVersionRepository methodologyVersionRepository
     )
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
-        _mapper = mapper;
         _methodologyVersionRepository = methodologyVersionRepository;
     }
 
@@ -56,13 +52,10 @@ public class MethodologyService : IMethodologyService
 
                 await _contentDbContext.Entry(latestPublishedVersion).Reference(m => m.MethodologyContent).LoadAsync();
 
-                var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-
-                viewModel.Publications = await GetPublishedPublicationsForMethodology(
-                    latestPublishedVersion.MethodologyId
+                return MethodologyVersionViewModel.FromModel(
+                    latestPublishedVersion,
+                    await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId)
                 );
-
-                return viewModel;
             });
     }
 
@@ -110,7 +103,7 @@ public class MethodologyService : IMethodologyService
                 Slug = pm.Publication.Slug,
                 LatestReleaseSlug = pm.Publication.LatestPublishedReleaseVersion!.Release.Slug,
                 Owner = pm.Owner,
-                Contact = _mapper.Map<ContactViewModel>(pm.Publication.Contact),
+                Contact = ContactViewModel.FromModel(pm.Publication.Contact),
             })
             .OrderBy(pvm => pvm.Title)
             .ToListAsync();
@@ -121,7 +114,7 @@ public class MethodologyService : IMethodologyService
         var latestPublishedMethodologies = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(
             publicationId
         );
-        return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
+        return latestPublishedMethodologies.Select(MethodologyVersionSummaryViewModel.FromModel).ToList();
     }
 
     public async Task<Either<ActionResult, List<MethodologySitemapItemViewModel>>> ListSitemapItems(

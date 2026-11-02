@@ -4,21 +4,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record ContactViewModel
 {
-    public string TeamName { get; init; } = string.Empty;
+    public required string TeamName { get; init; }
 
-    public string TeamEmail { get; init; } = string.Empty;
+    public required string TeamEmail { get; init; }
 
-    public string ContactName { get; init; } = string.Empty;
+    public required string ContactName { get; init; }
 
-    public string ContactTelNo { get; init; } = string.Empty;
+    public required string? ContactTelNo { get; init; }
 
-    public ContactViewModel() { }
-
-    public ContactViewModel(Contact contact)
-    {
-        TeamName = contact.TeamName;
-        TeamEmail = contact.TeamEmail;
-        ContactName = contact.ContactName;
-        ContactTelNo = contact.ContactTelNo ?? string.Empty;
-    }
+    public static ContactViewModel FromModel(Contact contact) =>
+        new()
+        {
+            TeamName = contact.TeamName,
+            TeamEmail = contact.TeamEmail,
+            ContactName = contact.ContactName,
+            ContactTelNo = contact.ContactTelNo,
+        };
 }

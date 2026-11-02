@@ -77,8 +77,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             services.AddDataProtection();
         }
 
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         services
             .AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();

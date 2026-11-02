@@ -383,7 +383,7 @@ public class PublicationService(
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId, query => query.Include(p => p.Contact))
             .OnSuccessDo(userService.CheckCanViewPublication)
-            .OnSuccess(publication => mapper.Map<ContactViewModel>(publication.Contact));
+            .OnSuccess(publication => ContactViewModel.FromModel(publication.Contact));
     }
 
     public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(
@@ -404,7 +404,7 @@ public class PublicationService(
                 publication.Contact.TeamEmail = updatedContact.TeamEmail;
                 await context.SaveChangesAsync();
 
-                return mapper.Map<ContactViewModel>(publication.Contact);
+                return ContactViewModel.FromModel(publication.Contact);
             });
     }
 

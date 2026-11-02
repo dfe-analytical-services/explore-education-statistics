@@ -1,10 +1,10 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
-using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 /// <summary>
 /// AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
 /// </summary>
-public class MappingProfiles : CommonMappingProfile
+public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
@@ -40,10 +40,12 @@ public class MappingProfiles : CommonMappingProfile
         CreateMap<MethodologyVersion, IdTitleViewModel>();
 
         CreateMap<Theme, IdTitleViewModel>();
-        CreateMap<Publication, PublicationSummaryViewModel>();
+        CreateMap<Publication, PublicationSummaryViewModel>()
+            .ForMember(dest => dest.Contact, m => m.MapFrom(p => ContactViewModel.FromModel(p.Contact)));
         CreateMap<Publication, PublicationViewModel>().ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
         CreateMap<Publication, PublicationCreateViewModel>()
-            .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
+            .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme))
+            .ForMember(dest => dest.Contact, m => m.MapFrom(p => ContactViewModel.FromModel(p.Contact)));
 
         CreateContentBlockMap();
         CreateMap<DataBlockCreateRequest, DataBlockVersion>()
