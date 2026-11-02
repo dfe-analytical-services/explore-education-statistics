@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -142,6 +143,11 @@ public static class StorageDataSetTestUtils
         public IStorageDataSet Resolve(File dataFile)
         {
             return factory.Create(dataFile.SubjectId!.Value);
+        }
+
+        public IStorageDataSet Resolve(Guid subjectId, DataStorageVersion dataStorageVersion)
+        {
+            return factory.Create(subjectId);
         }
 
         public Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)

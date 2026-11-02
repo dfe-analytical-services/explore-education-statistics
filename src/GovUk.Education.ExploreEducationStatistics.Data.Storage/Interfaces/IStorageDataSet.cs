@@ -6,7 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
-/// Storage-agnostic read access to a single data set: its observations, filters, indicators, locations and time periods
+/// Storage-agnostic access to a single data set: reading its observations, filters, indicators, locations and time
+/// periods, and deleting it.
 ///
 /// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
@@ -94,4 +95,18 @@ public interface IStorageDataSet
         IEnumerable<Guid>? locationIds = null,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Marks the data set as deleted while keeping its data, recording the release version it was removed from so that
+    /// it can still be found and deleted later.
+    /// </summary>
+    /// <remarks>
+    /// Soft deleting will be removed once data sets have been migrated to parquet.
+    /// </remarks>
+    Task SoftDelete(Guid releaseVersionId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes the data set's data.
+    /// </summary>
+    Task Delete(CancellationToken cancellationToken = default);
 }

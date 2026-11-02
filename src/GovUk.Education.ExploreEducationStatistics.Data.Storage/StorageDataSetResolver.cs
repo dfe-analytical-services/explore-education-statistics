@@ -27,10 +27,20 @@ public class StorageDataSetResolver(
             throw new ArgumentException($"File {dataFile.Id} is not a data file linked to a subject", nameof(dataFile));
         }
 
-        var subjectId = dataFile.SubjectId.Value;
-
-        return CreateStorageDataSet(subjectId, dataFile.DataStorageVersion)
+        var dataStorageVersion =
+            dataFile.DataStorageVersion
             ?? throw new InvalidOperationException($"No data storage version recorded for data file {dataFile.Id}");
+
+        return Resolve(dataFile.SubjectId.Value, dataStorageVersion);
+    }
+
+    public IStorageDataSet Resolve(Guid subjectId, DataStorageVersion dataStorageVersion)
+    {
+        return dataStorageVersion switch
+        {
+            DataStorageVersion.StatsDB => statisticsDbDataSetFactory.Create(subjectId),
+            _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
+        };
     }
 
     public async Task<IStorageDataSet?> TryResolve(Guid subjectId, CancellationToken cancellationToken = default)
@@ -40,16 +50,6 @@ public class StorageDataSetResolver(
             .Select(file => file.DataStorageVersion)
             .SingleOrDefaultAsync(cancellationToken);
 
-        return CreateStorageDataSet(subjectId, dataStorageVersion);
-    }
-
-    private IStorageDataSet? CreateStorageDataSet(Guid subjectId, DataStorageVersion? dataStorageVersion)
-    {
-        return dataStorageVersion switch
-        {
-            DataStorageVersion.StatsDB => statisticsDbDataSetFactory.Create(subjectId),
-            null => null,
-            _ => throw new NotSupportedException($"Data storage version {dataStorageVersion} is not supported"),
-        };
+        return dataStorageVersion is null ? null : Resolve(subjectId, dataStorageVersion.Value);
     }
 }

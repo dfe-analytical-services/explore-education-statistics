@@ -1,8 +1,9 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -10,11 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseDataSetService(
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ReleaseDataSetService.SubjectDeleter? subjectDeleter = null
+    IStorageDataSetResolver storageDataSetResolver
 ) : IReleaseDataSetService
 {
-    private readonly SubjectDeleter _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
-
     public async Task Delete(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedDataSet = true)
     {
         await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
@@ -45,15 +44,20 @@ public class ReleaseDataSetService(
 
     public async Task DeleteSoftDeleted(Guid releaseVersionId)
     {
-        var subjectIds = await statisticsDbContext
+        var subjects = await statisticsDbContext
             .Subject.IgnoreQueryFilters()
             .Where(s => s.SoftDeleted && s.SoftDeletedReleaseVersionId == releaseVersionId)
-            .Select(s => s.Id)
             .ToListAsync();
 
-        foreach (var subjectId in subjectIds)
+        foreach (var subject in subjects)
         {
-            await HardDelete(subjectId);
+            var dataStorageVersion =
+                subject.SoftDeletedDataStorageVersion
+                ?? throw new InvalidOperationException(
+                    $"No data storage version recorded for soft deleted subject {subject.Id}"
+                );
+
+            await HardDelete(subject, storageDataSetResolver.Resolve(subject.Id, dataStorageVersion));
         }
     }
 
@@ -88,34 +92,23 @@ public class ReleaseDataSetService(
             return;
         }
 
+        var dataSet = await storageDataSetResolver.Resolve(subjectId);
+
         if (softDelete)
         {
-            subject.SoftDeleted = true;
-            subject.SoftDeletedReleaseVersionId = releaseVersionId;
-            subject.SoftDeletedDataStorageVersion = DataStorageVersion.StatsDB;
-            await statisticsDbContext.SaveChangesAsync();
+            await dataSet.SoftDelete(releaseVersionId);
             return;
         }
 
-        await HardDelete(subjectId);
+        await HardDelete(subject, dataSet);
     }
 
-    private async Task HardDelete(Guid subjectId)
+    private async Task HardDelete(Subject subject, IStorageDataSet dataSet)
     {
-        await footnoteRepository.DeleteFootnoteLinksBySubject(subjectId);
-        _subjectDeleter.Delete(subjectId, statisticsDbContext);
-    }
+        await footnoteRepository.DeleteFootnoteLinksBySubject(subject.Id);
+        await dataSet.Delete();
 
-    // Separate this into a separate class
-    // for ease of mocking in tests.
-    public class SubjectDeleter
-    {
-        public virtual void Delete(Guid subjectId, StatisticsDbContext context)
-        {
-            // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
-            // N.B. This delete will be slow if there are a large number of observations but this is only
-            // executed by the tests when the theme is torn down so ensure files used are < 1000 rows.
-            context.Database.ExecuteSqlInterpolated($"DELETE FROM Subject WHERE Id = {subjectId}");
-        }
+        statisticsDbContext.Subject.Remove(subject);
+        await statisticsDbContext.SaveChangesAsync();
     }
 }
