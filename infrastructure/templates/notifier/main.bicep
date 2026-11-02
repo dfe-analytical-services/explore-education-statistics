@@ -121,6 +121,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountPublicNetworkAccessEnabled: true
     ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
+    // The Notifier keeps its subscriptions in tables.
+    // TODO EES-7502 - grant this unconditionally once every environment has moved to the ELZ.
+    deployTableRoleAssignment: useUserAssignedIdentity
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
@@ -160,4 +163,21 @@ module storageAccountBlobServiceModule '../common/components/blobService.bicep' 
   dependsOn: [
     functionAppModule
   ]
+}
+
+// When the release apps use their user-assigned identities, allow the Publisher to send messages to the Notifier's
+// queues. Nothing uses this role until the Publisher connects to storage with its identity rather than a connection
+// string.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+resource publisherIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.publisher.identity
+}
+
+module publisherStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'notifierPublisherStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: functionAppModule.outputs.storageAccountName
+    principalIds: [publisherIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
+  }
 }

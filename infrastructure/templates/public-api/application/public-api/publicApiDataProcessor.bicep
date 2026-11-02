@@ -11,7 +11,7 @@ param storageAccountSku StorageAccountSku
 @description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
 param adminUsesUserAssignedIdentity bool = false
 
-@description('Whether the Function App host and Durable Functions connect to their storage accounts with the Data Processor\'s managed identity, rather than with connection strings.')
+@description('Whether the Data Processor connects to storage accounts with its managed identity, rather than with connection strings.')
 param identityBasedStorageConnections bool = false
 
 @description('Specifies the location for all resources.')
@@ -158,6 +158,17 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       alertsGroupName: resourceNames.alertsGroup
     } : null
     tagValues: tagValues
+  }
+}
+
+// Allow the Data Processor to read data files from the core storage account.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+module coreStorageAccountRoleAssignmentModule '../../../common/components/storageAccountRoleAssignment.bicep' = if (identityBasedStorageConnections) {
+  name: 'dataProcessorCoreStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.storageAccounts.core
+    principalIds: [dataProcessorFunctionAppManagedIdentity.properties.principalId]
+    role: 'Storage Blob Data Reader'
   }
 }
 
