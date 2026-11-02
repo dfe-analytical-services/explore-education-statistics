@@ -145,3 +145,30 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     tagValues: tagValues
   }
 }
+
+// When the release apps use their user-assigned identities, grant them here their roles on the storage accounts that
+// the Importer uses.
+// TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
+resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+// Allow the Importer to read and write files in the core storage account.
+module coreStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'importerCoreStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.storageAccounts.core
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Storage Blob Data Contributor'
+  }
+}
+
+// Allow Admin to send messages to the Importer's queues.
+module adminStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'importerAdminStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: functionAppModule.outputs.storageAccountName
+    principalIds: [adminIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
+  }
+}
