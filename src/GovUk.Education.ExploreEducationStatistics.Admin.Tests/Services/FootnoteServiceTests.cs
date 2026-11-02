@@ -2242,7 +2242,7 @@ public class FootnoteServiceTests
             userService ?? AlwaysTrueUserService().Object,
             dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
             footnoteRepository,
-            releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext, footnoteRepository),
+            releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext),
             statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
         );
     }
