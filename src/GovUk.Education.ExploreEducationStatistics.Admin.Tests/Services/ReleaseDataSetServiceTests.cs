@@ -43,8 +43,6 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
             .Returns(Task.CompletedTask);
 
-        footnoteRepository.Setup(mock => mock.DeleteFootnoteLinksBySubject(subject.Id)).Returns(Task.CompletedTask);
-
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var service = BuildService(statisticsDbContext, footnoteRepository: footnoteRepository.Object);
@@ -150,8 +148,6 @@ public class ReleaseDataSetServiceTests
         footnoteRepository
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
             .Returns(Task.CompletedTask);
-
-        footnoteRepository.Setup(mock => mock.DeleteFootnoteLinksBySubject(subject.Id)).Returns(Task.CompletedTask);
 
         var subjectDeleter = new Mock<ReleaseDataSetService.SubjectDeleter>(MockBehavior.Strict);
 
@@ -266,12 +262,6 @@ public class ReleaseDataSetServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        footnoteRepository
-            .Setup(mock =>
-                mock.DeleteFootnoteLinksBySubject(It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId))
-            )
-            .Returns(Task.CompletedTask);
-
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var service = BuildService(statisticsDbContext, footnoteRepository: footnoteRepository.Object);
@@ -329,12 +319,6 @@ public class ReleaseDataSetServiceTests
                     releaseVersion.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)
                 )
-            )
-            .Returns(Task.CompletedTask);
-
-        footnoteRepository
-            .Setup(mock =>
-                mock.DeleteFootnoteLinksBySubject(It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId))
             )
             .Returns(Task.CompletedTask);
 
