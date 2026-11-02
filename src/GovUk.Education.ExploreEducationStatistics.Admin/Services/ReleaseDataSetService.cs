@@ -69,6 +69,8 @@ public class ReleaseDataSetService(
             return;
         }
 
+        await footnoteRepository.DeleteFootnoteLinksBySubject(subjectId);
+
         if (softDelete)
         {
             subject.SoftDeleted = true;
@@ -76,12 +78,6 @@ public class ReleaseDataSetService(
             return;
         }
 
-        await HardDelete(subjectId);
-    }
-
-    private async Task HardDelete(Guid subjectId)
-    {
-        await footnoteRepository.DeleteFootnoteLinksBySubject(subjectId);
         _subjectDeleter.Delete(subjectId, statisticsDbContext);
     }
 
