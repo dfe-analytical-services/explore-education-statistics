@@ -334,6 +334,140 @@ public class SubjectResultMetaServiceTests
     }
 
     [Fact]
+    public async Task GetSubjectMeta_IndicatorsFromQueryReturnedInIndicatorSequenceOrder()
+    {
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1).Generate(1));
+
+        var releaseVersion = publication.ReleaseVersions[0];
+
+        Subject subject = _dataFixture.DefaultSubject();
+
+        ReleaseSubject releaseSubject = _dataFixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(
+                _dataFixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).WithPublicationId(publication.Id)
+            )
+            .WithSubject(subject);
+
+        IndicatorGroup indicatorGroup1 = _dataFixture.DefaultIndicatorGroup().WithSubject(subject);
+        IndicatorGroup indicatorGroup2 = _dataFixture.DefaultIndicatorGroup().WithSubject(subject);
+
+        Indicator indicatorA = _dataFixture.DefaultIndicator().WithLabel("A").WithIndicatorGroup(indicatorGroup1);
+        Indicator indicatorB = _dataFixture.DefaultIndicator().WithLabel("B").WithIndicatorGroup(indicatorGroup1);
+        Indicator indicatorC = _dataFixture.DefaultIndicator().WithLabel("C").WithIndicatorGroup(indicatorGroup2);
+
+        // The indicator sequence orders the indicators differently from their labels
+        ReleaseFile releaseFile = _dataFixture
+            .DefaultReleaseFile()
+            .WithFile(_dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject.Id))
+            .WithIndicatorSequence([
+                new IndicatorGroupSequenceEntry(indicatorGroup2.Id, [indicatorC.Id]),
+                new IndicatorGroupSequenceEntry(indicatorGroup1.Id, [indicatorB.Id, indicatorA.Id]),
+            ]);
+
+        var observations = new List<Observation>();
+
+        // Indicator B isn't selected
+        var query = new FullTableQuery { Indicators = ListOf(indicatorA.Id, indicatorC.Id), SubjectId = subject.Id };
+
+        var expectedIndicatorIds = ListOf(indicatorC.Id, indicatorA.Id);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(Strict);
+        var dataSet = new Mock<IStorageDataSet>(Strict);
+        var locationService = new Mock<ILocationService>(Strict);
+        var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
+        var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+        boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>())).Returns([]);
+
+        dataSet
+            .Setup(s => s.ListFilterItems(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        dataSet
+            .Setup(s =>
+                s.ListIndicators(
+                    It.Is<IEnumerable<Guid>>(ids => ids.SequenceEqual(query.Indicators)),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync([indicatorA, indicatorC]);
+
+        locationService
+            .Setup(s =>
+                s.GetLocationViewModels(
+                    It.IsAny<List<Location>>(),
+                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
+                    null
+                )
+            )
+            .ReturnsAsync([]);
+
+        footnoteRepository
+            .Setup(s =>
+                s.GetFootnotesForSelection(
+                    releaseVersion.Id,
+                    subject.Id,
+                    new List<FilterItem>(),
+                    It.Is<IReadOnlyCollection<Guid>>(ids => ids.SequenceEqual(expectedIndicatorIds))
+                )
+            )
+            .ReturnsAsync([]);
+
+        releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id)).ReturnsAsync(releaseFile);
+
+        timePeriodService.Setup(s => s.GetTimePeriodRange(observations)).Returns([]);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                boundaryLevelRepository: boundaryLevelRepository.Object,
+                storageDataSetResolver: MockStorageDataSetResolver(subject.Id, dataSet.Object).Object,
+                locationService: locationService.Object,
+                footnoteRepository: footnoteRepository.Object,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                timePeriodService: timePeriodService.Object
+            );
+
+            var result = await service.GetSubjectMeta(releaseVersion.Id, query, observations, isCroppedTable: false);
+
+            VerifyAllMocks(
+                boundaryLevelRepository,
+                dataSet,
+                locationService,
+                footnoteRepository,
+                releaseDataFileRepository,
+                timePeriodService
+            );
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(expectedIndicatorIds, viewModel.Indicators.Select(i => i.Value).ToList());
+        }
+    }
+
+    [Fact]
     public async Task GetSubjectMeta_BoundaryLevelViewModelsReturnedForSubject()
     {
         Publication publication = _dataFixture
@@ -418,13 +552,7 @@ public class SubjectResultMetaServiceTests
         var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
         locationService
-            .Setup(s =>
-                s.GetLocationViewModels(
-                    It.IsAny<List<Location>>(),
-                    It.IsAny<Dictionary<GeographicLevel, List<string>>>(),
-                    null
-                )
-            )
+            .Setup(s => s.GetLocationViewModels(It.IsAny<List<Location>>(), options.Value.Hierarchies, null))
             .ReturnsAsync([]);
 
         boundaryLevelRepository
@@ -475,6 +603,7 @@ public class SubjectResultMetaServiceTests
             VerifyAllMocks(
                 boundaryLevelRepository,
                 dataSet,
+                locationService,
                 footnoteRepository,
                 releaseDataFileRepository,
                 timePeriodService

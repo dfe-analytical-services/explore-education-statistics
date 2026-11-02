@@ -389,16 +389,14 @@ public class DataImportServiceTests
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
             .WithTimePeriod(2000, April)
-            .WithFilterItems([rootFilterB.FilterGroups[0].FilterItems[0], childFilterB.FilterGroups[0].FilterItems[0]])
-            .Generate();
+            .WithFilterItems([rootFilterB.FilterGroups[0].FilterItems[0], childFilterB.FilterGroups[0].FilterItems[0]]);
 
         var observationA = _fixture
             .DefaultObservation()
             .WithSubject(subject)
             .WithLocation(new Location { GeographicLevel = GeographicLevel.Country })
             .WithTimePeriod(2000, April)
-            .WithFilterItems([rootFilterA.FilterGroups[0].FilterItems[0], childFilterA.FilterGroups[0].FilterItems[0]])
-            .Generate();
+            .WithFilterItems([rootFilterA.FilterGroups[0].FilterItems[0], childFilterA.FilterGroups[0].FilterItems[0]]);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -435,6 +433,16 @@ public class DataImportServiceTests
             Assert.Equal(2, updatedFile.FilterHierarchies.Count);
             Assert.Equal([rootFilterA.Id, childFilterA.Id], updatedFile.FilterHierarchies[0].FilterIds);
             Assert.Equal([rootFilterB.Id, childFilterB.Id], updatedFile.FilterHierarchies[1].FilterIds);
+
+            var hierarchyATier = Assert.Single(updatedFile.FilterHierarchies[0].Tiers);
+            var hierarchyARootItemId = rootFilterA.FilterGroups[0].FilterItems[0].Id;
+            Assert.Equal([hierarchyARootItemId], hierarchyATier.Keys.ToList());
+            Assert.Equal([childFilterA.FilterGroups[0].FilterItems[0].Id], hierarchyATier[hierarchyARootItemId]);
+
+            var hierarchyBTier = Assert.Single(updatedFile.FilterHierarchies[1].Tiers);
+            var hierarchyBRootItemId = rootFilterB.FilterGroups[0].FilterItems[0].Id;
+            Assert.Equal([hierarchyBRootItemId], hierarchyBTier.Keys.ToList());
+            Assert.Equal([childFilterB.FilterGroups[0].FilterItems[0].Id], hierarchyBTier[hierarchyBRootItemId]);
         }
     }
 
