@@ -69,8 +69,6 @@ public class ReleaseDataSetService(
             return;
         }
 
-        await footnoteRepository.DeleteFootnoteLinksBySubject(subjectId);
-
         if (softDelete)
         {
             subject.SoftDeleted = true;
