@@ -97,15 +97,11 @@ public interface IStorageDataSet
     );
 
     /// <summary>
-    /// Marks the data set as deleted while keeping its data.
+    /// Deletes the data set's data, or if <paramref name="softDelete" /> is true, marks the data set as deleted
+    /// while keeping its data.
     /// </summary>
     /// <remarks>
     /// Soft deleting will be removed once data sets have been migrated to parquet.
     /// </remarks>
-    Task SoftDelete(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Deletes the data set's data.
-    /// </summary>
-    Task Delete(CancellationToken cancellationToken = default);
+    Task Delete(bool softDelete, CancellationToken cancellationToken = default);
 }
