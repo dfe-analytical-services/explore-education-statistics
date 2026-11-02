@@ -279,7 +279,11 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             if (publicDataDbExists)
             {
                 var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
-                services.AddPsqlDbContext<PublicDataDbContext>(publicDataDbConnectionString, hostEnvironment);
+                services.AddPsqlDbContext<PublicDataDbContext>(
+                    publicDataDbConnectionString,
+                    hostEnvironment,
+                    configuration: configuration
+                );
             }
         }
 
