@@ -144,12 +144,26 @@ public class ReleaseVersionService(
             .OnSuccessDo(userService.CheckCanDeleteTestReleaseVersion)
             .OnSuccessDo(async releaseVersion =>
             {
-                // Unset any Soft Deleted flag on Test ReleaseVersions prior to hard-deleting them,
-                // as a number of Services / Repositories that will be called during the hard delete
-                // are not configured to look for soft-deleted data.
+                // Unset any Soft Deleted flags on Test ReleaseVersions / Subjects
+                // prior to hard-deleting them, as a number of Services / Repositories that
+                // will be called during the hard delete are not configured to look for
+                // soft-deleted data.
+                var subjects = await statisticsDbContext
+                    .ReleaseSubject.IgnoreQueryFilters()
+                    .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersion.Id)
+                    .Select(releaseSubject => releaseSubject.Subject)
+                    .ToListAsync(cancellationToken);
+
                 releaseVersion.SoftDeleted = false;
+                // Probably redundant: a Subject is only soft deleted once no ReleaseSubject links to it,
+                // so Subjects found through this release version's ReleaseSubjects shouldn't be soft deleted.
+                subjects.ForEach(subject => subject.SoftDeleted = false);
+
                 context.ReleaseVersions.Update(releaseVersion);
+                statisticsDbContext.Subject.UpdateRange(subjects);
+
                 await context.SaveChangesAsync(cancellationToken);
+                await statisticsDbContext.SaveChangesAsync(cancellationToken);
             })
             .OnSuccess(releaseVersion =>
                 DoDeleteReleaseVersion(
