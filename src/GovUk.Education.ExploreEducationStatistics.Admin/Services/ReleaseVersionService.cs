@@ -193,6 +193,13 @@ public class ReleaseVersionService(
                     new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)
                 )
             )
+            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
+            .OnSuccessDo(() =>
+                releaseDataSetService.DeleteAll(
+                    releaseVersionId: releaseVersion.Id,
+                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
+                )
+            )
             .OnSuccessDo(() =>
                 releaseDataFileService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
@@ -203,7 +210,6 @@ public class ReleaseVersionService(
                 releaseFileService.DeleteAll(releaseVersionId: releaseVersion.Id, forceDelete: forceDeleteRelatedData)
             )
             .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(releaseVersion.Id, cancellationToken))
-            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
             .OnSuccessDo(async _ =>
             {
                 // Methodologies scheduled with this ReleaseVersion have to be unscheduled before it is
@@ -237,12 +243,6 @@ public class ReleaseVersionService(
                 // entries for a ReleaseVersion that has none is a no-op.
                 await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
                     releaseVersionIds: [releaseVersion.Id]
-                );
-
-                // TODO: This may be redundant (investigate as part of EES-1295)
-                await releaseDataSetService.DeleteAll(
-                    releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
                 );
 
                 if (forceDeleteRelatedData)

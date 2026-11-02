@@ -19,7 +19,7 @@ public abstract class StorageDataSetResolverTests
         {
             var subjectId = Guid.NewGuid();
 
-            var contentDbContextId = await SeedDataFile(subjectId);
+            var contentDbContextId = await SeedDataAndMetadataFiles(subjectId);
 
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
             await using var statisticsDbContext = InMemoryStatisticsDbContext();
@@ -118,7 +118,7 @@ public abstract class StorageDataSetResolverTests
         {
             var subjectId = Guid.NewGuid();
 
-            var contentDbContextId = await SeedDataFile(subjectId);
+            var contentDbContextId = await SeedDataAndMetadataFiles(subjectId);
 
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
             await using var statisticsDbContext = InMemoryStatisticsDbContext();
@@ -147,13 +147,23 @@ public abstract class StorageDataSetResolverTests
         }
     }
 
-    private static async Task<string> SeedDataFile(Guid subjectId)
+    private static async Task<string> SeedDataAndMetadataFiles(Guid subjectId)
     {
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-        contentDbContext.Files.Add(BuildDataFile(subjectId));
+        contentDbContext.Files.AddRange(
+            BuildDataFile(subjectId),
+            new File
+            {
+                Id = Guid.NewGuid(),
+                RootPath = Guid.NewGuid(),
+                Filename = "data.meta.csv",
+                SubjectId = subjectId,
+                Type = FileType.Metadata,
+            }
+        );
         await contentDbContext.SaveChangesAsync();
 
         return contentDbContextId;
