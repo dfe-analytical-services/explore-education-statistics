@@ -20,3 +20,6 @@ param zoneRedundantAppServicePlans = true
 
 // Deploy a user-assigned managed identity for each of this pipeline's apps.
 param deployAppIdentities = true
+
+// No content shares for the Function Apps on Dedicated plans.
+param functionAppContentShares = false
