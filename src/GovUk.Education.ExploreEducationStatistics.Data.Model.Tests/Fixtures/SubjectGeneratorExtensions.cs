@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
@@ -39,8 +40,24 @@ public static class SubjectGeneratorExtensions
         IEnumerable<Footnote> footnotes
     ) => generator.ForInstance(s => s.SetFootnotes(footnotes));
 
+    public static Generator<Subject> WithSoftDeleted(
+        this Generator<Subject> generator,
+        Guid releaseVersionId,
+        DataStorageVersion dataStorageVersion
+    ) => generator.ForInstance(s => s.SetSoftDeleted(releaseVersionId, dataStorageVersion));
+
     public static InstanceSetters<Subject> SetDefaults(this InstanceSetters<Subject> setters) =>
         setters.SetDefault(s => s.Id);
+
+    public static InstanceSetters<Subject> SetSoftDeleted(
+        this InstanceSetters<Subject> setters,
+        Guid releaseVersionId,
+        DataStorageVersion dataStorageVersion
+    ) =>
+        setters
+            .Set(s => s.SoftDeleted, true)
+            .Set(s => s.SoftDeletedReleaseVersionId, releaseVersionId)
+            .Set(s => s.SoftDeletedDataStorageVersion, dataStorageVersion);
 
     public static InstanceSetters<Subject> SetFilters(
         this InstanceSetters<Subject> setters,

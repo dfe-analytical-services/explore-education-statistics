@@ -1,4 +1,6 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public class Subject
@@ -9,4 +11,6 @@ public class Subject
     public List<IndicatorGroup> IndicatorGroups { get; set; } = new();
     public List<SubjectFootnote> Footnotes { get; set; } = new();
     public bool SoftDeleted { get; set; }
+    public Guid? SoftDeletedReleaseVersionId { get; set; }
+    public DataStorageVersion? SoftDeletedDataStorageVersion { get; set; }
 }

@@ -53,7 +53,7 @@ public class ReleaseVersionService(
     IFootnoteRepository footnoteRepository,
     IDataBlockService dataBlockService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
-    IReleaseSubjectRepository releaseSubjectRepository,
+    IReleaseDataSetService releaseDataSetService,
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
@@ -144,32 +144,25 @@ public class ReleaseVersionService(
             .OnSuccessDo(userService.CheckCanDeleteTestReleaseVersion)
             .OnSuccessDo(async releaseVersion =>
             {
-                // Unset any Soft Deleted flags on Test ReleaseVersions / Subjects
-                // prior to hard-deleting them, as a number of Services / Repositories that
-                // will be called during the hard delete are not configured to look for
-                // soft-deleted data.
-                var subjects = await statisticsDbContext
-                    .ReleaseSubject.IgnoreQueryFilters()
-                    .Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersion.Id)
-                    .Select(releaseSubject => releaseSubject.Subject)
-                    .ToListAsync(cancellationToken);
-
+                // Unset any Soft Deleted flag on Test ReleaseVersions prior to hard-deleting them,
+                // as a number of Services / Repositories that will be called during the hard delete
+                // are not configured to look for soft-deleted data.
                 releaseVersion.SoftDeleted = false;
-                subjects.ForEach(subject => subject.SoftDeleted = false);
-
                 context.ReleaseVersions.Update(releaseVersion);
-                statisticsDbContext.Subject.UpdateRange(subjects);
-
                 await context.SaveChangesAsync(cancellationToken);
-                await statisticsDbContext.SaveChangesAsync(cancellationToken);
             })
             .OnSuccess(releaseVersion =>
                 DoDeleteReleaseVersion(
-                    releaseVersion: releaseVersion,
-                    forceDeleteRelatedData: true,
-                    hardDeleteContentReleaseVersion: true,
-                    cancellationToken
-                )
+                        releaseVersion: releaseVersion,
+                        forceDeleteRelatedData: true,
+                        hardDeleteContentReleaseVersion: true,
+                        cancellationToken
+                    )
+                    // A data set is only soft deleted once its ReleaseSubject has been removed and no other
+                    // ReleaseSubject links to it, so data sets removed from this release version earlier can't be
+                    // found through its ReleaseSubjects. Find them by the release version recorded when they
+                    // were soft deleted instead.
+                    .OnSuccessDo(() => releaseDataSetService.DeleteSoftDeleted(releaseVersion.Id))
             );
     }
 
@@ -238,9 +231,9 @@ public class ReleaseVersionService(
                 );
 
                 // TODO: This may be redundant (investigate as part of EES-1295)
-                await releaseSubjectRepository.DeleteAllReleaseSubjects(
+                await releaseDataSetService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedSubjects: !forceDeleteRelatedData
+                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
                 );
 
                 if (forceDeleteRelatedData)
@@ -899,10 +892,7 @@ public class ReleaseVersionService(
             .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlockVersions(deletePlan.DeleteDataBlockPlan))
             .OnSuccessDo(async deletePlan =>
             {
-                await releaseSubjectRepository.DeleteReleaseSubject(
-                    releaseVersionId: releaseVersionId,
-                    subjectId: deletePlan.SubjectId
-                );
+                await releaseDataSetService.Delete(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId);
                 await privateCacheService.DeleteItemAsync(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
