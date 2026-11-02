@@ -44,6 +44,10 @@ param azureFileShares AzureFileShareMount[]?
 @description('The resource id of an existing user-assigned managed identity for the slot to use instead of a system-assigned one, shared with the owning App Service.')
 param userAssignedIdentityId string = ''
 
+// TODO EES-7502 - remove once Admin logs in to PostgreSQL with its user-assigned identity.
+@description('Whether the slot keeps a system-assigned identity alongside the user-assigned one, for anything that still needs it. Only applies with userAssignedIdentityId.')
+param keepSystemAssignedIdentity bool = false
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -62,7 +66,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2025-03-01' = {
   tags: tagValues
   identity: !empty(userAssignedIdentityId)
     ? {
-        type: 'UserAssigned'
+        type: keepSystemAssignedIdentity ? 'SystemAssigned, UserAssigned' : 'UserAssigned'
         userAssignedIdentities: {
           '${userAssignedIdentityId}': {}
         }
