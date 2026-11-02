@@ -76,10 +76,10 @@ public class PublishingService(
                 new IBlobStorageService.CopyDirectoryOptions
                 {
                     DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                    ShouldTransferCallbackAsync = (source, _) =>
+                    ShouldCopyBlob = sourcePath =>
                         // Filter by blobs with matching file paths
                         TransferBlobIfFileExistsCallback(
-                            source: source,
+                            sourcePath: sourcePath,
                             files: files,
                             sourceContainerName: PrivateReleaseFiles,
                             logger: logger
@@ -107,10 +107,10 @@ public class PublishingService(
             new IBlobStorageService.CopyDirectoryOptions
             {
                 DestinationConnectionString = _appOptions.PublicStorageConnectionString,
-                ShouldTransferCallbackAsync = (source, _) =>
+                ShouldCopyBlob = sourcePath =>
                     // Filter by blobs with matching file paths
                     TransferBlobIfFileExistsCallback(
-                        source: source,
+                        sourcePath: sourcePath,
                         files: files,
                         sourceContainerName: PrivateMethodologyFiles,
                         logger: logger
