@@ -1090,10 +1090,10 @@ public abstract class StatisticsDbDataSetTests
         }
     }
 
-    public class SoftDeleteTests : StatisticsDbDataSetTests
+    public class DeleteTests : StatisticsDbDataSetTests
     {
         [Fact]
-        public async Task SoftDeletesOnlyThisDataSetsSubject()
+        public async Task SoftDelete_SoftDeletesOnlyThisDataSetsSubject()
         {
             var subject = new Subject { Id = Guid.NewGuid() };
             var otherSubject = new Subject { Id = Guid.NewGuid() };
@@ -1110,7 +1110,7 @@ public abstract class StatisticsDbDataSetTests
             {
                 var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
 
-                await dataSet.SoftDelete();
+                await dataSet.Delete(softDelete: true);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))

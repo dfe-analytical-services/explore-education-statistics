@@ -70,13 +70,12 @@ public class ReleaseDataSetService(
 
         var dataSet = await storageDataSetResolver.Resolve(subjectId);
 
+        await dataSet.Delete(softDelete: softDelete);
+
         if (softDelete)
         {
-            await dataSet.SoftDelete();
             return;
         }
-
-        await dataSet.Delete();
 
         statisticsDbContext.Subject.Remove(subject);
         await statisticsDbContext.SaveChangesAsync();

@@ -46,7 +46,7 @@ public class ReleaseDataSetServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.SoftDelete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
@@ -165,7 +165,7 @@ public class ReleaseDataSetServiceTests
 
         var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet.Setup(mock => mock.Delete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
@@ -286,8 +286,8 @@ public class ReleaseDataSetServiceTests
         var dataSet1 = new Mock<IStorageDataSet>(MockBehavior.Strict);
         var dataSet2 = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet1.Setup(mock => mock.SoftDelete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        dataSet2.Setup(mock => mock.SoftDelete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet1.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet2.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
@@ -358,8 +358,8 @@ public class ReleaseDataSetServiceTests
         var dataSet1 = new Mock<IStorageDataSet>(MockBehavior.Strict);
         var dataSet2 = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        dataSet1.Setup(mock => mock.Delete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        dataSet2.Setup(mock => mock.Delete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet1.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet2.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
