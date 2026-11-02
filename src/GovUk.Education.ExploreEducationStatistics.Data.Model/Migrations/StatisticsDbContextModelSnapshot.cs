@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -618,6 +618,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("SoftDeletedDataStorageVersion")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<Guid?>("SoftDeletedReleaseVersionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
