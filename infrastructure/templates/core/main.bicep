@@ -91,6 +91,10 @@ param deployContainerRegistry bool = false
 @description('Whether to grant the Admin App Service\'s and Publisher Function App\'s system-assigned identities permission to send Event Grid events, and the Publisher\'s permission to purge the Front Door cache. In ELZ, the release pipeline grants these roles to their user-assigned identities instead, so the param files in "parameters/elz" turn this off.')
 param deploySystemAssignedIdentityRoleAssignments bool = true
 
+// TODO EES-7502 - remove, leaving identity-based audit storage on, once every environment has moved to the ELZ.
+@description('Whether the SQL Servers write audit logs and vulnerability assessment scans to the logging storage account with their system-assigned identities, rather than with the account\'s access key. Only the param files in "parameters/elz" turn this on, for the new environments.')
+param sqlServerIdentityBasedAuditStorage bool = false
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -359,6 +363,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    identityBasedAuditStorage: sqlServerIdentityBasedAuditStorage
     contentDbConfig: contentDbConfig
     statisticsDbConfig: statisticsDbConfig
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
@@ -383,6 +388,7 @@ module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = 
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    identityBasedAuditStorage: sqlServerIdentityBasedAuditStorage
     statisticsDbConfig: statisticsDbConfig
     statisticsPrimaryDatabaseId: coreSqlServerModule.outputs.statisticsDatabaseId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId

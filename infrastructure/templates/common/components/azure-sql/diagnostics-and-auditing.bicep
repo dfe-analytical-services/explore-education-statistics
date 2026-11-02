@@ -13,6 +13,10 @@ param loggingStorageAccountName string
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
+// TODO EES-7502 - remove the access key alternative once every environment has moved to the ELZ.
+@description('Whether auditing and vulnerability assessment write to the logging storage account with the SQL Server\'s system-assigned identity, rather than with the account\'s access key. The SQL Server must have a system-assigned identity.')
+param identityBasedAuditStorage bool = false
+
 resource sqlServer 'Microsoft.Sql/servers@2025-01-01' existing = {
   name: sqlServerName
 }
@@ -27,7 +31,21 @@ resource loggingStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' ex
 }
 
 var loggingStorageEndpoint = loggingStorageAccount.properties.primaryEndpoints.blob
-var loggingStorageAccessKey = loggingStorageAccount.listKeys().keys[0].value
+
+// The access key, for when the SQL Server doesn't write to the logging storage account with its identity.
+var loggingStorageAccessKeySettings = identityBasedAuditStorage
+  ? {}
+  : { storageAccountAccessKey: loggingStorageAccount.listKeys().keys[0].value }
+
+// Allow the SQL Server to write audit logs and vulnerability assessment scans to the logging storage account.
+module loggingStorageAccountRoleAssignmentModule '../storageAccountRoleAssignment.bicep' = if (identityBasedAuditStorage) {
+  name: '${sqlServerName}LoggingStorageRoleAssignmentDeploy'
+  params: {
+    storageAccountName: loggingStorageAccount.name
+    principalIds: [sqlServer.identity!.principalId]
+    role: 'Storage Blob Data Contributor'
+  }
+}
 
 var databaseDiagnosticsLogsAndMetrics = {
   logs: [
@@ -59,17 +77,17 @@ resource securityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2025-0
 resource vulnerabilityAssessment 'Microsoft.Sql/servers/vulnerabilityAssessments@2025-01-01' = {
   parent: sqlServer
   name: 'Default'
-  properties: {
+  properties: union({
     storageContainerPath: '${loggingStorageEndpoint}vulnerability-assessment'
-    storageAccountAccessKey: loggingStorageAccessKey
     recurringScans: {
       isEnabled: true
       emailSubscriptionAdmins: true
       emails: teamEmailAddresses
     }
-  }
+  }, loggingStorageAccessKeySettings)
   dependsOn: [
     securityAlertPolicy
+    loggingStorageAccountRoleAssignmentModule
   ]
 }
 
@@ -92,21 +110,20 @@ resource masterDbAuditingSettings 'Microsoft.Sql/servers/databases/extendedAudit
 resource serverAuditingSettings 'Microsoft.Sql/servers/extendedAuditingSettings@2025-01-01' = {
   parent: sqlServer
   name: 'default'
-  properties: {
+  properties: union({
     auditActionsAndGroups: [
       'SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP'
       'FAILED_DATABASE_AUTHENTICATION_GROUP'
       'BATCH_COMPLETED_GROUP'
     ]
     isAzureMonitorTargetEnabled: true
-    isManagedIdentityInUse: false
+    isManagedIdentityInUse: identityBasedAuditStorage
     isStorageSecondaryKeyInUse: false
     state: 'Enabled'
     storageEndpoint: loggingStorageEndpoint
-    storageAccountAccessKey: loggingStorageAccessKey
     storageAccountSubscriptionId: az.subscription().subscriptionId
     retentionDays: databaseAuditBlobRetentionDays
-  }
+  }, loggingStorageAccessKeySettings)
   dependsOn: [
     masterDbAuditingSettings
   ]
@@ -115,14 +132,13 @@ resource serverAuditingSettings 'Microsoft.Sql/servers/extendedAuditingSettings@
 resource devOpsAuditingSettings 'Microsoft.Sql/servers/devOpsAuditingSettings@2025-01-01' = {
   parent: sqlServer
   name: 'Default'
-  properties: {
+  properties: union({
     isAzureMonitorTargetEnabled: true
-    isManagedIdentityInUse: false
+    isManagedIdentityInUse: identityBasedAuditStorage
     state: 'Enabled'
     storageEndpoint: loggingStorageEndpoint
-    storageAccountAccessKey: loggingStorageAccessKey
     storageAccountSubscriptionId: az.subscription().subscriptionId
-  }
+  }, loggingStorageAccessKeySettings)
   dependsOn: [
     serverAuditingSettings
   ]

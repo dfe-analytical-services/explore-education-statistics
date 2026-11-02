@@ -18,3 +18,7 @@ param backupVaultCrossRegionRestore = true
 
 // The release pipeline grants Admin's and the Publisher's user-assigned identities their roles instead.
 param deploySystemAssignedIdentityRoleAssignments = false
+
+// The SQL Servers write auditing and vulnerability assessment output to the logging storage account with their
+// system-assigned identities.
+param sqlServerIdentityBasedAuditStorage = true
