@@ -3,6 +3,7 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
+import KeyStatsExportMenu from '@common/modules/find-statistics/components/KeyStatsExportMenu';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
@@ -10,7 +11,7 @@ import { ReleaseVersionHomeContent } from '@common/services/publicationService';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import glossaryService from '@frontend/services/glossaryService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
+import React, { useRef } from 'react';
 
 const PublicationReleaseHeadlinesSection = ({
   headlinesSection,
@@ -23,55 +24,59 @@ const PublicationReleaseHeadlinesSection = ({
 > & {
   releaseVersionId: string;
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const getReleaseFile = useGetReleaseFile(releaseVersionId);
 
   const secondaryKeyStatsDataBlock = keyStatisticsSecondarySection.content[0];
 
   const summaryTab = (
     <>
-      <KeyStatContainer>
-        {keyStatistics?.map(keyStat => {
-          if (keyStat.type === 'KeyStatisticDataBlock') {
+      <KeyStatsExportMenu containerRef={containerRef} />
+      <div ref={containerRef}>
+        <KeyStatContainer>
+          {keyStatistics?.map(keyStat => {
+            if (keyStat.type === 'KeyStatisticDataBlock') {
+              return (
+                <KeyStatDataBlock
+                  key={keyStat.id}
+                  releaseVersionId={releaseVersionId}
+                  dataBlockId={keyStat.dataBlockId}
+                  dataBlockStaleTime={Infinity}
+                  trend={keyStat.trend}
+                  guidanceTitle={keyStat.guidanceTitle}
+                  guidanceText={keyStat.guidanceText}
+                />
+              );
+            }
+
             return (
-              <KeyStatDataBlock
+              <KeyStat
                 key={keyStat.id}
-                releaseVersionId={releaseVersionId}
-                dataBlockId={keyStat.dataBlockId}
-                dataBlockStaleTime={Infinity}
+                title={keyStat.title}
+                statistic={keyStat.statistic}
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}
               />
             );
-          }
+          })}
+        </KeyStatContainer>
 
-          return (
-            <KeyStat
-              key={keyStat.id}
-              title={keyStat.title}
-              statistic={keyStat.statistic}
-              trend={keyStat.trend}
-              guidanceTitle={keyStat.guidanceTitle}
-              guidanceText={keyStat.guidanceText}
-            />
-          );
-        })}
-      </KeyStatContainer>
-
-      {headlinesSection.content.map(block => (
-        <ContentBlockRenderer
-          key={block.id}
-          block={block}
-          getGlossaryEntry={glossaryService.getEntry}
-          trackGlossaryLinks={glossaryEntrySlug =>
-            logEvent({
-              category: `Publication Release Headlines Glossary Link`,
-              action: `Glossary link clicked`,
-              label: glossaryEntrySlug,
-            })
-          }
-        />
-      ))}
+        {headlinesSection.content.map(block => (
+          <ContentBlockRenderer
+            key={block.id}
+            block={block}
+            getGlossaryEntry={glossaryService.getEntry}
+            trackGlossaryLinks={glossaryEntrySlug =>
+              logEvent({
+                category: `Publication Release Headlines Glossary Link`,
+                action: `Glossary link clicked`,
+                label: glossaryEntrySlug,
+              })
+            }
+          />
+        ))}
+      </div>
     </>
   );
 
