@@ -17,6 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 /// <summary>
 /// AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
 /// </summary>
+/// <remarks>
+/// Note that we are gradually moving away from AutoMapper, and it has already been removed from every other
+/// project in this solution except for Admin. See EES-6647 and decision D24.
+///
+/// To help with this, avoid adding new type maps here. Instead, map explicitly, for example with a
+/// static FromModel method on the response type.
+///
+/// When changing code that relies on one of these type maps, consider whether it's a good
+/// opportunity to replace it with an explicit mapping and remove the type map.
+/// </remarks>
 public class MappingProfiles : Profile
 {
     public MappingProfiles()
