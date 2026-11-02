@@ -4,6 +4,7 @@ using System.Web;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -18,6 +19,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
 public abstract class BlobSasServiceTests
 {
+    protected const string UserDelegationKeyObjectId = "00000000-0000-0000-0000-000000000001";
+
+    protected static UserDelegationKey UserDelegationKey(DateTimeOffset expiresOn) =>
+        // Positional arguments, as the factory's overloads share the same parameter names.
+        BlobsModelFactory.UserDelegationKey(
+            UserDelegationKeyObjectId, // signedObjectId
+            "00000000-0000-0000-0000-000000000002", // signedTenantId
+            expiresOn.AddDays(-1), // signedStartsOn
+            expiresOn, // signedExpiresOn
+            "b", // signedService
+            "2025-01-05", // signedVersion
+            Convert.ToBase64String(new byte[32]) // value
+        );
+
     public class CreateBlobDownloadTokenTests : BlobSasServiceTests
     {
         [Fact]
@@ -245,20 +260,6 @@ public abstract class BlobSasServiceTests
             );
         }
 
-        private const string UserDelegationKeyObjectId = "00000000-0000-0000-0000-000000000001";
-
-        private static UserDelegationKey UserDelegationKey(DateTimeOffset expiresOn) =>
-            // Positional arguments, as the factory's overloads share the same parameter names.
-            BlobsModelFactory.UserDelegationKey(
-                UserDelegationKeyObjectId, // signedObjectId
-                "00000000-0000-0000-0000-000000000002", // signedTenantId
-                expiresOn.AddDays(-1), // signedStartsOn
-                expiresOn, // signedExpiresOn
-                "b", // signedService
-                "2025-01-05", // signedVersion
-                Convert.ToBase64String(new byte[32]) // value
-            );
-
         private static (Mock<BlobServiceClient>, Mock<BlobClient>) MockIdentityBlobServiceClient(
             IBlobContainer container,
             string path
@@ -282,6 +283,82 @@ public abstract class BlobSasServiceTests
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
             return (blobServiceClient, blobClient);
+        }
+    }
+
+    public class CreateContainerReadSasUriTests : BlobSasServiceTests
+    {
+        private static readonly Uri ContainerUri = new("https://testaccount.blob.core.windows.net/a-container");
+
+        [Fact]
+        public async Task AccountKey_SignsWithAccountKey()
+        {
+            var now = DateTime.UtcNow;
+            var expiryDuration = TimeSpan.FromHours(1);
+
+            var containerClient = new Mock<BlobContainerClient>(Strict);
+            containerClient.SetupGet(client => client.Name).Returns("a-container");
+            containerClient.SetupGet(client => client.Uri).Returns(ContainerUri);
+            containerClient.SetupGet(client => client.CanGenerateSasUri).Returns(true);
+            containerClient
+                .Setup(client =>
+                    client.GenerateSasUri(
+                        It.Is<BlobSasBuilder>(builder =>
+                            builder.BlobContainerName == "a-container"
+                            && builder.Resource == "c"
+                            && builder.Permissions == "r"
+                            && builder.ExpiresOn == now.Add(expiryDuration)
+                        )
+                    )
+                )
+                .Returns(new Uri($"{ContainerUri}?sig=signed-with-key"));
+
+            var service = BuildService(dateTimeProvider: new DateTimeProvider(now));
+
+            var uri = await service.CreateContainerReadSasUri(
+                blobServiceClient: Mock.Of<BlobServiceClient>(Strict),
+                containerClient: containerClient.Object,
+                expiryDuration: expiryDuration
+            );
+
+            Assert.Equal(new Uri($"{ContainerUri}?sig=signed-with-key"), uri);
+        }
+
+        [Fact]
+        public async Task NoAccountKey_SignsWithUserDelegationKey()
+        {
+            var now = DateTime.UtcNow;
+
+            var containerClient = new Mock<BlobContainerClient>(Strict);
+            containerClient.SetupGet(client => client.Name).Returns("a-container");
+            containerClient.SetupGet(client => client.Uri).Returns(ContainerUri);
+            containerClient.SetupGet(client => client.CanGenerateSasUri).Returns(false);
+
+            var blobServiceClient = new Mock<BlobServiceClient>(Strict);
+            blobServiceClient.SetupGet(client => client.AccountName).Returns("testaccount");
+            blobServiceClient
+                .Setup(client =>
+                    client.GetUserDelegationKeyAsync(
+                        It.IsAny<BlobGetUserDelegationKeyOptions>(),
+                        CancellationToken.None
+                    )
+                )
+                .ReturnsAsync(Response.FromValue(UserDelegationKey(expiresOn: now.AddDays(1)), null!));
+
+            var service = BuildService(dateTimeProvider: new DateTimeProvider(now));
+
+            var uri = await service.CreateContainerReadSasUri(
+                blobServiceClient: blobServiceClient.Object,
+                containerClient: containerClient.Object,
+                expiryDuration: TimeSpan.FromHours(1)
+            );
+
+            var sas = HttpUtility.ParseQueryString(uri.Query);
+
+            Assert.Equal(ContainerUri.AbsolutePath, uri.AbsolutePath);
+            Assert.Equal("c", sas["sr"]);
+            Assert.Equal("r", sas["sp"]);
+            Assert.Equal(UserDelegationKeyObjectId, sas["skoid"]);
         }
     }
 
