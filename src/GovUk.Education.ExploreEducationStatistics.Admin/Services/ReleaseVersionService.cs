@@ -155,8 +155,6 @@ public class ReleaseVersionService(
                     .ToListAsync(cancellationToken);
 
                 releaseVersion.SoftDeleted = false;
-                // Probably redundant: a Subject is only soft deleted once no ReleaseSubject links to it,
-                // so Subjects found through this release version's ReleaseSubjects shouldn't be soft deleted.
                 subjects.ForEach(subject => subject.SoftDeleted = false);
 
                 context.ReleaseVersions.Update(releaseVersion);
