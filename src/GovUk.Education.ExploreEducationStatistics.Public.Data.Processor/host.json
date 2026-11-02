@@ -5,7 +5,7 @@
       "hubName": "DataProcessorTaskHub",
       "storageProvider": {
         "type": "AzureStorage",
-        "connectionStringName": "DurableManagementStorage"
+        "connectionName": "DurableManagementStorage"
       }
     }
   },
