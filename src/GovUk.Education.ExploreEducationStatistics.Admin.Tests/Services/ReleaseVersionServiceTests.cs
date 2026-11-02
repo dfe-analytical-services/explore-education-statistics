@@ -2667,16 +2667,6 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
-            releaseDataSetService
-                .Setup(mock => mock.DeleteSoftDeleted(releaseVersion.Id))
-                .Callback(() =>
-                    releaseDataSetService.Verify(
-                        mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
-                        Times.Once
-                    )
-                )
-                .Returns(Task.CompletedTask);
-
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
@@ -2753,7 +2743,6 @@ public abstract class ReleaseVersionServiceTests
                     privateCacheService,
                     releaseDataFilesService,
                     releaseFileService,
-                    releaseDataSetService,
                     footnoteRepository,
                     processorClient,
                     releasePublishingStatusRepository,
