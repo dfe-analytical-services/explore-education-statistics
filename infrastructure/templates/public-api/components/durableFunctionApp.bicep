@@ -71,7 +71,12 @@ param userAssignedManagedIdentityParams {
   id: string
   name: string
   principalId: string
+  clientId: string
 }?
+
+// TODO EES-7502 - remove the connection string alternative once every environment has moved to the ELZ.
+@description('Whether the Function App host and Durable Functions connect to their storage accounts with the user-assigned managed identity, rather than with connection strings. The code file shares still use connection strings, as Elastic Premium plans need them.')
+param identityBasedStorageConnections bool = false
 
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Function App')
 param entraIdAuthentication EntraIdAuthentication?
@@ -163,6 +168,13 @@ var slot2StorageAccountName = '${storageAccountsNamePrefix}s2'
 var functionAppCodeFileShareName = '${functionAppName}-${abbreviations.fileShare}'
 var keyVaultReferenceIdentity = userAssignedManagedIdentityParams != null ? userAssignedManagedIdentityParams!.id : null
 
+// The app settings for an identity-based connection to a storage account, named after the connection.
+func identityBasedStorageConnectionSettings(connectionName string, storageAccountName string, clientId string) object => {
+  '${connectionName}__accountName': storageAccountName
+  '${connectionName}__credential': 'managedidentity'
+  '${connectionName}__clientId': clientId
+}
+
 var storageAlerts = alerts != null
   ? {
       availability: alerts!.storageAccountAvailability
@@ -188,10 +200,12 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
   params: {
     storageAccountName: managementStorageAccountName
     sku: storageAccountSku
-    connectionStringSecret: {
-      keyVaultName: keyVaultName
-      secretName: '${managementStorageAccountName}-connection-string'
-    }
+    connectionStringSecret: identityBasedStorageConnections
+      ? null
+      : {
+          keyVaultName: keyVaultName
+          secretName: '${managementStorageAccountName}-connection-string'
+        }
     allowedSubnetIds: [subnetId]
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
@@ -377,6 +391,33 @@ module functionAppKeyVaultRoleAssignments '../../common/components/key-vault/key
   }
 }
 
+// With identity-based connections, the Function App host uses the management storage account, and Durable Functions
+// uses the slot storage accounts, through the user-assigned identity. Durable Functions needs blob, queue and table
+// access, and the host needs to own its blobs.
+var storageAccountRoles = flatten(map(
+  [managementStorageAccountName, slot1StorageAccountName, slot2StorageAccountName],
+  account => map(
+    ['Storage Blob Data Owner', 'Storage Queue Data Contributor', 'Storage Table Data Contributor'],
+    role => { storageAccountName: account, role: role }
+  )
+))
+
+module storageAccountRoleAssignments '../../common/components/storageAccountRoleAssignment.bicep' = [
+  for (assignment, index) in storageAccountRoles: if (identityBasedStorageConnections) {
+    name: '${functionAppName}StorageRoleAssignment${index}'
+    params: {
+      storageAccountName: assignment.storageAccountName
+      principalIds: [userAssignedManagedIdentityParams!.principalId]
+      role: assignment.role
+    }
+    dependsOn: [
+      manamementStorageAccountModule
+      slot1StorageAccountModule
+      slot2StorageAccountModule
+    ]
+  }
+]
+
 module azureStorageAccountsConfigModule '../../common/components/storage/file-share-mounts-for-site.bicep' = {
   name: '${functionApp.name}StorageAccountsConfigDeploy'
   params: {
@@ -401,10 +442,17 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // site is being viewed.
       'SLOT_NAME'
     ]
-    commonSettings: union(appSettings, {
-      // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName!})'
-
+    // AzureWebJobsStorage tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets"
+    // files.
+    commonSettings: union(appSettings, identityBasedStorageConnections
+      ? identityBasedStorageConnectionSettings(
+          'AzureWebJobsStorage',
+          managementStorageAccountName,
+          userAssignedManagedIdentityParams!.clientId
+        )
+      : {
+          AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName!})'
+        }, {
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
       WEBSITE_CONTENTOVERVNET: 1
@@ -438,26 +486,41 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // See https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references?tabs=azure-cli#considerations-for-azure-files-mounting.
       WEBSITE_SKIP_CONTENTSHARE_VALIDATION: 1
     })
-    stagingOnlySettings: {
+    stagingOnlySettings: union({
       SLOT_NAME: 'staging'
-      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName!})'
 
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName!})'
-    }
-    prodOnlySettings: {
+    }, identityBasedStorageConnections
+      ? identityBasedStorageConnectionSettings(
+          'DurableManagementStorage',
+          slot1StorageAccountName,
+          userAssignedManagedIdentityParams!.clientId
+        )
+      : {
+          DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName!})'
+        })
+    prodOnlySettings: union({
       SLOT_NAME: 'production'
-      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName!})'
 
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName!})'
-    }
+    }, identityBasedStorageConnections
+      ? identityBasedStorageConnectionSettings(
+          'DurableManagementStorage',
+          slot2StorageAccountName,
+          userAssignedManagedIdentityParams!.clientId
+        )
+      : {
+          DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName!})'
+        })
     azureFileShares: azureFileShares
   }
   dependsOn: [
     functionAppKeyVaultRoleAssignments
+    storageAccountRoleAssignments
     slot1FileShareModule
     slot2FileShareModule
   ]
