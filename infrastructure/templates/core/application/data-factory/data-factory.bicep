@@ -12,6 +12,9 @@ param alertsGroupName string
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to keep the name that the old ARM templates gave its Key Vault role assignment, so that legacy deploys don\'t recreate it. Off for new environments, which take the standard name.')
+param keepLegacyNames bool = true
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -30,7 +33,8 @@ module keyVaultSecretsUserRoleAssignmentModule '../../../common/components/key-v
   name: '${dataFactoryName}KeyVaultSecretsUserRoleAssignmentModule'
   params: {
     keyVaultName: keyVaultName
-    roleAssignmentNameOverride: keyVaultSecretsUserRoleAssignmentName
+    // TODO EES-7502 - remove the legacy name once every environment has moved to the ELZ.
+    roleAssignmentNameOverride: keepLegacyNames ? keyVaultSecretsUserRoleAssignmentName : null
     principalIds: [dataFactory.identity.principalId]
     role: 'Secrets User'
   }

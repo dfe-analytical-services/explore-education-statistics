@@ -56,6 +56,9 @@ param alertsGroupName string
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to keep the name that the old ARM templates gave its private endpoint connection, so that legacy deploys don\'t recreate it. Off for new environments, which take the standard name.')
+param keepLegacyNames bool = true
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -82,8 +85,9 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
     allowedSubnets: allowedSubnets
     privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
-    // TODO EES-7502 - use standardised name for private endpoint connections.
-    privateLinkServiceConnectionNameOverride: '${serverName}-pep-conn'
+    // Without the legacy name, the connection takes the private endpoint's name.
+    // TODO EES-7502 - remove the legacy name once every environment has moved to the ELZ.
+    privateLinkServiceConnectionNameOverride: keepLegacyNames ? '${serverName}-pep-conn' : null
     firewallRules: firewallRules
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays

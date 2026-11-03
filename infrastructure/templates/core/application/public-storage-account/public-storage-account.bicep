@@ -38,6 +38,9 @@ param deployAlerts bool
 @description('Whether the storage account accepts its account keys. Turned off where everything connects with a managed identity.')
 param sharedKeyAccessEnabled bool = true
 
+@description('Whether to keep the name that the old ARM templates gave the Backup vault\'s role assignment, so that legacy deploys don\'t recreate it. Off for new environments, which take the standard name.')
+param keepLegacyNames bool = true
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -92,7 +95,10 @@ module backupVaultRoleAssignmentModule '../../../common/components/storageAccoun
     storageAccountName: storageAccountModule.outputs.storageAccountName
     principalIds: [backupVault.identity.principalId]
     role: 'Storage Account Backup Contributor'
-    roleAssignmentNameOverride: guid(backupVault.id, backupContributorRoleDefinitionId, storageAccountModule.outputs.storageAccountId)
+    // TODO EES-7502 - remove the legacy name once every environment has moved to the ELZ.
+    roleAssignmentNameOverride: keepLegacyNames
+      ? guid(backupVault.id, backupContributorRoleDefinitionId, storageAccountModule.outputs.storageAccountId)
+      : null
   }
 }
 

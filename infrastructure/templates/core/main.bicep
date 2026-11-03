@@ -103,6 +103,10 @@ param storeStorageAccountConnectionStrings bool = true
 @description('Whether the core, public and logging storage accounts accept their account keys. In ELZ everything connects to them with managed identities, so the param files in "parameters/elz" turn this off.')
 param storageSharedKeyAccessEnabled bool = true
 
+// TODO EES-7502 - remove, along with the legacy names it keeps, once every environment has moved to the ELZ.
+@description('Whether to keep the names that the old ARM templates gave some role assignments and private endpoint connections, so that legacy deploys don\'t recreate them. New environments take the standard names, so the param files in "parameters/elz" turn this off.')
+param keepLegacyNames bool = true
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -293,6 +297,7 @@ module appGatewayModule 'application/applicationGateway/appGateway.bicep' = if (
 module dataFactoryModule 'application/data-factory/data-factory.bicep' = if (deployDataFactory) {
   name: 'dataFactoryModuleDeploy'
   params: {
+    keepLegacyNames: keepLegacyNames
     dataFactoryName: resourceNames.dataFactory
     alertsGroupName: alertsModule.outputs.actionGroupName
     keyVaultName: keyVaultModule.outputs.keyVaultName
@@ -324,6 +329,7 @@ module loggingStorageAccountModule 'application/logging-storage-account/logging-
 module coreStorageAccountModule 'application/core-storage-account/core-storage-account.bicep' = {
   name: 'coreStorageAccountModuleDeploy'
   params: {
+    keepLegacyNames: keepLegacyNames
     storageAccountName: resourceNames.storageAccounts.core
     sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: coreStorageAccountSku
@@ -345,6 +351,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
 module publicStorageAccountModule 'application/public-storage-account/public-storage-account.bicep' = {
   name: 'publicStorageAccountModuleDeploy'
   params: {
+    keepLegacyNames: keepLegacyNames
     storageAccountName: resourceNames.storageAccounts.public
     sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: publicStorageAccountSku
@@ -366,6 +373,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
 module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
   name: 'coreSqlServerModuleDeploy'
   params: {
+    keepLegacyNames: keepLegacyNames
     serverName: resourceNames.databases.coreSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
@@ -391,6 +399,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
 module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
   name: 'publicSqlServerModuleDeploy'
   params: {
+    keepLegacyNames: keepLegacyNames
     serverName: resourceNames.databases.publicSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
