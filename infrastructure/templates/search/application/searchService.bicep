@@ -38,6 +38,9 @@ param storageIpRules IpRange[]
 @description('Whether to store the Search storage account\'s connection string in Key Vault, for the Search Docs Function App to read.')
 param storeStorageAccountConnectionString bool = true
 
+@description('Whether the Search storage account accepts its account keys.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -86,6 +89,7 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
   name: 'searchStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.search.storageAccount
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     connectionStringSecret: storeStorageAccountConnectionString
       ? {
           keyVaultName: keyVault.name
