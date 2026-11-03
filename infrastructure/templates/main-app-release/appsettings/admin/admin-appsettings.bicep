@@ -1,5 +1,5 @@
 import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
-import { secretRefsFromSecrets } from '../../../common/functions.bicep'
+import { keylessStorageConnectionString, secretRefsFromSecrets } from '../../../common/functions.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01. Supplied by the pipeline from the environment\'s variable group ("subscription").')
 param environmentIdentifier string = ''
@@ -9,6 +9,10 @@ param environmentName string
 
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
+
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the app connects to storage accounts with its managed identity, given keyless connection strings, rather than with connection strings from Key Vault. Only the param files in "parameters/elz" turn this on.')
+param identityBasedStorageConnections bool = false
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -97,21 +101,46 @@ var secretNames = [
   resourceNames.keyVault.secrets.admin.openIdConnectValidAudience
   resourceNames.keyVault.secrets.admin.openIdConnectValidIssuers
   resourceNames.keyVault.secrets.admin.openIdConnectFullyQualifiedScopeName
-  resourceNames.keyVault.secrets.coreStorageAccountConnectionString
-  resourceNames.keyVault.secrets.importerStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publicStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
   resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId
   resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId
   resourceNames.keyVault.secrets.screener.appRegistrationClientId
-  resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString
 ]
 
-resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
+// The storage connection string secrets, only looked up when the app doesn't connect to storage with its managed
+// identity. They aren't stored in that case.
+var storageSecretNames = identityBasedStorageConnections
+  ? []
+  : [
+      resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+      resourceNames.keyVault.secrets.importerStorageAccountConnectionString
+      resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+      resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
+      resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString
+    ]
+
+resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in concat(secretNames, storageSecretNames): {
   name: '${keyVaultName}/${secretName}'
 }]
 
 var secretRefs = secretRefsFromSecrets(secrets)
+
+// Each storage account's connection string: keyless, so that the app connects with its managed identity, or else a
+// Key Vault reference.
+var storageConnectionStrings = identityBasedStorageConnections
+  ? {
+      core: keylessStorageConnectionString(resourceNames.storageAccounts.core)
+      importer: keylessStorageConnectionString(resourceNames.importer.storageAccount)
+      public: keylessStorageConnectionString(resourceNames.storageAccounts.public)
+      publisher: keylessStorageConnectionString(resourceNames.publisher.storageAccount)
+      screener: keylessStorageConnectionString(resourceNames.screener.functionStorageAccount)
+    }
+  : {
+      core: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
+      importer: secretRefs[resourceNames.keyVault.secrets.importerStorageAccountConnectionString]
+      public: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
+      publisher: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
+      screener: secretRefs[resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString]
+    }
 
 resource publicApiContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
   name: resourceNames.publicApi.apiApp
@@ -156,10 +185,10 @@ output appSettings object = {
   MemoryCache__ExpirationScanFrequencySeconds: memoryCacheConfig.expirationScanFrequencySeconds
   MemoryCache__Overrides__DurationInSeconds: memoryCacheConfig.?overridesDurationInSeconds
   MemoryCache__Overrides__ExpirySchedule: memoryCacheConfig.?overridesExpirySchedule
-  CoreStorage: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
-  ImporterStorage: secretRefs[resourceNames.keyVault.secrets.importerStorageAccountConnectionString]
-  PublicStorage: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
-  PublisherStorage: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
+  CoreStorage: storageConnectionStrings.core
+  ImporterStorage: storageConnectionStrings.importer
+  PublicStorage: storageConnectionStrings.public
+  PublisherStorage: storageConnectionStrings.publisher
   PreReleaseAccess__AccessWindow__MinutesBeforeReleaseTimeStart: preReleaseMinutesBeforeStart
   ReleaseApproval__PrepareScheduledReleaseVersionsFunctionCronSchedule: prepareScheduledReleaseVersionsFunctionCronSchedule
   ReleaseApproval__PublishScheduledReleaseVersionsFunctionCronSchedule: publishScheduledReleaseVersionsFunctionCronSchedule
@@ -174,7 +203,7 @@ output appSettings object = {
   PublicDataProcessor__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId]
   DataScreener__Url: 'https://${resourceNames.screener.functionApp}.azurewebsites.net/api'
   DataScreener__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.screener.appRegistrationClientId]
-  DataScreener__ScreenerStorage: secretRefs[resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString]
+  DataScreener__ScreenerStorage: storageConnectionStrings.screener
   DataScreener__ScreenerProgressUpdateIntervalSeconds: 5
   DataScreener__ScreenerProgressUpdateFailureIntervalMinutes: 1440
   DataProtection__KeyVaultKeyUri: dataProtectionKeyUri
