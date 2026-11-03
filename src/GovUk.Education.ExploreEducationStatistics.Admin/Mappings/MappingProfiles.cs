@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
 using DataBlockVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockVersionViewModel;
@@ -40,8 +39,6 @@ public class MappingProfiles : Profile
         CreateMap<MethodologyVersion, IdTitleViewModel>();
 
         CreateMap<Theme, IdTitleViewModel>();
-        CreateMap<Publication, PublicationSummaryViewModel>()
-            .ForMember(dest => dest.Contact, m => m.MapFrom(p => ContactViewModel.FromModel(p.Contact)));
         CreateMap<Publication, PublicationViewModel>().ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
         CreateMap<Publication, PublicationCreateViewModel>()
             .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme))
