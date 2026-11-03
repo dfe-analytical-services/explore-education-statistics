@@ -25,3 +25,7 @@ param sqlServerIdentityBasedAuditStorage = true
 // The apps connect to the core and public storage accounts with their managed identities, so their connection strings
 // aren't stored.
 param storeStorageAccountConnectionStrings = false
+
+// Everything connects to the core, public and logging storage accounts with managed identities, so they don't accept
+// account keys.
+param storageSharedKeyAccessEnabled = false

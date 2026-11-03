@@ -76,6 +76,10 @@ param functionAppContentShares bool = true
 @description('Whether to store the Importer\'s, Notifier\'s and Publisher\'s storage account connection strings in Key Vault. The apps read them in legacy. In ELZ they connect with their managed identities instead, so the param files in "parameters/elz" turn this off.')
 param storeStorageAccountConnectionStrings bool = true
 
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the Importer\'s, Notifier\'s and Publisher\'s storage accounts accept their account keys. In ELZ everything connects to them with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
 var tagValues = union(tags, {
   Environment: environmentConfig.environmentName!
@@ -266,6 +270,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
     useUserAssignedIdentity: deployAppIdentities
     deployContentShare: functionAppContentShares
     storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: importerStorageAccountSku
@@ -291,6 +296,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     useUserAssignedIdentity: deployAppIdentities
     deployContentShare: functionAppContentShares
     storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: notifierStorageAccountSku
@@ -318,6 +324,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     useUserAssignedIdentity: deployAppIdentities
     deployContentShare: functionAppContentShares
     storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: publisherStorageAccountSku

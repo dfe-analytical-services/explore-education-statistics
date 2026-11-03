@@ -24,6 +24,10 @@ param deployAppIdentities bool = false
 @description('Whether the Search Docs Function App connects to the search storage account with its managed identity, given a keyless connection string, rather than with a connection string from Key Vault, which then isn\'t stored. Only the param files in "parameters/elz" turn this on.')
 param identityBasedStorageConnections bool = false
 
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the search storage account accepts its account keys. In ELZ everything connects to it with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -182,6 +186,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
     storeStorageAccountConnectionString: !identityBasedStorageConnections
+    storageSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     tagValues: tagValues
   }
