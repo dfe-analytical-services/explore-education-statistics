@@ -1,20 +1,33 @@
+import datetime
 import json
 import os.path
 
 
 def get_local_storage_json_from_browser(driver) -> dict:
     local_storage_string = driver.execute_script("""
-        return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
-          try {
-            acc[key] = JSON.parse(value);
-          } catch (e) {
-            acc[key] = value;
-          }
-          return acc;
-        }, {}));
-        """)
+         return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
+             try {
+                 acc[key] = JSON.parse(value);
+             } catch (e) {
+                 acc[key] = value;
+             }
+             return acc;
+         }, {}));
+         """)
 
-    return json.loads(local_storage_string)
+    local_storage_json = json.loads(local_storage_string)
+    encryption_cookie = driver.get_cookie("msal.cache.encryption")
+    expires = datetime.datetime.now() + datetime.timedelta(minutes=15)
+    local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE"] = encryption_cookie["value"]
+    local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES"] = expires.isoformat()
+
+    return local_storage_json
+
+
+def clear_browser_local_storage(driver):
+    driver.execute_script("""
+        window.localStorage.clear();
+    """)
 
 
 def get_local_storage_filename_for_user(user: str) -> str:
@@ -60,29 +73,10 @@ def clear_local_storage_file(user: str):
 
 
 def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
-    for key, value in local_storage_json.items():
-        # If value is already a dict, check it directly
-        if isinstance(value, dict):
-            if value.get("credentialType") == "AccessToken":
-                return value["secret"]
-            continue
+    robot_test_access_token = local_storage_json.get("ees_robotTests")
 
-        # Skip if value isn't a string (though in local storage they usually are)
-        if not isinstance(value, str):
-            continue
-
-        try:
-            # Try to turn the string value into a dictionary
-            entry_data = json.loads(value)
-
-            if isinstance(entry_data, dict):
-                # Check if this dictionary is the AccessToken we want
-                if entry_data.get("credentialType") == "AccessToken":
-                    return entry_data["secret"]
-
-        except (json.JSONDecodeError, TypeError):
-            # If the string isn't JSON (like "msal.version": "3.30.0"), just skip it
-            continue
+    if robot_test_access_token:
+        return robot_test_access_token["value"]
 
     # If we get here, we've exhausted the loop
     raise RuntimeError("Unable to find access token from local storage JSON")
@@ -91,3 +85,17 @@ def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
 def get_access_token_from_file(user: str) -> str:
     local_storage_json = read_local_storage_json_from_file(user)
     return get_access_token_from_local_storage_json(local_storage_json)
+
+
+def has_encryption_cookie_expired(usr: str) -> bool:
+    local_storage_json = read_local_storage_json_from_file(usr)
+    expires = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES")
+    if expires:
+        return datetime.datetime.now() > datetime.datetime.fromisoformat(expires)
+    return True
+
+
+def write_auth_encryption_to_cookie(local_storage_json: dict, driver):
+    encryption_cookie = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE")
+
+    driver.add_cookie({"name": "msal.cache.encryption", "value": encryption_cookie})
