@@ -28,6 +28,7 @@ public class FootnoteRepository : IFootnoteRepository
         var footnote = new Footnote
         {
             Releases = new List<ReleaseFootnote> { new() { ReleaseVersionId = releaseVersionId } },
+            ReleaseVersionId = releaseVersionId,
             Content = content,
             Order = order,
             Filters = filterIds.Select(filterId => new FilterFootnote { FilterId = filterId }).ToList(),
