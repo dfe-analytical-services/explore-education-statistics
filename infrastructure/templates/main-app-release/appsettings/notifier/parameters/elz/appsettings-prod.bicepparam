@@ -4,3 +4,6 @@ using '../../notifier-appsettings.bicep'
 extends '../appsettings-prod.bicepparam'
 
 param elz = true
+
+// Connect to storage accounts with the app's managed identity rather than connection strings from Key Vault.
+param identityBasedStorageConnections = true
