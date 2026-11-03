@@ -23,6 +23,11 @@ func removeMultiple(input string, removals string[]) string =>
   }))
 
 @export()
+@description('Builds the connection string for an app to reach a PostgreSQL database with its managed identity.')
+func publicDataDbConnectionString(postgreSqlServerName string, managedIdentityName string) string =>
+  'Server=${postgreSqlServerName}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${managedIdentityName}'
+
+@export()
 func keyVaultRef(vaultUri string, secretName string) string =>
   '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/${secretName}/)'
 

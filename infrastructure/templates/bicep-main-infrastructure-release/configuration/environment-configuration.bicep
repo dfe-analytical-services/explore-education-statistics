@@ -12,23 +12,11 @@ type EnvironmentConfig = {
   @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
   domain: string?
 
-  @description('Cron expression that defines when the PrepareScheduledReleaseVersions function runs in the Publisher Function App.')
-  prepareScheduledReleaseVersionsFunctionCronSchedule: string?
-
-  @description('Cron expression that defines when the PublishScheduledReleaseVersions function runs in the Publisher Function App')
-  publishScheduledReleaseVersionsFunctionCronSchedule: string?
-
-  @description('Maximum number of table cells that a table builder query could potentially render for a request to be valid.')
-  tableBuilderMaxTableCellsAllowed: int?
-
   @description('Whether or not to enable autoscaling of App Services in this environment.')
   autoscaleAppServices: bool?
 
   @description('Whether or not to enable detailed error messages in this environment.')
   detailedErrors: bool?
-
-  @description('Whether or not to enable Swagger API pages in this environment.')
-  enableSwagger: bool?
 
   @description('Additional CORS allowed origins for the Admin site.')
   additionalAdminAllowedOrigins: string[]?
@@ -38,9 +26,6 @@ type EnvironmentConfig = {
 
   @description('Whether analytics is enabled.')
   analyticsEnabled: bool?
-
-  @description('Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance).')
-  basicAuthEnabled: bool?
 
   @description('Number of days to retain blobs after delete.')
   blobDeleteRetentionDays: int?
@@ -54,25 +39,12 @@ type EnvironmentPipelineVariables = {
 }
 
 var defaultConfig = {
-  enableSwagger: false
   detailedErrors: false
   autoscaleAppServices: true
   analyticsEnabled: true
-  basicAuthEnabled: false
-  memoryCacheConfig: {
-    expirationScanFrequencySeconds: 60
-    maxCacheSizeMb: 50
-  }
-  tableBuilderMaxTableCellsAllowed: 1000000
-  prepareScheduledReleaseVersionsFunctionCronSchedule: '0 5 0 * * *'
-  publishScheduledReleaseVersionsFunctionCronSchedule: '0 30 9 * * *'
   blobDeleteRetentionDays: 90
 }
 
 @export()
 func mergeEnvironmentConfig(overridden EnvironmentConfig) EnvironmentConfig =>
-  union(
-    defaultConfig,
-    overridden,
-    union(defaultConfig.memoryCacheConfig, overridden.?memoryCacheConfig ?? {})
-  )
+  union(defaultConfig, overridden)

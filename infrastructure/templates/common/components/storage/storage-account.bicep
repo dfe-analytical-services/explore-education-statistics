@@ -23,11 +23,14 @@ param kind StorageAccountKind = 'StorageV2'
 @description('The access tier for Blob access.')
 param accessTier 'Hot' | 'Cool' | 'Cold' | 'Premium' = 'Hot'
 
-@description('Key Vault Name.  If specified, a Key Vault secret will be added for this storage account connection string.')
-param keyVaultName string?
+@description('Key Vault secret in which to store this storage account\'s connection string. The connection string is only stored if this is supplied, so only supply it where something reads the secret.')
+param connectionStringSecret {
+  @description('Name of the Key Vault in which to store the secret.')
+  keyVaultName: string
 
-@description('The name of the Key Vault secret holding the connection string for this storage account. Defaults to "<storageAccountName>-connection-string" if not supplied.')
-param connectionStringSecretNameOverride string?
+  @description('Name of the secret.')
+  secretName: string
+}?
 
 @description('Whether the storage account is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
@@ -168,30 +171,16 @@ module latencyAlert '../alerts/staticMetricAlert.bicep' = if (alerts != null && 
 var key = storageAccount.listKeys().keys[0].value
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
-// TODO EES-7502 - make secret names consistent.
-var connectionStringSecretName = connectionStringSecretNameOverride ?? '${storageAccountName}-connection-string'
-
-module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null) {
+module storeADOConnectionStringToKeyVault '../key-vault/keyVaultSecret.bicep' = if (connectionStringSecret != null) {
   name: '${storageAccountName}ConnectionStringSecretDeploy'
   params: {
-    keyVaultName: keyVaultName!
-    secretName: connectionStringSecretName
+    keyVaultName: connectionStringSecret!.keyVaultName
+    secretName: connectionStringSecret!.secretName
     secretValue: storageAccountConnectionString
-  }
-}
-
-var accessKeySecretName = '${storageAccountName}-access-key'
-
-module storeAccessKeyToKeyVault '../key-vault/keyVaultSecret.bicep' = if (keyVaultName != null) {
-  name: '${storageAccountName}AccessKeySecretDeploy'
-  params: {
-    keyVaultName: keyVaultName!
-    secretValue: key
-    secretName: accessKeySecretName
   }
 }
 
 output storageAccountId string = storageAccount.id
 output storageAccountName string = storageAccount.name
-output connectionStringSecretName string = connectionStringSecretName
-output accessKeySecretName string = accessKeySecretName
+@description('Name of the Key Vault secret holding the connection string, or null if it isn\'t stored.')
+output connectionStringSecretName string? = connectionStringSecret.?secretName

@@ -1,11 +1,14 @@
 import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
 import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
-@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
-param environmentIdentifier string
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01. Supplied by the pipeline from the environment\'s variable group ("subscription").')
+param environmentIdentifier string = ''
 
 @description('Name of this environment e.g. Development, Test.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('Number of rows processed per batch during data file import.')
 param rowsPerBatch int = 3000
@@ -21,6 +24,7 @@ param deployedAt string = ''
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentIdentifier
   environmentName: environmentName
+  elz: elz
 })
 
 var keyVaultName = resourceNames.keyVault.keyVault

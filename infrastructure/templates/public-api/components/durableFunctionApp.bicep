@@ -184,8 +184,11 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
   name: '${managementStorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: managementStorageAccountName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${managementStorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       blob: privateEndpoints.storageAccounts
@@ -204,8 +207,11 @@ module slot1StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot1StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot1StorageAccountName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${slot1StorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       file: privateEndpoints.storageAccounts
@@ -239,8 +245,11 @@ module slot2StorageAccountModule '../../common/components/storage/storage-accoun
   name: '${slot2StorageAccountName}StorageAccountDeploy'
   params: {
     storageAccountName: slot2StorageAccountName
+    connectionStringSecret: {
+      keyVaultName: keyVaultName
+      secretName: '${slot2StorageAccountName}-connection-string'
+    }
     allowedSubnetIds: [subnetId]
-    keyVaultName: keyVaultName
     publicNetworkAccessEnabled: false
     privateEndpointSubnetIds: {
       file: privateEndpoints.storageAccounts
@@ -388,7 +397,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     ]
     commonSettings: union(appSettings, {
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
-      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName})'
+      AzureWebJobsStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${manamementStorageAccountModule.outputs.connectionStringSecretName!})'
 
       // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
       // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
@@ -425,19 +434,19 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       SLOT_NAME: 'staging'
-      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
+      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName!})'
 
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName})'
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot1StorageAccountModule.outputs.connectionStringSecretName!})'
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
-      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
+      DurableManagementStorage: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName!})'
 
       // The following property tell the Function App slot that its deployment code file share (as identified by the WEBSITE_CONTENTSHARE setting)
       // resides in the specified Storage account.
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName})'
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${slot2StorageAccountModule.outputs.connectionStringSecretName!})'
     }
     azureFileShares: azureFileShares
   }

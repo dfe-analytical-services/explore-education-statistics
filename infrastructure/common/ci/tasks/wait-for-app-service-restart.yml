@@ -28,7 +28,7 @@ parameters:
     type: string
   - name: pollingDelaySeconds
     type: number
-    default: 2
+    default: 5
   - name: maxAttempts
     type: number
     default: 60

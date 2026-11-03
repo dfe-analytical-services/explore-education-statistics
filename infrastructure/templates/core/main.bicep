@@ -13,6 +13,9 @@ param location string = resourceGroup().location
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 @description('The public site URL for use with Azure Front Door.')
 param publicSiteUrl string = ''
 
@@ -83,7 +86,7 @@ param sqlAzureAdministratorLogin string = ''
 param sqlAzureAdministratorSid string = ''
 
 @description('Whether or not public access is enabled for the Core and Public SQL Servers.')
-param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Enabled'
+param sqlServerPublicNetworkAccess 'Enabled' | 'Disabled' = 'Disabled'
 
 @description('Email addresses to notify for SQL security alerts and vulnerability assessment scans.')
 param teamEmailAddresses string[] = []
@@ -134,6 +137,7 @@ var tagValues = union(resourceTags ?? {}, {
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
+  elz: elz
 })
 
 module vNetModule 'application/virtual-network/virtual-network.bicep' = {
@@ -286,6 +290,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.core
+    connectionStringSecretName: resourceNames.keyVault.secrets.coreStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -302,6 +307,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   name: 'publicStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.public
+    connectionStringSecretName: resourceNames.keyVault.secrets.publicStorageAccountConnectionString
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName

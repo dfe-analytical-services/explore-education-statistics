@@ -79,11 +79,14 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
   name: 'searchStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.search.storageAccount
+    connectionStringSecret: {
+      keyVaultName: keyVault.name
+      secretName: resourceNames.keyVault.secrets.searchStorageAccountConnectionString
+    }
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    keyVaultName: keyVault.name
     alerts: {
       availability: true
       latency: false
@@ -115,7 +118,7 @@ module searchServiceBlobRoleAssignmentModule '../../common/components/storageAcc
 
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
-output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName
+output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName!
 output searchStorageAccountManagedIdentityConnectionString string = 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
 output searchStorageDocumentContainers object = searchStorageDocumentContainers

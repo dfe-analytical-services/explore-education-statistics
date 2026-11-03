@@ -21,6 +21,8 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml
+
             - template: ../../../../common/ci/tasks/update-azure-cli-and-extensions.yml
 
             - template: ../tasks/deploy-bicep.yml

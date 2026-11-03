@@ -1,6 +1,6 @@
 ---
 title: Versioning
-last_reviewed_on: 2025-07-17
+last_reviewed_on: 2026-10-28
 review_in: 6 months
 weight: 4
 ---
@@ -44,7 +44,10 @@ The following are considered **minor** changes:
 - indicator details were updated (e.g. label, unit, decimal places)
 - data values were updated
 
-**Patch** versions represent a replacement of a data set within a release. This can include equivalent changes to a minor update, but not major update changes. They are primarily data corrections or in-cycle data updates (e.g. planned revisions).
+**Patch** versions represent a replacement of a data set within a release. They are primarily data corrections or in-cycle data updates (e.g. planned revisions), and usually only include changes equivalent to a minor update.
+
+In exceptional circumstances, a patch version may include major (breaking) changes. These are only
+allowed after review by the EES team, and will always be listed in the data set's changelog.
 
 As long as you have specified a data set version to use, any query that you have previously created
 should continue to work as normal regardless of new versions being published.
@@ -82,3 +85,7 @@ For example:
 
 - `dataSetVersion=*` uses the latest major and minor version
 - `dataSetVersion=2.*` uses the latest minor version of the v2 series
+
+As patch versions may occasionally include major changes, using a wildcard could mean your query
+receives breaking changes without warning. If your code relies on a specific set of facets or
+indicators, we recommend specifying an exact version and checking the changelog before upgrading.

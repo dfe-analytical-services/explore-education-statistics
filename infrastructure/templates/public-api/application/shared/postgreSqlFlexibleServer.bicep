@@ -1,7 +1,6 @@
 import { IpRange } from '../../../common/types.bicep'
 import { ResourceNames } from '../../../common/resource-names.bicep'
 import { PrincipalNameAndId, PostgreSqlFlexibleServerConfig } from '../../types.bicep'
-import { replaceMultiple } from '../../../common/functions.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
@@ -46,12 +45,6 @@ var formattedFirewallRules = map(firewallRules, rule => {
 })
 
 var serverName = resourceNames.databases.postgreSqlFlexibleServer
-
-func createManagedIdentityConnectionString(templateString string, identityName string) string =>
-  replaceMultiple(templateString, {
-    '[database_name]': 'public_data'
-    '[managed_identity_name]': identityName
-  })
 
 module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
@@ -109,48 +102,3 @@ module backupInstanceModule '../../../common/components/data-protection/postgres
   }
 }
 
-var connectionStringTemplate = postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
-
-var dataProcessorPsqlConnectionStringSecretKey = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
-
-module storeDataProcessorPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storeDataProcessorPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.keyVault.keyVault
-    secretName: dataProcessorPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.publicApi.processor.identity
-    )
-  }
-}
-
-var publisherPsqlConnectionStringSecretKey = 'ees-publisher-connectionstring-publicdatadb'
-
-module storePublisherPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storePublisherPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.keyVault.keyVault
-    secretName: publisherPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.publisher.functionApp
-    )
-  }
-}
-
-var adminPsqlConnectionStringSecretKey = 'ees-admin-connectionstring-publicdatadb'
-
-module storeAdminPsqlConnectionString '../../../common/components/key-vault/keyVaultSecret.bicep' = {
-  name: 'storeAdminPsqlConnectionString'
-  params: {
-    keyVaultName: resourceNames.keyVault.keyVault
-    secretName: adminPsqlConnectionStringSecretKey
-    secretValue: createManagedIdentityConnectionString(
-      connectionStringTemplate,
-      resourceNames.admin.appService
-    ) 
-  }
-}
-
-output managedIdentityConnectionStringTemplate string = connectionStringTemplate

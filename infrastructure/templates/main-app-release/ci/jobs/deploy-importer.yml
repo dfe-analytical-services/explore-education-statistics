@@ -24,6 +24,8 @@ jobs:
           steps:
             - checkout: self
 
+            - template: ../../../../common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml
+
             - template: ../../../../common/ci/tasks/get-resource-names.yml
               parameters:
                 environment: ${{ parameters.environment }}

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.TheoryData;
@@ -1189,6 +1190,70 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
         }
 
         [Fact]
+        public async Task PatchVersionWithMajorChanges_Returns400()
+        {
+            var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: true);
+
+            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id);
+
+            response
+                .AssertValidationProblem()
+                .AssertHasError("dataSetVersionId", ValidationMessages.DataSetVersionMappingResultedInMajorChange.Code);
+        }
+
+        [Fact]
+        public async Task PatchVersionWithMajorChanges_BauUserAllowsMajorVersionUpdate_Success()
+        {
+            var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: true);
+
+            var processorClientMock = SetupProcessorClient(nextDataSetVersion);
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: nextDataSetVersion.Id,
+                allowMajorVersionUpdate: true
+            );
+
+            MockUtils.VerifyAllMocks(processorClientMock);
+
+            var viewModel = response.AssertOk<DataSetVersionSummaryViewModel>();
+
+            Assert.Equal(nextDataSetVersion.Id, viewModel.Id);
+            Assert.Equal("1.0.1", viewModel.Version);
+        }
+
+        [Fact]
+        public async Task PatchVersionWithMajorChanges_NonBauUserAllowsMajorVersionUpdate_Returns403()
+        {
+            // CanManagePublicApiDataSets is currently BAU-only, so requesting a major version update
+            // does not bypass the authorisation check for non-BAU users.
+            ClaimsPrincipal identityUser = DataFixture.StandardUser();
+
+            var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: true);
+
+            var response = await CompleteNextVersionImport(
+                dataSetVersionId: nextDataSetVersion.Id,
+                allowMajorVersionUpdate: true,
+                user: identityUser
+            );
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task PatchVersionWithoutMajorChanges_Success()
+        {
+            var nextDataSetVersion = await SetupPatchVersion(hasMajorChanges: false);
+
+            var processorClientMock = SetupProcessorClient(nextDataSetVersion);
+
+            var response = await CompleteNextVersionImport(dataSetVersionId: nextDataSetVersion.Id);
+
+            MockUtils.VerifyAllMocks(processorClientMock);
+
+            response.AssertOk<DataSetVersionSummaryViewModel>();
+        }
+
+        [Fact]
         public async Task EmptyRequiredFields_Return400()
         {
             var response = await CompleteNextVersionImport(dataSetVersionId: Guid.Empty);
@@ -1198,8 +1263,77 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
             validationProblem.AssertHasNotEmptyError("dataSetVersionId");
         }
 
+        private async Task<DataSetVersion> SetupPatchVersion(bool hasMajorChanges)
+        {
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(
+                    DataFixture
+                        .DefaultReleaseVersion()
+                        .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()))
+                )
+                .WithFile(DataFixture.DefaultFile(FileType.Data));
+
+            await fixture.GetContentDbContext().AddTestData(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture.DefaultDataSet().WithStatusPublished();
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion currentDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dsv.DataSet.LatestLiveVersion = dsv);
+
+            DataSetVersion nextDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1, indicators: 1, locations: 1, timePeriods: 2)
+                .WithVersionNumber(major: 1, minor: 0, patch: 1)
+                .WithStatusMapping()
+                .WithDataSet(dataSet)
+                .WithRelease(DataFixture.DefaultDataSetVersionRelease().WithReleaseFileId(releaseFile.Id))
+                .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(currentDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithHasDeletedTimePeriods(hasMajorChanges);
+
+            await fixture
+                .GetPublicDataDbContext()
+                .AddTestData(context =>
+                {
+                    context.DataSetVersions.AddRange(currentDataSetVersion, nextDataSetVersion);
+                    context.DataSets.Update(dataSet);
+                    context.DataSetVersionMappings.Add(mapping);
+                });
+
+            return nextDataSetVersion;
+        }
+
+        private Mock<IProcessorClient> SetupProcessorClient(DataSetVersion nextDataSetVersion)
+        {
+            var processorClientMock = fixture.GetProcessorClientMock();
+
+            processorClientMock
+                .Setup(c => c.CompleteNextDataSetVersionImport(nextDataSetVersion.Id, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() =>
+                    new ProcessDataSetVersionResponseViewModel
+                    {
+                        DataSetId = nextDataSetVersion.DataSetId,
+                        DataSetVersionId = nextDataSetVersion.Id,
+                        InstanceId = Guid.NewGuid(),
+                    }
+                );
+
+            return processorClientMock;
+        }
+
         private async Task<HttpResponseMessage> CompleteNextVersionImport(
             Guid dataSetVersionId,
+            bool allowMajorVersionUpdate = false,
             ClaimsPrincipal? user = null
         )
         {
@@ -1209,7 +1343,13 @@ public abstract class DataSetVersionsControllerTests(DataSetVersionsControllerTe
 
             return await client.PostAsync(
                 uri,
-                new JsonNetContent(new NextDataSetVersionCompleteImportRequest { DataSetVersionId = dataSetVersionId })
+                new JsonNetContent(
+                    new NextDataSetVersionCompleteImportRequest
+                    {
+                        DataSetVersionId = dataSetVersionId,
+                        AllowMajorVersionUpdate = allowMajorVersionUpdate,
+                    }
+                )
             );
         }
     }

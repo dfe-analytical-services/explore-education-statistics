@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Events;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
@@ -20,12 +19,7 @@ public interface IAdminEventRaiser
 
     Task OnPublicationChanged(Publication publication);
 
-    Task OnPublicationDeleted(
-        Guid publicationId,
-        string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease,
-        IReadOnlyList<Guid> releaseIds
-    );
+    Task OnPublicationDeleted(Guid publicationId, string publicationSlug, IReadOnlyList<Guid> releaseIds);
 
     Task OnPublicationLatestPublishedReleaseReordered(
         Publication publication,

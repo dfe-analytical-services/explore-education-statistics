@@ -54,6 +54,7 @@ public interface IDataSetVersionService
 
     Task<Either<ActionResult, DataSetVersionSummaryViewModel>> CompleteNextVersionImport(
         Guid dataSetVersionId,
+        bool allowMajorVersionUpdate = false,
         CancellationToken cancellationToken = default
     );
 

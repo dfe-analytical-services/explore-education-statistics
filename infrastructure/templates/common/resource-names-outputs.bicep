@@ -13,7 +13,11 @@ param environmentIdentifier string
 @description('Name of this environment e.g. Development, Test.')
 param environmentName string
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions.')
+param elz bool = false
+
 output resourceNames ResourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentIdentifier
   environmentName: environmentName
+  elz: elz
 })

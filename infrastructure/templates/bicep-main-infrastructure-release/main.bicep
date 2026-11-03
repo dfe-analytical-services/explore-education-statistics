@@ -40,6 +40,9 @@ param dateProvisioned string = utcNow('u')
 //
 param environmentConfigParam EnvironmentConfig = {}
 
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
+
 // Merge default configuration with overridden configuration.
 var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
 
@@ -171,6 +174,7 @@ param publicSiteProdAppSettings object = {}
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentConfig.environmentIdentifier!
   environmentName: environmentConfig.environmentName!
+  elz: elz
 })
 
 var minTlsVersion = '1.2'

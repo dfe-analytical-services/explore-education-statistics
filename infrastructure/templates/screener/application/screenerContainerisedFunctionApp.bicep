@@ -164,6 +164,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     dockerPullManagedIdentityClientId: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
     dockerPullManagedIdentitySecretValue: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     deploymentStorageAccountName: resourceNames.screener.functionStorageAccount
+    deploymentStorageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.admin.screenerStorageAccountConnectionString
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     publicNetworkAccessEnabled: true

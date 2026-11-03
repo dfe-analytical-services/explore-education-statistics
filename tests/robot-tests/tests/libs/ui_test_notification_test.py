@@ -32,10 +32,6 @@ def _teams_content(notification) -> dict:
     return notification.to_teams_card()["attachments"][0]["content"]
 
 
-def _slack_fields(notification) -> list[str]:
-    return [field["text"] for field in notification.to_slack_blocks()[1]["fields"]]
-
-
 def _results(
     failed: int = 0,
     run_attempts: int = 1,
@@ -94,24 +90,12 @@ class UiTestReportTests(unittest.TestCase):
     def setUp(self):
         self.notification = ui_test_report(_results(), ARTIFACTS_URL)
 
-    def test_slack_blocks_contain_the_expected_facts(self):
-        self.assertEqual(
-            [f"*{title}*" for title in EXPECTED_FACT_TITLES],
-            [field.split("\n")[0] for field in _slack_fields(self.notification)],
-        )
-
-    def test_teams_card_contains_the_same_facts(self):
+    def test_teams_card_contains_facts(self):
         facts = _teams_content(self.notification)["body"][1]["facts"]
 
         self.assertEqual(EXPECTED_FACT_TITLES, [fact["title"] for fact in facts])
 
-    def test_slack_blocks_report_the_environment_and_suite(self):
-        fields = _slack_fields(self.notification)
-
-        self.assertIn("*Environment*\npreprod", fields)
-        self.assertIn("*Suite*\nadmin", fields)
-
-    def test_teams_card_reports_the_same_environment_and_suite(self):
+    def test_teams_card_reports_environment_and_suite(self):
         facts = _teams_content(self.notification)["body"][1]["facts"]
 
         self.assertEqual("preprod", next(fact["value"] for fact in facts if fact["title"] == "Environment"))
@@ -142,15 +126,7 @@ class UiTestReportTests(unittest.TestCase):
     def test_failing_run_is_coloured_warning(self):
         self.assertEqual(WARNING, ui_test_report(_results(failed=2)).colour)
 
-    def test_slack_blocks_list_the_failed_suites(self):
-        notification = ui_test_report(_results(failed=1, failed_suites=("tests/admin/bau/publication.robot",)))
-        blocks = notification.to_slack_blocks()
-
-        self.assertEqual("*Failed test suites* (1)", blocks[3]["text"]["text"])
-        listed = blocks[4]["elements"][0]["elements"][0]["elements"][0]["text"]
-        self.assertEqual("bau/publication.robot", listed)
-
-    def test_teams_card_lists_the_same_failed_suites(self):
+    def test_teams_card_lists_failed_suites(self):
         notification = ui_test_report(_results(failed=1, failed_suites=("tests/admin/bau/publication.robot",)))
         body = _teams_content(notification)["body"]
 
@@ -160,7 +136,6 @@ class UiTestReportTests(unittest.TestCase):
     def test_omits_the_failed_suites_section_for_a_passing_run(self):
         notification = ui_test_report(_results())
 
-        self.assertEqual(2, len(notification.to_slack_blocks()))
         self.assertEqual(2, len(_teams_content(notification)["body"]))
 
     def test_teams_card_links_to_the_pipeline_artifacts(self):
@@ -172,10 +147,6 @@ class UiTestReportTests(unittest.TestCase):
 
     def test_teams_card_has_no_action_outside_a_pipeline(self):
         self.assertNotIn("actions", _teams_content(ui_test_report(_results())))
-
-    def test_attaches_the_results_archive_only_when_there_is_something_to_investigate(self):
-        self.assertIsNone(ui_test_report(_results()).results_archive_name)
-        self.assertIsNotNone(ui_test_report(_results(run_attempts=2)).results_archive_name)
 
 
 class MultiLineError(Exception):
@@ -193,12 +164,7 @@ class UiTestExceptionTests(unittest.TestCase):
     def test_is_coloured_attention(self):
         self.assertEqual(ATTENTION, self.notification.colour)
 
-    def test_slack_blocks_contain_the_error_details(self):
-        section = self.notification.to_slack_blocks()[-1]
-
-        self.assertEqual("*Error details*\nValueError('boom')", section["text"]["text"])
-
-    def test_teams_card_contains_the_same_error_details(self):
+    def test_teams_card_contains_the_error_details(self):
         body = _teams_content(self.notification)["body"]
 
         self.assertEqual("Error details", body[2]["text"])

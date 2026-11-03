@@ -5,24 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Events;
 
 public record PublicationDeletedEvent : IEvent
 {
-    public PublicationDeletedEvent(
-        Guid publicationId,
-        string publicationSlug,
-        LatestPublishedReleaseInfo? latestPublishedRelease,
-        IReadOnlyList<Guid> releaseIds
-    )
+    public PublicationDeletedEvent(Guid publicationId, string publicationSlug, IReadOnlyList<Guid> releaseIds)
     {
         Subject = publicationId.ToString();
-        Payload = new EventPayload
-        {
-            PublicationSlug = publicationSlug,
-            LatestPublishedRelease = latestPublishedRelease,
-            ReleaseIds = releaseIds,
-        };
+        Payload = new EventPayload { PublicationSlug = publicationSlug, ReleaseIds = releaseIds };
     }
 
     // Changes to this event should also increment the version accordingly.
-    private const string DataVersion = "1.1";
+    private const string DataVersion = "2.0";
     private const string EventType = PublicationChangedEventTypes.PublicationDeleted;
 
     // Which Topic endpoint to use from the appsettings
@@ -41,14 +31,13 @@ public record PublicationDeletedEvent : IEvent
     public record EventPayload
     {
         public required string PublicationSlug { get; init; }
-        public required LatestPublishedReleaseInfo? LatestPublishedRelease { get; init; }
 
         /// <summary>
-        /// The ids of every Release that belonged to the deleted Publication.
+        /// The Release Ids that belonged to the deleted Publication.
         /// </summary>
         /// <remarks>
-        /// A subscriber cannot look these up once the Publication is gone, and a searchable document is
-        /// named after the Release it was built from, so they have to travel with the event.
+        /// A subscriber cannot look these up after the Publication is deleted,
+        /// which is why they are included in the event payload.
         /// </remarks>
         public required IReadOnlyList<Guid> ReleaseIds { get; init; }
     }

@@ -1,4 +1,5 @@
 import { abbreviations } from 'abbreviations.bicep'
+import { elzAbbreviations } from 'abbreviations-elz.bicep'
 import { eventTopics } from 'eventTopics.bicep'
 
 @export()
@@ -9,6 +10,9 @@ type ResourceNamingContext = {
 
   @description('Name of this environment e.g. Development, Test.')
   environmentName: string
+
+  @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions rather than the legacy one. Defaults to false.')
+  elz: bool?
 }
 
 @export()
@@ -270,7 +274,6 @@ type ResourceNames = {
       publisher: {
         databaseUserPassword: string
         notifyApiKey: string
-        publicDataDbConnectionString: string
       }
       screener: {
         appRegistrationClientId: string
@@ -281,7 +284,10 @@ type ResourceNames = {
       notifierStorageAccountConnectionString: string
       publicStorageAccountConnectionString: string
       publisherStorageAccountConnectionString: string
-      publicApiContainerAppPrivateUrl: string
+      analyticsStorageAccountConnectionString: string
+      nlSearchStorageAccountConnectionString: string
+      searchDocsStorageAccountConnectionString: string
+      searchStorageAccountConnectionString: string
     }
   }
   alertsGroup: string
@@ -307,13 +313,15 @@ type ResourceNames = {
 // TODO EES-7502 - use standardised naming convention for Core and Notifier storage, which use
 // "storage" rather than "sa" in Test and Pre-Production.
 @export()
-func getResourceNamesForEnvironment(context ResourceNamingContext) ResourceNames => getResourceNames(
-  context.environmentIdentifier,
-  '${context.environmentIdentifier}-ees-papi',
-  '${context.environmentIdentifier}-ees-sapi',
-  '${context.environmentIdentifier}-ees',
-  (context.environmentName == 'Test' || context.environmentName == 'Pre-Production') ? 'storage' : abbreviations.storageStorageAccounts
-)
+func getResourceNamesForEnvironment(context ResourceNamingContext) ResourceNames => (context.?elz ?? false)
+  ? getElzResourceNames(context.environmentIdentifier)
+  : getResourceNames(
+      context.environmentIdentifier,
+      '${context.environmentIdentifier}-ees-papi',
+      '${context.environmentIdentifier}-ees-sapi',
+      '${context.environmentIdentifier}-ees',
+      (context.environmentName == 'Test' || context.environmentName == 'Pre-Production') ? 'storage' : abbreviations.storageStorageAccounts
+    )
 
 func getResourceNames(
   legacyResourcePrefix string,
@@ -586,18 +594,20 @@ func getResourceNames(
       publisher: {
         databaseUserPassword: 'ees-sql-password-publisher'
         notifyApiKey: 'ees-publisher-govuknotify-api-key'
-        publicDataDbConnectionString: 'ees-publisher-connectionstring-publicdatadb'
       }
       screener: {
         appRegistrationClientId: 'ees-screener-app-registration-client-id'
       }
-      publicApiContainerAppPrivateUrl: 'ees-publicapi-public-api-containerapp-private-url'
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
       notifierStorageAccountConnectionString: '${legacyResourcePrefix}${legacyStorageAccountAbbreviation}eesnotify-connection-string'
       publicStorageAccountConnectionString: 'ees-storage-public'
       publisherStorageAccountConnectionString: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher-connection-string'
+      analyticsStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}anlytfa-connection-string'
+      nlSearchStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn-connection-string'
+      searchDocsStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn-connection-string'
+      searchStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}search-connection-string'
     }
   } 
   alertsGroup: '${legacyResourcePrefix}-ag-ees-alertedusers'
@@ -618,5 +628,330 @@ func getResourceNames(
     }
   }
   logAnalyticsWorkspace: '${newResourcePrefix}-${abbreviations.operationalInsightsWorkspaces}'
+}
+
+// Builds a resource name using the ELZ naming convention "{environment}{type}-uks-{workload}01"
+// e.g. s292d01app-uks-dataapi01.
+func elzName(environmentIdentifier string, abbreviation string, workload string) string =>
+  '${environmentIdentifier}${abbreviation}-uks-${workload}01'
+
+// Builds a resource name using the ELZ naming convention but without the "01" instance number, for resources that
+// are named by their purpose and would never have a second instance for the same purpose, but whose names still need
+// to be unique beyond their resource group e.g. Event Grid topics, whose endpoints are unique per region.
+func elzPurposeName(environmentIdentifier string, abbreviation string, purpose string) string =>
+  '${environmentIdentifier}${abbreviation}-uks-${purpose}'
+
+// Builds a resource name using the ELZ naming convention but without the environment prefix or "01" instance
+// number, for policies and child resources whose names only need to be unique within their parent or resource group
+// e.g. subnets, file shares, WAF policies and Front Door routes.
+func elzLocalName(abbreviation string, purpose string) string =>
+  '${abbreviation}-uks-${purpose}'
+
+// Storage Account names may only contain lowercase letters and numbers, up to 24 characters, so these drop the
+// hyphens and the trailing "01" from the ELZ naming convention e.g. s292d01stukscore.
+func elzStorageAccountName(environmentIdentifier string, workload string) string =>
+  '${environmentIdentifier}${elzAbbreviations.storageStorageAccounts}uks${workload}'
+
+func getElzResourceNames(env string) ResourceNames => {
+  acr: {
+    serverName: '${env}${elzAbbreviations.containerRegistryRegistries}uksees01'
+  }
+  admin: {
+    appService: elzName(env, elzAbbreviations.webSitesAppService, 'admin')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'admin')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'admin')
+    signalRName: elzName(env, elzAbbreviations.signalRServiceSignalR, 'admin')
+  }
+  analytics: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'analytics')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'analytics')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'analytics')
+    functionStorageAccount: elzStorageAccountName(env, 'analyticsfn')
+    storage: {
+      storageAccountName: elzStorageAccountName(env, 'analytics')
+      fileShareName: elzLocalName(elzAbbreviations.fileShare, 'analytics')
+    }
+  }
+  applicationGateway: {
+    applicationGateway: elzName(env, elzAbbreviations.networkApplicationGateways, 'ees')
+    managedIdentity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'agw')
+    publicIpAddress: elzName(env, elzAbbreviations.networkPublicIPAddresses, 'agw')
+    frontendIpConfig: 'public-frontend-ip-config'
+    globalWafPolicy: elzLocalName(elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwglobal')
+    sites: {
+      publicSite: {
+        backend: 'publicsite-backend'
+        route: 'publicsite-routing-rule'
+        site: 'publicsite-site'
+      }
+      publicApi: {
+        backend: 'papi-backend'
+        route: 'papi-routing-rule'
+        site: 'papi-site'
+        wafPolicy: elzLocalName(elzAbbreviations.networkFirewallPoliciesWebApplication, 'agwpapi')
+        rewriteSet: 'papidocs-rewrites'
+      }
+      publicApiDocs: {
+        backend: 'papidocs-backend'
+        // Path rules on the Public API's route. "papidocs-backend" is already the backend pool's name.
+        pathRules: {
+          backend: 'papidocs-path-rule'
+          rootRedirect: 'papidocs-root-redirect-rule'
+        }
+      }
+    }
+  }
+  backups: {
+    backupVault: elzName(env, elzAbbreviations.backupVaults, 'ees')
+    backupVaultBlobsPolicy: elzLocalName(elzAbbreviations.backupVaultPolicies, 'blob')
+    backupVaultPsqlFlexibleServerPolicy: elzLocalName(elzAbbreviations.backupVaultPolicies, 'psql')
+    recoveryServicesVault: elzName(env, elzAbbreviations.recoveryServicesVaults, 'ees')
+  }
+  containerAppEnvironment: elzName(env, elzAbbreviations.appManagedEnvironments, 'ees')
+  contentApi: {
+    appService: elzName(env, elzAbbreviations.webSitesAppService, 'contentapi')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'contentapi')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'contentapi')
+  }
+  dataApi: {
+    appService: elzName(env, elzAbbreviations.webSitesAppService, 'dataapi')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'dataapi')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'dataapi')
+  }
+  dataFactory: elzName(env, elzAbbreviations.dataFactoryFactories, 'ees')
+  frontDoor: {
+    frontDoorName: elzName(env, elzAbbreviations.frontDoorProfiles, 'ees')
+    defaultEndpoint: {
+      endpointName: elzName(env, elzAbbreviations.frontDoorEndpoints, 'ees')
+    }
+    // Front Door WAF policy names may only contain letters and numbers.
+    wafPolicy: '${elzAbbreviations.frontDoorWafPolicies}uksees'
+    wafSecurityPolicy: elzLocalName(elzAbbreviations.frontDoorWafSecurityPolicies, 'ees')
+    publicSite: {
+      customDomain: elzLocalName(elzAbbreviations.frontDoorDomains, 'publicsite')
+      originGroup: elzLocalName(elzAbbreviations.frontDoorOriginGroups, 'publicsite')
+      origin: elzLocalName(elzAbbreviations.frontDoorOrigins, 'publicsite')
+      route: elzLocalName(elzAbbreviations.frontDoorRoutes, 'publicsite')
+    }
+    contentApi: {
+      customDomain: elzLocalName(elzAbbreviations.frontDoorDomains, 'contentapi')
+      originGroup: elzLocalName(elzAbbreviations.frontDoorOriginGroups, 'contentapi')
+      origin: elzLocalName(elzAbbreviations.frontDoorOrigins, 'contentapi')
+      route: elzLocalName(elzAbbreviations.frontDoorRoutes, 'contentapi')
+      allFilesCacheRoute: elzLocalName(elzAbbreviations.frontDoorRoutes, 'contentapiallfilescache')
+    }
+  }
+  importer: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'importer')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'importer')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'importer')
+    storageAccount: elzStorageAccountName(env, 'importer')
+  }
+  nlSearch: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'nlsearch')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'nlsearch')
+    functionStorageAccount: elzStorageAccountName(env, 'nlsearchfn')
+  }
+  notifier: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'notifier')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'notifier')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'notifier')
+    storageAccount: elzStorageAccountName(env, 'notifier')
+  }
+  publicApi: {
+    apiApp: elzName(env, elzAbbreviations.appContainerApps, 'papiapi')
+    apiAppIdentity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'papiapi')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'papi')
+    docsApp: elzName(env, elzAbbreviations.staticWebApps, 'papidocs')
+    processor: {
+      functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'papiprocessor')
+      appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'papiprocessor')
+      identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'papiprocessor')
+      // Suffixed with "mg", "s1" and "s2". "papiprocessor" would take the longest of these over the
+      // 24 character limit for Storage Account names.
+      storageAccountsPrefix: elzStorageAccountName(env, 'papiproc')
+    }
+    storage: {
+      storageAccount: elzStorageAccountName(env, 'papi')
+      fileShare: elzLocalName(elzAbbreviations.fileShare, 'papidata')
+    }
+  }
+  publicSite: {
+    appService: elzName(env, elzAbbreviations.webSitesAppService, 'publicsite')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'publicsite')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'publicsite')
+  }
+  publisher: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'publisher')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'publisher')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'publisher')
+    storageAccount: elzStorageAccountName(env, 'publisher')
+  }
+  screener: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'screener')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'screener')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'screener')
+    functionStorageAccount: elzStorageAccountName(env, 'screenerfn')
+    logsStorageAccount: elzStorageAccountName(env, 'screenerlogs')
+    logsFileShare: elzLocalName(elzAbbreviations.fileShare, 'screenerlogs')
+  }
+  search: {
+    service: elzName(env, elzAbbreviations.searchSearchServices, 'ees')
+    storageAccount: elzStorageAccountName(env, 'search')
+    appInsights: elzName(env, elzAbbreviations.insightsComponents, 'search')
+  }
+  searchDocs: {
+    functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'searchdocs')
+    appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'searchdocs')
+    functionStorageAccount: elzStorageAccountName(env, 'searchdocsfn')
+    eventSubscriptions: {
+      publicationArchived: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationarchived')
+      publicationChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationchanged')
+      publicationDeleted: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationdeleted')
+      publicationLatestPublishedReleaseReordered: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationlatestpublishedreleasereordered')
+      publicationRestored: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'publicationrestored')
+      releaseSlugChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'releaseslugchanged')
+      releaseVersionPublished: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'releaseversionpublished')
+      themeChanged: elzLocalName(elzAbbreviations.eventGridSubscriptions, 'themechanged')
+    }
+  }
+  storageAccounts: {
+    core: elzStorageAccountName(env, 'core')
+    public: elzStorageAccountName(env, 'public')
+    logging: elzStorageAccountName(env, 'logging')
+  }
+  // TODO EES-7502 - these keep the existing one-to-one set of subnets for now. See "Subnet migration" in
+  // azure-resource-update-plan-for-elz.md for the proposed consolidation into shared private endpoint subnets.
+  vnet: {
+    vnet: elzName(env, elzAbbreviations.networkVirtualNetworks, 'ees')
+    subnets: {
+      // Core shared infrastructure subnets.
+      applicationGateway: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'agw')
+      eventGridCustomTopicPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'evgtpep')
+
+      // Core application subnets.
+      admin: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'admin')
+      contentApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'contentapi')
+      dataApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'dataapi')
+      importer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'importer')
+      notifier: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'notifier')
+      publisher: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'publisher')
+      sqlServerPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'sqlpep')
+
+      // Screener subnets.
+      screenerFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screener')
+      screenerStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'screenerpep')
+
+      // Public API subnets.
+      publicApiDataProcessor: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessor')
+      publicApiDataProcessorPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papiprocessorpep')
+      publicApiStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'papistpep')
+      containerAppEnvironment: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'cae')
+      psqlFlexibleServer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'psql')
+
+      // NL Search subnets.
+      nlSearchFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearch')
+      nlSearchFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'nlsearchpep')
+
+      // Search subnets.
+      searchDocsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocs')
+      searchDocsFunctionAppPrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchdocspep')
+      searchStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'searchstpep')
+
+      // Analytics subnets.
+      analyticsFunctionApp: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analytics')
+      analyticsStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'analyticsstpep')
+    }
+  }
+  keyVault: {
+    keyVault: elzName(env, elzAbbreviations.keyVaultVaults, 'ees')
+    keys: {
+      // Shared by the App Services (Admin, Content API, Data API) for their ASP.NET Core Data Protection key ring.
+      dataProtection: 'app-service-dataprotection-key'
+    }
+    // Certificates and secrets live in a Key Vault dedicated to EES in a single environment, so their names
+    // need neither an "ees-" prefix nor an environment prefix. They are named "{workload}-{purpose}", using the
+    // same workload names as the resources above e.g. "publicsite-basic-auth-username".
+    certificates: {
+      publicSite: 'publicsite-certificate'
+      contentApiFrontDoor: 'contentapi-afd-certificate'
+      publicApiAppGateway: 'papi-agw-certificate'
+    }
+    secrets: {
+      acr: {
+        dockerPullUsername: 'DOCKER-REGISTRY-SERVER-USERNAME'
+        dockerPullPassword: 'DOCKER-REGISTRY-SERVER-PASSWORD'
+        dockerRegistryServerDomain: 'DOCKER-REGISTRY-SERVER-DOMAIN'
+      }
+      admin: {
+        adminGovUkNotifyApiKey: 'admin-govuknotify-api-key'
+        adminSignalrConnectionString: 'admin-signalr-connection-string'
+        databaseUserPassword: 'admin-sql-password'
+        openIdConnectClientId: 'admin-openidconnect-client-id'
+        openIdConnectAuthority: 'admin-openidconnect-authority'
+        openIdConnectValidAudience: 'admin-openidconnect-valid-audience'
+        openIdConnectValidIssuers: 'admin-openidconnect-valid-issuers'
+        openIdConnectFullyQualifiedScopeName: 'admin-openidconnect-fully-qualified-scope-name'
+        screenerStorageAccountConnectionString: 'screener-storage-connection-string'
+      }
+      contentApi: {
+        databaseUserPassword: 'contentapi-sql-password'
+      }
+      dataApi: {
+        databaseUserPassword: 'dataapi-sql-password'
+      }
+      importer: {
+        databaseUserPassword: 'importer-sql-password'
+      }
+      notifier: {
+        databaseUserPassword: 'notifier-sql-password'
+        govUkNotifyApiKey: 'notifier-govuknotify-api-key'
+        tokenSecretKey: 'notifier-token-secret-key'
+      }
+      publicApi: {
+        apiAppRegistrationClientId: 'papi-app-registration-client-id'
+        dataProcessorAppRegistrationClientId: 'papiprocessor-app-registration-client-id'
+      }
+      publicSite: {
+        basicAuthUsername: 'publicsite-basic-auth-username'
+        basicAuthPassword: 'publicsite-basic-auth-password'
+      }
+      publisher: {
+        databaseUserPassword: 'publisher-sql-password'
+        notifyApiKey: 'publisher-govuknotify-api-key'
+      }
+      screener: {
+        appRegistrationClientId: 'screener-app-registration-client-id'
+      }
+      bauEmail: 'bau-email'
+      coreStorageAccountConnectionString: 'core-storage-connection-string'
+      importerStorageAccountConnectionString: 'importer-storage-connection-string'
+      notifierStorageAccountConnectionString: 'notifier-storage-connection-string'
+      publicStorageAccountConnectionString: 'public-storage-connection-string'
+      publisherStorageAccountConnectionString: 'publisher-storage-connection-string'
+      analyticsStorageAccountConnectionString: 'analytics-storage-connection-string'
+      nlSearchStorageAccountConnectionString: 'nlsearch-storage-connection-string'
+      searchDocsStorageAccountConnectionString: 'searchdocs-storage-connection-string'
+      searchStorageAccountConnectionString: 'search-storage-connection-string'
+    }
+  }
+  alertsGroup: elzName(env, elzAbbreviations.insightsActionGroups, 'alertedusers')
+  alertsLogicApp: elzName(env, elzAbbreviations.logicWorkflows, 'alerts')
+  databases: {
+    coreSqlServer: elzName(env, elzAbbreviations.sqlServers, 'core')
+    publicSqlServer: elzName(env, elzAbbreviations.sqlServers, 'public')
+    contentDb: 'content'
+    statisticsDb: 'statistics'
+    postgreSqlFlexibleServer: elzName(env, elzAbbreviations.dBforPostgreSQLServers, 'ees')
+  }
+  eventGrid: {
+    topics: {
+      publicationChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.publicationChanged, '-', ''))
+      releaseChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseChanged, '-', ''))
+      releaseVersionChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.releaseVersionChanged, '-', ''))
+      themeChanged: elzPurposeName(env, elzAbbreviations.eventGridTopics, replace(eventTopics.themeChanged, '-', ''))
+    }
+  }
+  logAnalyticsWorkspace: elzName(env, elzAbbreviations.operationalInsightsWorkspaces, 'ees')
 }
 

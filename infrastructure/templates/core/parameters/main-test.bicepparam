@@ -9,8 +9,6 @@ param contentApiUrl = 'https://content.test.explore-education-statistics.service
 param publicApiApplicationGatewayFqdn = 'test.statistics.api.education.gov.uk'
 param publicApiPublicUrl = 'https://pp-api.education.gov.uk/statistics-test'
 
-param sqlServerPublicNetworkAccess = 'Disabled'
-
 param contentDbConfig = {
   sku: {
     name: 'Standard'

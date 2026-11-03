@@ -4,7 +4,7 @@ import { releaseApiDataSetChangelogRoute } from '@admin/routes/releaseRoutes';
 import { DataSetDraftVersionStatus } from '@admin/services/apiDataSetService';
 import NotificationBanner from '@common/components/NotificationBanner';
 import Button from '@common/components/Button';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
@@ -14,6 +14,8 @@ interface Props {
   finalisingStatus?: DataSetFinalisingStatus;
   releaseVersionId: string;
   publicationId: string;
+  finaliseAcknowledgement?: ReactNode;
+  finaliseDisabled?: boolean;
   onFinalise: () => void;
 }
 
@@ -24,6 +26,8 @@ export default function ApiDataSetFinaliseBanner({
   finalisingStatus,
   releaseVersionId,
   publicationId,
+  finaliseAcknowledgement,
+  finaliseDisabled = false,
   onFinalise,
 }: Props) {
   if (
@@ -59,7 +63,10 @@ export default function ApiDataSetFinaliseBanner({
           need to make any changes to the mappings you will have to remove this
           draft API data set version and create a new version.
         </p>
-        <Button onClick={onFinalise}>Finalise this data set version</Button>
+        {finaliseAcknowledgement}
+        <Button disabled={finaliseDisabled} onClick={onFinalise}>
+          Finalise this data set version
+        </Button>
       </NotificationBanner>
     );
   }

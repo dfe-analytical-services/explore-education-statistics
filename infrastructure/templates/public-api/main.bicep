@@ -8,6 +8,7 @@ import {
 import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig } from '../common/components/storage/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
+import { publicDataDbConnectionString } from '../common/functions.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -76,6 +77,9 @@ param docsAppSku StaticWebAppSku = 'Free'
 
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -167,6 +171,7 @@ var tagValues = union(resourceTags ?? {}, {
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: subscription
   environmentName: environmentName
+  elz: elz
 })
 
 var maintenanceFirewallRules = [
@@ -343,7 +348,10 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
 }
 
 output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
-output dataProcessorPsqlConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-publicdatadb'
+output dataProcessorPsqlConnectionString string = publicDataDbConnectionString(
+  resourceNames.databases.postgreSqlFlexibleServer,
+  resourceNames.publicApi.processor.identity
+)
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule!.outputs.managedIdentityClientId

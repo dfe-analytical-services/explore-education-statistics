@@ -121,6 +121,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     linuxFxVersion: 'Python|3.14'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: resourceNames.nlSearch.functionStorageAccount
+    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.nlSearchStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules

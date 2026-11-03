@@ -1,11 +1,14 @@
 import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
 import { secretRefsFromSecrets } from '../../../common/functions.bicep'
 
-@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01.')
-param environmentIdentifier string
+@description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01. Supplied by the pipeline from the environment\'s variable group ("subscription").')
+param environmentIdentifier string = ''
 
 @description('Name of this environment e.g. Development, Test.')
 param environmentName string
+
+@description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
+param elz bool = false
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -61,13 +64,12 @@ pre-existing instances that haven't shut down yet.
 ''')
 param deployedAt string = ''
 
-// getResourceNamesForEnvironment only actually reads environmentIdentifier/environmentName,
-// but still expects something shaped like the shared EnvironmentConfig type - this plain
-// object literal satisfies that structurally, without this file needing to import the type
-// itself just to pass these two values through.
+// This plain object literal satisfies getResourceNamesForEnvironment's ResourceNamingContext type
+// structurally, without this file needing to import the type itself just to pass these values through.
 var resourceNames = getResourceNamesForEnvironment({
   environmentIdentifier: environmentIdentifier
   environmentName: environmentName
+  elz: elz
 })
 
 var adminHostname = 'admin.${domain}'
@@ -96,7 +98,6 @@ var secretNames = [
   resourceNames.keyVault.secrets.importerStorageAccountConnectionString
   resourceNames.keyVault.secrets.publicStorageAccountConnectionString
   resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl
   resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId
   resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId
   resourceNames.keyVault.secrets.screener.appRegistrationClientId
@@ -108,6 +109,10 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 }]
 
 var secretRefs = secretRefsFromSecrets(secrets)
+
+resource publicApiContainerApp 'Microsoft.App/containerApps@2024-03-01' existing = {
+  name: resourceNames.publicApi.apiApp
+}
 
 @description('Application-specific appsettings for Admin, applied to its staging slot ahead of each code deploy.')
 output appSettings object = {
@@ -158,7 +163,7 @@ output appSettings object = {
   PublicApp__Url: 'https://${domain}'
   PublicDataDbExists: true
   PublicDataApi__PublicUrl: 'https://${publicApiUrl}'
-  PublicDataApi__PrivateUrl: secretRefs[resourceNames.keyVault.secrets.publicApiContainerAppPrivateUrl]
+  PublicDataApi__PrivateUrl: 'https://${publicApiContainerApp.properties.configuration.ingress.fqdn}'
   PublicDataApi__DocsUrl: 'https://${publicApiUrl}/docs'
   PublicDataApi__AppRegistrationClientId: secretRefs[resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId]
   PublicDataProcessor__Url: 'https://${resourceNames.publicApi.processor.functionApp}.azurewebsites.net'
