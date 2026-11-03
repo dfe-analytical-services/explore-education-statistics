@@ -26,11 +26,11 @@ const formId = 'pairedIndicatorsForm';
 export const pairedIndicatorErrorMessages = {
   cannotPairWithItself: 'An indicator cannot be paired with itself.',
   childHasMultipleParents:
-    'A child indicator can only have one parent indicator.',
+    'A paired indicator can only be paired with one main indicator.',
   parentHasMultipleChildren:
-    'A parent indicator can only have one child indicator.',
+    'A main indicator can only have one paired indicator.',
   cannotBeChained:
-    'An indicator cannot be both a parent and a child indicator.',
+    'An indicator cannot be both a main indicator and a paired indicator.',
 } as const;
 
 interface FormValues {
@@ -62,8 +62,8 @@ const validationSchema: ObjectSchema<FormValues> = Yup.object({
   pairedIndicators: Yup.array()
     .of(
       Yup.object({
-        parentIndicatorId: Yup.string().required('Select a parent indicator'),
-        childIndicatorId: Yup.string().required('Select a child indicator'),
+        parentIndicatorId: Yup.string().required('Select a main indicator'),
+        childIndicatorId: Yup.string().required('Select a paired indicator'),
       }),
     )
     .required()
@@ -217,7 +217,7 @@ function PairedIndicatorsFields({
       id="pairedIndicators"
       legend="Paired indicators"
       legendSize="m"
-      hint="A child indicator is selected automatically with its parent indicator in the table tool, and cannot be selected on its own. An indicator can only have one parent or one child indicator, and cannot be both a parent and a child indicator."
+      hint="A paired indicator is selected automatically with its main indicator in the table tool, and cannot be selected on its own. A main indicator can only have one paired indicator, and an indicator cannot be both a main indicator and a paired indicator."
       error={typeof listError === 'string' ? listError : undefined}
     >
       {fields.length === 0 && (
@@ -234,14 +234,14 @@ function PairedIndicatorsFields({
           >
             <FormFieldSelect<FormValues>
               name={`pairedIndicators.${index}.parentIndicatorId`}
-              label="Parent indicator"
+              label="Main indicator"
               optGroups={indicatorOptGroups}
               placeholder="Select an indicator"
             />
             <FormFieldSelect<FormValues>
               name={`pairedIndicators.${index}.childIndicatorId`}
-              label="Child indicator"
-              hint="Selected automatically when the parent indicator is selected"
+              label="Paired indicator"
+              hint="Selected automatically when the main indicator is selected"
               optGroups={indicatorOptGroups}
               placeholder="Select an indicator"
             />
