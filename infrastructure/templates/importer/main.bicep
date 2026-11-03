@@ -28,6 +28,9 @@ param deployContentShare bool = true
 @description('Whether to store the storage account\'s connection string in Key Vault, for the apps that connect to it with a connection string rather than a managed identity.')
 param storeStorageAccountConnectionString bool = true
 
+@description('Whether the storage account accepts its account keys, for the apps that connect to it with a connection string rather than a managed identity.')
+param storageAccountSharedKeyAccessEnabled bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -98,6 +101,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountName: resourceNames.importer.storageAccount
     storageAccountSku: storageAccountSku
     deployContentShare: deployContentShare
+    storageAccountSharedKeyAccessEnabled: storageAccountSharedKeyAccessEnabled
     storageAccountConnectionStringSecretName: storeStorageAccountConnectionString
       ? resourceNames.keyVault.secrets.importerStorageAccountConnectionString
       : null

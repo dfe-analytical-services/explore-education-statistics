@@ -99,6 +99,10 @@ param sqlServerIdentityBasedAuditStorage bool = false
 @description('Whether to store the core and public storage accounts\' connection strings in Key Vault. The apps read them in legacy. In ELZ they connect with their managed identities instead, so the param files in "parameters/elz" turn this off.')
 param storeStorageAccountConnectionStrings bool = true
 
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the core, public and logging storage accounts accept their account keys. In ELZ everything connects to them with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -309,6 +313,7 @@ module loggingStorageAccountModule 'application/logging-storage-account/logging-
   name: 'loggingStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.logging
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     alertsGroupName: alertsModule.outputs.actionGroupName
     blobDeleteRetentionDays: blobDeleteRetentionDays
     deployAlerts: deployAlerts
@@ -320,6 +325,7 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.core
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: coreStorageAccountSku
     connectionStringSecretName: storeStorageAccountConnectionStrings
       ? resourceNames.keyVault.secrets.coreStorageAccountConnectionString
@@ -340,6 +346,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   name: 'publicStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.public
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: publicStorageAccountSku
     connectionStringSecretName: storeStorageAccountConnectionStrings
       ? resourceNames.keyVault.secrets.publicStorageAccountConnectionString

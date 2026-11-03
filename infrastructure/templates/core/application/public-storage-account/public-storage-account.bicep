@@ -35,6 +35,9 @@ param backupBlobsPolicyName string
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether the storage account accepts its account keys. Turned off where everything connects with a managed identity.')
+param sharedKeyAccessEnabled bool = true
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -49,6 +52,7 @@ module storageAccountModule '../../../common/components/storage/storage-account.
   name: 'publicStorageAccountDeploy'
   params: {
     storageAccountName: storageAccountName
+    sharedKeyAccessEnabled: sharedKeyAccessEnabled
     kind: 'StorageV2'
     sku: sku
     publicNetworkAccessEnabled: true
