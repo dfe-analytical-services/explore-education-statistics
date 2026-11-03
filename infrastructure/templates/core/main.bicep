@@ -95,6 +95,10 @@ param deploySystemAssignedIdentityRoleAssignments bool = true
 @description('Whether the SQL Servers write audit logs and vulnerability assessment scans to the logging storage account with their system-assigned identities, rather than with the account\'s access key. Only the param files in "parameters/elz" turn this on, for the new environments.')
 param sqlServerIdentityBasedAuditStorage bool = false
 
+// TODO EES-7502 - remove, leaving the connection strings unstored, once every environment has moved to the ELZ.
+@description('Whether to store the core and public storage accounts\' connection strings in Key Vault. The apps read them in legacy. In ELZ they connect with their managed identities instead, so the param files in "parameters/elz" turn this off.')
+param storeStorageAccountConnectionStrings bool = true
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -317,7 +321,9 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   params: {
     storageAccountName: resourceNames.storageAccounts.core
     sku: coreStorageAccountSku
-    connectionStringSecretName: resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+    connectionStringSecretName: storeStorageAccountConnectionStrings
+      ? resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+      : null
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -335,7 +341,9 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   params: {
     storageAccountName: resourceNames.storageAccounts.public
     sku: publicStorageAccountSku
-    connectionStringSecretName: resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+    connectionStringSecretName: storeStorageAccountConnectionStrings
+      ? resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+      : null
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName

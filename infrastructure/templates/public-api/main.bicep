@@ -8,7 +8,7 @@ import {
 import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig, StorageAccountSku } from '../common/components/storage/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
-import { publicDataDbConnectionString } from '../common/functions.bicep'
+import { keylessStorageConnectionString, publicDataDbConnectionString } from '../common/functions.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -369,6 +369,13 @@ output dataProcessorPsqlConnectionString string = publicDataDbConnectionString(
   resourceNames.databases.postgreSqlFlexibleServer,
   resourceNames.publicApi.processor.identity
 )
+
+// The Data Processor's core storage connection: keyless, so that it connects with its managed identity, or else a Key
+// Vault reference.
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+output dataProcessorPrivateStorageConnectionString string = dataProcessorIdentityBasedStorageConnections
+  ? keylessStorageConnectionString(resourceNames.storageAccounts.core)
+  : '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault}; SecretName=${resourceNames.keyVault.secrets.coreStorageAccountConnectionString})'
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule!.outputs.managedIdentityClientId
