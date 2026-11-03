@@ -27,7 +27,15 @@ public class MethodologyCacheServiceTests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Theme 1 Publication 1",
-                    Methodologies = [new() { Title = "Theme 1 Publication 1 Methodology 1" }],
+                    Methodologies =
+                    [
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Slug = "theme-1-publication-1-methodology-1",
+                            Title = "Theme 1 Publication 1 Methodology 1",
+                        },
+                    ],
                 },
             ],
         },
@@ -40,7 +48,15 @@ public class MethodologyCacheServiceTests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Theme 2 Publication 1",
-                    Methodologies = [new() { Title = "Theme 2 Publication 1 Methodology 1" }],
+                    Methodologies =
+                    [
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Slug = "theme-2-publication-1-methodology-1",
+                            Title = "Theme 2 Publication 1 Methodology 1",
+                        },
+                    ],
                 },
             ],
         },
