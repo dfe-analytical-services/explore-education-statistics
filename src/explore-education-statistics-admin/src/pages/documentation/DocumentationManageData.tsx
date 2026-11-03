@@ -3,6 +3,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import {
   documentationConfigureChartsRoute,
+  documentationIndexRoute,
   documentationManageDataBlockRoute,
 } from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
@@ -36,7 +37,10 @@ const DocumentationManageContent = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Managing data' },
       ]}
       title="Managing data"

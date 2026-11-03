@@ -1,7 +1,10 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { documentationCreateReleaseRoute } from '@admin/routes/documentationRoutes';
+import {
+  documentationCreateReleaseRoute,
+  documentationIndexRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageCreatePublication from './images/guidance/guidance-publication-create.png';
@@ -19,7 +22,10 @@ const DocumentationCreateNewRelease = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Creating a new publication' },
       ]}
       title="Creating a new publication"

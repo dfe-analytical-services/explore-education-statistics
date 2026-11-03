@@ -20,7 +20,7 @@ import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
 import ThemesPage from '@admin/pages/themes/ThemesPage';
 import administrationPageRoutes from '@admin/routes/administrationPageRoutes';
-import documentationRoutes from '@admin/routes/documentationRoutes';
+import documentationRoutes from '@admin/routes/documentationPageRoutes';
 import {
   preReleaseContentRoute,
   preReleaseTableToolRoute,

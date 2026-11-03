@@ -10,6 +10,7 @@ import InsetText from '@common/components/InsetText';
 import ButtonLink from '@admin/components/ButtonLink';
 import useQueryParams from '@admin/hooks/useQueryParams';
 import { PageFeedbackViewModel } from '@common/services/types/pageFeedback';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 import truncateAround from '@common/utils/string/truncateAround';
 import PageFeedbackDetailsModal from '../admin-dashboard/components/PageFeedbackDetailsModal';
 
@@ -61,7 +62,10 @@ const PageFeedbackPage = () => {
       caption="View feedback"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Feedback' },
       ]}
     >

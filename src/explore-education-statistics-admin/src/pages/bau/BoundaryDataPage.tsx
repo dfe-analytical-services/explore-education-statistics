@@ -11,7 +11,10 @@ import boundaryTypesMap from '@common/utils/boundaryTypesMap';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
-import { administrationBoundaryDataUploadRoute } from '@admin/routes/administrationRoutes';
+import {
+  administrationBoundaryDataUploadRoute,
+  administrationIndexRoute,
+} from '@admin/routes/administrationRoutes';
 import styles from './BoundaryDataPage.module.scss';
 
 const BoundaryDataPage = () => {
@@ -24,7 +27,10 @@ const BoundaryDataPage = () => {
       caption="Manage Boundary data"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Boundary data' },
       ]}
     >

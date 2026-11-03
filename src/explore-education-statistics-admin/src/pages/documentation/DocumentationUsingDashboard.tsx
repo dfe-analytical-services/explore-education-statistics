@@ -5,6 +5,7 @@ import {
   documentationCreatePublicationRoute,
   documentationCreateReleaseRoute,
   documentationEditReleaseRoute,
+  documentationIndexRoute,
   documentationManageContentRoute,
   documentationManageDataBlockRoute,
   documentationManageDataRoute,
@@ -29,7 +30,10 @@ const DocumentationCreateNewRelease = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Using your administration dashboard' },
       ]}
       title="Using your administration dashboard"

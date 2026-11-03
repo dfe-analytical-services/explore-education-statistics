@@ -4,6 +4,7 @@ import React from 'react';
 import {
   documentationContentStandardsRoute,
   documentationEditReleaseRoute,
+  documentationIndexRoute,
   documentationStyleGuideRoute,
 } from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
@@ -38,7 +39,10 @@ const DocumentationManageContent = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Managing content' },
       ]}
       title="Managing content"

@@ -40,7 +40,10 @@ const BauUsersPage = () => {
       caption="Manage access to the service"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Users' },
       ]}
     >

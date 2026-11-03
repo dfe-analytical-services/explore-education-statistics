@@ -3,6 +3,7 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import {
   documentationConfigureChartsRoute,
+  documentationIndexRoute,
   documentationManageContentRoute,
   documentationManageDataRoute,
 } from '@admin/routes/documentationRoutes';
@@ -31,7 +32,10 @@ const DocumentationManageDataBlock = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Managing data blocks and creating tables and charts' },
       ]}
       title="Managing data blocks and creating tables and charts"

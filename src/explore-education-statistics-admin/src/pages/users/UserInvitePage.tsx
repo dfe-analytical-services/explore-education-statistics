@@ -25,6 +25,10 @@ import userInvitesService, {
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import { FormFieldset } from '@common/components/form';
 import { useNavigate } from 'react-router';
+import {
+  administrationIndexRoute,
+  administrationInvitedUsersRoute,
+} from '@admin/routes/administrationRoutes';
 
 export interface InviteUserPreReleaseRole {
   releaseId: string;
@@ -132,8 +136,11 @@ export default function UserInvitePage() {
         caption="Manage access to this service"
         wide
         breadcrumbs={[
-          { name: 'Platform administration', link: '/administration' },
-          { name: 'Invites', link: '/administration/users/invites' },
+          {
+            name: 'Platform administration',
+            link: administrationIndexRoute.fullPath,
+          },
+          { name: 'Invites', link: administrationInvitedUsersRoute.fullPath },
           { name: 'Invite user' },
         ]}
       >

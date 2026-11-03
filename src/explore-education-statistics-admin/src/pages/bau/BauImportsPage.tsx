@@ -6,6 +6,7 @@ import React from 'react';
 import importStatusService from '@admin/services/importStatusService';
 import { releaseDataRoute } from '@admin/routes/releaseRoutes';
 import { generatePath } from 'react-router';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 
 const BauImportsPage = () => {
   const { value, isLoading } = useAsyncRetry(() =>
@@ -18,7 +19,10 @@ const BauImportsPage = () => {
       caption="Manage incomplete imports"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Incomplete imports' },
       ]}
     >

@@ -37,7 +37,10 @@ const PreReleaseUsersPage = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Pre-release users' },
       ]}
       title="Pre-release users"

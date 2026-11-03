@@ -44,7 +44,10 @@ const InvitedUsersPage = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Pending invites' },
       ]}
       title="Pending invites"

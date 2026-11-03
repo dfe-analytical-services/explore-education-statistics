@@ -1,7 +1,10 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import { documentationManageDataRoute } from '@admin/routes/documentationRoutes';
+import {
+  documentationIndexRoute,
+  documentationManageDataRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageChartCreate from './images/guidance/guidance-chart-create.png';
@@ -49,7 +52,10 @@ const DocumentationManageDataBlock = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Configuring charts' },
       ]}
       title="Configuring charts"

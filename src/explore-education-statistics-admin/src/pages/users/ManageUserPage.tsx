@@ -12,7 +12,10 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import releaseQueries from '@admin/queries/releaseQueries';
 import { useParams } from 'react-router';
-import { administrationUsersRoute } from '@admin/routes/administrationRoutes';
+import {
+  administrationIndexRoute,
+  administrationUsersRoute,
+} from '@admin/routes/administrationRoutes';
 
 export default function ManageUserPage() {
   const { userId } = useParams<{ userId: string }>() as { userId: string };
@@ -34,8 +37,11 @@ export default function ManageUserPage() {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
-        { name: 'Users', link: '/administration/users' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
+        { name: 'Users', link: administrationUsersRoute.fullPath },
         { name: 'Manage user' },
       ]}
       caption="Manage user"

@@ -146,12 +146,12 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
     )}
     {user.permissions.isBauUser && (
       <li className="govuk-header__navigation-item">
-        <a
+        <Link
           className="govuk-header__link"
-          href={administrationIndexRoute.fullPath}
+          to={administrationIndexRoute.fullPath}
         >
           Platform administration
-        </a>
+        </Link>
       </li>
     )}
     <li className="govuk-header__navigation-item">

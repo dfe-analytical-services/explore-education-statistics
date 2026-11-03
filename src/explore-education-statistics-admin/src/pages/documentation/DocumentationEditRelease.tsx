@@ -3,6 +3,7 @@ import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
 import {
   documentationContentStandardsRoute,
+  documentationIndexRoute,
   documentationManageContentRoute,
   documentationManageDataBlockRoute,
   documentationManageDataRoute,
@@ -27,7 +28,10 @@ const DocumentationCreateNewRelease = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Editing a release and updating release status' },
       ]}
       title="Editing a release and updating release status"
