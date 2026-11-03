@@ -122,7 +122,10 @@ public class PublicationService(
                 await context.SaveChangesAsync();
 
                 return await persistenceHelper
-                    .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
+                    .CheckEntityExists<Publication>(
+                        saved.Entity.Id,
+                        query => query.Include(p => p.Theme).Include(p => p.Contact)
+                    )
                     .OnSuccess(GeneratePublicationCreateViewModel);
             });
     }
