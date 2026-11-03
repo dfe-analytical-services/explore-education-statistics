@@ -216,6 +216,8 @@ module alertsModule 'application/alerts/alerts.bicep' = {
     actionGroupName: resourceNames.alertsGroup
     alertsLogicAppName: resourceNames.alertsLogicApp
     keyVaultName: keyVaultModule.outputs.keyVaultName
+    slackAlertsConfigSecretName: resourceNames.keyVault.secrets.alerts.slackConfig
+    teamsWebhookUrlSecretName: resourceNames.keyVault.secrets.alerts.teamsWebhookUrl
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
   }
 }
@@ -373,6 +375,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
 module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
   name: 'coreSqlServerModuleDeploy'
   params: {
+    sqlAdministratorLoginPasswordSecretName: resourceNames.keyVault.secrets.sqlAdminPassword
     keepLegacyNames: keepLegacyNames
     serverName: resourceNames.databases.coreSqlServer
     location: location
@@ -399,6 +402,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
 module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
   name: 'publicSqlServerModuleDeploy'
   params: {
+    sqlAdministratorLoginPasswordSecretName: resourceNames.keyVault.secrets.sqlAdminPassword
     keepLegacyNames: keepLegacyNames
     serverName: resourceNames.databases.publicSqlServer
     location: location

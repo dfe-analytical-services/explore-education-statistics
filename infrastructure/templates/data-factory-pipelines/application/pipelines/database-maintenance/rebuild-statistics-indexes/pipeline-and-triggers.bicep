@@ -7,6 +7,12 @@ param statisticsDbLinkedServiceName string
 @description('Name of the Key Vault instance that owns secrets for this pipeline.')
 param keyVaultName string
 
+@description('Name of the Key Vault secret holding the Slack app token that alerts are posted with.')
+param slackAppTokenSecretName string
+
+@description('Name of the Key Vault secret holding the Teams Power Automate webhook URL that alerts are posted to.')
+param teamsWebhookUrlSecretName string
+
 @description('Slack channel to post Azure alerts to.')
 param slackAlertsChannel string
 
@@ -23,8 +29,8 @@ module pipelineModule 'pipeline.bicep' = {
     statisticsDbLinkedServiceName: statisticsDbLinkedServiceName
     fragmentationTables: fragmentationTables
     slackAlertsChannel: slackAlertsChannel
-    slackAppToken: keyVault.getSecret('ees-alerts-slackapptoken')
-    teamsPowerAutomateWebhookUrl: keyVault.getSecret('ees-alerts-teamswebhookurl')
+    slackAppToken: keyVault.getSecret(slackAppTokenSecretName)
+    teamsPowerAutomateWebhookUrl: keyVault.getSecret(teamsWebhookUrlSecretName)
   }
 }
 

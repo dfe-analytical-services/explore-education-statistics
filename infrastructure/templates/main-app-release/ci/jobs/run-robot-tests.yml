@@ -53,10 +53,14 @@ jobs:
               keyVaultName="$(subscription)kv-uks-ees01"
               basicAuthUsernameSecret="publicsite-basic-auth-username"
               basicAuthPasswordSecret="publicsite-basic-auth-password"
+              slackAppTokenSecret="alerts-slack-app-token"
+              teamsUiTestsWebhookUrlSecret="alerts-teams-uitests-webhook-url"
             else
               keyVaultName="$(subscription)-kv-ees-01"
               basicAuthUsernameSecret="ees-public-site-basic-auth-username"
               basicAuthPasswordSecret="ees-public-site-basic-auth-password"
+              slackAppTokenSecret="ees-alerts-slackapptoken"
+              teamsUiTestsWebhookUrlSecret="ees-alerts-teams-uitests-webhookurl"
             fi
 
             echo "Using Key Vault $keyVaultName"
@@ -64,7 +68,7 @@ jobs:
 
             # The Basic Auth secrets only exist in environments with Basic Auth enabled. Azure DevOps renders the
             # boolean parameter as "True" or "False", hence the lowercasing with ",,".
-            secretsFilter="ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl"
+            secretsFilter="$slackAppTokenSecret,$teamsUiTestsWebhookUrlSecret"
             if [ "${BASIC_AUTH_ENABLED,,}" = "true" ]; then
               secretsFilter="$secretsFilter,$basicAuthUsernameSecret,$basicAuthPasswordSecret"
             fi
@@ -80,9 +84,33 @@ jobs:
           # Runs as a normal step so that it can use the Key Vault and secret names worked out above.
           RunAsPreJob: false
 
-      # The Key Vault task creates a variable named after each secret it fetches, so the basic auth secrets arrive under
-      # different variable names for the legacy and ELZ naming conventions. Copy whichever were fetched into fixed
-      # (still secret) variables for the tests to use.
+      # The Key Vault task creates a variable named after each secret it fetches, so the secrets arrive under different
+      # variable names for the legacy and ELZ naming conventions. Copy whichever were fetched into fixed (still secret)
+      # variables for the tests to use.
+      - task: Bash@3
+        displayName: Set alerts credentials
+        env:
+          ELZ: $(elz)
+          LEGACY_SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
+          LEGACY_TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
+          ELZ_SLACK_APP_TOKEN: $(alerts-slack-app-token)
+          ELZ_TEAMS_UI_TESTS_WEBHOOK_URL: $(alerts-teams-uitests-webhook-url)
+        inputs:
+          targetType: inline
+          script: |
+            set -eo pipefail
+
+            if [ "${ELZ,,}" = "true" ]; then
+              slackAppToken="$ELZ_SLACK_APP_TOKEN"
+              teamsUiTestsWebhookUrl="$ELZ_TEAMS_UI_TESTS_WEBHOOK_URL"
+            else
+              slackAppToken="$LEGACY_SLACK_APP_TOKEN"
+              teamsUiTestsWebhookUrl="$LEGACY_TEAMS_UI_TESTS_WEBHOOK_URL"
+            fi
+
+            echo "##vso[task.setvariable variable=slackAppToken;issecret=true]$slackAppToken"
+            echo "##vso[task.setvariable variable=teamsUiTestsWebhookUrl;issecret=true]$teamsUiTestsWebhookUrl"
+
       - ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
         - task: Bash@3
           displayName: Set Public Site basic auth credentials
@@ -120,8 +148,8 @@ jobs:
             pipenv install
             pipenv run python run_tests.py --env "${{ parameters.testEnvironment }}" --file "tests/general_public" --processes 4 --rerun-attempts 1 --ci --enable-slack-notifications
         env:
-          SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
-          TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
+          SLACK_APP_TOKEN: $(slackAppToken)
+          TEAMS_UI_TESTS_WEBHOOK_URL: $(teamsUiTestsWebhookUrl)
           ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
             PUBLIC_AUTH_USER: $(publicSiteBasicAuthUsername)
             PUBLIC_AUTH_PASSWORD: $(publicSiteBasicAuthPassword)

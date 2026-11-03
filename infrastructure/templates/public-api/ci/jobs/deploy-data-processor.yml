@@ -39,7 +39,7 @@ jobs:
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 keyVaultName: $(resourceNames.keyVault.keyVault)
-                secretName: ees-public-api-data-processor-app-registration-client-id
+                secretName: $(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
                 variableName: dataProcessorAppRegistrationClientId
 
             # We do config updates out of Bicep template so we can implement slot swapping.

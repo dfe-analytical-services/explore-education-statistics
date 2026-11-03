@@ -22,6 +22,7 @@ module linkedServicesModule 'application/configuration/linked-services.bicep' = 
   name: 'dataFactoryLinkedServicesModuleDeploy'
   params: {
     dataFactoryName: resourceNames.dataFactory
+    sqlConnectionStringSecretName: resourceNames.keyVault.secrets.dataFactory.sqlConnectionString
   }
 }
 
@@ -39,6 +40,8 @@ module purgeSoftDeletedSubjectsPipelineModule 'application/pipelines/database-ma
     dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
     keyVaultName: resourceNames.keyVault.keyVault
+    slackAppTokenSecretName: resourceNames.keyVault.secrets.alerts.slackAppToken
+    teamsWebhookUrlSecretName: resourceNames.keyVault.secrets.alerts.teamsWebhookUrl
     slackAlertsChannel: slackAlertsChannel
   }
 }
@@ -49,6 +52,8 @@ module rebuildStatisticsIndexesPipelineModule 'application/pipelines/database-ma
     dataFactoryName: resourceNames.dataFactory
     statisticsDbLinkedServiceName: linkedServicesModule.outputs.statisticsDbLinkedServiceName
     keyVaultName: resourceNames.keyVault.keyVault
+    slackAppTokenSecretName: resourceNames.keyVault.secrets.alerts.slackAppToken
+    teamsWebhookUrlSecretName: resourceNames.keyVault.secrets.alerts.teamsWebhookUrl
     slackAlertsChannel: slackAlertsChannel
   }
 }

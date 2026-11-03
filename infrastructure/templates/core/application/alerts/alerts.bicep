@@ -10,6 +10,12 @@ param alertsLogicAppName string
 @description('The Key Vault instance that holds secrets necessary for alerts.')
 param keyVaultName string
 
+@description('Name of the Key Vault secret holding the Slack channels and app token that alerts are posted with.')
+param slackAlertsConfigSecretName string
+
+@description('Name of the Key Vault secret holding the Teams Power Automate webhook URL that alerts are posted to.')
+param teamsWebhookUrlSecretName string
+
 @description('Resource Id of the Log Analytics Workspace to link the logic app to.')
 param logAnalyticsWorkspaceId string
 
@@ -23,8 +29,8 @@ module alertsLogicAppModule 'alerts-logic-app.bicep' = {
     subscription: subscription
     alertsLogicAppName: alertsLogicAppName
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    slackAlertsConfig: keyVault.getSecret('ees-alerts-slackconfig')
-    teamsPowerAutomateWebhookUrl: keyVault.getSecret('ees-alerts-teamswebhookurl')
+    slackAlertsConfig: keyVault.getSecret(slackAlertsConfigSecretName)
+    teamsPowerAutomateWebhookUrl: keyVault.getSecret(teamsWebhookUrlSecretName)
   }
 }
 

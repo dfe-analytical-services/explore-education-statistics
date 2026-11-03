@@ -277,6 +277,11 @@ type ResourceNames = {
       publicApi: {
         apiAppRegistrationClientId: string
         dataProcessorAppRegistrationClientId: string
+        appGatewayFuapiHeader: string
+        dataProcessorContentDbConnectionString: string
+        dataProcessorManagementStorageConnectionString: string
+        dataProcessorSlot1StorageConnectionString: string
+        dataProcessorSlot2StorageConnectionString: string
       }
       publicSite: {
         basicAuthUsername: string
@@ -289,6 +294,16 @@ type ResourceNames = {
       screener: {
         appRegistrationClientId: string
       }
+      alerts: {
+        slackConfig: string
+        slackAppToken: string
+        teamsWebhookUrl: string
+        teamsUiTestsWebhookUrl: string
+      }
+      dataFactory: {
+        sqlConnectionString: string
+      }
+      sqlAdminPassword: string
       bauEmail: string
       coreStorageAccountConnectionString: string
       importerStorageAccountConnectionString: string
@@ -608,6 +623,11 @@ func getResourceNames(
       publicApi: {
         apiAppRegistrationClientId: 'ees-public-api-app-registration-client-id'
         dataProcessorAppRegistrationClientId: 'ees-public-api-data-processor-app-registration-client-id'
+        appGatewayFuapiHeader: 'ees-publicapi-app-gateway-fuapi-header'
+        dataProcessorContentDbConnectionString: 'ees-publicapi-data-processor-connectionstring-contentdb'
+        dataProcessorManagementStorageConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}processormg-connection-string'
+        dataProcessorSlot1StorageConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}processors1-connection-string'
+        dataProcessorSlot2StorageConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}processors2-connection-string'
       }
       publicSite: {
         basicAuthUsername: 'ees-public-site-basic-auth-username'
@@ -620,6 +640,16 @@ func getResourceNames(
       screener: {
         appRegistrationClientId: 'ees-screener-app-registration-client-id'
       }
+      alerts: {
+        slackConfig: 'ees-alerts-slackconfig'
+        slackAppToken: 'ees-alerts-slackapptoken'
+        teamsWebhookUrl: 'ees-alerts-teamswebhookurl'
+        teamsUiTestsWebhookUrl: 'ees-alerts-teams-uitests-webhookurl'
+      }
+      dataFactory: {
+        sqlConnectionString: 'ees-sql-admin-datafactory-connectionstring'
+      }
+      sqlAdminPassword: 'ees-sql-admin-password'
       bauEmail: 'ees-bau-email'
       coreStorageAccountConnectionString: 'ees-storage-core'
       importerStorageAccountConnectionString: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer-connection-string'
@@ -944,6 +974,11 @@ func getElzResourceNames(env string) ResourceNames => {
       publicApi: {
         apiAppRegistrationClientId: 'papi-app-registration-client-id'
         dataProcessorAppRegistrationClientId: 'papiprocessor-app-registration-client-id'
+        appGatewayFuapiHeader: 'papi-appgateway-fuapi-header'
+        dataProcessorContentDbConnectionString: 'papiprocessor-contentdb-connection-string'
+        dataProcessorManagementStorageConnectionString: 'papiprocessor-management-storage-connection-string'
+        dataProcessorSlot1StorageConnectionString: 'papiprocessor-slot1-storage-connection-string'
+        dataProcessorSlot2StorageConnectionString: 'papiprocessor-slot2-storage-connection-string'
       }
       publicSite: {
         basicAuthUsername: 'publicsite-basic-auth-username'
@@ -956,6 +991,16 @@ func getElzResourceNames(env string) ResourceNames => {
       screener: {
         appRegistrationClientId: 'screener-app-registration-client-id'
       }
+      alerts: {
+        slackConfig: 'alerts-slack-config'
+        slackAppToken: 'alerts-slack-app-token'
+        teamsWebhookUrl: 'alerts-teams-webhook-url'
+        teamsUiTestsWebhookUrl: 'alerts-teams-uitests-webhook-url'
+      }
+      dataFactory: {
+        sqlConnectionString: 'datafactory-sql-connection-string'
+      }
+      sqlAdminPassword: 'sql-admin-password'
       bauEmail: 'bau-email'
       coreStorageAccountConnectionString: 'core-storage-connection-string'
       importerStorageAccountConnectionString: 'importer-storage-connection-string'

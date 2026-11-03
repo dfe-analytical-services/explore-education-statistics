@@ -72,7 +72,7 @@ module publicApiWafPolicyModule 'publicApiWafPolicy.bicep' = {
   params: {
     location: location
     policyName: resourceNames.applicationGateway.sites.publicApi.wafPolicy
-    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
+    fuapiSecretValue: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.appGatewayFuapiHeader)
     tagValues: tagValues
   }
 }

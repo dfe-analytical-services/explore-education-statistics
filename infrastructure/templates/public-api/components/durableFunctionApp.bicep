@@ -18,6 +18,13 @@ param appServicePlanName string
 @description('Specifies the name prefix for all storage accounts')
 param storageAccountsNamePrefix string
 
+@description('Names of the Key Vault secrets in which to store the storage accounts\' connection strings.')
+param storageConnectionStringSecretNames {
+  management: string
+  slot1: string
+  slot2: string
+}
+
 @description('Function App Plan : operating system')
 param operatingSystem 'Windows' | 'Linux' = 'Linux'
 
@@ -208,7 +215,7 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
       ? null
       : {
           keyVaultName: keyVaultName
-          secretName: '${managementStorageAccountName}-connection-string'
+          secretName: storageConnectionStringSecretNames.management
         }
     allowedSubnetIds: [subnetId]
     publicNetworkAccessEnabled: false
@@ -232,7 +239,7 @@ module slot1StorageAccountModule '../../common/components/storage/storage-accoun
     sku: storageAccountSku
     connectionStringSecret: {
       keyVaultName: keyVaultName
-      secretName: '${slot1StorageAccountName}-connection-string'
+      secretName: storageConnectionStringSecretNames.slot1
     }
     allowedSubnetIds: [subnetId]
     publicNetworkAccessEnabled: false
@@ -271,7 +278,7 @@ module slot2StorageAccountModule '../../common/components/storage/storage-accoun
     sku: storageAccountSku
     connectionStringSecret: {
       keyVaultName: keyVaultName
-      secretName: '${slot2StorageAccountName}-connection-string'
+      secretName: storageConnectionStringSecretNames.slot2
     }
     allowedSubnetIds: [subnetId]
     publicNetworkAccessEnabled: false

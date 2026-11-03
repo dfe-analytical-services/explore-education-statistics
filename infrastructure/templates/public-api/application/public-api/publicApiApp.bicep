@@ -89,10 +89,10 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
   params: {
     location: location
     containerAppName: resourceNames.publicApi.apiApp
-    acrLoginServer: keyVault.getSecret('DOCKER-REGISTRY-SERVER-DOMAIN')
+    acrLoginServer: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerRegistryServerDomain)
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    dockerPullManagedIdentityClientId: keyVault.getSecret('DOCKER-REGISTRY-SERVER-USERNAME')
-    dockerPullManagedIdentitySecretValue: keyVault.getSecret('DOCKER-REGISTRY-SERVER-PASSWORD')
+    dockerPullManagedIdentityClientId: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullUsername)
+    dockerPullManagedIdentitySecretValue: keyVault.getSecret(resourceNames.keyVault.secrets.acr.dockerPullPassword)
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     environmentId: containerAppEnvironmentId
     environmentIpAddress: containerAppEnvironmentIpAddress

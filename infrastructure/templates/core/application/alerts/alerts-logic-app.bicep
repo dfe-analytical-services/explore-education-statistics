@@ -11,7 +11,8 @@ param logAnalyticsWorkspaceId string
 @description('''
 JSON array of the Slack workspaces to post alerts to, each entry taking the form
 `{ "channels": ["<channel id>"], "authToken": "<app token>" }`. Held in the `ees-alerts-slackconfig`
-Key Vault secret so that each workspace's channels travel with the token that can post to them.
+Key Vault secret (`alerts-slack-config` in the ELZ) so that each workspace's channels travel with the token
+that can post to them.
 ''')
 param slackAlertsConfig string
 

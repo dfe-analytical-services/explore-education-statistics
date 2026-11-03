@@ -102,6 +102,11 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
     functionAppName: resourceNames.publicApi.processor.functionApp
     appServicePlanName: resourceNames.publicApi.processor.appServicePlan
     storageAccountsNamePrefix: resourceNames.publicApi.processor.storageAccountsPrefix
+    storageConnectionStringSecretNames: {
+      management: resourceNames.keyVault.secrets.publicApi.dataProcessorManagementStorageConnectionString
+      slot1: resourceNames.keyVault.secrets.publicApi.dataProcessorSlot1StorageConnectionString
+      slot2: resourceNames.keyVault.secrets.publicApi.dataProcessorSlot2StorageConnectionString
+    }
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id

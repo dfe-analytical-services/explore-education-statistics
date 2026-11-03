@@ -1,6 +1,9 @@
 @description('Name of the Data Factory instance that owns these linked services.')
 param dataFactoryName string
 
+@description('Name of the Key Vault secret holding the connection string with which Data Factory connects to the statistics database.')
+param sqlConnectionStringSecretName string
+
 var statisticsDatabaseLinkedServiceName = 'ls_sql_statistics'
 
 resource statisticsDatabaseLinkedService 'Microsoft.DataFactory/factories/linkedServices@2018-06-01' = {
@@ -15,7 +18,7 @@ resource statisticsDatabaseLinkedService 'Microsoft.DataFactory/factories/linked
           referenceName: 'AzureKeyVault'
           type: 'LinkedServiceReference'
         }
-        secretName: 'ees-sql-admin-datafactory-connectionstring'
+        secretName: sqlConnectionStringSecretName
       }
     }
     connectVia: {

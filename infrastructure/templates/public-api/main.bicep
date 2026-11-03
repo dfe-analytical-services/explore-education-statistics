@@ -290,7 +290,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     location: location
     resourceNames: resourceNames
-    apiAppRegistrationClientId: keyVault.getSecret('ees-public-api-app-registration-client-id')
+    apiAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.apiAppRegistrationClientId)
     containerAppEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     containerAppEnvironmentIpAddress: containerAppEnvironmentModule.outputs.containerAppEnvironmentIpAddress
     contentApiUrl: publicUrls.contentApi
@@ -333,7 +333,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
     location: location
     resourceNames: resourceNames
     applicationInsightsKey: appInsightsModule.outputs.appInsightsKey
-    dataProcessorAppRegistrationClientId: keyVault.getSecret('ees-public-api-data-processor-app-registration-client-id')
+    dataProcessorAppRegistrationClientId: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.dataProcessorAppRegistrationClientId)
     devopsServicePrincipalId: devopsServicePrincipalId
     storageFirewallRules: maintenanceIpRanges
     functionAppFirewallRules: union(
@@ -369,7 +369,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
   ]
 }
 
-output dataProcessorContentDbConnectionStringSecretKey string = 'ees-publicapi-data-processor-connectionstring-contentdb'
+output dataProcessorContentDbConnectionStringSecretKey string = resourceNames.keyVault.secrets.publicApi.dataProcessorContentDbConnectionString
 output dataProcessorPsqlConnectionString string = publicDataDbConnectionString(
   resourceNames.databases.postgreSqlFlexibleServer,
   resourceNames.publicApi.processor.identity

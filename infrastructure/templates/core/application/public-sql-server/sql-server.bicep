@@ -14,6 +14,9 @@ param sqlAdministratorLogin string
 @description('The Key Vault instance that holds the SQL Server admin password.')
 param keyVaultName string
 
+@description('Name of the Key Vault secret holding the SQL Server admin user\'s password.')
+param sqlAdministratorLoginPasswordSecretName string
+
 @description('The login name of the Entra ID admin for the SQL Server.')
 param sqlAzureAdministratorLogin string
 
@@ -79,7 +82,7 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     serverName: serverName
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
-    sqlAdministratorLoginPassword: keyVault.getSecret('ees-sql-admin-password')
+    sqlAdministratorLoginPassword: keyVault.getSecret(sqlAdministratorLoginPasswordSecretName)
     sqlAzureAdministratorLogin: sqlAzureAdministratorLogin
     sqlAzureAdministratorSid: sqlAzureAdministratorSid
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess

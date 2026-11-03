@@ -4,6 +4,12 @@ param dataFactoryName string
 @description('Name of the Key Vault instance that owns secrets for this pipeline.')
 param keyVaultName string
 
+@description('Name of the Key Vault secret holding the Slack app token that alerts are posted with.')
+param slackAppTokenSecretName string
+
+@description('Name of the Key Vault secret holding the Teams Power Automate webhook URL that alerts are posted to.')
+param teamsWebhookUrlSecretName string
+
 @description('Name of the Statistics database linked service.')
 param statisticsDbLinkedServiceName string
 
@@ -24,8 +30,8 @@ module pipelineModule 'pipeline.bicep' = {
     dataFactoryName: dataFactoryName
     statisticsDbLinkedServiceName: statisticsDbLinkedServiceName
     slackAlertsChannel: slackAlertsChannel
-    slackAppToken: keyVault.getSecret('ees-alerts-slackapptoken')
-    teamsPowerAutomateWebhookUrl: keyVault.getSecret('ees-alerts-teamswebhookurl')
+    slackAppToken: keyVault.getSecret(slackAppTokenSecretName)
+    teamsPowerAutomateWebhookUrl: keyVault.getSecret(teamsWebhookUrlSecretName)
     removeSoftDeletedSubjectsObservationLimit: removeSoftDeletedSubjectsObservationLimit
     removeSoftDeletedSubjectsObservationCommitBatchSize: removeSoftDeletedSubjectsObservationCommitBatchSize
     removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize: removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize

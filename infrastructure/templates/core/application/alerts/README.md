@@ -17,7 +17,8 @@ The [Logic App](alerts-logic-app.bicep) receives JSON payloads from metric alert
 information using a series of `Compose` actions, and then 2 HTTP actions, one for Teams and one for
 Slack, take those variables and construct POSTs in the correct format for their target platforms.
 
-All Slack configuration lives in a single `ees-alerts-slackconfig` Key Vault secret, holding a JSON
+All Slack configuration lives in a single `ees-alerts-slackconfig` Key Vault secret (`alerts-slack-config` in
+the ELZ subscriptions), holding a JSON
 array of workspaces:
 
 ```json
