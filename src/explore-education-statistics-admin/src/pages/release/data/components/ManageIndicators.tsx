@@ -153,8 +153,8 @@ export default function ManageIndicators({
         <section className="govuk-!-margin-bottom-8">
           <h4>Paired indicators</h4>
           <p className="govuk-hint">
-            A child indicator is selected automatically with its parent
-            indicator in the table tool, and cannot be selected on its own.
+            A paired indicator is selected automatically with its main indicator
+            in the table tool, and cannot be selected on its own.
           </p>
           {pairedIndicators.length === 0 ? (
             <p>No indicators have been paired for this data set.</p>
@@ -165,8 +165,8 @@ export default function ManageIndicators({
               </caption>
               <thead>
                 <tr>
-                  <th scope="col">Parent indicator</th>
-                  <th scope="col">Child indicator</th>
+                  <th scope="col">Main indicator</th>
+                  <th scope="col">Paired indicator</th>
                 </tr>
               </thead>
               <tbody>

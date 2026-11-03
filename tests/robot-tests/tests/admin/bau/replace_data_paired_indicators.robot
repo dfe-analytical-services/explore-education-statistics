@@ -84,7 +84,7 @@ Check the saved pairs
     user checks table cell contains    3    1    Unauthorised absence sessions    id:reordering
     user checks table cell contains    3    2    Unauthorised absence rate    id:reordering
 
-Check a child indicator is selected with its parent in the table tool
+Check a paired indicator is selected with its main indicator in the table tool
     user starts creating a data block up to choosing indicators
 
     user waits until page contains    Selected automatically with Overall absence sessions
@@ -100,7 +100,7 @@ Check a child indicator is selected with its parent in the table tool
     user checks indicator checkbox is not checked    Overall absence sessions
     user checks indicator checkbox is not checked    Overall absence rate
 
-Check searching for a child indicator also shows its parent in the table tool
+Check searching for a paired indicator also shows its main indicator in the table tool
     user enters text into element    ${INDICATORS_SEARCH}    Authorised absence rate
 
     user waits until page contains element    ${AUTHORISED_SESSIONS_LABEL}
@@ -111,7 +111,7 @@ Check searching for a child indicator also shows its parent in the table tool
     user clears element text    ${INDICATORS_SEARCH}
     user waits until page contains element    ${ENROLMENTS_LABEL}
 
-Check selecting all parent indicators also selects their children in the table tool
+Check selecting all main indicators also selects their paired indicators in the table tool
     user clicks select all for category    Absence sessions
 
     user checks indicator checkbox is checked    Overall absence sessions
@@ -149,12 +149,12 @@ Check paired indicators that will be maintained or dropped
     user checks table cell contains    1    2    Overall absence rate    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    1    3    Maintained    ${REPLACEMENT_PAIRS_TABLE}
 
-    # The renamed child indicator isn't mapped automatically, so the pair is dropped
+    # The renamed paired indicator isn't mapped automatically, so the pair is dropped
     user checks table cell contains    2    1    Authorised absence sessions    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    2    2    Authorised absence rate    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    2    3    Dropped    ${REPLACEMENT_PAIRS_TABLE}
 
-    # The removed child indicator has nothing to map to, so the pair is dropped
+    # The removed paired indicator has nothing to map to, so the pair is dropped
     user checks table cell contains    3    1    Unauthorised absence sessions    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    3    2    Unauthorised absence rate    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    3    3    Dropped    ${REPLACEMENT_PAIRS_TABLE}
@@ -212,7 +212,7 @@ Check indicators from a dropped pair can be selected on their own in the table t
     user checks indicator checkbox is checked    Authorised absence rate
     user checks indicator checkbox is not checked    Authorised absence sessions
 
-    # The overall pair was maintained, so its child still can't be selected on its own
+    # The overall pair was maintained, so its paired indicator still can't be selected on its own
     user checks element is disabled    ${OVERALL_RATE_CHECKBOX}
 
 

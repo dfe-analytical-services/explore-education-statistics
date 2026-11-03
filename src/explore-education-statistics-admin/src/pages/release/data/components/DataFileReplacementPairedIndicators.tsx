@@ -28,7 +28,7 @@ export default function DataFileReplacementPairedIndicators({
         <>
           <p>
             {hasDroppedPairs
-              ? 'One or more paired indicators will be dropped by this data replacement because their parent or child indicator has not been mapped. Indicators from a dropped pair can be selected independently in the table tool.'
+              ? 'One or more paired indicators will be dropped by this data replacement because one of their indicators has not been mapped. Indicators from a dropped pair can be selected independently in the table tool.'
               : 'All paired indicators will be maintained by this data replacement.'}
           </p>
 
@@ -39,8 +39,8 @@ export default function DataFileReplacementPairedIndicators({
             </caption>
             <thead>
               <tr>
-                <th scope="col">Parent indicator</th>
-                <th scope="col">Child indicator</th>
+                <th scope="col">Main indicator</th>
+                <th scope="col">Paired indicator</th>
                 <th scope="col">Status</th>
               </tr>
             </thead>

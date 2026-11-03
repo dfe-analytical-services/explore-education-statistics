@@ -70,8 +70,8 @@ const ReleaseDataReorderSection = ({
           each item.
         </p>
         <p>
-          You can also pair indicators so that a child indicator is always
-          selected with its parent indicator.
+          You can also pair indicators so that a paired indicator is always
+          selected with its main indicator.
         </p>
         <p>
           These changes will be reflected in the table tool on the public

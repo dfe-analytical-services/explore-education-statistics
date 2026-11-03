@@ -158,9 +158,9 @@ const ReleaseDataFileReplacementCompletePage = () => {
                 {droppedPairs.length > 0 && (
                   <>
                     <p>
-                      The following paired indicators were dropped because their
-                      parent or child indicator was not mapped. Their indicators
-                      can now be selected independently in the table tool:
+                      The following paired indicators were dropped because one
+                      of their indicators was not mapped. Their indicators can
+                      now be selected independently in the table tool:
                     </p>
                     <PairedIndicatorsList
                       pairs={droppedPairs}

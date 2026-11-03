@@ -82,10 +82,10 @@ describe('PairedIndicatorsForm', () => {
 
     const pair = await screen.findByRole('group', { name: 'Pair 1' });
 
-    expect(within(pair).getByLabelText('Parent indicator')).toHaveValue(
+    expect(within(pair).getByLabelText('Main indicator')).toHaveValue(
       'indicator-1',
     );
-    expect(within(pair).getByLabelText('Child indicator')).toHaveValue(
+    expect(within(pair).getByLabelText('Paired indicator')).toHaveValue(
       'indicator-2',
     );
     expect(adminTableBuilderService.getPairedIndicators).toHaveBeenCalledWith(
@@ -139,15 +139,15 @@ describe('PairedIndicatorsForm', () => {
 
     const pair2 = screen.getByRole('group', { name: 'Pair 2' });
     await user.selectOptions(
-      within(pair2).getByLabelText('Parent indicator'),
+      within(pair2).getByLabelText('Main indicator'),
       'indicator-3',
     );
     await user.selectOptions(
-      within(pair2).getByLabelText('Child indicator'),
+      within(pair2).getByLabelText('Paired indicator'),
       'indicator-1',
     );
 
-    // Remove the original pair, otherwise indicator 1 would be both a parent and a child
+    // Remove the original pair, otherwise indicator 1 would be both a main and a paired indicator
     await user.click(screen.getByRole('button', { name: 'Remove pair 1' }));
 
     await user.click(
@@ -206,7 +206,7 @@ describe('PairedIndicatorsForm', () => {
         ['indicator-1', 'indicator-3'],
         ['indicator-2', 'indicator-3'],
       ],
-      message: 'A child indicator can only have one parent indicator.',
+      message: 'A paired indicator can only be paired with one main indicator.',
     },
     {
       name: 'a parent indicator with multiple children',
@@ -214,7 +214,7 @@ describe('PairedIndicatorsForm', () => {
         ['indicator-1', 'indicator-2'],
         ['indicator-1', 'indicator-3'],
       ],
-      message: 'A parent indicator can only have one child indicator.',
+      message: 'A main indicator can only have one paired indicator.',
     },
     {
       name: 'chained indicators',
@@ -222,7 +222,8 @@ describe('PairedIndicatorsForm', () => {
         ['indicator-1', 'indicator-2'],
         ['indicator-2', 'indicator-3'],
       ],
-      message: 'An indicator cannot be both a parent and a child indicator.',
+      message:
+        'An indicator cannot be both a main indicator and a paired indicator.',
     },
   ])('shows a validation error for $name', async ({ pairs, message }) => {
     adminTableBuilderService.getPairedIndicators.mockResolvedValue({
@@ -277,10 +278,10 @@ describe('PairedIndicatorsForm', () => {
     );
 
     expect(
-      await screen.findByText('Select a parent indicator', { selector: 'a' }),
+      await screen.findByText('Select a main indicator', { selector: 'a' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Select a child indicator', { selector: 'a' }),
+      screen.getByText('Select a paired indicator', { selector: 'a' }),
     ).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
