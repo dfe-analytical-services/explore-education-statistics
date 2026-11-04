@@ -18,3 +18,7 @@ param deployAppIdentities = true
 
 // No content shares for the Function Apps on Dedicated plans.
 param functionAppContentShares = false
+
+// The apps connect to the Importer's, Notifier's and Publisher's storage accounts with their managed identities, so their
+// connection strings aren't stored.
+param storeStorageAccountConnectionStrings = false

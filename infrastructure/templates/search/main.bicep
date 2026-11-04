@@ -20,6 +20,10 @@ param storageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
 param deployAppIdentities bool = false
 
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the Search Docs Function App connects to the search storage account with its managed identity, given a keyless connection string, rather than with a connection string from Key Vault, which then isn\'t stored. Only the param files in "parameters/elz" turn this on.')
+param identityBasedStorageConnections bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -146,7 +150,8 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
     searchServiceSearchIndexerName: searchServiceSearchIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
-    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.?searchStorageAccountConnectionStringSecretName
+    identityBasedStorageConnection: identityBasedStorageConnections
     searchDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.searchDocuments
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
@@ -176,6 +181,7 @@ module searchServiceModule 'application/searchService.bicep' = {
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
+    storeStorageAccountConnectionString: !identityBasedStorageConnections
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     tagValues: tagValues
   }

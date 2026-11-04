@@ -21,3 +21,7 @@ param deploySystemAssignedIdentityRoleAssignments = false
 // The SQL Servers write auditing and vulnerability assessment output to the logging storage account with their
 // system-assigned identities.
 param sqlServerIdentityBasedAuditStorage = true
+
+// The apps connect to the core and public storage accounts with their managed identities, so their connection strings
+// aren't stored.
+param storeStorageAccountConnectionStrings = false

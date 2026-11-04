@@ -1,6 +1,7 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
 import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
+import { keylessStorageConnectionString } from '../../common/functions.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
@@ -21,9 +22,12 @@ param searchServiceName string
 @description('Name of the Search storage account.')
 param searchStorageAccountName string
 
-@description('The connection string to the Search storage account.')
-@secure()
-param searchStorageAccountConnectionStringSecretName string
+@description('The name of the Key Vault secret holding the Search storage account\'s connection string. Not needed when the Function App connects with its managed identity.')
+param searchStorageAccountConnectionStringSecretName string?
+
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the Function App connects to the Search storage account with its managed identity, given a keyless connection string, rather than with a connection string from Key Vault.')
+param identityBasedStorageConnection bool = false
 
 @description('Storage container name for search documents in the Search storage account.')
 param searchDocumentsContainerName string
@@ -108,7 +112,9 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     appSettings: [
       {
         name: 'App__SearchStorageConnectionString'
-        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
+        value: identityBasedStorageConnection
+          ? keylessStorageConnectionString(searchStorageAccount.name)
+          : '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName!})'
       }
       {
         name: 'App__SearchDocumentsContainerName'

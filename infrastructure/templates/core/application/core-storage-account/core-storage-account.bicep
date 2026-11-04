@@ -8,8 +8,8 @@ param storageAccountName string
 @description('Storage account SKU, which sets its redundancy.')
 param sku StorageAccountSku
 
-@description('Name of the Key Vault secret holding the storage account\'s connection string.')
-param connectionStringSecretName string
+@description('Name of the Key Vault secret in which to store the storage account\'s connection string. Omit to not store it.')
+param connectionStringSecretName string?
 
 @description('Retention of blobs in days.')
 param blobDeleteRetentionDays int
@@ -52,10 +52,12 @@ module storageAccountModule '../../../common/components/storage/storage-account.
     kind: 'StorageV2'
     sku: sku
     publicNetworkAccessEnabled: true
-    connectionStringSecret: {
-      keyVaultName: keyVaultName
-      secretName: connectionStringSecretName
-    }
+    connectionStringSecret: connectionStringSecretName != null
+      ? {
+          keyVaultName: keyVaultName
+          secretName: connectionStringSecretName!
+        }
+      : null
     firewallRules: firewallRules
     allowedSubnetIds: [
       subnets.admin.id
