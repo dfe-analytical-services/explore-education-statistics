@@ -6,13 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public interface IContentApiClient
 {
     /// <summary>
-    /// Retrieve the latest release for the specified publication in a searchable document format.
+    /// Retrieve the latest release for the specified publication as a release document.
     /// </summary>
     /// <param name="publicationSlug">the publication slug</param>
     /// <param name="cancellationToken">cancellation token</param>
-    /// <returns>The latest release for the publication in searchable document format</returns>
-    /// <exception cref="UnableToGetPublicationLatestReleaseSearchViewModelException">Thrown if the call to the API was unsuccessful</exception>
-    Task<ReleaseDocument> GetPublicationLatestReleaseSearchableDocument(
+    /// <returns>The latest release for the publication as a release document</returns>
+    /// <exception cref="UnableToGetPublicationLatestReleaseDocumentException">Thrown if the call to the API was unsuccessful</exception>
+    Task<ReleaseDocument> GetPublicationLatestReleaseDocument(
         string publicationSlug,
         CancellationToken cancellationToken = default
     );

@@ -24,7 +24,7 @@ internal class ReleaseDocumentCreator(
         CancellationToken cancellationToken = default
     )
     {
-        var releaseDocument = await contentApiClient.GetPublicationLatestReleaseSearchableDocument(
+        var releaseDocument = await contentApiClient.GetPublicationLatestReleaseDocument(
             request.PublicationSlug,
             cancellationToken
         );

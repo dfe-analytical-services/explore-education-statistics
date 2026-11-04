@@ -71,7 +71,7 @@ public class ReleaseDocumentCreatorTests
         {
             // ARRANGE
             var releaseId = new Guid("11223344-5566-7788-9900-123456789abc");
-            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(builder => builder.WithReleaseId(releaseId));
+            _contentApiClientMockBuilder.WhereReleaseDocumentIs(builder => builder.WithReleaseId(releaseId));
 
             var sut = GetSut();
 
@@ -89,7 +89,7 @@ public class ReleaseDocumentCreatorTests
         {
             // ARRANGE
             var releaseDocument = new ReleaseDocumentBuilder().Build();
-            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
+            _contentApiClientMockBuilder.WhereReleaseDocumentIs(releaseDocument);
             var sut = GetSut();
 
             // ACT
@@ -110,7 +110,7 @@ public class ReleaseDocumentCreatorTests
         {
             // ARRANGE
             var releaseDocument = new ReleaseDocumentBuilder().Build();
-            _contentApiClientMockBuilder.WhereReleaseSearchViewModelIs(releaseDocument);
+            _contentApiClientMockBuilder.WhereReleaseDocumentIs(releaseDocument);
             var sut = GetSut();
 
             // ACT

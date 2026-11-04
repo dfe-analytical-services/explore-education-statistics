@@ -19,9 +19,7 @@ internal class ContentApiClientMockBuilder
         Assert = new Asserter(_mock);
 
         _mock
-            .Setup(m =>
-                m.GetPublicationLatestReleaseSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>())
-            )
+            .Setup(m => m.GetPublicationLatestReleaseDocument(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _releaseDocument ?? _releaseDocumentBuilder.Build());
 
         _mock
@@ -58,17 +56,17 @@ internal class ContentApiClientMockBuilder
         return _mock.Object;
     }
 
-    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(ReleaseDocument releaseDocument)
+    public ContentApiClientMockBuilder WhereReleaseDocumentIs(ReleaseDocument releaseDocument)
     {
         _releaseDocument = releaseDocument;
         return this;
     }
 
-    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        Func<ReleaseDocumentBuilder, ReleaseDocumentBuilder> modifyReleaseSearchViewModel
+    public ContentApiClientMockBuilder WhereReleaseDocumentIs(
+        Func<ReleaseDocumentBuilder, ReleaseDocumentBuilder> modifyReleaseDocument
     )
     {
-        modifyReleaseSearchViewModel(_releaseDocumentBuilder);
+        modifyReleaseDocument(_releaseDocumentBuilder);
         return this;
     }
 
@@ -129,7 +127,7 @@ internal class ContentApiClientMockBuilder
         public void ContentWasLoadedFor(string publicationSlug)
         {
             mock.Verify(
-                m => m.GetPublicationLatestReleaseSearchableDocument(publicationSlug, It.IsAny<CancellationToken>()),
+                m => m.GetPublicationLatestReleaseDocument(publicationSlug, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }

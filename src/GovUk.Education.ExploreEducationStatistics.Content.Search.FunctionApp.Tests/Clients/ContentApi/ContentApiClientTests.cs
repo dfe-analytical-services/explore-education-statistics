@@ -157,7 +157,7 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
+                var actual = await sut.GetPublicationLatestReleaseDocument(publicationSlug);
 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -197,14 +197,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
 
                 // ACT
                 var exception = await Record.ExceptionAsync(() =>
-                    sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug)
+                    sut.GetPublicationLatestReleaseDocument(publicationSlug)
                 );
 
                 // ASSERT
                 Assert.NotNull(exception);
-                var unableToGetPublicationLatestReleaseSearchViewModelException =
-                    Assert.IsType<UnableToGetPublicationLatestReleaseSearchViewModelException>(exception);
-                Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseSearchViewModelException.Message);
+                var unableToGetPublicationLatestReleaseDocumentException =
+                    Assert.IsType<UnableToGetPublicationLatestReleaseDocumentException>(exception);
+                Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseDocumentException.Message);
             }
         }
     }
@@ -277,15 +277,15 @@ public class ContentApiClientTests(ITestOutputHelper output)
             Print($"ErrorMessage: {result.ErrorMessage ?? "<null>"}");
         }
 
-        [Fact(Skip = "Call Content API to get a searchable document")]
-        public async Task GetSearchableDocument()
+        [Fact(Skip = "Call Content API to get a release document")]
+        public async Task GetReleaseDocument()
         {
             // ARRANGE
             var sut = GetSut();
             const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
             // ACT
-            var result = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
+            var result = await sut.GetPublicationLatestReleaseDocument(publicationSlug);
 
             // ASSERT
             PrintAsJson(result);
