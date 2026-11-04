@@ -9,10 +9,8 @@ public class ReleaseDocumentRemoverMockBuilder
     private RemovePublicationReleaseDocumentsResponse? _removePublicationReleaseDocumentsResponse;
     private RemoveReleaseDocumentResponse? _removeReleaseDocumentResponse;
 
-    public ReleaseDocumentRemoverMockBuilder()
+    public IReleaseDocumentRemover Build()
     {
-        Assert = new Asserter(_mock);
-
         _mock
             .Setup(m =>
                 m.RemovePublicationReleaseDocuments(
@@ -20,22 +18,19 @@ public class ReleaseDocumentRemoverMockBuilder
                     It.IsAny<CancellationToken>()
                 )
             )
-            .ReturnsAsync(
+            .ReturnsAsync(() =>
                 _removePublicationReleaseDocumentsResponse
-                    ?? new RemovePublicationReleaseDocumentsResponse(new Dictionary<Guid, bool>())
+                ?? new RemovePublicationReleaseDocumentsResponse(new Dictionary<Guid, bool>())
             );
 
         _mock
             .Setup(m =>
                 m.RemoveReleaseDocument(It.IsAny<RemoveReleaseDocumentRequest>(), It.IsAny<CancellationToken>())
             )
-            .ReturnsAsync(_removeReleaseDocumentResponse ?? new RemoveReleaseDocumentResponse(Success: true));
+            .ReturnsAsync(() => _removeReleaseDocumentResponse ?? new RemoveReleaseDocumentResponse(Success: true));
 
         _mock.Setup(m => m.RemoveAllReleaseDocuments(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-    }
 
-    public IReleaseDocumentRemover Build()
-    {
         return _mock.Object;
     }
 
@@ -51,7 +46,7 @@ public class ReleaseDocumentRemoverMockBuilder
         return this;
     }
 
-    public Asserter Assert { get; }
+    public Asserter Assert => new(_mock);
 
     public class Asserter(Mock<IReleaseDocumentRemover> mock)
     {
