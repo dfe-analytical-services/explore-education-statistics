@@ -9,7 +9,7 @@ param name string
 ])
 param vaultStorageRedundancy string = 'GeoRedundant'
 
-@description('Whether backups can be restored in the paired region. Needs geo-redundant storage. Once protection has started, the vault can\'t then move off geo-redundant storage.')
+@description('Whether backups can be restored in the paired region. Only PostgreSQL backups support this. Needs geo-redundant storage. Once protection has started, the vault can\'t then move off geo-redundant storage.')
 param crossRegionRestoreEnabled bool = false
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
