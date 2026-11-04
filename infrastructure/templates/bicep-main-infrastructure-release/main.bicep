@@ -68,6 +68,10 @@ param publisherStorageAccountSku StorageAccountSku = 'Standard_GZRS'
 @description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
 param deployAppIdentities bool = false
 
+// TODO EES-7502 - remove, leaving the content shares off, once every environment has moved to the ELZ.
+@description('Whether the Importer, Notifier and Publisher Function Apps get a content share. They run on Dedicated plans, which don\'t need one. Removing an existing app\'s content share would move its content, so only the param files in "parameters/elz" turn this off, for the new environments.')
+param functionAppContentShares bool = true
+
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
 var tagValues = union(tags, {
   Environment: environmentConfig.environmentName!
@@ -256,6 +260,7 @@ module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
     useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: importerStorageAccountSku
@@ -279,6 +284,7 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   name: 'notifierModuleDeploy'
   params: {
     useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: notifierStorageAccountSku
@@ -304,6 +310,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   name: 'publisherModuleDeploy'
   params: {
     useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: publisherStorageAccountSku
