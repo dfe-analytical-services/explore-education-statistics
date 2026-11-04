@@ -125,6 +125,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageFirewallRules: maintenanceIpRanges
     ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
+    // The Publisher keeps its publishing status in tables.
+    // TODO EES-7502 - grant this unconditionally once every environment has moved to the ELZ.
+    deployTableRoleAssignment: useUserAssignedIdentity
     functionAppFirewallRules: []
     healthCheckPath: '/api/health'
     applicationInsightsConnectionString: appInsightsModule.outputs.applicationInsightsConnectionString
@@ -189,8 +192,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
   }
 }
 
-// When the Publisher uses its user-assigned identity, grant it here the roles that the core pipeline grants its
-// system-assigned identity. The core pipeline can then deploy before the Publisher's identity exists.
+// When the Publisher uses its user-assigned identity, grant it here its roles on resources that the core pipeline
+// creates: the roles that the core pipeline grants its system-assigned identity, and its storage roles. The core
+// pipeline can then deploy before the Publisher's identity exists.
 // TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
 resource publisherIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
   name: resourceNames.publisher.identity
@@ -218,6 +222,37 @@ module frontDoorRoleAssignmentModule '../common/components/front-door/afd-endpoi
     principalId: publisherIdentity!.properties.principalId
   }
 }
+
+// Allow the Publisher to read and write files in the core and public storage accounts. Nothing uses these roles until
+// the Publisher connects to storage with its identity rather than connection strings.
+module storageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = [
+  for (storageAccountName, index) in [resourceNames.storageAccounts.core, resourceNames.storageAccounts.public]: if (useUserAssignedIdentity) {
+    name: 'publisherStorageAccountRoleAssignmentModuleDeploy-${index}'
+    params: {
+      storageAccountName: storageAccountName
+      principalIds: [publisherIdentity!.properties.principalId]
+      role: 'Storage Blob Data Contributor'
+    }
+  }
+]
+
+// Admin's user-assigned identity is created alongside the Publisher's, by the same switch.
+// TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
+resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+// Allow Admin to send messages to the Publisher's queues, and to read and clear its publishing status tables.
+module adminStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = [
+  for (role, index) in ['Storage Queue Data Contributor', 'Storage Table Data Contributor']: if (useUserAssignedIdentity) {
+    name: 'publisherAdminStorageAccountRoleAssignmentModuleDeploy-${index}'
+    params: {
+      storageAccountName: functionAppModule.outputs.storageAccountName
+      principalIds: [adminIdentity!.properties.principalId]
+      role: role
+    }
+  }
+]
 
 module storageAccountBlobServiceModule '../common/components/blobService.bicep' = {
   name: 'publisherStorageAccountBlobServiceModuleDeploy'

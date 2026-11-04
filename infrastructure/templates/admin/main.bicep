@@ -162,9 +162,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
   }
 }
 
-// When Admin uses its user-assigned identity, grant it here the role that the core pipeline grants its system-assigned
-// identity. The core pipeline can then deploy before Admin's identity exists.
-// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+// When Admin uses its user-assigned identity, grant it here its roles on resources that the core pipeline creates.
+// TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
 resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
   name: resourceNames.admin.identity
 }
@@ -177,6 +176,18 @@ module eventGridTopicRoleAssignmentModule '../common/components/event-grid/event
       principalId: adminIdentity!.properties.principalId
       roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
       topicName: topicName
+    }
+  }
+]
+
+// Allow Admin to read and write files in the core and public storage accounts.
+module storageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = [
+  for (storageAccountName, index) in [resourceNames.storageAccounts.core, resourceNames.storageAccounts.public]: if (useUserAssignedIdentity) {
+    name: 'adminStorageAccountRoleAssignmentModuleDeploy-${index}'
+    params: {
+      storageAccountName: storageAccountName
+      principalIds: [adminIdentity!.properties.principalId]
+      role: 'Storage Blob Data Contributor'
     }
   }
 ]
