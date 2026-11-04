@@ -23,7 +23,7 @@ public class RemoveReleaseDocumentFunctionTests
     [Fact]
     public async Task WhenMessageContainsReleaseId_ThenDocumentRemoverCalled()
     {
-        var command = new RemoveReleaseDocumentDto { ReleaseId = Guid.NewGuid() };
+        var command = new RemoveReleaseDocumentMessageDto { ReleaseId = Guid.NewGuid() };
 
         await GetSut().RemoveReleaseDocument(command, new FunctionContextMockBuilder().Build());
 
@@ -34,7 +34,7 @@ public class RemoveReleaseDocumentFunctionTests
     [MemberData(nameof(TheoryDatas.Blank.Guids), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageDoesNotContainReleaseId_ThenDocumentRemoverNotCalled(Guid? missingReleaseId)
     {
-        var command = new RemoveReleaseDocumentDto { ReleaseId = missingReleaseId };
+        var command = new RemoveReleaseDocumentMessageDto { ReleaseId = missingReleaseId };
 
         await GetSut().RemoveReleaseDocument(command, new FunctionContextMockBuilder().Build());
 

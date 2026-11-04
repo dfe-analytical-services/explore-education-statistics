@@ -29,18 +29,21 @@ public class OnPublicationLatestPublishedReleaseReorderedFunction(IEventGridEven
                 }
 
                 // Create release document for the release version that has become the latest version
-                RefreshReleaseDocumentMessageDto[] newReleaseDocuments = [new() { PublicationSlug = payload.Slug }];
+                RefreshReleaseDocumentMessageDto[] refreshReleaseDocumentMessages =
+                [
+                    new() { PublicationSlug = payload.Slug },
+                ];
 
                 // Remove the previous "latest" release version's release document
-                RemoveReleaseDocumentDto[] removeReleaseDocuments = !payload.PreviousReleaseId.IsBlank()
-                    ? [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousReleaseId.Value }]
+                RemoveReleaseDocumentMessageDto[] removeReleaseDocumentMessages = !payload.PreviousReleaseId.IsBlank()
+                    ? [new RemoveReleaseDocumentMessageDto { ReleaseId = payload.PreviousReleaseId.Value }]
                     : [];
 
                 return Task.FromResult(
                     new OnPublicationLatestPublishedReleaseReorderedOutput
                     {
-                        RefreshReleaseDocuments = newReleaseDocuments,
-                        RemoveReleaseDocuments = removeReleaseDocuments,
+                        RefreshReleaseDocumentMessages = refreshReleaseDocumentMessages,
+                        RemoveReleaseDocumentMessages = removeReleaseDocumentMessages,
                     }
                 );
             }

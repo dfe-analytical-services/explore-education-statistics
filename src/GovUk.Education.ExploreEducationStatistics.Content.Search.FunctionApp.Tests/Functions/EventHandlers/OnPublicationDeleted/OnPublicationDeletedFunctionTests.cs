@@ -26,7 +26,9 @@ public class OnPublicationDeletedFunctionTests
 
         var response = await GetSut().OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
 
-        var expected = releaseIds.Select(releaseId => new RemoveReleaseDocumentDto { ReleaseId = releaseId }).ToArray();
+        var expected = releaseIds
+            .Select(releaseId => new RemoveReleaseDocumentMessageDto { ReleaseId = releaseId })
+            .ToArray();
 
         Assert.Equal(expected, response);
     }

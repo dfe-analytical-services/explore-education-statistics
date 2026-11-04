@@ -23,7 +23,7 @@ public class RemovePublicationReleaseDocumentsFunctionTests
     [Fact]
     public async Task WhenMessageContainsSlug_ThenDocumentRemoverCalled()
     {
-        var command = new RemovePublicationReleaseDocumentsDto { PublicationSlug = "publication-slug" };
+        var command = new RemovePublicationReleaseDocumentsMessageDto { PublicationSlug = "publication-slug" };
 
         await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 
@@ -34,7 +34,7 @@ public class RemovePublicationReleaseDocumentsFunctionTests
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageDoesNotContainSlug_ThenDocumentRemoverNotCalled(string? publicationSlug)
     {
-        var command = new RemovePublicationReleaseDocumentsDto { PublicationSlug = publicationSlug };
+        var command = new RemovePublicationReleaseDocumentsMessageDto { PublicationSlug = publicationSlug };
 
         await GetSut().RemovePublicationReleaseDocuments(command, new FunctionContextMockBuilder().Build());
 

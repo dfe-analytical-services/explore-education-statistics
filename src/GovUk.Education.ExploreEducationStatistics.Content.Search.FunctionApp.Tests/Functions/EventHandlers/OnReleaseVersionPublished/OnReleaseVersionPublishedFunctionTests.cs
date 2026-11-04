@@ -71,8 +71,8 @@ public class OnReleaseVersionPublishedFunctionTests
         // document will be created using its new ReleaseId.
         // Therefore, the existing, previously latest release document needs to be removed.
         Assert.Equal(
-            [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
-            response.RemoveReleaseDocuments
+            [new RemoveReleaseDocumentMessageDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }],
+            response.RemoveReleaseDocumentMessages
         );
     }
 
@@ -93,7 +93,7 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveReleaseDocuments);
+        Assert.Empty(response.RemoveReleaseDocumentMessages);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveReleaseDocuments);
+        Assert.Empty(response.RemoveReleaseDocumentMessages);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class OnReleaseVersionPublishedFunctionTests
         var response = await sut.OnReleaseVersionPublished(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         // ASSERT
-        Assert.Empty(response.RemoveReleaseDocuments);
+        Assert.Empty(response.RemoveReleaseDocumentMessages);
     }
 
     [Theory]

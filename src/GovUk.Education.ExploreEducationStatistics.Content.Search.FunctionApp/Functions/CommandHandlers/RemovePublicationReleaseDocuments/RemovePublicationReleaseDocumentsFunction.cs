@@ -14,12 +14,13 @@ public class RemovePublicationReleaseDocumentsFunction(
 {
     [Function(nameof(RemovePublicationReleaseDocuments))]
     public async Task RemovePublicationReleaseDocuments(
-        [QueueTrigger("%RemovePublicationReleaseDocumentsQueueName%")] RemovePublicationReleaseDocumentsDto message,
+        [QueueTrigger("%RemovePublicationReleaseDocumentsQueueName%")]
+            RemovePublicationReleaseDocumentsMessageDto message,
         FunctionContext context
     ) => await commandHandler.Handle(RemovePublicationReleaseDocuments, message, context.CancellationToken);
 
     private async Task RemovePublicationReleaseDocuments(
-        RemovePublicationReleaseDocumentsDto message,
+        RemovePublicationReleaseDocumentsMessageDto message,
         CancellationToken cancellationToken
     )
     {

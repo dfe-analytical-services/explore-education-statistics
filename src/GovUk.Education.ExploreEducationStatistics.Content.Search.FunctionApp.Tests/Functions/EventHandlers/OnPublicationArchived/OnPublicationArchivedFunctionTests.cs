@@ -21,7 +21,7 @@ public class OnPublicationArchivedFunctionTests
     {
         var payload = new PublicationArchivedEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
-        var expected = new RemovePublicationReleaseDocumentsDto { PublicationSlug = payload.PublicationSlug };
+        var expected = new RemovePublicationReleaseDocumentsMessageDto { PublicationSlug = payload.PublicationSlug };
 
         var response = await GetSut().OnPublicationArchived(eventGridEvent, new FunctionContextMockBuilder().Build());
 

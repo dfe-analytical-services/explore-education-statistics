@@ -15,11 +15,14 @@ public class RemoveReleaseDocumentFunction(
 {
     [Function(nameof(RemoveReleaseDocument))]
     public async Task RemoveReleaseDocument(
-        [QueueTrigger("%RemoveReleaseDocumentQueueName%")] RemoveReleaseDocumentDto message,
+        [QueueTrigger("%RemoveReleaseDocumentQueueName%")] RemoveReleaseDocumentMessageDto message,
         FunctionContext context
     ) => await commandHandler.Handle(RemoveReleaseDocument, message, context.CancellationToken);
 
-    private async Task RemoveReleaseDocument(RemoveReleaseDocumentDto message, CancellationToken cancellationToken)
+    private async Task RemoveReleaseDocument(
+        RemoveReleaseDocumentMessageDto message,
+        CancellationToken cancellationToken
+    )
     {
         var releaseId = message.ReleaseId;
         if (releaseId.IsBlank())

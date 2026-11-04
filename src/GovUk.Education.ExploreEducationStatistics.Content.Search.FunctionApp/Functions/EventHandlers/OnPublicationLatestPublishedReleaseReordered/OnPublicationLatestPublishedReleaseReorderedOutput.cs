@@ -7,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public record OnPublicationLatestPublishedReleaseReorderedOutput
 {
     [QueueOutput("%RefreshReleaseDocumentQueueName%")]
-    public RefreshReleaseDocumentMessageDto[] RefreshReleaseDocuments { get; init; } = [];
+    public RefreshReleaseDocumentMessageDto[] RefreshReleaseDocumentMessages { get; init; } = [];
 
     [QueueOutput("%RemoveReleaseDocumentQueueName%")]
-    public RemoveReleaseDocumentDto[] RemoveReleaseDocuments { get; init; } = [];
+    public RemoveReleaseDocumentMessageDto[] RemoveReleaseDocumentMessages { get; init; } = [];
 
     public static OnPublicationLatestPublishedReleaseReorderedOutput Empty => new();
 }

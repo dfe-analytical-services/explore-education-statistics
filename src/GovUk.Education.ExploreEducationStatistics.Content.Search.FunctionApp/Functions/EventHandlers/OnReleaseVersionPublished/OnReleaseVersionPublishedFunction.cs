@@ -26,7 +26,7 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
                         : new OnReleaseVersionPublishedOutput
                         {
                             RefreshReleaseDocumentMessages = BuildRefreshReleaseDocumentMessages(payload),
-                            RemoveReleaseDocuments = BuildRemoveReleaseDocumentsCommands(payload),
+                            RemoveReleaseDocumentMessages = BuildRemoveReleaseDocumentMessages(payload),
                         }
                 )
         );
@@ -35,12 +35,12 @@ public class OnReleaseVersionPublishedFunction(IEventGridEventHandler eventGridE
         ReleaseVersionPublishedEventDto payload
     ) => [new() { PublicationSlug = payload.PublicationSlug }];
 
-    private static RemoveReleaseDocumentDto[] BuildRemoveReleaseDocumentsCommands(
+    private static RemoveReleaseDocumentMessageDto[] BuildRemoveReleaseDocumentMessages(
         ReleaseVersionPublishedEventDto payload
     ) =>
         payload
             is { NewlyPublishedReleaseVersionIsForDifferentRelease: true, PreviousLatestPublishedReleaseId: not null }
-            ? [new RemoveReleaseDocumentDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }]
+            ? [new RemoveReleaseDocumentMessageDto { ReleaseId = payload.PreviousLatestPublishedReleaseId }]
             : [];
 }
 
@@ -50,7 +50,7 @@ public record OnReleaseVersionPublishedOutput
     public RefreshReleaseDocumentMessageDto[] RefreshReleaseDocumentMessages { get; init; } = [];
 
     [QueueOutput("%RemoveReleaseDocumentQueueName%")]
-    public RemoveReleaseDocumentDto[] RemoveReleaseDocuments { get; init; } = [];
+    public RemoveReleaseDocumentMessageDto[] RemoveReleaseDocumentMessages { get; init; } = [];
 
     public static OnReleaseVersionPublishedOutput Empty => new();
 }

@@ -41,7 +41,7 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
 
         // ASSERT
         Assert.NotNull(response);
-        var actual = Assert.Single(response.RefreshReleaseDocuments);
+        var actual = Assert.Single(response.RefreshReleaseDocumentMessages);
         Assert.NotNull(actual);
         Assert.Equal(payload.Slug, actual.PublicationSlug);
     }
@@ -77,10 +77,10 @@ public class OnPublicationLatestPublishedReleaseReorderedFunctionTests
         // ASSERT
         Assert.NotNull(response);
 
-        RemoveReleaseDocumentDto[] expected = hasPreviousReleaseId
-            ? [new RemoveReleaseDocumentDto { ReleaseId = previousReleaseId! }]
+        RemoveReleaseDocumentMessageDto[] expected = hasPreviousReleaseId
+            ? [new RemoveReleaseDocumentMessageDto { ReleaseId = previousReleaseId! }]
             : [];
-        Assert.Equal(expected, response.RemoveReleaseDocuments);
+        Assert.Equal(expected, response.RemoveReleaseDocumentMessages);
     }
 
     [Theory]
