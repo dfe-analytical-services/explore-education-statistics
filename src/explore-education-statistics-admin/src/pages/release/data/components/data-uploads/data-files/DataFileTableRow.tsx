@@ -15,7 +15,7 @@ import DataFileDetailsModal from './DataFileDetailsModal';
 import DataFileTitleEditModal from './DataFileTitleEditModal';
 import DataFileReplacementModal from './DataFileReplacementModal';
 import DataFileImportCancelButton from './DataFileImportCancelButton';
-import ApiUploadStatus from './ApiUploadStatus';
+import ApiUploadStatus, { ApiUploadStatusValue } from './ApiUploadStatus';
 
 interface Props {
   permissions: DataUploadsPermissions;
@@ -29,11 +29,13 @@ interface Props {
     dataFile: DataFile,
     importStatus: DataFileImportStatus,
   ) => Promise<void>;
+  apiStatus?: ApiUploadStatusValue;
 }
 
 export default function DataFileTableRow({
   permissions,
   dataFile,
+  apiStatus,
   publicationId,
   releaseVersionId,
   onEditFile,
@@ -57,7 +59,7 @@ export default function DataFileTableRow({
           releaseVersionId={releaseVersionId}
           onStatusChange={onStatusChange}
         />
-        <ApiUploadStatus status={dataFile.apiStatus} />
+        <ApiUploadStatus status={apiStatus} />
       </td>
       <td data-testid={`${dataFile.title}-actions`}>
         <ButtonGroup className={styles.actions}>

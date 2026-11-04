@@ -8,6 +8,7 @@ import DataFileTableRow from '@admin/pages/release/data/components/data-uploads/
 import React from 'react';
 import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
 import styles from './DataFilesTable.module.scss';
+import { ApiUploadStatusValue } from './data-files/ApiUploadStatus';
 
 interface Props {
   permissions: DataUploadsPermissions;
@@ -27,12 +28,14 @@ interface Props {
     importStatus: DataFileImportStatus,
   ) => Promise<void>;
   onRefreshUploads: () => void;
+  dataFilesApiStatus?: Record<string, ApiUploadStatusValue>;
 }
 
 export default function DataFilesTable({
   permissions,
   caption,
   dataFiles,
+  dataFilesApiStatus,
   dataSetUploads,
   publicationId,
   releaseVersionId,
@@ -73,6 +76,7 @@ export default function DataFilesTable({
               onEditFile={onEditFile}
               onReplaceFile={onReplaceFile}
               onStatusChange={onStatusChange}
+              apiStatus={dataFilesApiStatus?.[dataFile.id]}
             />
           ))}
           {dataSetUploads.map(upload => (
