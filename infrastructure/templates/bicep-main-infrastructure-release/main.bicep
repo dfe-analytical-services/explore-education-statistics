@@ -65,7 +65,7 @@ param notifierStorageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('SKU of the Publisher Function App\'s storage account, which holds the release publishing statuses.')
 param publisherStorageAccountSku StorageAccountSku = 'Standard_GZRS'
 
-@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
 param deployAppIdentities bool = false
 
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
@@ -255,6 +255,7 @@ module appIdentitiesModule '../common/components/managed-identity/user-assigned-
 module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: importerStorageAccountSku
@@ -269,11 +270,15 @@ module importerModuleDeploy '../importer/main.bicep' = {
     existingAppSettings: importerProdAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module notifierModuleDeploy '../notifier/main.bicep' = {
   name: 'notifierModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: notifierStorageAccountSku
@@ -290,11 +295,15 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     http5xxAlert: http5xxAlerts.?notifier
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module publisherModuleDeploy '../publisher/main.bicep' = {
   name: 'publisherModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: publisherStorageAccountSku
@@ -311,6 +320,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
+    appIdentitiesModule
     // Publisher is dependent on Notifier's storage account being available
     // in order to reference its connection string secret in Key Vault.
     notifierModuleDeploy

@@ -34,6 +34,9 @@ param eventGridNames ResourceNames.eventGrid
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
+@description('Whether to grant the Publisher Function App\'s system-assigned identity its roles here. It will have a user-assigned identity under the ELZ and role management will happen in the Publisher\'s owning pipeline.')
+param deployPublisherRoleAssignments bool
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -94,8 +97,11 @@ module adminTopicRoleAssignmentModuleDeploy '../../../common/components/event-gr
 ]
 
 // Allow the Publisher Function App to send events to Event Grid topics
+// TODO EES-7502 - remove this grant, the publisherFunction lookup and the deployPublisherRoleAssignments param once
+// every environment has moved to the ELZ, where the release pipeline grants this role to the Publisher's user-assigned
+// identity instead.
 module publisherTopicRoleAssignmentModuleDeploy '../../../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
-  for (topicName, index) in topicNamesList: {
+  for (topicName, index) in topicNamesList: if (deployPublisherRoleAssignments) {
     name: 'publisherTopicRoleAssignmentModuleDeploy-${index}'
     params: {
       principalId: publisherFunction.identity.principalId
