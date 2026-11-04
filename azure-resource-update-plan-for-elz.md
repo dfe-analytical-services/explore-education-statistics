@@ -78,10 +78,10 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 14 | Remove the subscription allow-lists, e.g. the `@allowed` list in `frontDoor.bicep` | To do | Decision 12 |
 | 15 | Create the shared tooling resource group for the Container Registry and agent VMSS, and agree its name and network connection | To do | Decision 13; open question 6 |
 | 16 | Add the Azure CLI to `vmss-agent-bootstrap.sh` and reimage the agent scale sets | To do | Unblocks follow-up 1 |
-| 17 | Move the Windows apps to Linux: publish flags, `linuxFxVersion`, app settings, testing | To do | [Section 6.2](#62-windows--linux) |
+| 17 | Move the Windows apps to Linux: publish flags, `linuxFxVersion`, app settings, testing | Done | [Section 6.2](#62-windows--linux). Done under the `elz` flag (EES-7802). Still to test on Linux: the Importer's `libmagic` dependency and case-sensitive file paths. |
 | 18 | Replace the remaining App Insights instrumentation keys with connection strings | To do | [Section 6.6](#66-monitoring) |
 | 19 | Connect the data processor's Durable Functions storage with managed identity | To do | [Section 6.12](#612-data-processor-durable-functions-storage) |
-| 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. SQL, PostgreSQL, App Service plans, Container Apps and Search still to do. |
+| 20 | Apply the redundancy settings, and decide which environments get them | In progress | [Section 6.10](#610-redundancy). Storage done in the `parameters/elz` files (EES-7803): SKUs per [section 6.4](#64-storage-redundancy-and-access), with no geo copy in Dev and Test, and the file share backup policy on the vault tier. Vaults done: both geo-redundant in every environment, and cross-region restore turned on for the Backup vault (the Recovery Services vault already had it). SQL, PostgreSQL, App Service plans, Container Apps and Search still to do. |
 | 21 | Move the Content API to `cont.` hostnames, keeping `content.` on Prod for a transition period | To do | [Section 6.11](#611-content-api-hostnames) |
 | 22 | Identity and access groundwork: user-assigned identities per app, SQL Entra-only, Key Vault RBAC, split key-based storage from identity-only | To do | [Section 7](#7-identity-and-network-access) |
 | 23 | Tidy-ups: retire `infrastructure/infrastructure-pipeline.yml`, delete the unused Basic ACR module, update preview API versions | To do | [Section 6.9](#69-api-versions-and-leftovers) |
@@ -506,7 +506,7 @@ Low priority, but cheap to do while every template is being touched:
 | AI Search | 2 replicas or more, which spreads across zones automatically † | Each replica is billed |
 | Container Registry | Zone redundancy † | Moves to the shared tooling group |
 | Key Vault, Event Grid, Front Door, Log Analytics | Built in, nothing to set † | |
-| Recovery Services and Backup vaults | Geo-redundant, cross-region restore on | Vault redundancy can't change once items are protected † |
+| Recovery Services and Backup vaults | Geo-redundant, cross-region restore on, in every environment. Done: the Recovery Services vault already had both; the Backup vault gets cross-region restore from `backupVaultCrossRegionRestore` in the core `parameters/elz` files | Vault redundancy can't change once items are protected †. Cross-region restore costs extra, and secondary-region restore points lag by up to 36 hours |
 
 **Open (Proposed):** which environments get this. Zone redundancy multiplies instance counts, and PostgreSQL HA needs a bigger tier. The suggestion is Prod and Pre-Prod (so it's rehearsed), with Dev and Test on the cheaper non-redundant settings. The creation-only settings (App Service plans, Container Apps environment, vaults) are then set correctly from day one where they matter.
 
