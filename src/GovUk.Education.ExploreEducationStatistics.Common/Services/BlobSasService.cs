@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Concurrent;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -16,8 +17,14 @@ public class BlobSasService(
     BlobSasService.ISecureBlobClientCreator? secureBlobClientCreator = null
 ) : IBlobSasService
 {
+    // How long each user delegation key is requested for, and so reused for. Azure allows up to 7 days.
+    private static readonly TimeSpan UserDelegationKeyLifetime = TimeSpan.FromDays(1);
+
     private readonly ISecureBlobClientCreator _secureBlobClientCreator =
         secureBlobClientCreator ?? new SecureBlobClientCreator();
+
+    // User delegation keys by storage account name, reused until they'd expire before the SAS they sign.
+    private readonly ConcurrentDictionary<string, UserDelegationKey> _userDelegationKeys = new();
 
     public Task<Either<ActionResult, BlobDownloadToken>> CreateBlobDownloadToken(
         BlobServiceClient blobServiceClient,
@@ -37,10 +44,12 @@ public class BlobSasService(
                     cancellationToken: cancellationToken
                 );
 
-                var uri = CreateSasUrl(
+                var uri = await CreateSasUrl(
+                    blobServiceClient: blobServiceClient,
                     client: blobClient,
                     containerName: containerName,
-                    expiryDuration: expiryDuration
+                    expiryDuration: expiryDuration,
+                    cancellationToken: cancellationToken
                 );
 
                 var requestParameters = uri.Query[1..];
@@ -73,25 +82,71 @@ public class BlobSasService(
             );
     }
 
-    private Uri CreateSasUrl(BlobClient client, string containerName, TimeSpan expiryDuration)
+    private async Task<Uri> CreateSasUrl(
+        BlobServiceClient blobServiceClient,
+        BlobClient client,
+        string containerName,
+        TimeSpan expiryDuration,
+        CancellationToken cancellationToken
+    )
     {
-        // Check if BlobContainerClient object has been authorized with Shared Key
+        // Create a SAS token that's valid for a very short time.
+        var sasBuilder = new BlobSasBuilder
+        {
+            BlobContainerName = containerName,
+            Resource = "c",
+            ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
+        };
+
+        sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+
+        // A client authorised with the account key signs the SAS with that key.
         if (client.CanGenerateSasUri)
         {
-            // Create a SAS token that's valid for a very short time.
-            var sasBuilder = new BlobSasBuilder
-            {
-                BlobContainerName = containerName,
-                Resource = "c",
-                ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
-            };
-
-            sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
-
             return client.GenerateSasUri(sasBuilder);
         }
 
-        throw new InvalidOperationException("Could not generate SAS");
+        // A client authorised with a managed identity has no account key, so signs the SAS with a user delegation key
+        // obtained with that identity instead.
+        var userDelegationKey = await GetUserDelegationKey(
+            blobServiceClient: blobServiceClient,
+            sasExpiresOn: sasBuilder.ExpiresOn,
+            cancellationToken: cancellationToken
+        );
+
+        var uriBuilder = new BlobUriBuilder(client.Uri)
+        {
+            Sas = sasBuilder.ToSasQueryParameters(userDelegationKey, blobServiceClient.AccountName),
+        };
+
+        return uriBuilder.ToUri();
+    }
+
+    private async Task<UserDelegationKey> GetUserDelegationKey(
+        BlobServiceClient blobServiceClient,
+        DateTimeOffset sasExpiresOn,
+        CancellationToken cancellationToken
+    )
+    {
+        // A SAS stops working when the key that signed it expires, so only reuse a key that outlasts the SAS.
+        if (
+            _userDelegationKeys.TryGetValue(blobServiceClient.AccountName, out var cachedKey)
+            && cachedKey.SignedExpiresOn >= sasExpiresOn
+        )
+        {
+            return cachedKey;
+        }
+
+        var keyExpiresOn = new DateTimeOffset(dateTimeProvider.UtcNow.Add(UserDelegationKeyLifetime));
+
+        UserDelegationKey userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync(
+            new BlobGetUserDelegationKeyOptions(keyExpiresOn > sasExpiresOn ? keyExpiresOn : sasExpiresOn),
+            cancellationToken
+        );
+
+        _userDelegationKeys[blobServiceClient.AccountName] = userDelegationKey;
+
+        return userDelegationKey;
     }
 
     private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
