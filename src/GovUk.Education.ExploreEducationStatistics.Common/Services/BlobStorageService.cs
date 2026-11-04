@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
@@ -12,9 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
-using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
@@ -42,6 +40,12 @@ public abstract partial class BlobStorageService(
 ) : IBlobStorageService
 {
     private static readonly TimeSpan DefaultDownloadTokenExpiryDuration = TimeSpan.FromMinutes(5);
+
+    // How long the source of a server-side copy can be read for. A copy within a region normally takes seconds.
+    private static readonly TimeSpan CopySourceSasExpiryDuration = TimeSpan.FromHours(1);
+
+    // How many blobs a directory copy copies at once.
+    private const int MaxConcurrentDirectoryCopies = 8;
 
     protected BlobStorageService(
         string connectionString,
@@ -219,7 +223,9 @@ public abstract partial class BlobStorageService(
 
         try
         {
-            await destinationBlob.StartCopyFromUriAsync(sourceBlob.Uri);
+            await destinationBlob.StartCopyFromUriAsync(
+                await GetCopySourceUri(sourceContainerClient, sourcePath, CancellationToken.None)
+            );
 
             // Get the destination blob's properties and log the progress
             BlobProperties destinationProperties = await destinationBlob.GetPropertiesAsync();
@@ -543,38 +549,59 @@ public abstract partial class BlobStorageService(
             destinationDirectoryPath
         );
 
-        var sourceContainer = await GetCloudBlobContainer(sourceContainerName);
-        var destinationContainer = await GetCloudBlobContainer(
-            destinationContainerName,
-            connectionString: options?.DestinationConnectionString
+        var sourceContainer = await GetBlobContainer(sourceContainerName);
+        var destinationContainer = options?.DestinationConnectionString is null
+            ? await GetBlobContainer(destinationContainerName)
+            : await GetBlobContainer(
+                StorageClientFactory.CreateBlobServiceClient(options.DestinationConnectionString),
+                options.DestinationConnectionString,
+                destinationContainerName
+            );
+
+        var sourcePrefix = DirectoryPrefix(sourceDirectoryPath);
+        var destinationPrefix = DirectoryPrefix(destinationDirectoryPath);
+
+        var filesTransferred = new ConcurrentBag<BlobInfo>();
+
+        await Parallel.ForEachAsync(
+            sourceContainer.GetBlobsAsync(new GetBlobsOptions { Prefix = sourcePrefix, Traits = BlobTraits.Metadata }),
+            new ParallelOptions { MaxDegreeOfParallelism = MaxConcurrentDirectoryCopies },
+            async (sourceBlob, cancellationToken) =>
+            {
+                if (options?.ShouldCopyBlob?.Invoke(sourceBlob.Name) == false)
+                {
+                    return;
+                }
+
+                var destinationBlob = destinationContainer.GetBlobClient(
+                    destinationPrefix + sourceBlob.Name[sourcePrefix.Length..]
+                );
+
+                var copied = await CopyBlobInDirectory(
+                    sourceContainer: sourceContainer,
+                    sourceBlobName: sourceBlob.Name,
+                    destinationBlob: destinationBlob,
+                    overwrite: options?.OverwriteExistingBlobs ?? false,
+                    cancellationToken: cancellationToken
+                );
+
+                if (copied)
+                {
+                    filesTransferred.Add(
+                        new BlobInfo(
+                            path: destinationBlob.Name,
+                            contentType: sourceBlob.Properties.ContentType,
+                            contentLength: sourceBlob.Properties.ContentLength ?? 0,
+                            meta: sourceBlob.Metadata,
+                            created: sourceBlob.Properties.CreatedOn,
+                            updated: sourceBlob.Properties.LastModified
+                        )
+                    );
+                }
+            }
         );
 
-        var sourceDirectory = sourceContainer.GetDirectoryReference(sourceDirectoryPath);
-        var destinationDirectory = destinationContainer.GetDirectoryReference(destinationDirectoryPath);
-
-        var copyDirectoryOptions = new CopyDirectoryOptions { Recursive = true };
-
-        var filesTransferred = new List<BlobInfo>();
-
-        var context = new DirectoryTransferContext();
-        context.FileTransferred += (_, args) => FileTransferredCallback(args, filesTransferred);
-        context.FileFailed += FileFailedCallback;
-        context.FileSkipped += FileSkippedCallback;
-        context.SetAttributesCallbackAsync += options?.SetAttributesCallbackAsync;
-        context.ShouldTransferCallbackAsync += options?.ShouldTransferCallbackAsync;
-        context.ShouldOverwriteCallbackAsync += options?.ShouldOverwriteCallbackAsync;
-
-        // TODO EES-4202 Find alternative to copying directory since TransferManager
-        // depends on deprecated Microsoft.Azure.Storage.Blob SDK v11
-        await TransferManager.CopyDirectoryAsync(
-            sourceDirectory,
-            destinationDirectory,
-            CopyMethod.ServiceSideAsyncCopy,
-            copyDirectoryOptions,
-            context
-        );
-
-        return filesTransferred;
+        return filesTransferred.ToList();
     }
 
     public async Task MoveDirectory(
@@ -593,66 +620,109 @@ public abstract partial class BlobStorageService(
             options: new IBlobStorageService.CopyDirectoryOptions
             {
                 DestinationConnectionString = options?.DestinationConnectionString,
-                SetAttributesCallbackAsync = options?.SetAttributesCallbackAsync,
-                ShouldOverwriteCallbackAsync = (_, _) => Task.FromResult(true),
-                ShouldTransferCallbackAsync = options?.ShouldTransferCallbackAsync,
+                ShouldCopyBlob = options?.ShouldCopyBlob,
+                OverwriteExistingBlobs = true,
             }
         );
         await DeleteBlobs(sourceContainerName, sourceDirectoryPath);
     }
 
-    private void FileTransferredCallback(TransferEventArgs e, ICollection<BlobInfo> allFilesStream)
+    /// <summary>
+    /// Copies one file during a directory copy. Azure Storage copies the data itself, so the file isn't downloaded
+    /// and re-uploaded by this app. A failed or skipped copy is logged rather than thrown, so the rest of the directory
+    /// is still copied.
+    ///
+    /// This method is use within a parallel operation so that multiple blobs can be copied at once.
+    /// </summary>
+    /// <returns>Whether the file was copied.</returns>
+    private async Task<bool> CopyBlobInDirectory(
+        BlobContainerClient sourceContainer,
+        string sourceBlobName,
+        BlobClient destinationBlob,
+        bool overwrite,
+        CancellationToken cancellationToken
+    )
     {
-        var source = (CloudBlockBlob)e.Source;
-        var destination = (CloudBlockBlob)e.Destination;
+        try
+        {
+            var sourceUri = await GetCopySourceUri(sourceContainer, sourceBlobName, cancellationToken);
 
-        allFilesStream.Add(
-            new BlobInfo(
-                path: destination.Name,
-                contentType: source.Properties.ContentType,
-                contentLength: source.Properties.Length,
-                meta: source.Metadata,
-                created: source.Properties.Created,
-                updated: source.Properties.LastModified
-            )
-        );
+            var copyOperation = await destinationBlob.StartCopyFromUriAsync(
+                sourceUri,
+                new BlobCopyFromUriOptions
+                {
+                    // Only copy if the destination doesn't exist yet, unless overwriting.
+                    DestinationConditions = overwrite ? null : new BlobRequestConditions { IfNoneMatch = ETag.All },
+                },
+                cancellationToken
+            );
 
-        logger.LogInformation(
-            "Transferred {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
-            source.Container.Name,
-            source.Name,
-            destination.Container.Name,
-            destination.Name
-        );
+            await copyOperation.WaitForCompletionAsync(cancellationToken);
+
+            logger.LogInformation(
+                "Transferred {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
+                sourceContainer.Name,
+                sourceBlobName,
+                destinationBlob.BlobContainerName,
+                destinationBlob.Name
+            );
+
+            return true;
+        }
+        catch (RequestFailedException e) when (!overwrite && e.Status is 409 or 412)
+        {
+            logger.LogInformation(
+                "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
+                sourceContainer.Name,
+                sourceBlobName,
+                destinationBlob.BlobContainerName,
+                destinationBlob.Name
+            );
+
+            return false;
+        }
+        catch (Exception e) when (e is not OperationCanceledException)
+        {
+            logger.LogInformation(
+                "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
+                sourceContainer.Name,
+                sourceBlobName,
+                destinationBlob.BlobContainerName,
+                destinationBlob.Name,
+                e.Message
+            );
+
+            return false;
+        }
     }
 
-    private void FileFailedCallback(object? sender, TransferEventArgs e)
+    /// <summary>
+    /// Gets a URI from which the destination of a server-side copy can read a source blob. It carries a short-lived,
+    /// read-only SAS, as the destination may be in another storage account, or this client may connect with a managed
+    /// identity, which a copy's source can't be authorised with directly.
+    /// </summary>
+    private async Task<Uri> GetCopySourceUri(
+        BlobContainerClient sourceContainer,
+        string sourceBlobName,
+        CancellationToken cancellationToken
+    )
     {
-        var source = (CloudBlockBlob)e.Source;
-        var destination = (CloudBlockBlob)e.Destination;
-
-        logger.LogInformation(
-            "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
-            source.Container.Name,
-            source.Name,
-            destination.Container.Name,
-            destination.Name,
-            e.Exception.Message
+        var containerSasUri = await blobSasService.CreateContainerReadSasUri(
+            blobServiceClient: client,
+            containerClient: sourceContainer,
+            expiryDuration: CopySourceSasExpiryDuration,
+            cancellationToken: cancellationToken
         );
+
+        return new BlobUriBuilder(containerSasUri) { BlobName = sourceBlobName }.ToUri();
     }
 
-    private void FileSkippedCallback(object? sender, TransferEventArgs e)
+    /// <summary>
+    /// Gets a directory path as a blob name prefix ending in "/", as it was treated by the previous copy library.
+    /// </summary>
+    private static string DirectoryPrefix(string directoryPath)
     {
-        var source = (CloudBlockBlob)e.Source;
-        var destination = (CloudBlockBlob)e.Destination;
-
-        logger.LogInformation(
-            "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
-            source.Container.Name,
-            source.Name,
-            destination.Container.Name,
-            destination.Name
-        );
+        return directoryPath == string.Empty || directoryPath.EndsWith('/') ? directoryPath : $"{directoryPath}/";
     }
 
     private async Task<BlobClient> GetBlobClient(IBlobContainer containerName, string path)
@@ -676,42 +746,23 @@ public abstract partial class BlobStorageService(
         return new NotFoundResult();
     }
 
-    /**
-     * TODO EES-4202
-     * We still need to use the older CloudBlobContainer implementation as we
-     * need to interop with DataMovement.TransferManager which hasn't been
-     * updated to work with Azure SDK 12 yet.
-     */
-    private async Task<CloudBlobContainer> GetCloudBlobContainer(
-        IBlobContainer container,
-        string? connectionString = null
-    )
+    private Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
     {
-        var storageAccount = CloudStorageAccount.Parse(connectionString ?? defaultConnectionString);
-        var blobClient = storageAccount.CreateCloudBlobClient();
-
-        var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
-
-        var containerClient = blobClient.GetContainerReference(containerName);
-
-        await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            defaultConnectionString,
-            AzureStorageType.Blob,
-            containerName,
-            () => containerClient.CreateIfNotExistsAsync()
-        );
-
-        return containerClient;
+        return GetBlobContainer(client, defaultConnectionString, container);
     }
 
-    private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
+    private async Task<BlobContainerClient> GetBlobContainer(
+        BlobServiceClient serviceClient,
+        string connectionString,
+        IBlobContainer container
+    )
     {
-        var containerName = IsDevelopmentStorageAccount(client) ? container.EmulatedName : container.Name;
+        var containerName = IsDevelopmentStorageAccount(serviceClient) ? container.EmulatedName : container.Name;
 
-        var containerClient = client.GetBlobContainerClient(containerName);
+        var containerClient = serviceClient.GetBlobContainerClient(containerName);
 
         await storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-            defaultConnectionString,
+            connectionString,
             AzureStorageType.Blob,
             containerName,
             () => containerClient.CreateIfNotExistsAsync()
@@ -723,11 +774,6 @@ public abstract partial class BlobStorageService(
     private static bool IsDevelopmentStorageAccount(BlobServiceClient client)
     {
         return client.AccountName.ToLower() == "devstoreaccount1";
-    }
-
-    private static bool IsDevelopmentStorageAccount(CloudBlobClient client)
-    {
-        return client.Credentials.AccountName.ToLower() == "devstoreaccount1";
     }
 
     private async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
