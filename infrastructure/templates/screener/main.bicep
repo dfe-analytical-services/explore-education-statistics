@@ -21,6 +21,9 @@ param storageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
 param deployAppIdentities bool = false
 
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -124,6 +127,7 @@ module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionModuleDeploy'
   params: {
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     location: location

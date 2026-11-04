@@ -87,6 +87,9 @@ param storageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('Whether to spread the Container App Environment across availability zones.')
 param containerAppEnvironmentZoneRedundant bool = false
 
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -277,6 +280,7 @@ module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' 
 module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployContainerApp) {
   name: 'publicApiAppApplicationModuleDeploy'
   params: {
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     location: location
     resourceNames: resourceNames
     apiAppRegistrationClientId: keyVault.getSecret('ees-public-api-app-registration-client-id')
@@ -315,6 +319,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     storageAccountSku: storageAccountSku
     location: location
     resourceNames: resourceNames

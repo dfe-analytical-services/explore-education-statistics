@@ -47,12 +47,26 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string connectionString,
         IHostEnvironment hostEnvironment,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null,
+        IConfiguration? configuration = null
     )
         where TDbContext : DbContext =>
         hostEnvironment.IsDevelopment()
             ? services.AddDevelopmentPsqlDbContext<TDbContext>(connectionString)
-            : services.AddManagedIdentityPsqlDbContext<TDbContext>(connectionString, optionsConfiguration);
+            : services.AddManagedIdentityPsqlDbContext<TDbContext>(
+                connectionString,
+                optionsConfiguration,
+                configuration
+            );
+
+    // TODO EES-7502 - remove once Admin and the Publisher log in to PostgreSQL with their user-assigned identities.
+    // An App Service or Function App with both a system-assigned and a user-assigned identity can set this to keep
+    // logging in to PostgreSQL with its system-assigned identity, while "AZURE_CLIENT_ID" selects the user-assigned
+    // identity for everything else.
+    //
+    // This would best be done after all data is migrated to the ELZ and the service switched over.
+    private static bool PsqlUsesSystemAssignedIdentity(IConfiguration? configuration) =>
+        configuration?.GetValue<bool>("PsqlUseSystemAssignedIdentity") ?? false;
 
     private static IServiceCollection AddFunctionAppManagedIdentityPsqlDbContext<TDbContext>(
         this IServiceCollection services,
@@ -62,13 +76,7 @@ public static class ServiceCollectionExtensions
     )
         where TDbContext : DbContext
     {
-        // TODO EES-7502 - remove once the Publisher logs in to PostgreSQL with its user-assigned identity.
-        // A Function App with both a system-assigned and a user-assigned identity can set this to keep
-        // logging in to PostgreSQL with its system-assigned identity, while "AZURE_CLIENT_ID" selects
-        // the user-assigned identity for everything else.
-        //
-        // This would best be done after all data is migrated to the ELZ and the service switched over.
-        if (configuration.GetValue<bool>("PsqlUseSystemAssignedIdentity"))
+        if (PsqlUsesSystemAssignedIdentity(configuration))
         {
             return services.RegisterManagedIdentityPsqlDbContext<TDbContext>(
                 connectionString,
@@ -91,12 +99,16 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddManagedIdentityPsqlDbContext<TDbContext>(
         this IServiceCollection services,
         string connectionString,
-        Action<DbContextOptionsBuilder>? optionsConfiguration = null
+        Action<DbContextOptionsBuilder>? optionsConfiguration = null,
+        IConfiguration? configuration = null
     )
         where TDbContext : DbContext =>
         services.RegisterManagedIdentityPsqlDbContext<TDbContext>(
             connectionString,
-            optionsConfiguration: optionsConfiguration
+            optionsConfiguration: optionsConfiguration,
+            accessTokenProvider: PsqlUsesSystemAssignedIdentity(configuration)
+                ? new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned)
+                : null
         );
 
     private static IServiceCollection AddDevelopmentPsqlDbContext<TDbContext>(

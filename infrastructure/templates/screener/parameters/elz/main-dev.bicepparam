@@ -10,3 +10,6 @@ param storageAccountSku = 'Standard_ZRS'
 
 // Deploy a user-assigned managed identity for each of this pipeline's apps.
 param deployAppIdentities = true
+
+// Admin calls this pipeline's apps with its user-assigned identity.
+param adminUsesUserAssignedIdentity = true
