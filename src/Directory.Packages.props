@@ -44,14 +44,14 @@
     <PackageVersion Include="Dapper" Version="2.1.89" />
     <PackageVersion Include="DuckDB.NET.Data.Full" Version="1.3.2" />
     <PackageVersion Include="InterpolatedSql" Version="2.5.1" />
-    <PackageVersion Include="InterpolatedSql.Dapper" Version="2.5.0" />
+    <PackageVersion Include="InterpolatedSql.Dapper" Version="2.5.1" />
     <PackageVersion Include="linq2db" Version="6.5.1" />
     <PackageVersion Include="linq2db.EntityFrameworkCore" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1" />
   </ItemGroup>
 
   <ItemGroup Label="EES Common">
-    <PackageVersion Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.1.0" />
+    <PackageVersion Include="GovUk.Education.ExploreEducationStatistics.Common.DuckDb" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup Label="Entity Framework Core">
