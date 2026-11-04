@@ -12,5 +12,6 @@ param publicStorageAccountSku = 'Standard_RAGZRS'
 // Copy file share backups into the geo-redundant Recovery Services Vault.
 param vaultedFileShareBackups = true
 
-// Allow Backup Vault backups to be restored in the paired region.
+// Allow Backup Vault PostgreSQL backups to be restored in the paired region, which the current subscription's
+// param file turns off.
 param backupVaultCrossRegionRestore = true

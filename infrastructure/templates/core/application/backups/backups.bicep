@@ -9,7 +9,7 @@ param location string = resourceGroup().location
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool
 
-@description('Whether Backup Vault backups can be restored in the paired region.')
+@description('Whether Backup Vault backups can be restored in the paired region. Only PostgreSQL backups support this.')
 param backupVaultCrossRegionRestore bool
 
 @description('Whether or not to create or update Recovery Services Vault and policies.')
