@@ -16,9 +16,6 @@ type AdminConfig = {
   @description('Whether or not to enable published Education In Numbers pages deletion in this environment.')
   enableEinPublishedPageDeletion: bool?
 
-  @description('Whether or not to enable the release rollover feature in this environment.')
-  enableReleaseRollover: bool?
-
   @description('Pre-release start time as number of minutes before a release is scheduled to be published.')
   preReleaseMinutesBeforeStart: int?
 }
@@ -34,7 +31,6 @@ var defaultConfig = {
   }
   enableThemeDeletion: false
   enableEinPublishedPageDeletion: false
-  enableReleaseRollover: false
   preReleaseMinutesBeforeStart: 870
 }
 
