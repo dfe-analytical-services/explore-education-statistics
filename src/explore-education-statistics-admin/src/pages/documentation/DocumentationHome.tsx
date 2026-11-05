@@ -1,6 +1,19 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import {
+  documentationConfigureChartsRoute,
+  documentationContentStandardsRoute,
+  documentationCreatePublicationRoute,
+  documentationCreateReleaseRoute,
+  documentationEditReleaseRoute,
+  documentationGlossaryRoute,
+  documentationManageContentRoute,
+  documentationManageDataBlockRoute,
+  documentationManageDataRoute,
+  documentationStyleGuideRoute,
+  documentationUsingDashboardRoute,
+} from '@admin/routes/documentationRoutes';
 
 const BrowseReleasesPage = () => {
   return (
@@ -16,7 +29,7 @@ const BrowseReleasesPage = () => {
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-one-third">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="/documentation/content-design-standards-guide">
+            <Link to={documentationContentStandardsRoute.fullPath}>
               Content design standards guide
             </Link>
           </h3>
@@ -27,7 +40,7 @@ const BrowseReleasesPage = () => {
         </div>
         <div className="govuk-grid-column-one-third">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="/documentation/style-guide">Style guide</Link>
+            <Link to={documentationStyleGuideRoute.fullPath}>Style guide</Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Browse our A to Z list of style, spelling and grammar conventions
@@ -37,7 +50,7 @@ const BrowseReleasesPage = () => {
         </div>
         <div className="govuk-grid-column-one-third">
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <Link to="/documentation/glossary">A-Z Glossary</Link>
+            <Link to={documentationGlossaryRoute.fullPath}>A-Z Glossary</Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Browse our A to Z list of definitions for terms used across
@@ -53,7 +66,7 @@ const BrowseReleasesPage = () => {
       </h3>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/using-dashboard">
+        <Link to={documentationUsingDashboardRoute.fullPath}>
           Using your administration dashboard
         </Link>
       </h3>
@@ -63,7 +76,9 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/manage-content">Managing content</Link>
+        <Link to={documentationManageContentRoute.fullPath}>
+          Managing content
+        </Link>
       </h3>
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to manage content within a release - including adding new and
@@ -71,7 +86,7 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/manage-data">Managing data</Link>
+        <Link to={documentationManageDataRoute.fullPath}>Managing data</Link>
       </h3>
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to manage data for and within a release - including preparing data
@@ -79,7 +94,7 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/create-new-publication">
+        <Link to={documentationCreatePublicationRoute.fullPath}>
           Creating a new publication
         </Link>
       </h3>
@@ -89,7 +104,7 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/create-new-release">
+        <Link to={documentationCreateReleaseRoute.fullPath}>
           Creating a new release
         </Link>
       </h3>
@@ -99,7 +114,7 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/edit-release">
+        <Link to={documentationEditReleaseRoute.fullPath}>
           Editing a release and updating release status
         </Link>
       </h3>
@@ -109,7 +124,7 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/manage-data-block">
+        <Link to={documentationManageDataBlockRoute.fullPath}>
           Managing data blocks and creating tables and charts
         </Link>
       </h3>
@@ -119,7 +134,9 @@ const BrowseReleasesPage = () => {
       </p>
 
       <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-        <Link to="/documentation/configure-charts">Creating charts</Link>
+        <Link to={documentationConfigureChartsRoute.fullPath}>
+          Creating charts
+        </Link>
       </h3>
       <p className="govuk-caption-m govuk-!-margin-top-1">
         How to create charts based on a saved data block.{' '}

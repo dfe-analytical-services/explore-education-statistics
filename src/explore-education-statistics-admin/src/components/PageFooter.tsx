@@ -2,6 +2,7 @@ import { useAuthContext } from '@admin/contexts/AuthContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import classNames from 'classnames';
 import React from 'react';
+import { contactUsRoute } from '@admin/routes/routes';
 import Link from './Link';
 
 interface Props {
@@ -55,7 +56,10 @@ const PageFooter = ({ wide }: Props) => {
                       </li>
                     )}
                     <li className="govuk-footer__inline-list-item">
-                      <Link className="govuk-footer__link" to="/contact-us">
+                      <Link
+                        className="govuk-footer__link"
+                        to={contactUsRoute.fullPath}
+                      >
                         Contact us
                         <VisuallyHidden>
                           {' '}

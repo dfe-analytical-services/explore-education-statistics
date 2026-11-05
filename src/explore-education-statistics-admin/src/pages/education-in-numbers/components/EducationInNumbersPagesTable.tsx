@@ -94,12 +94,19 @@ const EducationInNumbersPagesTable = ({
                 <ButtonGroup className={styles.actions}>
                   {page.published === undefined && page.version > 0 && (
                     <Link
-                      to={`/education-in-numbers/${page.previousVersionId}/summary`}
+                      to={generatePath(
+                        educationInNumbersSummaryRoute.fullPath,
+                        { educationInNumbersPageId: page.previousVersionId },
+                      )}
                     >
                       View currently published page
                     </Link>
                   )}
-                  <Link to={`/education-in-numbers/${page.id}/summary`}>
+                  <Link
+                    to={generatePath(educationInNumbersSummaryRoute.fullPath, {
+                      educationInNumbersPageId: page.id,
+                    })}
+                  >
                     {page.published === undefined ? 'Edit' : 'View'}
                   </Link>
                   {page.published !== undefined && (
