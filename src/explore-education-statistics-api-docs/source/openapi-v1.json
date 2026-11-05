@@ -2684,7 +2684,6 @@
           },
           "detail": {
             "description": "Additional detail about the error that can be used to provide\r\nmore context to users. May be omitted if there is none.",
-            "nullable": true,
             "example": {
               "maxLength": 50
             }
@@ -3737,7 +3736,6 @@
           },
           "detail": {
             "description": "Additional detail about the warning that can be used to provide\r\nmore context to users. May be omitted if there is none.",
-            "nullable": true,
             "example": {
               "total": 0
             }
