@@ -17,6 +17,9 @@ param elz bool = false
 @description('SKU of the Function App storage accounts, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param deployAppIdentities bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -78,6 +81,18 @@ var resourceNames = getResourceNamesForEnvironment({
   environmentName: environmentName
   elz: elz
 })
+
+module appIdentitiesModule '../common/components/managed-identity/user-assigned-identities.bicep' = if (deployAppIdentities) {
+  name: 'appIdentitiesModuleDeploy'
+  params: {
+    identityNames: [
+      resourceNames.nlSearch.identity
+      resourceNames.searchDocs.identity
+    ]
+    location: location
+    tagValues: tagValues
+  }
+}
 
 module monitoringModule 'application/monitoring.bicep' = {
   name: 'monitoringModuleDeploy'
