@@ -13,7 +13,8 @@ public class ConfigController(
     IOptions<OpenIdConnectSpaClientOptions> oidcOptions,
     IOptions<AppInsightsOptions> appInsightsOptions,
     IOptions<PublicAppOptions> publicAppOptions,
-    IOptions<PublicDataApiOptions> publicDataApiOptions
+    IOptions<PublicDataApiOptions> publicDataApiOptions,
+    IOptions<AppOptions> appOptions
 ) : ControllerBase
 {
     [AllowAnonymous]
@@ -28,6 +29,7 @@ public class ConfigController(
             PublicApiDocsUrl = publicDataApiOptions.Value.DocsUrl,
             PermittedEmbedUrlDomains = EmbedBlockService.PermittedDomains,
             Oidc = oidcOptions.Value,
+            EnableReleaseRollover = appOptions.Value.EnableReleaseRollover,
         };
     }
 }
