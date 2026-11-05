@@ -26,16 +26,19 @@ import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/authService';
 import { ReleaseVersionContextProvider } from '@admin/pages/release/contexts/ReleaseVersionContext';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
+import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/apiDataSetService');
+jest.mock('@admin/services/apiDataSetVersionService');
 
 const releaseDataFileService = jest.mocked(_releaseDataFileService);
 const permissionService = jest.mocked(_permissionService);
 const dataReplacementService = jest.mocked(_dataReplacementService);
 const apiDataSetService = jest.mocked(_apiDataSetService);
+const apiDataSetVersionService = jest.mocked(_apiDataSetVersionService);
 
 describe('ReleaseDataUploadsSection', () => {
   beforeEach(() => {
@@ -180,6 +183,16 @@ describe('ReleaseDataUploadsSection', () => {
   beforeEach(() => {
     releaseDataFileService.getDataSetUploads.mockResolvedValue([]);
     apiDataSetService.listDataSets.mockResolvedValue([]);
+
+    apiDataSetVersionService.listVersions.mockResolvedValue({
+      results: [],
+      paging: {
+        page: 1,
+        pageSize: 100,
+        totalResults: 0,
+        totalPages: 0,
+      },
+    });
   });
 
   test('renders uploaded but not yet imported data files in the uploaded data files table', async () => {
@@ -372,7 +385,7 @@ describe('ReleaseDataUploadsSection', () => {
     ): ApiDataSetSummary {
       const dataSet: ApiDataSetSummary = {
         id: 'api-dataset-1',
-        title: 'Test aata 1',
+        title: 'Test data 1',
         summary: 'Test summary',
         status: status === 'Published' ? 'Published' : 'Draft',
         previousReleaseIds: [],
@@ -423,9 +436,9 @@ describe('ReleaseDataUploadsSection', () => {
     }
 
     test.each([
-      ['Processing', 'API DRAFT'],
-      ['Draft', 'API READY'],
-      ['Published', 'API LIVE'],
+      ['Processing', 'API Draft'],
+      ['Draft', 'API Ready'],
+      ['Published', 'API Live'],
     ] as const)(
       'displays %s API versions as %s',
       async (versionStatus, expectedStatus) => {
@@ -476,9 +489,9 @@ describe('ReleaseDataUploadsSection', () => {
         'Complete',
       );
 
-      expect(screen.queryByText('API READY')).not.toBeInTheDocument();
-      expect(screen.queryByText('API DRAFT')).not.toBeInTheDocument();
-      expect(screen.queryByText('API LIVE')).not.toBeInTheDocument();
+      expect(screen.queryByText('API Ready')).not.toBeInTheDocument();
+      expect(screen.queryByText('API Draft')).not.toBeInTheDocument();
+      expect(screen.queryByText('API Live')).not.toBeInTheDocument();
     });
 
     test('does not display a status when the API version does not match', async () => {
@@ -499,7 +512,77 @@ describe('ReleaseDataUploadsSection', () => {
         'Complete',
       );
 
-      expect(screen.queryByText('API READY')).not.toBeInTheDocument();
+      expect(screen.queryByText('API Ready')).not.toBeInTheDocument();
+    });
+
+    test('displays API live for an older published version', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue([linkedDataFile]);
+
+      const publishedDataSet = makeApiDataSet('Published');
+
+      apiDataSetService.listDataSets.mockResolvedValue([
+        {
+          ...publishedDataSet,
+          latestLiveVersion: {
+            ...publishedDataSet.latestLiveVersion!,
+            id: 'api-version-2',
+            version: '2.0',
+          },
+        },
+      ]);
+
+      apiDataSetVersionService.listVersions.mockResolvedValue({
+        results: [
+          {
+            id: 'api-version-1',
+            version: '1.0',
+            type: 'Major',
+            status: 'Published',
+            file: {
+              id: 'data-1',
+              title: 'Test data 1',
+            },
+            published: '2026-10-01',
+            releaseVersion: {
+              id: 'release-1',
+              title: 'Test release',
+            },
+          },
+        ],
+        paging: {
+          page: 1,
+          pageSize: 100,
+          totalResults: 1,
+          totalPages: 1,
+        },
+      });
+
+      renderUploads();
+
+      expect(await screen.findByText('API Live')).toBeInTheDocument();
+
+      expect(apiDataSetVersionService.listVersions).toHaveBeenCalledWith({
+        dataSetId: 'api-dataset-1',
+        page: 1,
+        pageSize: 100,
+      });
+
+      const statusCell = screen.getByTestId('Test data 1-status');
+
+      expect(statusCell).toHaveTextContent('Complete');
+      expect(statusCell).toHaveTextContent('API Live');
+    });
+
+    test('does not fetch API data sets for unlinked uploads', async () => {
+      releaseDataFileService.getDataFiles.mockResolvedValue(testDataFiles);
+
+      renderUploads();
+
+      expect(
+        await screen.findByTestId('Test data 1-status'),
+      ).toBeInTheDocument();
+
+      expect(apiDataSetService.listDataSets).not.toHaveBeenCalled();
     });
   });
 
