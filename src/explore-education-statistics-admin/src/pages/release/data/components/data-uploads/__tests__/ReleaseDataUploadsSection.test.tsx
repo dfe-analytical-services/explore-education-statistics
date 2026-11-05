@@ -221,6 +221,8 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(fileTableRows).toHaveLength(2);
 
+    expect(within(fileTableRows[1]).getAllByRole('cell')).toHaveLength(5);
+
     const fileTableRow = within(fileTableRows[1]);
 
     expect(
@@ -347,6 +349,14 @@ describe('ReleaseDataUploadsSection', () => {
 
     expect(fileTableRows).toHaveLength(3);
 
+    expect(
+      within(screen.getByTestId('Data files table')).getByRole('columnheader', {
+        name: 'API Status',
+      }),
+    ).toBeInTheDocument();
+
+    expect(within(fileTableRows[1]).getAllByRole('cell')).toHaveLength(5);
+
     const fileTableRow1 = within(fileTableRows[1]);
 
     expect(fileTableRow1.getByTestId('Test data 1-title')).toHaveTextContent(
@@ -460,14 +470,21 @@ describe('ReleaseDataUploadsSection', () => {
         );
 
         const linkedStatusCell = screen.getByTestId('Test data 1-status');
+        const linkedApiStatusCell = screen.getByTestId(
+          'Test data 1-api-status',
+        );
 
         expect(linkedStatusCell).toHaveTextContent('Complete');
-        expect(linkedStatusCell).toHaveTextContent(expectedStatus);
+        expect(linkedStatusCell).not.toHaveTextContent(expectedStatus);
+        expect(linkedApiStatusCell).toHaveTextContent(expectedStatus);
 
         const unlinkedStatusCell = screen.getByTestId('Test data 2-status');
+        const unlinkedApiStatusCell = screen.getByTestId(
+          'Test data 2-api-status',
+        );
 
         expect(unlinkedStatusCell).toHaveTextContent('Complete');
-        expect(unlinkedStatusCell).not.toHaveTextContent('API');
+        expect(unlinkedApiStatusCell).toBeEmptyDOMElement();
       },
     );
 
@@ -569,8 +586,10 @@ describe('ReleaseDataUploadsSection', () => {
 
       const statusCell = screen.getByTestId('Test data 1-status');
 
+      const apiStatusCell = screen.getByTestId('Test data 1-api-status');
+
       expect(statusCell).toHaveTextContent('Complete');
-      expect(statusCell).toHaveTextContent('API Live');
+      expect(apiStatusCell).toHaveTextContent(/API Live/i);
     });
 
     test('does not fetch API data sets for unlinked uploads', async () => {

@@ -85,6 +85,9 @@ export default function DataSetUploadTableRow({
           status={screeningStatus}
         />
       </td>
+
+      {!isReplacement && <td />}
+
       <td data-testid={`${dataSetUpload.dataSetTitle}-actions`}>
         <ButtonGroup className={styles.actions}>
           <DataSetUploadDetailsModal

@@ -59,6 +59,8 @@ export default function DataFileTableRow({
           releaseVersionId={releaseVersionId}
           onStatusChange={onStatusChange}
         />
+      </td>
+      <td data-testid={`${dataFile.title}-api-status`}>
         <ApiUploadStatus status={apiStatus} />
       </td>
       <td data-testid={`${dataFile.title}-actions`}>

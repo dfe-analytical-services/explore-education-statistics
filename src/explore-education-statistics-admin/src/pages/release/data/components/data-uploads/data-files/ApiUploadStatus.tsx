@@ -10,8 +10,8 @@ interface Props {
 
 const statusColours: Record<ApiUploadStatusValue, TagProps['colour']> = {
   'API DRAFT': 'yellow',
-  'API READY': 'green',
-  'API LIVE': 'blue',
+  'API READY': 'blue',
+  'API LIVE': 'green',
 };
 
 const statusLabels: Record<ApiUploadStatusValue, string> = {
@@ -26,10 +26,8 @@ export default function ApiUploadStatus({ status }: Props) {
   }
 
   return (
-    <div className="govuk-!-padding-top-2">
-      <Tag colour={statusColours[status]} className={styles.tag}>
-        {statusLabels[status]}
-      </Tag>
-    </div>
+    <Tag colour={statusColours[status]} className={styles.tag}>
+      {statusLabels[status]}
+    </Tag>
   );
 }
