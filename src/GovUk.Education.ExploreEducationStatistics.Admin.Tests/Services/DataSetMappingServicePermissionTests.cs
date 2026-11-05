@@ -1,10 +1,9 @@
 #nullable enable
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
@@ -26,26 +24,24 @@ public class DataSetMappingServicePermissionTests
     [Fact]
     public async Task UpdateFilterMappings()
     {
-        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
-
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        var releaseVersion = CreateReleaseVersion();
 
         await PermissionTestUtils
             .PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(userService =>
+            .SetupResourceCheckToFailWithMatcher(
+                ReleaseVersionWithReleaseLoaded(releaseVersion),
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
             {
-                var service = SetupDataSetMappingService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    userService: userService.Object
-                );
-                return service.UpdateFilterMappings(
+                var contentDbContextId = await SaveReleaseVersion(releaseVersion);
+
+                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+                await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+
+                var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext, userService.Object);
+
+                return await service.UpdateFilterMappings(
                     releaseVersion.Id,
                     new FilterMappingUpdatesRequest(),
                     CancellationToken.None
@@ -54,28 +50,26 @@ public class DataSetMappingServicePermissionTests
     }
 
     [Fact]
-    public async Task UpdateIndicatorMapping()
+    public async Task UpdateIndicatorMappings()
     {
-        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
-
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        var releaseVersion = CreateReleaseVersion();
 
         await PermissionTestUtils
             .PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(userService =>
+            .SetupResourceCheckToFailWithMatcher(
+                ReleaseVersionWithReleaseLoaded(releaseVersion),
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
             {
-                var service = SetupDataSetMappingService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    userService: userService.Object
-                );
-                return service.UpdateIndicatorMappings(
+                var contentDbContextId = await SaveReleaseVersion(releaseVersion);
+
+                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+                await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+
+                var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext, userService.Object);
+
+                return await service.UpdateIndicatorMappings(
                     releaseVersion.Id,
                     new IndicatorMappingUpdatesRequest(),
                     CancellationToken.None
@@ -86,26 +80,24 @@ public class DataSetMappingServicePermissionTests
     [Fact]
     public async Task UpdateLocationMappings()
     {
-        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
-        await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
-
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
+        var releaseVersion = CreateReleaseVersion();
 
         await PermissionTestUtils
             .PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(releaseVersion, SecurityPolicies.CanUpdateSpecificReleaseVersion)
-            .AssertForbidden(userService =>
+            .SetupResourceCheckToFailWithMatcher(
+                ReleaseVersionWithReleaseLoaded(releaseVersion),
+                SecurityPolicies.CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
             {
-                var service = SetupDataSetMappingService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    userService: userService.Object
-                );
-                return service.UpdateLocationMappings(
+                var contentDbContextId = await SaveReleaseVersion(releaseVersion);
+
+                await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+                await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext();
+
+                var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext, userService.Object);
+
+                return await service.UpdateLocationMappings(
                     releaseVersion.Id,
                     new LocationMappingUpdatesRequest(),
                     CancellationToken.None
@@ -115,86 +107,32 @@ public class DataSetMappingServicePermissionTests
 
     // The UpdateSpecificReleaseVersion authorization handler reads ReleaseVersion.Release.PublicationId for users
     // without the UpdateAllReleases claim (e.g. analysts), so the Release must be loaded before the policy check.
-    [Fact]
-    public async Task UpdateFilterMappings_ReleaseLoadedForPolicyCheck()
-    {
-        await AssertReleaseLoadedForPolicyCheck(
-            (service, releaseVersionId) =>
-                service.UpdateFilterMappings(
-                    releaseVersionId,
-                    new FilterMappingUpdatesRequest(),
-                    CancellationToken.None
-                )
-        );
-    }
+    private static Expression<Func<ReleaseVersion, bool>> ReleaseVersionWithReleaseLoaded(
+        ReleaseVersion releaseVersion
+    ) =>
+        rv =>
+            rv.Id == releaseVersion.Id
+            && rv.Release != null
+            && rv.Release.PublicationId == releaseVersion.Release.PublicationId;
 
-    [Fact]
-    public async Task UpdateIndicatorMappings_ReleaseLoadedForPolicyCheck()
-    {
-        await AssertReleaseLoadedForPolicyCheck(
-            (service, releaseVersionId) =>
-                service.UpdateIndicatorMappings(
-                    releaseVersionId,
-                    new IndicatorMappingUpdatesRequest(),
-                    CancellationToken.None
-                )
-        );
-    }
-
-    [Fact]
-    public async Task UpdateLocationMappings_ReleaseLoadedForPolicyCheck()
-    {
-        await AssertReleaseLoadedForPolicyCheck(
-            (service, releaseVersionId) =>
-                service.UpdateLocationMappings(
-                    releaseVersionId,
-                    new LocationMappingUpdatesRequest(),
-                    CancellationToken.None
-                )
-        );
-    }
-
-    private static async Task AssertReleaseLoadedForPolicyCheck<TResult>(
-        Func<DataSetMappingService, Guid, Task<Either<ActionResult, TResult>>> updateMappings
-    )
-    {
-        ReleaseVersion releaseVersion = DataFixture
+    private static ReleaseVersion CreateReleaseVersion() =>
+        DataFixture
             .DefaultReleaseVersion()
             .WithRelease(DataFixture.DefaultRelease().WithPublication(DataFixture.DefaultPublication()));
 
+    /// <summary>
+    /// Saves the release version in its own context, so the service reads it back from a fresh context and
+    /// EF can't populate Release from entities it's already tracking.
+    /// </summary>
+    private static async Task<string> SaveReleaseVersion(ReleaseVersion releaseVersion)
+    {
         var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        {
-            contentDbContext.ReleaseVersions.Add(releaseVersion);
-            await contentDbContext.SaveChangesAsync();
-        }
 
-        var userService = new Mock<IUserService>(MockBehavior.Strict);
-        userService
-            .Setup(s =>
-                s.MatchesPolicy(
-                    It.Is<ReleaseVersion>(rv =>
-                        rv.Id == releaseVersion.Id
-                        && rv.Release != null
-                        && rv.Release.PublicationId == releaseVersion.Release.PublicationId
-                    ),
-                    SecurityPolicies.CanUpdateSpecificReleaseVersion
-                )
-            )
-            .ReturnsAsync(true);
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        await contentDbContext.SaveChangesAsync();
 
-        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext())
-        {
-            var service = SetupDataSetMappingService(contentDbContext, statisticsDbContext, userService.Object);
-
-            // No DataSetMapping exists, so the request fails after passing the policy check.
-            var result = await updateMappings(service, releaseVersion.Id);
-
-            result.AssertNotFound();
-        }
-
-        MockUtils.VerifyAllMocks(userService);
+        return contentDbContextId;
     }
 
     private static DataSetMappingService SetupDataSetMappingService(
