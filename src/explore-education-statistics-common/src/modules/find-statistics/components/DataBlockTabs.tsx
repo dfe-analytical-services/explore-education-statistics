@@ -117,9 +117,7 @@ const DataBlockTabsContent = ({
           }
           title="Chart"
         >
-          <LoadingSpinner
-            loading={isTableDataLoading || isGeoJsonInitialLoading}
-          >
+          <LoadingSpinner loading={isTableDataLoading}>
             {isChartError && errorMessage}
             {chart && (
               <ErrorBoundary fallback={errorMessage}>
@@ -127,6 +125,7 @@ const DataBlockTabsContent = ({
                   id="dataBlockTabs-chart"
                   source={dataBlock.source}
                   chart={chart}
+                  loading={isGeoJsonInitialLoading}
                 />
                 {additionTabContentElement}
               </ErrorBoundary>

@@ -824,6 +824,13 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
     });
 
+    const testDescribedDataBlockMap: DataBlock = {
+      ...testDataBlockMap,
+      charts: [
+        { ...testMapConfiguration, title: 'Map title', alt: 'Map alt text' },
+      ],
+    };
+
     test('hydrates a map table without replacing it while GeoJSON loads', () => {
       tableBuilderService.getDataBlockGeoJson.mockReturnValue(
         new Promise(noop),
@@ -833,7 +840,7 @@ describe('DataBlockTabs', () => {
           <DataBlockTabs
             releaseVersionId="release-1"
             id="test-block"
-            dataBlock={testDataBlockMap}
+            dataBlock={testDescribedDataBlockMap}
             dataBlockStaleTime={Infinity}
           />,
           createQueryClient(testMapTableData),
@@ -842,6 +849,8 @@ describe('DataBlockTabs', () => {
       expect(within(container).getByRole('table', { hidden: true })).toBe(
         serverTable,
       );
+      expect(container).toHaveTextContent('Map title');
+      expect(container).toHaveTextContent('Map alt text');
       expect(tableBuilderService.getDataBlockGeoJson).toHaveBeenCalledTimes(1);
       expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
       expect(onRecoverableError).not.toHaveBeenCalled();
@@ -921,9 +930,15 @@ describe('DataBlockTabs', () => {
       expect(tabs[0]).toHaveTextContent('Chart');
       expect(tabs[1]).toHaveTextContent('Table');
 
-      const chartSection = container.querySelector('#test-block-charts');
+      const chartSection = container.querySelector(
+        '#test-block-charts',
+      ) as HTMLElement;
       expect(chartSection).not.toHaveAttribute('hidden');
       expect(chartSection).toHaveTextContent('Aggregated results chart');
+      expect(within(chartSection).getByTestId('chart-alt')).toHaveTextContent(
+        'Some alt text',
+      );
+      expect(chartSection.querySelector('svg')).toBeNull();
 
       const tableSection = container.querySelector(
         '#test-block-tables',
@@ -955,7 +970,7 @@ describe('DataBlockTabs', () => {
       expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
     });
 
-    test('renders the table while the map geoJSON is loading', () => {
+    test('renders the table, and describes the map, while the map geoJSON is loading', () => {
       tableBuilderService.getDataBlockGeoJson.mockReturnValue(
         new Promise(noop),
       );
@@ -965,7 +980,7 @@ describe('DataBlockTabs', () => {
           <DataBlockTabs
             releaseVersionId="release-1"
             id="test-block"
-            dataBlock={testDataBlockMap}
+            dataBlock={testDescribedDataBlockMap}
             dataBlockStaleTime={Infinity}
           />
         </QueryClientProvider>,
@@ -976,9 +991,38 @@ describe('DataBlockTabs', () => {
       const chartSection = document.querySelector(
         '#test-block-charts',
       ) as HTMLElement;
-      expect(
-        within(chartSection).getByTestId('loadingSpinner'),
-      ).toBeInTheDocument();
+      expect(within(chartSection).getByTestId('loadingSpinner')).toHaveClass(
+        'dfe-js-only',
+      );
+      expect(within(chartSection).getByTestId('chart-alt')).toHaveTextContent(
+        'Map alt text',
+      );
+      expect(chartSection).toHaveTextContent('Map title');
+    });
+
+    test('server-renders the map description while its geoJSON is not loaded', () => {
+      const container = renderServerMarkup(
+        <DataBlockTabs
+          releaseVersionId="release-1"
+          id="test-block"
+          dataBlock={testDescribedDataBlockMap}
+        />,
+        createQueryClient(testMapTableData),
+      );
+
+      const chartSection = container.querySelector(
+        '#test-block-charts',
+      ) as HTMLElement;
+      expect(chartSection).toHaveTextContent('Map title');
+      expect(within(chartSection).getByTestId('chart-alt')).toHaveTextContent(
+        'Map alt text',
+      );
+      expect(within(chartSection).getByTestId('chart-alt')).toHaveClass(
+        'dfe-js-hidden',
+      );
+      expect(within(chartSection).getByTestId('loadingSpinner')).toHaveClass(
+        'dfe-js-only',
+      );
     });
 
     test('server-renders a placeholder when the table data is not cached', () => {
@@ -992,7 +1036,7 @@ describe('DataBlockTabs', () => {
       );
 
       expect(
-        container.querySelector('[data-testid="Data block - Test data block"]'),
+        within(container).getByTestId('Data block - Test data block'),
       ).toBeEmptyDOMElement();
       expect(container.querySelector('table')).not.toBeInTheDocument();
     });
@@ -1020,11 +1064,11 @@ describe('DataBlockTabs', () => {
       );
 
       expect(container).toHaveTextContent('Summary content');
-      expect(
-        container.querySelector(
-          '#test-block-tables [data-testid="loadingSpinner"]',
-        ),
-      ).not.toBeNull();
+
+      const tableSection = container.querySelector(
+        '#test-block-tables',
+      ) as HTMLElement;
+      expect(within(tableSection).getByTestId('loadingSpinner')).toBeDefined();
     });
 
     test('renders the other tabs while the table data is loading', () => {

@@ -86,7 +86,7 @@ export default function useDataBlock({
   }, [tableData]);
 
   const chartFullTable = useMemo(() => {
-    if (!tableData || !fullTable || isGeoJsonInitialLoading) return undefined;
+    if (!tableData || !fullTable) return undefined;
     if (!selectedBoundaryLevel || !geoJson) return fullTable;
     try {
       return mapFullTable({
@@ -100,19 +100,12 @@ export default function useDataBlock({
       logger.error(error);
       return undefined;
     }
-  }, [
-    tableData,
-    isGeoJsonInitialLoading,
-    selectedBoundaryLevel,
-    geoJson,
-    fullTable,
-  ]);
+  }, [tableData, selectedBoundaryLevel, geoJson, fullTable]);
 
   // Mapping errors are caught and logged above, so are reported as errors
   // here rather than leaving the table or chart to silently not render.
   const isTableMappingError = !!tableData && !fullTable;
-  const isGeoJsonMappingError =
-    !!fullTable && !isGeoJsonInitialLoading && !chartFullTable;
+  const isGeoJsonMappingError = !!fullTable && !chartFullTable;
 
   const chartProps = useMemo<RenderableChart | undefined>(() => {
     if (!chartFullTable || !chart) return undefined;
