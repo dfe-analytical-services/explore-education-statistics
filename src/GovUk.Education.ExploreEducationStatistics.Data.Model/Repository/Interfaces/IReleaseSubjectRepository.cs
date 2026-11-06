@@ -7,8 +7,4 @@ public interface IReleaseSubjectRepository
         Guid releaseVersionId,
         Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null
     );
-
-    Task DeleteReleaseSubject(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedSubject = true);
-
-    Task DeleteAllReleaseSubjects(Guid releaseVersionId, bool softDeleteOrphanedSubjects = true);
 }
