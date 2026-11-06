@@ -11,11 +11,13 @@ parameters:
     type: string
   - name: parameterFile
     type: string
-  - name: searchServiceNLSearchFilterIndexName
+  - name: searchServiceFilterIndexName
     type: string
-  - name: searchServiceNLSearchDatasetIndexName
+  - name: searchServiceDatasetIndexName
     type: string
-  - name: searchServiceSearchIndexerName
+  - name: searchServiceReleaseIndexerName
+    type: string
+  - name: searchServiceDatasetIndexerName
     type: string
 
 steps:
@@ -38,6 +40,7 @@ steps:
               subscription='$(subscription)' \
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
-              searchServiceNLSearchFilterIndexName=${{ parameters.searchServiceNLSearchFilterIndexName }} \
-              searchServiceNLSearchDatasetIndexName=${{ parameters.searchServiceNLSearchDatasetIndexName }} \
-              searchServiceSearchIndexerName=${{ parameters.searchServiceSearchIndexerName }}
+              searchServiceFilterIndexName=${{ parameters.searchServiceFilterIndexName }} \
+              searchServiceDatasetIndexName=${{ parameters.searchServiceDatasetIndexName }} \
+              searchServiceReleaseIndexerName=${{ parameters.searchServiceReleaseIndexerName }} \
+              searchServiceDatasetIndexerName=${{ parameters.searchServiceDatasetIndexerName }}

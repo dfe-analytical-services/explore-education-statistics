@@ -5,13 +5,19 @@ import { SearchStorageQueueNames } from '../types.bicep'
 @description('The URL of the Content API.')
 param contentApiUrl string
 
+@description('Storage container name for dataset documents in the Search storage account.')
+param datasetDocumentsContainerName string
+
+@description('Name of the indexer associated with the \'Dataset\' index in Azure AI Search.')
+param datasetIndexerName string
+
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Name of the indexer associated with the release documents (\'Search\') index in Azure AI Search.')
+@description('Name of the indexer associated with the \'Release\' index in Azure AI Search.')
 param releaseIndexerName string
 
 @description('Specifies the Azure AI Search service name.')
@@ -87,6 +93,11 @@ resource releaseDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServic
   name: releaseDocumentsContainerName
 }
 
+resource datasetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+  parent: searchBlobStorage
+  name: datasetDocumentsContainerName
+}
+
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
   name: searchServiceName
 }
@@ -107,12 +118,20 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: releaseDocumentsContainer.name
       }
       {
+        name: 'App__DatasetDocumentsContainerName'
+        value: datasetDocumentsContainer.name
+      }
+      {
         name: 'AzureSearch__SearchServiceEndpoint'
         value: searchService.properties.endpoint
       }
       {
         name: 'AzureSearch__ReleaseIndexerName'
         value: releaseIndexerName
+      }
+      {
+        name: 'AzureSearch__DatasetIndexerName'
+        value: datasetIndexerName
       }
       {
         name: 'ContentApi__Url'
