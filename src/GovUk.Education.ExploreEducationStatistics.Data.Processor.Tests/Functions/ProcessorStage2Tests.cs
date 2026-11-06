@@ -250,11 +250,10 @@ public class ProcessorStage2Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var importerService = new ImporterService(
             new AppOptions().ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()

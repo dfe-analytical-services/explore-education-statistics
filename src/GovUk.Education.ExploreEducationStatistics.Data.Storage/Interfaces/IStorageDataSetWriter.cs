@@ -51,6 +51,36 @@ public interface IStorageDataSetWriter
     Guid GetLocationId(Location location);
 
     /// <summary>
+    /// The id for a new filter read from the given CSV column.
+    /// </summary>
+    Guid NewFilterId(string column);
+
+    /// <summary>
+    /// The id for a new filter group with the given label, within the given filter.
+    /// </summary>
+    Guid NewFilterGroupId(Guid filterId, string label);
+
+    /// <summary>
+    /// The id for a new filter item with the given label, within the given filter group.
+    /// </summary>
+    Guid NewFilterItemId(Guid filterGroupId, string label);
+
+    /// <summary>
+    /// The id for a new indicator group with the given label.
+    /// </summary>
+    Guid NewIndicatorGroupId(string label);
+
+    /// <summary>
+    /// The id for a new indicator read from the given CSV column.
+    /// </summary>
+    Guid NewIndicatorId(string column);
+
+    /// <summary>
+    /// The id for a new observation read from the given CSV row.
+    /// </summary>
+    Guid NewObservationId(int csvRow);
+
+    /// <summary>
     /// Prepares for observations to be written by <see cref="WriteObservations" />.
     /// </summary>
     /// <param name="filters">All filters for the data set.</param>

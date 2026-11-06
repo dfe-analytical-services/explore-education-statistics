@@ -367,6 +367,7 @@ public abstract class StatisticsDbDataSetWriterTests
             subjectId: subjectId,
             context: InMemoryStatisticsDbContext(_statisticsDbContextId),
             databaseHelper: new InMemoryDatabaseHelper(dbContextSupplier.Object),
+            guidGenerator: new SequentialGuidGenerator(),
             importerLocationService: new ImporterLocationService(
                 new SequentialGuidGenerator(),
                 importerLocationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>()),

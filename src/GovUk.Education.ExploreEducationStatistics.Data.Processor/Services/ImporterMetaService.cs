@@ -1,7 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -26,17 +25,10 @@ public enum MetaColumns
 
 public class ImporterMetaService : IImporterMetaService
 {
-    private readonly IGuidGenerator _guidGenerator;
-
     public static readonly string[] RequiredMetaColumns = Enum.GetValues<MetaColumns>()
         .Where(col => col != MetaColumns.parent_filter && col != MetaColumns.filter_default) // if we make other columns optional, screener would also need updating
         .Select(col => col.ToString())
         .ToArray();
-
-    public ImporterMetaService(IGuidGenerator guidGenerator)
-    {
-        _guidGenerator = guidGenerator;
-    }
 
     public async Task<SubjectMeta> Import(
         List<string> metaFileCsvHeaders,
@@ -60,15 +52,15 @@ public class ImporterMetaService : IImporterMetaService
 
         if (!filtersAlreadyImported || !indicatorsAlreadyImported)
         {
-            // @MarkFix Make every id deterministic for newly imported parquet data sets, e.g. a name-based (v5) guid
-            // from the subject id and the CSV column/label path, so a re-import gives the same ids. Covers filters and
-            // indicators here, the Guid.NewGuid() in the IndicatorGroup, FilterGroup and FilterItem constructors, and
-            // per-data-set location ids. Existing data sets keep their random ids.
             var filters = filtersAndMeta.Select(f => f.Filter).ToList();
-            filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
+            filters.ForEach(filter => filter.Id = dataSetWriter.NewFilterId(filter.Name));
 
             var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
-            indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
+            indicators
+                .Select(indicator => indicator.IndicatorGroup)
+                .Distinct()
+                .ForEach(indicatorGroup => indicatorGroup.Id = dataSetWriter.NewIndicatorGroupId(indicatorGroup.Label));
+            indicators.ForEach(indicator => indicator.Id = dataSetWriter.NewIndicatorId(indicator.Name));
 
             await dataSetWriter.WriteFiltersAndIndicators(filters, indicators);
         }

@@ -197,7 +197,76 @@ public abstract class ParquetV1DataSetWriterTests
         }
     }
 
-    private ParquetV1DataSetWriter BuildWriter()
+    public class NewIdTests : ParquetV1DataSetWriterTests
+    {
+        [Fact]
+        public void SameForSameSubjectAndInput()
+        {
+            var writer = BuildWriter();
+            var otherWriter = BuildWriter();
+
+            var filterId = writer.NewFilterId("filter");
+            var filterGroupId = writer.NewFilterGroupId(filterId, "Group");
+
+            Assert.Equal(filterId, otherWriter.NewFilterId("filter"));
+            Assert.Equal(filterGroupId, otherWriter.NewFilterGroupId(filterId, "Group"));
+            Assert.Equal(
+                writer.NewFilterItemId(filterGroupId, "Item"),
+                otherWriter.NewFilterItemId(filterGroupId, "Item")
+            );
+            Assert.Equal(writer.NewIndicatorGroupId("Group"), otherWriter.NewIndicatorGroupId("Group"));
+            Assert.Equal(writer.NewIndicatorId("indicator"), otherWriter.NewIndicatorId("indicator"));
+            Assert.Equal(writer.NewObservationId(2), otherWriter.NewObservationId(2));
+        }
+
+        [Fact]
+        public void DifferentForDifferentSubject()
+        {
+            var writer = BuildWriter();
+            var otherWriter = BuildWriter(Guid.NewGuid());
+
+            Assert.NotEqual(writer.NewFilterId("filter"), otherWriter.NewFilterId("filter"));
+            Assert.NotEqual(writer.NewIndicatorGroupId("Group"), otherWriter.NewIndicatorGroupId("Group"));
+            Assert.NotEqual(writer.NewIndicatorId("indicator"), otherWriter.NewIndicatorId("indicator"));
+            Assert.NotEqual(writer.NewObservationId(2), otherWriter.NewObservationId(2));
+        }
+
+        [Fact]
+        public void DifferentForDifferentParent()
+        {
+            var writer = BuildWriter();
+
+            Assert.NotEqual(
+                writer.NewFilterGroupId(Guid.NewGuid(), "Group"),
+                writer.NewFilterGroupId(Guid.NewGuid(), "Group")
+            );
+            Assert.NotEqual(
+                writer.NewFilterItemId(Guid.NewGuid(), "Item"),
+                writer.NewFilterItemId(Guid.NewGuid(), "Item")
+            );
+        }
+
+        [Fact]
+        public void DifferentForEachKindOfId()
+        {
+            var writer = BuildWriter();
+            var parentId = Guid.NewGuid();
+
+            Guid[] ids =
+            [
+                writer.NewFilterId("name"),
+                writer.NewFilterGroupId(parentId, "name"),
+                writer.NewFilterItemId(parentId, "name"),
+                writer.NewIndicatorGroupId("name"),
+                writer.NewIndicatorId("name"),
+            ];
+
+            Assert.Equal(ids.Length, ids.Distinct().Count());
+            Assert.NotEqual(writer.NewIndicatorId("2"), writer.NewObservationId(2));
+        }
+    }
+
+    private ParquetV1DataSetWriter BuildWriter(Guid? subjectId = null)
     {
         var dbContextSupplier = new Mock<IDbContextSupplier>(Strict);
         dbContextSupplier
@@ -215,7 +284,7 @@ public abstract class ParquetV1DataSetWriterTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             Filename = "data.csv",
-            SubjectId = _subjectId,
+            SubjectId = subjectId ?? _subjectId,
             Type = FileType.Data,
             DataStorageVersion = DataStorageVersion.ParquetV1,
         };
