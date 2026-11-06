@@ -16,6 +16,10 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
 import React, { useCallback, useMemo } from 'react';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
+import { ApiDataSetLiveVersionSummary } from '@admin/services/apiDataSetService';
+import { ApiUploadStatusValue } from './data-files/ApiUploadStatus';
 import DataFilesTable from './DataFilesTable';
 import DataUploadsGuidance from './DataUploadsGuidance';
 import DataFileUploadForm from './DataFileUploadForm';
@@ -62,6 +66,130 @@ export default function ReleaseDataUploadsSection({
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
+  const hasLinkedApiDataFiles = importStageDataFiles.some(
+    file => !!file.publicApiDataSetId,
+  );
+
+  const { data: apiDataSets = [], isSuccess: apiDataSetsLoaded } = useQuery({
+    ...apiDataSetQueries.list(publicationId),
+    enabled: hasLinkedApiDataFiles,
+    refetchInterval: 20_000, // 20 seconds
+  });
+
+  // Find linked versions that aren't the current draft or latest live.
+  const historicalDataSetIds = useMemo(() => {
+    if (!apiDataSetsLoaded) {
+      return [];
+    }
+
+    const dataSetIds = importStageDataFiles.flatMap(file => {
+      const { publicApiDataSetId, publicApiDataSetVersion } = file;
+
+      if (!publicApiDataSetId || !publicApiDataSetVersion) {
+        return [];
+      }
+
+      const dataSet = apiDataSets.find(item => item.id === publicApiDataSetId);
+
+      if (
+        dataSet?.draftVersion?.version === publicApiDataSetVersion ||
+        dataSet?.latestLiveVersion?.version === publicApiDataSetVersion
+      ) {
+        return [];
+      }
+
+      return [publicApiDataSetId];
+    });
+
+    return Array.from(new Set(dataSetIds));
+  }, [importStageDataFiles, apiDataSets, apiDataSetsLoaded]);
+
+  // Fetch older published versions only when necessary.
+  // Fetch all pages so we don't silently miss an onlder version.
+  const { data: historicalVersionsByDataSet = {} } = useQuery({
+    queryKey: ['uploadHistoricalApiVersions', historicalDataSetIds],
+    enabled: historicalDataSetIds.length > 0,
+    staleTime: 60_000, // 1 minute
+    queryFn: async (): Promise<
+      Record<string, ApiDataSetLiveVersionSummary[]>
+    > => {
+      const entries = await Promise.all(
+        historicalDataSetIds.map(async dataSetId => {
+          const firstPage = await apiDataSetVersionService.listVersions({
+            dataSetId,
+            page: 1,
+            pageSize: 100,
+          });
+
+          const remainingPages = await Promise.all(
+            Array.from(
+              { length: Math.max(0, firstPage.paging.totalPages - 1) },
+              (_, index) =>
+                apiDataSetVersionService.listVersions({
+                  dataSetId,
+                  page: index + 2,
+                  pageSize: 100,
+                }),
+            ),
+          );
+
+          const versions = [
+            ...firstPage.results,
+            ...remainingPages.flatMap(page => page.results),
+          ];
+
+          return [dataSetId, versions] as const;
+        }),
+      );
+
+      return Object.fromEntries(entries);
+    },
+  });
+
+  // Derive a status mapping without changing the DataFile objects.
+  const dataFileApiStatuses = useMemo(() => {
+    const statuses: Record<string, ApiUploadStatusValue> = {};
+
+    importStageDataFiles.forEach(dataFile => {
+      const { publicApiDataSetId, publicApiDataSetVersion } = dataFile;
+
+      if (!publicApiDataSetId || !publicApiDataSetVersion) {
+        return;
+      }
+
+      const dataSet = apiDataSets.find(item => item.id === publicApiDataSetId);
+
+      const draft = dataSet?.draftVersion;
+      const live = dataSet?.latestLiveVersion;
+
+      if (draft?.version === publicApiDataSetVersion) {
+        if (draft.status === 'Draft') {
+          statuses[dataFile.id] = 'API READY';
+        } else if (draft.status !== 'Cancelled') {
+          statuses[dataFile.id] = 'API DRAFT';
+        }
+        return;
+      }
+
+      if (live?.version === publicApiDataSetVersion) {
+        if (live.status !== 'Withdrawn') {
+          statuses[dataFile.id] = 'API LIVE';
+        }
+        return;
+      }
+
+      const historicalVersion = historicalVersionsByDataSet[
+        publicApiDataSetId
+      ]?.find(version => version.version === publicApiDataSetVersion);
+
+      if (historicalVersion && historicalVersion.status !== 'Withdrawn') {
+        statuses[dataFile.id] = 'API LIVE';
+      }
+    });
+
+    return statuses;
+  }, [importStageDataFiles, apiDataSets, historicalVersionsByDataSet]);
 
   const newDataSetUploads = useMemo(
     () => preImportDataSetUploads.filter(upload => !upload.replacingFileId),
@@ -267,6 +395,7 @@ export default function ReleaseDataUploadsSection({
                     permissions={permissions}
                     caption="Data files"
                     dataFiles={dataFilesWithoutImportedReplacements}
+                    dataFilesApiStatus={dataFileApiStatuses}
                     dataSetUploads={newDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}
