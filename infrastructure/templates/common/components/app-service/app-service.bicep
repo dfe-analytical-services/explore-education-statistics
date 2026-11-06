@@ -295,6 +295,24 @@ module stagingSlotCertificateUserRoleAssignmentModule '../../../common/component
   }
 }
 
+module stagingSlotSecretsOfficerRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?secretsOfficer ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultSecretsOfficerRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Secrets Officer'
+  }
+}
+
+module stagingSlotCryptoUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?cryptoUser ?? false)) {
+  name: '${appServiceName}StagingSlotKeyVaultCryptoUserRole'
+  params: {
+    keyVaultName: keyVaultRoles!.keyVaultName!
+    principalIds: [stagingSlotModule!.outputs.slotIdentityPrincipalId]
+    role: 'Crypto User'
+  }
+}
+
 module autoscaleSettingsModule 'autoscale-settings.bicep' = {
   name: '${appServiceName}AutoscaleSettingsDeploy'
   params: {
