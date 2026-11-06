@@ -21,7 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +35,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FilterMapping = GovUk.Education.ExploreEducationStatistics.Content.Model.FilterMapping;
@@ -70,6 +71,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -78,6 +80,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -138,11 +141,6 @@ public class ReplacementServiceTests
             .WithOriginalDataFile(originalFile)
             .WithReplacementDataFile(replacementFile);
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
@@ -175,19 +173,13 @@ public class ReplacementServiceTests
                 contentDbContext,
                 statisticsDbContext,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
                 releaseVersionId: releaseVersion.Id,
                 originalFileId: originalFile.Id
             );
-
-            VerifyAllMocks(timePeriodService);
 
             result.AssertBadRequest(ReplacementMustBeValid);
         }
@@ -211,6 +203,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -219,6 +212,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -490,13 +484,6 @@ public class ReplacementServiceTests
             subject: originalReleaseSubject.Subject
         );
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
@@ -601,6 +588,9 @@ public class ReplacementServiceTests
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(location);
             statisticsDbContext.Observation.AddRange(observationForLocationOriginal, observationForLocationReplacement);
+            statisticsDbContext.Observation.AddRange(
+                CalendarYearObservations(replacementReleaseSubject.SubjectId, location, 2019, 2020)
+            );
             statisticsDbContext.Footnote.AddRange(
                 footnoteForFilter,
                 footnoteForFilterGroup,
@@ -618,11 +608,7 @@ public class ReplacementServiceTests
                 contentDbContext,
                 statisticsDbContext,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -632,7 +618,7 @@ public class ReplacementServiceTests
 
             result.AssertBadRequest(ReplacementImportMustBeComplete);
 
-            VerifyAllMocks(timePeriodService, releaseFileRepository);
+            VerifyAllMocks(releaseFileRepository);
         }
     }
 
@@ -743,11 +729,6 @@ public class ReplacementServiceTests
             )
             .ReturnsAsync(dataSetVersion);
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
         var apiDataSetVersionMappingService = new Mock<IDataSetVersionMappingService>(Strict);
         apiDataSetVersionMappingService
             .Setup(service => service.GetMappingStatus(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
@@ -801,7 +782,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    timePeriodService: timePeriodService.Object,
                     dataSetVersionService: dataSetVersionService.Object,
                     apiDataSetVersionMappingService: apiDataSetVersionMappingService.Object
                 )
@@ -812,7 +792,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(timePeriodService, dataSetVersionService, apiDataSetVersionMappingService);
+            VerifyAllMocks(dataSetVersionService, apiDataSetVersionMappingService);
             result.AssertRight();
         }
     }
@@ -835,6 +815,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -843,6 +824,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -1135,13 +1117,6 @@ public class ReplacementServiceTests
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
             .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var replacementDataImport = new DataImport { File = replacementFile, Status = DataImportStatus.COMPLETE };
 
         var dataSetMapping = _fixture
@@ -1261,6 +1236,9 @@ public class ReplacementServiceTests
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
             statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
+            statisticsDbContext.Observation.AddRange(
+                CalendarYearObservations(replacementReleaseSubject.SubjectId, replacementLocation, 2019, 2020)
+            );
             statisticsDbContext.Footnote.AddRange(
                 footnoteForFilter,
                 footnoteForFilterGroup,
@@ -1302,7 +1280,6 @@ public class ReplacementServiceTests
                 replacementPlanService: BuildReplacementPlanService(
                     contentDbContext,
                     statisticsDbContext,
-                    timePeriodService: timePeriodService.Object,
                     releaseFileRepository: releaseFileRepository.Object
                 )
             );
@@ -1314,7 +1291,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1518,6 +1495,7 @@ public class ReplacementServiceTests
                     Tiers: [new Dictionary<Guid, List<Guid>> { { originalFilterItem1Id, [originalFilterItem2Id] } }]
                 ),
             ],
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -1526,6 +1504,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -1855,13 +1834,6 @@ public class ReplacementServiceTests
                 }
             );
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -1889,6 +1861,9 @@ public class ReplacementServiceTests
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
             statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
+            statisticsDbContext.Observation.AddRange(
+                CalendarYearObservations(replacementReleaseSubject.SubjectId, replacementLocation, 2019, 2020)
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -1926,11 +1901,7 @@ public class ReplacementServiceTests
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -1938,7 +1909,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService);
 
             result.AssertRight();
         }
@@ -2008,6 +1979,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2016,6 +1988,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2292,13 +2265,6 @@ public class ReplacementServiceTests
                 }
             );
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2326,6 +2292,9 @@ public class ReplacementServiceTests
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
             statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
             statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
+            statisticsDbContext.Observation.AddRange(
+                CalendarYearObservations(replacementReleaseSubject.SubjectId, replacementLocation, 2019, 2020)
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -2363,11 +2332,7 @@ public class ReplacementServiceTests
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -2377,7 +2342,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService);
         }
 
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2421,6 +2386,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2429,6 +2395,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2600,13 +2567,6 @@ public class ReplacementServiceTests
                 }
             );
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
         var contentDbContextId = Guid.NewGuid().ToString();
         var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -2628,6 +2588,19 @@ public class ReplacementServiceTests
             statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
             statisticsDbContext.Filter.AddRange(originalFilter1, replacementFilter1);
             statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
+            statisticsDbContext.Observation.AddRange(
+                CalendarYearObservations(
+                    replacementReleaseSubject.SubjectId,
+                    new Location
+                    {
+                        Id = Guid.NewGuid(),
+                        GeographicLevel = GeographicLevel.Country,
+                        Country = _england,
+                    },
+                    2019,
+                    2020
+                )
+            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
@@ -2665,11 +2638,7 @@ public class ReplacementServiceTests
                 cacheKeyService: cacheKeyService.Object,
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -2677,7 +2646,7 @@ public class ReplacementServiceTests
                 originalFileId: originalFile.Id
             );
 
-            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService, timePeriodService);
+            VerifyAllMocks(privateBlobCacheService, cacheKeyService, releaseVersionService);
 
             result.AssertRight();
         }
@@ -2724,6 +2693,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -2732,6 +2702,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -2906,11 +2877,6 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
@@ -2929,11 +2895,7 @@ public class ReplacementServiceTests
                 statisticsDbContext,
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -2943,7 +2905,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(releaseVersionService, timePeriodService);
+            VerifyAllMocks(releaseVersionService);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2994,6 +2956,7 @@ public class ReplacementServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalReleaseSubject.SubjectId,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -3002,6 +2965,7 @@ public class ReplacementServiceTests
             Type = FileType.Data,
             SubjectId = replacementReleaseSubject.SubjectId,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         originalFile.ReplacedBy = replacementFile;
@@ -3128,11 +3092,6 @@ public class ReplacementServiceTests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
         var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
         releaseFileRepository
             .Setup(mock =>
@@ -3153,11 +3112,7 @@ public class ReplacementServiceTests
                 statisticsDbContext,
                 releaseVersionService: releaseVersionService.Object,
                 releaseFileRepository: releaseFileRepository.Object,
-                replacementPlanService: BuildReplacementPlanService(
-                    contentDbContext,
-                    statisticsDbContext,
-                    timePeriodService: timePeriodService.Object
-                )
+                replacementPlanService: BuildReplacementPlanService(contentDbContext, statisticsDbContext)
             );
 
             var result = await replacementService.Replace(
@@ -3167,7 +3122,7 @@ public class ReplacementServiceTests
 
             result.AssertRight();
 
-            VerifyAllMocks(releaseVersionService, timePeriodService);
+            VerifyAllMocks(releaseVersionService);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -3229,11 +3184,25 @@ public class ReplacementServiceTests
             .SingleAsync(footnote => footnote.Id == id);
     }
 
+    private static Observation[] CalendarYearObservations(Guid subjectId, Location location, params int[] years)
+    {
+        return years
+            .Select(year => new Observation
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subjectId,
+                Location = location,
+                Year = year,
+                TimeIdentifier = CalendarYear,
+            })
+            .ToArray();
+    }
+
     private static ReplacementPlanService BuildReplacementPlanService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
         IDataSetVersionService? dataSetVersionService = null,
-        ITimePeriodService? timePeriodService = null,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IDataSetVersionMappingService? apiDataSetVersionMappingService = null,
         IReleaseFileRepository? releaseFileRepository = null
     )
@@ -3241,11 +3210,9 @@ public class ReplacementServiceTests
         var userService = AlwaysTrueUserService().Object;
         return new ReplacementPlanService(
             contentDbContext,
-            statisticsDbContext,
             new FootnoteRepository(statisticsDbContext),
-            new LocationRepository(statisticsDbContext),
+            storageDataSetResolver ?? BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             dataSetVersionService ?? Mock.Of<IDataSetVersionService>(Strict),
-            timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService,
             apiDataSetVersionMappingService ?? Mock.Of<IDataSetVersionMappingService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict)
@@ -3265,6 +3232,7 @@ public class ReplacementServiceTests
         return new ReplacementService(
             contentDbContext,
             statisticsDbContext,
+            BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
             releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
             replacementPlanService ?? Mock.Of<IReplacementPlanService>(Strict),

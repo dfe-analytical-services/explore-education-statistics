@@ -14,6 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -22,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -174,6 +178,8 @@ public class ProcessorStage2Tests
                 Id = Guid.NewGuid(),
                 Filename = scenario.GetFilenameUnderTest(),
                 Type = FileType.Data,
+                SubjectId = subject.Id,
+                DataStorageVersion = DataStorageVersion.StatsDB,
             },
             MetaFile = new File
             {
@@ -230,26 +236,28 @@ public class ProcessorStage2Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict),
+            Mock.Of<IStorageDataSetWriterResolver>(Strict),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var importerService = new ImporterService(
             new AppOptions().ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -261,7 +269,15 @@ public class ProcessorStage2Tests
         );
 
         var processorService = BuildProcessorService(
-            dbContextSupplier,
+            storageDataSetResolver: BuildStatisticsDbDataSetResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            storageDataSetWriterResolver: BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                transactionHelper,
+                importerLocationCache,
+                guidGenerator
+            ),
             dataImportService: dataImportService,
             privateBlobStorageService: privateBlobStorageService.Object,
             importerService: importerService,
@@ -462,7 +478,8 @@ public class ProcessorStage2Tests
     }
 
     private static ProcessorService BuildProcessorService(
-        IDbContextSupplier dbContextSupplier,
+        IStorageDataSetResolver storageDataSetResolver,
+        IStorageDataSetWriterResolver storageDataSetWriterResolver,
         IDataImportService? dataImportService = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
         IImporterService? importerService = null,
@@ -476,7 +493,8 @@ public class ProcessorStage2Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            storageDataSetResolver,
+            storageDataSetWriterResolver
         );
     }
 

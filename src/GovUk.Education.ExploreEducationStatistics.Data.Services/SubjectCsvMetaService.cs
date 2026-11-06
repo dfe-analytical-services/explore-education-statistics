@@ -7,12 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,26 +22,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 public class SubjectCsvMetaService : ISubjectCsvMetaService
 {
     private readonly ILogger<SubjectCsvMetaService> _logger;
-    private readonly StatisticsDbContext _statisticsDbContext;
     private readonly ContentDbContext _contentDbContext;
     private readonly IUserService _userService;
-    private readonly IFilterItemRepository _filterItemRepository;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public SubjectCsvMetaService(
         ILogger<SubjectCsvMetaService> logger,
-        StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
         IUserService userService,
-        IFilterItemRepository filterItemRepository,
+        IStorageDataSetResolver storageDataSetResolver,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
-        _statisticsDbContext = statisticsDbContext;
         _contentDbContext = contentDbContext;
         _userService = userService;
-        _filterItemRepository = filterItemRepository;
+        _storageDataSetResolver = storageDataSetResolver;
         _releaseFileBlobService = releaseFileBlobService;
     }
 
@@ -57,9 +53,19 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             .OnSuccess(() => GetCsvStream(releaseSubject, cancellationToken))
             .OnSuccess(async csvStream =>
             {
-                var locations = GetLocations([.. query.LocationIds]);
-                var filters = await GetFilters([.. query.GetFilterItemIds()]);
-                var indicators = await GetIndicators(query);
+                var dataSet = await _storageDataSetResolver.Resolve(releaseSubject.SubjectId, cancellationToken);
+
+                var locations = (await dataSet.ListLocations(query.LocationIds, cancellationToken)).ToDictionary(
+                    location => location.Id,
+                    location => location.GetCsvValues()
+                );
+                var filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                    await dataSet.ListFilterItems(query.GetFilterItemIds(), cancellationToken)
+                );
+                var indicators = (await dataSet.ListIndicators(query.Indicators, cancellationToken)).ToDictionary(
+                    indicator => indicator.Name,
+                    indicator => new IndicatorCsvMetaViewModel(indicator)
+                );
                 var headers = csvStream is not null
                     ? await ListCsvHeaders(csvStream, filters, indicators)
                     : ListCsvHeaders(filters, indicators, locations);
@@ -155,27 +161,5 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
 
         return filteredHeaders;
-    }
-
-    private Dictionary<Guid, Dictionary<string, string>> GetLocations(HashSet<Guid> locationIds)
-    {
-        var locations = _statisticsDbContext
-            .Location.AsNoTracking()
-            .Where(location => locationIds.Contains(location.Id));
-        return locations.ToDictionary(location => location.Id, location => location.GetCsvValues());
-    }
-
-    private async Task<Dictionary<string, FilterCsvMetaViewModel>> GetFilters(HashSet<Guid> filterItemIds)
-    {
-        var filterItems = await _filterItemRepository.GetFilterItems(filterItemIds);
-        return FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems);
-    }
-
-    private async Task<Dictionary<string, IndicatorCsvMetaViewModel>> GetIndicators(FullTableQuery query)
-    {
-        return await _statisticsDbContext
-            .Indicator.AsNoTracking()
-            .Where(indicator => query.Indicators.Contains(indicator.Id))
-            .ToDictionaryAsync(indicator => indicator.Name, indicator => new IndicatorCsvMetaViewModel(indicator));
     }
 }

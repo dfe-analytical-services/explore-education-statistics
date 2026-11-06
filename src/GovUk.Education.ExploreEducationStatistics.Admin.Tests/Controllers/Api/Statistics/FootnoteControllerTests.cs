@@ -6,7 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -14,6 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
+using ReleaseFile = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFile;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
@@ -28,8 +30,6 @@ public class FootnoteControllerTests
 
     public FootnoteControllerTests()
     {
-        var subjectIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
-
         var footnote = new Footnote
         {
             Id = FootnoteId,
@@ -41,11 +41,7 @@ public class FootnoteControllerTests
             Subjects = new List<SubjectFootnote>(),
         };
 
-        var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-        var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
         var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
-        var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
-        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
         footnoteService
             .Setup(s =>
@@ -91,89 +87,11 @@ public class FootnoteControllerTests
 
         footnoteService.Setup(s => s.DeleteFootnote(ReleaseVersionId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-        releaseService
-            .Setup(s => s.ListSubjects(ReleaseVersionId))
-            .ReturnsAsync(
-                subjectIds
-                    .Select(id => new SubjectViewModel(
-                        id: id,
-                        name: $"Subject {id}",
-                        order: 0,
-                        content: "Test content",
-                        timePeriods: new TimePeriodLabels(),
-                        geographicLevels: new List<string>(),
-                        geographicLevelsCsvOnly: new List<string>(),
-                        filters: new List<string>(),
-                        indicators: new List<string>(),
-                        file: new FileInfo
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = "Test file",
-                            FileName = "test.csv",
-                            Size = "1 Mb",
-                        },
-                        lastUpdated: DateTime.Now
-                    ))
-                    .ToList()
-            );
-
-        filterRepository
-            .Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
-            .ReturnsAsync(
-                new List<Filter>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Hint = "Filter Hint",
-                        Label = "Filter label",
-                        Name = "Filter name",
-                        FilterGroups = new List<FilterGroup>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Filter group",
-                                FilterItems = new List<FilterItem>
-                                {
-                                    new() { Id = Guid.NewGuid(), Label = "Filter item" },
-                                },
-                            },
-                        },
-                    },
-                }
-            );
-
-        indicatorGroupRepository
-            .Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
-            .ReturnsAsync(
-                new List<IndicatorGroup>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator group",
-                        Indicators = new List<Indicator>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Label = "Indicator label",
-                                Name = "Indicator name",
-                                Unit = IndicatorUnit.Percent,
-                                DecimalPlaces = 2,
-                            },
-                        },
-                    },
-                }
-            );
-
         _controller = new FootnoteController(
-            filterRepository.Object,
             footnoteService.Object,
-            indicatorGroupRepository.Object,
-            releaseService.Object,
-            releaseDataFileRepository.Object
+            Mock.Of<IStorageDataSetResolver>(MockBehavior.Strict),
+            Mock.Of<IReleaseService>(MockBehavior.Strict),
+            Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict)
         );
     }
 
@@ -249,9 +167,8 @@ public class FootnoteControllerTests
         footnoteService.Setup(s => s.GetFootnote(ReleaseVersionId, footnote.Id)).ReturnsAsync(footnote);
 
         var controller = new FootnoteController(
-            Mock.Of<IFilterRepository>(MockBehavior.Strict),
             footnoteService.Object,
-            Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
+            Mock.Of<IStorageDataSetResolver>(MockBehavior.Strict),
             Mock.Of<IReleaseService>(MockBehavior.Strict),
             Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict)
         );
@@ -289,6 +206,181 @@ public class FootnoteControllerTests
     }
 
     [Fact]
+    public async Task GetFootnotesMeta_ReturnsFiltersAndIndicatorsFromEachSubjectsDataSet()
+    {
+        var subject1Id = Guid.NewGuid();
+        var subject2Id = Guid.NewGuid();
+
+        var releaseFile1 = new ReleaseFile
+        {
+            Name = "Subject 1",
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subject1Id,
+                Type = FileType.Data,
+            },
+        };
+        var releaseFile2 = new ReleaseFile
+        {
+            Name = "Subject 2",
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subject2Id,
+                Type = FileType.Data,
+            },
+        };
+
+        // Subject 1's filter groups, filter items, indicator groups and indicators are not in label order
+        var subject1FilterItemB = new FilterItem { Id = Guid.NewGuid(), Label = "Filter item B" };
+        var subject1FilterItemA = new FilterItem { Id = Guid.NewGuid(), Label = "Filter item A" };
+        var subject1FilterGroupB = new FilterGroup { Id = Guid.NewGuid(), Label = "Filter group B" };
+        var subject1FilterGroupA = new FilterGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Filter group A",
+            FilterItems = [subject1FilterItemB, subject1FilterItemA],
+        };
+        var subject1Filter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Hint = "Subject 1 filter hint",
+            Label = "Subject 1 filter",
+            FilterGroups = [subject1FilterGroupB, subject1FilterGroupA],
+        };
+
+        var subject1IndicatorB = new Indicator { Id = Guid.NewGuid(), Label = "Indicator B" };
+        var subject1IndicatorA = new Indicator { Id = Guid.NewGuid(), Label = "Indicator A" };
+        var subject1IndicatorGroupB = new IndicatorGroup { Id = Guid.NewGuid(), Label = "Indicator group B" };
+        var subject1IndicatorGroupA = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Indicator group A",
+            Indicators = [subject1IndicatorB, subject1IndicatorA],
+        };
+
+        var subject2FilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Subject 2 filter item" };
+        var subject2Filter = new Filter
+        {
+            Id = Guid.NewGuid(),
+            Label = "Subject 2 filter",
+            FilterGroups =
+            [
+                new FilterGroup
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Subject 2 filter group",
+                    FilterItems = [subject2FilterItem],
+                },
+            ],
+        };
+
+        var subject2Indicator = new Indicator { Id = Guid.NewGuid(), Label = "Subject 2 indicator" };
+        var subject2IndicatorGroup = new IndicatorGroup
+        {
+            Id = Guid.NewGuid(),
+            Label = "Subject 2 indicator group",
+            Indicators = [subject2Indicator],
+        };
+
+        var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+        var subject1DataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
+        var subject2DataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
+
+        releaseService
+            .Setup(s => s.ListSubjects(ReleaseVersionId))
+            .ReturnsAsync(ListOf(BuildSubjectViewModel(subject1Id), BuildSubjectViewModel(subject2Id)));
+
+        releaseDataFileRepository.Setup(s => s.GetBySubject(ReleaseVersionId, subject1Id)).ReturnsAsync(releaseFile1);
+        releaseDataFileRepository.Setup(s => s.GetBySubject(ReleaseVersionId, subject2Id)).ReturnsAsync(releaseFile2);
+
+        storageDataSetResolver.Setup(s => s.Resolve(releaseFile1.File)).Returns(subject1DataSet.Object);
+        storageDataSetResolver.Setup(s => s.Resolve(releaseFile2.File)).Returns(subject2DataSet.Object);
+
+        subject1DataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([subject1Filter]);
+        subject1DataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([subject1IndicatorGroupB, subject1IndicatorGroupA]);
+
+        subject2DataSet
+            .Setup(s => s.ListFilters(includeItems: true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([subject2Filter]);
+        subject2DataSet
+            .Setup(s => s.ListIndicatorGroups(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([subject2IndicatorGroup]);
+
+        var controller = new FootnoteController(
+            Mock.Of<IFootnoteService>(MockBehavior.Strict),
+            storageDataSetResolver.Object,
+            releaseService.Object,
+            releaseDataFileRepository.Object
+        );
+
+        var result = await controller.GetFootnotesMeta(ReleaseVersionId);
+
+        VerifyAllMocks(
+            releaseService,
+            releaseDataFileRepository,
+            storageDataSetResolver,
+            subject1DataSet,
+            subject2DataSet
+        );
+
+        var viewModel = result.AssertOkResult();
+
+        Assert.Equal(ListOf(subject1Id, subject2Id), viewModel.Subjects.Keys.ToList());
+
+        var subject1 = viewModel.Subjects[subject1Id];
+        Assert.Equal(subject1Id, subject1.SubjectId);
+        Assert.Equal("Subject 1", subject1.SubjectName);
+
+        var subject1FilterViewModel = Assert.Single(subject1.Filters);
+        Assert.Equal(subject1Filter.Id, subject1FilterViewModel.Key);
+        Assert.Equal("Subject 1 filter", subject1FilterViewModel.Value.Legend);
+        Assert.Equal("Subject 1 filter hint", subject1FilterViewModel.Value.Hint);
+        Assert.Equal(
+            ListOf(subject1FilterGroupA.Id, subject1FilterGroupB.Id),
+            subject1FilterViewModel.Value.Options.Keys.ToList()
+        );
+        Assert.Equal(
+            ListOf(subject1FilterItemA.Id.ToString(), subject1FilterItemB.Id.ToString()),
+            subject1FilterViewModel.Value.Options[subject1FilterGroupA.Id].Options.Select(o => o.Value).ToList()
+        );
+        Assert.Empty(subject1FilterViewModel.Value.Options[subject1FilterGroupB.Id].Options);
+
+        Assert.Equal(ListOf(subject1IndicatorGroupA.Id, subject1IndicatorGroupB.Id), subject1.Indicators.Keys.ToList());
+        Assert.Equal(
+            ListOf(subject1IndicatorA.Id, subject1IndicatorB.Id),
+            subject1.Indicators[subject1IndicatorGroupA.Id].Options.Select(o => o.Value).ToList()
+        );
+        Assert.Empty(subject1.Indicators[subject1IndicatorGroupB.Id].Options);
+
+        var subject2 = viewModel.Subjects[subject2Id];
+        Assert.Equal(subject2Id, subject2.SubjectId);
+        Assert.Equal("Subject 2", subject2.SubjectName);
+
+        var subject2FilterViewModel = Assert.Single(subject2.Filters);
+        Assert.Equal(subject2Filter.Id, subject2FilterViewModel.Key);
+        var subject2FilterGroupViewModel = Assert.Single(subject2FilterViewModel.Value.Options).Value;
+        Assert.Equal(
+            ListOf(subject2FilterItem.Id.ToString()),
+            subject2FilterGroupViewModel.Options.Select(o => o.Value).ToList()
+        );
+
+        var subject2IndicatorGroupViewModel = Assert.Single(subject2.Indicators);
+        Assert.Equal(subject2IndicatorGroup.Id, subject2IndicatorGroupViewModel.Key);
+        Assert.Equal(
+            ListOf(subject2Indicator.Id),
+            subject2IndicatorGroupViewModel.Value.Options.Select(o => o.Value).ToList()
+        );
+    }
+
+    [Fact]
     public async Task GetFootnotes()
     {
         var result = await _controller.GetFootnotes(ReleaseVersionId);
@@ -314,5 +406,28 @@ public class FootnoteControllerTests
         );
 
         result.AssertOkResult();
+    }
+
+    private static SubjectViewModel BuildSubjectViewModel(Guid subjectId)
+    {
+        return new SubjectViewModel(
+            id: subjectId,
+            name: $"Subject {subjectId}",
+            order: 0,
+            content: "Test content",
+            timePeriods: new TimePeriodLabels(),
+            geographicLevels: new List<string>(),
+            geographicLevelsCsvOnly: new List<string>(),
+            filters: new List<string>(),
+            indicators: new List<string>(),
+            file: new FileInfo
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test file",
+                FileName = "test.csv",
+                Size = "1 Mb",
+            },
+            lastUpdated: DateTime.Now
+        );
     }
 }

@@ -4,8 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,24 +20,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 [Authorize]
 public class FootnoteController : ControllerBase
 {
-    private readonly IFilterRepository _filterRepository;
     private readonly IFootnoteService _footnoteService;
-    private readonly IIndicatorGroupRepository _indicatorGroupRepository;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseService _releaseService;
     private readonly IReleaseDataFileRepository _releaseDataFileRepository;
     private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
     public FootnoteController(
-        IFilterRepository filterRepository,
         IFootnoteService footnoteService,
-        IIndicatorGroupRepository indicatorGroupRepository,
+        IStorageDataSetResolver storageDataSetResolver,
         IReleaseService releaseService,
         IReleaseDataFileRepository releaseDataFileRepository
     )
     {
-        _filterRepository = filterRepository;
         _footnoteService = footnoteService;
-        _indicatorGroupRepository = indicatorGroupRepository;
+        _storageDataSetResolver = storageDataSetResolver;
         _releaseService = releaseService;
         _releaseDataFileRepository = releaseDataFileRepository;
     }
@@ -119,14 +116,18 @@ public class FootnoteController : ControllerBase
             {
                 var subjectMetaViewModels = await subjects
                     .ToAsyncEnumerable()
-                    .SelectAwait(async subject => new FootnotesSubjectMetaViewModel
+                    .SelectAwait(async subject =>
                     {
-                        Filters = await GetFilters(subject.Id),
-                        Indicators = await GetIndicators(subject.Id),
-                        SubjectId = subject.Id,
-                        SubjectName = (
-                            await _releaseDataFileRepository.GetBySubject(releaseVersionId, subject.Id)
-                        ).Name,
+                        var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseVersionId, subject.Id);
+                        var dataSet = _storageDataSetResolver.Resolve(releaseFile.File);
+
+                        return new FootnotesSubjectMetaViewModel
+                        {
+                            Filters = await GetFilters(dataSet),
+                            Indicators = await GetIndicators(dataSet),
+                            SubjectId = subject.Id,
+                            SubjectName = releaseFile.Name,
+                        };
                     })
                     .ToListAsync();
 
@@ -144,9 +145,9 @@ public class FootnoteController : ControllerBase
         return await _footnoteService.UpdateFootnotes(releaseVersionId, request).HandleFailuresOrOk();
     }
 
-    private async Task<Dictionary<Guid, FootnotesIndicatorsMetaViewModel>> GetIndicators(Guid subjectId)
+    private static async Task<Dictionary<Guid, FootnotesIndicatorsMetaViewModel>> GetIndicators(IStorageDataSet dataSet)
     {
-        return (await _indicatorGroupRepository.GetIndicatorGroups(subjectId))
+        return (await dataSet.ListIndicatorGroups())
             .OrderBy(group => group.Label, LabelComparer)
             .ToDictionary(
                 group => group.Id,
@@ -161,9 +162,9 @@ public class FootnoteController : ControllerBase
             );
     }
 
-    private async Task<Dictionary<Guid, FootnotesFilterMetaViewModel>> GetFilters(Guid subjectId)
+    private static async Task<Dictionary<Guid, FootnotesFilterMetaViewModel>> GetFilters(IStorageDataSet dataSet)
     {
-        return (await _filterRepository.GetFiltersIncludingItems(subjectId)).ToDictionary(
+        return (await dataSet.ListFilters(includeItems: true)).ToDictionary(
             filter => filter.Id,
             filter => new FootnotesFilterMetaViewModel
             {

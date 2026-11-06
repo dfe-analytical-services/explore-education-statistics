@@ -10,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +47,15 @@ var host = new HostBuilder()
                         providerOptions => providerOptions.EnableCustomRetryOnFailure()
                     )
                 )
+                // For IStorageDataSet when DataStorageVersion == StatsDB
+                .AddDbContext<StatisticsDbContext>(options =>
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()
+                    )
+                )
+                .AddStorageDataSets()
+                .AddStorageDataSetWriters()
                 .AddSingleton<IBlobSasService, BlobSasService>()
                 .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>(
                     provider => new PrivateBlobStorageService(
@@ -57,7 +68,6 @@ var host = new HostBuilder()
                 )
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
-                .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
                 .AddTransient<IDataImportService, DataImportService>()
                 .AddTransient<IDataSetMappingService, DataSetMappingService>()
@@ -66,7 +76,6 @@ var host = new HostBuilder()
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .AddTransient<IProcessorService, ProcessorService>()
                 .AddSingleton<IDatabaseHelper, DatabaseHelper>()
-                .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
                 .AddSingleton<IDbContextSupplier, DbContextSupplier>()
                 .AddSingleton<DateTimeProvider>()
                 .Configure<AppOptions>(hostContext.Configuration.GetSection(AppOptions.Section));
@@ -80,6 +89,9 @@ await RestartImports();
 await host.RunAsync();
 return;
 
+// Caches the StatsDB's shared locations for StatisticsDbDataSetWriter. It isn't behind IStorageDataSetWriter
+// as it isn't scoped to a data set. It will be removed once data sets are parquet files with their own
+// per-data-set locations.
 void LoadLocationCache()
 {
     var dbContextSupplier = host.Services.GetRequiredService<IDbContextSupplier>();
