@@ -47,6 +47,10 @@ public class ImporterMetaService : IImporterMetaService
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
 
+        // @MarkFix Make every id deterministic for newly imported parquet data sets, e.g. a name-based (v5) guid
+        // from the subject id and the CSV column/label path, so a re-import gives the same ids. Covers filters and
+        // indicators here, the Guid.NewGuid() in the IndicatorGroup, FilterGroup and FilterItem constructors, and
+        // per-data-set location ids. Existing data sets keep their random ids.
         var indicators = metaFileReader.ReadIndicatorsFromCsv(metaRows, subjectId);
         indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
