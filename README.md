@@ -188,6 +188,15 @@ dotnet nuget add source https://nuget.pkg.github.com/<OWNER>/index.json -n <NAME
 > If using a non-Windows machine, you may need to include the `--store-password-in-clear-text` option to the
 > above command, as encryption is only supported on Windows.
 
+#### GitHub Actions
+
+GitHub Actions workflows that restore .NET dependencies (e.g. CodeQL) authenticate with the built-in
+`GITHUB_TOKEN`, which requires the `packages: read` permission in the workflow. The token can only read
+a package if the package grants this repository access, so when a new package is published from
+[ees-common](https://github.com/dfe-analytical-services/ees-common), an organisation package admin must
+add `explore-education-statistics` with the **Read** role under the package's
+**Package settings** > **Manage Actions access**.
+
 
 ### Trust the .NET HTTPS development certificate
 
