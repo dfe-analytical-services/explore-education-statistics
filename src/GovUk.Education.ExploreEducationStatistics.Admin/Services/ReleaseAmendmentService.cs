@@ -597,6 +597,7 @@ public class ReleaseAmendmentService(
                 Summary = originalFile.Summary,
                 FilterSequence = originalFile.FilterSequence,
                 IndicatorSequence = originalFile.IndicatorSequence,
+                PairedIndicators = originalFile.PairedIndicators,
                 Published = originalFile.Published,
                 PublicApiDataSetId = originalFile.PublicApiDataSetId,
                 PublicApiDataSetVersion = originalFile.PublicApiDataSetVersion,
