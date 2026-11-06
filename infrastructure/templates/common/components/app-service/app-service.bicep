@@ -12,8 +12,9 @@ param appInsightsName string
 @description('The operating system to use to host App Services.')
 param operatingSystem 'Windows' | 'Linux'
 
-@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
-param kind 'app' | 'app,linux,container'
+@description('''The kind of App Service to create. Use "app" with the "Windows" operating system for code on Windows,
+"app,linux" with "Linux" for code on Linux, and "app,linux,container" with "Linux" for Docker.''')
+param kind 'app' | 'app,linux' | 'app,linux,container'
 
 @description('Details of common Key Vault roles to apply to this App Service.')
 param keyVaultRoles {
@@ -126,6 +127,10 @@ var ipSecurityRestrictions = [
   }
 ]
 
+// Code on Linux takes its runtime stack from linuxFxVersion, and code on Windows from netFrameworkVersion. Docker App
+// Services get their image in linuxFxVersion from the application release pipeline, so this leaves it unset for them.
+var runtimeStackConfig = kind == 'app,linux' ? { linuxFxVersion: 'DOTNETCORE|10.0' } : { netFrameworkVersion: 'v10.0' }
+
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
   kind: kind
@@ -142,11 +147,10 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
     clientAffinityEnabled: false
     reserved: operatingSystem == 'Linux'
     virtualNetworkSubnetId: vnetIntegrationSubnetRef ?? ''
-    siteConfig: {
+    siteConfig: union(runtimeStackConfig, {
       http20Enabled: true
       minTlsVersion: minTlsVersion
       ftpsState: 'FtpsOnly'
-      netFrameworkVersion: 'v10.0'
       alwaysOn: true
       webSocketsEnabled: false
       remoteDebuggingEnabled: false
@@ -161,7 +165,7 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
       cors: {
         allowedOrigins: allowedOrigins
       }
-    }
+    })
   }
 }
 
