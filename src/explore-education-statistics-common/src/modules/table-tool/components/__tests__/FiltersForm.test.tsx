@@ -898,8 +898,8 @@ describe('FiltersForm', () => {
       // child indicator stays in its own group
       const testSubjectMetaChildGroupFirst = produce(testSubjectMeta, draft => {
         draft.filters = {};
-        draft.indicators.AbsenceByReason.order = 1;
-        draft.indicators.AbsenceFields.order = 0;
+        draft.indicators.AbsenceByReason.order = 0;
+        draft.indicators.AbsenceFields.order = 1;
         draft.indicators.AbsenceByReason.options[1].parentIndicatorId =
           'authorised-absence-rate';
       });
@@ -924,12 +924,12 @@ describe('FiltersForm', () => {
 
       expect(
         groups.map(group => group.querySelector('legend')?.textContent),
-      ).toEqual(['Absence fields', 'Absence by reason']);
+      ).toEqual(['Absence by reason', 'Absence fields']);
 
+      expect(within(groups[0]).getByLabelText(childLabel)).toBeDisabled();
       expect(
-        within(groups[0]).getByLabelText('Authorised absence rate'),
+        within(groups[1]).getByLabelText('Authorised absence rate'),
       ).toBeEnabled();
-      expect(within(groups[1]).getByLabelText(childLabel)).toBeDisabled();
     });
 
     test('checking and unchecking the parent indicator also checks and unchecks the child indicator', async () => {
