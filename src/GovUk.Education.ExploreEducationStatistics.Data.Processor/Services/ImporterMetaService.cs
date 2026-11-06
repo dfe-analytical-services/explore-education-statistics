@@ -60,6 +60,10 @@ public class ImporterMetaService : IImporterMetaService
 
         if (!filtersAlreadyImported || !indicatorsAlreadyImported)
         {
+            // @MarkFix Make every id deterministic for newly imported parquet data sets, e.g. a name-based (v5) guid
+            // from the subject id and the CSV column/label path, so a re-import gives the same ids. Covers filters and
+            // indicators here, the Guid.NewGuid() in the IndicatorGroup, FilterGroup and FilterItem constructors, and
+            // per-data-set location ids. Existing data sets keep their random ids.
             var filters = filtersAndMeta.Select(f => f.Filter).ToList();
             filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
 
