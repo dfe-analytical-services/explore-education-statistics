@@ -35,6 +35,8 @@ public record IndicatorMetaViewModel
 
     public int? DecimalPlaces { get; init; }
 
+    public Guid? ParentIndicatorId { get; init; }
+
     public IndicatorMetaViewModel(Indicator indicator)
     {
         DecimalPlaces = indicator.DecimalPlaces;
