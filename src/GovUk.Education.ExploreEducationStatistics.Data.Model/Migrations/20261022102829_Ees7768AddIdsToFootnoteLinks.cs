@@ -15,64 +15,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 name: "IndicatorGroupId",
                 table: "IndicatorFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "SubjectId",
                 table: "IndicatorFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "FilterGroupId",
                 table: "FilterItemFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "FilterId",
                 table: "FilterItemFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "SubjectId",
                 table: "FilterItemFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "FilterId",
                 table: "FilterGroupFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "SubjectId",
                 table: "FilterGroupFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "SubjectId",
                 table: "FilterFootnote",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000")
+                nullable: true
             );
 
             migrationBuilder.Sql(
@@ -105,6 +97,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 JOIN Indicator ON Indicator.Id = IndicatorFootnote.IndicatorId
                 JOIN IndicatorGroup ON IndicatorGroup.Id = Indicator.IndicatorGroupId;
                 "
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "IndicatorGroupId",
+                table: "IndicatorFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "SubjectId",
+                table: "IndicatorFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "FilterGroupId",
+                table: "FilterItemFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "FilterId",
+                table: "FilterItemFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "SubjectId",
+                table: "FilterItemFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "FilterId",
+                table: "FilterGroupFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "SubjectId",
+                table: "FilterGroupFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
+            );
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "SubjectId",
+                table: "FilterFootnote",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true
             );
 
             migrationBuilder.CreateIndex(
