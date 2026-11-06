@@ -1,10 +1,10 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateSearchableDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveSearchableDocument;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +18,7 @@ public class ProgramTests
          {
              "App": {
                  "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                 "SearchDocumentsContainerName": "search-documents-container-name"
+                 "ReleaseDocumentsContainerName": "release-documents-container-name"
              },
              "ContentApi": {
                  "Url": "http://contentapi.test.url:8123"
@@ -68,37 +68,37 @@ public class ProgramTests
             }
         }
 
-        public class SearchableDocumentCreatorTests : ProgramTests
+        public class ReleaseDocumentCreatorTests : ProgramTests
         {
             [Fact]
-            public void Should_resolve_ISearchableDocumentCreator()
+            public void Should_resolve_IReleaseDocumentCreator()
             {
                 // ARRANGE
                 var sut = GetSut();
 
                 // ACT
-                var actual = sut.Services.GetRequiredService<ISearchableDocumentCreator>();
+                var actual = sut.Services.GetRequiredService<IReleaseDocumentCreator>();
 
                 // ASSERT
                 Assert.NotNull(actual);
-                Assert.IsType<SearchableDocumentCreator>(actual);
+                Assert.IsType<ReleaseDocumentCreator>(actual);
             }
         }
 
-        public class SearchableDocumentRemoverTests : ProgramTests
+        public class ReleaseDocumentRemoverTests : ProgramTests
         {
             [Fact]
-            public void Should_resolve_ISearchableDocumentRemover()
+            public void Should_resolve_IReleaseDocumentRemover()
             {
                 // ARRANGE
                 var sut = GetSut();
 
                 // ACT
-                var actual = sut.Services.GetRequiredService<ISearchableDocumentRemover>();
+                var actual = sut.Services.GetRequiredService<IReleaseDocumentRemover>();
 
                 // ASSERT
                 Assert.NotNull(actual);
-                Assert.IsType<SearchableDocumentRemover>(actual);
+                Assert.IsType<ReleaseDocumentRemover>(actual);
             }
         }
 
@@ -165,7 +165,7 @@ public class ProgramTests
                     {
                        "App": {
                             "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
-                            "SearchDocumentsContainerName": "search-documents-container-name"
+                            "ReleaseDocumentsContainerName": "release-documents-container-name"
                        }
                     }
                     """
@@ -193,7 +193,7 @@ public class ProgramTests
                         {
                            "App": {
                                 "SearchStorageConnectionString": null,
-                                "SearchDocumentsContainerName": "search-documents-container-name"
+                                "ReleaseDocumentsContainerName": "release-documents-container-name"
                            }
                         }
                         """
@@ -218,7 +218,7 @@ public class ProgramTests
                         {
                            "App": {
                                 "SearchStorageConnectionString": "UseDevelopmentStorage=true",
-                                "SearchDocumentsContainerName": null
+                                "ReleaseDocumentsContainerName": null
                            }
                         }
                         """
@@ -233,29 +233,29 @@ public class ProgramTests
             }
         }
 
-        public class ReindexSearchableDocumentsFunctionTests : ProgramTests
+        public class ReindexReleaseDocumentsFunctionTests : ProgramTests
         {
             [Fact]
-            public void Should_resolve_ReindexSearchableDocumentsFunction()
+            public void Should_resolve_ReindexReleaseDocumentsFunction()
             {
                 // ARRANGE
                 var sut = GetSut();
 
                 // ACT
-                var actual = ActivatorUtilities.CreateInstance<ReindexSearchableDocumentsFunction>(sut.Services);
+                var actual = ActivatorUtilities.CreateInstance<ReindexReleaseDocumentsFunction>(sut.Services);
 
                 // ASSERT
                 Assert.NotNull(actual);
             }
 
             [Fact]
-            public void GivenNotConfigured_WhenResolvingReindexSearchableDocumentsFunction_ThenShouldResolve()
+            public void GivenNotConfigured_WhenResolvingReindexReleaseDocumentsFunction_ThenShouldResolve()
             {
                 // ARRANGE
                 var sut = GetSutWithConfig("{}");
 
                 // ACT
-                var actual = sut.Services.GetRequiredService<IOptions<ReindexSearchableDocumentsFunction>>();
+                var actual = sut.Services.GetRequiredService<IOptions<ReindexReleaseDocumentsFunction>>();
 
                 // ASSERT
                 Assert.NotNull(actual);
@@ -274,7 +274,7 @@ public class ProgramTests
                 Assert.NotNull(options.Value);
                 Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
                 Assert.Null(options.Value.SearchServiceAccessKey);
-                Assert.Equal(string.Empty, options.Value.IndexerName);
+                Assert.Equal(string.Empty, options.Value.ReleaseIndexerName);
             }
         }
 

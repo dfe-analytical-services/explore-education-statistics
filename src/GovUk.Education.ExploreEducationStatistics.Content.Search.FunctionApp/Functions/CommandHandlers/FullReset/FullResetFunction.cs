@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.AspNetCore.Http;
@@ -7,27 +7,22 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
 
-public class FullResetFunction(
-    IFullSearchableDocumentResetter fullSearchableDocumentResetter,
-    ICommandHandler commandHandler
-)
+public class FullResetFunction(IFullReleaseDocumentResetter fullReleaseDocumentResetter, ICommandHandler commandHandler)
 {
     [Function(nameof(FullSearchableDocumentsReset))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
-    public async Task<RefreshSearchableDocumentMessageDto[]> FullSearchableDocumentsReset(
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
+    public async Task<RefreshReleaseDocumentMessageDto[]> FullSearchableDocumentsReset(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
             HttpRequest ignored, //  The binding name _ is invalid
         FunctionContext context
     ) => await commandHandler.Handle(ResetSearchableDocument, context.CancellationToken);
 
-    private async Task<RefreshSearchableDocumentMessageDto[]> ResetSearchableDocument(
-        CancellationToken cancellationToken
-    )
+    private async Task<RefreshReleaseDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
     {
-        var response = await fullSearchableDocumentResetter.PerformReset(cancellationToken);
+        var response = await fullReleaseDocumentResetter.PerformReset(cancellationToken);
 
         return response
-            .AllPublications.Select(publication => new RefreshSearchableDocumentMessageDto
+            .AllPublications.Select(publication => new RefreshReleaseDocumentMessageDto
             {
                 PublicationSlug = publication.PublicationSlug,
             })
