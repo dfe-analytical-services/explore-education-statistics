@@ -35,7 +35,7 @@ public class PairedIndicatorService(
     {
         return await FindDataReleaseFile(releaseVersionId, subjectId, cancellationToken)
             .OnSuccessDo(releaseFile => userService.CheckCanViewReleaseVersion(releaseFile.ReleaseVersion))
-            .OnSuccess(releaseFile => PairedIndicatorsViewModel.Create(releaseFile.PairedIndicators));
+            .OnSuccess(releaseFile => PairedIndicatorsViewModel.FromModel(releaseFile.PairedIndicators));
     }
 
     public async Task<Either<ActionResult, PairedIndicatorsViewModel>> UpdatePairedIndicators(
@@ -69,7 +69,7 @@ public class PairedIndicatorService(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: subjectId)
                 );
 
-                return PairedIndicatorsViewModel.Create(releaseFile.PairedIndicators);
+                return PairedIndicatorsViewModel.FromModel(releaseFile.PairedIndicators);
             });
     }
 
@@ -98,7 +98,7 @@ public class PairedIndicatorService(
 
         return import?.Status == DataImportStatus.COMPLETE
             ? Unit.Instance
-            : ValidationResult(ToErrorViewModel(ValidationMessages.PairedIndicatorsImportNotComplete));
+            : ValidationResult(ValidationMessages.GenerateErrorPairedIndicatorsImportNotComplete());
     }
 
     private async Task<Either<ActionResult, Unit>> CheckIndicatorsBelongToSubject(
@@ -124,9 +124,6 @@ public class PairedIndicatorService(
 
         return matchingIndicatorCount == requestedIndicatorIds.Count
             ? Unit.Instance
-            : ValidationResult(ToErrorViewModel(ValidationMessages.PairedIndicatorsIndicatorNotForSubject));
+            : ValidationResult(ValidationMessages.GenerateErrorPairedIndicatorsIndicatorNotForSubject());
     }
-
-    private static ErrorViewModel ToErrorViewModel(LocalizableMessage message) =>
-        new() { Code = message.Code, Message = message.Message };
 }

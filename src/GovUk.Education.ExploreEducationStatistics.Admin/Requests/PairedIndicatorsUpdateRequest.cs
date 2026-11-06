@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record PairedIndicatorsUpdateRequest
 {
-    public List<PairedIndicatorRequest> PairedIndicators { get; init; } = [];
+    public List<PairedIndicatorRequest> PairedIndicators { get; init; } = null!;
 
     public class Validator : AbstractValidator<PairedIndicatorsUpdateRequest>
     {

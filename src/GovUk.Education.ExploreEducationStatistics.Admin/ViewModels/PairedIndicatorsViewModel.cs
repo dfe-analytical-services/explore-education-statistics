@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record PairedIndicatorsViewModel(List<PairedIndicatorViewModel> PairedIndicators)
 {
-    public static PairedIndicatorsViewModel Create(List<PairedIndicatorEntry>? pairedIndicators) =>
+    public static PairedIndicatorsViewModel FromModel(List<PairedIndicatorEntry>? pairedIndicators) =>
         new(
             pairedIndicators
                 ?.Select(pair => new PairedIndicatorViewModel(

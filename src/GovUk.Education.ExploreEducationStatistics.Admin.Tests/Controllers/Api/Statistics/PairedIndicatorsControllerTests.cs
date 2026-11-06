@@ -319,6 +319,33 @@ public abstract class PairedIndicatorsControllerTests(PairedIndicatorsController
             Assert.Null(await GetSavedPairedIndicators(dataSet.ReleaseFile.Id));
         }
 
+        [Theory]
+        [InlineData("{}")]
+        [InlineData("""{ "pairedIndicators": null }""")]
+        public async Task MissingOrNullPairedIndicators_ReturnsValidationErrorAndKeepsExistingPairs(string body)
+        {
+            var dataSet = await SeedDataSet();
+            var existingPairedIndicators = new List<PairedIndicatorEntry>
+            {
+                new(dataSet.IndicatorIds[0], dataSet.IndicatorIds[1]),
+            };
+            await SetPairedIndicators(dataSet.ReleaseFile, existingPairedIndicators);
+
+            var client = fixture.CreateClient(user: OptimisedTestUsers.Bau);
+
+            var response = await client.PutAsync(
+                PairedIndicatorsUrl(dataSet.ReleaseVersion.Id, dataSet.SubjectId),
+                new StringContent(body, Encoding.UTF8, "application/json")
+            );
+
+            // Model binding rejects the missing list as required before the request validator runs
+            var validationProblem = response.AssertValidationProblem();
+            var error = Assert.Single(validationProblem.Errors);
+            Assert.Equal("PairedIndicators", error.Path);
+            Assert.Equal("The PairedIndicators field is required.", error.Message);
+            (await GetSavedPairedIndicators(dataSet.ReleaseFile.Id)).AssertDeepEqualTo(existingPairedIndicators);
+        }
+
         private async Task<HttpResponseMessage> UpdatePairedIndicators(
             Guid releaseVersionId,
             Guid subjectId,

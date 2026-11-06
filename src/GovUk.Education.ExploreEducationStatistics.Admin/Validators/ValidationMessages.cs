@@ -547,10 +547,28 @@ public static class ValidationMessages
         Message: "Paired indicators cannot be changed until the data set import is complete."
     );
 
+    public static ErrorViewModel GenerateErrorPairedIndicatorsImportNotComplete()
+    {
+        return new ErrorViewModel
+        {
+            Code = PairedIndicatorsImportNotComplete.Code,
+            Message = PairedIndicatorsImportNotComplete.Message,
+        };
+    }
+
     public static readonly LocalizableMessage PairedIndicatorsIndicatorNotForSubject = new(
         Code: nameof(PairedIndicatorsIndicatorNotForSubject),
         Message: "All paired indicators must belong to the data set."
     );
+
+    public static ErrorViewModel GenerateErrorPairedIndicatorsIndicatorNotForSubject()
+    {
+        return new ErrorViewModel
+        {
+            Code = PairedIndicatorsIndicatorNotForSubject.Code,
+            Message = PairedIndicatorsIndicatorNotForSubject.Message,
+        };
+    }
 
     public static readonly LocalizableMessage PairedIndicatorCannotPairWithItself = new(
         Code: nameof(PairedIndicatorCannotPairWithItself),
