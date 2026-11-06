@@ -1,28 +1,25 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 
 public class DataSetMappingServiceTests
 {
+    private static readonly Country England = new("E92000001", "England");
+    private static readonly LocalAuthority Derby = new("E06000015", "", "Derby");
+
     private readonly DataFixture _fixture = new();
 
     [Fact]
@@ -420,204 +417,223 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
-    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementHasDifferentLocation_LocationMatchedByCode()
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementHasSameLocation_LocationAutoMapped()
     {
-        var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
-
-        var statsReleaseVersion = _fixture.DefaultStatsReleaseVersion().WithId(releaseVersion.Id).Generate();
-
-        var (originalReleaseSubject, replacementReleaseSubject) = _fixture
-            .DefaultReleaseSubject()
-            .WithReleaseVersion(statsReleaseVersion)
-            .WithSubjects(_fixture.DefaultSubject().Generate(2))
-            .GenerateTuple2();
-
-        var originalFile = new File
+        var location = new Location
         {
             Id = Guid.NewGuid(),
-            Type = FileType.Data,
-            SubjectId = originalReleaseSubject.SubjectId,
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Country = England,
+            LocalAuthority = Derby,
         };
 
-        var replacementFile = new File
-        {
-            Id = Guid.NewGuid(),
-            Type = FileType.Data,
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Replacing = originalFile,
-        };
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [location],
+            replacementLocations: [location]
+        );
 
-        originalFile.ReplacedBy = replacementFile;
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping>
+            {
+                { location.Id, CreateLocationMapping(location, location, MapStatus.AutoSet) },
+            },
+            locationMappings
+        );
+    }
 
-        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
-
-        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
-
-        var originalFilterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Test filter item - not changing" };
-
-        var replacementFilterItem = new FilterItem { Label = "Test filter item - not changing" };
-
-        var originalFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { originalFilterItem },
-        };
-
-        var replacementFilterGroup = new FilterGroup
-        {
-            Label = "Default group - not changing",
-            FilterItems = new List<FilterItem> { replacementFilterItem },
-        };
-
-        var originalFilter = new Filter
-        {
-            Label = "Filter - not changing",
-            Name = "filter_not_changing",
-            Subject = originalReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { originalFilterGroup },
-        };
-
-        var replacementFilter = new Filter
-        {
-            Label = "Filter - not changing",
-            Name = "filter_not_changing",
-            Subject = replacementReleaseSubject.Subject,
-            FilterGroups = new List<FilterGroup> { replacementFilterGroup },
-        };
-
-        var originalIndicator = new Indicator
-        {
-            Id = Guid.NewGuid(),
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var replacementIndicator = new Indicator
-        {
-            Label = "Indicator - not changing",
-            Name = "indicator_not_changing",
-        };
-
-        var originalIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = originalReleaseSubject.Subject,
-            Indicators = new List<Indicator> { originalIndicator },
-        };
-
-        var replacementIndicatorGroup = new IndicatorGroup
-        {
-            Label = "Default group - not changing",
-            Subject = replacementReleaseSubject.Subject,
-            Indicators = new List<Indicator> { replacementIndicator },
-        };
-
-        Country england = new("E92000001", "England");
-        LocalAuthority derby = new("E06000015", "", "Derby");
-
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementHasIdenticalLocationWithDifferentId_LocationAutoMapped()
+    {
         var originalLocation = new Location
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.LocalAuthority,
-            LocalAuthority = derby,
-        };
-        var observationForOriginalLocation = new Observation
-        {
-            SubjectId = originalReleaseSubject.SubjectId,
-            Location = originalLocation,
+            Country = England,
+            LocalAuthority = Derby,
         };
 
-        // Replacement location has a different id but the primary attribute code remains the same
         var replacementLocation = new Location
         {
             Id = Guid.NewGuid(),
             GeographicLevel = GeographicLevel.LocalAuthority,
-            Country = england,
-            LocalAuthority = derby,
-        };
-        var observationForReplacementLocation = new Observation
-        {
-            SubjectId = replacementReleaseSubject.SubjectId,
-            Location = replacementLocation,
+            Country = England,
+            LocalAuthority = Derby,
         };
 
-        var timePeriod = new TimePeriodQuery
-        {
-            StartYear = 2019,
-            StartCode = CalendarYear,
-            EndYear = 2020,
-            EndCode = CalendarYear,
-        };
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation]
+        );
 
-        var dataBlockVersion = new DataBlockVersion
-        {
-            Name = "Test DataBlock",
-            Query = new FullTableQuery
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping>
             {
-                SubjectId = originalReleaseSubject.SubjectId,
-                Filters = new[] { originalFilterItem.Id },
-                Indicators = new[] { originalIndicator.Id },
-                LocationIds = [originalLocation.Id],
-                TimePeriod = timePeriod,
+                {
+                    originalLocation.Id,
+                    CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
+                },
             },
-            ReleaseVersion = releaseVersion,
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasDifferentName_LocationUnset()
+    {
+        var originalLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
         };
 
-        var timePeriodService = new Mock<ITimePeriodService>(Strict);
-        timePeriodService
-            .Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
-            .ReturnsAsync(
-                new List<(int Year, TimeIdentifier TimeIdentifier)> { (2019, CalendarYear), (2020, CalendarYear) }
-            );
-
-        var releaseFileRepository = new Mock<IReleaseFileRepository>(Strict);
-        releaseFileRepository
-            .Setup(mock => mock.CheckLinkedOriginalAndReplacementReleaseFilesExist(releaseVersion.Id, originalFile.Id))
-            .ReturnsAsync((originalReleaseFile, replacementReleaseFile));
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        var statisticsDbContextId = Guid.NewGuid().ToString();
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        var replacementLocation = new Location
         {
-            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
-            contentDbContext.ReleaseFiles.AddRange(originalReleaseFile, replacementReleaseFile);
-            contentDbContext.DataBlockVersions.AddRange(dataBlockVersion);
-            await contentDbContext.SaveChangesAsync();
-        }
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby with { Name = "Derby City" },
+        };
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping> { { originalLocation.Id, CreateLocationMapping(originalLocation) } },
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasAdditionalAttribute_LocationUnset()
+    {
+        var originalLocation = new Location
         {
-            statisticsDbContext.ReleaseVersion.AddRange(statsReleaseVersion);
-            statisticsDbContext.ReleaseSubject.AddRange(originalReleaseSubject, replacementReleaseSubject);
-            statisticsDbContext.Filter.AddRange(originalFilter, replacementFilter);
-            statisticsDbContext.IndicatorGroup.AddRange(originalIndicatorGroup, replacementIndicatorGroup);
-            statisticsDbContext.Location.AddRange(originalLocation, replacementLocation);
-            statisticsDbContext.Observation.AddRange(observationForOriginalLocation, observationForReplacementLocation);
-            await statisticsDbContext.SaveChangesAsync();
-        }
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
 
-        var dataImportService = BuildDataSetMappingService(contentDbContextId, statisticsDbContextId);
-
-        await dataImportService.CreateInitialDataSetMappingIfReplacement(replacementFile.Id);
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        var replacementLocation = new Location
         {
-            var dbDataSetMapping = contentDbContext.DataSetMappings.Single(m =>
-                m.OriginalDataFileId == originalFile.Id && m.ReplacementDataFileId == replacementFile.Id
-            );
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Country = England,
+            LocalAuthority = Derby,
+        };
 
-            Assert.Equal(
-                new Dictionary<Guid, LocationMapping>
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping> { { originalLocation.Id, CreateLocationMapping(originalLocation) } },
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_SameLocalAuthorityInDifferentRegions_EachLocationAutoMapped()
+    {
+        Region eastMidlands = new("E12000004", "East Midlands");
+        Region westMidlands = new("E12000005", "West Midlands");
+
+        var originalLocationInEastMidlands = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Region = eastMidlands,
+            LocalAuthority = Derby,
+        };
+
+        var originalLocationInWestMidlands = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Region = westMidlands,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocationInEastMidlands = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Region = eastMidlands,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocationInWestMidlands = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Region = westMidlands,
+            LocalAuthority = Derby,
+        };
+
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocationInEastMidlands, originalLocationInWestMidlands],
+            replacementLocations: [replacementLocationInWestMidlands, replacementLocationInEastMidlands]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping>
+            {
                 {
-                    {
-                        originalLocation.Id,
-                        CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
-                    },
+                    originalLocationInEastMidlands.Id,
+                    CreateLocationMapping(
+                        originalLocationInEastMidlands,
+                        replacementLocationInEastMidlands,
+                        MapStatus.AutoSet
+                    )
                 },
-                dbDataSetMapping.LocationMappings
-            );
-        }
+                {
+                    originalLocationInWestMidlands.Id,
+                    CreateLocationMapping(
+                        originalLocationInWestMidlands,
+                        replacementLocationInWestMidlands,
+                        MapStatus.AutoSet
+                    )
+                },
+            },
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementHasMultipleIdenticalLocations_LocationUnset()
+    {
+        var originalLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocation1 = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocation2 = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
+
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation1, replacementLocation2]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping> { { originalLocation.Id, CreateLocationMapping(originalLocation) } },
+            locationMappings
+        );
     }
 
     [Fact]
@@ -648,6 +664,71 @@ public class DataSetMappingServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             Assert.False(contentDbContext.DataSetMappings.Any());
+        }
+    }
+
+    private async Task<Dictionary<Guid, LocationMapping>> GenerateLocationMappings(
+        List<Location> originalLocations,
+        List<Location> replacementLocations
+    )
+    {
+        var (originalSubject, replacementSubject) = _fixture.DefaultSubject().GenerateTuple2();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = originalSubject.Id,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            Type = FileType.Data,
+            SubjectId = replacementSubject.Id,
+            Replacing = originalFile,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        var statisticsDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Files.AddRange(originalFile, replacementFile);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        {
+            statisticsDbContext.Location.AddRange(originalLocations.Union(replacementLocations));
+            statisticsDbContext.Observation.AddRange(
+                originalLocations.Select(location => new Observation
+                {
+                    SubjectId = originalSubject.Id,
+                    LocationId = location.Id,
+                })
+            );
+            statisticsDbContext.Observation.AddRange(
+                replacementLocations.Select(location => new Observation
+                {
+                    SubjectId = replacementSubject.Id,
+                    LocationId = location.Id,
+                })
+            );
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var service = BuildDataSetMappingService(contentDbContextId, statisticsDbContextId);
+
+        await service.CreateInitialDataSetMappingIfReplacement(replacementFile.Id);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            return contentDbContext
+                .DataSetMappings.Single(mapping =>
+                    mapping.OriginalDataFileId == originalFile.Id && mapping.ReplacementDataFileId == replacementFile.Id
+                )
+                .LocationMappings;
         }
     }
 
@@ -739,8 +820,8 @@ public class DataSetMappingServiceTests
             OriginalName = original.ToLocationAttribute().Name!,
             OriginalGeographicLevel = original.GeographicLevel,
             ReplacementId = replacement?.Id,
-            ReplacementCode = replacement?.ToLocationAttribute().Code!,
-            ReplacementName = replacement?.ToLocationAttribute().Name!,
+            ReplacementCode = replacement?.ToLocationAttribute().Code ?? "",
+            ReplacementName = replacement?.ToLocationAttribute().Name ?? "",
             ReplacementGeographicLevel = replacement?.GeographicLevel,
             Status = status,
         };
