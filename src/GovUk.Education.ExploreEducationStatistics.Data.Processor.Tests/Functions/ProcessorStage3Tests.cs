@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -203,13 +204,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -429,13 +429,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -575,13 +574,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -736,13 +734,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -886,13 +883,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1066,13 +1062,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1220,13 +1215,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporterMock = new Mock<TestObservationBatchImporter> { CallBase = true };
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1346,13 +1340,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1512,13 +1505,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1697,13 +1689,12 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator);
+        var importerMetaService = new ImporterMetaService();
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
-            guidGenerator,
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
@@ -1825,6 +1816,10 @@ public class ProcessorStage3Tests
 
             Assert.Equal(16, observations.Count);
             Enumerable.Range(0, 16).ForEach(i => Assert.Equal(i + 2, observations[i].CsvRow));
+            Assert.Equal(
+                observations.Select(o => UuidUtils.UuidV5(_subject.Id, $"observation:{o.CsvRow}")),
+                observations.Select(o => o.Id)
+            );
 
             var firstObservation = observations.First();
             var expectedLocation = _locations.Single(l => l.LocalAuthority!.Name == "Birmingham");
@@ -2019,8 +2014,7 @@ public class ProcessorStage3Tests
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5 }.ToOptionsWrapper(),
-            guidGenerator,
-            new ImporterMetaService(guidGenerator),
+            new ImporterMetaService(),
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );

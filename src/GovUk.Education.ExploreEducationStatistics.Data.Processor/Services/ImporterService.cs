@@ -1,6 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -17,7 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 public class ImporterService : IImporterService
 {
     private readonly AppOptions _appOptions;
-    private readonly IGuidGenerator _guidGenerator;
     private readonly IImporterMetaService _importerMetaService;
     private readonly IDataImportService _dataImportService;
     private readonly ILogger<ImporterService> _logger;
@@ -26,14 +24,12 @@ public class ImporterService : IImporterService
 
     public ImporterService(
         IOptions<AppOptions> appOptions,
-        IGuidGenerator guidGenerator,
         IImporterMetaService importerMetaService,
         IDataImportService dataImportService,
         ILogger<ImporterService> logger
     )
     {
         _appOptions = appOptions.Value;
-        _guidGenerator = guidGenerator;
         _importerMetaService = importerMetaService;
         _dataImportService = dataImportService;
         _logger = logger;
@@ -155,7 +151,10 @@ public class ImporterService : IImporterService
         );
 
         var filterGroups = filterGroupsFromCsv
-            .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
+            .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel)
+            {
+                Id = dataSetWriter.NewFilterGroupId(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel),
+            })
             .ToList();
 
         var filterItems = filterItemsFromCsv
@@ -167,7 +166,11 @@ public class ImporterService : IImporterService
                     fg.FilterId.Equals(filterId) && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase)
                 );
 
-                return new FilterItem(filterItemLabel, filterGroup); // includes filterGroups objects in returned filterItems
+                // includes filterGroups objects in returned filterItems
+                return new FilterItem(filterItemLabel, filterGroup)
+                {
+                    Id = dataSetWriter.NewFilterItemId(filterGroup.Id, filterItemLabel),
+                };
             })
             .ToList();
 
@@ -364,7 +367,7 @@ public class ImporterService : IImporterService
         int csvRowNum
     )
     {
-        var observationId = _guidGenerator.NewGuid();
+        var observationId = dataSetWriter.NewObservationId(csvRowNum);
         var location = fixedInformationReader.GetLocation(rowValues);
 
         return new Observation

@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
@@ -64,6 +65,36 @@ public class ParquetV1DataSetWriter(
     public Guid GetLocationId(Location location)
     {
         return _statisticsDbDataSetWriter.GetLocationId(location);
+    }
+
+    public Guid NewFilterId(string column)
+    {
+        return UuidUtils.UuidV5(SubjectId, $"filter:{column}");
+    }
+
+    public Guid NewFilterGroupId(Guid filterId, string label)
+    {
+        return UuidUtils.UuidV5(filterId, $"filter-group:{label}");
+    }
+
+    public Guid NewFilterItemId(Guid filterGroupId, string label)
+    {
+        return UuidUtils.UuidV5(filterGroupId, $"filter-item:{label}");
+    }
+
+    public Guid NewIndicatorGroupId(string label)
+    {
+        return UuidUtils.UuidV5(SubjectId, $"indicator-group:{label}");
+    }
+
+    public Guid NewIndicatorId(string column)
+    {
+        return UuidUtils.UuidV5(SubjectId, $"indicator:{column}");
+    }
+
+    public Guid NewObservationId(int csvRow)
+    {
+        return UuidUtils.UuidV5(SubjectId, $"observation:{csvRow}");
     }
 
     public Task StartObservations(

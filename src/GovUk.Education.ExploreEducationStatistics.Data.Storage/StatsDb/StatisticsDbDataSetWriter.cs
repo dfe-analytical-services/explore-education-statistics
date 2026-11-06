@@ -13,6 +13,7 @@ public class StatisticsDbDataSetWriter(
     Guid subjectId,
     StatisticsDbContext context,
     IDatabaseHelper databaseHelper,
+    IGuidGenerator guidGenerator,
     ImporterLocationService importerLocationService,
     IObservationBatchImporter observationBatchImporter,
     StatisticsDbDataSetFactory statisticsDbDataSetFactory
@@ -89,6 +90,36 @@ public class StatisticsDbDataSetWriter(
     public Guid GetLocationId(Location location)
     {
         return importerLocationService.Get(location).Id;
+    }
+
+    public Guid NewFilterId(string column)
+    {
+        return guidGenerator.NewGuid();
+    }
+
+    public Guid NewFilterGroupId(Guid filterId, string label)
+    {
+        return guidGenerator.NewGuid();
+    }
+
+    public Guid NewFilterItemId(Guid filterGroupId, string label)
+    {
+        return guidGenerator.NewGuid();
+    }
+
+    public Guid NewIndicatorGroupId(string label)
+    {
+        return guidGenerator.NewGuid();
+    }
+
+    public Guid NewIndicatorId(string column)
+    {
+        return guidGenerator.NewGuid();
+    }
+
+    public Guid NewObservationId(int csvRow)
+    {
+        return guidGenerator.NewGuid();
     }
 
     public Task StartObservations(
