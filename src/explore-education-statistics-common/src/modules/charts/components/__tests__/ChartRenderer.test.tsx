@@ -7,7 +7,8 @@ import ChartRenderer, {
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { screen } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 jest.mock('recharts/lib/util/LogUtils');
 
@@ -58,6 +59,88 @@ describe('ChartRenderer', () => {
       onBoundaryLevelChange: async () => undefined,
     },
   };
+
+  test('server-renders descriptions without running chart geometry calculations', () => {
+    const container = document.createElement('div');
+    container.innerHTML = renderToStaticMarkup(
+      <ChartRenderer
+        source="Test source"
+        chart={{
+          type: 'line',
+          title: 'Aggregated results chart',
+          alt: 'Test description',
+          height: 300,
+          axes: undefined!,
+          legend: { items: [] },
+          data: testFullTableMeta.results,
+          meta: testFullTableMeta.subjectMeta,
+        }}
+      />,
+    );
+
+    expect(container).toHaveTextContent('Aggregated results chart');
+    expect(container).toHaveTextContent('Source: Test source');
+    expect(container.querySelector('svg')).toBeNull();
+    expect(within(container).getByTestId('chart-alt')).toHaveTextContent(
+      'Test description',
+    );
+  });
+
+  test('server-renders the alt text, hidden when JS is enabled', () => {
+    const container = document.createElement('div');
+    container.innerHTML = renderToStaticMarkup(
+      <ChartRenderer
+        chart={{ ...testMapChartRenderer.chart, alt: 'Test description' }}
+      />,
+    );
+
+    const alt = within(container).getByTestId('chart-alt');
+    expect(alt).toHaveTextContent('Test description');
+    expect(alt).toHaveClass('dfe-js-hidden');
+    expect(
+      within(container).queryByTestId('loadingSpinner'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not server-render alt text when there is none', () => {
+    const container = document.createElement('div');
+    container.innerHTML = renderToStaticMarkup(
+      <ChartRenderer {...testMapChartRenderer} />,
+    );
+
+    expect(
+      within(container).queryByTestId('chart-alt'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('replaces the alt text with the chart once mounted', async () => {
+    render(
+      <ChartRenderer
+        chart={{ ...testMapChartRenderer.chart, alt: 'Test description' }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('chart-alt')).not.toBeInTheDocument();
+    });
+  });
+
+  test('keeps the alt text, with a loading spinner, while loading', async () => {
+    render(
+      <ChartRenderer
+        chart={{ ...testMapChartRenderer.chart, alt: 'Test description' }}
+        loading
+      />,
+    );
+
+    await act(async () => {});
+
+    expect(screen.getByTestId('chart-alt')).toHaveTextContent(
+      'Test description',
+    );
+    expect(screen.getByTestId('loadingSpinner')).toHaveClass('dfe-js-only');
+    expect(screen.queryByText('Export options')).not.toBeInTheDocument();
+  });
 
   test('renders auto-generated boundary level footnote successfully', async () => {
     render(<ChartRenderer {...testMapChartRenderer} />);
