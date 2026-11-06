@@ -254,6 +254,34 @@ describe('ManageIndicators', () => {
     ).not.toHaveBeenCalled();
   });
 
+  test('disables both edit buttons when there are no indicators', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue({
+      ...testSubjectMeta,
+      indicators: {},
+    });
+    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
+
+    render(
+      <ManageIndicators
+        releaseVersionId="release-version-id"
+        subject={testSubject}
+        onBack={noop}
+      />,
+    );
+
+    expect(
+      await screen.findByText('No indicators available.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reorder indicators' }),
+    ).toBeAriaDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Edit paired indicators' }),
+    ).toBeAriaDisabled();
+  });
+
   test('clicking Back to data files calls onBack', async () => {
     const onBack = jest.fn();
 

@@ -7,7 +7,7 @@ import _tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import { screen, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, useLocation } from 'react-router';
 
 jest.mock('@admin/services/tableBuilderService');
 jest.mock('@common/services/tableBuilderService');
@@ -182,5 +182,36 @@ describe('ReleaseDataReorderSection', () => {
     expect(
       screen.queryByRole('table', { name: /data files in this release/ }),
     ).not.toBeInTheDocument();
+  });
+
+  test('going back from the manageIndicators query param removes it from the URL', async () => {
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
+      pairedIndicators: [],
+    });
+
+    const LocationSearch = () => (
+      <p data-testid="location-search">{useLocation().search}</p>
+    );
+
+    const { user } = render(
+      <MemoryRouter initialEntries={['/data?manageIndicators=subject-2']}>
+        <ReleaseDataReorderSection
+          releaseVersionId="release-version-id"
+          canUpdateRelease
+        />
+        <LocationSearch />
+      </MemoryRouter>,
+    );
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Back to data files' }),
+    );
+
+    expect(
+      await screen.findByRole('table', { name: /data files in this release/ }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('location-search')).toBeEmptyDOMElement();
   });
 });

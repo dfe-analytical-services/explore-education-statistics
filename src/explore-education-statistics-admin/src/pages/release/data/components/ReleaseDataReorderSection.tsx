@@ -17,6 +17,7 @@ import adminTableBuilderService from '@admin/services/tableBuilderService';
 
 import useQueryParams from '@admin/hooks/useQueryParams';
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 interface Props {
   releaseVersionId: string;
@@ -46,6 +47,18 @@ const ReleaseDataReorderSection = ({
       setReorderingIndicators(subject);
     }
   }, [subjects, manageIndicators]);
+
+  const navigate = useNavigate();
+  const { pathname, hash } = useLocation();
+
+  const handleBackFromIndicators = () => {
+    setReorderingIndicators(undefined);
+
+    // Drop the link's query param so the data set isn't opened again
+    if (manageIndicators) {
+      navigate({ pathname, hash }, { replace: true });
+    }
+  };
 
   const handleSaveFilters = async (
     subjectId: string,
@@ -161,7 +174,7 @@ const ReleaseDataReorderSection = ({
               <ManageIndicators
                 releaseVersionId={releaseVersionId}
                 subject={reorderingIndicators}
-                onBack={() => setReorderingIndicators(undefined)}
+                onBack={handleBackFromIndicators}
               />
             )}
           </div>

@@ -1,4 +1,5 @@
-import adminTableBuilderService, {
+import {
+  PairedIndicator,
   PairedIndicators,
 } from '@admin/services/tableBuilderService';
 import Button from '@common/components/Button';
@@ -7,12 +8,8 @@ import { Form, FormFieldset } from '@common/components/form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormProvider from '@common/components/form/FormProvider';
 import { SelectOption } from '@common/components/form/FormSelect';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import tableBuilderService, {
-  Subject,
-} from '@common/services/tableBuilderService';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
@@ -118,34 +115,24 @@ const validationSchema: ObjectSchema<FormValues> = Yup.object({
 });
 
 interface Props {
-  releaseVersionId: string;
+  indicatorGroups: SubjectMeta['indicators'][string][];
+  pairedIndicators: PairedIndicator[];
   subject: Subject;
   onCancel: () => void;
   onSave: (subjectId: string, request: PairedIndicators) => Promise<void>;
 }
 
 export default function PairedIndicatorsForm({
-  releaseVersionId,
+  indicatorGroups,
+  pairedIndicators,
   subject,
   onCancel,
   onSave,
 }: Props) {
-  const { value, isLoading } = useAsyncHandledRetry(async () => {
-    const [subjectMeta, { pairedIndicators }] = await Promise.all([
-      tableBuilderService.getSubjectMeta(subject.id, releaseVersionId),
-      adminTableBuilderService.getPairedIndicators(
-        releaseVersionId,
-        subject.id,
-      ),
-    ]);
-
-    return { subjectMeta, pairedIndicators };
-  }, [subject.id, releaseVersionId]);
-
   const indicatorOptGroups = useMemo<Dictionary<SelectOption[]>>(
     () =>
       Object.fromEntries(
-        Object.values(value?.subjectMeta.indicators ?? {}).map(group => [
+        indicatorGroups.map(group => [
           group.label,
           group.options.map(option => ({
             label: option.label,
@@ -153,19 +140,18 @@ export default function PairedIndicatorsForm({
           })),
         ]),
       ),
-    [value?.subjectMeta.indicators],
+    [indicatorGroups],
   );
 
   const initialValues = useMemo<FormValues>(
-    () => ({ pairedIndicators: value?.pairedIndicators ?? [] }),
-    [value?.pairedIndicators],
+    () => ({ pairedIndicators }),
+    [pairedIndicators],
   );
 
   return (
-    <LoadingSpinner loading={isLoading}>
+    <>
       <h3>{`Pair indicators for ${subject.name}`}</h3>
       <FormProvider
-        enableReinitialize
         errorMappings={errorMappings}
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -180,7 +166,11 @@ export default function PairedIndicatorsForm({
             <PairedIndicatorsFields indicatorOptGroups={indicatorOptGroups} />
 
             <ButtonGroup>
-              <Button type="submit" disabled={formState.isSubmitting}>
+              <Button
+                id={`${formId}-submit`}
+                type="submit"
+                disabled={formState.isSubmitting}
+              >
                 Save paired indicators
               </Button>
               <Button variant="secondary" onClick={onCancel}>
@@ -190,7 +180,7 @@ export default function PairedIndicatorsForm({
           </Form>
         )}
       </FormProvider>
-    </LoadingSpinner>
+    </>
   );
 }
 

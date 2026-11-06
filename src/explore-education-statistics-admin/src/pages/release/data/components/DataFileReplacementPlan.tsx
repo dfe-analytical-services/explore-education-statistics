@@ -715,23 +715,28 @@ function Plan({
         })}
       </div>
 
-      <LoadingSpinner loading={isLoadingPairedIndicators}>
-        <DataFileReplacementPairedIndicators
-          manageIndicatorsPath={getManageIndicatorsPath({
-            publicationId,
-            releaseVersionId,
-            subjectId: plan.originalSubjectId,
-          })}
-          pairedIndicators={pairedIndicators ?? []}
-        />
-      </LoadingSpinner>
+      <div className="dfe-position--relative">
+        <LoadingSpinner loading={isFetchingPlan} overlay />
+        <LoadingSpinner loading={isLoadingPairedIndicators}>
+          <DataFileReplacementPairedIndicators
+            manageIndicatorsPath={getManageIndicatorsPath({
+              publicationId,
+              releaseVersionId,
+              subjectId: plan.originalSubjectId,
+            })}
+            pairedIndicators={pairedIndicators ?? []}
+          />
+        </LoadingSpinner>
+      </div>
 
       <ButtonGroup className="govuk-!-margin-top-8">
         {plan.valid && (
           <Button
-            disabled={isSubmitting || !pairedIndicators}
+            // Wait for the plan to refresh after a mapping change, so the
+            // paired indicators passed on match the saved mappings
+            disabled={isSubmitting || isFetchingPlan || !pairedIndicators}
             onClick={async () => {
-              if (!pairedIndicators) {
+              if (isFetchingPlan || !pairedIndicators) {
                 return;
               }
 

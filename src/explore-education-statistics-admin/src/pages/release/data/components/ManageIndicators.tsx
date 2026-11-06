@@ -90,36 +90,33 @@ export default function ManageIndicators({
     setMode('view');
   };
 
+  const pairedIndicators = value?.pairedIndicators ?? [];
+
   if (mode === 'reorder') {
     return (
-      <div aria-live="polite">
-        <ReorderIndicatorsList
-          releaseVersionId={releaseVersionId}
-          subject={subject}
-          onCancel={() => setMode('view')}
-          onSave={handleSaveOrder}
-        />
-      </div>
+      <ReorderIndicatorsList
+        releaseVersionId={releaseVersionId}
+        subject={subject}
+        onCancel={() => setMode('view')}
+        onSave={handleSaveOrder}
+      />
     );
   }
 
   if (mode === 'pair') {
     return (
-      <div aria-live="polite">
-        <PairedIndicatorsForm
-          releaseVersionId={releaseVersionId}
-          subject={subject}
-          onCancel={() => setMode('view')}
-          onSave={handleSavePairs}
-        />
-      </div>
+      <PairedIndicatorsForm
+        indicatorGroups={indicatorGroups}
+        pairedIndicators={pairedIndicators}
+        subject={subject}
+        onCancel={() => setMode('view')}
+        onSave={handleSavePairs}
+      />
     );
   }
 
-  const pairedIndicators = value?.pairedIndicators ?? [];
-
   return (
-    <div aria-live="polite">
+    <>
       <h3>{`Manage indicators for ${subject.name}`}</h3>
 
       <LoadingSpinner loading={isLoading}>
@@ -189,6 +186,7 @@ export default function ManageIndicators({
           )}
           <Button
             className="govuk-!-margin-bottom-0"
+            disabled={indicatorGroups.length === 0}
             onClick={() => setMode('pair')}
           >
             Edit paired indicators
@@ -199,6 +197,6 @@ export default function ManageIndicators({
       <Button variant="secondary" onClick={onBack}>
         Back to data files
       </Button>
-    </div>
+    </>
   );
 }

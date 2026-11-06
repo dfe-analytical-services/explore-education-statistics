@@ -1,25 +1,12 @@
 import PairedIndicatorsForm from '@admin/pages/release/data/components/PairedIndicatorsForm';
-import _adminTableBuilderService from '@admin/services/tableBuilderService';
+import { PairedIndicator } from '@admin/services/tableBuilderService';
 import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
 import render from '@common-test/render';
-import _tableBuilderService, {
-  Subject,
-  SubjectMeta,
-} from '@common/services/tableBuilderService';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-
-jest.mock('@admin/services/tableBuilderService');
-jest.mock('@common/services/tableBuilderService');
-
-const adminTableBuilderService = _adminTableBuilderService as jest.Mocked<
-  typeof _adminTableBuilderService
->;
-const tableBuilderService = _tableBuilderService as jest.Mocked<
-  typeof _tableBuilderService
->;
 
 describe('PairedIndicatorsForm', () => {
   const testSubject = {
@@ -27,53 +14,43 @@ describe('PairedIndicatorsForm', () => {
     name: 'Subject name',
   } as Subject;
 
-  const testSubjectMeta: SubjectMeta = {
-    filters: {},
-    indicators: {
-      Group1: {
-        id: 'group-1',
-        label: 'Group 1',
-        options: [
-          {
-            value: 'indicator-1',
-            label: 'Indicator 1',
-            unit: '',
-            name: 'indicator_1',
-          },
-          {
-            value: 'indicator-2',
-            label: 'Indicator 2',
-            unit: '',
-            name: 'indicator_2',
-          },
-          {
-            value: 'indicator-3',
-            label: 'Indicator 3',
-            unit: '',
-            name: 'indicator_3',
-          },
-        ],
-        order: 0,
-      },
+  const testIndicatorGroups: SubjectMeta['indicators'][string][] = [
+    {
+      id: 'group-1',
+      label: 'Group 1',
+      options: [
+        {
+          value: 'indicator-1',
+          label: 'Indicator 1',
+          unit: '',
+          name: 'indicator_1',
+        },
+        {
+          value: 'indicator-2',
+          label: 'Indicator 2',
+          unit: '',
+          name: 'indicator_2',
+        },
+        {
+          value: 'indicator-3',
+          label: 'Indicator 3',
+          unit: '',
+          name: 'indicator_3',
+        },
+      ],
+      order: 0,
     },
-    locations: {},
-    timePeriod: { hint: '', legend: '', options: [] },
-  };
-
-  beforeEach(() => {
-    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
-  });
+  ];
 
   test('renders existing paired indicators', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [
-        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
-      ],
-    });
+    const pairedIndicators: PairedIndicator[] = [
+      { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+    ];
 
     render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={jest.fn()}
@@ -88,20 +65,15 @@ describe('PairedIndicatorsForm', () => {
     expect(within(pair).getByLabelText('Paired indicator')).toHaveValue(
       'indicator-2',
     );
-    expect(adminTableBuilderService.getPairedIndicators).toHaveBeenCalledWith(
-      'release-version-id',
-      'subject-id',
-    );
   });
 
   test('renders a message when there are no paired indicators', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [],
-    });
+    const pairedIndicators: PairedIndicator[] = [];
 
     render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={jest.fn()}
@@ -116,17 +88,16 @@ describe('PairedIndicatorsForm', () => {
   });
 
   test('adding, changing and removing pairs saves the correct request', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [
-        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
-      ],
-    });
+    const pairedIndicators: PairedIndicator[] = [
+      { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+    ];
 
     const onSave = jest.fn().mockResolvedValue(undefined);
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={onSave}
@@ -163,17 +134,16 @@ describe('PairedIndicatorsForm', () => {
   });
 
   test('removing all pairs saves an empty request', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [
-        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
-      ],
-    });
+    const pairedIndicators: PairedIndicator[] = [
+      { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+    ];
 
     const onSave = jest.fn().mockResolvedValue(undefined);
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={onSave}
@@ -226,18 +196,19 @@ describe('PairedIndicatorsForm', () => {
         'An indicator cannot be both a main indicator and a paired indicator.',
     },
   ])('shows a validation error for $name', async ({ pairs, message }) => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: pairs.map(([parentIndicatorId, childIndicatorId]) => ({
+    const pairedIndicators: PairedIndicator[] = pairs.map(
+      ([parentIndicatorId, childIndicatorId]) => ({
         parentIndicatorId,
         childIndicatorId,
-      })),
-    });
+      }),
+    );
 
     const onSave = jest.fn();
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={onSave}
@@ -257,15 +228,14 @@ describe('PairedIndicatorsForm', () => {
   });
 
   test('shows a validation error when a pair is incomplete', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [],
-    });
+    const pairedIndicators: PairedIndicator[] = [];
 
     const onSave = jest.fn();
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={onSave}
@@ -287,11 +257,9 @@ describe('PairedIndicatorsForm', () => {
   });
 
   test('shows a server validation error when the import is not complete', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [
-        { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
-      ],
-    });
+    const pairedIndicators: PairedIndicator[] = [
+      { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+    ];
 
     const onSave = jest.fn().mockRejectedValue(
       createAxiosErrorMock<ValidationProblemDetails>({
@@ -306,7 +274,8 @@ describe('PairedIndicatorsForm', () => {
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={noop}
         onSave={onSave}
@@ -327,16 +296,31 @@ describe('PairedIndicatorsForm', () => {
     ).toBeInTheDocument();
   });
 
+  test('gives the submit button the id the error summary links to', () => {
+    render(
+      <PairedIndicatorsForm
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={[]}
+        subject={testSubject}
+        onCancel={noop}
+        onSave={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Save paired indicators' }),
+    ).toHaveAttribute('id', 'pairedIndicatorsForm-submit');
+  });
+
   test('clicking Cancel calls onCancel', async () => {
-    adminTableBuilderService.getPairedIndicators.mockResolvedValue({
-      pairedIndicators: [],
-    });
+    const pairedIndicators: PairedIndicator[] = [];
 
     const onCancel = jest.fn();
 
     const { user } = render(
       <PairedIndicatorsForm
-        releaseVersionId="release-version-id"
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={pairedIndicators}
         subject={testSubject}
         onCancel={onCancel}
         onSave={jest.fn()}
