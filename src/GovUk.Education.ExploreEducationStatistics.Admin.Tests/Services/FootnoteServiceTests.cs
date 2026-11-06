@@ -1731,6 +1731,277 @@ public class FootnoteServiceTests
     }
 
     [Fact]
+    public async Task UpdateFootnote_RetainCriteria()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubject = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubject(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .WithIndicatorGroups(
+                        _fixture
+                            .DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .Generate(1)
+                    )
+            )
+            .Generate();
+
+        var subject = releaseSubject.Subject;
+        var filter = subject.Filters[0];
+        var filterGroup = subject.Filters[1].FilterGroups[0];
+        var filterItem = subject.Filters[2].FilterGroups[0].FilterItems[0];
+        var indicator = subject.IndicatorGroups[0].Indicators[0];
+
+        var footnote = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithOrder(1)
+            .WithFilters([filter])
+            .WithFilterGroups([filterGroup])
+            .WithFilterItems([filterItem])
+            .WithIndicators([indicator])
+            .WithSubjects([subject])
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+            statisticsDbContext.Footnote.Add(footnote);
+            await statisticsDbContext.SaveChangesAsync();
+
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+        dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(releaseVersion.Id)).Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        {
+            var service = SetupFootnoteService(
+                statisticsDbContext,
+                contentDbContext,
+                dataBlockService: dataBlockService.Object
+            );
+
+            var result = await service.UpdateFootnote(
+                releaseVersionId: releaseVersion.Id,
+                footnoteId: footnote.Id,
+                "Updated footnote",
+                filterIds: SetOf(filter.Id),
+                filterGroupIds: SetOf(filterGroup.Id),
+                filterItemIds: SetOf(filterItem.Id),
+                indicatorIds: SetOf(indicator.Id),
+                subjectIds: SetOf(subject.Id)
+            );
+
+            result.AssertRight();
+        }
+
+        VerifyAllMocks(dataBlockService);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var savedFootnote = Assert.Single(statisticsDbContext.Footnote);
+            Assert.Equal(footnote.Id, savedFootnote.Id);
+            Assert.Equal("Updated footnote", savedFootnote.Content);
+            Assert.Equal(1, savedFootnote.Order);
+            Assert.Equal(releaseVersion.Id, savedFootnote.ReleaseVersionId);
+
+            var savedSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote);
+            Assert.Equal(subject.Id, savedSubjectFootnote.SubjectId);
+            Assert.Equal(footnote.Id, savedSubjectFootnote.FootnoteId);
+
+            var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote);
+            Assert.Equal(filter.Id, savedFilterFootnote.FilterId);
+            Assert.Equal(footnote.Id, savedFilterFootnote.FootnoteId);
+            Assert.Equal(subject.Id, savedFilterFootnote.SubjectId);
+
+            var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote);
+            Assert.Equal(filterGroup.Id, savedFilterGroupFootnote.FilterGroupId);
+            Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
+            Assert.Equal(subject.Filters[1].Id, savedFilterGroupFootnote.FilterId);
+            Assert.Equal(subject.Id, savedFilterGroupFootnote.SubjectId);
+
+            var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote);
+            Assert.Equal(filterItem.Id, savedFilterItemFootnote.FilterItemId);
+            Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
+            Assert.Equal(subject.Filters[2].FilterGroups[0].Id, savedFilterItemFootnote.FilterGroupId);
+            Assert.Equal(subject.Filters[2].Id, savedFilterItemFootnote.FilterId);
+            Assert.Equal(subject.Id, savedFilterItemFootnote.SubjectId);
+
+            var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote);
+            Assert.Equal(indicator.Id, savedIndicatorFootnote.IndicatorId);
+            Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
+            Assert.Equal(subject.IndicatorGroups[0].Id, savedIndicatorFootnote.IndicatorGroupId);
+            Assert.Equal(subject.Id, savedIndicatorFootnote.SubjectId);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateFootnote_ReplaceOverlappingCriteria()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture.DefaultFilter(filterGroupCount: 2, filterItemCount: 2).Generate(3))
+            .WithIndicatorGroups(
+                _fixture.DefaultIndicatorGroup().WithIndicators(_fixture.DefaultIndicator().Generate(3)).Generate(1)
+            )
+            .Generate();
+
+        var (otherSubject1, otherSubject2) = _fixture.DefaultSubject().GenerateTuple2();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects([subject, otherSubject1, otherSubject2])
+            .GenerateList(3);
+
+        var filters = subject.Filters;
+        var filterGroups = filters[0].FilterGroups;
+        var filterItems = filters[0].FilterGroups.SelectMany(filterGroup => filterGroup.FilterItems).ToList();
+        var indicatorGroup = subject.IndicatorGroups[0];
+        var indicators = indicatorGroup.Indicators;
+
+        var footnote = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithOrder(1)
+            .WithFilters([filters[0], filters[1]])
+            .WithFilterGroups([filterGroups[0], filterGroups[1]])
+            .WithFilterItems([filterItems[0], filterItems[1]])
+            .WithIndicators([indicators[0], indicators[1]])
+            .WithSubjects([subject, otherSubject1])
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(releaseSubjects);
+            statisticsDbContext.Footnote.Add(footnote);
+            await statisticsDbContext.SaveChangesAsync();
+
+            contentDbContext.Add(
+                _fixture
+                    .DefaultReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithRelease(_fixture.DefaultRelease())
+                    .Generate()
+            );
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+        dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(releaseVersion.Id)).Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+        {
+            var service = SetupFootnoteService(
+                statisticsDbContext,
+                contentDbContext,
+                dataBlockService: dataBlockService.Object
+            );
+
+            var result = await service.UpdateFootnote(
+                releaseVersionId: releaseVersion.Id,
+                footnoteId: footnote.Id,
+                "Updated footnote",
+                filterIds: SetOf(filters[1].Id, filters[2].Id),
+                filterGroupIds: SetOf(filterGroups[1].Id, filters[1].FilterGroups[0].Id),
+                filterItemIds: SetOf(filterItems[1].Id, filterItems[2].Id),
+                indicatorIds: SetOf(indicators[1].Id, indicators[2].Id),
+                subjectIds: SetOf(otherSubject1.Id, otherSubject2.Id)
+            );
+
+            result.AssertRight();
+        }
+
+        VerifyAllMocks(dataBlockService);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var savedFootnote = Assert.Single(statisticsDbContext.Footnote);
+            Assert.Equal(footnote.Id, savedFootnote.Id);
+            Assert.Equal("Updated footnote", savedFootnote.Content);
+            Assert.Equal(1, savedFootnote.Order);
+            Assert.Equal(releaseVersion.Id, savedFootnote.ReleaseVersionId);
+
+            Assert.Equal(
+                SetOf((footnote.Id, otherSubject1.Id), (footnote.Id, otherSubject2.Id)),
+                statisticsDbContext
+                    .SubjectFootnote.AsEnumerable()
+                    .Select(sf => (sf.FootnoteId, sf.SubjectId))
+                    .ToHashSet()
+            );
+
+            Assert.Equal(
+                SetOf((footnote.Id, filters[1].Id, subject.Id), (footnote.Id, filters[2].Id, subject.Id)),
+                statisticsDbContext
+                    .FilterFootnote.AsEnumerable()
+                    .Select(ff => (ff.FootnoteId, ff.FilterId, ff.SubjectId))
+                    .ToHashSet()
+            );
+
+            Assert.Equal(
+                SetOf(
+                    (footnote.Id, filterGroups[1].Id, filters[0].Id, subject.Id),
+                    (footnote.Id, filters[1].FilterGroups[0].Id, filters[1].Id, subject.Id)
+                ),
+                statisticsDbContext
+                    .FilterGroupFootnote.AsEnumerable()
+                    .Select(fgf => (fgf.FootnoteId, fgf.FilterGroupId, fgf.FilterId, fgf.SubjectId))
+                    .ToHashSet()
+            );
+
+            Assert.Equal(
+                SetOf(
+                    (footnote.Id, filterItems[1].Id, filterGroups[0].Id, filters[0].Id, subject.Id),
+                    (footnote.Id, filterItems[2].Id, filterGroups[1].Id, filters[0].Id, subject.Id)
+                ),
+                statisticsDbContext
+                    .FilterItemFootnote.AsEnumerable()
+                    .Select(fif => (fif.FootnoteId, fif.FilterItemId, fif.FilterGroupId, fif.FilterId, fif.SubjectId))
+                    .ToHashSet()
+            );
+
+            Assert.Equal(
+                SetOf(
+                    (footnote.Id, indicators[1].Id, indicatorGroup.Id, subject.Id),
+                    (footnote.Id, indicators[2].Id, indicatorGroup.Id, subject.Id)
+                ),
+                statisticsDbContext
+                    .IndicatorFootnote.AsEnumerable()
+                    .Select(inf => (inf.FootnoteId, inf.IndicatorId, inf.IndicatorGroupId, inf.SubjectId))
+                    .ToHashSet()
+            );
+        }
+    }
+
+    [Fact]
     public async Task UpdateFootnote_ReleaseAndFootnoteNotRelated()
     {
         var (releaseVersion, otherReleaseVersion) = _fixture.DefaultStatsReleaseVersion().GenerateTuple2();
