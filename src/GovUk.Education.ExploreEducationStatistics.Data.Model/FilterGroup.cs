@@ -8,7 +8,6 @@ public class FilterGroup
     public Guid FilterId { get; set; }
     public string Label { get; set; } = string.Empty;
     public List<FilterItem> FilterItems { get; set; } = new();
-    public List<FilterGroupFootnote> Footnotes { get; set; } = new();
 
     public static IEqualityComparer<FilterGroup> IdComparer { get; } = new IdEqualityComparer();
 

@@ -110,7 +110,7 @@ public class SubjectResultMetaService : ISubjectResultMetaService
                 var footnoteViewModels = await GetFootnoteViewModels(
                     releaseVersionId: releaseVersionId,
                     subjectId: query.SubjectId,
-                    filterItemIds: filterItems.Select(fi => fi.Id).ToList(),
+                    filterItems: filterItems,
                     indicatorIds: indicatorViewModels.Select(i => i.Value).ToList()
                 );
                 _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -184,14 +184,14 @@ public class SubjectResultMetaService : ISubjectResultMetaService
     private async Task<List<FootnoteViewModel>> GetFootnoteViewModels(
         Guid releaseVersionId,
         Guid subjectId,
-        IEnumerable<Guid> filterItemIds,
-        IEnumerable<Guid> indicatorIds
+        IList<FilterItem> filterItems,
+        IReadOnlyCollection<Guid> indicatorIds
     )
     {
-        var footnotes = await _footnoteRepository.GetFilteredFootnotes(
+        var footnotes = await _footnoteRepository.GetFootnotesForSelection(
             releaseVersionId: releaseVersionId,
             subjectId: subjectId,
-            filterItemIds: filterItemIds,
+            filterItems: filterItems,
             indicatorIds: indicatorIds
         );
 
