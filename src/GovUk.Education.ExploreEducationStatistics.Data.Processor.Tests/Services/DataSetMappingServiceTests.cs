@@ -478,7 +478,7 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
-    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasDifferentName_LocationUnset()
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasDifferentName_LocationMatchedByCode()
     {
         var originalLocation = new Location
         {
@@ -500,13 +500,19 @@ public class DataSetMappingServiceTests
         );
 
         Assert.Equal(
-            new Dictionary<Guid, LocationMapping> { { originalLocation.Id, CreateLocationMapping(originalLocation) } },
+            new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    originalLocation.Id,
+                    CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
+                },
+            },
             locationMappings
         );
     }
 
     [Fact]
-    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasAdditionalAttribute_LocationUnset()
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationHasAdditionalAttribute_LocationMatchedByCode()
     {
         var originalLocation = new Location
         {
@@ -526,6 +532,86 @@ public class DataSetMappingServiceTests
         var locationMappings = await GenerateLocationMappings(
             originalLocations: [originalLocation],
             replacementLocations: [replacementLocation]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    originalLocation.Id,
+                    CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
+                },
+            },
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_SchoolsLocalAuthorityHasDifferentName_SchoolMatchedByCode()
+    {
+        School school = new("100000", "Test school");
+
+        var originalLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.School,
+            LocalAuthority = Derby,
+            School = school,
+        };
+
+        var replacementLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.School,
+            LocalAuthority = Derby with { Name = "Derby City" },
+            School = school,
+        };
+
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping>
+            {
+                {
+                    originalLocation.Id,
+                    CreateLocationMapping(originalLocation, replacementLocation, MapStatus.AutoSet)
+                },
+            },
+            locationMappings
+        );
+    }
+
+    [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementLocationsHaveDifferentNameAndSameCode_LocationUnset()
+    {
+        var originalLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocation1 = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby with { Name = "Derby City" },
+        };
+
+        var replacementLocation2 = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            Country = England,
+            LocalAuthority = Derby with { Name = "Derby City" },
+        };
+
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocation1, replacementLocation2]
         );
 
         Assert.Equal(
