@@ -19,19 +19,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7
 
-    - name: Install .NET
+    # Credentials are written to a NuGet config outside the checkout, which NuGet picks up
+    # from the parent directory hierarchy.
+    - name: Install .NET and authenticate with GitHub Packages
       uses: actions/setup-dotnet@v6
       with:
         global-json-file: global.json
-
-    # Credentials are only added to the runner's ephemeral copy of the NuGet config.
-    - name: Add credentials for GitHub Packages NuGet source
-      run: >
-        dotnet nuget update source dfe-analytical-services-github
-        --username ${{ github.actor }}
-        --password ${{ secrets.GITHUB_TOKEN }}
-        --store-password-in-clear-text
-        --configfile src/nuget.config
+        source-url: https://nuget.pkg.github.com/dfe-analytical-services/index.json
+        config-file: src/nuget.config
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
