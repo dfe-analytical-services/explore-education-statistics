@@ -134,8 +134,8 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             .Distinct()
             .ToListAsync();
 
-        // Match by GeogLvl + Code. We don't check by Name to preserve behaviour from before location mapping was
-        // introduced (which allowed analysts to change/fix location names with replacements).
+        var replacementLocationsByKey = replacementLocations.ToLookup(ImporterLocationCache.GetLocationCacheKey);
+
         var replacementLocationsByLevelAndCode = replacementLocations.ToLookup(location =>
             (location.GeographicLevel, location.ToLocationAttribute().GetCodeOrFallback())
         );
@@ -144,10 +144,20 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             originalLocation => originalLocation.Id,
             originalLocation =>
             {
-                var matchingReplacements = replacementLocationsByLevelAndCode[
-                    (originalLocation.GeographicLevel, originalLocation.ToLocationAttribute().GetCodeOrFallback())
+                var matchingReplacements = replacementLocationsByKey[
+                    ImporterLocationCache.GetLocationCacheKey(originalLocation)
                 ]
                     .ToList();
+                if (matchingReplacements.Count == 0)
+                {
+                    // If none matching on every attribute, check if any matching by GeogLvl + Code. We don't check by
+                    // Name to preserve behaviour from before location mapping was introduced (which allowed analysts
+                    // to change/fix location names with replacements).
+                    matchingReplacements = replacementLocationsByLevelAndCode[
+                        (originalLocation.GeographicLevel, originalLocation.ToLocationAttribute().GetCodeOrFallback())
+                    ]
+                        .ToList();
+                }
                 var replacementLocation = matchingReplacements.Count == 1 ? matchingReplacements[0] : null;
 
                 return new LocationMapping
