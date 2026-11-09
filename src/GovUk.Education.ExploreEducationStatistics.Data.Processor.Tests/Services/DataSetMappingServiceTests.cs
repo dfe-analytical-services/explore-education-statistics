@@ -621,7 +621,7 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
-    public async Task CreateInitialDataSetMappingIfReplacement_SameLocalAuthorityInDifferentRegions_EachLocationAutoMapped()
+    public async Task CreateInitialDataSetMappingIfReplacement_SameLocalAuthorityInDifferentRegions_LocationsUnset()
     {
         Region eastMidlands = new("E12000004", "East Midlands");
         Region westMidlands = new("E12000005", "West Midlands");
@@ -666,22 +666,8 @@ public class DataSetMappingServiceTests
         Assert.Equal(
             new Dictionary<Guid, LocationMapping>
             {
-                {
-                    originalLocationInEastMidlands.Id,
-                    CreateLocationMapping(
-                        originalLocationInEastMidlands,
-                        replacementLocationInEastMidlands,
-                        MapStatus.AutoSet
-                    )
-                },
-                {
-                    originalLocationInWestMidlands.Id,
-                    CreateLocationMapping(
-                        originalLocationInWestMidlands,
-                        replacementLocationInWestMidlands,
-                        MapStatus.AutoSet
-                    )
-                },
+                { originalLocationInEastMidlands.Id, CreateLocationMapping(originalLocationInEastMidlands) },
+                { originalLocationInWestMidlands.Id, CreateLocationMapping(originalLocationInWestMidlands) },
             },
             locationMappings
         );

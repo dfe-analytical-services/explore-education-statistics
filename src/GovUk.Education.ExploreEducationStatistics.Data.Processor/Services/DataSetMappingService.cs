@@ -134,29 +134,19 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier) : IData
             .Distinct()
             .ToListAsync();
 
-        var replacementLocationsByKey = replacementLocations.ToLookup(ImporterLocationCache.GetLocationCacheKey);
-
         var locationMappings = originalLocations.ToDictionary(
             originalLocation => originalLocation.Id,
             originalLocation =>
             {
-                var matchingReplacements = replacementLocationsByKey[
-                    ImporterLocationCache.GetLocationCacheKey(originalLocation)
-                ]
+                // Match by GeogLvl + Code. We don't check by Name to preserve behaviour from before location mapping
+                // was introduced (which allowed analysts to change/fix location names with replacements).
+                var matchingReplacements = replacementLocations
+                    .Where(location =>
+                        location.GeographicLevel == originalLocation.GeographicLevel
+                        && location.ToLocationAttribute().GetCodeOrFallback()
+                            == originalLocation.ToLocationAttribute().GetCodeOrFallback()
+                    )
                     .ToList();
-                if (matchingReplacements.Count == 0)
-                {
-                    // If none matching on every attribute, check if any matching by GeogLvl + Code. We don't check by
-                    // Name to preserve behaviour from before location mapping was introduced (which allowed analysts
-                    // to change/fix location names with replacements).
-                    matchingReplacements = replacementLocations
-                        .Where(location =>
-                            location.GeographicLevel == originalLocation.GeographicLevel
-                            && location.ToLocationAttribute().GetCodeOrFallback()
-                                == originalLocation.ToLocationAttribute().GetCodeOrFallback()
-                        )
-                        .ToList();
-                }
                 var replacementLocation = matchingReplacements.Count == 1 ? matchingReplacements[0] : null;
 
                 return new LocationMapping
