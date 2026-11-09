@@ -11,14 +11,11 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services;
 
-public class TableBuilderQueryOptimiser(
-    IStorageDataSetResolver storageDataSetResolver,
-    IOptions<TableBuilderOptions> options
-) : ITableBuilderQueryOptimiser
+public class TableBuilderQueryOptimiser(IOptions<TableBuilderOptions> options) : ITableBuilderQueryOptimiser
 {
     private const int MaxSelections = 5;
 
-    private async Task<int> GetMaximumTableCellCount(FullTableQuery query)
+    private static async Task<int> GetMaximumTableCellCount(IStorageDataSet dataSet, FullTableQuery query)
     {
         var filterItemIds = query.GetFilterItemIds();
 
@@ -30,7 +27,6 @@ public class TableBuilderQueryOptimiser(
         }
         else
         {
-            var dataSet = await storageDataSetResolver.Resolve(query.SubjectId);
             var filterItems = await dataSet.ListFilterItems(filterItemIds);
 
             var notFound = filterItemIds.Except(filterItems.Select(filterItem => filterItem.Id)).ToList();
@@ -54,13 +50,17 @@ public class TableBuilderQueryOptimiser(
         );
     }
 
-    public async Task<bool> IsCroppingRequired(FullTableQuery query)
+    public async Task<bool> IsCroppingRequired(IStorageDataSet dataSet, FullTableQuery query)
     {
-        var maxCells = await GetMaximumTableCellCount(query);
+        var maxCells = await GetMaximumTableCellCount(dataSet, query);
         return maxCells > options.Value.MaxTableCellsAllowed;
     }
 
-    public async Task<FullTableQuery> CropQuery(FullTableQuery query, CancellationToken cancellationToken)
+    public async Task<FullTableQuery> CropQuery(
+        IStorageDataSet dataSet,
+        FullTableQuery query,
+        CancellationToken cancellationToken
+    )
     {
         if (query.TimePeriod is not null)
         {
@@ -74,17 +74,21 @@ public class TableBuilderQueryOptimiser(
                 query.TimePeriod.EndYear = croppedTimePeriods.Last().Year;
                 query.TimePeriod.EndCode = croppedTimePeriods.Last().TimeIdentifier;
 
-                if (!await IsCroppingRequired(query))
+                if (!await IsCroppingRequired(dataSet, query))
                 {
                     return query;
                 }
             }
         }
 
-        return await CropLocations(query, cancellationToken);
+        return await CropLocations(dataSet, query, cancellationToken);
     }
 
-    private async Task<FullTableQuery> CropLocations(FullTableQuery query, CancellationToken cancellationToken)
+    private static async Task<FullTableQuery> CropLocations(
+        IStorageDataSet dataSet,
+        FullTableQuery query,
+        CancellationToken cancellationToken
+    )
     {
         var maxLocationsPerGeographicLevel = new Dictionary<GeographicLevel, int>
         {
@@ -109,7 +113,6 @@ public class TableBuilderQueryOptimiser(
             { GeographicLevel.Ward, 2 },
         };
 
-        var dataSet = await storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
         var locations = await dataSet.ListLocations(query.LocationIds, cancellationToken);
 
         var croppedLocationIds = locations
