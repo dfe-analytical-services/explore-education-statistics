@@ -693,6 +693,41 @@ public class DataSetMappingServiceTests
     }
 
     [Fact]
+    public async Task CreateInitialDataSetMappingIfReplacement_ReplacementHasNoLocationWithSameLevelAndCode_LocationUnset()
+    {
+        var originalLocation = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = Derby,
+        };
+
+        var replacementLocationWithDifferentCode = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthority,
+            LocalAuthority = new LocalAuthority("E06000018", "", "Nottingham"),
+        };
+
+        var replacementLocationWithDifferentLevel = new Location
+        {
+            Id = Guid.NewGuid(),
+            GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+            LocalAuthorityDistrict = new LocalAuthorityDistrict(Derby.Code, Derby.Name),
+        };
+
+        var locationMappings = await GenerateLocationMappings(
+            originalLocations: [originalLocation],
+            replacementLocations: [replacementLocationWithDifferentCode, replacementLocationWithDifferentLevel]
+        );
+
+        Assert.Equal(
+            new Dictionary<Guid, LocationMapping> { { originalLocation.Id, CreateLocationMapping(originalLocation) } },
+            locationMappings
+        );
+    }
+
+    [Fact]
     public async Task CreateInitialDataSetMappingIfReplacement_NoMappingCreatedIfNotReplacement_Success()
     {
         var file = new File
