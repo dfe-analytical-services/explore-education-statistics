@@ -642,25 +642,9 @@ public class DataSetMappingServiceTests
             LocalAuthority = Derby,
         };
 
-        var replacementLocationInEastMidlands = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            Region = eastMidlands,
-            LocalAuthority = Derby,
-        };
-
-        var replacementLocationInWestMidlands = new Location
-        {
-            Id = Guid.NewGuid(),
-            GeographicLevel = GeographicLevel.LocalAuthority,
-            Region = westMidlands,
-            LocalAuthority = Derby,
-        };
-
         var locationMappings = await GenerateLocationMappings(
             originalLocations: [originalLocationInEastMidlands, originalLocationInWestMidlands],
-            replacementLocations: [replacementLocationInWestMidlands, replacementLocationInEastMidlands]
+            replacementLocations: [originalLocationInWestMidlands, originalLocationInEastMidlands]
         );
 
         Assert.Equal(
