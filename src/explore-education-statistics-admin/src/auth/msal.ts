@@ -12,10 +12,6 @@ import {
   signedOutRoute,
   signInRoute,
 } from '@admin/routes/routes';
-import {
-  cacheAuthenticationInformation,
-  clearCachedAuthenticationInformation,
-} from '@admin/auth/msalRobotTests';
 
 const msalLoggingEnabled = false;
 
@@ -118,9 +114,6 @@ export function handleLogin(returnUrl?: string) {
 }
 
 export function handleLogout() {
-  // if we don't we'd be logged in constantly
-  clearCachedAuthenticationInformation();
-
   getMsalInstance()
     .logoutRedirect({
       idTokenHint: getMsalInstance().getAllAccounts()[0].idToken,
@@ -146,12 +139,8 @@ export async function acquireTokenSilent(): Promise<AuthenticationResult> {
     throw new Error('No account available');
   }
 
-  const authenticationResult = await instance.acquireTokenSilent({
+  return instance.acquireTokenSilent({
     scopes: [adminApiScope],
     account: accounts[0],
   });
-
-  await cacheAuthenticationInformation(authenticationResult.accessToken);
-
-  return authenticationResult;
 }
