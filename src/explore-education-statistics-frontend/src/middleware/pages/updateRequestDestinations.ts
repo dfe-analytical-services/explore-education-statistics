@@ -1,7 +1,7 @@
 import getPublicEnv from '@frontend/utils/publicEnv';
 import {
   NextFetchEvent,
-  NextMiddleware,
+  NextProxy,
   NextRequest,
   NextResponse,
   URLPattern,
@@ -32,7 +32,7 @@ const destinationUpdates: DestinationUpdate[] = [
 export default function updateRequestDestination(
   request: NextRequest,
   event: NextFetchEvent,
-  middleware: NextMiddleware,
+  middleware: NextProxy,
 ) {
   const { nextUrl } = request;
 

@@ -9,9 +9,6 @@ const path = require('path');
 const nextConfig = {
   compress: false,
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER ?? '',
   },
@@ -64,6 +61,7 @@ const nextConfig = {
 
         config.plugins.push(
           new StylelintPlugin({
+            files: 'src/**/*.{css,scss}',
             // Next doesn't play nicely with emitted errors
             // so we'll just display warnings instead
             emitErrors: false,

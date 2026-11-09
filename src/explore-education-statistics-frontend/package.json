@@ -7,8 +7,8 @@
     "@azure/search-documents": "^12.2.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "@next/bundle-analyzer": "15.5.12",
-    "@next/env": "15.5.12",
+    "@next/bundle-analyzer": "16.4.5",
+    "@next/env": "16.4.5",
     "@tanstack/react-query": "4.42.0",
     "accessible-autocomplete": "^3.0.1",
     "applicationinsights": "^2.9.8",
@@ -26,7 +26,7 @@
     "leaflet": "^1.9.4",
     "lodash": "^4.18.1",
     "memoizee": "^0.4.17",
-    "next": "15.5.28",
+    "next": "16.4.5",
     "next-sitemap": "^4.2.3",
     "nookies": "^2.5.2",
     "react": "19.2.7",
@@ -82,8 +82,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production NEXT_CONFIG_MODE=server node server.js",
     "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node server.js",
-    "build": "next build",
-    "build:analyze": "cross-env ANALYZE=true next build",
+    "build": "next build --webpack",
+    "build:analyze": "cross-env ANALYZE=true next build --webpack",
     "postbuild": "next-sitemap",
     "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint src/**/*.{ts,tsx}",
@@ -93,7 +93,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot",
-    "tsc": "tsc --noEmit"
+    "tsc": "next typegen && tsc --noEmit"
   },
   "browserslist": [
     ">0.2%",

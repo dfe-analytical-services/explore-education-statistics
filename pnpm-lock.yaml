@@ -37,8 +37,8 @@ importers:
         specifier: ^9.39.5
         version: 9.39.5
       '@next/eslint-plugin-next':
-        specifier: 16.2.10
-        version: 16.2.10
+        specifier: 16.4.5
+        version: 16.4.5(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
@@ -82,8 +82,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       eslint-config-next:
-        specifier: 16.2.11
-        version: 16.2.11(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: 16.4.5
+        version: 16.4.5(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
@@ -264,10 +264,10 @@ importers:
         version: 6.5.1(supports-color@10.2.2)
       '@swc/core':
         specifier: ^1.15.46
-        version: 1.15.47
+        version: 1.15.47(@swc/helpers@0.5.23)
       '@swc/jest':
         specifier: ^0.2.39
-        version: 0.2.39(@swc/core@1.15.47)
+        version: 0.2.39(@swc/core@1.15.47(@swc/helpers@0.5.23))
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -444,16 +444,16 @@ importers:
         version: 5.1.0(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))(webpack@5.108.4)
       swc-loader:
         specifier: ^0.2.7
-        version: 0.2.7(@swc/core@1.15.47)(webpack@5.108.4)
+        version: 0.2.7(@swc/core@1.15.47(@swc/helpers@0.5.23))(webpack@5.108.4)
       terser-webpack-plugin:
         specifier: ^5.6.1
-        version: 5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4)
+        version: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       webpack:
         specifier: ^5.108.0
-        version: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+        version: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-dev-server:
         specifier: ^4.15.2
         version: 4.15.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(webpack-cli@5.1.4)(webpack@5.108.4)
@@ -474,7 +474,7 @@ importers:
         version: 8.0.2(@babel/core@8.0.1)
       '@ckeditor/ckeditor5-dev-utils':
         specifier: ^50.3.1
-        version: 50.3.1(@swc/core@1.15.47)(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
+        version: 50.3.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
       babel-loader:
         specifier: ^10.1.1
         version: 10.1.1(@babel/core@8.0.1)(webpack@5.105.2)
@@ -501,10 +501,10 @@ importers:
         version: 3.3.4(webpack@5.105.2)
       terser-webpack-plugin:
         specifier: ^5.6.1
-        version: 5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
+        version: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
       webpack:
         specifier: ^5.105.1
-        version: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+        version: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli:
         specifier: ^5.1.4
         version: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.105.2)
@@ -628,10 +628,10 @@ importers:
     devDependencies:
       '@swc/core':
         specifier: ^1.15.46
-        version: 1.15.47
+        version: 1.15.47(@swc/helpers@0.5.23)
       '@swc/jest':
         specifier: ^0.2.39
-        version: 0.2.39(@swc/core@1.15.47)
+        version: 0.2.39(@swc/core@1.15.47(@swc/helpers@0.5.23))
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -747,11 +747,11 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       '@next/bundle-analyzer':
-        specifier: 15.5.12
-        version: 15.5.12
+        specifier: 16.4.5
+        version: 16.4.5
       '@next/env':
-        specifier: 15.5.12
-        version: 15.5.12
+        specifier: 16.4.5
+        version: 16.4.5
       '@tanstack/react-query':
         specifier: 4.42.0
         version: 4.42.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -804,11 +804,11 @@ importers:
         specifier: ^0.4.17
         version: 0.4.17
       next:
-        specifier: 15.5.28
-        version: 15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
+        specifier: 16.4.5
+        version: 16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
       next-sitemap:
         specifier: ^4.2.3
-        version: 4.2.3(next@15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))
+        version: 4.2.3(next@16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))
       nookies:
         specifier: ^2.5.2
         version: 2.5.2
@@ -835,17 +835,17 @@ importers:
         version: 0.11.0(immer@10.2.0)(react@19.2.7)
       webpack:
         specifier: ^5.108.0
-        version: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+        version: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       yup:
         specifier: ^1.3.3
         version: 1.3.3
     devDependencies:
       '@swc/core':
         specifier: ^1.15.46
-        version: 1.15.47
+        version: 1.15.47(@swc/helpers@0.5.23)
       '@swc/jest':
         specifier: ^0.2.39
-        version: 0.2.39(@swc/core@1.15.47)
+        version: 0.2.39(@swc/core@1.15.47(@swc/helpers@0.5.23))
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -920,7 +920,7 @@ importers:
         version: 3.0.1(jest@30.5.2(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(supports-color@10.2.2))
       next-router-mock:
         specifier: ^1.0.5
-        version: 1.0.5(next@15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))(react@19.2.7)
+        version: 1.0.5(next@16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))(react@19.2.7)
       node-mocks-http:
         specifier: ^1.18.0
         version: 1.18.0(@types/express@4.17.25)(@types/node@22.20.4)
@@ -3797,75 +3797,66 @@ packages:
   '@nevware21/ts-utils@0.15.0':
     resolution: {integrity: sha512-+bUMKIiKAgoW5uNEb5xxzBzdwdLS9SKRcOy8SxLE+KqSlIdUYV5O9nxJVq1RUYcO2DtL5DlrK1GbgcVEHv6GVA==}
 
-  '@next/bundle-analyzer@15.5.12':
-    resolution: {integrity: sha512-tDkdfvuKz9JlH+B/CEIY0+XqQ5gymVZZWvDer5HJI68rPI0EYfbSadbvIUvHTugYnMkyxSBf8u0P2yGOSQ4h+w==}
+  '@next/bundle-analyzer@16.4.5':
+    resolution: {integrity: sha512-kIlb+9t1i/Zg7yuRXN7I9nhEb92UGbnMfIzpZPps7YoCgmneCMpmN6zG6mduUluhI+y00MGLytkDsccVCujrGw==}
 
   '@next/env@13.5.11':
     resolution: {integrity: sha512-fbb2C7HChgM7CemdCY+y3N1n8pcTKdqtQLbC7/EQtPdLvlMUT9JX/dBYl8MMZAtYG4uVMyPFHXckb68q/NRwqg==}
 
-  '@next/env@15.5.12':
-    resolution: {integrity: sha512-pUvdJN1on574wQHjaBfNGDt9Mz5utDSZFsIIQkMzPgNS8ZvT4H2mwOrOIClwsQOb6EGx5M76/CZr6G8i6pSpLg==}
+  '@next/env@16.4.5':
+    resolution: {integrity: sha512-JwSPwpdkZL5VMl2jA/q+JI8MZdweAL3xmw5/tb9y/TLtmS0YXZnmYDzSihwk8xTj1OL+WM53gTqaj96yuLp6Xw==}
 
-  '@next/env@15.5.28':
-    resolution: {integrity: sha512-xxW5EBI8fMPuVTPBW7LL980IRbuDXlbkUAwp9DDhtb4Lnich3nJ13uYpvrX4VE74hWPf6AvHHAMmGCidcHjbfg==}
+  '@next/eslint-plugin-next@16.4.5':
+    resolution: {integrity: sha512-dNmc4y4En/34tWxaBFF2tG/R9GeiRwVPf7v8Az/Pqk8FcT4Uv0ePmrZKvWBL2nFy1QprPgJW+6XjfyV6jbRV3Q==}
 
-  '@next/eslint-plugin-next@16.2.10':
-    resolution: {integrity: sha512-Gs8D2m21VnJeFo9qvYIIqJH94frWerWYu41BprU1pLtRVF7PCQNLiFZZ3fG+iPuj3K83Cwv/rt+msLOy8Qgu3Q==}
-
-  '@next/eslint-plugin-next@16.2.11':
-    resolution: {integrity: sha512-vMEf/aXOpzFFdtIvFYOnIDPKb0xBbrXONsz83CcKdRrekfxNdL8PNkq5qHqAHSXVlIifnX68LOMaxr3z5PkeLQ==}
-
-  '@next/eslint-plugin-next@16.3.0':
-    resolution: {integrity: sha512-OqgJ8PN0d04KcPhDX/PTY5tJUJZxlbrt7O7FBsm4XE0XW2JDrKnDXsc9uo9WUimJGPoo2j+JRGhyXApC//mvbw==}
-
-  '@next/swc-darwin-arm64@15.5.28':
-    resolution: {integrity: sha512-dPoQYXcfSIqx5o+TOXVXO7kONK5qbtNRDeiTfII0bT3puGIT6VF5e0QwmxNZfEZ5Zety5f3m9P/p4xqwfiLlPg==}
+  '@next/swc-darwin-arm64@16.4.5':
+    resolution: {integrity: sha512-W5TniBzWKASbNNwHZ/S/f1MxQUXU/LdjklVMWA0Ujbfl7SZnUzFls45hO0i/sF7Bx1jJBWp7WWmoQajXtX/O8A==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@15.5.28':
-    resolution: {integrity: sha512-RgCJ7buBivTH+6sddqaVm+/v8kwMHlFkobvdt3DfETutws5HrxnToMIWSN9X3MZ3aAi7BbKrGZZWUDQLEycXqw==}
+  '@next/swc-darwin-x64@16.4.5':
+    resolution: {integrity: sha512-uWq4qkHapBDS1oFltWS4YxTb9pLHAtLNcpbuK6SmRsebLYZqpBML/j/C0op+50JYGTpZgVL/DWNt/6oWlamrrw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@15.5.28':
-    resolution: {integrity: sha512-OHXQe13olE59aKe++zHavGcJPh5SLHXi6Anret3BBeq1+qhSuOJDNAli/EDDfxs6UTqA4Qddo4uyYry2slyjiQ==}
+  '@next/swc-linux-arm64-gnu@16.4.5':
+    resolution: {integrity: sha512-FdRcyOx5u5P51mlAqLB9EXdd8jZO5fsdHtk4BAQSkqOywCsbTNN/rmw+jO7pnmjNdAtu2AG46NzbCL2FPDrrgw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-arm64-musl@15.5.28':
-    resolution: {integrity: sha512-nTB7bB6vfn4ezCJNYP43ukt2o8L3+WxKF/sTcTxepdXsJh3SM9RhlU7wrZYbH7L4HO5M87dqDTwm8587vAkCiw==}
+  '@next/swc-linux-arm64-musl@16.4.5':
+    resolution: {integrity: sha512-cyvmmgtRXR8aGVT86wi9Py53IlfyCx7P2fZxuAXAoTummDnhKtUyjrMeXfapqp4qgD+gT5RqyGD/VfA16jEK7Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-linux-x64-gnu@15.5.28':
-    resolution: {integrity: sha512-WXCfVI32rW3xCusoUX1RpZKtyChWU2Zwe27JUDmM3KrXwcDNc9vV4zEq0GKFAURnuQ/Ouo/XqPvB0yh445XZCg==}
+  '@next/swc-linux-x64-gnu@16.4.5':
+    resolution: {integrity: sha512-hPc+Fl+N22DAvqZHq559NmamXboOX5Lu8I5Wl0DezfrhTk1Zz21NQeYoZDmNI/NjTcrdsVxM72Fzn2lI+Q+vAw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@next/swc-linux-x64-musl@15.5.28':
-    resolution: {integrity: sha512-Miq+NDb/HWsXuxseYxMM6fuEOQXgTziarkKIRpVKCn8W69cEfhQaQr+90pO+u4q2CbJR2wzXmUuCFyZaJs/Nng==}
+  '@next/swc-linux-x64-musl@16.4.5':
+    resolution: {integrity: sha512-gbACYE8IP/jlprNTpiWXHb8N9CofOzpnEwH2SrIz1dUbiJf1FbDssDupCAPeP1Taxe8mgG20sGZamJI7KFOdZw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@next/swc-win32-arm64-msvc@15.5.28':
-    resolution: {integrity: sha512-5LR79lemgDlgxvG7MQJ+zHCkVcrUoQuO7CiIvq3I58vNW4goSOE2b+19Z6FujRWMouvni4gvudYFuFuNxolGWA==}
+  '@next/swc-win32-arm64-msvc@16.4.5':
+    resolution: {integrity: sha512-+8gj++ZMo8H20Xh2ijjNqyFk5LPLw0AC4Fs4Tq/G94rjjQXhOjN4jgSWsWKPFsyY26hfIeemJIwKtMxOsp5GBA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@15.5.28':
-    resolution: {integrity: sha512-GNipvXUYROSTf4PXEyH95FrWImIB5zdaK6uEOg0RP1/X2drnvoMwiBkJ0VWdzX7w3iiBm3y5g2TxkKDGVTOQcg==}
+  '@next/swc-win32-x64-msvc@16.4.5':
+    resolution: {integrity: sha512-qNZj66pYXnaWLiF9R9GUbfBdrCv7kC6TaZfIwB2KH5WPc/8pEM3nVOj8hpQhWJU8S94rlH5MPDcX15+RrgUhiw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -4725,8 +4716,8 @@ packages:
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
 
-  '@swc/helpers@0.5.15':
-    resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
+  '@swc/helpers@0.5.23':
+    resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
 
   '@swc/jest@0.2.39':
     resolution: {integrity: sha512-eyokjOwYd0Q8RnMHri+8/FS1HIrIUKK/sRrFp8c1dThUOfNeCWbLmBP1P5VsKdvmkd25JaH+OKYwEYiAYg9YAA==}
@@ -6945,8 +6936,8 @@ packages:
     peerDependencies:
       eslint: ^9.0.0
 
-  eslint-config-next@16.2.11:
-    resolution: {integrity: sha512-FIpbK/dUyxUExchDB7eBg3k+VU8R2iR/Cx9/kqTBUTFv2bOIR9aRrpno4rvAQ9VhiPQAyFKNA2NlZwouGWtclA==}
+  eslint-config-next@16.4.5:
+    resolution: {integrity: sha512-mvh39zYLoNjpT5tVmf8xZu7i5lEOb5jN5cW6qD9OpeCp4GEEOeYta0Z2XyKiD0pYdlvm5/Td6Bi890maPRlIjg==}
     peerDependencies:
       eslint: '>=9.0.0'
       typescript: '>=3.3.1'
@@ -9144,9 +9135,9 @@ packages:
   next-tick@1.1.0:
     resolution: {integrity: sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==}
 
-  next@15.5.28:
-    resolution: {integrity: sha512-JjhLBBY1PNnuwPtcZ7t8yxVeJVYvD2Jyp633J+gRCNbzSt7N0E+xqCf6uQiff3+3qmUkwcF/ksfSsK1xsZ76Tw==}
-    engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+  next@16.4.5:
+    resolution: {integrity: sha512-rmdfsWosjTUO+6R0S3KokoIk6Kj0sWDRTe86tZHdqaWH/oXq/udX3/4xb+YQi7aWbyEFoglDU54kaifLCdXbBw==}
+    engines: {node: '>=20.9.0'}
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -12115,7 +12106,7 @@ snapshots:
     dependencies:
       '@babel/compat-data': 8.0.0
       '@babel/helper-validator-option': 8.0.0
-      browserslist: 4.28.5
+      browserslist: 4.28.8
       lru-cache: 11.2.6
       semver: 7.8.5
 
@@ -13970,8 +13961,8 @@ snapshots:
   '@ckeditor/ckeditor5-core@46.1.1':
     dependencies:
       '@ckeditor/ckeditor5-engine': 46.1.1
-      '@ckeditor/ckeditor5-ui': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-utils': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-ui': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-utils': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-watchdog': 46.1.1
       es-toolkit: 1.39.5
 
@@ -13995,11 +13986,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@ckeditor/ckeditor5-dev-translations@50.3.1(@swc/core@1.15.47)(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)':
+  '@ckeditor/ckeditor5-dev-translations@50.3.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)':
     dependencies:
       '@babel/parser': 7.29.7
       '@babel/traverse': 7.29.7(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-dev-utils': 50.3.1(@swc/core@1.15.47)(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
+      '@ckeditor/ckeditor5-dev-utils': 50.3.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
       chalk: 5.6.2
       fs-extra: 11.4.0
       glob: 11.1.0
@@ -14024,9 +14015,9 @@ snapshots:
       - uglify-js
       - webpack
 
-  '@ckeditor/ckeditor5-dev-utils@50.3.1(@swc/core@1.15.47)(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)':
+  '@ckeditor/ckeditor5-dev-utils@50.3.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)':
     dependencies:
-      '@ckeditor/ckeditor5-dev-translations': 50.3.1(@swc/core@1.15.47)(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
+      '@ckeditor/ckeditor5-dev-translations': 50.3.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(supports-color@8.1.1)(typescript@6.0.3)(webpack@5.105.2)
       '@types/postcss-import': 14.0.3
       '@types/through2': 2.0.41
       chalk: 5.6.2
@@ -14050,7 +14041,7 @@ snapshots:
       shelljs: 0.10.0
       simple-git: 3.36.0(supports-color@8.1.1)
       style-loader: 4.0.0(webpack@5.105.2)
-      terser-webpack-plugin: 5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
+      terser-webpack-plugin: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
       through2: 4.0.2
       upath: 2.0.1
     transitivePeerDependencies:
@@ -14219,7 +14210,7 @@ snapshots:
       '@ckeditor/ckeditor5-engine': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
       es-toolkit: 1.39.5
 
   '@ckeditor/ckeditor5-editor-multi-root@46.1.1(supports-color@10.2.2)':
@@ -14377,7 +14368,7 @@ snapshots:
       '@ckeditor/ckeditor5-icons': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
 
   '@ckeditor/ckeditor5-font@46.1.1(supports-color@10.2.2)':
     dependencies:
@@ -14433,7 +14424,7 @@ snapshots:
       '@ckeditor/ckeditor5-paragraph': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
 
   '@ckeditor/ckeditor5-heading@46.1.1(supports-color@10.2.2)':
     dependencies:
@@ -14580,7 +14571,7 @@ snapshots:
       '@ckeditor/ckeditor5-upload': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
       '@ckeditor/ckeditor5-widget': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
       es-toolkit: 1.39.5
 
   '@ckeditor/ckeditor5-image@46.1.1(supports-color@10.2.2)':
@@ -14671,12 +14662,12 @@ snapshots:
       '@ckeditor/ckeditor5-core': 46.1.1
       '@ckeditor/ckeditor5-engine': 46.1.1
       '@ckeditor/ckeditor5-icons': 46.1.1
-      '@ckeditor/ckeditor5-image': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-image': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-typing': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
       '@ckeditor/ckeditor5-widget': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
       es-toolkit: 1.39.5
 
   '@ckeditor/ckeditor5-link@46.1.1(supports-color@10.2.2)':
@@ -14722,7 +14713,7 @@ snapshots:
       '@ckeditor/ckeditor5-typing': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
 
   '@ckeditor/ckeditor5-list@46.1.1(supports-color@10.2.2)':
     dependencies:
@@ -15161,7 +15152,7 @@ snapshots:
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
       '@ckeditor/ckeditor5-widget': 46.1.1
-      ckeditor5: 46.1.1(supports-color@8.1.1)
+      ckeditor5: 46.1.1(supports-color@10.2.2)
       es-toolkit: 1.39.5
 
   '@ckeditor/ckeditor5-table@46.1.1(supports-color@10.2.2)':
@@ -15235,11 +15226,11 @@ snapshots:
 
   '@ckeditor/ckeditor5-ui@46.1.1':
     dependencies:
-      '@ckeditor/ckeditor5-core': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-editor-multi-root': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-core': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-editor-multi-root': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-engine': 46.1.1
       '@ckeditor/ckeditor5-icons': 46.1.1
-      '@ckeditor/ckeditor5-utils': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-utils': 46.1.1(supports-color@10.2.2)
       '@types/color-convert': 2.0.4
       color-convert: 3.1.0
       color-parse: 2.0.2
@@ -15325,7 +15316,7 @@ snapshots:
 
   '@ckeditor/ckeditor5-utils@46.1.1':
     dependencies:
-      '@ckeditor/ckeditor5-ui': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-ui': 46.1.1(supports-color@10.2.2)
       es-toolkit: 1.39.5
 
   '@ckeditor/ckeditor5-utils@46.1.1(supports-color@10.2.2)':
@@ -16700,7 +16691,7 @@ snapshots:
 
   '@nevware21/ts-utils@0.15.0': {}
 
-  '@next/bundle-analyzer@15.5.12':
+  '@next/bundle-analyzer@16.4.5':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
     transitivePeerDependencies:
@@ -16709,47 +16700,37 @@ snapshots:
 
   '@next/env@13.5.11': {}
 
-  '@next/env@15.5.12': {}
+  '@next/env@16.4.5': {}
 
-  '@next/env@15.5.28': {}
-
-  '@next/eslint-plugin-next@16.2.10':
-    dependencies:
-      fast-glob: 3.3.1
-
-  '@next/eslint-plugin-next@16.2.11':
-    dependencies:
-      fast-glob: 3.3.1
-
-  '@next/eslint-plugin-next@16.3.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))':
+  '@next/eslint-plugin-next@16.4.5(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       fast-glob: 3.3.1
     transitivePeerDependencies:
       - eslint
 
-  '@next/swc-darwin-arm64@15.5.28':
+  '@next/swc-darwin-arm64@16.4.5':
     optional: true
 
-  '@next/swc-darwin-x64@15.5.28':
+  '@next/swc-darwin-x64@16.4.5':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@15.5.28':
+  '@next/swc-linux-arm64-gnu@16.4.5':
     optional: true
 
-  '@next/swc-linux-arm64-musl@15.5.28':
+  '@next/swc-linux-arm64-musl@16.4.5':
     optional: true
 
-  '@next/swc-linux-x64-gnu@15.5.28':
+  '@next/swc-linux-x64-gnu@16.4.5':
     optional: true
 
-  '@next/swc-linux-x64-musl@15.5.28':
+  '@next/swc-linux-x64-musl@16.4.5':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@15.5.28':
+  '@next/swc-win32-arm64-msvc@16.4.5':
     optional: true
 
-  '@next/swc-win32-x64-msvc@15.5.28':
+  '@next/swc-win32-x64-msvc@16.4.5':
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -16958,7 +16939,7 @@ snapshots:
       react-refresh: 0.18.0
       schema-utils: 4.2.0
       source-map: 0.7.4
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
       type-fest: 2.19.0
       webpack-dev-server: 4.15.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(webpack-cli@5.1.4)(webpack@5.108.4)
@@ -17453,7 +17434,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.15.47':
     optional: true
 
-  '@swc/core@1.15.47':
+  '@swc/core@1.15.47(@swc/helpers@0.5.23)':
     dependencies:
       '@swc/counter': 0.1.3
       '@swc/types': 0.1.27
@@ -17470,17 +17451,18 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.15.47
       '@swc/core-win32-ia32-msvc': 1.15.47
       '@swc/core-win32-x64-msvc': 1.15.47
+      '@swc/helpers': 0.5.23
 
   '@swc/counter@0.1.3': {}
 
-  '@swc/helpers@0.5.15':
+  '@swc/helpers@0.5.23':
     dependencies:
       tslib: 2.8.1
 
-  '@swc/jest@0.2.39(@swc/core@1.15.47)':
+  '@swc/jest@0.2.39(@swc/core@1.15.47(@swc/helpers@0.5.23))':
     dependencies:
       '@jest/create-cache-key-function': 30.2.0
-      '@swc/core': 1.15.47
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       '@swc/counter': 0.1.3
       jsonc-parser: 3.3.1
 
@@ -18241,36 +18223,36 @@ snapshots:
 
   '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.105.2)':
     dependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.105.2)
 
   '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.108.4)':
     dependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.108.4)
     optional: true
 
   '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.105.2)':
     dependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.105.2)
 
   '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.108.4)':
     dependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.108.4)
     optional: true
 
   '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack-dev-server@4.15.2)(webpack@5.105.2)':
     dependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.105.2)
     optionalDependencies:
       webpack-dev-server: 4.15.2(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)(webpack-cli@5.1.4)(webpack@5.105.2)
 
   '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack-dev-server@4.15.2)(webpack@5.108.4)':
     dependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.108.4)
     optionalDependencies:
       webpack-dev-server: 4.15.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(webpack-cli@5.1.4)(webpack@5.108.4)
@@ -18293,9 +18275,9 @@ snapshots:
 
   accessible-autocomplete@3.0.1: {}
 
-  acorn-import-attributes@1.9.5(acorn@8.17.0):
+  acorn-import-attributes@1.9.5(acorn@8.18.0):
     dependencies:
-      acorn: 8.17.0
+      acorn: 8.18.0
 
   acorn-import-phases@1.0.4(acorn@8.15.0):
     dependencies:
@@ -18579,14 +18561,14 @@ snapshots:
       '@babel/core': 8.0.1
       find-up: 5.0.0
     optionalDependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   babel-loader@10.1.1(@babel/core@8.0.1)(webpack@5.108.4):
     dependencies:
       '@babel/core': 8.0.1
       find-up: 5.0.0
     optionalDependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   babel-plugin-istanbul@7.0.1(supports-color@10.2.2):
     dependencies:
@@ -18857,7 +18839,7 @@ snapshots:
 
   browserslist@4.28.5:
     dependencies:
-      baseline-browser-mapping: 2.10.42
+      baseline-browser-mapping: 2.11.15
       caniuse-lite: 1.0.30001809
       electron-to-chromium: 1.5.389
       node-releases: 2.0.50
@@ -19028,57 +19010,57 @@ snapshots:
   ckeditor5@46.1.1:
     dependencies:
       '@ckeditor/ckeditor5-adapter-ckfinder': 46.1.1
-      '@ckeditor/ckeditor5-alignment': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-autoformat': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-autosave': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-basic-styles': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-block-quote': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-bookmark': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-ckbox': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-ckfinder': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-alignment': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-autoformat': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-autosave': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-basic-styles': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-block-quote': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-bookmark': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-ckbox': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-ckfinder': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-clipboard': 46.1.1
       '@ckeditor/ckeditor5-cloud-services': 46.1.1
-      '@ckeditor/ckeditor5-code-block': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-code-block': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-core': 46.1.1
-      '@ckeditor/ckeditor5-easy-image': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-easy-image': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-editor-balloon': 46.1.1
       '@ckeditor/ckeditor5-editor-classic': 46.1.1
       '@ckeditor/ckeditor5-editor-decoupled': 46.1.1
       '@ckeditor/ckeditor5-editor-inline': 46.1.1
       '@ckeditor/ckeditor5-editor-multi-root': 46.1.1
-      '@ckeditor/ckeditor5-emoji': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-emoji': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-engine': 46.1.1
       '@ckeditor/ckeditor5-enter': 46.1.1
-      '@ckeditor/ckeditor5-essentials': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-essentials': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-find-and-replace': 46.1.1
-      '@ckeditor/ckeditor5-font': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-fullscreen': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-heading': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-highlight': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-font': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-fullscreen': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-heading': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-highlight': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-horizontal-line': 46.1.1
-      '@ckeditor/ckeditor5-html-embed': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-html-support': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-html-embed': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-html-support': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-icons': 46.1.1
-      '@ckeditor/ckeditor5-image': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-indent': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-language': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-link': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-list': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-markdown-gfm': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-media-embed': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-mention': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-minimap': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-page-break': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-image': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-indent': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-language': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-link': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-list': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-markdown-gfm': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-media-embed': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-mention': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-minimap': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-page-break': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-paragraph': 46.1.1
       '@ckeditor/ckeditor5-paste-from-office': 46.1.1
       '@ckeditor/ckeditor5-remove-format': 46.1.1
       '@ckeditor/ckeditor5-restricted-editing': 46.1.1
       '@ckeditor/ckeditor5-select-all': 46.1.1
-      '@ckeditor/ckeditor5-show-blocks': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-show-blocks': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-source-editing': 46.1.1
       '@ckeditor/ckeditor5-special-characters': 46.1.1
-      '@ckeditor/ckeditor5-style': 46.1.1(supports-color@8.1.1)
-      '@ckeditor/ckeditor5-table': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-style': 46.1.1(supports-color@10.2.2)
+      '@ckeditor/ckeditor5-table': 46.1.1(supports-color@10.2.2)
       '@ckeditor/ckeditor5-theme-lark': 46.1.1
       '@ckeditor/ckeditor5-typing': 46.1.1
       '@ckeditor/ckeditor5-ui': 46.1.1
@@ -19087,7 +19069,7 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 46.1.1
       '@ckeditor/ckeditor5-watchdog': 46.1.1
       '@ckeditor/ckeditor5-widget': 46.1.1
-      '@ckeditor/ckeditor5-word-count': 46.1.1(supports-color@8.1.1)
+      '@ckeditor/ckeditor5-word-count': 46.1.1(supports-color@10.2.2)
 
   ckeditor5@46.1.1(supports-color@10.2.2):
     dependencies:
@@ -19472,7 +19454,7 @@ snapshots:
       postcss-modules-values: 4.0.0(postcss@8.5.26)
       postcss-value-parser: 4.2.0
       semver: 7.8.5
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   css-loader@6.8.1(webpack@5.108.4):
     dependencies:
@@ -19484,7 +19466,7 @@ snapshots:
       postcss-modules-values: 4.0.0(postcss@8.5.26)
       postcss-value-parser: 4.2.0
       semver: 7.8.5
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   css-loader@7.1.3(webpack@5.105.2):
     dependencies:
@@ -19497,7 +19479,7 @@ snapshots:
       postcss-value-parser: 4.2.0
       semver: 7.8.5
     optionalDependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   css-minimizer-webpack-plugin@8.0.0(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(webpack@5.108.4):
     dependencies:
@@ -19507,7 +19489,7 @@ snapshots:
       postcss: 8.5.26
       schema-utils: 4.3.3
       serialize-javascript: 7.1.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
       clean-css: 5.3.3
       csso: 5.0.5
@@ -20113,7 +20095,7 @@ snapshots:
       esbuild: 0.27.7
       get-tsconfig: 4.14.1
       loader-utils: 2.0.4
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-sources: 1.4.3
 
   esbuild@0.27.7:
@@ -20193,7 +20175,7 @@ snapshots:
 
   eslint-config-airbnb-extended@3.2.0(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
-      '@next/eslint-plugin-next': 16.3.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
+      '@next/eslint-plugin-next': 16.4.5(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       '@stylistic/eslint-plugin': 5.10.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       confusing-browser-globals: 1.0.11
       eslint: 9.39.5(jiti@2.6.1)(supports-color@10.2.2)
@@ -20216,12 +20198,12 @@ snapshots:
       - ts-declaration-location
       - typescript
 
-  eslint-config-next@16.2.11(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3):
+  eslint-config-next@16.4.5(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
-      '@next/eslint-plugin-next': 16.2.11
+      '@next/eslint-plugin-next': 16.4.5(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       eslint: 9.39.5(jiti@2.6.1)(supports-color@10.2.2)
       eslint-import-resolver-node: 0.3.10(supports-color@10.2.2)
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@8.1.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
       eslint-plugin-react: 7.37.5(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))
@@ -20262,12 +20244,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@8.1.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@10.2.2)
       eslint: 9.39.5(jiti@2.6.1)(supports-color@10.2.2)
-      get-tsconfig: 4.13.6
+      get-tsconfig: 4.14.1
       is-bun-module: 2.0.0
       stable-hash: 0.0.5
       tinyglobby: 0.2.15
@@ -20317,7 +20299,7 @@ snapshots:
       '@typescript-eslint/parser': 8.64.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       eslint: 9.39.5(jiti@2.6.1)(supports-color@10.2.2)
       eslint-import-resolver-node: 0.3.10(supports-color@10.2.2)
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@8.1.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import-x@4.17.1(@typescript-eslint/utils@8.65.0(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10(supports-color@10.2.2))(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2))(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -20504,7 +20486,7 @@ snapshots:
       micromatch: 4.0.8
       normalize-path: 3.0.0
       schema-utils: 4.3.3
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2):
     dependencies:
@@ -20844,7 +20826,7 @@ snapshots:
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.1.1
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   filelist@1.0.4:
     dependencies:
@@ -20946,7 +20928,7 @@ snapshots:
       semver: 7.8.5
       tapable: 1.1.3
       typescript: 6.0.3
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
       eslint: 9.39.5(jiti@2.6.1)(supports-color@10.2.2)
 
@@ -20965,7 +20947,7 @@ snapshots:
       semver: 7.8.5
       tapable: 2.3.0
       typescript: 6.0.3
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   form-data@4.0.6:
     dependencies:
@@ -21415,7 +21397,7 @@ snapshots:
       pretty-error: 4.0.0
       tapable: 2.3.3
     optionalDependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   html2canvas@1.4.1:
     dependencies:
@@ -21603,8 +21585,8 @@ snapshots:
 
   import-in-the-middle@1.15.0:
     dependencies:
-      acorn: 8.17.0
-      acorn-import-attributes: 1.9.5(acorn@8.17.0)
+      acorn: 8.18.0
+      acorn-import-attributes: 1.9.5(acorn@8.18.0)
       cjs-module-lexer: 1.4.3
       module-details-from-path: 1.0.4
 
@@ -23158,13 +23140,13 @@ snapshots:
     dependencies:
       schema-utils: 4.3.3
       tapable: 2.3.0
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   mini-css-extract-plugin@2.10.2(webpack@5.108.4):
     dependencies:
       schema-utils: 4.3.3
       tapable: 2.3.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   minimalistic-assert@1.0.1: {}
 
@@ -23186,15 +23168,15 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  minimizer-webpack-plugin@5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4):
+  minimizer-webpack-plugin@5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
-      '@swc/core': 1.15.47
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       clean-css: 5.3.3
       cssnano: 7.1.2(postcss@8.5.26)
       csso: 5.0.5
@@ -23291,39 +23273,40 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-router-mock@1.0.5(next@15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))(react@19.2.7):
+  next-router-mock@1.0.5(next@16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0))(react@19.2.7):
     dependencies:
-      next: 15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
+      next: 16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
       react: 19.2.7
 
-  next-sitemap@4.2.3(next@15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)):
+  next-sitemap@4.2.3(next@16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)):
     dependencies:
       '@corex/deepmerge': 4.0.43
       '@next/env': 13.5.11
       fast-glob: 3.3.0
       minimist: 1.2.8
-      next: 15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
+      next: 16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)
 
   next-tick@1.1.0: {}
 
-  next@15.5.28(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0):
+  next@16.4.5(@babel/core@8.0.1)(@opentelemetry/api@1.9.0)(@types/node@22.20.4)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0):
     dependencies:
-      '@next/env': 15.5.28
-      '@swc/helpers': 0.5.15
+      '@next/env': 16.4.5
+      '@swc/helpers': 0.5.23
+      baseline-browser-mapping: 2.11.15
       caniuse-lite: 1.0.30001809
       postcss: 8.5.26
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       styled-jsx: 5.1.6(@babel/core@8.0.1)(babel-plugin-macros@3.1.0)(react@19.2.7)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.28
-      '@next/swc-darwin-x64': 15.5.28
-      '@next/swc-linux-arm64-gnu': 15.5.28
-      '@next/swc-linux-arm64-musl': 15.5.28
-      '@next/swc-linux-x64-gnu': 15.5.28
-      '@next/swc-linux-x64-musl': 15.5.28
-      '@next/swc-win32-arm64-msvc': 15.5.28
-      '@next/swc-win32-x64-msvc': 15.5.28
+      '@next/swc-darwin-arm64': 16.4.5
+      '@next/swc-darwin-x64': 16.4.5
+      '@next/swc-linux-arm64-gnu': 16.4.5
+      '@next/swc-linux-arm64-musl': 16.4.5
+      '@next/swc-linux-x64-gnu': 16.4.5
+      '@next/swc-linux-x64-musl': 16.4.5
+      '@next/swc-win32-arm64-msvc': 16.4.5
+      '@next/swc-win32-x64-msvc': 16.4.5
       '@opentelemetry/api': 1.9.0
       sass: 1.101.0
       sharp: 0.35.5(@types/node@22.20.4)
@@ -23877,7 +23860,7 @@ snapshots:
       jiti: 1.21.7
       postcss: 8.5.26
       semver: 7.8.5
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     transitivePeerDependencies:
       - typescript
 
@@ -23888,7 +23871,7 @@ snapshots:
       postcss: 8.5.26
       semver: 7.8.5
     optionalDependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     transitivePeerDependencies:
       - typescript
 
@@ -23899,7 +23882,7 @@ snapshots:
       postcss: 8.5.26
       semver: 7.8.5
     optionalDependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     transitivePeerDependencies:
       - typescript
 
@@ -24350,7 +24333,7 @@ snapshots:
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.1.1
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   react-dev-utils@12.0.1(eslint@9.39.5(jiti@2.6.1)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)(webpack@5.108.4):
     dependencies:
@@ -24378,7 +24361,7 @@ snapshots:
       shell-quote: 1.10.0
       strip-ansi: 6.0.1
       text-table: 0.2.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -24872,7 +24855,7 @@ snapshots:
       neo-async: 2.6.2
     optionalDependencies:
       sass: 1.101.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   sass@1.101.0:
     dependencies:
@@ -25201,7 +25184,7 @@ snapshots:
     dependencies:
       iconv-lite: 0.6.3
       source-map-js: 1.2.1
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   source-map-support@0.5.21:
     dependencies:
@@ -25232,6 +25215,17 @@ snapshots:
 
   spdx-license-ids@3.0.22: {}
 
+  spdy-transport@3.0.0(supports-color@10.2.2):
+    dependencies:
+      debug: 4.4.3(supports-color@10.2.2)
+      detect-node: 2.1.0
+      hpack.js: 2.1.6
+      obuf: 1.1.2
+      readable-stream: 3.6.2
+      wbuf: 1.7.3
+    transitivePeerDependencies:
+      - supports-color
+
   spdy-transport@3.0.0(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
@@ -25240,6 +25234,17 @@ snapshots:
       obuf: 1.1.2
       readable-stream: 3.6.2
       wbuf: 1.7.3
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
+  spdy@4.0.2(supports-color@10.2.2):
+    dependencies:
+      debug: 4.4.3(supports-color@10.2.2)
+      handle-thing: 2.0.1
+      http-deceiver: 1.2.7
+      select-hose: 2.0.0
+      spdy-transport: 3.0.0(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -25252,6 +25257,7 @@ snapshots:
       spdy-transport: 3.0.0(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   split2@4.2.0: {}
 
@@ -25411,15 +25417,15 @@ snapshots:
 
   style-loader@3.3.4(webpack@5.105.2):
     dependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   style-loader@4.0.0(webpack@5.105.2):
     dependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   style-loader@4.0.0(webpack@5.108.4):
     dependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   style-search@0.1.0: {}
 
@@ -25482,7 +25488,7 @@ snapshots:
       normalize-path: 3.0.0
       schema-utils: 4.3.3
       stylelint: 17.14.1(supports-color@10.2.2)(typescript@6.0.3)
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
@@ -25574,11 +25580,11 @@ snapshots:
       picocolors: 1.1.1
       sax: 1.6.1
 
-  swc-loader@0.2.7(@swc/core@1.15.47)(webpack@5.108.4):
+  swc-loader@0.2.7(@swc/core@1.15.47(@swc/helpers@0.5.23))(webpack@5.108.4):
     dependencies:
-      '@swc/core': 1.15.47
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       '@swc/counter': 0.1.3
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   symbol-tree@3.2.4: {}
 
@@ -25617,15 +25623,15 @@ snapshots:
       type-fest: 0.16.0
       unique-string: 2.0.0
 
-  terser-webpack-plugin@5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2):
+  terser-webpack-plugin@5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.0
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
-      '@swc/core': 1.15.47
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       clean-css: 5.3.3
       cssnano: 7.1.2(postcss@8.5.26)
       csso: 5.0.5
@@ -25633,15 +25639,15 @@ snapshots:
       html-minifier-terser: 6.1.0
       postcss: 8.5.26
 
-  terser-webpack-plugin@5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4):
+  terser-webpack-plugin@5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
       terser: 5.46.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optionalDependencies:
-      '@swc/core': 1.15.47
+      '@swc/core': 1.15.47(@swc/helpers@0.5.23)
       clean-css: 5.3.3
       cssnano: 7.1.2(postcss@8.5.26)
       csso: 5.0.5
@@ -26173,7 +26179,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-merge: 5.8.0
     optionalDependencies:
       webpack-bundle-analyzer: 4.10.1
@@ -26193,7 +26199,7 @@ snapshots:
       import-local: 3.2.0
       interpret: 3.1.1
       rechoir: 0.8.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-merge: 5.8.0
     optionalDependencies:
       webpack-bundle-analyzer: 4.10.1
@@ -26207,7 +26213,7 @@ snapshots:
       mime-types: 2.1.35
       range-parser: 1.2.1
       schema-utils: 4.3.3
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
     optional: true
 
   webpack-dev-middleware@5.3.4(webpack@5.108.4):
@@ -26217,7 +26223,7 @@ snapshots:
       mime-types: 2.1.35
       range-parser: 1.2.1
       schema-utils: 4.3.3
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
 
   webpack-dev-server@4.15.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(webpack-cli@5.1.4)(webpack@5.108.4):
     dependencies:
@@ -26248,11 +26254,11 @@ snapshots:
       selfsigned: 2.4.1
       serve-index: 1.9.2(supports-color@10.2.2)
       sockjs: 0.3.24
-      spdy: 4.0.2(supports-color@8.1.1)
+      spdy: 4.0.2(supports-color@10.2.2)
       webpack-dev-middleware: 5.3.4(webpack@5.108.4)
       ws: 8.21.3
     optionalDependencies:
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.108.4)
     transitivePeerDependencies:
       - bufferutil
@@ -26293,7 +26299,7 @@ snapshots:
       webpack-dev-middleware: 5.3.4(webpack@5.105.2)
       ws: 8.21.3
     optionalDependencies:
-      webpack: 5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack-dev-server@4.15.2)(webpack@5.105.2)
     transitivePeerDependencies:
       - bufferutil
@@ -26305,7 +26311,7 @@ snapshots:
   webpack-manifest-plugin@6.0.1(webpack@5.108.4):
     dependencies:
       tapable: 2.3.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-sources: 3.3.3
 
   webpack-merge@5.8.0:
@@ -26322,7 +26328,7 @@ snapshots:
 
   webpack-sources@3.5.1: {}
 
-  webpack@5.105.2(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4):
+  webpack@5.105.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.8
@@ -26346,7 +26352,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
+      terser-webpack-plugin: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.105.2)
       watchpack: 2.5.1
       webpack-sources: 3.3.3
     optionalDependencies:
@@ -26365,7 +26371,7 @@ snapshots:
       - postcss
       - uglify-js
 
-  webpack@5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4):
+  webpack@5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4):
     dependencies:
       '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
@@ -26383,7 +26389,7 @@ snapshots:
       graceful-fs: 4.2.11
       loader-runner: 4.3.2
       mime-db: 1.54.0
-      minimizer-webpack-plugin: 5.6.1(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4)
+      minimizer-webpack-plugin: 5.6.1(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack@5.108.4)
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
@@ -26605,7 +26611,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       pretty-bytes: 5.6.0
       upath: 1.2.0
-      webpack: 5.108.4(@swc/core@1.15.47)(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
+      webpack: 5.108.4(@swc/core@1.15.47(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@7.1.2(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@6.1.0)(postcss@8.5.26)(webpack-cli@5.1.4)
       webpack-sources: 1.4.3
       workbox-build: 7.4.1(@types/babel__core@7.20.5)(supports-color@10.2.2)
     transitivePeerDependencies:

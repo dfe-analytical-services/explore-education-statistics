@@ -2,7 +2,7 @@ import getPublicEnv from '@frontend/utils/publicEnv';
 import 'urlpattern-polyfill';
 import { Dictionary } from '@common/types';
 import redirectService, { Redirects } from '@frontend/services/redirectService';
-import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
+import type { NextFetchEvent, NextProxy, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 interface CachedRedirects {
@@ -53,7 +53,7 @@ const lowercaseRedirectsExclusionPatterns: URLPattern[] = [
 export default async function redirectPages(
   request: NextRequest,
   event: NextFetchEvent,
-  middleware: NextMiddleware,
+  middleware: NextProxy,
 ) {
   const { nextUrl } = request;
   const decodedPathname = decodeURIComponent(nextUrl.pathname);
