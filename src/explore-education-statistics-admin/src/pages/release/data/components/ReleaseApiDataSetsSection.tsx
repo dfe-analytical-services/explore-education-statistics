@@ -13,7 +13,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React from 'react';
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 
 export default function ReleaseApiDataSetsSection() {
@@ -29,16 +29,6 @@ export default function ReleaseApiDataSetsSection() {
     ...apiDataSetQueries.list(releaseVersion.publicationId),
     refetchInterval: 20_000,
   });
-
-  useEffect(() => {
-    if (dataSets.length === 0) {
-      return;
-    }
-
-    queryClient.invalidateQueries({
-      queryKey: releaseDataFileQueries.list(releaseVersion.id).queryKey,
-    });
-  }, [dataSets, queryClient, releaseVersion.id]);
 
   const draftDataSets = dataSets.filter(
     dataSet => dataSet.draftVersion,

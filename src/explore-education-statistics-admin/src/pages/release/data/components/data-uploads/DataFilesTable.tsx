@@ -7,8 +7,8 @@ import {
 import DataFileTableRow from '@admin/pages/release/data/components/data-uploads/data-files/DataFileTableRow';
 import React from 'react';
 import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
+import { ApiUploadStatusValue } from '@admin/pages/release/data/components/data-uploads/data-files/ApiUploadStatus';
 import styles from './DataFilesTable.module.scss';
-import { ApiUploadStatusValue } from './data-files/ApiUploadStatus';
 
 interface Props {
   permissions: DataUploadsPermissions;

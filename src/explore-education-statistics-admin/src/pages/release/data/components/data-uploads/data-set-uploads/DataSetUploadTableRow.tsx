@@ -86,7 +86,7 @@ export default function DataSetUploadTableRow({
         />
       </td>
 
-      {!isReplacement && <td />}
+      {!isReplacement && <td>N/A</td>}
 
       <td data-testid={`${dataSetUpload.dataSetTitle}-actions`}>
         <ButtonGroup className={styles.actions}>

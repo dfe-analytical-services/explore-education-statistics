@@ -9,8 +9,8 @@ interface Props {
 }
 
 const statusColours: Record<ApiUploadStatusValue, TagProps['colour']> = {
-  'API DRAFT': 'yellow',
-  'API READY': 'blue',
+  'API DRAFT': 'blue',
+  'API READY': 'yellow',
   'API LIVE': 'green',
 };
 
@@ -22,7 +22,7 @@ const statusLabels: Record<ApiUploadStatusValue, string> = {
 
 export default function ApiUploadStatus({ status }: Props) {
   if (!status) {
-    return null;
+    return <>N/A</>;
   }
 
   return (
