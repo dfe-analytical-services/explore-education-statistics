@@ -32,25 +32,30 @@ def setup_auth_variables(user, email, password, identity_provider, clear_existin
 
         # Checks that the stored authentication information is actually valid.
         # If not, we want to be able to try and authenticate again.
-        jwt_token = local_storage_helper.get_access_token_from_file(user)
-        response = session.request(
-            "GET",
-            url=f'{os.getenv("ADMIN_URL")}/api/permissions/access',
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {jwt_token}",
-            },
-            stream=True,
-            verify=False,
-        )
+        try:
+            jwt_token = local_storage_helper.get_access_token_from_file(user)
+        except RuntimeError:
+            jwt_token = None
+            logger.warning("Found no access token in local files!")
 
-        if response.status_code == 200:
-            authenticated = True
-        else:
-            authenticated = False
-            logger.warning("Found invalid authentication information in local files!")
+        if jwt_token:
+            response = session.request(
+                "GET",
+                url=f'{os.getenv("ADMIN_URL")}/api/permissions/access',
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {jwt_token}",
+                },
+                stream=True,
+                verify=False,
+            )
 
-        if local_storage_helper.has_encryption_cookie_expired(user):
+            if response.status_code == 200:
+                authenticated = True
+            else:
+                logger.warning("Found invalid authentication information in local files!")
+
+        if authenticated and local_storage_helper.has_encryption_cookie_expired(user):
             logger.warning("Found invalid authentication information in local files! (cookie out of date)")
             authenticated = False
 

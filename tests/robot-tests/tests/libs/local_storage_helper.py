@@ -1,9 +1,27 @@
 import datetime
 import json
 import os.path
+import time
+
+ROBOT_TESTS_ACCESS_TOKEN_KEY = "ees_robotTests"
+
+
+def wait_until_access_token_in_browser_local_storage(driver, timeout_seconds: int = 30):
+    # The Admin frontend only writes the access token to local storage after the first
+    # successful acquireTokenSilent() call, which can complete after the Dashboard has rendered.
+    max_time = time.time() + timeout_seconds
+    while time.time() < max_time:
+        if driver.execute_script(f"return window.localStorage.getItem('{ROBOT_TESTS_ACCESS_TOKEN_KEY}');"):
+            return
+        time.sleep(0.5)
+    raise RuntimeError(
+        f"Timed out after {timeout_seconds}s waiting for '{ROBOT_TESTS_ACCESS_TOKEN_KEY}' in browser local storage"
+    )
 
 
 def get_local_storage_json_from_browser(driver) -> dict:
+    wait_until_access_token_in_browser_local_storage(driver)
+
     local_storage_string = driver.execute_script("""
          return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
              try {
@@ -73,7 +91,7 @@ def clear_local_storage_file(user: str):
 
 
 def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
-    robot_test_access_token = local_storage_json.get("ees_robotTests")
+    robot_test_access_token = local_storage_json.get(ROBOT_TESTS_ACCESS_TOKEN_KEY)
 
     if robot_test_access_token:
         return robot_test_access_token["value"]
