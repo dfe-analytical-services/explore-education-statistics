@@ -280,91 +280,27 @@ public class FootnoteService : IFootnoteService
         var unlinkedFilterItemIds = filterItemIds.ToHashSet();
         var unlinkedIndicatorIds = indicatorIds.ToHashSet();
 
-        if (AllLinked())
-        {
-            return footnoteLinks;
-        }
-
         foreach (var subjectId in releaseVersionSubjectIds)
         {
+            if (AllLinked())
+            {
+                break;
+            }
+
             var dataSet = await _storageDataSetResolver.Resolve(subjectId);
 
-            if (unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0)
+            var filterGroupsOrItemsUnlinked = unlinkedFilterGroupIds.Count > 0 || unlinkedFilterItemIds.Count > 0;
+
+            if (unlinkedFilterIds.Count > 0 || filterGroupsOrItemsUnlinked)
             {
-                var filters = await dataSet.ListFilters(includeItems: true);
-
-                foreach (var filter in filters)
-                {
-                    LinkFilter(filter, subjectId);
-
-                    foreach (var filterGroup in filter.FilterGroups)
-                    {
-                        if (unlinkedFilterGroupIds.Remove(filterGroup.Id))
-                        {
-                            footnoteLinks.FilterGroups.Add(
-                                new FilterGroupFootnote
-                                {
-                                    FilterGroupId = filterGroup.Id,
-                                    FilterId = filter.Id,
-                                    SubjectId = subjectId,
-                                }
-                            );
-                        }
-
-                        foreach (var filterItem in filterGroup.FilterItems)
-                        {
-                            if (unlinkedFilterItemIds.Remove(filterItem.Id))
-                            {
-                                footnoteLinks.FilterItems.Add(
-                                    new FilterItemFootnote
-                                    {
-                                        FilterItemId = filterItem.Id,
-                                        FilterGroupId = filterGroup.Id,
-                                        FilterId = filter.Id,
-                                        SubjectId = subjectId,
-                                    }
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-            else if (unlinkedFilterIds.Count > 0)
-            {
-                var filters = await dataSet.ListFilters();
-
-                foreach (var filter in filters)
-                {
-                    LinkFilter(filter, subjectId);
-                }
+                var filters = await dataSet.ListFilters(includeItems: filterGroupsOrItemsUnlinked);
+                LinkFilters(subjectId, filters);
             }
 
             if (unlinkedIndicatorIds.Count > 0)
             {
                 var indicatorGroups = await dataSet.ListIndicatorGroups();
-
-                foreach (var indicatorGroup in indicatorGroups)
-                {
-                    foreach (var indicator in indicatorGroup.Indicators)
-                    {
-                        if (unlinkedIndicatorIds.Remove(indicator.Id))
-                        {
-                            footnoteLinks.Indicators.Add(
-                                new IndicatorFootnote
-                                {
-                                    IndicatorId = indicator.Id,
-                                    IndicatorGroupId = indicatorGroup.Id,
-                                    SubjectId = subjectId,
-                                }
-                            );
-                        }
-                    }
-                }
-            }
-
-            if (AllLinked())
-            {
-                break;
+                LinkIndicators(subjectId, indicatorGroups);
             }
         }
 
@@ -389,11 +325,75 @@ public class FootnoteService : IFootnoteService
             && unlinkedFilterItemIds.Count == 0
             && unlinkedIndicatorIds.Count == 0;
 
-        void LinkFilter(Filter filter, Guid subjectId)
+        void LinkFilters(Guid subjectId, List<Filter> filters)
         {
-            if (unlinkedFilterIds.Remove(filter.Id))
+            var filterGroups = filters.SelectMany(filter => filter.FilterGroups).ToList();
+
+            foreach (var filter in filters)
             {
-                footnoteLinks.Filters.Add(new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId });
+                if (unlinkedFilterIds.Remove(filter.Id))
+                {
+                    footnoteLinks.Filters.Add(new FilterFootnote { FilterId = filter.Id, SubjectId = subjectId });
+                }
+            }
+
+            foreach (var filterGroup in filterGroups)
+            {
+                if (unlinkedFilterGroupIds.Remove(filterGroup.Id))
+                {
+                    footnoteLinks.FilterGroups.Add(
+                        new FilterGroupFootnote
+                        {
+                            FilterGroupId = filterGroup.Id,
+                            FilterId = filterGroup.FilterId,
+                            SubjectId = subjectId,
+                        }
+                    );
+                }
+            }
+
+            var filterItems = filterGroups.SelectMany(
+                filterGroup => filterGroup.FilterItems,
+                (filterGroup, filterItem) => (FilterGroup: filterGroup, FilterItem: filterItem)
+            );
+
+            foreach (var (filterGroup, filterItem) in filterItems)
+            {
+                if (unlinkedFilterItemIds.Remove(filterItem.Id))
+                {
+                    footnoteLinks.FilterItems.Add(
+                        new FilterItemFootnote
+                        {
+                            FilterItemId = filterItem.Id,
+                            FilterGroupId = filterGroup.Id,
+                            FilterId = filterGroup.FilterId,
+                            SubjectId = subjectId,
+                        }
+                    );
+                }
+            }
+        }
+
+        void LinkIndicators(Guid subjectId, List<IndicatorGroup> indicatorGroups)
+        {
+            var indicators = indicatorGroups.SelectMany(
+                indicatorGroup => indicatorGroup.Indicators,
+                (indicatorGroup, indicator) => (IndicatorGroup: indicatorGroup, Indicator: indicator)
+            );
+
+            foreach (var (indicatorGroup, indicator) in indicators)
+            {
+                if (unlinkedIndicatorIds.Remove(indicator.Id))
+                {
+                    footnoteLinks.Indicators.Add(
+                        new IndicatorFootnote
+                        {
+                            IndicatorId = indicator.Id,
+                            IndicatorGroupId = indicatorGroup.Id,
+                            SubjectId = subjectId,
+                        }
+                    );
+                }
             }
         }
     }
