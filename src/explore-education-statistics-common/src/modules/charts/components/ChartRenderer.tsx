@@ -1,5 +1,7 @@
 import ChartExportMenu from '@common/modules/charts/components/ChartExportMenu';
 import FigureFootnotes from '@common/components/FigureFootnotes';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useMounted from '@common/hooks/useMounted';
 import HorizontalBarBlock, {
   HorizontalBarProps,
 } from '@common/modules/charts/components/HorizontalBarBlock';
@@ -48,6 +50,7 @@ export interface ChartRendererProps {
   source?: string;
   id?: string;
   chart: RenderableChart;
+  loading?: boolean;
   showExportMenu?: boolean;
 }
 
@@ -55,9 +58,11 @@ function ChartRenderer({
   source,
   id,
   chart,
+  loading = false,
   showExportMenu = true,
 }: ChartRendererProps) {
-  const { data, meta, subtitle, title, type } = chart;
+  const { alt, data, meta, subtitle, title, type } = chart;
+  const { isMounted } = useMounted();
   const [selectedBoundaryLevelId, setSelectedBoundaryLevelId] = useState(
     type === 'map' ? getMapInitialBoundaryLevel(chart) : undefined,
   );
@@ -121,7 +126,7 @@ function ChartRenderer({
   if (data?.length && meta) {
     return (
       <>
-        {showExportMenu && (
+        {showExportMenu && !loading && (
           <ChartExportMenu chartRef={chartRef} chartTitle={title} />
         )}
         <figure
@@ -142,7 +147,22 @@ function ChartRenderer({
             </figcaption>
           )}
 
-          {chartComponent}
+          {isMounted && !loading ? (
+            chartComponent
+          ) : (
+            <>
+              {/*
+                SSR the chart alt text (included in the chartComponent itself
+                when the chart has loaded)
+              */}
+              {alt && (
+                <p className="govuk-body dfe-js-hidden" data-testid="chart-alt">
+                  {alt}
+                </p>
+              )}
+              {loading && <LoadingSpinner className="dfe-js-only" />}
+            </>
+          )}
 
           <FigureFootnotes
             footnotes={footnotes}

@@ -1,6 +1,7 @@
 import Gate from '@common/components/Gate';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 describe('Gate', () => {
   test('renders children immediately if `condition` is true', () => {
@@ -270,6 +271,39 @@ describe('Gate', () => {
 
     waitFor(() => {
       expect(screen.queryByText('children')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('server render', () => {
+    test('renders children if `condition` is true', () => {
+      expect(
+        renderToStaticMarkup(
+          // eslint-disable-next-line react/jsx-boolean-value
+          <Gate condition={true}>
+            <p>children</p>
+          </Gate>,
+        ),
+      ).toBe('<p>children</p>');
+    });
+
+    test('renders the fallback if `condition` is false', () => {
+      expect(
+        renderToStaticMarkup(
+          <Gate condition={false} fallback={<p>fallback</p>}>
+            <p>children</p>
+          </Gate>,
+        ),
+      ).toBe('<p>fallback</p>');
+    });
+
+    test('renders the fallback if `condition` is a function', () => {
+      expect(
+        renderToStaticMarkup(
+          <Gate condition={() => true} fallback={<p>fallback</p>}>
+            <p>children</p>
+          </Gate>,
+        ),
+      ).toBe('<p>fallback</p>');
     });
   });
 });

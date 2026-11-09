@@ -10,6 +10,7 @@ import {
   screen,
   within,
 } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import { TestRouterWithProvider } from '@admin/components/testing/TestRouterRenderer';
 
@@ -75,23 +76,25 @@ describe('ReleaseContentEdit', () => {
     releaseContent: ReleaseContentType = testReleaseContent,
   ): RenderResult {
     return baseRender(
-      <TestRouterWithProvider initialUrl="/" route="/">
-        unattachedDataBlocks: [], unattachedDataBlocks: [],
-        <ReleaseContentHubContextProvider
-          releaseVersionId={releaseContent.release.id}
-        >
-          <ReleaseContentProvider
-            value={{
-              ...releaseContent,
-              canUpdateRelease: true,
-            }}
+      <QueryClientProvider client={new QueryClient()}>
+        <TestRouterWithProvider initialUrl="/" route="/">
+          unattachedDataBlocks: [], unattachedDataBlocks: [],
+          <ReleaseContentHubContextProvider
+            releaseVersionId={releaseContent.release.id}
           >
-            <EditingContextProvider editingMode="edit">
-              {child}
-            </EditingContextProvider>
-          </ReleaseContentProvider>
-        </ReleaseContentHubContextProvider>
-      </TestRouterWithProvider>,
+            <ReleaseContentProvider
+              value={{
+                ...releaseContent,
+                canUpdateRelease: true,
+              }}
+            >
+              <EditingContextProvider editingMode="edit">
+                {child}
+              </EditingContextProvider>
+            </ReleaseContentProvider>
+          </ReleaseContentHubContextProvider>
+        </TestRouterWithProvider>
+      </QueryClientProvider>,
     );
   }
 });
