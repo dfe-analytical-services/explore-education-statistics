@@ -2198,6 +2198,17 @@ public class FootnoteServiceTests
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
             );
+            contentDbContext.Files.Add(
+                new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject.SubjectId,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
+                }
+            );
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -2322,6 +2333,17 @@ public class FootnoteServiceTests
                     .WithId(releaseVersion.Id)
                     .WithRelease(_fixture.DefaultRelease())
                     .Generate()
+            );
+            contentDbContext.Files.AddRange(
+                releaseSubjects.Select(releaseSubject => new File
+                {
+                    Id = Guid.NewGuid(),
+                    RootPath = Guid.NewGuid(),
+                    Filename = "data.csv",
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject.SubjectId,
+                    DataStorageVersion = DataStorageVersion.StatsDB,
+                })
             );
             await contentDbContext.SaveChangesAsync();
         }
