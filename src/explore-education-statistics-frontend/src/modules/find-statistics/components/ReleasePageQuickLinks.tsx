@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import {
   PublicationSummary,
   ReleaseVersionSummary,
@@ -33,7 +34,7 @@ const ReleasePageQuickLinks = ({
         >
           <li>
             <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+              to={`${getPublicEnv('CONTENT_API_BASE_URL')}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',

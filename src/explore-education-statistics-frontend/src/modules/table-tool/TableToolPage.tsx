@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import TableToolWizard, {
   InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
@@ -389,7 +390,7 @@ export const getServerSideProps: GetServerSideProps<
   let subjectMeta: SubjectMeta | undefined;
   let selectedSubjectId: string | undefined;
 
-  const urlObj = new URL(req.url || '', process.env.PUBLIC_URL);
+  const urlObj = new URL(req.url || '', getPublicEnv('PUBLIC_URL'));
 
   // Check if the user has come from table tool search (with compressed query string)
   const hasCompressedQuery = urlObj.searchParams.has('fromSearch');
