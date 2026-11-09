@@ -194,10 +194,11 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
-        return await PrepareObservationQuery(query, cancellationToken)
+        var dataSet = await _storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
+
+        return await PrepareObservationQuery(dataSet, query, cancellationToken)
             .OnSuccess(async preparedQuery =>
             {
-                var dataSet = await _storageDataSetResolver.Resolve(preparedQuery.Query.SubjectId, cancellationToken);
                 var observations = await dataSet.ListObservations(
                     filterItemIds: preparedQuery.Query.GetFilterItemIds(),
                     locationIds: preparedQuery.Query.LocationIds,
@@ -214,11 +215,12 @@ public class TableBuilderService : ITableBuilderService
     /// either crops it or fails validation. Returns the (possibly cropped) query ready to be executed.
     /// </summary>
     private async Task<Either<ActionResult, PreparedObservationQuery>> PrepareObservationQuery(
+        IStorageDataSet dataSet,
         FullTableQuery query,
         CancellationToken cancellationToken
     )
     {
-        var requiresCropping = await _tableBuilderQueryOptimiser.IsCroppingRequired(query);
+        var requiresCropping = await _tableBuilderQueryOptimiser.IsCroppingRequired(dataSet, query);
 
         if (requiresCropping && !query.IgnoreMaxTableSize)
         {
@@ -227,7 +229,7 @@ public class TableBuilderService : ITableBuilderService
                 return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
             }
 
-            query = await _tableBuilderQueryOptimiser.CropQuery(query, cancellationToken);
+            query = await _tableBuilderQueryOptimiser.CropQuery(dataSet, query, cancellationToken);
         }
 
         return new PreparedObservationQuery(query, requiresCropping);

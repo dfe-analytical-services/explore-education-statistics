@@ -168,9 +168,22 @@ public class TableBuilderServiceTests
                 )
                 .ReturnsAsync(subjectMeta);
 
-            tableBuilderQueryOptimiser.Setup(mock => mock.IsCroppingRequired(query)).ReturnsAsync(true);
             tableBuilderQueryOptimiser
-                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
+                .Setup(mock =>
+                    mock.IsCroppingRequired(
+                        It.Is<IStorageDataSet>(dataSet => dataSet.SubjectId == query.SubjectId),
+                        query
+                    )
+                )
+                .ReturnsAsync(true);
+            tableBuilderQueryOptimiser
+                .Setup(mock =>
+                    mock.CropQuery(
+                        It.Is<IStorageDataSet>(dataSet => dataSet.SubjectId == query.SubjectId),
+                        query,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
@@ -455,9 +468,22 @@ public class TableBuilderServiceTests
                 )
                 .ReturnsAsync(subjectMeta);
 
-            tableBuilderQueryOptimiser.Setup(s => s.IsCroppingRequired(query)).ReturnsAsync(true);
             tableBuilderQueryOptimiser
-                .Setup(mock => mock.CropQuery(query, It.IsAny<CancellationToken>()))
+                .Setup(mock =>
+                    mock.IsCroppingRequired(
+                        It.Is<IStorageDataSet>(dataSet => dataSet.SubjectId == query.SubjectId),
+                        query
+                    )
+                )
+                .ReturnsAsync(true);
+            tableBuilderQueryOptimiser
+                .Setup(mock =>
+                    mock.CropQuery(
+                        It.Is<IStorageDataSet>(dataSet => dataSet.SubjectId == query.SubjectId),
+                        query,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(query);
 
             var service = BuildTableBuilderService(
