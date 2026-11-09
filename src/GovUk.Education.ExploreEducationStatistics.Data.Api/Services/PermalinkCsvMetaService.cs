@@ -51,7 +51,6 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
-        // The data set may have been deleted since the permalink was created
         var dataSet = await _storageDataSetResolver.TryResolve(subjectId, cancellationToken);
         var locations = await GetLocations(dataSet, tableResultMeta.Locations, cancellationToken);
 
