@@ -35,6 +35,10 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public string? Source { get; set; }
 
+    public bool? RolloverHasChanges { get; set; }
+
+    public Guid? RolloverSourceVersionId { get; set; }
+
     public FullTableQuery Query { get; set; }
 
     [JsonIgnore]

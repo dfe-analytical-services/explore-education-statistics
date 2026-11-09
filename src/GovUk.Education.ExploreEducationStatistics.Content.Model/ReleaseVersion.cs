@@ -34,6 +34,9 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     [NotMapped]
     public bool Amendment => Version > 0 && !Live;
 
+    [NotMapped]
+    public bool Rollover => Version == 0 && Release.RolloverSourceReleaseId != null;
+
     [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
     public Guid PublicationId { get; set; }
 
