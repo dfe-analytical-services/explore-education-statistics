@@ -40,7 +40,7 @@ public class TableBuilderQueryOptimiserTests
         };
 
         // Act
-        var result = await _optimiser.IsCroppingRequired(query);
+        var result = await _optimiser.IsCroppingRequired(_dataSet.Object, query);
 
         // Assert
         Assert.False(result);
@@ -55,7 +55,7 @@ public class TableBuilderQueryOptimiserTests
         SetupListFilterItems(query, BuildFilterItems(query.GetFilterItemIds()));
 
         // Act
-        var result = await _optimiser.IsCroppingRequired(query);
+        var result = await _optimiser.IsCroppingRequired(_dataSet.Object, query);
 
         // Assert
         Assert.True(result);
@@ -103,7 +103,7 @@ public class TableBuilderQueryOptimiserTests
         var optimiser = BuildTableBuilderQueryOptimiser(maxTableCellsAllowed);
 
         // Act
-        var result = await optimiser.IsCroppingRequired(query);
+        var result = await optimiser.IsCroppingRequired(_dataSet.Object, query);
 
         // Assert
         Assert.Equal(expectedCroppingRequired, result);
@@ -119,7 +119,7 @@ public class TableBuilderQueryOptimiserTests
         SetupListFilterItems(query, BuildFilterItems(query.GetFilterItemIds().Skip(1)));
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.IsCroppingRequired(query));
+        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.IsCroppingRequired(_dataSet.Object, query));
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class TableBuilderQueryOptimiserTests
         var optimiser = BuildTableBuilderQueryOptimiser(maxTableCellsAllowed: 200);
 
         // Act
-        var result = await optimiser.CropQuery(query, default);
+        var result = await optimiser.CropQuery(_dataSet.Object, query, default);
 
         // Assert
         _dataSet.Verify();
@@ -167,7 +167,7 @@ public class TableBuilderQueryOptimiserTests
             .ReturnsAsync(locations);
 
         // Act
-        var result = await _optimiser.CropQuery(query, default);
+        var result = await _optimiser.CropQuery(_dataSet.Object, query, default);
 
         // Assert
         _dataSet.Verify();
@@ -187,18 +187,12 @@ public class TableBuilderQueryOptimiserTests
         SetupListFilterItems(query, BuildFilterItems(query.GetFilterItemIds().Skip(1)));
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.CropQuery(query, default));
+        await Assert.ThrowsAsync<ArgumentException>(() => _optimiser.CropQuery(_dataSet.Object, query, default));
     }
 
-    private TableBuilderQueryOptimiser BuildTableBuilderQueryOptimiser(int maxTableCellsAllowed)
+    private static TableBuilderQueryOptimiser BuildTableBuilderQueryOptimiser(int maxTableCellsAllowed)
     {
-        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(Strict);
-        storageDataSetResolver
-            .Setup(mock => mock.Resolve(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_dataSet.Object);
-
         return new TableBuilderQueryOptimiser(
-            storageDataSetResolver.Object,
             new TableBuilderOptions { MaxTableCellsAllowed = maxTableCellsAllowed }.ToOptionsWrapper()
         );
     }
