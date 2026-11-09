@@ -149,8 +149,14 @@ def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
     if not encryption_cookie:
         raise RuntimeError("Unable to find MSAL encryption cookie in local storage JSON")
 
-    cookie = json.loads(urllib.parse.unquote(encryption_cookie))
-    base_key = _base64url_decode(cookie["key"])
+    try:
+        cookie = json.loads(urllib.parse.unquote(encryption_cookie))
+        cookie_id = cookie["id"]
+        base_key = _base64url_decode(cookie["key"])
+    except (ValueError, KeyError, TypeError) as error:
+        # Raise as RuntimeError so callers treat it as unusable auth and log in again
+        raise RuntimeError(f"Unable to parse MSAL encryption cookie from local storage JSON: {error!r}") from error
+
     client_id = _get_msal_client_id(local_storage_json)
 
     access_tokens = []
@@ -158,7 +164,7 @@ def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
     for key, entry in local_storage_json.items():
         # Encrypted MSAL entries look like { id, nonce, data, lastUpdatedAt }.
         # Entries encrypted with a different key are from a previous session.
-        if not isinstance(entry, dict) or entry.get("id") != cookie["id"] or "nonce" not in entry:
+        if not isinstance(entry, dict) or entry.get("id") != cookie_id or "nonce" not in entry or "data" not in entry:
             continue
 
         try:
