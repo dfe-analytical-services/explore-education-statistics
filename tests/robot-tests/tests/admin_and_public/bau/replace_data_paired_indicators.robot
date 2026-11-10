@@ -20,11 +20,8 @@ ${SUBJECT_NAME}                 UI test subject
 ${PAIRED_INDICATORS_FORM}       id:pairedIndicatorsForm
 ${REPLACEMENT_PAIRS_TABLE}      testid:paired-indicators-table
 ${INDICATORS}                   xpath://*[@id="filtersForm-indicators"]
-${INDICATORS_SEARCH}            id:filtersForm-indicators-search
 ${ENROLMENTS_LABEL}             ${INDICATORS}//label[text()="Number of pupil enrolments"]
 ${OVERALL_SESSIONS_LABEL}       ${INDICATORS}//label[text()="Overall absence sessions"]
-${AUTHORISED_SESSIONS_LABEL}    ${INDICATORS}//label[text()="Authorised absence sessions"]
-${AUTHORISED_RATE_LABEL}        ${INDICATORS}//label[text()="Authorised absence rate"]
 ${OVERALL_RATE_CHECKBOX}        ${INDICATORS}//label[text()="Overall absence rate"]/../input[@type="checkbox"]
 ${AUTHORISED_RATE_CHECKBOX}     ${INDICATORS}//label[text()="Authorised absence rate"]/../input[@type="checkbox"]
 
@@ -90,39 +87,10 @@ Check the saved pairs
 Check a paired indicator is selected with its main indicator in the table tool
     user starts creating a data block up to choosing indicators
 
-    user waits until page contains    Selected automatically with Overall absence sessions
-    user waits until page contains    Also selects Overall absence rate
+    # Smoke check that the saved pairs reach the table tool. The detailed behaviour is covered by Jest tests
     user checks element is disabled    ${OVERALL_RATE_CHECKBOX}
-    user checks indicator checkbox is not checked    Overall absence rate
-
     user clicks indicator checkbox    Overall absence sessions
-    user checks indicator checkbox is checked    Overall absence sessions
     user checks indicator checkbox is checked    Overall absence rate
-
-    user clicks indicator checkbox    Overall absence sessions
-    user checks indicator checkbox is not checked    Overall absence sessions
-    user checks indicator checkbox is not checked    Overall absence rate
-
-Check searching for a paired indicator also shows its main indicator in the table tool
-    user enters text into element    ${INDICATORS_SEARCH}    Authorised absence rate
-
-    user waits until page contains element    ${AUTHORISED_SESSIONS_LABEL}
-    user waits until page contains element    ${AUTHORISED_RATE_LABEL}
-    user waits until page does not contain element    ${ENROLMENTS_LABEL}
-    user waits until page does not contain element    ${OVERALL_SESSIONS_LABEL}
-
-    user clears element text    ${INDICATORS_SEARCH}
-    user waits until page contains element    ${ENROLMENTS_LABEL}
-
-Check selecting all main indicators also selects their paired indicators in the table tool
-    user clicks select all for category    Absence sessions
-
-    user checks indicator checkbox is checked    Overall absence sessions
-    user checks indicator checkbox is checked    Authorised absence sessions
-    user checks indicator checkbox is checked    Unauthorised absence sessions
-    user checks indicator checkbox is checked    Overall absence rate
-    user checks indicator checkbox is checked    Authorised absence rate
-    user checks indicator checkbox is checked    Unauthorised absence rate
 
     user clicks link    Data and files
     user waits until page contains data uploads table
@@ -162,11 +130,6 @@ Check paired indicators that will be maintained or dropped
     user checks table cell contains    3    2    Unauthorised absence rate    ${REPLACEMENT_PAIRS_TABLE}
     user checks table cell contains    3    3    Dropped    ${REPLACEMENT_PAIRS_TABLE}
 
-Check dropped pairs don't block the data replacement
-    user waits until page contains    Data blocks: OK
-    user waits until page contains    Footnotes: OK
-    user waits until page contains button    Confirm data replacement
-
 Follow the link to manage paired indicators
     user clicks link    Manage paired indicators
     user waits until h2 is visible    Manage filters and indicators
@@ -175,6 +138,7 @@ Follow the link to manage paired indicators
     user clicks button    Back to data files    id:reordering
 
 Confirm data replacement
+    # Confirming also shows that dropped pairs don't block the replacement
     user clicks link    Data uploads
     # The subject is being replaced, so only the replacements table is shown
     user waits until page contains data uploads replacements table
@@ -266,6 +230,8 @@ Collect the ids for table tool search links from the public table tool
 
     user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    ${ENROLMENTS_LABEL}
+    # Fail here, rather than in the search link checks, if the public site doesn't have the pairs
+    user checks element is disabled    ${OVERALL_RATE_CHECKBOX}
     ${primary_id}    user gets search link id    xpath://label[text()="Primary"]/../input[@type="checkbox"]
     ${secondary_id}    user gets search link id    xpath://label[text()="Secondary"]/../input[@type="checkbox"]
     ${special_id}    user gets search link id    xpath://label[text()="Special"]/../input[@type="checkbox"]
@@ -284,15 +250,6 @@ Collect the ids for table tool search links from the public table tool
     ...    ${SEARCH_LINK}
     ...    ${data_tables_link}?fromSearch&sub=${subject_id}&tp=${time_period}&f=${primary_id},${secondary_id},${special_id}&loc=${england_id}
 
-Check a search link for a paired indicator on its own also shows its main indicator
-    # The missing main indicator is added so the requested paired indicator is kept
-    user opens table tool search link for indicators    ${OVERALL_RATE_ID}
-
-    user checks results table shows indicator    Overall absence sessions
-    user checks results table shows indicator    Overall absence rate
-    user checks results table contains value    6,954,347
-    user checks results table contains value    5.91%
-
 Check a search link for a main indicator also shows its paired indicator
     user opens table tool search link for indicators    ${OVERALL_SESSIONS_ID}
 
@@ -301,20 +258,18 @@ Check a search link for a main indicator also shows its paired indicator
     user checks results table contains value    6,954,347
     user checks results table contains value    5.91%
 
-Check a search link mixing a paired indicator with another indicator keeps them all
-    user opens table tool search link for indicators    ${ENROLMENTS_ID},${OVERALL_RATE_ID}
+Check a search link keeps a paired indicator, an unrelated indicator and one from a dropped pair
+    # The overall rate's main indicator is added so the rate is kept. The authorised pair was dropped by
+    # the replacement, so its former main indicator isn't added.
+    user opens table tool search link for indicators    ${OVERALL_RATE_ID},${ENROLMENTS_ID},${AUTHORISED_RATE_ID}
 
-    user checks results table shows indicator    Number of pupil enrolments
     user checks results table shows indicator    Overall absence sessions
     user checks results table shows indicator    Overall absence rate
-    user checks results table contains value    367,520
+    user checks results table shows indicator    Number of pupil enrolments
+    user checks results table shows indicator    Authorised absence rate
     user checks results table contains value    6,954,347
     user checks results table contains value    5.91%
-
-Check a search link for an indicator from a dropped pair shows only that indicator
-    # The authorised pair was dropped by the replacement, so nothing is added
-    user opens table tool search link for indicators    ${AUTHORISED_RATE_ID}
-
+    user checks results table contains value    367,520
     user checks results table contains value    3.63%
     user checks page does not contain element    xpath://table[contains(., "Authorised absence sessions")]
 
