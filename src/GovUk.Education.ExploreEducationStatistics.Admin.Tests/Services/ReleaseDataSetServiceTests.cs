@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -149,9 +150,9 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
             .Returns(Task.CompletedTask);
 
-        var subjectDeleter = new Mock<ReleaseDataSetService.SubjectDeleter>(MockBehavior.Strict);
+        var subjectDeleter = new Mock<ISubjectDeleter>(MockBehavior.Strict);
 
-        subjectDeleter.Setup(mock => mock.Delete(subject.Id, It.IsAny<StatisticsDbContext>()));
+        subjectDeleter.Setup(mock => mock.Delete(subject.Id));
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
@@ -254,12 +255,10 @@ public class ReleaseDataSetServiceTests
         var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
         footnoteRepository
-            .Setup(mock =>
-                mock.DeleteFootnotesBySubject(
-                    releaseVersion.Id,
-                    It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)
-                )
-            )
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject1.SubjectId))
+            .Returns(Task.CompletedTask);
+        footnoteRepository
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject2.SubjectId))
             .Returns(Task.CompletedTask);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -314,19 +313,16 @@ public class ReleaseDataSetServiceTests
         var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
         footnoteRepository
-            .Setup(mock =>
-                mock.DeleteFootnotesBySubject(
-                    releaseVersion.Id,
-                    It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)
-                )
-            )
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject1.SubjectId))
+            .Returns(Task.CompletedTask);
+        footnoteRepository
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject2.SubjectId))
             .Returns(Task.CompletedTask);
 
-        var subjectDeleter = new Mock<ReleaseDataSetService.SubjectDeleter>(MockBehavior.Strict);
+        var subjectDeleter = new Mock<ISubjectDeleter>(MockBehavior.Strict);
 
-        subjectDeleter.Setup(mock =>
-            mock.Delete(It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId), It.IsAny<StatisticsDbContext>())
-        );
+        subjectDeleter.Setup(mock => mock.Delete(releaseSubject1.SubjectId));
+        subjectDeleter.Setup(mock => mock.Delete(releaseSubject2.SubjectId));
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
@@ -350,13 +346,13 @@ public class ReleaseDataSetServiceTests
     private static ReleaseDataSetService BuildService(
         StatisticsDbContext statisticsDbContext,
         IFootnoteRepository? footnoteRepository = null,
-        ReleaseDataSetService.SubjectDeleter? subjectDeleter = null
+        ISubjectDeleter? subjectDeleter = null
     )
     {
         return new ReleaseDataSetService(
             statisticsDbContext,
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-            subjectDeleter ?? Mock.Of<ReleaseDataSetService.SubjectDeleter>(MockBehavior.Strict)
+            subjectDeleter ?? Mock.Of<ISubjectDeleter>(MockBehavior.Strict)
         );
     }
 }
