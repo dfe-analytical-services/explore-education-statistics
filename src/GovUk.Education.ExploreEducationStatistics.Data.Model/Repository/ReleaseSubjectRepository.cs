@@ -5,21 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 
-public class ReleaseSubjectRepository : IReleaseSubjectRepository
+public class ReleaseSubjectRepository(StatisticsDbContext statisticsDbContext) : IReleaseSubjectRepository
 {
-    private readonly StatisticsDbContext _statisticsDbContext;
-
-    public ReleaseSubjectRepository(StatisticsDbContext statisticsDbContext)
-    {
-        _statisticsDbContext = statisticsDbContext;
-    }
-
     public async Task<IReadOnlyList<ReleaseSubject>> FindAll(
         Guid releaseVersionId,
         Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null
     )
     {
-        var query = _statisticsDbContext.ReleaseSubject.Where(rs => rs.ReleaseVersionId == releaseVersionId);
+        var query = statisticsDbContext.ReleaseSubject.Where(rs => rs.ReleaseVersionId == releaseVersionId);
 
         if (queryExtender is not null)
         {
