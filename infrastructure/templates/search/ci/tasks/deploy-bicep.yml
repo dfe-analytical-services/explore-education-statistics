@@ -13,11 +13,11 @@ parameters:
     type: string
   - name: searchServiceFilterIndexName
     type: string
-  - name: searchServiceDatasetIndexName
+  - name: searchServiceDataSetIndexName
     type: string
   - name: searchServiceReleaseIndexerName
     type: string
-  - name: searchServiceDatasetIndexerName
+  - name: searchServiceDataSetIndexerName
     type: string
 
 steps:
@@ -41,6 +41,6 @@ steps:
               resourceTags='$(resourceTags)' \
               maintenanceIpRanges='$(maintenanceFirewallRules)' \
               searchServiceFilterIndexName=${{ parameters.searchServiceFilterIndexName }} \
-              searchServiceDatasetIndexName=${{ parameters.searchServiceDatasetIndexName }} \
+              searchServiceDataSetIndexName=${{ parameters.searchServiceDataSetIndexName }} \
               searchServiceReleaseIndexerName=${{ parameters.searchServiceReleaseIndexerName }} \
-              searchServiceDatasetIndexerName=${{ parameters.searchServiceDatasetIndexerName }}
+              searchServiceDataSetIndexerName=${{ parameters.searchServiceDataSetIndexerName }}
