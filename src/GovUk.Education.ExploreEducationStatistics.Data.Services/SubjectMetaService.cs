@@ -72,6 +72,7 @@ public class SubjectMetaService(
 
                 var filters = await dataSet.ListFilters(includeItems: true);
                 var indicators = await dataSet.ListIndicatorGroups();
+                var timePeriods = await dataSet.ListTimePeriods();
 
                 return new SubjectMetaViewModel
                 {
@@ -82,7 +83,7 @@ public class SubjectMetaService(
                         releaseFile.PairedIndicators
                     ),
                     Locations = await GetLocations(dataSet),
-                    TimePeriod = BuildTimePeriodsViewModels(await dataSet.ListTimePeriods()),
+                    TimePeriod = BuildTimePeriodsViewModels(timePeriods),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
                 };
             });

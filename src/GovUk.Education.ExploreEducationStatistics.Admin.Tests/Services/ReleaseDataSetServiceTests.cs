@@ -290,10 +290,10 @@ public class ReleaseDataSetServiceTests
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
         storageDataSetResolver
-            .Setup(mock => mock.Resolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.TryResolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet1.Object);
         storageDataSetResolver
-            .Setup(mock => mock.Resolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.TryResolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet2.Object);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -304,7 +304,9 @@ public class ReleaseDataSetServiceTests
                 storageDataSetResolver: storageDataSetResolver.Object
             );
 
-            await service.DeleteAll(releaseVersionId: releaseVersion.Id);
+            var dataSets = await service.ResolveAll(releaseVersion.Id);
+
+            await service.DeleteAll(releaseVersionId: releaseVersion.Id, dataSets: dataSets);
 
             MockUtils.VerifyAllMocks(footnoteRepository, dataSet1, dataSet2, storageDataSetResolver);
         }
@@ -360,10 +362,10 @@ public class ReleaseDataSetServiceTests
         var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
 
         storageDataSetResolver
-            .Setup(mock => mock.Resolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.TryResolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet1.Object);
         storageDataSetResolver
-            .Setup(mock => mock.Resolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
+            .Setup(mock => mock.TryResolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dataSet2.Object);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -374,7 +376,13 @@ public class ReleaseDataSetServiceTests
                 storageDataSetResolver: storageDataSetResolver.Object
             );
 
-            await service.DeleteAll(releaseVersionId: releaseVersion.Id, softDeleteOrphanedDataSets: false);
+            var dataSets = await service.ResolveAll(releaseVersion.Id);
+
+            await service.DeleteAll(
+                releaseVersionId: releaseVersion.Id,
+                dataSets: dataSets,
+                softDeleteOrphanedDataSets: false
+            );
 
             MockUtils.VerifyAllMocks(footnoteRepository, dataSet1, dataSet2, storageDataSetResolver);
         }
