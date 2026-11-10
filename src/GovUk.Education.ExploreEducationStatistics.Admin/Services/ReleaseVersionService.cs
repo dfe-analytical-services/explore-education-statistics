@@ -186,16 +186,11 @@ public class ReleaseVersionService(
                 forceDeleteAll: forceDeleteRelatedData,
                 cancellationToken: cancellationToken
             )
+            // The data sets are resolved from their data files, so resolve them before the files are deleted.
+            .OnSuccess(_ => releaseDataSetService.ResolveAll(releaseVersion.Id))
             .OnSuccessDo(async _ =>
                 await privateCacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(releaseVersion.Id)
-                )
-            )
-            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
-            .OnSuccessDo(() =>
-                releaseDataSetService.DeleteAll(
-                    releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
                 )
             )
             .OnSuccessDo(() =>
@@ -208,7 +203,8 @@ public class ReleaseVersionService(
                 releaseFileService.DeleteAll(releaseVersionId: releaseVersion.Id, forceDelete: forceDeleteRelatedData)
             )
             .OnSuccessDo(() => dataSetUploadRepository.DeleteAll(releaseVersion.Id, cancellationToken))
-            .OnSuccessDo(async _ =>
+            .OnSuccessDo(() => DeletePermalinks(releaseVersion.Id, cancellationToken))
+            .OnSuccessVoid(async dataSets =>
             {
                 // Methodologies scheduled with this ReleaseVersion have to be unscheduled before it is
                 // deleted. ScheduledWithReleaseVersionId is an optional foreign key with no cascading
@@ -241,6 +237,12 @@ public class ReleaseVersionService(
                 // entries for a ReleaseVersion that has none is a no-op.
                 await releasePublishingStatusRepository.RemovePublisherReleaseStatuses(
                     releaseVersionIds: [releaseVersion.Id]
+                );
+
+                await releaseDataSetService.DeleteAll(
+                    releaseVersionId: releaseVersion.Id,
+                    dataSets: dataSets,
+                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
                 );
 
                 if (forceDeleteRelatedData)

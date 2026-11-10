@@ -160,7 +160,6 @@ public class DataImportService(
             .ToList();
 
         var filters = (await dataSet.ListFilters(includeItems: true)).OrderBy(f => f.Label).ToList();
-
         var filterMetas = filters
             .Select(f => new FilterMeta
             {
@@ -172,7 +171,7 @@ public class DataImportService(
             })
             .ToList();
 
-        var indicators = (await dataSet.ListIndicators())
+        var indicatorMetas = (await dataSet.ListIndicators())
             .Select(i => new IndicatorMeta
             {
                 Id = i.Id,
@@ -187,7 +186,7 @@ public class DataImportService(
             NumDataFileRows = import.TotalRows!.Value,
             TimePeriodRange = new TimePeriodRangeMeta { Start = timePeriods.First(), End = timePeriods.Last() },
             Filters = filterMetas,
-            Indicators = indicators,
+            Indicators = indicatorMetas,
         };
 
         file.DataSetFileMeta = dataSetFileMeta;
