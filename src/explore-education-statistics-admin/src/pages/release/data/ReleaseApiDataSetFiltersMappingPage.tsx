@@ -43,6 +43,7 @@ import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 import sumBy from 'lodash/sumBy';
 import compact from 'lodash/compact';
+import BackToTopLink from '@common/components/BackToTopLink';
 
 export const sectionIds = {
   mappableFilterColumns: 'mappable-filter-columns',
@@ -389,33 +390,35 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             {Object.keys(mappableFilterOptions).length > 0 && filtersMapping ? (
               <>
                 {Object.keys(mappableFilterOptions).map(filterKey => (
-                  <ApiDataSetMappableTable
-                    key={filterKey}
-                    groupKey={filterKey}
-                    itemLabel="filter option"
-                    itemPluralLabel="filter options"
-                    tableCaptionText={
-                      filtersMapping.mappings[filterKey].source.label
-                    }
-                    mappableItems={mappableFilterOptions[filterKey]}
-                    newItems={newFilterOptions[filterKey]}
-                    pendingUpdates={pendingUpdates}
-                    readOnly={!canUpdateMappings}
-                    renderCandidate={candidate => candidate.label}
-                    renderCaptionEnd={
-                      <>
-                        <br />
-                        <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
-                          Column:{' '}
-                          <code className="govuk-!-font-weight-regular">
-                            {filterKey}
-                          </code>
-                        </div>
-                      </>
-                    }
-                    renderSource={source => source.label}
-                    onUpdate={handleUpdateMapping}
-                  />
+                  <React.Fragment key={filterKey}>
+                    <ApiDataSetMappableTable
+                      groupKey={filterKey}
+                      itemLabel="filter option"
+                      itemPluralLabel="filter options"
+                      tableCaptionText={
+                        filtersMapping.mappings[filterKey].source.label
+                      }
+                      mappableItems={mappableFilterOptions[filterKey]}
+                      newItems={newFilterOptions[filterKey]}
+                      pendingUpdates={pendingUpdates}
+                      readOnly={!canUpdateMappings}
+                      renderCandidate={candidate => candidate.label}
+                      renderCaptionEnd={
+                        <>
+                          <br />
+                          <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
+                            Column:{' '}
+                            <code className="govuk-!-font-weight-regular">
+                              {filterKey}
+                            </code>
+                          </div>
+                        </>
+                      }
+                      renderSource={source => source.label}
+                      onUpdate={handleUpdateMapping}
+                    />
+                    <BackToTopLink />
+                  </React.Fragment>
                 ))}
               </>
             ) : (
@@ -431,6 +434,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   New filter columns <Tag colour="grey">No action required</Tag>
                 </h3>
                 <ApiDataSetNewFilterColumnsTable newFilters={newFilters} />
+                <BackToTopLink />
               </>
             )}
 
@@ -446,6 +450,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <Accordion
                 id={`${sectionIds.newFilterOptions}-accordion`}
                 testId={`${sectionIds.newFilterOptions}-accordion`}
+                openAll
               >
                 {Object.keys(newFilterOptions).map(filterKey => {
                   if (newFilterOptions[filterKey].length) {
@@ -454,7 +459,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
                     return (
                       <AccordionSection
-                        backToTop={false}
+                        backToTop
                         caption={
                           <>
                             <strong>Column:</strong> <code>{filterKey}</code>
@@ -555,6 +560,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             }
                             onUpdate={handleUpdateMapping}
                           />
+                          <BackToTopLink />
                         </AccordionSection>
                       );
                     }

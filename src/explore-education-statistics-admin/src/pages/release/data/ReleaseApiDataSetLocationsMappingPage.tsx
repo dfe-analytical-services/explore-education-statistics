@@ -463,6 +463,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <Accordion
                 id={`${sectionIds.newLocations}-accordion`}
                 testId={`${sectionIds.newLocations}-accordion`}
+                openAll
               >
                 {typedKeys(newLocations).map(level => {
                   const levelNewLocations = newLocations[level];
@@ -471,7 +472,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                   if (levelNewLocations?.length) {
                     return (
                       <AccordionSection
-                        backToTop={false}
+                        backToTop
                         heading={`${groupLabel} (${levelNewLocations.length})`}
                         headingTag="h4"
                         id={sectionIds.newLocationsLevel(level)}

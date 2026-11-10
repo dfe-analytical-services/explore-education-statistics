@@ -31,6 +31,8 @@ import getUnmappedIndicatorErrors from '@admin/pages/release/data/utils/getUnmap
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import omit from 'lodash/omit';
+import ButtonText from '@common/components/ButtonText';
+import BackToTopLink from '@common/components/BackToTopLink';
 
 export const sectionIds = {
   mappableIndicators: 'mappable-indicators',
@@ -281,6 +283,8 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <p>No mappable indicators.</p>
             )}
 
+            <BackToTopLink />
+
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newIndicators}
@@ -299,6 +303,8 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <p>No new indicators.</p>
             )}
 
+            <BackToTopLink />
+
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.autoMappedIndicators}
@@ -315,7 +321,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               >
                 return (
                 <AccordionSection
-                  backToTop={false}
+                  backToTop
                   caption={
                     <p>
                       These indicators have been mapped automatically.{' '}
