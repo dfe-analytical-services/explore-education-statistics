@@ -1,3 +1,5 @@
+import useMappingAccordionControls from '@admin/pages/release/data/hooks/useMappingAccordionControls';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
 import getApiDataSetFilterMappings, {
@@ -91,6 +93,17 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const newSectionIds = Object.keys(newFilterOptions)
+    .filter(key => newFilterOptions[key].length)
+    .map(sectionIds.newFilterOptionsGroup);
+  const autoMappedSectionIds = Object.keys(autoMappedFilterOptions)
+    .filter(key => autoMappedFilterOptions[key].length)
+    .map(sectionIds.autoMappedFilterOptionsGroup);
+  const accordionControls = useMappingAccordionControls([
+    ...newSectionIds.map(id => ({ id, open: true })),
+    ...autoMappedSectionIds.map(id => ({ id, open: false })),
+  ]);
 
   const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
   const isFinalised = dataSet?.draftVersion?.status === 'Draft';
@@ -340,6 +353,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map filters</span>
             <h2>{dataSet?.title}</h2>
+
             {isFinalised && (
               <InsetText>
                 These mappings cannot be edited because this data set version
@@ -370,6 +384,16 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               Any filters in the new data set that have not been mapped will
               become new filters in the API data set.
             </p>
+
+            {accordionControls.hasSections && (
+              <div className="govuk-!-margin-bottom-4">
+                <AccordionToggleButton
+                  expanded={accordionControls.allExpanded}
+                  label={`${accordionControls.allExpanded ? 'Collapse' : 'Expand'} all sections`}
+                  onClick={accordionControls.toggleAll}
+                />
+              </div>
+            )}
 
             {Object.keys(mappableFilters).length > 0 && (
               <>
@@ -459,7 +483,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <Accordion
                 id={`${sectionIds.newFilterOptions}-accordion`}
                 testId={`${sectionIds.newFilterOptions}-accordion`}
-                openAll
+                {...accordionControls.getAccordionProps(newSectionIds)}
               >
                 {Object.keys(newFilterOptions).map(filterKey => {
                   if (newFilterOptions[filterKey].length) {
@@ -511,6 +535,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   <strong>There is no action required.</strong>
                 </p>
                 <Accordion
+                  {...accordionControls.getAccordionProps(autoMappedSectionIds)}
                   id={`${sectionIds.autoMappedFilterOptions}-accordion`}
                   showOpenAll={false}
                   testId={`${sectionIds.autoMappedFilterOptions}-accordion`}

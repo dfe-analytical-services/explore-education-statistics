@@ -1053,6 +1053,44 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
     });
   });
 
+  test('expands and collapses all accordion sections while preserving the initial defaults', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+    const { user } = renderPage();
+
+    const expandAll = await screen.findByRole('button', {
+      name: 'Expand all sections',
+    });
+    const sectionButtons = () =>
+      screen.getAllByRole('button', { name: /, (show|hide) this section$/ });
+    expect(
+      sectionButtons().some(
+        button => button.getAttribute('aria-expanded') === 'false',
+      ),
+    ).toBe(true);
+
+    await user.click(expandAll);
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'true'),
+    );
+
+    await user.click(sectionButtons()[0]);
+    expect(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Collapse all sections' }),
+    );
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'false'),
+    );
+  });
+
   function renderPage(options?: {
     releaseVersion?: ReleaseVersion;
     dataSetId?: string;

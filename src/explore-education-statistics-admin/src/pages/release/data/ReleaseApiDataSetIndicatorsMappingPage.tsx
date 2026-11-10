@@ -1,3 +1,5 @@
+import useMappingAccordionControls from '@admin/pages/release/data/hooks/useMappingAccordionControls';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import { useImmer } from 'use-immer';
 import getApiDataSetIndicatorMappings, {
   AutoMappedIndicator,
@@ -32,7 +34,6 @@ import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByL
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import omit from 'lodash/omit';
-import ButtonText from '@common/components/ButtonText';
 import BackToTopLink from '@common/components/BackToTopLink';
 
 export const sectionIds = {
@@ -71,6 +72,13 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const autoMappedSectionIds = autoMappedIndicators.length
+    ? [sectionIds.autoMappedIndicators]
+    : [];
+  const accordionControls = useMappingAccordionControls([
+    ...autoMappedSectionIds.map(id => ({ id, open: false })),
+  ]);
 
   const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
   const isFinalised = dataSet?.draftVersion?.status === 'Draft';
@@ -239,6 +247,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map indicators</span>
             <h2>{dataSet?.title}</h2>
+
             {isFinalised && (
               <InsetText>
                 These mappings cannot be edited because this data set version
@@ -269,6 +278,16 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               Any indicators in the new data set that have not been mapped will
               become new indicators in the API data set.
             </p>
+
+            {accordionControls.hasSections && (
+              <div className="govuk-!-margin-bottom-4">
+                <AccordionToggleButton
+                  expanded={accordionControls.allExpanded}
+                  label={`${accordionControls.allExpanded ? 'Collapse' : 'Expand'} all sections`}
+                  onClick={accordionControls.toggleAll}
+                />
+              </div>
+            )}
 
             <h3 className="govuk-heading-l" id={sectionIds.mappableIndicators}>
               Indicators not found in new data set ({mappableIndicators.length})
@@ -324,6 +343,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
             {autoMappedIndicators.length > 0 ? (
               <Accordion
+                {...accordionControls.getAccordionProps(autoMappedSectionIds)}
                 id={`${sectionIds.autoMappedIndicators}-accordion`}
                 showOpenAll={false}
                 testId={`${sectionIds.autoMappedIndicators}-accordion`}

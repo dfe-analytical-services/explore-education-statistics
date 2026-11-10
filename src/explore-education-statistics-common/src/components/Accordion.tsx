@@ -13,7 +13,6 @@ import React, {
   isValidElement,
   ReactElement,
   ReactNode,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -25,6 +24,10 @@ export interface AccordionProps {
   className?: string;
   id: string;
   openAll?: boolean;
+  /** When supplied, overrides `openAll` and section `open` defaults. */
+  openSectionIds?: string[];
+  /** Reports individual, bulk and hash-navigation expansion changes. */
+  onOpenSectionIdsChange?: (ids: string[]) => void;
   showOpenAll?: boolean;
   testId?: string;
   toggleAllHiddenText?: string;
@@ -37,6 +40,8 @@ const Accordion = ({
   className,
   id,
   openAll,
+  openSectionIds,
+  onOpenSectionIdsChange,
   showOpenAll = true,
   testId = 'accordion',
   toggleAllHiddenText,
@@ -68,6 +73,26 @@ const Accordion = ({
     }, {}),
   );
 
+  const isSectionOpen = (sectionId: string) =>
+    openSectionIds !== undefined
+      ? openSectionIds.includes(sectionId)
+      : (openSections[sectionId] ?? false);
+
+  const changeOpenSections = (ids: string[]) => {
+    if (openSectionIds === undefined) {
+      updateOpenSections(draft => {
+        sections.forEach(section => {
+          draft[section.id] = ids.includes(section.id);
+        });
+      });
+    }
+    onOpenSectionIdsChange?.(ids);
+  };
+
+  // Hash listeners are installed once, but must use the latest controlled state.
+  const expansionRef = useRef({ sections, isSectionOpen, changeOpenSections });
+  expansionRef.current = { sections, isSectionOpen, changeOpenSections };
+
   const { isMounted } = useMounted(() => {
     const goToAndOpenHash = async () => {
       setTimeout(() => {
@@ -97,15 +122,21 @@ const Accordion = ({
           return;
         }
 
-        updateOpenSections(draft => {
-          const matchingSection = sections.find(
-            section => sectionEl.id === section.id,
+        const expansion = expansionRef.current;
+        const matchingSection = expansion.sections.find(
+          section => sectionEl.id === section.id,
+        );
+        if (matchingSection) {
+          expansion.changeOpenSections(
+            expansion.sections
+              .filter(
+                section =>
+                  section.id === matchingSection.id ||
+                  expansion.isSectionOpen(section.id),
+              )
+              .map(section => section.id),
           );
-
-          if (matchingSection) {
-            draft[matchingSection.id] = true;
-          }
-        });
+        }
 
         setTimeout(() => {
           (locationHashEl as HTMLElement).scrollIntoView({
@@ -122,6 +153,9 @@ const Accordion = ({
   });
 
   useEffect(() => {
+    if (openSectionIds !== undefined) {
+      return;
+    }
     // Changing `openAll` prop toggles all sections.
     updateOpenSections(draft => {
       sections.forEach(section => {
@@ -129,37 +163,36 @@ const Accordion = ({
           openAll || section.element.props.open || draft[section.id] || false;
       });
     });
-  }, [sections, updateOpenSections, openAll]);
+  }, [sections, updateOpenSections, openAll, openSectionIds]);
 
-  const handleToggle = useCallback(
-    (isOpen: boolean, sectionId: string) => {
-      const matchingSection = sections.find(
-        section => section.id === sectionId,
-      );
+  const handleToggle = (isOpen: boolean, sectionId: string) => {
+    const matchingSection = sections.find(section => section.id === sectionId);
 
-      if (!matchingSection) {
-        return;
-      }
+    if (!matchingSection) {
+      return;
+    }
 
-      updateOpenSections(draft => {
-        draft[matchingSection.id] = isOpen;
+    changeOpenSections(
+      sections
+        .filter(section =>
+          section.id === sectionId ? isOpen : isSectionOpen(section.id),
+        )
+        .map(section => section.id),
+    );
+
+    if (onSectionOpen && isOpen) {
+      onSectionOpen({
+        id: sectionId,
+        title: matchingSection.element.props.heading,
       });
+    }
 
-      if (onSectionOpen && isOpen) {
-        onSectionOpen({
-          id: sectionId,
-          title: matchingSection.element.props.heading,
-        });
-      }
+    if (matchingSection.element.props.onToggle) {
+      matchingSection.element.props.onToggle(isOpen, sectionId);
+    }
+  };
 
-      if (matchingSection.element.props.onToggle) {
-        matchingSection.element.props.onToggle(isOpen, sectionId);
-      }
-    },
-    [onSectionOpen, sections, updateOpenSections],
-  );
-
-  const isAllOpen = Object.values(openSections).every(isOpen => isOpen);
+  const isAllOpen = sections.every(section => isSectionOpen(section.id));
 
   return (
     <div
@@ -182,11 +215,9 @@ const Accordion = ({
               </>
             }
             onClick={() => {
-              updateOpenSections(draft => {
-                Object.keys(draft).forEach(key => {
-                  draft[key] = !isAllOpen;
-                });
-              });
+              changeOpenSections(
+                isAllOpen ? [] : sections.map(section => section.id),
+              );
 
               if (onToggleAll) {
                 onToggleAll(!isAllOpen);
@@ -199,7 +230,7 @@ const Accordion = ({
       {sections.map(section =>
         cloneElement<AccordionSectionProps>(section.element, {
           id: section.id,
-          open: openSections[section.id] ?? false,
+          open: isSectionOpen(section.id),
           onToggle: handleToggle,
         }),
       )}

@@ -1,3 +1,5 @@
+import useMappingAccordionControls from '@admin/pages/release/data/hooks/useMappingAccordionControls';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
@@ -97,6 +99,17 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const newSectionIds = typedKeys(newLocations)
+    .filter(level => newLocations[level]?.length)
+    .map(sectionIds.newLocationsLevel);
+  const autoMappedSectionIds = typedKeys(autoMappedLocations)
+    .filter(level => autoMappedLocations[level]?.length)
+    .map(sectionIds.autoMappedLocationsLevel);
+  const accordionControls = useMappingAccordionControls([
+    ...newSectionIds.map(id => ({ id, open: true })),
+    ...autoMappedSectionIds.map(id => ({ id, open: false })),
+  ]);
 
   const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
   const isFinalised = dataSet?.draftVersion?.status === 'Draft';
@@ -330,6 +343,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map locations</span>
             <h2>{dataSet?.title}</h2>
+
             {isFinalised && (
               <InsetText>
                 These mappings cannot be edited because this data set version
@@ -360,6 +374,16 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               Any locations in the new data set that have not been mapped will
               show as new locations in the API data set.
             </p>
+
+            {accordionControls.hasSections && (
+              <div className="govuk-!-margin-bottom-4">
+                <AccordionToggleButton
+                  expanded={accordionControls.allExpanded}
+                  label={`${accordionControls.allExpanded ? 'Collapse' : 'Expand'} all sections`}
+                  onClick={accordionControls.toggleAll}
+                />
+              </div>
+            )}
 
             {Object.keys(deletedLocationGroups).length > 0 && (
               <>
@@ -475,7 +499,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <Accordion
                 id={`${sectionIds.newLocations}-accordion`}
                 testId={`${sectionIds.newLocations}-accordion`}
-                openAll
+                {...accordionControls.getAccordionProps(newSectionIds)}
               >
                 {typedKeys(newLocations).map(level => {
                   const levelNewLocations = newLocations[level];
@@ -522,6 +546,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
             </h3>
             {totalAutoMappedLocations > 0 ? (
               <Accordion
+                {...accordionControls.getAccordionProps(autoMappedSectionIds)}
                 id={`${sectionIds.autoMappedLocations}-accordion`}
                 showOpenAll={false}
                 testId={`${sectionIds.autoMappedLocations}-accordion`}
