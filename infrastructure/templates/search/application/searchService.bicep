@@ -5,7 +5,7 @@ import { ResourceNames } from '../../common/resource-names.bicep'
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
-@description('SKU of the storage accounts, which sets their redundancy.')
+@description('SKU of the storage account, which sets its redundancy.')
 param storageAccountSku StorageAccountSku
 
 @description('Location for all resources.')

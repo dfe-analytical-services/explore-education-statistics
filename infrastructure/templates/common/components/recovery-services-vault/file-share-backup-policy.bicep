@@ -69,6 +69,7 @@ retention settings then apply to the vault copies, and snapshots are kept for th
 most 30). A policy can't move between the snapshot and vault tiers in place.
 ''')
 param vaultTier {
+  @maxValue(30)
   snapshotRetentionDays: int
 }?
 
