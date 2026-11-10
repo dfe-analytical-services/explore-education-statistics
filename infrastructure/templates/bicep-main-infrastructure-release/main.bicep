@@ -1,5 +1,6 @@
 import { ServiceHttpStatusAlerts } from '../common/components/alerts/httpStatusAlertConfig.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 import { Tags } from 'types.bicep'
 import { EnvironmentConfig, EnvironmentPipelineVariables, mergeEnvironmentConfig } from 'configuration/environment-configuration.bicep'
 import { AdminConfig, mergeAdminConfig } from 'configuration/admin-configuration.bicep'
@@ -40,20 +41,32 @@ param dateProvisioned string = utcNow('u')
 //
 param environmentConfigParam EnvironmentConfig = {}
 
+// Merge default configuration with overridden configuration.
+var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+
+// These values are all supplied specifically by pipeline variables.
+param environmentPipelineVariables EnvironmentPipelineVariables = {}
+
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
 
-// Merge default configuration with overridden configuration.
-var environmentConfig = mergeEnvironmentConfig(environmentConfigParam)
+@description('The operating system to host every App Service and Function App on. An App Service plan can\'t change operating system in place, so only the param files in "parameters/elz" set Linux.')
+param appOperatingSystem 'Windows' | 'Linux' = 'Windows'
+
+@description('SKU of the Importer Function App\'s storage account.')
+param importerStorageAccountSku StorageAccountSku = 'Standard_LRS'
+
+@description('SKU of the Notifier Function App\'s storage account, which holds the email subscriptions.')
+param notifierStorageAccountSku StorageAccountSku = 'Standard_LRS'
+
+@description('SKU of the Publisher Function App\'s storage account, which holds the release publishing statuses.')
+param publisherStorageAccountSku StorageAccountSku = 'Standard_GZRS'
 
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
 var tagValues = union(tags, {
   Environment: environmentConfig.environmentName!
   DateProvisioned: dateProvisioned
 })
-
-// These values are all supplied specifically by pipeline variables.
-param environmentPipelineVariables EnvironmentPipelineVariables = {}
 
 
 
@@ -221,6 +234,8 @@ module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
+    storageAccountSku: importerStorageAccountSku
     appServiceSku: importerConfig.appServiceSku!
     deployAlerts: true
     http401Alert: http401Alerts.?importer
@@ -238,6 +253,8 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
   name: 'notifierModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
+    storageAccountSku: notifierStorageAccountSku
     appServiceSku: notifierConfig.appServiceSku!
     allowedOrigins: publicSiteAllowedOrigins
     minTlsVersion: minTlsVersion
@@ -257,6 +274,8 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
   name: 'publisherModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
+    storageAccountSku: publisherStorageAccountSku
     appServiceSku: publisherConfig.appServiceSku!
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -280,6 +299,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: adminConfig.appServiceSku!
     signalRAllowedOrigins: adminSiteAllowedOrigins
     signalRSku: adminConfig.signalRSku!
@@ -306,6 +326,7 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
   name: 'contentApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: contentApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
@@ -328,6 +349,7 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
     resourceNames: resourceNames
+    operatingSystem: appOperatingSystem
     appServiceSku: dataApiConfig.appServiceSku!
     autoscaleAppServices: environmentConfig.autoscaleAppServices!
     allowedOrigins: publicSiteAllowedOrigins
