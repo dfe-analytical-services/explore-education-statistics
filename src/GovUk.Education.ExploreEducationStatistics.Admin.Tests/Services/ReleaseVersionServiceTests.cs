@@ -28,6 +28,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Identity;
@@ -1703,12 +1704,6 @@ public abstract class ReleaseVersionServiceTests
 
             releaseDataFilesService
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
-                .Callback(() =>
-                    releaseDataSetService.Verify(
-                        mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
-                        Times.Once
-                    )
-                )
                 .ReturnsAsync(Unit.Instance);
 
             releaseFileService
@@ -1719,8 +1714,18 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            IReadOnlyDictionary<Guid, IStorageDataSet> dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+            releaseDataSetService.Setup(mock => mock.ResolveAll(releaseVersion.Id)).ReturnsAsync(dataSets);
+
             releaseDataSetService
-                .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataFilesService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -1804,7 +1809,7 @@ public abstract class ReleaseVersionServiceTests
                 dataSetUploadRepository.Verify(mock => mock.DeleteAll(releaseVersion.Id, default), Times.Once);
 
                 releaseDataSetService.Verify(
-                    mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
+                    mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData),
                     Times.Once
                 );
 
@@ -1964,8 +1969,18 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            IReadOnlyDictionary<Guid, IStorageDataSet> dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+            releaseDataSetService.Setup(mock => mock.ResolveAll(releaseVersion.Id)).ReturnsAsync(dataSets);
+
             releaseDataSetService
-                .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataFilesService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2143,8 +2158,18 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            IReadOnlyDictionary<Guid, IStorageDataSet> dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+            releaseDataSetService.Setup(mock => mock.ResolveAll(releaseVersion.Id)).ReturnsAsync(dataSets);
+
             releaseDataSetService
-                .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataFilesService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2416,8 +2441,18 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Instance);
 
+            IReadOnlyDictionary<Guid, IStorageDataSet> dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+            releaseDataSetService.Setup(mock => mock.ResolveAll(releaseVersion.Id)).ReturnsAsync(dataSets);
+
             releaseDataSetService
-                .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataFilesService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2602,20 +2637,24 @@ public abstract class ReleaseVersionServiceTests
 
             releaseDataFilesService
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
-                .Callback(() =>
-                    releaseDataSetService.Verify(
-                        mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
-                        Times.Once
-                    )
-                )
                 .ReturnsAsync(Unit.Instance);
 
             releaseFileService
                 .Setup(mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData))
                 .ReturnsAsync(Unit.Instance);
 
+            IReadOnlyDictionary<Guid, IStorageDataSet> dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+            releaseDataSetService.Setup(mock => mock.ResolveAll(releaseVersion.Id)).ReturnsAsync(dataSets);
+
             releaseDataSetService
-                .Setup(mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData))
+                .Setup(mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData))
+                .Callback(() =>
+                    releaseDataFilesService.Verify(
+                        mock => mock.DeleteAll(releaseVersion.Id, forceDeleteRelatedData),
+                        Times.Once
+                    )
+                )
                 .Returns(Task.CompletedTask);
 
             releasePublishingStatusRepository
@@ -2686,7 +2725,7 @@ public abstract class ReleaseVersionServiceTests
                 );
 
                 releaseDataSetService.Verify(
-                    mock => mock.DeleteAll(releaseVersion.Id, !forceDeleteRelatedData),
+                    mock => mock.DeleteAll(releaseVersion.Id, dataSets, !forceDeleteRelatedData),
                     Times.Once
                 );
 
