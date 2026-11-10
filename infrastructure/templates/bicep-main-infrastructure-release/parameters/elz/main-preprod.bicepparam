@@ -4,3 +4,16 @@ using '../../main.bicep'
 extends '../main-preprod.bicepparam'
 
 param elz = true
+
+// Zone-redundant storage. The Notifier and Publisher hold the email subscriptions and release publishing statuses,
+// so they get a readable geo copy as well.
+param importerStorageAccountSku = 'Standard_ZRS'
+param notifierStorageAccountSku = 'Standard_RAGZRS'
+param publisherStorageAccountSku = 'Standard_RAGZRS'
+
+// Host every App Service and Function App on Linux.
+param appOperatingSystem = 'Linux'
+
+// Spread the Admin, Content API, Data API and Public Site instances across availability zones. These plans already run
+// Premium SKUs with at least 2 instances, so this costs little.
+param zoneRedundantAppServicePlans = true
