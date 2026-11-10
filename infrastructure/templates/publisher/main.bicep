@@ -1,4 +1,5 @@
 import { HttpStatusAlertConfig } from '../common/components/alerts/httpStatusAlertConfig.bicep'
+import { StorageAccountSku } from '../common/components/storage/types.bicep'
 import { ResourceNames } from '../common/resource-names.bicep'
 import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
@@ -12,6 +13,12 @@ param minTlsVersion string
 
 @description('App Service Plan SKU.')
 param appServiceSku FunctionAppServicePlanSku
+
+@description('The operating system to host the Function App on.')
+param operatingSystem 'Windows' | 'Linux'
+
+@description('SKU of the Function App\'s storage account, which sets its redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -85,7 +92,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     appServicePlanName: resourceNames.publisher.appServicePlan
     storageAccountName: resourceNames.publisher.storageAccount
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
-    storageAccountSku: 'Standard_GZRS'
+    storageAccountSku: storageAccountSku
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true
@@ -93,8 +100,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     }
     sku: appServiceSku
     functionAppRuntime: 'dotnet-isolated'
-    operatingSystem: 'Windows'
-    netFrameworkVersion: 'v10.0'
+    operatingSystem: operatingSystem
+    netFrameworkVersion: operatingSystem == 'Windows' ? 'v10.0' : null
+    linuxFxVersion: 'DOTNET-ISOLATED|10.0'
     elasticCapacity: null
     alwaysOn: true
     publicNetworkAccessEnabled: true

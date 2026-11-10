@@ -133,7 +133,7 @@ public class ImporterLocationCache : IImporterLocationCache
         return $"{geographicLevel}{separator}{tokens.JoinToString(separator)}";
     }
 
-    private static string GetLocationCacheKey(Location location)
+    public static string GetLocationCacheKey(Location location)
     {
         return GetLocationCacheKey(
             location.GeographicLevel,
