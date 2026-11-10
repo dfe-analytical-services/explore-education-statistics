@@ -7,6 +7,7 @@ import { SelectedPublication } from '@common/modules/table-tool/types/selectedPu
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import {
+  addMissingParentIndicators,
   getPairedIndicatorChildIds,
   normalisePairedIndicators,
 } from '@common/modules/table-tool/utils/pairedIndicators';
@@ -406,14 +407,20 @@ export const getServerSideProps: GetServerSideProps<
       );
 
       // The search query skips the filters step, so add any paired indicators
-      // here for the table to match the form and its summary
+      // here for the table to match the form and its summary. Search can ask
+      // for a child indicator on its own, so add its parent first rather than
+      // let normalising drop the requested indicator.
+      const childIdsByParentId = getPairedIndicatorChildIds(
+        Object.values(fetchedSubjectMeta.indicators),
+      );
       const searchQuery = {
         ...decodedQuery,
         indicators: normalisePairedIndicators(
-          decodedQuery.indicators,
-          getPairedIndicatorChildIds(
-            Object.values(fetchedSubjectMeta.indicators),
+          addMissingParentIndicators(
+            decodedQuery.indicators,
+            childIdsByParentId,
           ),
+          childIdsByParentId,
         ),
       };
       initialQuery = {

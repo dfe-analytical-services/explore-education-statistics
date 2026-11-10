@@ -1,4 +1,5 @@
 import {
+  addMissingParentIndicators,
   getPairedIndicatorChildIds,
   normalisePairedIndicators,
 } from '@common/modules/table-tool/utils/pairedIndicators';
@@ -85,6 +86,43 @@ describe('pairedIndicators', () => {
       const selected = ['indicator-1', 'indicator-2'];
 
       expect(normalisePairedIndicators(selected, {})).toBe(selected);
+    });
+  });
+
+  describe('addMissingParentIndicators', () => {
+    const childIdsByParentId = { 'indicator-1': 'indicator-2' };
+
+    test('adds the parent of a child selected on its own, keeping the child', () => {
+      expect(
+        addMissingParentIndicators(['indicator-2'], childIdsByParentId),
+      ).toEqual(['indicator-1', 'indicator-2']);
+    });
+
+    test('keeps a child selected with other indicators', () => {
+      expect(
+        addMissingParentIndicators(
+          ['indicator-3', 'indicator-2'],
+          childIdsByParentId,
+        ),
+      ).toEqual(['indicator-3', 'indicator-1', 'indicator-2']);
+    });
+
+    test('does not duplicate a parent that is already selected', () => {
+      expect(
+        addMissingParentIndicators(
+          ['indicator-1', 'indicator-2'],
+          childIdsByParentId,
+        ),
+      ).toEqual(['indicator-1', 'indicator-2']);
+    });
+
+    test('keeps the child after normalising', () => {
+      expect(
+        normalisePairedIndicators(
+          addMissingParentIndicators(['indicator-2'], childIdsByParentId),
+          childIdsByParentId,
+        ),
+      ).toEqual(['indicator-1', 'indicator-2']);
     });
   });
 });
