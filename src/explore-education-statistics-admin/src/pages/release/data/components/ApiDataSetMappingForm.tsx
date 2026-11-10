@@ -62,22 +62,24 @@ export default function ApiDataSetMappingForm({
       value: noMappingValue,
       divider: `Select ${itemLabelPrefix} ${itemLabel}:`,
     },
-    ...(candidate
-      ? [
-          {
-            label: candidate?.label,
-            value: candidate.key,
-            hint: candidateHint?.(candidate),
-          },
-        ]
-      : []),
-    ...newItems.map(item => {
-      return {
-        label: item.label,
-        value: item.key,
-        hint: candidateHint?.(item),
-      };
-    }),
+    ...[
+      ...(candidate
+        ? [
+            {
+              label: candidate?.label,
+              value: candidate.key,
+              hint: candidateHint?.(candidate),
+            },
+          ]
+        : []),
+      ...newItems.map(item => {
+        return {
+          label: item.label,
+          value: item.key,
+          hint: candidateHint?.(item),
+        };
+      }),
+    ].toSorted((a, b) => a.label.localeCompare(b.label)),
   ];
 
   return (

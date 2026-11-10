@@ -66,7 +66,7 @@ export default function ApiDataSetMappableTable({
 
   const setAllNoMapping = useCallback(async () => {
     const updateRequestItems = Object.values(mappableItems)
-      .filter(item => item.mapping.type !== 'ManualNone')
+      .filter(item => item.mapping.type === 'AutoNone')
       .map(({ candidate, mapping }) => ({
         groupKey,
         previousCandidate: candidate,
@@ -79,7 +79,7 @@ export default function ApiDataSetMappableTable({
 
   return (
     <div className="table-container">
-      {totalUnmapped > 0 && (
+      {totalUnmapped > 0 && !isReadOnly && (
         <p>
           <ButtonText onClick={setAllNoMapping}>
             Set unmapped {itemPluralLabel} to "No mapping"
