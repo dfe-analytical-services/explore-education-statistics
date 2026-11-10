@@ -1,5 +1,8 @@
 *** Settings ***
+Library             String
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/table_tool.robot
 Library             ../../libs/admin_api.py
 
@@ -215,8 +218,128 @@ Check indicators from a dropped pair can be selected on their own in the table t
     # The overall pair was maintained, so its paired indicator still can't be selected on its own
     user checks element is disabled    ${OVERALL_RATE_CHECKBOX}
 
+Add data guidance to subject
+    user navigates to Data Guidance page and adds data guidance for subject    ${SUBJECT_NAME}
+    ...    ${SUBJECT_NAME} Main guidance content
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve release
+    user approves release for immediate publication
+
+Get public release link
+    ${PUBLIC_RELEASE_LINK}    user gets url public release will be accessible at
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
+Verify newly published release is public
+    user navigates to public release page    ${PUBLIC_RELEASE_LINK}    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Collect the ids for table tool search links from the public table tool
+    # Table tool search links pass ids without dashes, so read them from the public table tool's inputs
+    user navigates to data tables page on public frontend
+    environment variable should be set    TEST_THEME_NAME
+    user clicks radio    %{TEST_THEME_NAME}
+    user clicks radio    ${PUBLICATION_NAME}
+    user clicks element    id:publicationForm-submit
+
+    user waits until table tool wizard step is available    2    Select a data set
+    ${subject_id}    user gets search link id    xpath://label[text()="${SUBJECT_NAME}"]/../input[@type="radio"]
+    user clicks radio    ${SUBJECT_NAME}
+    user clicks element    id:publicationDataStepForm-submit
+
+    user waits until table tool wizard step is available    3    Choose locations
+    user clicks element    xpath://button[@data-testid="filter-accordion-button"][contains(., "National")]
+    ${england_id}    user gets search link id    xpath://label[text()="England"]/../input[@type="checkbox"]
+    user clicks checkbox    England
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    4    Choose time period
+    user chooses select option    id:timePeriodForm-start    2021/22
+    user chooses select option    id:timePeriodForm-end    2023/24
+    ${start}    Get Selected List Value    id:timePeriodForm-start
+    ${end}    Get Selected List Value    id:timePeriodForm-end
+    ${time_period}    Replace String    ${start}|${end}    _    |
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    5    Choose your filters
+    user waits until page contains element    ${ENROLMENTS_LABEL}
+    ${primary_id}    user gets search link id    xpath://label[text()="Primary"]/../input[@type="checkbox"]
+    ${secondary_id}    user gets search link id    xpath://label[text()="Secondary"]/../input[@type="checkbox"]
+    ${special_id}    user gets search link id    xpath://label[text()="Special"]/../input[@type="checkbox"]
+
+    ${ENROLMENTS_ID}    user gets search link id    ${ENROLMENTS_LABEL}/../input[@type="checkbox"]
+    ${OVERALL_SESSIONS_ID}    user gets search link id    ${OVERALL_SESSIONS_LABEL}/../input[@type="checkbox"]
+    ${OVERALL_RATE_ID}    user gets search link id    ${OVERALL_RATE_CHECKBOX}
+    ${AUTHORISED_RATE_ID}    user gets search link id    ${AUTHORISED_RATE_CHECKBOX}
+    Set Suite Variable    ${ENROLMENTS_ID}
+    Set Suite Variable    ${OVERALL_SESSIONS_ID}
+    Set Suite Variable    ${OVERALL_RATE_ID}
+    Set Suite Variable    ${AUTHORISED_RATE_ID}
+
+    ${data_tables_link}    Replace String    ${PUBLIC_RELEASE_LINK}    /find-statistics/    /data-tables/
+    Set Suite Variable
+    ...    ${SEARCH_LINK}
+    ...    ${data_tables_link}?fromSearch&sub=${subject_id}&tp=${time_period}&f=${primary_id},${secondary_id},${special_id}&loc=${england_id}
+
+Check a search link for a paired indicator on its own also shows its main indicator
+    # The missing main indicator is added so the requested paired indicator is kept
+    user opens table tool search link for indicators    ${OVERALL_RATE_ID}
+
+    user checks results table shows indicator    Overall absence sessions
+    user checks results table shows indicator    Overall absence rate
+    user checks results table contains value    6,954,347
+    user checks results table contains value    5.91%
+
+Check a search link for a main indicator also shows its paired indicator
+    user opens table tool search link for indicators    ${OVERALL_SESSIONS_ID}
+
+    user checks results table shows indicator    Overall absence sessions
+    user checks results table shows indicator    Overall absence rate
+    user checks results table contains value    6,954,347
+    user checks results table contains value    5.91%
+
+Check a search link mixing a paired indicator with another indicator keeps them all
+    user opens table tool search link for indicators    ${ENROLMENTS_ID},${OVERALL_RATE_ID}
+
+    user checks results table shows indicator    Number of pupil enrolments
+    user checks results table shows indicator    Overall absence sessions
+    user checks results table shows indicator    Overall absence rate
+    user checks results table contains value    367,520
+    user checks results table contains value    6,954,347
+    user checks results table contains value    5.91%
+
+Check a search link for an indicator from a dropped pair shows only that indicator
+    # The authorised pair was dropped by the replacement, so nothing is added
+    user opens table tool search link for indicators    ${AUTHORISED_RATE_ID}
+
+    user checks results table contains value    3.63%
+    user checks page does not contain element    xpath://table[contains(., "Authorised absence sessions")]
+
 
 *** Keywords ***
+user gets search link id
+    [Arguments]    ${locator}
+    user waits until page contains element    ${locator}
+    ${id}    Get Element Attribute    ${locator}    value
+    ${id}    Remove String    ${id}    -
+    [Return]    ${id}
+
+user opens table tool search link for indicators
+    [Arguments]    ${indicator_ids}
+    user navigates to    ${SEARCH_LINK}&ind=${indicator_ids}
+    user waits until results table appears    %{WAIT_LONG}
+
+user checks results table shows indicator
+    [Arguments]    ${label}
+    user waits until page contains element    xpath://table//th[normalize-space()="${label}"]
+
+user checks results table contains value
+    [Arguments]    ${value}
+    user waits until page contains element    xpath://table//td[normalize-space()="${value}"]
+
 user starts creating a data block up to choosing indicators
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
