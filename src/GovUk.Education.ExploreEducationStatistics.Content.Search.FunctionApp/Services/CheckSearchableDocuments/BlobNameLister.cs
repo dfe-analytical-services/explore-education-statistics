@@ -4,11 +4,6 @@ using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
-public interface IBlobNameLister
-{
-    Task<IList<string>> ListBlobsInContainer(CancellationToken cancellationToken = default);
-}
-
 public class BlobNameLister(
     Func<IAzureBlobStorageClient> azureBlobStorageClientFactory,
     IOptions<AppOptions> appOptions
