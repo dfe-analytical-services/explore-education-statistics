@@ -1,5 +1,6 @@
 #nullable enable
 using System.Security.Claims;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
@@ -119,6 +120,76 @@ public abstract class DataSetVersionMappingControllerTests(DataSetVersionMapping
             // Test that the mappings from the Controller are identical to the mappings saved in the database
             retrievedMappings.AssertDeepEqualTo(mapping.LocationMappingPlan, ignoreCollectionOrders: true);
         }
+
+        [Fact]
+        public async Task BauUser_Success_OrderedByLabel()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithLocationMappingPlan(
+                    DataFixture
+                        .DefaultLocationMappingPlan()
+                        .AddLevel(level: GeographicLevel.School, mappings: DataFixture.DefaultLocationLevelMappings())
+                        .AddLevel(
+                            level: GeographicLevel.LocalAuthority,
+                            mappings: DataFixture
+                                .DefaultLocationLevelMappings()
+                                .AddMapping(sourceKey: "source-key-1", mapping: LocationMapping("York"))
+                                .AddMapping(sourceKey: "source-key-2", mapping: LocationMapping("Area 10"))
+                                .AddMapping(sourceKey: "source-key-3", mapping: LocationMapping("Area 2"))
+                                .AddMapping(sourceKey: "source-key-5", mapping: LocationMapping("Barnsley"))
+                                .AddMapping(sourceKey: "source-key-4", mapping: LocationMapping("Barnsley"))
+                                .AddCandidate(
+                                    targetKey: "target-key-1",
+                                    candidate: DataFixture.DefaultMappableLocationOption().WithLabel("Wakefield")
+                                )
+                                .AddCandidate(
+                                    targetKey: "target-key-2",
+                                    candidate: DataFixture.DefaultMappableLocationOption().WithLabel("Leeds")
+                                )
+                        )
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var response = await GetLocationMappings(nextDataSetVersionId: nextDataSetVersion.Id);
+
+            var levels = (await ReadJson(response)).GetProperty("levels");
+
+            // Levels are ordered by their label
+            Assert.Equal([nameof(GeographicLevel.LocalAuthority), nameof(GeographicLevel.School)], Keys(levels));
+
+            var localAuthority = levels.GetProperty(nameof(GeographicLevel.LocalAuthority));
+
+            // Labels are in natural order, with duplicate labels ordered by key
+            Assert.Equal(
+                ["source-key-3", "source-key-2", "source-key-4", "source-key-5", "source-key-1"],
+                Keys(localAuthority.GetProperty("mappings"))
+            );
+            Assert.Equal(["target-key-2", "target-key-1"], Keys(localAuthority.GetProperty("candidates")));
+        }
+
+        private static LocationOptionMapping LocationMapping(string label) =>
+            DataFixture
+                .DefaultLocationOptionMapping()
+                .WithSource(DataFixture.DefaultMappableLocationOption().WithLabel(label))
+                .WithNoMapping();
+
+        private static async Task<JsonElement> ReadJson(HttpResponseMessage response)
+        {
+            response.AssertOk();
+            return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        }
+
+        private static string[] Keys(JsonElement element) =>
+            element.EnumerateObject().Select(property => property.Name).ToArray();
 
         [Fact]
         public async Task NotBauUserAndNotOnPublicationTeam_Returns403()
@@ -1246,24 +1317,35 @@ public abstract class DataSetVersionMappingControllerTests(DataSetVersionMapping
                             "filter-1-key",
                             DataFixture
                                 .DefaultFilterMapping()
+                                .WithSource(DataFixture.DefaultMappableFilter())
                                 .WithAutoMapped("filter-1-key")
                                 .AddOptionMapping(
                                     "filter-1-option-1-key",
-                                    DataFixture.DefaultFilterOptionMapping().WithAutoMapped("filter-1-option-1-key")
+                                    DataFixture
+                                        .DefaultFilterOptionMapping()
+                                        .WithSource(DataFixture.DefaultMappableFilterOption())
+                                        .WithAutoMapped("filter-1-option-1-key")
                                 )
                                 .AddOptionMapping(
                                     "filter-1-option-2-key",
-                                    DataFixture.DefaultFilterOptionMapping().WithManualNone()
+                                    DataFixture
+                                        .DefaultFilterOptionMapping()
+                                        .WithSource(DataFixture.DefaultMappableFilterOption())
+                                        .WithManualNone()
                                 )
                         )
                         .AddFilterMapping(
                             "filter-2-key",
                             DataFixture
                                 .DefaultFilterMapping()
+                                .WithSource(DataFixture.DefaultMappableFilter())
                                 .WithAutoMapped("filter-2-key")
                                 .AddOptionMapping(
                                     "filter-2-option-1-key",
-                                    DataFixture.DefaultFilterOptionMapping().WithAutoNone()
+                                    DataFixture
+                                        .DefaultFilterOptionMapping()
+                                        .WithSource(DataFixture.DefaultMappableFilterOption())
+                                        .WithAutoNone()
                                 )
                         )
                         .AddFilterCandidate(
@@ -1289,6 +1371,94 @@ public abstract class DataSetVersionMappingControllerTests(DataSetVersionMapping
             // Test that the mappings from the Controller are identical to the mappings saved in the database
             retrievedMappings.AssertDeepEqualTo(mapping.FilterMappingPlan, ignoreCollectionOrders: true);
         }
+
+        [Fact]
+        public async Task BauUser_Success_OrderedByLabel()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithFilterMappingPlan(
+                    DataFixture
+                        .DefaultFilterMappingPlan()
+                        .AddFilterMapping(
+                            "filter-1-key",
+                            DataFixture
+                                .DefaultFilterMapping()
+                                .WithSource(DataFixture.DefaultMappableFilter().WithLabel("Sex"))
+                                .WithAutoMapped("filter-1-key")
+                                .AddOptionMapping("option-1-key", FilterOptionMapping("Year 10"))
+                                .AddOptionMapping("option-2-key", FilterOptionMapping("Total"))
+                                .AddOptionMapping("option-3-key", FilterOptionMapping("Year 2"))
+                        )
+                        .AddFilterMapping(
+                            "filter-2-key",
+                            DataFixture
+                                .DefaultFilterMapping()
+                                .WithSource(DataFixture.DefaultMappableFilter().WithLabel("Ethnicity"))
+                                .WithAutoMapped("filter-2-key")
+                        )
+                        .AddFilterCandidate(
+                            "filter-1-key",
+                            DataFixture
+                                .DefaultFilterMappingCandidate()
+                                .WithLabel("Sex")
+                                .AddOptionCandidate(
+                                    "option-1-key",
+                                    DataFixture.DefaultMappableFilterOption().WithLabel("Male")
+                                )
+                                .AddOptionCandidate(
+                                    "option-2-key",
+                                    DataFixture.DefaultMappableFilterOption().WithLabel("Female")
+                                )
+                        )
+                        .AddFilterCandidate(
+                            "filter-2-key",
+                            DataFixture.DefaultFilterMappingCandidate().WithLabel("Ethnicity")
+                        )
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var response = await GetFilterMappings(nextDataSetVersionId: nextDataSetVersion.Id);
+
+            var plan = await ReadJson(response);
+            var mappings = plan.GetProperty("mappings");
+            var candidates = plan.GetProperty("candidates");
+
+            Assert.Equal(["filter-2-key", "filter-1-key"], Keys(mappings));
+            Assert.Equal(
+                ["option-2-key", "option-3-key", "option-1-key"],
+                Keys(mappings.GetProperty("filter-1-key").GetProperty("optionMappings"))
+            );
+
+            Assert.Equal(["filter-2-key", "filter-1-key"], Keys(candidates));
+            Assert.Equal(
+                ["option-2-key", "option-1-key"],
+                Keys(candidates.GetProperty("filter-1-key").GetProperty("options"))
+            );
+        }
+
+        private static FilterOptionMapping FilterOptionMapping(string label) =>
+            DataFixture
+                .DefaultFilterOptionMapping()
+                .WithSource(DataFixture.DefaultMappableFilterOption().WithLabel(label))
+                .WithAutoNone();
+
+        private static async Task<JsonElement> ReadJson(HttpResponseMessage response)
+        {
+            response.AssertOk();
+            return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        }
+
+        private static string[] Keys(JsonElement element) =>
+            element.EnumerateObject().Select(property => property.Name).ToArray();
 
         [Fact]
         public async Task NotBauUserAndNotOnPublicationTeam_Returns403()

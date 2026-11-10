@@ -9,6 +9,7 @@ import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDat
 import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import getUnmappedFilterErrors from '@admin/pages/release/data/utils/getUnmappedFilterErrors';
+import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByLabel';
 import ApiDataSetMappableFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnsTable';
 import ApiDataSetNewFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetNewFilterColumnsTable';
 import {
@@ -201,10 +202,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             if (previousMapping.type === 'AutoMapped') {
               const updated = draft[groupKey] ?? [];
 
-              updated.push({
-                candidate,
-                mapping: { ...previousMapping, candidateKey, type },
-              });
+              insertSortedByLabel(
+                updated,
+                {
+                  candidate,
+                  mapping: { ...previousMapping, candidateKey, type },
+                },
+                filterOption => filterOption.mapping.source.label,
+              );
 
               draft[groupKey] = updated;
             } else {
@@ -237,7 +242,11 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             });
           } else if (previousCandidate) {
             const updated = draft[groupKey] ?? [];
-            updated.push(previousCandidate);
+            insertSortedByLabel(
+              updated,
+              previousCandidate,
+              filterOption => filterOption.label,
+            );
             draft[groupKey] = updated;
           }
         });

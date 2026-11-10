@@ -13,6 +13,7 @@ import getApiDataSetLocationMappings, {
   MappableLocation,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import getUnmappedLocationErrors from '@admin/pages/release/data/utils/getUnmappedLocationErrors';
+import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByLabel';
 import { mappableTableId } from '@admin/pages/release/data/utils/mappingTableIds';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import apiDataSetVersionQueries from '@admin/queries/apiDataSetVersionQueries';
@@ -191,10 +192,14 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
             if (previousMapping.type === 'AutoMapped') {
               const updated = draft[level] ?? [];
 
-              updated.push({
-                candidate,
-                mapping: { ...previousMapping, candidateKey, type },
-              });
+              insertSortedByLabel(
+                updated,
+                {
+                  candidate,
+                  mapping: { ...previousMapping, candidateKey, type },
+                },
+                location => location.mapping.source.label,
+              );
 
               draft[level] = updated;
             } else {
@@ -228,7 +233,11 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
             });
           } else if (previousCandidate) {
             const updated = draft[level] ?? [];
-            updated.push(previousCandidate);
+            insertSortedByLabel(
+              updated,
+              previousCandidate,
+              location => location.label,
+            );
             draft[level] = updated;
           }
         });

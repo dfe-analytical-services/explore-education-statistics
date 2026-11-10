@@ -806,7 +806,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
       // Add to mappable table
       const mappableRows = within(mappableIndicatorsTable).getAllByRole('row');
       expect(mappableRows).toHaveLength(6);
-      const mappableIndicatorCells = within(mappableRows[5]).getAllByRole(
+      const mappableIndicatorCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(within(mappableIndicatorCells[0]).getByText('Indicator 1'));
@@ -824,7 +824,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
 
       const newIndicatorRows = within(newIndicatorsTable).getAllByRole('row');
       expect(newIndicatorRows).toHaveLength(3);
-      const newIndicatorCells = within(newIndicatorRows[2]).getAllByRole(
+      const newIndicatorCells = within(newIndicatorRows[1]).getAllByRole(
         'cell',
       );
       expect(within(newIndicatorCells[0]).getByText('Not applicable'));
@@ -937,7 +937,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
       // Add to mappable table
       const mappableRows = within(mappableIndicatorsTable).getAllByRole('row');
       expect(mappableRows).toHaveLength(6);
-      const mappableIndicatorCells = within(mappableRows[5]).getAllByRole(
+      const mappableIndicatorCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(within(mappableIndicatorCells[0]).getByText('Indicator 1'));

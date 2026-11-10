@@ -1158,7 +1158,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // Add location to unmapped table
       const unmappedRows = within(unmappedTable).getAllByRole('row');
       expect(unmappedRows).toHaveLength(5);
-      const unmappedLocationCells = within(unmappedRows[4]).getAllByRole(
+      const unmappedLocationCells = within(unmappedRows[1]).getAllByRole(
         'cell',
       );
       expect(within(unmappedLocationCells[0]).getByText('Location 1'));
@@ -1180,7 +1180,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       ).toBeInTheDocument();
       const newLocationRows = within(newLocationsTable).getAllByRole('row');
       expect(newLocationRows).toHaveLength(4);
-      const newLocationCells = within(newLocationRows[3]).getAllByRole('cell');
+      const newLocationCells = within(newLocationRows[1]).getAllByRole('cell');
       expect(within(newLocationCells[0]).getByText('Not applicable'));
       expect(within(newLocationCells[1]).getByText('Location 1'));
     });
@@ -1289,7 +1289,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // Add location to unmapped & manually mapped table
       const unmappedRows = within(unmappedTable).getAllByRole('row');
       expect(unmappedRows).toHaveLength(5);
-      const unmappedLocationCells = within(unmappedRows[4]).getAllByRole(
+      const unmappedLocationCells = within(unmappedRows[1]).getAllByRole(
         'cell',
       );
       expect(within(unmappedLocationCells[0]).getByText('Location 1'));
