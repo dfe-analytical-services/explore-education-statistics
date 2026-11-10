@@ -36,7 +36,9 @@ Validate homepage
     user checks page contains element    link:Glossary
     user waits until h2 is visible    Related services
     user checks page contains link    Statistics at DfE (opens in new tab)
-    user checks page contains link    Compare school and college performance (opens in new tab)
+    user checks page contains link with text and url
+    ...    Find and compare school and college profiles service (opens in new tab)
+    ...    https://www.find-compare-schools-college.service.gov.uk/
     user checks page contains link    Get information about schools (opens in new tab)
     user checks page contains link    Financial Benchmarking and Insights Tool (opens in new tab)
 

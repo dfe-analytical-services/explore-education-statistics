@@ -233,20 +233,22 @@ const HomePageRedesign = () => {
               </p>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
                 <a
-                  href="https://www.gov.uk/school-performance-tables"
+                  href="https://www.find-compare-schools-college.service.gov.uk/"
                   rel="noopener noreferrer nofollow"
                   target="_blank"
                   onClick={() =>
-                    logLinkClick('Compare school and college performance')
+                    logLinkClick(
+                      'Find and compare school and college profiles service',
+                    )
                   }
                 >
-                  Compare school and college performance{' '}
+                  Find and compare school and college profiles service{' '}
                   <VisuallyHidden>(opens in new tab)</VisuallyHidden>
                 </a>
               </h3>
               <p className="govuk-caption-m govuk-!-margin-top-1">
-                Search for and check the performance of primary, secondary and
-                special needs schools and colleges.
+                Search for information about schools and colleges in England,
+                including performance data.
               </p>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
                 <a
