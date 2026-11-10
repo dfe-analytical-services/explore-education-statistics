@@ -144,11 +144,7 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
       {
         name: 'PublicDataDb'
         type: 'PostgreSQL'
-        // Logs in as the identity the Publisher uses, whose name is also its PostgreSQL role name.
-        connectionString: publicDataDbConnectionString(
-          resourceNames.databases.postgreSqlFlexibleServer,
-          useUserAssignedIdentity ? resourceNames.publisher.identity : resourceNames.publisher.functionApp
-        )
+        connectionString: publicDataDbConnectionString(resourceNames.databases.postgreSqlFlexibleServer, resourceNames.publisher.functionApp)
       }
     ]
     alerts: deployAlerts ? {
