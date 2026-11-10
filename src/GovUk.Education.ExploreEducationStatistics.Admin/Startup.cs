@@ -468,7 +468,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
         services.AddTransient<IUserResourceRoleNotificationService, UserResourceRoleNotificationService>();
         services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
-        services.AddTransient<ReleaseDataSetService.SubjectDeleter, ReleaseDataSetService.SubjectDeleter>();
+        services.AddTransient<ISubjectDeleter, SubjectDeleter>();
         services.AddTransient<IReleaseDataSetService, ReleaseDataSetService>();
         services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
         services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();

@@ -9,11 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseDataSetService(
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ReleaseDataSetService.SubjectDeleter? subjectDeleter = null
+    ISubjectDeleter subjectDeleter
 ) : IReleaseDataSetService
 {
-    private readonly SubjectDeleter _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
-
     public async Task Delete(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedDataSet = true)
     {
         await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
@@ -60,35 +58,18 @@ public class ReleaseDataSetService(
             return;
         }
 
-        var subject = await statisticsDbContext
-            .Subject.IgnoreQueryFilters()
-            .SingleOrDefaultAsync(s => s.Id == subjectId);
-
-        if (subject == null)
+        if (!softDelete)
         {
+            subjectDeleter.Delete(subjectId);
             return;
         }
 
-        if (softDelete)
+        var subject = await statisticsDbContext.Subject.SingleOrDefaultAsync(s => s.Id == subjectId);
+
+        if (subject != null)
         {
             subject.SoftDeleted = true;
             await statisticsDbContext.SaveChangesAsync();
-            return;
-        }
-
-        _subjectDeleter.Delete(subjectId, statisticsDbContext);
-    }
-
-    // Separate this into a separate class
-    // for ease of mocking in tests.
-    public class SubjectDeleter
-    {
-        public virtual void Delete(Guid subjectId, StatisticsDbContext context)
-        {
-            // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
-            // N.B. This delete will be slow if there are a large number of observations but this is only
-            // executed by the tests when the theme is torn down so ensure files used are < 1000 rows.
-            context.Database.ExecuteSqlInterpolated($"DELETE FROM Subject WHERE Id = {subjectId}");
         }
     }
 }
