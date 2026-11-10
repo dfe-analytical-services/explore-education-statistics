@@ -1,4 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CheckSearchableDocuments;
@@ -8,11 +9,32 @@ public class ReleaseDocumentCheckerTests
     private readonly ReleaseVersionSummaryRetrieverMockBuilder _releaseVersionSummaryRetrieverMockBuilder = new();
     private readonly BlobNameListerMockBuilder _blobNameListerMockBuilder = new();
 
+    private const string ReleaseDocumentsContainerName = "release-documents-container";
+
     private ReleaseDocumentChecker GetSut() =>
-        new(_blobNameListerMockBuilder.Build(), _releaseVersionSummaryRetrieverMockBuilder.Build());
+        new(
+            _blobNameListerMockBuilder.Build(),
+            _releaseVersionSummaryRetrieverMockBuilder.Build(),
+            Microsoft.Extensions.Options.Options.Create(
+                new AppOptions { ReleaseDocumentsContainerName = ReleaseDocumentsContainerName }
+            )
+        );
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
+
+    [Fact]
+    public async Task WhenChecked_ThenBlobsAreListedForReleaseDocumentsContainer()
+    {
+        // Arrange
+        var sut = GetSut();
+
+        // Act
+        await sut.RunCheck();
+
+        // Assert
+        _blobNameListerMockBuilder.Assert.BlobsWereListedForContainer(ReleaseDocumentsContainerName);
+    }
 
     [Fact]
     public async Task GivenCorrectBlobsForReleases_WhenChecked_ThenReportIsEmpty()

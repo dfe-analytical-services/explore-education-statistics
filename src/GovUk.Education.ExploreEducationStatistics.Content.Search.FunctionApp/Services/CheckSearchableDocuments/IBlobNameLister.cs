@@ -2,5 +2,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public interface IBlobNameLister
 {
-    Task<IList<string>> ListBlobsInContainer(CancellationToken cancellationToken = default);
+    Task<IList<string>> ListBlobsInContainer(string containerName, CancellationToken cancellationToken = default);
 }

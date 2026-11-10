@@ -9,9 +9,16 @@ public class BlobNameListerMockBuilder
 
     private IList<string> _blobNames = new List<string>();
 
+    public BlobNameListerMockBuilder()
+    {
+        Assert = new Asserter(_mock);
+    }
+
     public IBlobNameLister Build()
     {
-        _mock.Setup(m => m.ListBlobsInContainer(It.IsAny<CancellationToken>())).ReturnsAsync(_blobNames);
+        _mock
+            .Setup(m => m.ListBlobsInContainer(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_blobNames);
 
         return _mock.Object;
     }
@@ -20,5 +27,15 @@ public class BlobNameListerMockBuilder
     {
         _blobNames = blobNames;
         return this;
+    }
+
+    public Asserter Assert { get; }
+
+    public class Asserter(Mock<IBlobNameLister> mock)
+    {
+        public void BlobsWereListedForContainer(string containerName)
+        {
+            mock.Verify(m => m.ListBlobsInContainer(containerName, It.IsAny<CancellationToken>()), Times.Once);
+        }
     }
 }
