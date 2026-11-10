@@ -966,7 +966,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Add to unmapped table
       const mappableRows = within(mappableFilter1Table).getAllByRole('row');
       expect(mappableRows).toHaveLength(5);
-      const mappableFilterOptionCells = within(mappableRows[4]).getAllByRole(
+      const mappableFilterOptionCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(
@@ -992,7 +992,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         'row',
       );
       expect(newFilterOptionRows).toHaveLength(3);
-      const newFilterOptionCells = within(newFilterOptionRows[2]).getAllByRole(
+      const newFilterOptionCells = within(newFilterOptionRows[1]).getAllByRole(
         'cell',
       );
       expect(within(newFilterOptionCells[0]).getByText('Not applicable'));
@@ -1099,7 +1099,7 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
       // Add to mappable table
       const mappableRows = within(mappableFilter1Table).getAllByRole('row');
       expect(mappableRows).toHaveLength(5);
-      const mappableFilterOptionCells = within(mappableRows[4]).getAllByRole(
+      const mappableFilterOptionCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(

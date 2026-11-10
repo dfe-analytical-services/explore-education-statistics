@@ -28,6 +28,7 @@ import compact from 'lodash/compact';
 import ButtonLink from '@admin/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
 import getUnmappedIndicatorErrors from '@admin/pages/release/data/utils/getUnmappedIndicatorErrors';
+import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByLabel';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import omit from 'lodash/omit';
@@ -113,10 +114,14 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
             if (previousMapping.type === 'AutoMapped') {
               const updated = draft ?? [];
-              updated.push({
-                candidate,
-                mapping: { ...previousMapping, candidateKey, type },
-              });
+              insertSortedByLabel(
+                updated,
+                {
+                  candidate,
+                  mapping: { ...previousMapping, candidateKey, type },
+                },
+                indicator => indicator.mapping.source.label,
+              );
             } else {
               const indicatorToUpdate = draft.find(
                 indicator => indicator.mapping.sourceKey === sourceKey,
@@ -146,7 +151,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               });
             } else if (previousCandidate) {
               const updated = draftNewIndicators ?? [];
-              updated.push(previousCandidate);
+              insertSortedByLabel(
+                updated,
+                previousCandidate,
+                indicator => indicator.label,
+              );
             }
           });
         });
