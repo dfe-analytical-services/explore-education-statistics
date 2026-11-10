@@ -31,12 +31,27 @@ import getUnmappedIndicatorErrors from '@admin/pages/release/data/utils/getUnmap
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import omit from 'lodash/omit';
+import ApiDataSetColumnName from '@admin/pages/release/data/components/ApiDataSetColumnName';
+import SummaryListItem from '@common/components/SummaryListItem';
+import { MappingWithKey } from '@admin/pages/release/data/utils/mappingTypes';
 
 export const sectionIds = {
   mappableIndicators: 'mappable-indicators',
   newIndicators: 'new-indicators',
   autoMappedIndicators: 'auto-mapped-indicators',
 } as const;
+
+// Indicator mapping keys (source keys and candidate keys) are the
+// indicator column names (see MappingKeyGenerators.IndicatorMeta).
+const renderColumnName = ({ key }: { key: string }) => (
+  <ApiDataSetColumnName column={key} />
+);
+
+const renderSourceColumnSummary = (mapping: MappingWithKey) => (
+  <SummaryListItem term="Column">
+    <code>{mapping.sourceKey}</code>
+  </SummaryListItem>
+);
 
 export default function ReleaseApiDataSetIndicatorsMappingPage() {
   const [autoMappedIndicators, updateAutoMappedIndicators] = useImmer<
@@ -273,8 +288,20 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
                 readOnly={!canUpdateMappings}
-                renderCandidate={candidate => candidate.label}
-                renderSource={source => source.label}
+                candidateHint={renderColumnName}
+                renderCandidate={candidate => (
+                  <>
+                    {candidate.label}
+                    {renderColumnName(candidate)}
+                  </>
+                )}
+                renderSource={(source, mapping) => (
+                  <>
+                    {source.label}
+                    <ApiDataSetColumnName column={mapping.sourceKey} />
+                  </>
+                )}
+                renderSourceDetailsStart={renderSourceColumnSummary}
                 onUpdate={handleUpdateMapping}
               />
             ) : (
@@ -293,7 +320,12 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <ApiDataSetNewItemsTable
                 itemPluralLabel="indicators"
                 newItems={newIndicators}
-                renderItem={item => item.label}
+                renderItem={item => (
+                  <>
+                    {item.label}
+                    {renderColumnName(item)}
+                  </>
+                )}
               />
             ) : (
               <p>No new indicators.</p>
@@ -313,7 +345,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 showOpenAll={false}
                 testId={`${sectionIds.autoMappedIndicators}-accordion`}
               >
-                return (
                 <AccordionSection
                   backToTop={false}
                   caption={
@@ -334,15 +365,29 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     newItems={newIndicators}
                     pendingUpdates={pendingUpdates}
                     readOnly={!canUpdateMappings}
-                    renderCandidate={candidate => candidate.label}
-                    renderSource={source => source.label}
+                    candidateHint={renderColumnName}
+                    renderCandidate={candidate => (
+                      <>
+                        {candidate.label}
+                        {renderColumnName(candidate)}
+                      </>
+                    )}
+                    renderSource={(source, mapping) => (
+                      <>
+                        {source.label}
+                        <ApiDataSetColumnName column={mapping.sourceKey} />
+                      </>
+                    )}
+                    renderSourceDetailsStart={renderSourceColumnSummary}
                     searchFilter={searchTerm =>
                       autoMappedIndicators.filter(item => {
                         const { candidate, mapping } = item;
 
                         const searchFields = compact([
                           candidate.label,
+                          candidate.key,
                           mapping.source.label,
+                          mapping.sourceKey,
                         ]);
 
                         return searchFields.some(field => {
@@ -353,7 +398,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     onUpdate={handleUpdateMapping}
                   />
                 </AccordionSection>
-                );
               </Accordion>
             ) : (
               <p>No indicators found in both.</p>
