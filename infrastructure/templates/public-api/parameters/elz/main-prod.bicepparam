@@ -7,3 +7,16 @@ param elz = true
 
 // Zone-redundant storage for the Data Processor. The data file share keeps its Premium_ZRS default.
 param storageAccountSku = 'Standard_ZRS'
+
+// Spread the Container App Environment across availability zones.
+param containerAppEnvironmentZoneRedundant = true
+
+// As ../main-prod.bicepparam, but with at least 2 replicas so that the Public API keeps running if a zone fails.
+param publicApiContainerAppConfig = {
+  cpuCores: 4
+  memoryGis: 8
+  minReplicas: 2
+  maxReplicas: 100
+  scaleAtConcurrentHttpRequests: 10
+  workloadProfileName: 'Consumption'
+}
