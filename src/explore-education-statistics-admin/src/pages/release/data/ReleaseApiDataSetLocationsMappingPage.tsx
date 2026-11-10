@@ -42,6 +42,7 @@ import omit from 'lodash/omit';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { useImmer } from 'use-immer';
+import BackToTopLink from '@common/components/BackToTopLink';
 
 export const sectionIds = {
   deletedLocationGroups: 'deleted-location-groups',
@@ -451,6 +452,8 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               </>
             )}
 
+            <BackToTopLink />
+
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
               id={sectionIds.newLocations}
@@ -521,7 +524,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
                   if (levelAutoMappedLocations?.length) {
                     return (
                       <AccordionSection
-                        backToTop={false}
+                        backToTop
                         heading={`${groupLabel} (${levelAutoMappedLocations.length})`}
                         headingTag="h4"
                         id={sectionIds.autoMappedLocationsLevel(level)}
