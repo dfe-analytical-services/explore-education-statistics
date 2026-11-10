@@ -6,12 +6,11 @@ import re
 import time
 import urllib.parse
 
-from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
-MSAL_TOKEN_KEYS_PATTERN = r"^msal\.(?:\d+\.)?token\.keys\.(.+)$"
+MSAL_TOKEN_KEYS_PATTERN = r"^msal\.\d+\.token\.keys\.(.+)$"
 
 
 def wait_until_access_token_in_browser_local_storage(driver, timeout_seconds: int = 30):
@@ -116,14 +115,14 @@ def _base64url_decode(value: str) -> bytes:
     return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
 
 
-def _get_msal_client_id(local_storage_json: dict) -> str:
-    # MSAL stores its token keys under "msal.<schema>.token.keys.<clientId>"
-    for key in local_storage_json.keys():
+def _get_msal_token_keys(local_storage_json: dict) -> tuple[str, dict]:
+    # MSAL indexes its token keys under "msal.<schema>.token.keys.<clientId>"
+    for key, value in local_storage_json.items():
         match = re.match(MSAL_TOKEN_KEYS_PATTERN, key)
         if match:
-            return match.group(1)
+            return match.group(1), value
 
-    raise RuntimeError("Unable to find MSAL client id in local storage JSON")
+    raise RuntimeError("Unable to find MSAL token keys in local storage JSON")
 
 
 def _decrypt_msal_cache_entry(key: str, entry: dict, base_key: bytes, client_id: str) -> dict:
@@ -149,38 +148,18 @@ def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
     if not encryption_cookie:
         raise RuntimeError("Unable to find MSAL encryption cookie in local storage JSON")
 
-    try:
-        cookie = json.loads(urllib.parse.unquote(encryption_cookie))
-        cookie_id = cookie["id"]
-        base_key = _base64url_decode(cookie["key"])
-    except (ValueError, KeyError, TypeError) as error:
-        # Raise as RuntimeError so callers treat it as unusable auth and log in again
-        raise RuntimeError(f"Unable to parse MSAL encryption cookie from local storage JSON: {error!r}") from error
+    cookie = json.loads(urllib.parse.unquote(encryption_cookie))
+    base_key = _base64url_decode(cookie["key"])
+    client_id, token_keys = _get_msal_token_keys(local_storage_json)
 
-    client_id = _get_msal_client_id(local_storage_json)
+    for key in token_keys.get("accessToken", []):
+        entry = local_storage_json.get(key)
 
-    access_tokens = []
+        # Entries encrypted with a different key are from a previous session
+        if entry and entry.get("id") == cookie["id"]:
+            return _decrypt_msal_cache_entry(key, entry, base_key, client_id)["secret"]
 
-    for key, entry in local_storage_json.items():
-        # Encrypted MSAL entries look like { id, nonce, data, lastUpdatedAt }.
-        # Entries encrypted with a different key are from a previous session.
-        if not isinstance(entry, dict) or entry.get("id") != cookie_id or "nonce" not in entry or "data" not in entry:
-            continue
-
-        try:
-            credential = _decrypt_msal_cache_entry(key, entry, base_key, client_id)
-        except (InvalidTag, ValueError):
-            # Entry can't be decrypted with this cookie's key, so ignore it
-            continue
-
-        if credential.get("credentialType") == "AccessToken":
-            access_tokens.append(credential)
-
-    if not access_tokens:
-        raise RuntimeError("Unable to find access token from local storage JSON")
-
-    # Use the token with the latest expiry if there is more than one
-    return max(access_tokens, key=lambda token: int(token.get("expiresOn", 0)))["secret"]
+    raise RuntimeError("Unable to find access token from local storage JSON")
 
 
 def get_access_token_from_file(user: str) -> str:
