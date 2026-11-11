@@ -15,7 +15,7 @@ public class FullResetFunctionTests
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenFullSearchableDocumentsReset_ThenFullReleaseDocumentResetterPerformsReset()
+    public async Task WhenFullReleaseDocumentsReset_ThenFullReleaseDocumentResetterPerformsReset()
     {
         // Arrange
         var sut = GetSut();
@@ -25,7 +25,7 @@ public class FullResetFunctionTests
         var functionContext = new FunctionContextMockBuilder().Build();
 
         // Act
-        await sut.FullSearchableDocumentsReset(httpRequest, functionContext);
+        await sut.FullReleaseDocumentsReset(httpRequest, functionContext);
 
         // Assert
         _fullReleaseDocumentResetter.Assert.PerformResetWasCalled();
@@ -36,9 +36,7 @@ public class FullResetFunctionTests
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]
-    public async Task WhenFullSearchableDocumentsReset_ThenRefreshReleaseDocumentCommandsReturned(
-        int numberOfPublications
-    )
+    public async Task WhenFullReleaseDocumentsReset_ThenRefreshReleaseDocumentCommandsReturned(int numberOfPublications)
     {
         // Arrange
         var publications = Enumerable
@@ -58,7 +56,7 @@ public class FullResetFunctionTests
         var functionContext = new FunctionContextMockBuilder().Build();
 
         // Act
-        var response = await sut.FullSearchableDocumentsReset(httpRequest, functionContext);
+        var response = await sut.FullReleaseDocumentsReset(httpRequest, functionContext);
 
         // Assert
         Assert.NotNull(response);
