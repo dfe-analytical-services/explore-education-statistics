@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
@@ -26,6 +27,11 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private const string GetDataSetDocumentKeysEndpoint = "/api/data-sets/searchable/keys";
 
+    private const string GetReleaseDataSetDocumentsEndpointFormat =
+        "/api/publications/{0}/releases/{1}/data-sets/searchable";
+
+    private const string GetPublicationDataSetDocumentsEndpointFormat = "/api/publications/{0}/data-sets/searchable";
+
     private const string GetThemesEndpoint = "/api/themes";
 
     private record GetResponse<T>
@@ -33,6 +39,8 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         public record Success(T Result) : GetResponse<T>;
 
         public record Error(string ErrorMessage) : GetResponse<T>;
+
+        public record NotFound(string ErrorMessage) : Error(ErrorMessage);
     }
 
     private async Task<GetResponse<TResponse>> Get<TResponse>(
@@ -46,9 +54,10 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             response = await HttpClient.GetAsync(apiEndpoint, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                return new GetResponse<TResponse>.Error(
-                    $"Error calling {apiEndpoint}: {response.ReasonPhrase}({response.StatusCode})"
-                );
+                var errorMessage = $"Error calling {apiEndpoint}: {response.ReasonPhrase}({response.StatusCode})";
+                return response.StatusCode == HttpStatusCode.NotFound
+                    ? new GetResponse<TResponse>.NotFound(errorMessage)
+                    : new GetResponse<TResponse>.Error(errorMessage);
             }
         }
         catch (HttpRequestException e)
@@ -170,6 +179,51 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             response,
             onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
             onError: errorMessage => new UnableToGetDataSetDocumentKeysException(errorMessage)
+        );
+    }
+
+    public async Task<DataSetDocument[]> GetReleaseDataSetDocuments(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var apiEndpoint = string.Format(GetReleaseDataSetDocumentsEndpointFormat, publicationSlug, releaseSlug);
+        var response = await Get<DataSetSearchableDocumentDto[]>(apiEndpoint, cancellationToken);
+
+        if (response is GetResponse<DataSetSearchableDocumentDto[]>.NotFound)
+        {
+            return [];
+        }
+
+        return Process(
+            response,
+            onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
+            onError: errorMessage => new UnableToGetReleaseDataSetDocumentsException(
+                publicationSlug,
+                releaseSlug,
+                errorMessage
+            )
+        );
+    }
+
+    public async Task<DataSetDocument[]> GetPublicationDataSetDocuments(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var apiEndpoint = string.Format(GetPublicationDataSetDocumentsEndpointFormat, publicationSlug);
+        var response = await Get<DataSetSearchableDocumentDto[]>(apiEndpoint, cancellationToken);
+
+        if (response is GetResponse<DataSetSearchableDocumentDto[]>.NotFound)
+        {
+            return [];
+        }
+
+        return Process(
+            response,
+            onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
+            onError: errorMessage => new UnableToGetPublicationDataSetDocumentsException(publicationSlug, errorMessage)
         );
     }
 
