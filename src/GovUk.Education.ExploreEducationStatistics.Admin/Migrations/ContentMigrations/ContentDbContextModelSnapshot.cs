@@ -242,12 +242,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("RolloverHasChanges")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("RolloverSourceVersionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
 
@@ -1348,9 +1342,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("RolloverResolvedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Summary")
                         .HasColumnType("nvarchar(max)");

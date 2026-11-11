@@ -41,8 +41,6 @@ public class ReleaseFile
     public List<PairedIndicatorEntry>? PairedIndicators { get; set; }
 
     public DateTime? Published { get; set; }
-
-    public DateTime? RolloverResolvedAt { get; set; }
 }
 
 public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> FilterGroupSequence);
