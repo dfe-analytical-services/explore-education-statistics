@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.14")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BoundaryLevel", (string)null);
+                    b.ToTable("BoundaryLevel");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.BoundaryData", b =>
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("Code");
 
-                    b.ToTable("BoundaryData", (string)null);
+                    b.ToTable("BoundaryData");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Filter", (string)null);
+                    b.ToTable("Filter");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterFootnote", b =>
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("FilterFootnote", (string)null);
+                    b.ToTable("FilterFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FilterId");
 
-                    b.ToTable("FilterGroup", (string)null);
+                    b.ToTable("FilterGroup");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroupFootnote", b =>
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("FilterGroupFootnote", (string)null);
+                    b.ToTable("FilterGroupFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FilterGroupId");
 
-                    b.ToTable("FilterItem", (string)null);
+                    b.ToTable("FilterItem");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItemFootnote", b =>
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("FilterItemFootnote", (string)null);
+                    b.ToTable("FilterItemFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", b =>
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Footnote", (string)null);
+                    b.ToTable("Footnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Indicator", (string)null);
+                    b.ToTable("Indicator");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
@@ -285,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("IndicatorFootnote", (string)null);
+                    b.ToTable("IndicatorFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("IndicatorGroup", (string)null);
+                    b.ToTable("IndicatorGroup");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Location", b =>
@@ -477,7 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("Ward_Code");
 
-                    b.ToTable("Location", (string)null);
+                    b.ToTable("Location");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
@@ -516,7 +516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("Year");
 
-                    b.ToTable("Observation", (string)null);
+                    b.ToTable("Observation");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
@@ -536,7 +536,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FilterItemId");
 
-                    b.ToTable("ObservationFilterItem", (string)null);
+                    b.ToTable("ObservationFilterItem");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseFootnote", b =>
@@ -551,7 +551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("ReleaseFootnote", (string)null);
+                    b.ToTable("ReleaseFootnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
@@ -572,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("ReleaseSubject", (string)null);
+                    b.ToTable("ReleaseSubject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion", b =>
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("PublicationId");
 
-                    b.ToTable("ReleaseVersion", (string)null);
+                    b.ToTable("ReleaseVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
@@ -602,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subject", (string)null);
+                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
@@ -617,7 +617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.HasIndex("FootnoteId");
 
-                    b.ToTable("SubjectFootnote", (string)null);
+                    b.ToTable("SubjectFootnote");
                 });
 
             modelBuilder.Entity("Thinktecture:TempTable:GovUk.Education.ExploreEducationStatistics.Data.Model.Database.IdTempTable", b =>
@@ -667,7 +667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateOnly>("Column1")
                         .HasColumnType("date");
 
-                    b.ToTable("#TempTable<DateOnly>", null, t =>
+                    b.ToTable("#TempTable<DateOnly>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -678,7 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateOnly?>("Column1")
                         .HasColumnType("date");
 
-                    b.ToTable("#TempTable<DateOnly?>", null, t =>
+                    b.ToTable("#TempTable<DateOnly?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -689,7 +689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTime>("Column1")
                         .HasColumnType("datetime2");
 
-                    b.ToTable("#TempTable<DateTime>", null, t =>
+                    b.ToTable("#TempTable<DateTime>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -700,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTime?>("Column1")
                         .HasColumnType("datetime2");
 
-                    b.ToTable("#TempTable<DateTime?>", null, t =>
+                    b.ToTable("#TempTable<DateTime?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTimeOffset>("Column1")
                         .HasColumnType("datetimeoffset");
 
-                    b.ToTable("#TempTable<DateTimeOffset>", null, t =>
+                    b.ToTable("#TempTable<DateTimeOffset>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -722,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTimeOffset?>("Column1")
                         .HasColumnType("datetimeoffset");
 
-                    b.ToTable("#TempTable<DateTimeOffset?>", null, t =>
+                    b.ToTable("#TempTable<DateTimeOffset?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -733,7 +733,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("Column1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("#TempTable<Guid>", null, t =>
+                    b.ToTable("#TempTable<Guid>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -744,7 +744,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid?>("Column1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("#TempTable<Guid?>", null, t =>
+                    b.ToTable("#TempTable<Guid?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -755,7 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<TimeOnly>("Column1")
                         .HasColumnType("time");
 
-                    b.ToTable("#TempTable<TimeOnly>", null, t =>
+                    b.ToTable("#TempTable<TimeOnly>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -766,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<TimeOnly?>("Column1")
                         .HasColumnType("time");
 
-                    b.ToTable("#TempTable<TimeOnly?>", null, t =>
+                    b.ToTable("#TempTable<TimeOnly?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -777,7 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<TimeSpan>("Column1")
                         .HasColumnType("time");
 
-                    b.ToTable("#TempTable<TimeSpan>", null, t =>
+                    b.ToTable("#TempTable<TimeSpan>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -788,7 +788,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<TimeSpan?>("Column1")
                         .HasColumnType("time");
 
-                    b.ToTable("#TempTable<TimeSpan?>", null, t =>
+                    b.ToTable("#TempTable<TimeSpan?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -799,7 +799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<bool>("Column1")
                         .HasColumnType("bit");
 
-                    b.ToTable("#TempTable<bool>", null, t =>
+                    b.ToTable("#TempTable<bool>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -810,7 +810,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<bool?>("Column1")
                         .HasColumnType("bit");
 
-                    b.ToTable("#TempTable<bool?>", null, t =>
+                    b.ToTable("#TempTable<bool?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -821,7 +821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<byte>("Column1")
                         .HasColumnType("tinyint");
 
-                    b.ToTable("#TempTable<byte>", null, t =>
+                    b.ToTable("#TempTable<byte>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -832,7 +832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<byte?>("Column1")
                         .HasColumnType("tinyint");
 
-                    b.ToTable("#TempTable<byte?>", null, t =>
+                    b.ToTable("#TempTable<byte?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -844,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasPrecision(38, 18)
                         .HasColumnType("decimal(38,18)");
 
-                    b.ToTable("#TempTable<decimal>", null, t =>
+                    b.ToTable("#TempTable<decimal>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -856,7 +856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasPrecision(38, 18)
                         .HasColumnType("decimal(38,18)");
 
-                    b.ToTable("#TempTable<decimal?>", null, t =>
+                    b.ToTable("#TempTable<decimal?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -867,7 +867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<double>("Column1")
                         .HasColumnType("float");
 
-                    b.ToTable("#TempTable<double>", null, t =>
+                    b.ToTable("#TempTable<double>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -878,7 +878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<double?>("Column1")
                         .HasColumnType("float");
 
-                    b.ToTable("#TempTable<double?>", null, t =>
+                    b.ToTable("#TempTable<double?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -889,7 +889,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<float>("Column1")
                         .HasColumnType("real");
 
-                    b.ToTable("#TempTable<float>", null, t =>
+                    b.ToTable("#TempTable<float>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -900,7 +900,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<float?>("Column1")
                         .HasColumnType("real");
 
-                    b.ToTable("#TempTable<float?>", null, t =>
+                    b.ToTable("#TempTable<float?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -911,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<int>("Column1")
                         .HasColumnType("int");
 
-                    b.ToTable("#TempTable<int>", null, t =>
+                    b.ToTable("#TempTable<int>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -922,7 +922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<int?>("Column1")
                         .HasColumnType("int");
 
-                    b.ToTable("#TempTable<int?>", null, t =>
+                    b.ToTable("#TempTable<int?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -933,7 +933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<long>("Column1")
                         .HasColumnType("bigint");
 
-                    b.ToTable("#TempTable<long>", null, t =>
+                    b.ToTable("#TempTable<long>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -944,7 +944,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<long?>("Column1")
                         .HasColumnType("bigint");
 
-                    b.ToTable("#TempTable<long?>", null, t =>
+                    b.ToTable("#TempTable<long?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -955,7 +955,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<short>("Column1")
                         .HasColumnType("smallint");
 
-                    b.ToTable("#TempTable<short>", null, t =>
+                    b.ToTable("#TempTable<short>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -966,7 +966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<short?>("Column1")
                         .HasColumnType("smallint");
 
-                    b.ToTable("#TempTable<short?>", null, t =>
+                    b.ToTable("#TempTable<short?>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
@@ -977,7 +977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("Column1")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("#TempTable<string>", null, t =>
+                    b.ToTable("#TempTable<string>", t =>
                         {
                             t.ExcludeFromMigrations();
                         });
