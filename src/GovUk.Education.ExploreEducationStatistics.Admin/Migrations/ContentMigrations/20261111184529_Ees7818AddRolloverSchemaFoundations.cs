@@ -18,27 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 nullable: true
             );
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "RolloverResolvedAt",
-                table: "ReleaseFiles",
-                type: "datetime2",
-                nullable: true
-            );
-
-            migrationBuilder.AddColumn<bool>(
-                name: "RolloverHasChanges",
-                table: "DataBlockVersions",
-                type: "bit",
-                nullable: true
-            );
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "RolloverSourceVersionId",
-                table: "DataBlockVersions",
-                type: "uniqueidentifier",
-                nullable: true
-            );
-
             migrationBuilder.CreateIndex(
                 name: "IX_Releases_RolloverSourceReleaseId",
                 table: "Releases",
@@ -62,12 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.DropIndex(name: "IX_Releases_RolloverSourceReleaseId", table: "Releases");
 
             migrationBuilder.DropColumn(name: "RolloverSourceReleaseId", table: "Releases");
-
-            migrationBuilder.DropColumn(name: "RolloverResolvedAt", table: "ReleaseFiles");
-
-            migrationBuilder.DropColumn(name: "RolloverHasChanges", table: "DataBlockVersions");
-
-            migrationBuilder.DropColumn(name: "RolloverSourceVersionId", table: "DataBlockVersions");
         }
     }
 }

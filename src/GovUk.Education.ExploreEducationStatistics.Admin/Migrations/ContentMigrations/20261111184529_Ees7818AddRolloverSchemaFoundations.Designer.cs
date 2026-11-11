@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20261109160633_Ees7818AddRolloverSchemaFoundations")]
+    [Migration("20261111184529_Ees7818AddRolloverSchemaFoundations")]
     partial class Ees7818AddRolloverSchemaFoundations
     {
         /// <inheritdoc />
@@ -243,12 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ReleaseVersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool?>("RolloverHasChanges")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("RolloverSourceVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Source")
@@ -1348,9 +1342,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("ReleaseVersionId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("RolloverResolvedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Summary")
                         .HasColumnType("nvarchar(max)");

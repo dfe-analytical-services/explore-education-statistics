@@ -1022,6 +1022,57 @@ public class ThemeServiceTests
     }
 
     [Fact]
+    public async Task DeleteThemes_ReleaseIsRolloverSourceForReleaseInRetainedTheme_RolloverSourceReleaseIdCleared()
+    {
+        Theme themeToDelete = _fixture.DefaultTheme();
+        Theme themeToRetain = _fixture.DefaultTheme();
+
+        Publication publicationToDelete = _fixture.DefaultPublication().WithTheme(themeToDelete);
+
+        Release sourceRelease = _fixture.DefaultRelease().WithPublication(publicationToDelete).Generate();
+
+        Publication publicationToRetain = _fixture.DefaultPublication().WithTheme(themeToRetain);
+
+        Release rolloverRelease = _fixture
+            .DefaultRelease()
+            .WithPublication(publicationToRetain)
+            .WithRolloverSourceRelease(sourceRelease)
+            .Generate();
+
+        using var fixture = new SqliteContentDbContextFixture();
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Publications.AddRange(publicationToDelete, publicationToRetain);
+            context.Releases.AddRange(sourceRelease, rolloverRelease);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+
+            var result = await service.DeleteThemes([themeToDelete.Id]);
+
+            VerifyAllMocks(publishingService);
+            result.AssertRight();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            // The rollover Release belongs to a Theme that was not deleted, so it must survive with its
+            // reference to the deleted source Release cleared. SQL Server cannot do this for us, as it
+            // rejects cascading actions on self-referencing foreign keys.
+            var remainingRelease = Assert.Single(await context.Releases.ToListAsync());
+            Assert.Equal(rolloverRelease.Id, remainingRelease.Id);
+            Assert.Null(remainingRelease.RolloverSourceReleaseId);
+        }
+    }
+
+    [Fact]
     public async Task DeleteThemes_ThemeNotFound_OthersDeleted_LogsWarningAndSucceeds()
     {
         var theme = new Theme { Id = Guid.NewGuid(), Title = "Theme to delete" };

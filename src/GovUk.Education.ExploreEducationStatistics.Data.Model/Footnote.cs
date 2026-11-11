@@ -29,8 +29,4 @@ public class Footnote : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
 
     // TODO EES-2979 Make this non-nullable and remove Releases once every Footnote belongs to one ReleaseVersion
     public Guid? ReleaseVersionId { get; set; }
-
-    public bool? RolloverHasChanges { get; set; }
-
-    public Guid? RolloverSourceFootnoteId { get; set; }
 }
