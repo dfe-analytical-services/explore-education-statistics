@@ -13,7 +13,7 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 {
     internal HttpClient HttpClient { get; } = httpClient;
 
-    private const string GetPublicationLatestReleaseSearchViewModelApiEndpointFormat =
+    private const string GetPublicationLatestReleaseSearchableDocumentApiEndpointFormat =
         "api/publications/{0}/releases/latest/searchable";
 
     private const string GetPublicationsEndpoint = "/api/publicationInfos";
@@ -71,18 +71,18 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             : new GetResponse<TResponse>.Success(responseData);
     }
 
-    public async Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
+    public async Task<ReleaseDocument> GetPublicationLatestReleaseDocument(
         string publicationSlug,
         CancellationToken cancellationToken
     )
     {
-        var apiEndpoint = BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(publicationSlug);
+        var apiEndpoint = BuildGetPublicationLatestReleaseSearchableDocumentApiEndpoint(publicationSlug);
         var response = await Get<ReleaseSearchableDocumentDto>(apiEndpoint, cancellationToken);
 
         return Process(
             response,
             onSuccess: dto => dto.ToModel(),
-            onError: errorMessage => new UnableToGetPublicationLatestReleaseSearchViewModelException(
+            onError: errorMessage => new UnableToGetPublicationLatestReleaseDocumentException(
                 publicationSlug,
                 errorMessage
             )
@@ -169,8 +169,8 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
     private static string BuildGetPublicationReleaseIdsEndpoint(string publicationSlug) =>
         string.Format(GetPublicationReleaseIdsEndpointFormat, publicationSlug);
 
-    private static string BuildGetPublicationLatestReleaseSearchViewModelApiEndpoint(string publicationSlug) =>
-        string.Format(GetPublicationLatestReleaseSearchViewModelApiEndpointFormat, publicationSlug);
+    private static string BuildGetPublicationLatestReleaseSearchableDocumentApiEndpoint(string publicationSlug) =>
+        string.Format(GetPublicationLatestReleaseSearchableDocumentApiEndpointFormat, publicationSlug);
 
     private static TResult Process<TResponse, TResult>(
         GetResponse<TResponse> response,

@@ -3,6 +3,7 @@ import { Footnote } from '@common/services/types/footnotes';
 import downloadTableOdsFile from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import ExportMenu from '@common/components/ExportMenu';
+import logger from '@common/services/logger';
 import downloadFile from '@common/utils/file/downloadFile';
 import React, { RefObject } from 'react';
 import copyElementToClipboard from '@common/utils/copyElementToClipboard';
@@ -42,6 +43,14 @@ export default function TableExportMenu({
     downloadFile({ file: csv, fileName });
   };
 
+  const handleCopyToClipboard = async () => {
+    try {
+      await copyElementToClipboard(tableRef);
+    } catch (error) {
+      logger.error(error);
+    }
+  };
+
   return (
     <ExportMenu title={title || 'table'}>
       <li role="menuitem">
@@ -55,7 +64,7 @@ export default function TableExportMenu({
         </ButtonText>
       </li>
       <li role="menuitem">
-        <ButtonText onClick={() => copyElementToClipboard(tableRef)}>
+        <ButtonText onClick={handleCopyToClipboard}>
           Copy table to clipboard
         </ButtonText>
       </li>

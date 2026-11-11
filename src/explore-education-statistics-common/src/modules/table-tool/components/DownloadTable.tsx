@@ -6,6 +6,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import downloadTableOdsFile from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
+import logger from '@common/services/logger';
 import { Footnote } from '@common/services/types/footnotes';
 import downloadFile from '@common/utils/file/downloadFile';
 import Yup from '@common/validation/yup';
@@ -56,6 +57,14 @@ const DownloadTable = ({
       : tableTitle;
 
     downloadTableOdsFile(fileName, tableFootnotes, tableRef, title);
+  };
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await copyElementToClipboard(tableRef);
+    } catch (error) {
+      logger.error(error);
+    }
   };
 
   const options = [
@@ -122,10 +131,7 @@ const DownloadTable = ({
                 <Button type="submit" disabled={formState.isSubmitting}>
                   Download table
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => copyElementToClipboard(tableRef)}
-                >
+                <Button variant="secondary" onClick={handleCopyToClipboard}>
                   Copy table to clipboard
                 </Button>
                 <LoadingSpinner

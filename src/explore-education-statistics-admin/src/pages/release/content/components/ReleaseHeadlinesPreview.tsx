@@ -6,9 +6,10 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
+import KeyStatsExportMenu from '@common/modules/find-statistics/components/KeyStatsExportMenu';
 import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
-import React from 'react';
+import React, { useRef } from 'react';
 
 interface Props {
   release: EditableRelease;
@@ -19,50 +20,59 @@ const ReleaseHeadlinesRedesign = ({
   release,
   transformFeaturedTableLinks,
 }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const getChartFile = useGetChartFile(release.id);
 
   const { headlinesSection, keyStatistics, keyStatisticsSecondarySection } =
     release;
 
+  const hasExportableContent =
+    !!keyStatistics?.length || headlinesSection.content.length > 0;
+
   const summaryTab = (
     <>
-      <KeyStatContainer>
-        {keyStatistics?.map(keyStat => {
-          if (keyStat.type === 'KeyStatisticDataBlock') {
+      {hasExportableContent && (
+        <KeyStatsExportMenu containerRef={containerRef} />
+      )}
+      <div ref={containerRef}>
+        <KeyStatContainer>
+          {keyStatistics?.map(keyStat => {
+            if (keyStat.type === 'KeyStatisticDataBlock') {
+              return (
+                <KeyStatDataBlock
+                  key={keyStat.id}
+                  releaseVersionId={release.id}
+                  dataBlockId={keyStat.dataBlockId}
+                  trend={keyStat.trend}
+                  guidanceTitle={keyStat.guidanceTitle}
+                  guidanceText={keyStat.guidanceText}
+                />
+              );
+            }
+
             return (
-              <KeyStatDataBlock
+              <KeyStat
                 key={keyStat.id}
-                releaseVersionId={release.id}
-                dataBlockId={keyStat.dataBlockId}
+                title={keyStat.title}
+                statistic={keyStat.statistic}
                 trend={keyStat.trend}
                 guidanceTitle={keyStat.guidanceTitle}
                 guidanceText={keyStat.guidanceText}
               />
             );
-          }
+          })}
+        </KeyStatContainer>
 
-          return (
-            <KeyStat
-              key={keyStat.id}
-              title={keyStat.title}
-              statistic={keyStat.statistic}
-              trend={keyStat.trend}
-              guidanceTitle={keyStat.guidanceTitle}
-              guidanceText={keyStat.guidanceText}
+        {headlinesSection.content.map(block => (
+          <div key={block.id} data-scroll={`editableSectionBlocks-${block.id}`}>
+            <ReleaseBlock
+              block={block}
+              releaseVersionId={release.id}
+              transformFeaturedTableLinks={transformFeaturedTableLinks}
             />
-          );
-        })}
-      </KeyStatContainer>
-
-      {headlinesSection.content.map(block => (
-        <div key={block.id} data-scroll={`editableSectionBlocks-${block.id}`}>
-          <ReleaseBlock
-            block={block}
-            releaseVersionId={release.id}
-            transformFeaturedTableLinks={transformFeaturedTableLinks}
-          />
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </>
   );
 

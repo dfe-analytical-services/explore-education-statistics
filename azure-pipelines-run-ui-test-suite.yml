@@ -30,7 +30,7 @@ jobs:
       inputs:
         azureSubscription: $(SPN_NAME)
         KeyVaultName: s101d01-kv-ees-01
-        SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl
+        SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-teams-uitests-webhookurl
         RunAsPreJob: true
 
     - task: PythonScript@0
@@ -43,7 +43,6 @@ jobs:
         # The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
         workingDirectory: tests/robot-tests
       env:
-        SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
         # The test runner reports to Teams whenever this is set, so that every environment
         # reports itself without any further pipeline configuration.
         TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)

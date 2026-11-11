@@ -1,4 +1,5 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('The URL of the Data API.')
@@ -13,17 +14,20 @@ param logAnalyticsWorkspaceId string
 @description('Specifies the Azure AI Search service name.')
 param searchServiceName string
 
-@description('Name of the \'Natural language search filter\' index in Azure AI Search.')
-param searchServiceNLSearchFilterIndexName string
+@description('Name of the \'Filter\' index in Azure AI Search.')
+param searchServiceFilterIndexName string
 
-@description('Name of the \'Natural language search dataset\' index in Azure AI Search.')
-param searchServiceNLSearchDatasetIndexName string
+@description('Name of the \'Dataset\' index in Azure AI Search.')
+param searchServiceDatasetIndexName string
 
 @description('The IP address ranges that can access the Natural Language Search Function App storage account.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
@@ -69,11 +73,11 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       }
       {
         name: 'AZURE_SEARCH_FILTER_INDEX'
-        value: searchServiceNLSearchFilterIndexName
+        value: searchServiceFilterIndexName
       }
       {
         name: 'AZURE_SEARCH_DATASET_INDEX'
-        value: searchServiceNLSearchDatasetIndexName
+        value: searchServiceDatasetIndexName
       }
       {
         name: 'AZURE_OPENAI_ENDPOINT'
@@ -121,6 +125,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     linuxFxVersion: 'Python|3.14'
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: resourceNames.nlSearch.functionStorageAccount
+    storageAccountSku: storageAccountSku
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.nlSearchStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

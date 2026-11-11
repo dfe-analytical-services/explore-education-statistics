@@ -57,8 +57,10 @@ export default function DataSetFileApiVersionHistory({
             part of a new release (likely with new / additional data).
           </li>
           <li className="govuk-!-margin-bottom-0">
-            Patch update (e.g. 1.1.0 to 1.1.1): a non-breaking change made as
-            part of a release amendment (e.g. data corrections).
+            Patch update (e.g. 1.1.0 to 1.1.1): a change made as part of a
+            release amendment (e.g. data corrections). These are usually
+            non-breaking, but in exceptional circumstances may include breaking
+            changes, which will be listed in the changelog.
           </li>
         </ul>
         <p>

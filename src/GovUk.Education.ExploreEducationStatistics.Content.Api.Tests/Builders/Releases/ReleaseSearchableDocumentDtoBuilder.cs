@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Builders.Releases;

@@ -14,6 +14,7 @@ import { useNotificationHubContext } from '@admin/contexts/NotificationHubContex
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import InsetText from '@common/components/InsetText';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 
 const ServiceAnnouncementPage = () => {
   interface FormValues {
@@ -45,7 +46,10 @@ const ServiceAnnouncementPage = () => {
       caption="Instantly broadcast a message to all connected users"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Service announcement' },
       ]}
     >

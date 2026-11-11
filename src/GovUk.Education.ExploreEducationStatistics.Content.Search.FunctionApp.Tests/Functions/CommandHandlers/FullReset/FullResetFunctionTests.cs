@@ -7,15 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class FullResetFunctionTests
 {
-    private readonly FullSearchableDocumentResetterMockBuilder _fullSearchableDocumentResetter = new();
+    private readonly FullReleaseDocumentResetterMockBuilder _fullReleaseDocumentResetter = new();
 
-    private FullResetFunction GetSut() => new(_fullSearchableDocumentResetter.Build(), new TestableCommandHandler());
+    private FullResetFunction GetSut() => new(_fullReleaseDocumentResetter.Build(), new TestableCommandHandler());
 
     [Fact]
     public void Can_instantiate_Sut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenFullSearchableDocumentsReset_ThenFullSearchableDocumentResetterPerformsReset()
+    public async Task WhenFullSearchableDocumentsReset_ThenFullReleaseDocumentResetterPerformsReset()
     {
         // Arrange
         var sut = GetSut();
@@ -28,7 +28,7 @@ public class FullResetFunctionTests
         await sut.FullSearchableDocumentsReset(httpRequest, functionContext);
 
         // Assert
-        _fullSearchableDocumentResetter.Assert.PerformResetWasCalled();
+        _fullReleaseDocumentResetter.Assert.PerformResetWasCalled();
     }
 
     [Theory]
@@ -36,7 +36,7 @@ public class FullResetFunctionTests
     [InlineData(1)]
     [InlineData(10)]
     [InlineData(100)]
-    public async Task WhenFullSearchableDocumentsReset_ThenResetPublicationSearchableDocumentCommandsReturned(
+    public async Task WhenFullSearchableDocumentsReset_ThenRefreshReleaseDocumentCommandsReturned(
         int numberOfPublications
     )
     {
@@ -49,7 +49,7 @@ public class FullResetFunctionTests
                 LatestReleaseSlug = $"release-slug-{i}",
             })
             .ToArray();
-        _fullSearchableDocumentResetter.WherePublicationsReturnedAre(publications);
+        _fullReleaseDocumentResetter.WherePublicationsReturnedAre(publications);
 
         var sut = GetSut();
 

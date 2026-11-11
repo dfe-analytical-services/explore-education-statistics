@@ -45,11 +45,15 @@ public class ConfigControllerTests
         var publicDataApiOptions = new PublicDataApiOptions();
         configuration.Bind(PublicDataApiOptions.Section, publicDataApiOptions);
 
+        var appOptions = new AppOptions();
+        configuration.Bind(AppOptions.Section, appOptions);
+
         var controller = new ConfigController(
             openIdConnectSpaClientOptions.ToOptionsWrapper(),
             appInsightsOptions.ToOptionsWrapper(),
             publicAppOptions.ToOptionsWrapper(),
-            publicDataApiOptions.ToOptionsWrapper()
+            publicDataApiOptions.ToOptionsWrapper(),
+            appOptions.ToOptionsWrapper()
         );
 
         var result = controller.GetConfig();
@@ -76,6 +80,43 @@ public class ConfigControllerTests
         Assert.Equal(realm, authorityMetadata.Issuer);
         Assert.Equal($"{realm}/protocol/openid-connect/userinfo", authorityMetadata.UserInfoEndpoint);
         Assert.Equal($"{realm}/protocol/openid-connect/logout", authorityMetadata.EndSessionEndpoint);
+
+        Assert.True(viewModel.EnableReleaseRollover);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void GetConfig_EnableReleaseRollover_ReflectsAppOptions(bool enableReleaseRollover)
+    {
+        var configuration = GetConfiguration();
+
+        var openIdConnectSpaClientOptions = new OpenIdConnectSpaClientOptions();
+        configuration.Bind(OpenIdConnectSpaClientOptions.Section, openIdConnectSpaClientOptions);
+
+        var appInsightsOptions = new AppInsightsOptions();
+        configuration.Bind(AppInsightsOptions.Section, appInsightsOptions);
+
+        var publicAppOptions = new PublicAppOptions();
+        configuration.Bind(PublicAppOptions.Section, publicAppOptions);
+
+        var publicDataApiOptions = new PublicDataApiOptions();
+        configuration.Bind(PublicDataApiOptions.Section, publicDataApiOptions);
+
+        var appOptions = new AppOptions { EnableReleaseRollover = enableReleaseRollover };
+
+        var controller = new ConfigController(
+            openIdConnectSpaClientOptions.ToOptionsWrapper(),
+            appInsightsOptions.ToOptionsWrapper(),
+            publicAppOptions.ToOptionsWrapper(),
+            publicDataApiOptions.ToOptionsWrapper(),
+            appOptions.ToOptionsWrapper()
+        );
+
+        var result = controller.GetConfig();
+        var viewModel = result.AssertOkResult();
+
+        Assert.Equal(enableReleaseRollover, viewModel.EnableReleaseRollover);
     }
 
     private static IConfiguration GetConfiguration()

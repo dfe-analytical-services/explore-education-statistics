@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationRestored;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationRestored.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -21,7 +21,7 @@ public class OnPublicationRestoredFunctionTests
     {
         var payload = new PublicationRestoredEventDto { PublicationSlug = "publication-slug" };
         var eventGridEvent = new EventGridEventBuilder().WithPayload(payload).Build();
-        var expected = new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug };
+        var expected = new RefreshReleaseDocumentMessageDto { PublicationSlug = payload.PublicationSlug };
 
         var response = await GetSut().OnPublicationRestored(eventGridEvent, new FunctionContextMockBuilder().Build());
 
