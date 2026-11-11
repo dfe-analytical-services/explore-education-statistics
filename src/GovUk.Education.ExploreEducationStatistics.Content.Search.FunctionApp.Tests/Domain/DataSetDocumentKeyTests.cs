@@ -19,4 +19,23 @@ public class DataSetDocumentKeyTests
             key.BlobName
         );
     }
+
+    [Fact]
+    public void BlobNamePrefix_ForPublication_IsPublicationId()
+    {
+        var prefix = DataSetDocumentKey.BlobNamePrefix(Guid.Parse("e20a2dd9-98d3-47bc-af5e-4818f3e0e692"));
+
+        Assert.Equal("e20a2dd9-98d3-47bc-af5e-4818f3e0e692/", prefix);
+    }
+
+    [Fact]
+    public void BlobNamePrefix_ForRelease_IsPublicationIdThenReleaseId()
+    {
+        var prefix = DataSetDocumentKey.BlobNamePrefix(
+            Guid.Parse("e20a2dd9-98d3-47bc-af5e-4818f3e0e692"),
+            Guid.Parse("0ad33459-9eab-447d-a43e-23ffb680e9e5")
+        );
+
+        Assert.Equal("e20a2dd9-98d3-47bc-af5e-4818f3e0e692/0ad33459-9eab-447d-a43e-23ffb680e9e5/", prefix);
+    }
 }

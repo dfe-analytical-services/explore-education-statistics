@@ -140,6 +140,22 @@ internal class AzureBlobStorageClientMockBuilder
             );
         }
 
+        public void NoBlobsListed()
+        {
+            mock.Verify(
+                m => m.ListBlobsInContainer(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
+        public void BlobWasNotDeleted(string blobName)
+        {
+            mock.Verify(
+                m => m.DeleteBlobIfExists(It.IsAny<string>(), blobName, It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
         public void NoBlobsDeleted()
         {
             mock.Verify(

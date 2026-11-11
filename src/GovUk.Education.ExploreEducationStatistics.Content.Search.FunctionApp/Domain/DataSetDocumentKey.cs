@@ -13,5 +13,12 @@ public record DataSetDocumentKey
     /// The name of the blob holding the data set document. The publication and release prefixes allow all the
     /// documents of a publication or release to be listed or removed by prefix.
     /// </summary>
-    public string BlobName => $"{PublicationId}/{ReleaseId}/{FileId}.json";
+    public string BlobName => $"{BlobNamePrefix(PublicationId, ReleaseId)}{FileId}.json";
+
+    /// <summary>
+    /// The prefix shared by the names of the blobs holding the data set documents of a publication, or of one of its
+    /// releases if a release id is specified.
+    /// </summary>
+    public static string BlobNamePrefix(Guid publicationId, Guid? releaseId = null) =>
+        releaseId is null ? $"{publicationId}/" : $"{publicationId}/{releaseId}/";
 }
