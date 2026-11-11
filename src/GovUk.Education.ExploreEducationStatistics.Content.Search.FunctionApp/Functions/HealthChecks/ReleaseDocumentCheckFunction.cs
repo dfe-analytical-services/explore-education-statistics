@@ -6,11 +6,11 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class SearchableDocumentCheckFunction(ReleaseDocumentChecker releaseDocumentChecker)
+public class ReleaseDocumentCheckFunction(ReleaseDocumentChecker releaseDocumentChecker)
 {
-    [Function(nameof(SearchableDocumentCheck))]
+    [Function(nameof(ReleaseDocumentCheck))]
     [Produces("application/json")]
-    public async Task<IActionResult> SearchableDocumentCheck(
+    public async Task<IActionResult> ReleaseDocumentCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest ignored, //  The binding name _ is invalid
         CancellationToken cancellationToken
     )
