@@ -1034,6 +1034,124 @@ public class PublicationServiceTests
         _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
     }
 
+    [Fact]
+    public async Task UpdatePublication_AlreadyPublished_OnlyThemeChanged_UpdatesTreeCacheAndRaisesEvent()
+    {
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases([_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: false)])
+            .WithTheme(_dataFixture.DefaultTheme());
+
+        Theme otherTheme = _dataFixture.DefaultTheme();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Publications.Add(publication);
+            context.Themes.Add(otherTheme);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context);
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
+                {
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    ThemeId = otherTheme.Id,
+                    SupersededById = null,
+                }
+            );
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(otherTheme.Id, viewModel.Theme.Id);
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var updatedPublication = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+            Assert.Equal(otherTheme.Id, updatedPublication.ThemeId);
+            Assert.Equal(publication.Title, updatedPublication.Title);
+            Assert.Equal(publication.Summary, updatedPublication.Summary);
+            Assert.Equal(publication.Slug, updatedPublication.Slug);
+
+            // The slug is unchanged so no redirect should be created
+            Assert.Empty(await context.PublicationRedirects.ToListAsync());
+
+            // Check that an event is still raised when UpdatePublication is only being used
+            // to move a publication between themes
+            AssertOnPublicationChangedEventRaised(updatedPublication);
+        }
+
+        // The publication's own cache is only removed when the slug changes,
+        // but the publications and methodologies trees are grouped by theme so they should be refreshed
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
+    }
+
+    [Fact]
+    public async Task UpdatePublication_NotPublished_OnlyThemeChanged_NoCacheUpdatesOrEventsRaised()
+    {
+        Publication publication = _dataFixture.DefaultPublication().WithTheme(_dataFixture.DefaultTheme());
+
+        Theme otherTheme = _dataFixture.DefaultTheme();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            context.Publications.Add(publication);
+            context.Themes.Add(otherTheme);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context);
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
+                {
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    ThemeId = otherTheme.Id,
+                    SupersededById = null,
+                }
+            );
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(otherTheme.Id, viewModel.Theme.Id);
+        }
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var updatedPublication = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+            Assert.Equal(otherTheme.Id, updatedPublication.ThemeId);
+            Assert.Equal(publication.Title, updatedPublication.Title);
+            Assert.Equal(publication.Summary, updatedPublication.Summary);
+            Assert.Equal(publication.Slug, updatedPublication.Slug);
+
+            Assert.Empty(await context.PublicationRedirects.ToListAsync());
+        }
+
+        // Moving a publication that isn't live between themes should not raise an event or touch any caches
+        AssertOnPublicationChangedEventsNotRaised();
+        _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
+        _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
+    }
+
     [Theory]
     [MemberData(
         nameof(PublicationServiceTestsTheoryData.PublicationArchivedEventTestData),
