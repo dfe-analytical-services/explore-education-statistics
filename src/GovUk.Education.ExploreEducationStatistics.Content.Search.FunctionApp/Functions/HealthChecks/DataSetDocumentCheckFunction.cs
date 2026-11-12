@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -6,16 +6,16 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.HealthChecks;
 
-public class SearchableDocumentCheckFunction(ReleaseDocumentChecker releaseDocumentChecker)
+public class DataSetDocumentCheckFunction(DataSetDocumentChecker dataSetDocumentChecker)
 {
-    [Function(nameof(SearchableDocumentCheck))]
+    [Function(nameof(DataSetDocumentCheck))]
     [Produces("application/json")]
-    public async Task<IActionResult> SearchableDocumentCheck(
+    public async Task<IActionResult> DataSetDocumentCheck(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest ignored, //  The binding name _ is invalid
         CancellationToken cancellationToken
     )
     {
-        var report = await releaseDocumentChecker.RunCheck(cancellationToken);
+        var report = await dataSetDocumentChecker.RunCheck(cancellationToken);
         return new OkObjectResult(report);
     }
 }

@@ -24,6 +24,8 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
 
     private const string GetPublicationReleaseIdsEndpointFormat = "api/publications/{0}/release-ids";
 
+    private const string GetDataSetDocumentKeysEndpoint = "/api/data-sets/searchable/keys";
+
     private const string GetThemesEndpoint = "/api/themes";
 
     private record GetResponse<T>
@@ -157,6 +159,17 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
             response,
             onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
             onError: errorMessage => new UnableToGetPublicationInfosException(errorMessage)
+        );
+    }
+
+    public async Task<DataSetDocumentKey[]> GetDataSetDocumentKeys(CancellationToken cancellationToken = default)
+    {
+        var response = await Get<DataSetDocumentKeyDto[]>(GetDataSetDocumentKeysEndpoint, cancellationToken);
+
+        return Process(
+            response,
+            onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
+            onError: errorMessage => new UnableToGetDataSetDocumentKeysException(errorMessage)
         );
     }
 
