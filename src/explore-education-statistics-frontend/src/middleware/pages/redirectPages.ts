@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import 'urlpattern-polyfill';
 import { Dictionary } from '@common/types';
 import redirectService, { Redirects } from '@frontend/services/redirectService';
@@ -197,7 +198,7 @@ function findRedirectIfExists(
 // 10 seconds on Development, and 60 seconds in all other
 // environments.
 function getCacheTime(): number {
-  switch (process.env.APP_ENV) {
+  switch (getPublicEnv('APP_ENV')) {
     case 'Local':
       return 2_000;
     case 'Development':
