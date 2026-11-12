@@ -1,7 +1,9 @@
 import Link from '@admin/components/Link';
 import styles from '@admin/pages/publication/PublicationReleasesPage.module.scss';
 import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
+import { releaseCreateRoute } from '@admin/routes/routes';
 import { ReleaseVersionSummaryWithPermissions } from '@admin/services/releaseVersionService';
+import appendQuery from '@common/utils/url/appendQuery';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import InsetText from '@common/components/InsetText';
@@ -36,7 +38,7 @@ export default function PublicationPublishedReleasesTable({
   onEdit,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
-  const { publicAppUrl } = useConfig();
+  const { publicAppUrl, enableReleaseRollover } = useConfig();
 
   useEffect(() => {
     rowRef.current?.focus();
@@ -158,6 +160,20 @@ export default function PublicationPublishedReleasesTable({
                           </p>
                         </ModalConfirm>
                       )}
+                      {enableReleaseRollover &&
+                        publication.permissions?.canCreateReleases && (
+                          <Link
+                            to={appendQuery(
+                              generatePath(releaseCreateRoute.fullPath, {
+                                publicationId: publication.id,
+                              }),
+                              { sourceReleaseId: release.id },
+                            )}
+                          >
+                            Create release rollover
+                            <VisuallyHidden> of {release.title}</VisuallyHidden>
+                          </Link>
+                        )}
                     </div>
                   </td>
                 </tr>

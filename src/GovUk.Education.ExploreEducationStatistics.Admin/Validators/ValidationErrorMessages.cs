@@ -16,6 +16,10 @@ public enum ValidationErrorMessages
     // Partial date
     PartialDateNotValid,
 
+    // Release rollover
+    RolloverSourceReleaseMustBeInSamePublication,
+    RolloverSourceReleaseMustBePublished,
+
     // Content
     IncorrectContentBlockTypeForUpdate,
     ContentBlockAlreadyAttachedToContentSection,
