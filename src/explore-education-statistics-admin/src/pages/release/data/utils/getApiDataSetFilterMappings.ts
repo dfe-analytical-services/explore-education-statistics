@@ -6,6 +6,7 @@ import {
   FilterOptionMapping,
 } from '@admin/services/apiDataSetVersionService';
 import { Dictionary } from '@common/types';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 
 export interface FilterOptionCandidateWithKey extends FilterOptionSource {
   key: string;
@@ -151,14 +152,26 @@ export default function getApiDataSetFilterMappings(
             }))
         : [];
 
+    // Option keys are generated from labels, so can be integer-like
+    // (e.g. '11'), which Object.entries enumerates before other keys
+    // regardless of the response order. Sort explicitly instead.
     if (autoMapped.length) {
-      autoMappedFilterOptions[filterKey] = autoMapped;
+      autoMappedFilterOptions[filterKey] = naturalOrderBy(autoMapped, [
+        option => option.mapping.source.label,
+        option => option.mapping.sourceKey,
+      ]);
     }
     if (mappable.length) {
-      mappableFilterOptions[filterKey] = mappable;
+      mappableFilterOptions[filterKey] = naturalOrderBy(mappable, [
+        option => option.mapping.source.label,
+        option => option.mapping.sourceKey,
+      ]);
     }
     if (newFilterOptionsForLevel.length) {
-      newFilterOptions[filterKey] = newFilterOptionsForLevel;
+      newFilterOptions[filterKey] = naturalOrderBy(newFilterOptionsForLevel, [
+        'label',
+        'key',
+      ]);
     }
   });
 

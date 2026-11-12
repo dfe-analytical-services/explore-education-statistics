@@ -7,8 +7,9 @@ import { naturalComparator } from '@common/utils/array/naturalOrderBy';
  * Mutates the list, so can be used directly on Immer drafts. The item is
  * placed after any existing items with an equal label.
  *
- * Mapping lists arrive from the backend ordered by label, so this keeps
- * that order when items move between lists after a mapping update.
+ * Mapping lists are sorted with {@link naturalComparator} when converted
+ * from the API response (see getApiDataSet*Mappings), so this keeps that
+ * order when items move between lists after a mapping update.
  */
 export default function insertSortedByLabel<T>(
   items: T[],

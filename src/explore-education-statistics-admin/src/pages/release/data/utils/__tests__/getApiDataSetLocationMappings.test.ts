@@ -415,4 +415,90 @@ describe('getApiDataSetLocationMappings', () => {
       ],
     });
   });
+
+  test('orders locations naturally by label when location keys are integer-like', () => {
+    // Integer-like keys (e.g. URNs) are enumerated first by
+    // Object.entries, regardless of the order the API returns them in.
+    const {
+      autoMappedLocations,
+      mappableLocations,
+      newLocations,
+      newLocationGroups,
+      deletedLocationGroups,
+    } = getApiDataSetLocationMappings({
+      levels: {
+        school: {
+          mappings: {
+            '100002': {
+              publicId: 'school-b-public-id',
+              source: { label: 'Bridge School', urn: '100002' },
+              type: 'AutoMapped',
+              candidateKey: '100002',
+            },
+            'school-a': {
+              publicId: 'school-a-public-id',
+              source: { label: 'Academy A', urn: 'school-a' },
+              type: 'AutoMapped',
+              candidateKey: 'school-a',
+            },
+            'school-c': {
+              publicId: 'school-c-public-id',
+              source: { label: 'Castle School', urn: 'school-c' },
+              type: 'AutoNone',
+            },
+            '100004': {
+              publicId: 'school-d-public-id',
+              source: { label: 'Dale School', urn: '100004' },
+              type: 'AutoNone',
+            },
+          },
+          candidates: {
+            '100002': { label: 'Bridge School', urn: '100002' },
+            'school-a': { label: 'Academy A', urn: 'school-a' },
+            'school-e': { label: 'Elm School', urn: 'school-e' },
+            '100006': { label: 'Fern School', urn: '100006' },
+          },
+        },
+        provider: {
+          mappings: {},
+          candidates: {
+            'provider-a': { label: 'Provider A' },
+            '200002': { label: 'Provider B' },
+          },
+        },
+        rscRegion: {
+          mappings: {
+            'region-a': {
+              publicId: 'region-a-public-id',
+              source: { label: 'Region A' },
+              type: 'AutoNone',
+            },
+            '300002': {
+              publicId: 'region-b-public-id',
+              source: { label: 'Region B' },
+              type: 'AutoNone',
+            },
+          },
+          candidates: {},
+        },
+      },
+    });
+
+    expect(
+      autoMappedLocations.school?.map(location => location.mapping.sourceKey),
+    ).toEqual(['school-a', '100002']);
+    expect(
+      mappableLocations.school?.map(location => location.mapping.sourceKey),
+    ).toEqual(['school-c', '100004']);
+    expect(newLocations.school?.map(location => location.key)).toEqual([
+      'school-e',
+      '100006',
+    ]);
+    expect(newLocationGroups.provider?.map(location => location.label)).toEqual(
+      ['Provider A', 'Provider B'],
+    );
+    expect(
+      deletedLocationGroups.rscRegion?.map(location => location.label),
+    ).toEqual(['Region A', 'Region B']);
+  });
 });

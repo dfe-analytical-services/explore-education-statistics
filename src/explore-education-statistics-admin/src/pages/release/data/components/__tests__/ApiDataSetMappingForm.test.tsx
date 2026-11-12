@@ -91,13 +91,47 @@ describe('ApiDataSetMappingForm', () => {
     expect(radios[0]).toBe(screen.getByLabelText('No mapping available'));
     expect(radios[0]).not.toBeChecked();
 
-    expect(radios[1]).toBe(screen.getByLabelText('Location 3'));
-    expect(radios[1]).toBeChecked();
+    expect(radios[1]).toBe(screen.getByLabelText('Location 2'));
+    expect(radios[1]).not.toBeChecked();
 
-    expect(radios[2]).toBe(screen.getByLabelText('Location 2'));
-    expect(radios[2]).not.toBeChecked();
+    expect(radios[2]).toBe(screen.getByLabelText('Location 3'));
+    expect(radios[2]).toBeChecked();
+
     expect(radios[3]).toBe(screen.getByLabelText('Location 4'));
     expect(radios[3]).not.toBeChecked();
+  });
+
+  test('renders the options in natural order', () => {
+    render(
+      <ApiDataSetMappingForm
+        candidate={{
+          key: 'Year10Key',
+          label: 'Year 10',
+        }}
+        groupKey="region"
+        itemLabel="location"
+        mapping={{
+          ...testMapping,
+          type: 'ManualMapped',
+          candidateKey: 'Year10Key',
+        }}
+        newItems={[
+          { key: 'Year1Key', label: 'Year 1' },
+          { key: 'Year2Key', label: 'Year 2' },
+        ]}
+        onSubmit={Promise.resolve}
+      />,
+    );
+
+    const radios = within(
+      screen.getByRole('group', { name: 'Next data set location' }),
+    ).getAllByRole('radio');
+
+    expect(radios).toHaveLength(4);
+    expect(radios[0]).toBe(screen.getByLabelText('No mapping available'));
+    expect(radios[1]).toBe(screen.getByLabelText('Year 1'));
+    expect(radios[2]).toBe(screen.getByLabelText('Year 2'));
+    expect(radios[3]).toBe(screen.getByLabelText('Year 10'));
   });
 
   test('renders the form correctly with no mapping available previously selected', async () => {
