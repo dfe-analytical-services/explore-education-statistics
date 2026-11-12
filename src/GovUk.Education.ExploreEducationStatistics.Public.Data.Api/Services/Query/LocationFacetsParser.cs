@@ -69,7 +69,9 @@ internal class LocationFacetsParser : IFacetsParser
     {
         var builder = new DuckDbSqlBuilder();
 
-        if (!TryGetLocationOptions(location, out var options))
+        var options = GetLocationOptions(location);
+
+        if (options.Count == 0)
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([location], path));
 
@@ -102,13 +104,15 @@ internal class LocationFacetsParser : IFacetsParser
 
         foreach (var location in locations)
         {
-            if (TryGetLocationOptions(location, out var matchingOptions))
+            var matchingOptions = GetLocationOptions(location);
+
+            if (matchingOptions.Count == 0)
             {
-                options.AddRange(matchingOptions);
+                notFoundLocations.Add(location);
                 continue;
             }
 
-            notFoundLocations.Add(location);
+            options.AddRange(matchingOptions);
         }
 
         if (notFoundLocations.Count != 0)
@@ -143,21 +147,10 @@ internal class LocationFacetsParser : IFacetsParser
                 .Build();
     }
 
-    private bool TryGetLocationOptions(
-        IDataSetQueryLocation queryLocation,
-        out IReadOnlyList<ParquetLocationOption> locationOptions
-    )
-    {
-        if (!_allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel(), out var options))
-        {
-            locationOptions = [];
-            return false;
-        }
-
-        locationOptions = options.Where(option => IsMatchingLocationOption(option, queryLocation)).ToList();
-
-        return locationOptions.Count != 0;
-    }
+    private List<ParquetLocationOption> GetLocationOptions(IDataSetQueryLocation queryLocation) =>
+        _allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel(), out var options)
+            ? options.Where(option => IsMatchingLocationOption(option, queryLocation)).ToList()
+            : [];
 
     private static bool IsMatchingLocationOption(ParquetLocationOption option, IDataSetQueryLocation queryLocation) =>
         queryLocation switch

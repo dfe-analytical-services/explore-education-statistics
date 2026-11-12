@@ -915,6 +915,7 @@ public abstract class DataSetQueryParserTests
 
             Assert.Equal(expectedSql, parsed.Sql);
             Assert.Equal(2, parsed.SqlParameters.Count);
+            Assert.NotEqual(locationOptions[0].Id, locationOptions[1].Id);
             Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[0].Argument);
             Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[1].Argument);
 
@@ -953,9 +954,11 @@ public abstract class DataSetQueryParserTests
 
             Assert.Equal(expectedSql, parsed.Sql);
             Assert.Equal(2, parsed.SqlParameters.Count);
+            Assert.NotEqual(locationOptions[0].Id, locationOptions[1].Id);
             Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[0].Argument);
             Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[1].Argument);
 
+            Assert.Empty(queryState.Errors);
             Assert.Empty(queryState.Warnings);
         }
 
@@ -1008,6 +1011,7 @@ public abstract class DataSetQueryParserTests
 
             Assert.Equal(expectedSql, parsed.Sql);
             Assert.Equal(3, parsed.SqlParameters.Count);
+            Assert.NotEqual(schoolOptions[0].Id, schoolOptions[1].Id);
             Assert.Equal(countryOption.Id, parsed.SqlParameters[0].Argument);
             Assert.Equal(schoolOptions[0].Id, parsed.SqlParameters[1].Argument);
             Assert.Equal(schoolOptions[1].Id, parsed.SqlParameters[2].Argument);
