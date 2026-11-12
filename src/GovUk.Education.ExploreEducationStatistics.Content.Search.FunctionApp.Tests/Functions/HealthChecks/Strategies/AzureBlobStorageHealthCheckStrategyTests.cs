@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class AzureBlobStorageHealthCheckStrategyTests
 {
     private const string ReleaseDocumentsContainerName = "release-documents-container-name";
-    private const string DatasetDocumentsContainerName = "dataset-documents-container-name";
+    private const string DataSetDocumentsContainerName = "dataset-documents-container-name";
 
     private readonly AzureBlobStorageClientMockBuilder _azureBlobStorageClientMockBuilder = new();
 
@@ -21,7 +21,7 @@ public class AzureBlobStorageHealthCheckStrategyTests
                 {
                     SearchStorageConnectionString = "UseDevelopmentStorage=true",
                     ReleaseDocumentsContainerName = ReleaseDocumentsContainerName,
-                    DatasetDocumentsContainerName = DatasetDocumentsContainerName,
+                    DataSetDocumentsContainerName = DataSetDocumentsContainerName,
                 }
             )
         );
@@ -45,14 +45,14 @@ public class AzureBlobStorageHealthCheckStrategyTests
             healthCheckResult.Message
         );
         Assert.Contains(
-            $"Connection to Dataset Documents Azure Blob Storage container '{DatasetDocumentsContainerName}':OK.",
+            $"Connection to Data Set Documents Azure Blob Storage container '{DataSetDocumentsContainerName}':OK.",
             healthCheckResult.Message
         );
     }
 
     [Theory]
     [InlineData(ReleaseDocumentsContainerName, "Release Documents")]
-    [InlineData(DatasetDocumentsContainerName, "Dataset Documents")]
+    [InlineData(DataSetDocumentsContainerName, "Data Set Documents")]
     public async Task WhenContainerNotFound_ThenShouldRespondIsUnhealthy(string containerName, string description)
     {
         // ARRANGE
@@ -83,7 +83,7 @@ public class AzureBlobStorageHealthCheckStrategyTests
         // ASSERT
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            $"Connection to Dataset Documents Azure Blob Storage container '{DatasetDocumentsContainerName}':OK.",
+            $"Connection to Data Set Documents Azure Blob Storage container '{DataSetDocumentsContainerName}':OK.",
             healthCheckResult.Message
         );
     }
@@ -92,7 +92,7 @@ public class AzureBlobStorageHealthCheckStrategyTests
     public async Task WhenContainerCheckThrows_ThenShouldRespondIsUnhealthy()
     {
         // ARRANGE
-        _azureBlobStorageClientMockBuilder.WhereContainerExistsThrowsFor(DatasetDocumentsContainerName);
+        _azureBlobStorageClientMockBuilder.WhereContainerExistsThrowsFor(DataSetDocumentsContainerName);
         var sut = GetSut();
 
         // ACT
@@ -101,7 +101,7 @@ public class AzureBlobStorageHealthCheckStrategyTests
         // ASSERT
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            $"Error occurred whilst trying to check for Dataset Documents Azure Blob Storage container '{DatasetDocumentsContainerName}': Container exists check failed",
+            $"Error occurred whilst trying to check for Data Set Documents Azure Blob Storage container '{DataSetDocumentsContainerName}': Container exists check failed",
             healthCheckResult.Message
         );
     }
