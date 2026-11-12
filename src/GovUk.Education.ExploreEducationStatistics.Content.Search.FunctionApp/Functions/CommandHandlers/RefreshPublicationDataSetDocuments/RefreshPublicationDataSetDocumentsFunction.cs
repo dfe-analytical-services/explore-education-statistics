@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshPublicationDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -26,13 +27,17 @@ public class RefreshPublicationDataSetDocumentsFunction(
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(message.PublicationSlug))
+        if (message.PublicationId.IsBlank() || string.IsNullOrWhiteSpace(message.PublicationSlug))
         {
             return [];
         }
 
         var response = await dataSetDocumentCreator.RefreshPublicationDataSetDocuments(
-            new RefreshPublicationDataSetDocumentsRequest { PublicationSlug = message.PublicationSlug },
+            new RefreshPublicationDataSetDocumentsRequest
+            {
+                PublicationId = message.PublicationId.Value,
+                PublicationSlug = message.PublicationSlug,
+            },
             cancellationToken
         );
 
@@ -47,6 +52,6 @@ public class RefreshPublicationDataSetDocumentsFunction(
             return [];
         }
 
-        return [new DataSetDocumentsChangedMessageDto()];
+        return [new DataSetDocumentsChangedMessageDto { PublicationId = message.PublicationId }];
     }
 }

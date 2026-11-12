@@ -70,30 +70,20 @@ internal class DataSetDocumentCreator(
             cancellationToken
         );
 
-        var publicationIds = dataSetDocuments
-            .Select(dataSetDocument => dataSetDocument.PublicationId)
-            .Distinct()
-            .ToList();
-
-        if (publicationIds.Count > 1)
+        // Guard against removing the documents of one publication while uploading those of another
+        if (dataSetDocuments.Any(dataSetDocument => dataSetDocument.PublicationId != request.PublicationId))
         {
             throw new InvalidOperationException(
                 $"""
-                The Data Set Documents for publication "{request.PublicationSlug}" do not all belong to the same publication
+                The Data Set Documents for publication "{request.PublicationSlug}" do not all belong to publication {request.PublicationId}
                 """
             );
         }
 
         var keys = await UploadDataSetDocuments(dataSetDocuments, cancellationToken);
 
-        // The publication's id is only known from its documents. Without any, its blobs can't be found by prefix.
-        if (publicationIds.Count == 0)
-        {
-            return BuildResponse(keys, new RemoveDataSetDocumentsResponse([]));
-        }
-
         var removed = await dataSetDocumentRemover.RemoveDataSetDocuments(
-            new RemoveDataSetDocumentsRequest { PublicationId = publicationIds.Single(), Except = keys },
+            new RemoveDataSetDocumentsRequest { PublicationId = request.PublicationId, Except = keys },
             cancellationToken
         );
 

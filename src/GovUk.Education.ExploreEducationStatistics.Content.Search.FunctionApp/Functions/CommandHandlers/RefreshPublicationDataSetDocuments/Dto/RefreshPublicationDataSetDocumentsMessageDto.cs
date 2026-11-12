@@ -2,5 +2,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public record RefreshPublicationDataSetDocumentsMessageDto
 {
+    public Guid? PublicationId { get; init; }
     public string? PublicationSlug { get; init; }
 }

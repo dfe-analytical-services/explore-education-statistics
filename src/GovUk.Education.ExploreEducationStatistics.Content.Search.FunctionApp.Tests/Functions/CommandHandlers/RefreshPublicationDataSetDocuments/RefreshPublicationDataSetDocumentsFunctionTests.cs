@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshPublicationDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshPublicationDataSetDocuments.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
@@ -11,6 +12,7 @@ public class RefreshPublicationDataSetDocumentsFunctionTests
 {
     private static readonly RefreshPublicationDataSetDocumentsMessageDto Message = new()
     {
+        PublicationId = Guid.NewGuid(),
         PublicationSlug = "publication-slug",
     };
 
@@ -32,11 +34,17 @@ public class RefreshPublicationDataSetDocumentsFunctionTests
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenMessageHasPublicationSlug_ThenDataSetDocumentsOfPublicationRefreshed()
+    public async Task WhenMessageIdentifiesPublication_ThenDataSetDocumentsOfPublicationRefreshed()
     {
         await GetSut().RefreshPublicationDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
 
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshPublicationDataSetDocumentsCalledFor("publication-slug");
+        _dataSetDocumentCreatorMockBuilder.Assert.RefreshPublicationDataSetDocumentsCalledFor(
+            new RefreshPublicationDataSetDocumentsRequest
+            {
+                PublicationId = Message.PublicationId!.Value,
+                PublicationSlug = "publication-slug",
+            }
+        );
     }
 
     [Fact]
@@ -45,7 +53,7 @@ public class RefreshPublicationDataSetDocumentsFunctionTests
         var response = await GetSut()
             .RefreshPublicationDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
 
-        Assert.Single(response);
+        Assert.Equal([new DataSetDocumentsChangedMessageDto { PublicationId = Message.PublicationId }], response);
     }
 
     [Fact]
@@ -71,12 +79,32 @@ public class RefreshPublicationDataSetDocumentsFunctionTests
     }
 
     [Theory]
+    [MemberData(nameof(TheoryDatas.Blank.Guids), MemberType = typeof(TheoryDatas.Blank))]
+    public async Task WhenMessageHasNoPublicationId_ThenDataSetDocumentsNotRefreshed(Guid? blankPublicationId)
+    {
+        var response = await GetSut()
+            .RefreshPublicationDataSetDocuments(
+                Message with
+                {
+                    PublicationId = blankPublicationId,
+                },
+                new FunctionContextMockBuilder().Build()
+            );
+
+        Assert.Empty(response);
+        _dataSetDocumentCreatorMockBuilder.Assert.RefreshPublicationDataSetDocumentsNotCalled();
+    }
+
+    [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Strings), MemberType = typeof(TheoryDatas.Blank))]
     public async Task WhenMessageHasNoPublicationSlug_ThenDataSetDocumentsNotRefreshed(string? blankPublicationSlug)
     {
         var response = await GetSut()
             .RefreshPublicationDataSetDocuments(
-                new RefreshPublicationDataSetDocumentsMessageDto { PublicationSlug = blankPublicationSlug },
+                Message with
+                {
+                    PublicationSlug = blankPublicationSlug,
+                },
                 new FunctionContextMockBuilder().Build()
             );
 
