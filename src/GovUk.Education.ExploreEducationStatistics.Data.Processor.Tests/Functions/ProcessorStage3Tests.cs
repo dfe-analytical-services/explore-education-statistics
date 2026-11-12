@@ -19,6 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -177,6 +179,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -196,23 +199,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -230,7 +226,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -402,6 +408,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -421,23 +428,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -455,7 +455,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -547,6 +557,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -566,23 +577,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -600,7 +604,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -707,6 +721,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -726,23 +741,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -760,7 +768,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -856,6 +874,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -875,23 +894,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -909,7 +921,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -1035,6 +1057,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1054,23 +1077,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -1088,7 +1104,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -1188,6 +1214,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1207,23 +1234,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporterMock = new Mock<TestObservationBatchImporter> { CallBase = true };
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporterMock.Object
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -1241,7 +1261,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporterMock.Object
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -1313,6 +1343,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1332,23 +1363,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -1366,7 +1390,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -1478,6 +1512,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1497,23 +1532,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -1531,7 +1559,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
@@ -1662,6 +1700,7 @@ public class ProcessorStage3Tests
                 InMemoryContentDbContext(_contentDbContextId),
                 InMemoryStatisticsDbContext(_statisticsDbContextId)
             ),
+            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
             Mock.Of<ILogger<DataImportService>>()
         );
 
@@ -1681,23 +1720,16 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, databaseHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var observationBatchImporter = new TestObservationBatchImporter();
 
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
             importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            databaseHelper,
-            observationBatchImporter
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -1715,7 +1747,17 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(_contentDbContextId),
+                InMemoryStatisticsDbContext(_statisticsDbContextId)
+            ),
+            BuildStorageDataSetWriterResolver(
+                InMemoryStatisticsDbContext(_statisticsDbContextId),
+                databaseHelper,
+                importerLocationCache,
+                guidGenerator,
+                observationBatchImporter
+            )
         );
 
         var function = BuildFunction(processorService: processorService, dataImportService: dataImportService);
