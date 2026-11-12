@@ -6,11 +6,12 @@ using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 
 [ExcludeFromCodeCoverage]
-internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
+internal class ContentApiClient(HttpClient httpClient, ILogger<ContentApiClient> logger) : IContentApiClient
 {
     internal HttpClient HttpClient { get; } = httpClient;
 
@@ -191,9 +192,15 @@ internal class ContentApiClient(HttpClient httpClient) : IContentApiClient
         var apiEndpoint = string.Format(GetReleaseDataSetDocumentsEndpointFormat, publicationSlug, releaseSlug);
         var response = await Get<DataSetSearchableDocumentDto[]>(apiEndpoint, cancellationToken);
 
+        // A release that is not found is treated as an error rather than as a release without data set documents.
+        // Otherwise a slug that no longer resolves would lead to the removal of the documents of a published release.
         if (response is GetResponse<DataSetSearchableDocumentDto[]>.NotFound)
         {
-            return [];
+            logger.LogWarning(
+                """Release "{ReleaseSlug}" of publication "{PublicationSlug}" was not found by the Content API. Its data set documents have not been refreshed or removed.""",
+                releaseSlug,
+                publicationSlug
+            );
         }
 
         return Process(

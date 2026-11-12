@@ -7,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.ContentApi;
@@ -15,13 +17,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
 {
     private IContentApiClient GetSut(
         HttpMessageHandler? httpMessageHandler = null,
-        Action<HttpClient>? modifyHttpClient = null
+        Action<HttpClient>? modifyHttpClient = null,
+        ILogger<ContentApiClient>? logger = null
     )
     {
         var httpClient = httpMessageHandler is null ? new HttpClient() : new HttpClient(httpMessageHandler);
         httpClient.Timeout = TimeSpan.FromSeconds(10);
         modifyHttpClient?.Invoke(httpClient);
-        return new ContentApiClient(httpClient);
+        return new ContentApiClient(httpClient, logger ?? new NullLogger<ContentApiClient>());
     }
 
     protected void Print(string s) => output.WriteLine(s);
@@ -281,7 +284,8 @@ public class ContentApiClientTests(ITestOutputHelper output)
         private IContentApiClient GetSut(
             HttpStatusCode statusCode,
             string json,
-            Action<HttpRequestMessage>? onRequest = null
+            Action<HttpRequestMessage>? onRequest = null,
+            ILogger<ContentApiClient>? logger = null
         ) =>
             GetSut(
                 httpMessageHandler: new StubHttpMessageHandler(
@@ -296,7 +300,8 @@ public class ContentApiClientTests(ITestOutputHelper output)
                         );
                     }
                 ),
-                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"),
+                logger: logger
             );
 
         public class GetReleaseDataSetDocumentsTests(ITestOutputHelper output) : DataSetDocumentsTests(output)
@@ -340,13 +345,18 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
 
             [Fact]
-            public async Task NotFoundResponse_ReturnsNoDataSetDocuments()
+            public async Task NotFoundResponse_ThrowsExceptionAndLogsWarning()
             {
-                var sut = GetSut(HttpStatusCode.NotFound, "");
+                var loggerMockBuilder = new LoggerMockBuilder<ContentApiClient>();
+                var sut = GetSut(HttpStatusCode.NotFound, "", logger: loggerMockBuilder.Build());
 
-                var result = await sut.GetReleaseDataSetDocuments("publication-slug", "2024-25");
+                await Assert.ThrowsAsync<UnableToGetReleaseDataSetDocumentsException>(() =>
+                    sut.GetReleaseDataSetDocuments("publication-slug", "2024-25")
+                );
 
-                Assert.Empty(result);
+                loggerMockBuilder.Assert.LoggedWarningContains(
+                    """Release "2024-25" of publication "publication-slug" was not found by the Content API"""
+                );
             }
 
             [Fact]
