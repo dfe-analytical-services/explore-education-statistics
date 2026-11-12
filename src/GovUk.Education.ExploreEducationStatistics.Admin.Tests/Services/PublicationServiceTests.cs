@@ -928,6 +928,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -953,11 +954,6 @@ public class PublicationServiceTests
             .Setup(s => s.PublicationTitleOrSlugChanged(publication.Id, publication.Slug, "New title", "new-title"))
             .Returns(Task.CompletedTask);
 
-        var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-        methodologyCacheService
-            .Setup(mock => mock.UpdateSummariesTree())
-            .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>([]));
-
         var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
         redirectsCacheService
             .Setup(mock => mock.UpdateRedirects())
@@ -974,7 +970,6 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(
                 context,
                 methodologyService: methodologyService.Object,
-                methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
@@ -990,7 +985,7 @@ public class PublicationServiceTests
                 }
             );
 
-            VerifyAllMocks(methodologyService, methodologyCacheService, redirectsCacheService);
+            VerifyAllMocks(methodologyService, redirectsCacheService);
 
             var viewModel = result.AssertRight();
 
@@ -1036,6 +1031,7 @@ public class PublicationServiceTests
 
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
     }
 
     [Theory]
@@ -1068,11 +1064,7 @@ public class PublicationServiceTests
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publicationService = BuildPublicationService(
-                context,
-                methodologyCacheService: new Mock<IMethodologyCacheService>(Default).Object,
-                redirectsCacheService: new Mock<IRedirectsCacheService>(Default).Object
-            );
+            var publicationService = BuildPublicationService(context);
 
             // Service method under test
             // The update request includes the new `SupersededBy` publication (null, live, or not live)
@@ -1171,7 +1163,6 @@ public class PublicationServiceTests
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
             methodologyService
@@ -1181,14 +1172,6 @@ public class PublicationServiceTests
             methodologyService
                 .Setup(s => s.PublicationTitleOrSlugChanged(publication.Id, publication.Slug, "New title", "new-title"))
                 .Returns(Task.CompletedTask);
-
-            methodologyCacheService
-                .Setup(mock => mock.UpdateSummariesTree())
-                .ReturnsAsync(
-                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                        new List<AllMethodologiesThemeViewModel>()
-                    )
-                );
 
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
@@ -1203,7 +1186,6 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(
                 context,
                 methodologyService: methodologyService.Object,
-                methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
@@ -1218,7 +1200,7 @@ public class PublicationServiceTests
                 }
             );
 
-            VerifyAllMocks(methodologyService, methodologyCacheService, redirectsCacheService);
+            VerifyAllMocks(methodologyService, redirectsCacheService);
 
             var viewModel = result.AssertRight();
 
@@ -1253,6 +1235,7 @@ public class PublicationServiceTests
 
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
     }
 
     [Fact]
@@ -1316,6 +1299,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -1351,6 +1335,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -1383,15 +1368,6 @@ public class PublicationServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            methodologyCacheService
-                .Setup(mock => mock.UpdateSummariesTree())
-                .ReturnsAsync(
-                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                        new List<AllMethodologiesThemeViewModel>()
-                    )
-                );
-
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
@@ -1406,7 +1382,6 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(
                 context,
                 methodologyService: methodologyService.Object,
-                methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
@@ -1415,7 +1390,7 @@ public class PublicationServiceTests
                 new PublicationSaveRequest { Title = "New title", ThemeId = theme.Id }
             );
 
-            VerifyAllMocks(methodologyService, methodologyCacheService, redirectsCacheService);
+            VerifyAllMocks(methodologyService, redirectsCacheService);
 
             var viewModel = result.AssertRight();
             Assert.Equal("New title", viewModel.Title);
@@ -1442,6 +1417,7 @@ public class PublicationServiceTests
 
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
     }
 
     [Fact]
@@ -1474,15 +1450,6 @@ public class PublicationServiceTests
                 )
                 .Returns(Task.CompletedTask);
 
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            methodologyCacheService
-                .Setup(mock => mock.UpdateSummariesTree())
-                .ReturnsAsync(
-                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                        new List<AllMethodologiesThemeViewModel>()
-                    )
-                );
-
             var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
             redirectsCacheService
                 .Setup(mock => mock.UpdateRedirects())
@@ -1497,7 +1464,6 @@ public class PublicationServiceTests
             var publicationService = BuildPublicationService(
                 context,
                 methodologyService: methodologyService.Object,
-                methodologyCacheService: methodologyCacheService.Object,
                 redirectsCacheService: redirectsCacheService.Object
             );
 
@@ -1506,7 +1472,7 @@ public class PublicationServiceTests
                 new PublicationSaveRequest { Title = "Older title", ThemeId = theme.Id }
             );
 
-            VerifyAllMocks(methodologyService, methodologyCacheService, redirectsCacheService);
+            VerifyAllMocks(methodologyService, redirectsCacheService);
 
             var viewModel = result.AssertRight();
             Assert.Equal("Older title", viewModel.Title);
@@ -1533,6 +1499,7 @@ public class PublicationServiceTests
 
         _publicationCacheServiceMockBuilder.Assert.CacheInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeUpdated();
     }
 
     [Fact]
@@ -1588,6 +1555,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -1643,6 +1611,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -1713,6 +1682,7 @@ public class PublicationServiceTests
         AssertOnPublicationChangedEventsNotRaised();
         _publicationCacheServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationAndReleases(publication.Slug);
         _publicationsTreeServiceMockBuilder.Assert.CacheNotInvalidatedForPublicationsTree();
+        _methodologyCacheServiceMockBuilder.Assert.SummariesTreeNotUpdated();
     }
 
     [Fact]
@@ -3136,7 +3106,7 @@ public class PublicationServiceTests
             publicationCacheService ?? _publicationCacheServiceMockBuilder.Build(),
             methodologyService ?? Mock.Of<IMethodologyService>(Strict),
             publicationsTreeService ?? _publicationsTreeServiceMockBuilder.Build(),
-            methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+            methodologyCacheService ?? _methodologyCacheServiceMockBuilder.Build(),
             redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
             _adminEventRaiserMockBuilder.Build()
         );
@@ -3158,6 +3128,7 @@ public class PublicationServiceTests
     }
 
     private readonly AdminEventRaiserMockBuilder _adminEventRaiserMockBuilder = new();
+    private readonly MethodologyCacheServiceMockBuilder _methodologyCacheServiceMockBuilder = new();
     private readonly PublicationCacheServiceMockBuilder _publicationCacheServiceMockBuilder = new();
     private readonly PublicationsTreeServiceMockBuilder _publicationsTreeServiceMockBuilder = new();
 
