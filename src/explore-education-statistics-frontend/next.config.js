@@ -45,6 +45,14 @@ const nextConfig = {
           typescript: {
             configFile: path.resolve(__dirname, 'tsconfig.json'),
           },
+          issue: {
+            // Next generates types into `.next/types` (build) and
+            // `.next/dev/types` (dev), and both are in tsconfig's `include`.
+            // Leftover generated files from a previous build can reference
+            // routes that no longer exist, so don't report issues in them.
+            // `pnpm tsc` and `next build` check freshly generated types.
+            exclude: [{ file: '**/.next/**' }],
+          },
         }),
       );
 
