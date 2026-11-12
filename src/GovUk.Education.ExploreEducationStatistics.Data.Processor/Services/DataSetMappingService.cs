@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
