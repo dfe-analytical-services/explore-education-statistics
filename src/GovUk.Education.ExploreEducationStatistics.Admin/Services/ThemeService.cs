@@ -251,6 +251,20 @@ public class ThemeService(
         // Capture the release Ids so that they can be used to raise an event after the publication is deleted.
         var releaseIds = releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList();
 
+        // Clear RolloverSourceReleaseId on any releases rolled over from this publication's releases, so the FK
+        // doesn't block the delete. This is a direct update because those rollover releases aren't tracked,
+        // so EF never nulls it for us.
+        var thisPublicationsReleaseIds = contentDbContext
+            .Releases.Where(r => r.PublicationId == publicationId)
+            .Select(r => r.Id);
+
+        await contentDbContext
+            .Releases.Where(r =>
+                r.RolloverSourceReleaseId != null
+                && thisPublicationsReleaseIds.Contains(r.RolloverSourceReleaseId!.Value)
+            )
+            .ExecuteUpdateAsync(s => s.SetProperty(r => r.RolloverSourceReleaseId, (Guid?)null), cancellationToken);
+
         var releaseVersionsAndDataSetVersions = await releaseVersionsToDelete
             .ToAsyncEnumerable()
             .Select(
