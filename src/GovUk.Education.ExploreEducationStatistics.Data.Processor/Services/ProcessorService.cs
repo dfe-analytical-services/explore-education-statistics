@@ -2,11 +2,10 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -18,7 +17,8 @@ public class ProcessorService(
     IImporterService importerService,
     IDataImportService dataImportService,
     IValidatorService validatorService,
-    IDbContextSupplier dbContextSupplier
+    IStorageDataSetResolver storageDataSetResolver,
+    IStorageDataSetWriterResolver storageDataSetWriterResolver
 ) : IProcessorService
 {
     public async Task ProcessStage1(Guid importId)
@@ -44,24 +44,18 @@ public class ProcessorService(
 
     public async Task ProcessStage2(Guid importId)
     {
-        var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
-
         var import = await dataImportService.GetImport(importId);
 
-        var subject = await statisticsDbContext.Subject.SingleAsync(subject => subject.Id == import.SubjectId);
+        var dataSet = storageDataSetResolver.Resolve(import.File);
+        var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
 
         var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await importerService.ImportMeta(
-            metaFileCsvHeaders,
-            metaFileCsvRows,
-            subject,
-            statisticsDbContext
-        );
-        await fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
+        var subjectMeta = await importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, dataSet, dataSetWriter);
+        await fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, dataSetWriter);
     }
 
     public async Task ProcessStage3(Guid importId)
@@ -70,11 +64,12 @@ public class ProcessorService(
 
         try
         {
-            var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
-            await fileImportService.ImportObservations(import, statisticsDbContext);
+            var dataSet = storageDataSetResolver.Resolve(import.File);
+            var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
+            await fileImportService.ImportObservations(import, dataSet, dataSetWriter);
 
             var completedImport = await dataImportService.GetImport(import.Id);
-            await fileImportService.CompleteImport(completedImport, statisticsDbContext);
+            await fileImportService.CompleteImport(completedImport, dataSetWriter);
         }
         catch (Exception e)
         {
