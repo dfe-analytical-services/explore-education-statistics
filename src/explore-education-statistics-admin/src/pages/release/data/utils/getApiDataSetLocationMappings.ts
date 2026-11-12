@@ -4,7 +4,6 @@ import {
   LocationOptionSource,
   LocationsMapping,
 } from '@admin/services/apiDataSetVersionService';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import camelCase from 'lodash/camelCase';
 
@@ -65,18 +64,16 @@ export default function getApiDataSetLocationMappings(
     const levelCandidateEntries = Object.entries(levelCandidates);
 
     if (!levelMappingEntries.length) {
-      newLocationGroups[levelKey] = naturalOrderBy(
-        levelCandidateEntries.map(([, candidate]) => candidate),
-        'label',
+      newLocationGroups[levelKey] = levelCandidateEntries.map(
+        ([, candidate]) => candidate,
       );
 
       return;
     }
 
     if (!levelCandidateEntries.length) {
-      deletedLocationGroups[levelKey] = naturalOrderBy(
-        levelMappingEntries.map(([, mapping]) => mapping.source),
-        'label',
+      deletedLocationGroups[levelKey] = levelMappingEntries.map(
+        ([, mapping]) => mapping.source,
       );
 
       return;
@@ -167,28 +164,16 @@ export default function getApiDataSetLocationMappings(
           key,
         }));
 
-    // Location keys can be integer-like (e.g. URNs), which Object.entries
-    // enumerates before other keys regardless of the response order.
-    // Sort explicitly instead.
     if (mappable.length) {
-      mappableLocations[levelKey] = naturalOrderBy(mappable, [
-        location => location.mapping.source.label,
-        location => location.mapping.sourceKey,
-      ]);
+      mappableLocations[levelKey] = mappable;
     }
 
     if (autoMapped.length) {
-      autoMappedLocations[levelKey] = naturalOrderBy(autoMapped, [
-        location => location.mapping.source.label,
-        location => location.mapping.sourceKey,
-      ]);
+      autoMappedLocations[levelKey] = autoMapped;
     }
 
     if (newLocationsForLevel.length) {
-      newLocations[levelKey] = naturalOrderBy(newLocationsForLevel, [
-        'label',
-        'key',
-      ]);
+      newLocations[levelKey] = newLocationsForLevel;
     }
   });
 

@@ -13,9 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 /// instances are returned so that tracked entities are never mutated.
 /// </para>
 /// <para>
-/// Note the admin frontend doesn't rely on this order, as enumerating JSON objects in
-/// JavaScript places integer-like keys first. It re-sorts with <c>Intl.Collator</c>
-/// instead, which can differ slightly from this comparison (e.g. for punctuation).
+/// The admin frontend relies on this order, except for filter options. Their keys are
+/// their labels, so can be integer-like (e.g. "11"), which JavaScript enumerates before
+/// other keys. The frontend re-sorts those with <c>Intl.Collator</c>, which can differ
+/// slightly from this comparison (e.g. for punctuation).
 /// </para>
 /// </summary>
 public static class MappingPlanOrdering

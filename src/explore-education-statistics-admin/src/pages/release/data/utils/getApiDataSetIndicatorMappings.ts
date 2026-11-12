@@ -4,7 +4,6 @@ import {
   IndicatorsMapping,
 } from '@admin/services/apiDataSetVersionService';
 import { Dictionary } from '@common/types';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 
 export interface IndicatorCandidateWithKey extends IndicatorCandidate {
   key: string;
@@ -76,18 +75,10 @@ export default function getApiDataSetIndicatorMappings({
       };
     });
 
-  // Sort explicitly as Object.entries enumerates integer-like
-  // keys first, regardless of the response order.
   return {
-    autoMappedIndicators: naturalOrderBy(autoMappedIndicators, [
-      indicator => indicator.mapping.source.label,
-      indicator => indicator.mapping.sourceKey,
-    ]),
-    newIndicators: naturalOrderBy(newIndicators, ['label', 'key']),
-    mappableIndicators: naturalOrderBy(mappableIndicators, [
-      indicator => indicator.mapping.source.label,
-      indicator => indicator.mapping.sourceKey,
-    ]),
+    autoMappedIndicators,
+    newIndicators,
+    mappableIndicators,
   };
 }
 
