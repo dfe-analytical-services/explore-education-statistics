@@ -251,16 +251,9 @@ public class ThemeService(
         // Capture the release Ids so that they can be used to raise an event after the publication is deleted.
         var releaseIds = releaseVersionsToDelete.Select(rv => rv.ReleaseId).Distinct().ToList();
 
-        // Other releases (potentially in a Publication/Theme that is not being deleted) may be rollover
-        // copies of one of this publication's releases, so their references have to be cleared or the
-        // delete breaches FK_Releases_Releases_RolloverSourceReleaseId. Unlike Publications.SupersededById,
-        // these Release rows aren't individually tracked/removed by this method - they're cascade-deleted by
-        // the database itself as a side effect of deleting the Publication below, which EF's own
-        // ClientSetNull fixup never sees (loading them into the change tracker, as done for SupersededById
-        // above, does nothing here). So clear the column directly with an immediate, explicit update
-        // instead, before anything else runs - queried by this publication's own Release ids directly,
-        // not the ReleaseVersion-derived `releaseIds` below, since a Release with no ReleaseVersions at all
-        // would otherwise be missed.
+        // Clear RolloverSourceReleaseId on any releases rolled over from this publication's releases, so the FK
+        // doesn't block the delete. This is a direct update because those rollover releases aren't tracked,
+        // so EF never nulls it for us.
         var thisPublicationsReleaseIds = contentDbContext
             .Releases.Where(r => r.PublicationId == publicationId)
             .Select(r => r.Id);
