@@ -334,4 +334,36 @@ public abstract class ReplacementServiceHelper
 
         return replacementSequence;
     }
+
+    public static List<PairedIndicatorEntry>? ReplacePairedIndicators(
+        List<PairedIndicatorEntry>? originalPairedIndicators,
+        DataSetMapping mapping
+    )
+    {
+        if (originalPairedIndicators is null)
+        {
+            return null;
+        }
+
+        var replacementIdsByOriginalId = mapping
+            .IndicatorMappings.Values.Where(map => map.ReplacementId != null)
+            .ToDictionary(map => map.OriginalId, map => map.ReplacementId!.Value);
+
+        // A pair is only carried forward if both its parent and child indicators are mapped to the replacement.
+        // Otherwise it's dropped, and any surviving indicator from the pair becomes independently selectable.
+        var replacementPairs = new List<PairedIndicatorEntry>();
+
+        foreach (var pair in originalPairedIndicators)
+        {
+            if (
+                replacementIdsByOriginalId.TryGetValue(pair.ParentIndicatorId, out var parentId)
+                && replacementIdsByOriginalId.TryGetValue(pair.ChildIndicatorId, out var childId)
+            )
+            {
+                replacementPairs.Add(new PairedIndicatorEntry(ParentIndicatorId: parentId, ChildIndicatorId: childId));
+            }
+        }
+
+        return replacementPairs.Count == 0 ? null : replacementPairs;
+    }
 }
