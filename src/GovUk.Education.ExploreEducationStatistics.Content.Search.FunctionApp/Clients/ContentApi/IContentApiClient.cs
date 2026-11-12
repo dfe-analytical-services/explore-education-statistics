@@ -92,8 +92,8 @@ public interface IContentApiClient
     /// </summary>
     /// <param name="publicationSlug">the publication slug</param>
     /// <param name="cancellationToken">cancellation token</param>
-    /// <returns>An array of data set documents, which is empty if the publication is not found.</returns>
-    /// <exception cref="UnableToGetPublicationDataSetDocumentsException">Thrown if the call to the API was unsuccessful</exception>
+    /// <returns>An array of data set documents, which is empty if the publication has no data files.</returns>
+    /// <exception cref="UnableToGetPublicationDataSetDocumentsException">Thrown if the call to the API was unsuccessful, including when the publication is not found</exception>
     Task<DataSetDocument[]> GetPublicationDataSetDocuments(
         string publicationSlug,
         CancellationToken cancellationToken = default

@@ -222,9 +222,15 @@ internal class ContentApiClient(HttpClient httpClient, ILogger<ContentApiClient>
         var apiEndpoint = string.Format(GetPublicationDataSetDocumentsEndpointFormat, publicationSlug);
         var response = await Get<DataSetSearchableDocumentDto[]>(apiEndpoint, cancellationToken);
 
+        // A publication that is not found is treated as an error rather than as a publication without data set
+        // documents. Otherwise a slug that no longer resolves would lead to the removal of the documents of a
+        // published publication.
         if (response is GetResponse<DataSetSearchableDocumentDto[]>.NotFound)
         {
-            return [];
+            logger.LogWarning(
+                """Publication "{PublicationSlug}" was not found by the Content API. Its data set documents have not been refreshed or removed.""",
+                publicationSlug
+            );
         }
 
         return Process(

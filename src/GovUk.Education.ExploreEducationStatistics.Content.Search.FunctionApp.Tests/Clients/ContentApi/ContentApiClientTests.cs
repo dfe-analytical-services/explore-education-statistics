@@ -411,13 +411,18 @@ public class ContentApiClientTests(ITestOutputHelper output)
             }
 
             [Fact]
-            public async Task NotFoundResponse_ReturnsNoDataSetDocuments()
+            public async Task NotFoundResponse_ThrowsExceptionAndLogsWarning()
             {
-                var sut = GetSut(HttpStatusCode.NotFound, "");
+                var loggerMockBuilder = new LoggerMockBuilder<ContentApiClient>();
+                var sut = GetSut(HttpStatusCode.NotFound, "", logger: loggerMockBuilder.Build());
 
-                var result = await sut.GetPublicationDataSetDocuments("publication-slug");
+                await Assert.ThrowsAsync<UnableToGetPublicationDataSetDocumentsException>(() =>
+                    sut.GetPublicationDataSetDocuments("publication-slug")
+                );
 
-                Assert.Empty(result);
+                loggerMockBuilder.Assert.LoggedWarningContains(
+                    """Publication "publication-slug" was not found by the Content API"""
+                );
             }
 
             [Fact]
