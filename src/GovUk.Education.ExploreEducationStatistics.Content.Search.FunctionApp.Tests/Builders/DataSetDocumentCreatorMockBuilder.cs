@@ -61,16 +61,12 @@ public class DataSetDocumentCreatorMockBuilder
             );
         }
 
-        public void RefreshPublicationDataSetDocumentsCalledFor(string expectedPublicationSlug)
+        public void RefreshPublicationDataSetDocumentsCalledFor(
+            RefreshPublicationDataSetDocumentsRequest expectedRequest
+        )
         {
             mock.Verify(
-                m =>
-                    m.RefreshPublicationDataSetDocuments(
-                        It.Is<RefreshPublicationDataSetDocumentsRequest>(request =>
-                            request.PublicationSlug == expectedPublicationSlug
-                        ),
-                        It.IsAny<CancellationToken>()
-                    ),
+                m => m.RefreshPublicationDataSetDocuments(expectedRequest, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }

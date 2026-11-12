@@ -155,6 +155,7 @@ public class DataSetDocumentCreatorTests
     {
         private readonly RefreshPublicationDataSetDocumentsRequest _request = new()
         {
+            PublicationId = PublicationId,
             PublicationSlug = PublicationSlug,
         };
 
@@ -207,16 +208,19 @@ public class DataSetDocumentCreatorTests
         }
 
         [Fact]
-        public async Task WhenPublicationHasNoDataSetDocuments_ShouldNotChangeBlobs()
+        public async Task WhenPublicationHasNoDataSetDocuments_ShouldRemoveAllDataSetDocumentsOfPublication()
         {
             _contentApiClientMockBuilder.WherePublicationHasDataSetDocuments();
 
-            var response = await GetSut().RefreshPublicationDataSetDocuments(_request);
+            await GetSut().RefreshPublicationDataSetDocuments(_request);
 
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsUploaded();
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
-            Assert.Empty(response.UploadedBlobNames);
-            Assert.Empty(response.RemovedBlobNames);
+            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
+                request.PublicationId == PublicationId
+                && request.ReleaseId == null
+                && request.FileId == null
+                && request.Except.Count == 0
+            );
         }
 
         [Fact]
@@ -234,7 +238,7 @@ public class DataSetDocumentCreatorTests
         }
 
         [Fact]
-        public async Task WhenDataSetDocumentsBelongToDifferentPublications_ShouldThrowWithoutChangingBlobs()
+        public async Task WhenDataSetDocumentBelongsToAnotherPublication_ShouldThrowWithoutChangingBlobs()
         {
             _contentApiClientMockBuilder.WherePublicationHasDataSetDocuments(
                 DataSetDocument1,
