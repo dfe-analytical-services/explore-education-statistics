@@ -25,15 +25,24 @@ import {
 } from '@common/services/types/organisation';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
-import { IdTitlePair } from '@admin/services/types/common';
+import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import Yup from '@common/validation/yup';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
+
+export type ReleaseCreationMode = 'WithData' | 'StructureOnly' | 'blank';
+
+const releaseCreationModeOptions: ReleaseCreationMode[] = [
+  'WithData',
+  'StructureOnly',
+  'blank',
+];
 
 export interface ReleaseSummaryFormValues {
   releaseType?: ReleaseType;
   templateReleaseId?: string;
+  creationMode?: ReleaseCreationMode;
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
   releaseLabel?: string;
@@ -53,13 +62,20 @@ const errorMappings = [
   }),
 ];
 
+export interface RolloverSourceRelease extends IdTitlePair {
+  timePeriodCoverage: ValueLabelPair;
+  yearTitle: string;
+}
+
 interface Props {
   submitText: string;
   templateRelease?: IdTitlePair;
+  rolloverSource?: RolloverSourceRelease;
   initialValues: ReleaseSummaryFormValues;
   releaseVersion: number;
   onSubmit: (values: ReleaseSummaryFormValues) => Promise<void> | void;
   onCancel: () => void;
+  onCreationModeChange?: (mode: ReleaseCreationMode) => void;
 }
 
 export default function ReleaseSummaryForm({
@@ -67,9 +83,15 @@ export default function ReleaseSummaryForm({
   releaseVersion,
   submitText,
   templateRelease,
+  rolloverSource,
   onSubmit,
   onCancel,
+  onCreationModeChange,
 }: Props) {
+  const [liveCreationMode, setLiveCreationMode] = useState(
+    initialValues.creationMode,
+  );
+
   const {
     value: timePeriodCoverageGroups,
     isLoading: timePeriodCoverageGroupsLoading,
@@ -105,6 +127,7 @@ export default function ReleaseSummaryForm({
         .required('Choose a release type')
         .oneOf(permittedReleaseTypes),
       templateReleaseId: Yup.string(),
+      creationMode: Yup.string().oneOf(releaseCreationModeOptions),
       releaseLabel: Yup.string().max(
         20,
         /* eslint-disable no-template-curly-in-string */
@@ -184,8 +207,40 @@ export default function ReleaseSummaryForm({
           findTimePeriodCoverageGroup(getValues('timePeriodCoverageCode'))
             ?.category.label ?? '';
 
+        const copiedFromHint =
+          rolloverSource && liveCreationMode !== 'blank'
+            ? `This release will be copied from ${rolloverSource.timePeriodCoverage.label.toLowerCase()} ${rolloverSource.yearTitle}`
+            : undefined;
+
         return (
           <Form id={formId} onSubmit={onSubmit}>
+            {rolloverSource && (
+              <FormFieldRadioGroup<ReleaseSummaryFormValues>
+                legend="Select template"
+                name="creationMode"
+                order={[]}
+                onChange={event => {
+                  const mode = event.target.value as ReleaseCreationMode;
+                  setLiveCreationMode(mode);
+                  onCreationModeChange?.(mode);
+                }}
+                options={[
+                  {
+                    label: `Copy existing release - release rollover (${rolloverSource.title}) including data and data blocks`,
+                    value: 'WithData',
+                  },
+                  {
+                    label: `Copy existing release - (${rolloverSource.title}) without data and data blocks`,
+                    value: 'StructureOnly',
+                  },
+                  {
+                    label: 'Create new blank release',
+                    value: 'blank',
+                  },
+                ]}
+              />
+            )}
+
             <FormFieldset
               hint="For 6 digit years, enter only the first four digits in this box e.g. for 2017/18, only enter 2017."
               id="timePeriodCoverage"
@@ -213,6 +268,7 @@ export default function ReleaseSummaryForm({
                           : timePeriodLabel
                       }
                     `}
+                hint={copiedFromHint}
                 width={4}
                 disabled={disableReleaseSlugChange}
               />
@@ -235,7 +291,7 @@ export default function ReleaseSummaryForm({
               }))}
             />
 
-            {templateRelease && (
+            {!rolloverSource && templateRelease && (
               <FormFieldRadioGroup<ReleaseSummaryFormValues>
                 legend="Select template"
                 name="templateReleaseId"

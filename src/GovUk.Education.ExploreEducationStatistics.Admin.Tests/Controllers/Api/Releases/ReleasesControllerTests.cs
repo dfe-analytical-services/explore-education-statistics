@@ -51,9 +51,15 @@ public class ReleasesControllerUnitTests
         result.AssertOkResult(returnedViewModel);
     }
 
-    private static ReleasesController BuildController(IReleaseService? releaseService = null)
+    private static ReleasesController BuildController(
+        IReleaseService? releaseService = null,
+        IReleaseRolloverService? releaseRolloverService = null
+    )
     {
-        return new ReleasesController(releaseService ?? Mock.Of<IReleaseService>(Strict));
+        return new ReleasesController(
+            releaseService ?? Mock.Of<IReleaseService>(Strict),
+            releaseRolloverService ?? Mock.Of<IReleaseRolloverService>(Strict)
+        );
     }
 }
 
