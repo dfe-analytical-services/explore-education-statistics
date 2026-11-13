@@ -3,6 +3,7 @@ using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
@@ -24,7 +25,7 @@ public class FileStorageService : IFileStorageService
         // table storage in favour of a database table, so we won't need this leasing
         // mechanism in the near future anyway.
         // TODO: Remove this in favour of database table for locking (EES-1232)
-        var client = new BlobServiceClient(
+        var client = StorageClientFactory.CreateBlobServiceClient(
             _publisherStorageConnectionString,
             new BlobClientOptions
             {

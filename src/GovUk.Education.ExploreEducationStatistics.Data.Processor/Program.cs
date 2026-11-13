@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -93,11 +94,17 @@ async Task ClearQueues()
     var config = host.Services.GetRequiredService<IOptions<AppOptions>>().Value;
     var connectionString = config.ImporterStorageConnectionString;
 
-    var importsPendingQueueClient = new QueueClient(connectionString, queueName: ImportsPendingQueue);
+    var importsPendingQueueClient = StorageClientFactory.CreateQueueClient(
+        connectionString,
+        queueName: ImportsPendingQueue
+    );
     await importsPendingQueueClient.CreateIfNotExistsAsync();
     await importsPendingQueueClient.ClearMessagesAsync();
 
-    var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue);
+    var restartImportsQueueClient = StorageClientFactory.CreateQueueClient(
+        connectionString,
+        queueName: RestartImportsQueue
+    );
     await restartImportsQueueClient.CreateIfNotExistsAsync();
     await restartImportsQueueClient.ClearMessagesAsync();
 }
@@ -109,6 +116,10 @@ async Task RestartImports()
 
     QueueClientOptions queueOptions = new() { MessageEncoding = QueueMessageEncoding.Base64 };
 
-    var restartImportsQueueClient = new QueueClient(connectionString, queueName: RestartImportsQueue, queueOptions);
+    var restartImportsQueueClient = StorageClientFactory.CreateQueueClient(
+        connectionString,
+        queueName: RestartImportsQueue,
+        queueOptions
+    );
     await restartImportsQueueClient.SendMessageAsync(JsonSerializer.Serialize(new RestartImportsMessage()));
 }
