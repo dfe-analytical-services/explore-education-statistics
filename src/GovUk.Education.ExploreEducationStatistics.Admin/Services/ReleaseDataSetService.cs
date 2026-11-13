@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -9,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseDataSetService(
     StatisticsDbContext statisticsDbContext,
     IFootnoteRepository footnoteRepository,
-    ISubjectDeleter subjectDeleter
+    IStorageDataSetResolver storageDataSetResolver
 ) : IReleaseDataSetService
 {
     public async Task Delete(Guid releaseVersionId, Guid subjectId, bool softDeleteOrphanedDataSet = true)
@@ -19,21 +20,47 @@ public class ReleaseDataSetService(
         await DeleteDataSetIfOrphaned(subjectId: subjectId, softDelete: softDeleteOrphanedDataSet);
     }
 
-    public async Task DeleteAll(Guid releaseVersionId, bool softDeleteOrphanedDataSets = true)
+    public async Task<IReadOnlyDictionary<Guid, IStorageDataSet>> ResolveAll(Guid releaseVersionId)
     {
-        var subjectIds = await statisticsDbContext
+        var dataSets = new Dictionary<Guid, IStorageDataSet>();
+
+        foreach (var subjectId in await ListSubjectIds(releaseVersionId))
+        {
+            var dataSet = await storageDataSetResolver.TryResolve(subjectId);
+
+            if (dataSet != null)
+            {
+                dataSets[subjectId] = dataSet;
+            }
+        }
+
+        return dataSets;
+    }
+
+    public async Task DeleteAll(
+        Guid releaseVersionId,
+        IReadOnlyDictionary<Guid, IStorageDataSet> dataSets,
+        bool softDeleteOrphanedDataSets = true
+    )
+    {
+        foreach (var subjectId in await ListSubjectIds(releaseVersionId))
+        {
+            await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
+            await footnoteRepository.DeleteFootnotesBySubject(releaseVersionId: releaseVersionId, subjectId: subjectId);
+            await DeleteDataSetIfOrphaned(
+                subjectId: subjectId,
+                softDelete: softDeleteOrphanedDataSets,
+                dataSet: dataSets.GetValueOrDefault(subjectId)
+            );
+        }
+    }
+
+    private async Task<List<Guid>> ListSubjectIds(Guid releaseVersionId)
+    {
+        return await statisticsDbContext
             .ReleaseSubject.Where(rs => rs.ReleaseVersionId == releaseVersionId)
             .Select(rs => rs.SubjectId)
             .ToListAsync();
-
-        foreach (var subjectId in subjectIds)
-        {
-            await Delete(
-                releaseVersionId: releaseVersionId,
-                subjectId: subjectId,
-                softDeleteOrphanedDataSet: softDeleteOrphanedDataSets
-            );
-        }
     }
 
     private async Task DeleteReleaseSubjectIfExists(Guid releaseVersionId, Guid subjectId)
@@ -51,25 +78,37 @@ public class ReleaseDataSetService(
         }
     }
 
-    private async Task DeleteDataSetIfOrphaned(Guid subjectId, bool softDelete)
+    private async Task DeleteDataSetIfOrphaned(Guid subjectId, bool softDelete, IStorageDataSet? dataSet = null)
     {
         if (await statisticsDbContext.ReleaseSubject.AnyAsync(rs => rs.SubjectId == subjectId))
         {
             return;
         }
 
-        if (!softDelete)
+        var subject = await statisticsDbContext
+            .Subject.IgnoreQueryFilters()
+            .SingleOrDefaultAsync(s => s.Id == subjectId);
+
+        if (subject == null)
         {
-            subjectDeleter.Delete(subjectId);
             return;
         }
 
-        var subject = await statisticsDbContext.Subject.SingleOrDefaultAsync(s => s.Id == subjectId);
+        dataSet ??= await storageDataSetResolver.TryResolve(subjectId);
+        if (dataSet != null)
+        {
+            await dataSet.Delete(softDelete: softDelete);
+        }
 
-        if (subject != null)
+        if (softDelete)
         {
             subject.SoftDeleted = true;
-            await statisticsDbContext.SaveChangesAsync();
         }
+        else
+        {
+            statisticsDbContext.Subject.Remove(subject);
+        }
+
+        await statisticsDbContext.SaveChangesAsync();
     }
 }

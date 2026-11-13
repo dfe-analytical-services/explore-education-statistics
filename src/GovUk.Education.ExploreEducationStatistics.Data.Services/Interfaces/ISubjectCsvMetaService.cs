@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ public interface ISubjectCsvMetaService
 {
     Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
         ReleaseSubject releaseSubject,
+        IStorageDataSet dataSet,
         FullTableQuery query,
         CancellationToken cancellationToken = default
     );

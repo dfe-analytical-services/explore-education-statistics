@@ -1,12 +1,12 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -44,16 +44,30 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
             .Returns(Task.CompletedTask);
 
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
+
+        dataSet.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, footnoteRepository: footnoteRepository.Object);
+            var service = BuildService(
+                statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                storageDataSetResolver: storageDataSetResolver.Object
+            );
 
             await service.Delete(
                 releaseVersionId: releaseSubject.ReleaseVersionId,
                 subjectId: releaseSubject.SubjectId
             );
 
-            MockUtils.VerifyAllMocks(footnoteRepository);
+            MockUtils.VerifyAllMocks(footnoteRepository, dataSet, storageDataSetResolver);
         }
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -150,16 +164,22 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
             .Returns(Task.CompletedTask);
 
-        var subjectDeleter = new Mock<ISubjectDeleter>(MockBehavior.Strict);
+        var dataSet = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        subjectDeleter.Setup(mock => mock.Delete(subject.Id));
+        dataSet.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet.Object);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var service = BuildService(
                 statisticsDbContext,
                 footnoteRepository: footnoteRepository.Object,
-                subjectDeleter: subjectDeleter.Object
+                storageDataSetResolver: storageDataSetResolver.Object
             );
 
             await service.Delete(
@@ -168,12 +188,128 @@ public class ReleaseDataSetServiceTests
                 softDeleteOrphanedDataSet: false
             );
 
-            MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
+            MockUtils.VerifyAllMocks(footnoteRepository, dataSet, storageDataSetResolver);
         }
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+            Assert.Empty(statisticsDbContext.Subject.IgnoreQueryFilters().ToList());
+        }
+    }
+
+    [Fact]
+    public async Task Delete_DataSetNotResolved()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
+            .Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IStorageDataSet?)null);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var service = BuildService(
+                statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                storageDataSetResolver: storageDataSetResolver.Object
+            );
+
+            await service.Delete(
+                releaseVersionId: releaseSubject.ReleaseVersionId,
+                subjectId: releaseSubject.SubjectId
+            );
+
+            MockUtils.VerifyAllMocks(footnoteRepository, storageDataSetResolver);
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+
+            var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
+            Assert.Single(subjects);
+            Assert.Equal(subject.Id, subjects[0].Id);
+            Assert.True(subjects[0].SoftDeleted);
+        }
+    }
+
+    [Fact]
+    public async Task Delete_SoftDeleteFalse_DataSetNotResolved()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository
+            .Setup(mock => mock.DeleteFootnotesBySubject(releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
+            .Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(subject.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IStorageDataSet?)null);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var service = BuildService(
+                statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                storageDataSetResolver: storageDataSetResolver.Object
+            );
+
+            await service.Delete(
+                releaseVersionId: releaseSubject.ReleaseVersionId,
+                subjectId: releaseSubject.SubjectId,
+                softDeleteOrphanedDataSet: false
+            );
+
+            MockUtils.VerifyAllMocks(footnoteRepository, storageDataSetResolver);
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+            Assert.Empty(statisticsDbContext.Subject.IgnoreQueryFilters().ToList());
         }
     }
 
@@ -261,26 +397,42 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject2.SubjectId))
             .Returns(Task.CompletedTask);
 
+        var dataSet1 = new Mock<IStorageDataSet>(MockBehavior.Strict);
+        var dataSet2 = new Mock<IStorageDataSet>(MockBehavior.Strict);
+
+        dataSet1.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet2.Setup(mock => mock.Delete(true, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet1.Object);
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet2.Object);
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext, footnoteRepository: footnoteRepository.Object);
+            var service = BuildService(
+                statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                storageDataSetResolver: storageDataSetResolver.Object
+            );
 
-            await service.DeleteAll(releaseVersionId: releaseVersion.Id);
+            var dataSets = await service.ResolveAll(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(footnoteRepository);
+            await service.DeleteAll(releaseVersionId: releaseVersion.Id, dataSets: dataSets);
+
+            MockUtils.VerifyAllMocks(footnoteRepository, dataSet1, dataSet2, storageDataSetResolver);
         }
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-
             var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
             Assert.Equal(2, subjects.Count);
-            Assert.Equal(releaseSubject1.SubjectId, subjects[0].Id);
-            Assert.True(subjects[0].SoftDeleted);
-
-            Assert.Equal(releaseSubject2.SubjectId, subjects[1].Id);
-            Assert.True(subjects[1].SoftDeleted);
+            Assert.All(subjects, subject => Assert.True(subject.SoftDeleted));
         }
     }
 
@@ -319,40 +471,57 @@ public class ReleaseDataSetServiceTests
             .Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id, releaseSubject2.SubjectId))
             .Returns(Task.CompletedTask);
 
-        var subjectDeleter = new Mock<ISubjectDeleter>(MockBehavior.Strict);
+        var dataSet1 = new Mock<IStorageDataSet>(MockBehavior.Strict);
+        var dataSet2 = new Mock<IStorageDataSet>(MockBehavior.Strict);
 
-        subjectDeleter.Setup(mock => mock.Delete(releaseSubject1.SubjectId));
-        subjectDeleter.Setup(mock => mock.Delete(releaseSubject2.SubjectId));
+        dataSet1.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSet2.Setup(mock => mock.Delete(false, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        var storageDataSetResolver = new Mock<IStorageDataSetResolver>(MockBehavior.Strict);
+
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(releaseSubject1.SubjectId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet1.Object);
+        storageDataSetResolver
+            .Setup(mock => mock.TryResolve(releaseSubject2.SubjectId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dataSet2.Object);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             var service = BuildService(
                 statisticsDbContext,
                 footnoteRepository: footnoteRepository.Object,
-                subjectDeleter: subjectDeleter.Object
+                storageDataSetResolver: storageDataSetResolver.Object
             );
 
-            await service.DeleteAll(releaseVersionId: releaseVersion.Id, softDeleteOrphanedDataSets: false);
+            var dataSets = await service.ResolveAll(releaseVersion.Id);
 
-            MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
+            await service.DeleteAll(
+                releaseVersionId: releaseVersion.Id,
+                dataSets: dataSets,
+                softDeleteOrphanedDataSets: false
+            );
+
+            MockUtils.VerifyAllMocks(footnoteRepository, dataSet1, dataSet2, storageDataSetResolver);
         }
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
             Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+            Assert.Empty(statisticsDbContext.Subject.IgnoreQueryFilters().ToList());
         }
     }
 
     private static ReleaseDataSetService BuildService(
         StatisticsDbContext statisticsDbContext,
         IFootnoteRepository? footnoteRepository = null,
-        ISubjectDeleter? subjectDeleter = null
+        IStorageDataSetResolver? storageDataSetResolver = null
     )
     {
         return new ReleaseDataSetService(
             statisticsDbContext,
             footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-            subjectDeleter ?? Mock.Of<ISubjectDeleter>(MockBehavior.Strict)
+            storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(MockBehavior.Strict)
         );
     }
 }

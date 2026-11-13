@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Options;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -230,9 +231,16 @@ public class ProcessorStage2Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict),
+            Mock.Of<ILogger<DataImportService>>()
+        );
 
-        var dataSetMappingService = new DataSetMappingService(dbContextSupplier);
+        var dataSetMappingService = new DataSetMappingService(
+            dbContextSupplier,
+            Mock.Of<IStorageDataSetResolver>(Strict)
+        );
 
         var guidGenerator = new SequentialGuidGenerator();
 
