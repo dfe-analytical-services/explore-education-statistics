@@ -14,11 +14,12 @@ public class FullReleaseDocumentResetter(
     {
         logger.LogInformation("Executing Full Release Document Reset");
 
+        // Get list of all live publications before deleting anything, so that a failure to get them does not leave an
+        // empty container with nothing queued to fill it again
+        var allPublications = await contentApiClient.GetAllLivePublicationInfos(cancellationToken);
+
         // Delete all release documents
         await releaseDocumentRemover.RemoveAllReleaseDocuments(cancellationToken);
-
-        // Get list of all live publications
-        var allPublications = await contentApiClient.GetAllLivePublicationInfos(cancellationToken);
 
         // Return list of slugs to send to the Release Document creator
         return new PerformResetResponse { AllPublications = allPublications };

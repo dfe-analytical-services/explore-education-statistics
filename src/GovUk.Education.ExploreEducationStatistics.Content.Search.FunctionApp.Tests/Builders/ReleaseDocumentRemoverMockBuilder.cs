@@ -98,5 +98,10 @@ public class ReleaseDocumentRemoverMockBuilder
         {
             mock.Verify(m => m.RemoveAllReleaseDocuments(It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        public void AllReleaseDocumentsNotRemoved()
+        {
+            mock.Verify(m => m.RemoveAllReleaseDocuments(It.IsAny<CancellationToken>()), Times.Never);
+        }
     }
 }

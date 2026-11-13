@@ -110,6 +110,16 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
+    public ContentApiClientMockBuilder WhereGetAllLivePublicationInfosThrows()
+    {
+        _mock
+            .Setup(m => m.GetAllLivePublicationInfos(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(
+                new UnableToGetPublicationInfosException("This is a test exception. GetAllLivePublicationInfos error.")
+            );
+        return this;
+    }
+
     public ContentApiClientMockBuilder WhereHasDataSetDocumentKeys(params DataSetDocumentKey[] dataSetDocumentKeys)
     {
         _dataSetDocumentKeys = dataSetDocumentKeys;

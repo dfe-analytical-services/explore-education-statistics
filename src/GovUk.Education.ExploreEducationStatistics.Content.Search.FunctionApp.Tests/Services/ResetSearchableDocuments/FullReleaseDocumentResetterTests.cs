@@ -1,4 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -61,5 +62,20 @@ public class FullReleaseDocumentResetterTests
         Assert.NotNull(response);
         var actual = response.AllPublications;
         Assert.Equal(publications, actual);
+    }
+
+    [Fact]
+    public async Task WhenPublicationsCannotBeRetrieved_ThenNoReleaseDocumentsAreRemoved()
+    {
+        // Arrange
+        _contentApi.WhereGetAllLivePublicationInfosThrows();
+
+        var sut = GetSut();
+
+        // Act
+        await Assert.ThrowsAsync<UnableToGetPublicationInfosException>(() => sut.PerformReset());
+
+        // Assert
+        _releaseDocumentRemover.Assert.AllReleaseDocumentsNotRemoved();
     }
 }
