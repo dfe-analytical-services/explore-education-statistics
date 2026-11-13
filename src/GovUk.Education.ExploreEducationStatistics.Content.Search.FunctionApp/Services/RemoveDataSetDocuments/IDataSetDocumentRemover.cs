@@ -10,4 +10,9 @@ public interface IDataSetDocumentRemover
         RemoveDataSetDocumentsRequest request,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Remove the data set documents of every publication.
+    /// </summary>
+    Task<RemoveDataSetDocumentsResponse> RemoveAllDataSetDocuments(CancellationToken cancellationToken = default);
 }
