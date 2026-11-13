@@ -11,6 +11,9 @@ param storageAccountSku StorageAccountSku
 @description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
 param adminUsesUserAssignedIdentity bool = false
 
+@description('Whether the Function App host and Durable Functions connect to their storage accounts with the Data Processor\'s managed identity, rather than with connection strings.')
+param identityBasedStorageConnections bool = false
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -118,7 +121,9 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       id: dataProcessorFunctionAppManagedIdentity.id
       name: dataProcessorFunctionAppManagedIdentity.name
       principalId: dataProcessorFunctionAppManagedIdentity.properties.principalId
+      clientId: dataProcessorFunctionAppManagedIdentity.properties.clientId
     }
+    identityBasedStorageConnections: identityBasedStorageConnections
     processorProdAppSettings: processorProdAppSettings
     processorStagingAppSettings: processorStagingAppSettings
     keyVaultName: resourceNames.keyVault.keyVault

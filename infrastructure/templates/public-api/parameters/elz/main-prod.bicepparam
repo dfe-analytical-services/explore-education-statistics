@@ -23,3 +23,6 @@ param publicApiContainerAppConfig = {
 
 // Admin calls this pipeline's apps with its user-assigned identity.
 param adminUsesUserAssignedIdentity = true
+
+// The Data Processor's host and Durable Functions connect to their storage accounts with its managed identity.
+param dataProcessorIdentityBasedStorageConnections = true
