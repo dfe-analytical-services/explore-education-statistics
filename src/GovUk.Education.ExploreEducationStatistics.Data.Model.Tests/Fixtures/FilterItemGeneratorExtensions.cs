@@ -16,11 +16,6 @@ public static class FilterItemGeneratorExtensions
         FilterGroup filterGroup
     ) => generator.ForInstance(s => s.SetFilterGroup(filterGroup));
 
-    public static Generator<FilterItem> WithFootnotes(
-        this Generator<FilterItem> generator,
-        IEnumerable<Footnote> footnotes
-    ) => generator.ForInstance(s => s.SetFootnotes(footnotes));
-
     public static Generator<FilterItem> WithLabel(this Generator<FilterItem> generator, string label) =>
         generator.ForInstance(s => s.SetLabel(label));
 
@@ -44,32 +39,4 @@ public static class FilterItemGeneratorExtensions
                 }
             )
             .Set(fi => fi.FilterGroupId, filterGroup.Id);
-
-    public static InstanceSetters<FilterItem> SetFootnotes(
-        this InstanceSetters<FilterItem> setters,
-        IEnumerable<Footnote> footnotes
-    ) =>
-        setters.Set(
-            fi => fi.Footnotes,
-            (_, filterItem) =>
-                footnotes
-                    .Select(footnote =>
-                    {
-                        var filterItemFootnote = new FilterItemFootnote
-                        {
-                            FilterItem = filterItem,
-                            FilterItemId = filterItem.Id,
-                            FilterGroupId = filterItem.FilterGroup.Id,
-                            FilterId = filterItem.FilterGroup.Filter.Id,
-                            Footnote = footnote,
-                            FootnoteId = footnote.Id,
-                            SubjectId = filterItem.FilterGroup.Filter.SubjectId,
-                        };
-
-                        footnote.FilterItems.Add(filterItemFootnote);
-
-                        return filterItemFootnote;
-                    })
-                    .ToList()
-        );
 }

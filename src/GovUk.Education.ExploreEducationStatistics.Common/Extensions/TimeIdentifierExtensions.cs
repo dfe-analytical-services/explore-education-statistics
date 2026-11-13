@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.TimeIdentifierUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimeIdentifierUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class TimeIdentifierExtensions
 {
@@ -24,47 +24,47 @@ public static class TimeIdentifierExtensions
 
     public static bool IsYear(this TimeIdentifier timeIdentifier)
     {
-        return GetYears().Contains(timeIdentifier);
+        return GetIdentifiersUsingYears().Contains(timeIdentifier);
     }
 
     public static bool IsAcademicQuarter(this TimeIdentifier timeIdentifier)
     {
-        return GetAcademicQuarters().Contains(timeIdentifier);
+        return GetIdentifiersUsingAcademicQuarters().Contains(timeIdentifier);
     }
 
     public static bool IsCalendarQuarter(this TimeIdentifier timeIdentifier)
     {
-        return GetCalendarQuarters().Contains(timeIdentifier);
+        return GetIdentifiersUsingCalendarQuarters().Contains(timeIdentifier);
     }
 
     public static bool IsFinancialQuarter(this TimeIdentifier timeIdentifier)
     {
-        return GetFinancialQuarters().Contains(timeIdentifier);
+        return GetIdentifiersUsingFinancialQuarters().Contains(timeIdentifier);
     }
 
     public static bool IsTaxQuarter(this TimeIdentifier timeIdentifier)
     {
-        return GetTaxQuarters().Contains(timeIdentifier);
+        return GetIdentifiersUsingTaxQuarters().Contains(timeIdentifier);
     }
 
     public static bool IsMonth(this TimeIdentifier timeIdentifier)
     {
-        return GetMonths().Contains(timeIdentifier);
+        return GetIdentifiersUsingMonths().Contains(timeIdentifier);
     }
 
     public static bool IsWeek(this TimeIdentifier timeIdentifier)
     {
-        return GetWeeks().Contains(timeIdentifier);
+        return GetIdentifiersUsingWeeks().Contains(timeIdentifier);
     }
 
     public static bool IsTerm(this TimeIdentifier timeIdentifier)
     {
-        return GetTerms().Contains(timeIdentifier);
+        return GetIdentifiersUsingTerms().Contains(timeIdentifier);
     }
 
     public static bool IsFinancialYearPart(this TimeIdentifier timeIdentifier)
     {
-        return GetFinancialYearParts().Contains(timeIdentifier);
+        return GetIdentifiersUsingFinancialYearParts().Contains(timeIdentifier);
     }
 
     public static bool HasAssociatedRange(this TimeIdentifier timeIdentifier)
@@ -76,42 +76,42 @@ public static class TimeIdentifierExtensions
     {
         if (timeIdentifier.IsMonth())
         {
-            return GetMonths();
+            return GetIdentifiersUsingMonths();
         }
 
         if (timeIdentifier.IsWeek())
         {
-            return GetWeeks();
+            return GetIdentifiersUsingWeeks();
         }
 
         if (timeIdentifier.IsAcademicQuarter())
         {
-            return GetAcademicQuarters();
+            return GetIdentifiersUsingAcademicQuarters();
         }
 
         if (timeIdentifier.IsCalendarQuarter())
         {
-            return GetCalendarQuarters();
+            return GetIdentifiersUsingCalendarQuarters();
         }
 
         if (timeIdentifier.IsFinancialQuarter())
         {
-            return GetFinancialQuarters();
+            return GetIdentifiersUsingFinancialQuarters();
         }
 
         if (timeIdentifier.IsTaxQuarter())
         {
-            return GetTaxQuarters();
+            return GetIdentifiersUsingTaxQuarters();
         }
 
         if (timeIdentifier.IsTerm())
         {
-            return GetTerms();
+            return GetIdentifiersUsingTerms();
         }
 
         if (timeIdentifier.IsFinancialYearPart())
         {
-            return GetFinancialYearParts();
+            return GetIdentifiersUsingFinancialYearParts();
         }
 
         throw new ArgumentOutOfRangeException(nameof(timeIdentifier), "The time identifier has no associated range");

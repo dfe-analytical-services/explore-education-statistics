@@ -11,6 +11,5 @@ public class Indicator
     public IndicatorUnit Unit { get; set; } = IndicatorUnit.None;
     public IndicatorGroup IndicatorGroup { get; set; } = null!;
     public Guid IndicatorGroupId { get; set; }
-    public List<IndicatorFootnote> Footnotes { get; set; } = new();
     public int? DecimalPlaces { get; set; }
 }
