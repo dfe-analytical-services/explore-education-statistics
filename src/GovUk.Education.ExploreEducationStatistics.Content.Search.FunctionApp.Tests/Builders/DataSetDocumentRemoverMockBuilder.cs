@@ -7,6 +7,7 @@ public class DataSetDocumentRemoverMockBuilder
 {
     private readonly Mock<IDataSetDocumentRemover> _mock = new(MockBehavior.Strict);
     private RemoveDataSetDocumentsResponse? _response;
+    private RemoveDataSetDocumentsResponse? _removeAllResponse;
 
     public IDataSetDocumentRemover Build()
     {
@@ -16,7 +17,17 @@ public class DataSetDocumentRemoverMockBuilder
             )
             .ReturnsAsync(() => _response ?? new RemoveDataSetDocumentsResponse([]));
 
+        _mock
+            .Setup(m => m.RemoveAllDataSetDocuments(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _removeAllResponse ?? new RemoveDataSetDocumentsResponse([]));
+
         return _mock.Object;
+    }
+
+    public DataSetDocumentRemoverMockBuilder WhereRemoveAllResponseIs(RemoveDataSetDocumentsResponse response)
+    {
+        _removeAllResponse = response;
+        return this;
     }
 
     public DataSetDocumentRemoverMockBuilder WhereResponseIs(RemoveDataSetDocumentsResponse response)
@@ -47,6 +58,16 @@ public class DataSetDocumentRemoverMockBuilder
                 m => m.RemoveDataSetDocuments(It.IsAny<RemoveDataSetDocumentsRequest>(), It.IsAny<CancellationToken>()),
                 Times.Never
             );
+        }
+
+        public void AllDataSetDocumentsRemoved()
+        {
+            mock.Verify(m => m.RemoveAllDataSetDocuments(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        public void AllDataSetDocumentsNotRemoved()
+        {
+            mock.Verify(m => m.RemoveAllDataSetDocuments(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }
