@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
@@ -17,7 +18,8 @@ public class PublishingCompletionService(
     IRedirectsCacheService redirectsCacheService,
     IDataSetPublishingService dataSetPublishingService,
     IPublisherEventRaiser publisherEventRaiser,
-    IEducationInNumbersService educationInNumbersService
+    IEducationInNumbersService educationInNumbersService,
+    ILogger<PublishingCompletionService> logger
 ) : IPublishingCompletionService
 {
     /// <summary>
@@ -76,12 +78,7 @@ public class PublishingCompletionService(
 
         await HandleArchivedPublications(publishedPublicationInfos, cancellationToken);
 
-        await contentService.InvalidatePreviousVersionsDownloadFiles(releaseVersionIdsToUpdate);
         await contentService.DeletePreviousVersionsContent(releaseVersionIdsToUpdate);
-
-        await notificationsService.NotifySubscribersIfApplicable(releaseVersionIdsToUpdate);
-
-        await notificationsService.SendReleasePublishingFeedbackEmails(releaseVersionIdsToUpdate);
 
         // Update the cached trees in case any methodologies/publications
         // are now accessible for the first time after publishing these releases
@@ -91,15 +88,79 @@ public class PublishingCompletionService(
 
         await dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
-        await educationInNumbersService.UpdateEinTiles(releaseVersionIdsToUpdate, cancellationToken);
-
         await publisherEventRaiser.OnReleaseVersionsPublished(publishedPublicationInfos);
+
+        await RunPostPublishingTasks(releaseVersionIdsToUpdate, cancellationToken);
 
         foreach (var status in releaseStatuses)
         {
             await releasePublishingStatusService.UpdatePublishingStage(
                 status.AsTableRowKey(),
                 ReleasePublishingStatusPublishingStage.Complete
+            );
+        }
+    }
+
+    /// <summary>
+    /// Runs tasks that should happen after publishing but must not prevent the release versions from going live.
+    /// Failures are logged rather than rethrown, and each task runs regardless of whether a previous one failed.
+    /// </summary>
+    // TODO EES-7752 Move these tasks somewhere they can run in parallel, separately from publishing, so they can't
+    // potentially block the current publication from being published.
+    private async Task RunPostPublishingTasks(Guid[] releaseVersionIds, CancellationToken cancellationToken)
+    {
+        await RunPostPublishingTask(
+            nameof(IContentService.InvalidatePreviousVersionsDownloadFiles),
+            releaseVersionIds,
+            cancellationToken,
+            () => contentService.InvalidatePreviousVersionsDownloadFiles(releaseVersionIds)
+        );
+
+        await RunPostPublishingTask(
+            nameof(INotificationsService.NotifySubscribersIfApplicable),
+            releaseVersionIds,
+            cancellationToken,
+            () => notificationsService.NotifySubscribersIfApplicable(releaseVersionIds)
+        );
+
+        await RunPostPublishingTask(
+            nameof(INotificationsService.SendReleasePublishingFeedbackEmails),
+            releaseVersionIds,
+            cancellationToken,
+            () => notificationsService.SendReleasePublishingFeedbackEmails(releaseVersionIds)
+        );
+
+        await RunPostPublishingTask(
+            nameof(IEducationInNumbersService.UpdateEinTiles),
+            releaseVersionIds,
+            cancellationToken,
+            () => educationInNumbersService.UpdateEinTiles(releaseVersionIds, cancellationToken)
+        );
+    }
+
+    private async Task RunPostPublishingTask(
+        string taskName,
+        Guid[] releaseVersionIds,
+        CancellationToken cancellationToken,
+        Func<Task> task
+    )
+    {
+        try
+        {
+            await task();
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Publishing was intentionally cancelled, so don't treat this as a task failure
+            throw;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Post-publishing task {TaskName} failed for release versions {ReleaseVersionIds}",
+                taskName,
+                string.Join(", ", releaseVersionIds)
             );
         }
     }

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Models
 using GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Builders.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
@@ -38,7 +39,8 @@ public class PublishingCompletionServiceTests
             _redirectsCacheService.Build(),
             _dataSetPublishingService.Build(),
             _publisherEventRaiser.Build(),
-            _educationInNumbersService.Build()
+            _educationInNumbersService.Build(),
+            NullLogger<PublishingCompletionService>.Instance
         );
 
     public class BasicTests : PublishingCompletionServiceTests
