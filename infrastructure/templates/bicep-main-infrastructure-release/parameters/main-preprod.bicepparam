@@ -20,6 +20,11 @@ param publicSiteConfigParam = {
   }
 }
 
+// The Content API's DNS has been cut over to Azure Front Door, so only accept traffic routed through it.
+param contentApiConfigParam = {
+  restrictOriginToFrontDoor: true
+}
+
 // Starter thresholds from 30 days of production App Insights request data (15-minute windows).
 // Each fires on a Total strictly greater than the threshold. Services not listed (importer,
 // publisher, notifier) keep the default Minimum > 0 rule.
