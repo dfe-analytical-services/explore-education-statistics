@@ -195,4 +195,26 @@ public abstract class DataSetDocumentRemoverTests
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsDeleted();
         }
     }
+
+    public class RemoveAllDataSetDocumentsTests : DataSetDocumentRemoverTests
+    {
+        [Fact]
+        public async Task ShouldDeleteAllBlobsInDataSetDocumentsContainer()
+        {
+            await GetSut().RemoveAllDataSetDocuments();
+
+            _azureBlobStorageClientMockBuilder.Assert.AllBlobsWereDeleted(DataSetDocumentsContainerName);
+        }
+
+        [Fact]
+        public async Task ShouldReturnNamesOfBlobsOfEveryPublication()
+        {
+            var response = await GetSut().RemoveAllDataSetDocuments();
+
+            Assert.Equal(
+                [Key1.BlobName, Key2.BlobName, OtherReleaseKey.BlobName, OtherPublicationKey.BlobName],
+                response.RemovedBlobNames
+            );
+        }
+    }
 }
