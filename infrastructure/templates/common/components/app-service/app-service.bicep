@@ -28,6 +28,13 @@ param keyVaultRoles {
   legacyKeyVaultRoleAssignmentName: bool
 }?
 
+@description('The name of an existing user-assigned managed identity for the App Service and its deploy slot to use instead of system-assigned ones, for Key Vault references and the app code. Its Key Vault roles are granted to this identity.')
+param userAssignedIdentityName string = ''
+
+// TODO EES-7502 - remove once Admin logs in to PostgreSQL with its user-assigned identity.
+@description('Whether the App Service and its deploy slot keep system-assigned identities alongside the user-assigned one, for anything that still needs them. Only applies with userAssignedIdentityName.')
+param keepSystemAssignedIdentity bool = false
+
 @description('Minimum TLS version supported.')
 param minTlsVersion string
 
@@ -131,17 +138,30 @@ var ipSecurityRestrictions = [
 // Services get their image in linuxFxVersion from the application release pipeline, so this leaves it unset for them.
 var runtimeStackConfig = kind == 'app,linux' ? { linuxFxVersion: 'DOTNETCORE|10.0' } : { netFrameworkVersion: 'v10.0' }
 
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(userAssignedIdentityName)) {
+  name: userAssignedIdentityName
+}
+
+var identity = !empty(userAssignedIdentityName)
+  ? {
+      type: keepSystemAssignedIdentity ? 'SystemAssigned, UserAssigned' : 'UserAssigned'
+      userAssignedIdentities: {
+        '${userAssignedIdentity.id}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
+
 resource appService 'Microsoft.Web/sites@2025-03-01' = {
   name: appServiceName
   kind: kind
   location: resourceGroup().location
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: identity
   tags: union(tagValues, {
     ServiceType: 'App Service'
   })
-  properties: {
+  properties: union({
     serverFarmId: appServicePlanId
     httpsOnly: true
     clientAffinityEnabled: false
@@ -166,8 +186,13 @@ resource appService 'Microsoft.Web/sites@2025-03-01' = {
         allowedOrigins: allowedOrigins
       }
     })
-  }
+  }, !empty(userAssignedIdentityName) ? { keyVaultReferenceIdentity: userAssignedIdentity.id } : {})
 }
+
+// The identity that the App Service uses, to which its roles are granted.
+var appServicePrincipalId = !empty(userAssignedIdentityName)
+  ? userAssignedIdentity!.properties.principalId
+  : appService.identity.principalId
 
 var infraAppSettings = union({
   APPINSIGHTS_INSTRUMENTATIONKEY: reference(
@@ -193,6 +218,9 @@ var infraAppSettings = union({
   WEBSITE_RUN_FROM_PACKAGE: '1'
 } : {}, operatingSystem == 'Windows' ? {
   WEBSITE_LOAD_CERTIFICATES: '*'
+} : {}, !empty(userAssignedIdentityName) ? {
+  // Picked up by DefaultAzureCredential in the app code.
+  AZURE_CLIENT_ID: userAssignedIdentity!.properties.clientId
 } : {})
 
 // Combine any appsettings supplied by the caller of this template along with any appsettings
@@ -213,10 +241,10 @@ module appServiceSecretsUserRoleAssignmentModule '../../../common/components/key
   name: '${appServiceName}KeyVaultSecretsUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName 
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
-    principalIds: [appService.identity.principalId]
+    principalIds: [appServicePrincipalId]
     role: 'Secrets User'
   }
 }
@@ -225,10 +253,10 @@ module appServiceCertificateUserRoleAssignmentModule '../../../common/components
   name: '${appServiceName}KeyVaultCertificateUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName 
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCertificateUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
-    principalIds: [appService.identity.principalId]
+    principalIds: [appServicePrincipalId]
     role: 'Certificate User'
   }
 }
@@ -237,10 +265,10 @@ module appServiceSecretsOfficerRoleAssignmentModule '../../../common/components/
   name: '${appServiceName}KeyVaultSecretsOfficerRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultSecretsOfficer), 'Microsoft.Web/sites/${appServiceName}')
       : null
-    principalIds: [appService.identity.principalId]
+    principalIds: [appServicePrincipalId]
     role: 'Secrets Officer'
   }
 }
@@ -249,10 +277,10 @@ module appServiceCryptoUserRoleAssignmentModule '../../../common/components/key-
   name: '${appServiceName}KeyVaultCryptoUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
-    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName
+    roleAssignmentNameOverride: keyVaultRoles!.legacyKeyVaultRoleAssignmentName && empty(userAssignedIdentityName)
       ? guid(resourceId('Microsoft.KeyVault/vaults', keyVaultRoles!.keyVaultName!), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.KeyVaultCryptoUser), 'Microsoft.Web/sites/${appServiceName}')
       : null
-    principalIds: [appService.identity.principalId]
+    principalIds: [appServicePrincipalId]
     role: 'Crypto User'
   }
 }
@@ -270,6 +298,8 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     tagValues: tagValues
     healthCheckPath: healthCheckPath
     connectionStrings: connectionStrings
+    userAssignedIdentityId: !empty(userAssignedIdentityName) ? userAssignedIdentity.id : ''
+    keepSystemAssignedIdentity: keepSystemAssignedIdentity
   }
 }
 
@@ -281,7 +311,9 @@ resource stagingSlotAppSettings 'Microsoft.Web/sites/slots/config@2025-03-01' = 
   ]
 }
 
-module stagingSlotSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?secretsUser ?? false)) {
+// Grants for the deploy slot's own system-assigned identity. With a user-assigned identity, the slot shares the App
+// Service's identity, which is granted its roles above.
+module stagingSlotSecretsUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && empty(userAssignedIdentityName) && (keyVaultRoles.?secretsUser ?? false)) {
   name: '${appServiceName}StagingSlotKeyVaultSecretsUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
@@ -290,7 +322,7 @@ module stagingSlotSecretsUserRoleAssignmentModule '../../../common/components/ke
   }
 }
 
-module stagingSlotCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && (keyVaultRoles.?certificateUser ?? false)) {
+module stagingSlotCertificateUserRoleAssignmentModule '../../../common/components/key-vault/keyVaultRoleAssignment.bicep' = if (swapSlotEnabled && empty(userAssignedIdentityName) && (keyVaultRoles.?certificateUser ?? false)) {
   name: '${appServiceName}StagingSlotKeyVaultCertificateUserRole'
   params: {
     keyVaultName: keyVaultRoles!.keyVaultName!
@@ -344,4 +376,4 @@ module alertsModule 'alerts.bicep' = if (alerts != null) {
 }
 
 output appServiceName string = appService.name
-output appServiceSystemIdentityId string = appService.identity.principalId
+output appServiceIdentityPrincipalId string = appServicePrincipalId
