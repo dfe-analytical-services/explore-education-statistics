@@ -20,4 +20,11 @@ public interface IDataSetSearchableDocumentsService
     Task<DataSetSearchableDocumentKeyDto[]> GetDataSetSearchableDocumentKeys(
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Lists the publications which have data set searchable documents.
+    /// </summary>
+    Task<DataSetSearchableDocumentPublicationDto[]> GetDataSetSearchableDocumentPublications(
+        CancellationToken cancellationToken = default
+    );
 }

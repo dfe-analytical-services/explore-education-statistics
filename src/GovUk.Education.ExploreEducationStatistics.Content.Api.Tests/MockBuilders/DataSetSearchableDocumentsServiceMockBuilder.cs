@@ -14,6 +14,8 @@ public class DataSetSearchableDocumentsServiceMockBuilder
 
     private DataSetSearchableDocumentKeyDto[] _searchableDocumentKeys = [];
 
+    private DataSetSearchableDocumentPublicationDto[] _searchableDocumentPublications = [];
+
     public DataSetSearchableDocumentsServiceMockBuilder()
     {
         _mock
@@ -33,6 +35,10 @@ public class DataSetSearchableDocumentsServiceMockBuilder
         _mock
             .Setup(m => m.GetDataSetSearchableDocumentKeys(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _searchableDocumentKeys);
+
+        _mock
+            .Setup(m => m.GetDataSetSearchableDocumentPublications(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _searchableDocumentPublications);
     }
 
     public IDataSetSearchableDocumentsService Build() => _mock.Object;
@@ -50,6 +56,14 @@ public class DataSetSearchableDocumentsServiceMockBuilder
     )
     {
         _searchableDocumentKeys = searchableDocumentKeys;
+        return this;
+    }
+
+    public DataSetSearchableDocumentsServiceMockBuilder WhereHasSearchableDocumentPublications(
+        params DataSetSearchableDocumentPublicationDto[] searchableDocumentPublications
+    )
+    {
+        _searchableDocumentPublications = searchableDocumentPublications;
         return this;
     }
 
@@ -112,6 +126,11 @@ public class DataSetSearchableDocumentsServiceMockBuilder
         public void GetDataSetSearchableDocumentKeysWasCalled()
         {
             mock.Verify(m => m.GetDataSetSearchableDocumentKeys(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        public void GetDataSetSearchableDocumentPublicationsWasCalled()
+        {
+            mock.Verify(m => m.GetDataSetSearchableDocumentPublications(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

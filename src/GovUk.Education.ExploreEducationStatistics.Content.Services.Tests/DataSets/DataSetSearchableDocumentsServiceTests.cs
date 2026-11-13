@@ -787,6 +787,103 @@ public abstract class DataSetSearchableDocumentsServiceTests
         }
     }
 
+    public class GetDataSetSearchableDocumentPublicationsTests : DataSetSearchableDocumentsServiceTests
+    {
+        [Fact]
+        public async Task WhenPublicationsHaveDataSets_ReturnsEachPublicationOnceInSlugOrder()
+        {
+            // Arrange
+            Publication publicationB = _dataFixture
+                .DefaultPublication()
+                .WithSlug("publication-b")
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ =>
+                    [
+                        _dataFixture.DefaultRelease(publishedVersions: 2, year: 2020),
+                        _dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2021),
+                    ]
+                );
+
+            Publication publicationA = _dataFixture
+                .DefaultPublication()
+                .WithSlug("publication-a")
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            // The only data sets of this publication are on a version which is no longer the latest published version
+            Publication publicationWithDataSetsRemoved = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 2)]);
+
+            // The only files of this publication are not data sets
+            Publication publicationWithoutDataSets = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+
+            Publication unpublishedPublication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)]);
+
+            ReleaseFile ancillaryReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(publicationWithoutDataSets.Releases[0].Versions[0])
+                .WithFile(_dataFixture.DefaultFile(FileType.Ancillary));
+
+            var contextId = await SeedDatabase(
+                [
+                    publicationB,
+                    publicationA,
+                    publicationWithDataSetsRemoved,
+                    publicationWithoutDataSets,
+                    unpublishedPublication,
+                ],
+                [
+                    .. publicationB.Releases.SelectMany(release =>
+                        release.Versions.SelectMany(releaseVersion => GenerateDataSetReleaseFiles(releaseVersion))
+                    ),
+                    .. GenerateDataSetReleaseFiles(publicationA.Releases[0].Versions[0]),
+                    .. GenerateDataSetReleaseFiles(publicationWithDataSetsRemoved.Releases[0].Versions[0]),
+                    .. GenerateDataSetReleaseFiles(unpublishedPublication.Releases[0].Versions[0]),
+                    ancillaryReleaseFile,
+                ]
+            );
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var actual = await sut.GetDataSetSearchableDocumentPublications();
+
+            // Assert
+            DataSetSearchableDocumentPublicationDto[] expected =
+            [
+                new() { PublicationId = publicationA.Id, PublicationSlug = "publication-a" },
+                new() { PublicationId = publicationB.Id, PublicationSlug = "publication-b" },
+            ];
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public async Task WhenNoDataSets_ReturnsEmpty()
+        {
+            // Arrange
+            var contextId = await SeedDatabase([], []);
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var actual = await sut.GetDataSetSearchableDocumentPublications();
+
+            // Assert
+            Assert.Empty(actual);
+        }
+    }
+
     private List<ReleaseFile> GenerateDataSetReleaseFiles(ReleaseVersion releaseVersion, int numberOfDataSets = 2) =>
         _dataFixture
             .DefaultReleaseFile()
