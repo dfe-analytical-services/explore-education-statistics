@@ -53,7 +53,7 @@ public class ReleaseVersionService(
     IFootnoteRepository footnoteRepository,
     IDataBlockService dataBlockService,
     IReleasePublishingStatusRepository releasePublishingStatusRepository,
-    IReleaseSubjectRepository releaseSubjectRepository,
+    IReleaseDataSetService releaseDataSetService,
     IDataSetVersionService dataSetVersionService,
     IProcessorClient processorClient,
     IPrivateBlobCacheService privateCacheService,
@@ -238,9 +238,9 @@ public class ReleaseVersionService(
                 );
 
                 // TODO: This may be redundant (investigate as part of EES-1295)
-                await releaseSubjectRepository.DeleteAllReleaseSubjects(
+                await releaseDataSetService.DeleteAll(
                     releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedSubjects: !forceDeleteRelatedData
+                    softDeleteOrphanedDataSets: !forceDeleteRelatedData
                 );
 
                 if (forceDeleteRelatedData)
@@ -899,10 +899,7 @@ public class ReleaseVersionService(
             .OnSuccessDo(deletePlan => dataBlockService.DeleteDataBlockVersions(deletePlan.DeleteDataBlockPlan))
             .OnSuccessDo(async deletePlan =>
             {
-                await releaseSubjectRepository.DeleteReleaseSubject(
-                    releaseVersionId: releaseVersionId,
-                    subjectId: deletePlan.SubjectId
-                );
+                await releaseDataSetService.Delete(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId);
                 await privateCacheService.DeleteItemAsync(
                     new PrivateSubjectMetaCacheKey(releaseVersionId: releaseVersionId, subjectId: deletePlan.SubjectId)
                 );
