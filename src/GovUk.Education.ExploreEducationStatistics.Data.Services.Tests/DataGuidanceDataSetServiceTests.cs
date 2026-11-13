@@ -24,9 +24,9 @@ public class DataGuidanceDataSetServiceTests
     {
         var releaseVersion = new ReleaseVersion();
 
-        var subject1 = new Subject();
+        var subject1 = new Subject { Id = Guid.NewGuid() };
 
-        var subject2 = new Subject();
+        var subject2 = new Subject { Id = Guid.NewGuid() };
 
         var subject1Filter = new Filter
         {
@@ -127,6 +127,7 @@ public class DataGuidanceDataSetServiceTests
         var subject1Footnote2 = new FilterFootnote
         {
             Filter = subject1Filter,
+            SubjectId = subject1.Id,
             Footnote = new Footnote
             {
                 Content = "Subject 1 Footnote 2",
@@ -137,6 +138,7 @@ public class DataGuidanceDataSetServiceTests
         var subject1Footnote3 = new FilterGroupFootnote
         {
             FilterGroup = new FilterGroup { Filter = subject1Filter },
+            SubjectId = subject1.Id,
             Footnote = new Footnote
             {
                 Content = "Subject 1 Footnote 3",
@@ -148,6 +150,7 @@ public class DataGuidanceDataSetServiceTests
         var subject2Footnote1 = new FilterItemFootnote
         {
             FilterItem = new FilterItem { FilterGroup = new FilterGroup { Filter = subject2Filter } },
+            SubjectId = subject2.Id,
             Footnote = new Footnote
             {
                 Content = "Subject 2 Footnote 1",
@@ -158,6 +161,7 @@ public class DataGuidanceDataSetServiceTests
         var subject2Footnote2 = new IndicatorFootnote
         {
             Indicator = subject2IndicatorGroup.Indicators[0],
+            SubjectId = subject2.Id,
             Footnote = new Footnote
             {
                 Content = "Subject 2 Footnote 2",
@@ -577,8 +581,8 @@ public class DataGuidanceDataSetServiceTests
 
         var releaseVersion2 = new ReleaseVersion { Id = Guid.NewGuid() };
 
-        var subject1 = new Subject();
-        var subject2 = new Subject();
+        var subject1 = new Subject { Id = Guid.NewGuid() };
+        var subject2 = new Subject { Id = Guid.NewGuid() };
 
         // Version 1 has one data set, Version 2 adds another data set
 

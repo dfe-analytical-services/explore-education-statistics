@@ -2,5 +2,5 @@
 
 public class FootnoteIndicatorGroupViewModel
 {
-    public IEnumerable<string> Indicators { get; set; }
+    public List<string> Indicators { get; set; }
 }
