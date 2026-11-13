@@ -42,6 +42,11 @@ const ReleaseSummaryPage = () => {
           </p>
 
           <SummaryList>
+            {releaseVersion.rolloverSourceReleaseLabel && (
+              <SummaryListItem term="Copy of release">
+                {releaseVersion.rolloverSourceReleaseLabel}
+              </SummaryListItem>
+            )}
             <SummaryListItem term="Time period">
               {releaseVersion.timePeriodCoverage.label}
             </SummaryListItem>

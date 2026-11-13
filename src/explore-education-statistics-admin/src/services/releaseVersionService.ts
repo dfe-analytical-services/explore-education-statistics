@@ -48,6 +48,7 @@ export interface ReleaseVersion {
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;
   yearTitle: string;
+  rolloverSourceReleaseLabel?: string;
 }
 
 export interface ReleaseVersionSummary {

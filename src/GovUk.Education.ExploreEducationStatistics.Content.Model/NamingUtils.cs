@@ -17,6 +17,13 @@ public static class NamingUtils
         );
     }
 
+    public static string? FormatReleaseLabel(string? releaseLabel)
+    {
+        var trimmedLabel = string.IsNullOrWhiteSpace(releaseLabel) ? null : releaseLabel.Trim();
+
+        return trimmedLabel != null ? Regex.Replace(trimmedLabel, @"\s+", " ") : null;
+    }
+
     public static string SlugFromTitle(string title)
     {
         // NOTE: If you change anything here, you should also update `slugFromTitle.ts` in the frontend

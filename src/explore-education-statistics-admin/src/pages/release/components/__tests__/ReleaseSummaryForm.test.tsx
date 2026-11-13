@@ -213,6 +213,17 @@ describe('ReleaseSummaryForm', () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText('Create new template')).toBeInTheDocument();
 
+    // This is the pre-existing, non-rollover template picker - unlike the rollover one, it must
+    // stay AFTER "Release type" (its original, unchanged position), not move to the top of the
+    // form - that reordering is a rollover-only change (`rolloverSource`), not something this
+    // (unrelated, `templateRelease`-only) path should ever be affected by.
+    const legends = Array.from(document.querySelectorAll('legend')).map(
+      legend => legend.textContent,
+    );
+    expect(legends.indexOf('Release type')).toBeLessThan(
+      legends.indexOf('Select template'),
+    );
+
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
@@ -221,6 +232,87 @@ describe('ReleaseSummaryForm', () => {
       name: 'Cancel',
     });
     expect(buttonCancel).toBeInTheDocument();
+  });
+
+  test('renders correctly with the rollover field when `rolloverSource` is provided, and shows it before the time period section', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          creationMode: 'WithData',
+          releaseType: undefined,
+          releaseLabel: '',
+          publishingOrganisations: [],
+        }}
+        releaseVersion={0}
+        rolloverSource={{
+          id: 'rollover-source-id',
+          title: 'Academic year 2024/25',
+          timePeriodCoverage: { value: 'AY', label: 'Academic year' },
+          yearTitle: '2024/25',
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const templateRadios = within(
+      screen.getByRole('group', { name: 'Select template' }),
+    ).getAllByRole('radio');
+    expect(templateRadios).toHaveLength(3);
+
+    const withDataOption = screen.getByLabelText(
+      'Copy existing release - release rollover (Academic year 2024/25) including data and data blocks',
+    );
+    const structureOnlyOption = screen.getByLabelText(
+      'Copy existing release - (Academic year 2024/25) without data and data blocks',
+    );
+    const blankOption = screen.getByLabelText('Create new blank release');
+
+    // The rollover option must render FIRST - this isn't alphabetical (it would otherwise sort
+    // after the "without data" option, since "(" sorts before "r"), so relies on `order={[]}`
+    // disabling FormRadioGroup's default alphabetical-by-label sort.
+    expect(templateRadios).toEqual([
+      withDataOption,
+      structureOnlyOption,
+      blankOption,
+    ]);
+    expect(withDataOption).toBeChecked();
+
+    // The "Select template" group should appear before "Select time period coverage" in the form.
+    const legends = Array.from(document.querySelectorAll('legend')).map(
+      legend => legend.textContent,
+    );
+    expect(legends.indexOf('Select template')).toBeLessThan(
+      legends.indexOf('Select time period coverage'),
+    );
+
+    // The "copied from" hint shows under the year field while a copy option is selected, and
+    // hides once "blank" is chosen.
+    const yearField = screen.getByLabelText(
+      testTimeIdentifiers[0].category.label,
+    );
+    expect(yearField).toHaveAccessibleDescription(
+      'This release will be copied from academic year 2024/25',
+    );
+
+    await userEvent.click(blankOption);
+
+    expect(yearField).not.toHaveAccessibleDescription(
+      'This release will be copied from academic year 2024/25',
+    );
   });
 
   test('validation error when no year or release type selected', async () => {

@@ -86,6 +86,8 @@ public record ReleaseVersionViewModel
 
     public bool UpdatePublishedDisplayDate { get; init; }
 
+    public string? RolloverSourceReleaseLabel { get; init; }
+
     public static ReleaseVersionViewModel FromReleaseVersion(
         ReleaseVersion releaseVersion,
         bool preReleaseUsersOrInvitesAdded,
@@ -119,6 +121,11 @@ public record ReleaseVersionViewModel
             Amendment = releaseVersion.Amendment,
             PreviousVersionId = releaseVersion.PreviousVersionId,
             UpdatePublishedDisplayDate = releaseVersion.UpdatePublishedDisplayDate,
+            RolloverSourceReleaseLabel = releaseVersion.Release.RolloverSourceRelease is { } sourceRelease
+                ? string.IsNullOrEmpty(sourceRelease.Label)
+                    ? sourceRelease.YearTitle
+                    : $"{sourceRelease.YearTitle} - {sourceRelease.Label}"
+                : null,
         };
 }
 
