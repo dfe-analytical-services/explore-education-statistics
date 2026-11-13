@@ -163,12 +163,12 @@ public class TableBuilderService : ITableBuilderService
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccessVoid(async releaseSubject =>
             {
+                var dataSet = await _storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
+
                 await _subjectCsvMetaService
-                    .GetSubjectCsvMeta(releaseSubject, query, cancellationToken)
+                    .GetSubjectCsvMeta(releaseSubject, dataSet, query, cancellationToken)
                     .OnSuccessVoid(async meta =>
                     {
-                        var dataSet = await _storageDataSetResolver.Resolve(query.SubjectId, cancellationToken);
-
                         await using var writer = new StreamWriter(stream, leaveOpen: true);
                         await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
 

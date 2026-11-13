@@ -24,26 +24,24 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
     private readonly ILogger<SubjectCsvMetaService> _logger;
     private readonly ContentDbContext _contentDbContext;
     private readonly IUserService _userService;
-    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public SubjectCsvMetaService(
         ILogger<SubjectCsvMetaService> logger,
         ContentDbContext contentDbContext,
         IUserService userService,
-        IStorageDataSetResolver storageDataSetResolver,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
         _contentDbContext = contentDbContext;
         _userService = userService;
-        _storageDataSetResolver = storageDataSetResolver;
         _releaseFileBlobService = releaseFileBlobService;
     }
 
     public async Task<Either<ActionResult, SubjectCsvMetaViewModel>> GetSubjectCsvMeta(
         ReleaseSubject releaseSubject,
+        IStorageDataSet dataSet,
         FullTableQuery query,
         CancellationToken cancellationToken = default
     )
@@ -53,8 +51,6 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             .OnSuccess(() => GetCsvStream(releaseSubject, cancellationToken))
             .OnSuccess(async csvStream =>
             {
-                var dataSet = await _storageDataSetResolver.Resolve(releaseSubject.SubjectId, cancellationToken);
-
                 var locations = (await dataSet.ListLocations(query.LocationIds, cancellationToken)).ToDictionary(
                     location => location.Id,
                     location => location.GetCsvValues()
