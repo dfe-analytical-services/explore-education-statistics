@@ -4,6 +4,7 @@ import { ResourceNames } from '../common/resource-names.bicep'
 import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { FunctionAppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { IpRange } from '../common/types.bicep'
+import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -19,6 +20,9 @@ param operatingSystem 'Windows' | 'Linux'
 
 @description('SKU of the Function App\'s storage account, which sets its redundancy.')
 param storageAccountSku StorageAccountSku
+
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
 
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
@@ -88,6 +92,13 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'publisherFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.publisher.identity : ''
+    // TODO EES-7502 - stop keeping the system-assigned identity, and remove PsqlUseSystemAssignedIdentity below, once
+    // the Publisher logs in to PostgreSQL with its user-assigned identity. This needs a PostgreSQL role named after
+    // resourceNames.publisher.identity, and the connection string's User Id changing to match.
+    //
+    // This would best be done when data is fully migrated into ELZ and the service switched over.
+    keepSystemAssignedIdentity: true
     functionAppName: resourceNames.publisher.functionApp
     appServicePlanName: resourceNames.publisher.appServicePlan
     storageAccountName: resourceNames.publisher.storageAccount
@@ -160,9 +171,47 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
         mountPath: publicApiFileshareMountPath
       }
     ]
-    appSettings: []
+    // Log in to PostgreSQL with the system-assigned identity, whose PostgreSQL role is named after the Function App.
+    appSettings: useUserAssignedIdentity
+      ? [
+          {
+            name: 'PsqlUseSystemAssignedIdentity'
+            value: 'true'
+          }
+        ]
+      : []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
+  }
+}
+
+// When the Publisher uses its user-assigned identity, grant it here the roles that the core pipeline grants its
+// system-assigned identity. The core pipeline can then deploy before the Publisher's identity exists.
+// TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
+resource publisherIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.publisher.identity
+}
+
+// Allow the Publisher to send events to the Event Grid topics.
+module eventGridTopicRoleAssignmentModule '../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+  for (topicName, index) in map(items(resourceNames.eventGrid.topics), item => item.value): if (useUserAssignedIdentity) {
+    name: 'publisherTopicRoleAssignmentModuleDeploy-${index}'
+    params: {
+      principalId: publisherIdentity!.properties.principalId
+      roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
+      topicName: topicName
+    }
+  }
+]
+
+// Allow the Publisher to purge cached files from the Front Door endpoint.
+module frontDoorRoleAssignmentModule '../common/components/front-door/afd-endpoint-role-assignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'publisherFrontDoorRoleAssignmentModuleDeploy'
+  params: {
+    frontDoorProfileName: resourceNames.frontDoor.frontDoorName
+    frontDoorEndpointName: resourceNames.frontDoor.defaultEndpoint.endpointName
+    principalResourceId: publisherIdentity.id
+    principalId: publisherIdentity!.properties.principalId
   }
 }
 
