@@ -35,7 +35,7 @@ Upload an invalid data set and wait for it to fail the screener checks
     user checks invalid data set details in data uploads table
 
 Check the screening failures
-    user clicks button in table cell    1    4    View details    testid:Data files table
+    user clicks button in table cell    1    5    View details    testid:Data files table
     user waits until modal is visible    Data set details
     user waits until h3 is visible    Screener test failures
     user checks invalid data set details in modal
@@ -75,7 +75,7 @@ Upload an invalid data set in a ZIP file and wait for it to fail the screener ch
     user checks invalid data set details in data uploads table
 
 Check the screening failures for the ZIP file
-    user clicks button in table cell    1    4    View details    testid:Data files table
+    user clicks button in table cell    1    5    View details    testid:Data files table
     user waits until modal is visible    Data set details
     user waits until h3 is visible    Screener test failures
     user checks invalid data set details in modal
@@ -122,8 +122,8 @@ user checks invalid data set details in data uploads table
     user checks table cell contains    1    1    Invalid data set    testid:Data files table
     user checks table cell contains    1    2    976 B    testid:Data files table
     user waits until table cell contains    1    3    Failed screening    testid:Data files table
-    user checks table cell contains    1    4    View details    testid:Data files table
-    user checks table cell contains    1    4    Delete files    testid:Data files table
+    user checks table cell contains    1    5    View details    testid:Data files table
+    user checks table cell contains    1    5    Delete files    testid:Data files table
 
 user checks invalid data set details in modal
     user checks modal warning text contains    You will need to delete this file

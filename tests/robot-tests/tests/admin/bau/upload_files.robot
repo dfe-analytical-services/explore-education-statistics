@@ -42,11 +42,11 @@ Upload a ZIP file
 
     user waits until table cell contains    1    3    Pending review    testid:Data files table
 
-    user checks table cell contains    1    4    View details    testid:Data files table
-    user checks table cell contains    1    4    Delete files    testid:Data files table
+    user checks table cell contains    1    5    View details    testid:Data files table
+    user checks table cell contains    1    5    Delete files    testid:Data files table
 
 Check the screening results
-    user clicks button in table cell    1    4    View details    testid:Data files table
+    user clicks button in table cell    1    5    View details    testid:Data files table
     user waits until modal is visible    Data set details
 
     user acknowledges any warnings in screener modal
@@ -78,9 +78,9 @@ Continue the import
     user checks table cell contains    1    1    ${SUBJECT_NAME}    testid:Data files table
     user checks table cell contains    1    2    140 Kb    testid:Data files table
     user waits until table cell contains    1    3    Complete    testid:Data files table
-    user checks table cell contains    1    4    View details    testid:Data files table
-    user checks table cell contains    1    4    Edit title    testid:Data files table
-    user checks table cell contains    1    4    Delete files    testid:Data files table
+    user checks table cell contains    1    5    View details    testid:Data files table
+    user checks table cell contains    1    5    Edit title    testid:Data files table
+    user checks table cell contains    1    5    Delete files    testid:Data files table
 
 Change data file title
     user clicks button containing text    Edit title

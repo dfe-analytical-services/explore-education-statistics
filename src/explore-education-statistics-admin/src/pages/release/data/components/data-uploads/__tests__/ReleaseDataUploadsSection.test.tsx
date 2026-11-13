@@ -475,7 +475,7 @@ describe('ReleaseDataUploadsSection', () => {
       },
     );
 
-    test('does not display an API status for compatible but unlinked data files', async () => {
+    test('displays N/A for compatible but unlinked data files', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         {
           ...testDataFiles[0],
@@ -493,12 +493,15 @@ describe('ReleaseDataUploadsSection', () => {
         'Complete',
       );
 
+      expect(screen.getByTestId('Test data 1-api-status')).toHaveTextContent(
+        'N/A',
+      );
       expect(screen.queryByText('API Ready')).not.toBeInTheDocument();
       expect(screen.queryByText('API Draft')).not.toBeInTheDocument();
       expect(screen.queryByText('API Live')).not.toBeInTheDocument();
     });
 
-    test('does not display a status when the API version does not match', async () => {
+    test('displays N/A when the API version does not match', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         {
           ...linkedDataFile,
@@ -516,6 +519,13 @@ describe('ReleaseDataUploadsSection', () => {
         'Complete',
       );
 
+      await waitFor(() => {
+        expect(apiDataSetService.listDataSets).toHaveBeenCalled();
+      });
+
+      expect(screen.getByTestId('Test data 1-api-status')).toHaveTextContent(
+        'N/A',
+      );
       expect(screen.queryByText('API Ready')).not.toBeInTheDocument();
     });
 

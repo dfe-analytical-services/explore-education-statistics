@@ -55,7 +55,7 @@ As bau1, check the "Cannot delete files" modal offers to remove the API data set
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks button in table cell    1    4    Delete files    testid:Data files table
+    user clicks button in table cell    1    5    Delete files    testid:Data files table
     ${modal}=    user waits until modal is visible    Cannot delete files
     user checks element contains    ${modal}
     ...    This data file has an API data set linked to it. Please remove the API data set before deleting.
@@ -99,7 +99,7 @@ As a Standard User, check the "Cannot delete files" modal instead asks them to c
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks button in table cell    1    4    Delete files    testid:Data files table
+    user clicks button in table cell    1    5    Delete files    testid:Data files table
     ${modal}=    user waits until modal is visible    Cannot delete files
     user checks element contains    ${modal}
     ...    This data file has an API data set linked to it. It will need removing before the data file can be deleted. You do not have the required role to resolve the issue, but you can contact the EES team for support at

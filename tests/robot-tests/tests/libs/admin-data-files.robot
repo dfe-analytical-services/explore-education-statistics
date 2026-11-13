@@ -196,6 +196,10 @@ user waits until data file replacement is in status
 user waits until page contains data uploads table
     user waits until page contains element    ${DATA_FILES_TABLE_SELECTOR}    %{WAIT_DATA_FILE_IMPORT}
 
+user waits until data file API status contains
+    [Arguments]    ${SUBJECT_NAME}    ${EXPECTED_STATUS}    ${WAIT}=%{WAIT_MEDIUM}
+    user waits until element contains    testid:${SUBJECT_NAME}-api-status    ${EXPECTED_STATUS}    ${WAIT}
+
 user waits until page contains data uploads replacements table
     user waits until page contains element    ${REPLACEMENTS_TABLE_SELECTOR}    %{WAIT_DATA_FILE_IMPORT}
 
