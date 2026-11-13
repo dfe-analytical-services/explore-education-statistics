@@ -32,6 +32,33 @@ describe('searchTableTool', () => {
     });
   }
 
+  /**
+   * Creates a stream that only produces a chunk when one is read
+   * (no read-ahead), so `pulls` shows how far the handler has read.
+   * It never closes if `close` is false.
+   */
+  function createPullStream(chunks: string[], { close = true } = {}) {
+    const state = { pulls: 0 };
+
+    const stream = new ReadableStream<Uint8Array>(
+      {
+        pull(controller) {
+          const chunk = chunks[state.pulls];
+          state.pulls += 1;
+
+          if (chunk !== undefined) {
+            controller.enqueue(encoder.encode(chunk));
+          } else if (close) {
+            controller.close();
+          }
+        },
+      },
+      { highWaterMark: 0 },
+    );
+
+    return { stream, state };
+  }
+
   function mockFetch(response: FetchResponse) {
     const fetchMock = jest.fn().mockResolvedValue(response);
     global.fetch = fetchMock;
@@ -173,6 +200,87 @@ describe('searchTableTool', () => {
     await handling;
 
     expect(upstreamSignal?.aborted).toBe(true);
+    expect(res._isEndCalled()).toBe(false);
+  });
+
+  test('waits for a slow client to drain before reading more from the search endpoint', async () => {
+    const { stream, state } = createPullStream([
+      'data: {"stage":"starting pipeline"}\n\n',
+      'data: {"stage":"pipeline complete"}\n\n',
+    ]);
+
+    mockFetch({ ok: true, status: 200, body: stream });
+
+    const { req, res } = createApiMocks(
+      { method: 'POST', body: {} },
+      // Needed for the response to emit 'drain'.
+      { eventEmitter: EventEmitter },
+    );
+
+    // Simulate a slow client: the response buffer is always full.
+    const writeSpy = jest.spyOn(res, 'write').mockReturnValue(false);
+
+    const handling = handler(req, res);
+
+    await waitFor(() => {
+      expect(writeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    // Give the handler a chance to (incorrectly) keep reading.
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(writeSpy).toHaveBeenCalledTimes(1);
+    expect(state.pulls).toBe(1);
+
+    res.emit('drain');
+
+    await waitFor(() => {
+      expect(writeSpy).toHaveBeenCalledTimes(2);
+    });
+    expect(state.pulls).toBe(2);
+
+    res.emit('drain');
+    await handling;
+
+    expect(writeSpy.mock.calls.map(([chunk]) => String(chunk))).toEqual([
+      'data: {"stage":"starting pipeline"}\n\n',
+      'data: {"stage":"pipeline complete"}\n\n',
+    ]);
+    expect(res._isEndCalled()).toBe(true);
+  });
+
+  test('stops waiting for a slow client to drain when it disconnects', async () => {
+    const { stream, state } = createPullStream(['data: {}\n\n'], {
+      close: false,
+    });
+    let upstreamSignal: AbortSignal | undefined;
+
+    global.fetch = jest.fn().mockImplementation((_, init: RequestInit) => {
+      upstreamSignal = init.signal ?? undefined;
+      return Promise.resolve({ ok: true, status: 200, body: stream });
+    });
+
+    const { req, res } = createApiMocks(
+      { method: 'POST', body: {} },
+      // Needed for the response to emit 'close'.
+      { eventEmitter: EventEmitter },
+    );
+
+    const writeSpy = jest.spyOn(res, 'write').mockReturnValue(false);
+
+    const handling = handler(req, res);
+
+    await waitFor(() => {
+      expect(writeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    // Disconnect while waiting for the response to drain.
+    res.emit('close');
+    await handling;
+
+    expect(upstreamSignal?.aborted).toBe(true);
+    expect(state.pulls).toBe(1);
+    expect(writeSpy).toHaveBeenCalledTimes(1);
     expect(res._isEndCalled()).toBe(false);
   });
 });
