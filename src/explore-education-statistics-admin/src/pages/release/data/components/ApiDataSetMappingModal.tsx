@@ -22,6 +22,7 @@ interface Props {
   mapping: MappingWithKey;
   newItems: CandidateWithKey[];
   renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetailsStart?: (mapping: MappingWithKey) => ReactNode;
   onSubmit: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -33,6 +34,7 @@ export default function ApiDataSetMappingModal({
   mapping,
   newItems,
   renderSourceDetails,
+  renderSourceDetailsStart,
   onSubmit,
 }: Props) {
   const [isOpen, toggleOpen] = useToggle(false);
@@ -51,6 +53,7 @@ export default function ApiDataSetMappingModal({
     >
       <h3>{`Current data set ${itemLabel}`}</h3>
       <SummaryList>
+        {renderSourceDetailsStart?.(mapping)}
         <SummaryListItem term="Label">{mapping.source.label}</SummaryListItem>
         {renderSourceDetails?.(mapping.source)}
 

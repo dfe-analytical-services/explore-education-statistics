@@ -2,6 +2,7 @@ import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import { AutoMappedLocation } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
 import { GlobalPermissions } from '@admin/services/authService';
+import SummaryListItem from '@common/components/SummaryListItem';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 import React, { ComponentProps } from 'react';
@@ -500,6 +501,38 @@ describe('ApiDataSetAutoMappedTable', () => {
         name: 'Map location for Location 2',
       }),
     ).not.toBeInTheDocument();
+  });
+
+  test('passes the mapping to `renderSource`', () => {
+    renderTable({
+      renderSource: (source, mapping) =>
+        `${source.label} (${mapping.sourceKey})`,
+    });
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(within(rows[1]).getAllByRole('cell')[0]).toHaveTextContent(
+      'Location 1 (Location1Key)',
+    );
+    expect(within(rows[2]).getAllByRole('cell')[0]).toHaveTextContent(
+      'Location 2 (Location2Key)',
+    );
+  });
+
+  test('passes `renderSourceDetailsStart` to the mapping modal', async () => {
+    const { user } = renderTable({
+      renderSourceDetailsStart: mapping => (
+        <SummaryListItem term="Column">{mapping.sourceKey}</SummaryListItem>
+      ),
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Map location for Location 1' }),
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+    expect(modal.getByTestId('Column')).toHaveTextContent('Location1Key');
+    expect(modal.getAllByRole('term')[0]).toHaveTextContent('Column');
   });
 
   function renderTable(

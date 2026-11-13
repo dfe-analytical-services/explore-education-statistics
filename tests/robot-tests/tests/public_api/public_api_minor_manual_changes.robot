@@ -265,6 +265,7 @@ Validate the row headings and its contents in the 'mappable indicators' section
     user checks table column heading contains    1    4    Actions    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
     user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    1    Column: enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    2    Unmapped    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    3    N/A    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
@@ -288,6 +289,7 @@ Validate the row headings and its contents in the 'new indicators' section befor
 
     user checks table cell contains    1    1    Not applicable    ${NEW_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    2    Number of enrolments    ${NEW_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Column: number_of_enrolments    ${NEW_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    3    Minor    ${NEW_INDICATORS_TABLE_SELECTOR}
 
 User selects "No mapping" for indicator
@@ -316,6 +318,16 @@ User maps original indicator to an indicator in the new data set version
     user clicks button in table cell    1    4    Map indicator    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
     ${modal}=    user waits until modal is visible    Map existing indicator
+
+    # Column name is listed first in the current data set indicator summary
+    user waits until parent contains element    ${MODAL_SELECTOR}    xpath:(.//dt)[1][contains(text(), "Column")]
+    user checks summary list contains    Column    enrolments    ${MODAL_SELECTOR}
+    user checks summary list contains    Label    Enrolments    ${MODAL_SELECTOR}
+
+    # Column name is shown in the radio option hint
+    user waits until parent contains element    ${MODAL_SELECTOR}
+    ...    xpath:.//*[contains(@class, "govuk-radios__hint")][contains(., "Column: number_of_enrolments")]
+
     user clicks radio    Number of enrolments
     user clicks button    Update indicator mapping
     user waits until modal is not visible    Map existing indicator
@@ -327,7 +339,9 @@ Verify mapping the original indicator to a target indicator are reflected in the
 Validate the row headings and its contents in the 'mappable indicators' section after mapping
     user waits until h3 is visible    Indicators not found in new data set (1)
     user checks table cell contains    1    1    Enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    1    Column: enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    2    Number of enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
+    user checks table cell contains    1    2    Column: number_of_enrolments    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
     user checks table cell contains    1    3    Minor    ${MAPPABLE_INDICATORS_TABLE_SELECTOR}
 
 Validate the row headings and its contents in the 'new indicators' section after mapping
