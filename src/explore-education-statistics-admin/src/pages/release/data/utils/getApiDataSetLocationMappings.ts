@@ -6,7 +6,6 @@ import {
 } from '@admin/services/apiDataSetVersionService';
 import { LocationLevelKey } from '@common/utils/locationLevelsMap';
 import camelCase from 'lodash/camelCase';
-import sortBy from 'lodash/sortBy';
 
 export interface LocationCandidateWithKey extends LocationCandidate {
   key: string;
@@ -54,7 +53,7 @@ export default function getApiDataSetLocationMappings(
     Record<LocationLevelKey, LocationOptionSource[]>
   > = {};
 
-  sortBy(Object.keys(locationsMapping.levels)).forEach(level => {
+  Object.keys(locationsMapping.levels).forEach(level => {
     // TODO remove camelCase
     const levelKey = camelCase(level) as LocationLevelKey;
 

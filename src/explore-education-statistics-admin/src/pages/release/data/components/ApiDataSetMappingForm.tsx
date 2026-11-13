@@ -11,6 +11,7 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
 import React, { ReactNode } from 'react';
 import prefixNoun from '@common/utils/string/prefixNoun';
+import { naturalComparator } from '@common/utils/array/naturalOrderBy';
 import {
   CandidateWithKey,
   MappingWithKey,
@@ -62,22 +63,24 @@ export default function ApiDataSetMappingForm({
       value: noMappingValue,
       divider: `Select ${itemLabelPrefix} ${itemLabel}:`,
     },
-    ...(candidate
-      ? [
-          {
-            label: candidate?.label,
-            value: candidate.key,
-            hint: candidateHint?.(candidate),
-          },
-        ]
-      : []),
-    ...newItems.map(item => {
-      return {
-        label: item.label,
-        value: item.key,
-        hint: candidateHint?.(item),
-      };
-    }),
+    ...[
+      ...(candidate
+        ? [
+            {
+              label: candidate?.label,
+              value: candidate.key,
+              hint: candidateHint?.(candidate),
+            },
+          ]
+        : []),
+      ...newItems.map(item => {
+        return {
+          label: item.label,
+          value: item.key,
+          hint: candidateHint?.(item),
+        };
+      }),
+    ].toSorted((a, b) => naturalComparator(a.label, b.label)),
   ];
 
   return (

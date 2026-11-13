@@ -806,7 +806,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
       // Add to mappable table
       const mappableRows = within(mappableIndicatorsTable).getAllByRole('row');
       expect(mappableRows).toHaveLength(6);
-      const mappableIndicatorCells = within(mappableRows[5]).getAllByRole(
+      const mappableIndicatorCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(within(mappableIndicatorCells[0]).getByText('Indicator 1'));
@@ -824,7 +824,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
 
       const newIndicatorRows = within(newIndicatorsTable).getAllByRole('row');
       expect(newIndicatorRows).toHaveLength(3);
-      const newIndicatorCells = within(newIndicatorRows[2]).getAllByRole(
+      const newIndicatorCells = within(newIndicatorRows[1]).getAllByRole(
         'cell',
       );
       expect(within(newIndicatorCells[0]).getByText('Not applicable'));
@@ -937,7 +937,7 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
       // Add to mappable table
       const mappableRows = within(mappableIndicatorsTable).getAllByRole('row');
       expect(mappableRows).toHaveLength(6);
-      const mappableIndicatorCells = within(mappableRows[5]).getAllByRole(
+      const mappableIndicatorCells = within(mappableRows[1]).getAllByRole(
         'cell',
       );
       expect(within(mappableIndicatorCells[0]).getByText('Indicator 1'));
@@ -1051,6 +1051,44 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
       );
       expect(within(mappableIndicator2Cells[2]).getByText('Major'));
     });
+  });
+
+  test('expands and collapses all accordion sections while preserving the initial defaults', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+    const { user } = renderPage();
+
+    const expandAll = await screen.findByRole('button', {
+      name: 'Expand all sections',
+    });
+    const sectionButtons = () =>
+      screen.getAllByRole('button', { name: /, (show|hide) this section$/ });
+    expect(
+      sectionButtons().some(
+        button => button.getAttribute('aria-expanded') === 'false',
+      ),
+    ).toBe(true);
+
+    await user.click(expandAll);
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'true'),
+    );
+
+    await user.click(sectionButtons()[0]);
+    expect(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Collapse all sections' }),
+    );
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'false'),
+    );
   });
 
   function renderPage(options?: {

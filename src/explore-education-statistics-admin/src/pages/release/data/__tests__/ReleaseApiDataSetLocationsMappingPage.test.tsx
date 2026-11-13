@@ -1158,7 +1158,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // Add location to unmapped table
       const unmappedRows = within(unmappedTable).getAllByRole('row');
       expect(unmappedRows).toHaveLength(5);
-      const unmappedLocationCells = within(unmappedRows[4]).getAllByRole(
+      const unmappedLocationCells = within(unmappedRows[1]).getAllByRole(
         'cell',
       );
       expect(within(unmappedLocationCells[0]).getByText('Location 1'));
@@ -1180,7 +1180,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       ).toBeInTheDocument();
       const newLocationRows = within(newLocationsTable).getAllByRole('row');
       expect(newLocationRows).toHaveLength(4);
-      const newLocationCells = within(newLocationRows[3]).getAllByRole('cell');
+      const newLocationCells = within(newLocationRows[1]).getAllByRole('cell');
       expect(within(newLocationCells[0]).getByText('Not applicable'));
       expect(within(newLocationCells[1]).getByText('Location 1'));
     });
@@ -1289,7 +1289,7 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       // Add location to unmapped & manually mapped table
       const unmappedRows = within(unmappedTable).getAllByRole('row');
       expect(unmappedRows).toHaveLength(5);
-      const unmappedLocationCells = within(unmappedRows[4]).getAllByRole(
+      const unmappedLocationCells = within(unmappedRows[1]).getAllByRole(
         'cell',
       );
       expect(within(unmappedLocationCells[0]).getByText('Location 1'));
@@ -1386,6 +1386,48 @@ describe('ReleaseApiDataSetLocationsMappingPage', () => {
       );
       expect(within(unmappedLocation2Cells[2]).getByText('Major'));
     });
+  });
+
+  test('expands and collapses all accordion sections while preserving the initial defaults', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getLocationsMapping.mockResolvedValue(
+      testLocationsMapping,
+    );
+    const { user } = renderPage();
+
+    const expandAll = await screen.findByRole('button', {
+      name: 'Expand all sections',
+    });
+    const sectionButtons = () =>
+      screen.getAllByRole('button', { name: /, (show|hide) this section$/ });
+    expect(
+      sectionButtons().some(
+        button => button.getAttribute('aria-expanded') === 'false',
+      ),
+    ).toBe(true);
+    expect(
+      sectionButtons().some(
+        button => button.getAttribute('aria-expanded') === 'true',
+      ),
+    ).toBe(true);
+    await user.click(expandAll);
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'true'),
+    );
+
+    await user.click(sectionButtons()[0]);
+    expect(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: 'Expand all sections' }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Collapse all sections' }),
+    );
+    sectionButtons().forEach(button =>
+      expect(button).toHaveAttribute('aria-expanded', 'false'),
+    );
   });
 
   function renderPage(options?: {

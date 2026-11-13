@@ -38,7 +38,7 @@ public class DataSetVersionMappingService(
     )
     {
         return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
-            .OnSuccess(mapping => mapping.LocationMappingPlan);
+            .OnSuccess(mapping => mapping.LocationMappingPlan.OrderByLabel());
     }
 
     public Task<Either<ActionResult, BatchLocationMappingUpdatesResponseViewModel>> ApplyBatchLocationMappingUpdates(
@@ -63,7 +63,7 @@ public class DataSetVersionMappingService(
     )
     {
         return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
-            .OnSuccess(mapping => mapping.FilterMappingPlan);
+            .OnSuccess(mapping => mapping.FilterMappingPlan.OrderByLabel());
     }
 
     public Task<Either<ActionResult, IndicatorMappingPlan>> GetIndicatorMappings(
@@ -72,7 +72,7 @@ public class DataSetVersionMappingService(
     )
     {
         return CheckMappingExistsAndCanView(nextDataSetVersionId, cancellationToken)
-            .OnSuccess(mapping => mapping.IndicatorMappingPlan);
+            .OnSuccess(mapping => mapping.IndicatorMappingPlan.OrderByLabel());
     }
 
     public async Task<MappingStatusViewModel?> GetMappingStatus(

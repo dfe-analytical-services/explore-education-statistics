@@ -1,3 +1,5 @@
+import useMappingAccordionControls from '@admin/pages/release/data/hooks/useMappingAccordionControls';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import Link from '@admin/components/Link';
 import ButtonLink from '@admin/components/ButtonLink';
 import getApiDataSetFilterMappings, {
@@ -9,6 +11,7 @@ import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDat
 import ApiDataSetNewItemsTable from '@admin/pages/release/data/components/ApiDataSetNewItemsTable';
 import ApiDataSetAutoMappedTable from '@admin/pages/release/data/components/ApiDataSetAutoMappedTable';
 import getUnmappedFilterErrors from '@admin/pages/release/data/utils/getUnmappedFilterErrors';
+import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByLabel';
 import ApiDataSetMappableFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetMappableFilterColumnsTable';
 import ApiDataSetNewFilterColumnsTable from '@admin/pages/release/data/components/ApiDataSetNewFilterColumnsTable';
 import {
@@ -43,6 +46,7 @@ import omit from 'lodash/omit';
 import { useImmer } from 'use-immer';
 import sumBy from 'lodash/sumBy';
 import compact from 'lodash/compact';
+import BackToTopLink from '@common/components/BackToTopLink';
 
 export const sectionIds = {
   mappableFilterColumns: 'mappable-filter-columns',
@@ -89,6 +93,17 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const newSectionIds = Object.keys(newFilterOptions)
+    .filter(key => newFilterOptions[key].length)
+    .map(sectionIds.newFilterOptionsGroup);
+  const autoMappedSectionIds = Object.keys(autoMappedFilterOptions)
+    .filter(key => autoMappedFilterOptions[key].length)
+    .map(sectionIds.autoMappedFilterOptionsGroup);
+  const accordionControls = useMappingAccordionControls([
+    ...newSectionIds.map(id => ({ id, open: true })),
+    ...autoMappedSectionIds.map(id => ({ id, open: false })),
+  ]);
 
   const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
   const isFinalised = dataSet?.draftVersion?.status === 'Draft';
@@ -200,10 +215,14 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             if (previousMapping.type === 'AutoMapped') {
               const updated = draft[groupKey] ?? [];
 
-              updated.push({
-                candidate,
-                mapping: { ...previousMapping, candidateKey, type },
-              });
+              insertSortedByLabel(
+                updated,
+                {
+                  candidate,
+                  mapping: { ...previousMapping, candidateKey, type },
+                },
+                filterOption => filterOption.mapping.source.label,
+              );
 
               draft[groupKey] = updated;
             } else {
@@ -236,7 +255,11 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             });
           } else if (previousCandidate) {
             const updated = draft[groupKey] ?? [];
-            updated.push(previousCandidate);
+            insertSortedByLabel(
+              updated,
+              previousCandidate,
+              filterOption => filterOption.label,
+            );
             draft[groupKey] = updated;
           }
         });
@@ -330,6 +353,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map filters</span>
             <h2>{dataSet?.title}</h2>
+
             {isFinalised && (
               <InsetText>
                 These mappings cannot be edited because this data set version
@@ -361,6 +385,16 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               become new filters in the API data set.
             </p>
 
+            {accordionControls.hasSections && (
+              <div className="govuk-!-margin-bottom-4">
+                <AccordionToggleButton
+                  expanded={accordionControls.allExpanded}
+                  label={`${accordionControls.allExpanded ? 'Collapse' : 'Expand'} all sections`}
+                  onClick={accordionControls.toggleAll}
+                />
+              </div>
+            )}
+
             {Object.keys(mappableFilters).length > 0 && (
               <>
                 <h3
@@ -389,33 +423,35 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
             {Object.keys(mappableFilterOptions).length > 0 && filtersMapping ? (
               <>
                 {Object.keys(mappableFilterOptions).map(filterKey => (
-                  <ApiDataSetMappableTable
-                    key={filterKey}
-                    groupKey={filterKey}
-                    itemLabel="filter option"
-                    itemPluralLabel="filter options"
-                    tableCaptionText={
-                      filtersMapping.mappings[filterKey].source.label
-                    }
-                    mappableItems={mappableFilterOptions[filterKey]}
-                    newItems={newFilterOptions[filterKey]}
-                    pendingUpdates={pendingUpdates}
-                    readOnly={!canUpdateMappings}
-                    renderCandidate={candidate => candidate.label}
-                    renderCaptionEnd={
-                      <>
-                        <br />
-                        <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
-                          Column:{' '}
-                          <code className="govuk-!-font-weight-regular">
-                            {filterKey}
-                          </code>
-                        </div>
-                      </>
-                    }
-                    renderSource={source => source.label}
-                    onUpdate={handleUpdateMapping}
-                  />
+                  <React.Fragment key={filterKey}>
+                    <ApiDataSetMappableTable
+                      groupKey={filterKey}
+                      itemLabel="filter option"
+                      itemPluralLabel="filter options"
+                      tableCaptionText={
+                        filtersMapping.mappings[filterKey].source.label
+                      }
+                      mappableItems={mappableFilterOptions[filterKey]}
+                      newItems={newFilterOptions[filterKey]}
+                      pendingUpdates={pendingUpdates}
+                      readOnly={!canUpdateMappings}
+                      renderCandidate={candidate => candidate.label}
+                      renderCaptionEnd={
+                        <>
+                          <br />
+                          <div className="govuk-!-font-size-19 govuk-!-margin-top-4">
+                            Column:{' '}
+                            <code className="govuk-!-font-weight-regular">
+                              {filterKey}
+                            </code>
+                          </div>
+                        </>
+                      }
+                      renderSource={source => source.label}
+                      onUpdate={handleUpdateMapping}
+                    />
+                    <BackToTopLink />
+                  </React.Fragment>
                 ))}
               </>
             ) : (
@@ -431,6 +467,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   New filter columns <Tag colour="grey">No action required</Tag>
                 </h3>
                 <ApiDataSetNewFilterColumnsTable newFilters={newFilters} />
+                <BackToTopLink />
               </>
             )}
 
@@ -446,6 +483,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <Accordion
                 id={`${sectionIds.newFilterOptions}-accordion`}
                 testId={`${sectionIds.newFilterOptions}-accordion`}
+                {...accordionControls.getAccordionProps(newSectionIds)}
               >
                 {Object.keys(newFilterOptions).map(filterKey => {
                   if (newFilterOptions[filterKey].length) {
@@ -454,7 +492,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
                     return (
                       <AccordionSection
-                        backToTop={false}
+                        backToTop
                         caption={
                           <>
                             <strong>Column:</strong> <code>{filterKey}</code>
@@ -497,6 +535,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                   <strong>There is no action required.</strong>
                 </p>
                 <Accordion
+                  {...accordionControls.getAccordionProps(autoMappedSectionIds)}
                   id={`${sectionIds.autoMappedFilterOptions}-accordion`}
                   showOpenAll={false}
                   testId={`${sectionIds.autoMappedFilterOptions}-accordion`}
@@ -555,6 +594,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             }
                             onUpdate={handleUpdateMapping}
                           />
+                          <BackToTopLink />
                         </AccordionSection>
                       );
                     }

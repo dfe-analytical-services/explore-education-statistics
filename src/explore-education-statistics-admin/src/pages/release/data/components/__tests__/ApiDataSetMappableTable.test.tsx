@@ -159,6 +159,59 @@ describe('ApiDataSetMappableTable', () => {
     ).toBeInTheDocument();
   });
 
+  test('sets all unmapped options to no mapping without changing manual mappings', async () => {
+    const onUpdate = jest.fn().mockResolvedValue(undefined);
+    const secondUnmappedOption: MappableFilterOption = {
+      mapping: {
+        publicId: 'filter-option-5-public-id',
+        source: { label: 'Filter Option 5' },
+        sourceKey: 'FilterOption5SourceKey',
+        type: 'AutoNone',
+      },
+    };
+    const { user } = renderTable({
+      mappableItems: [...testFilterOptions, secondUnmappedOption],
+      onUpdate,
+    });
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Set unmapped filter options to "No mapping"',
+      }),
+    );
+
+    expect(onUpdate).toHaveBeenCalledTimes(2);
+    [testFilterOptions[0], secondUnmappedOption].forEach(({ mapping }) => {
+      expect(onUpdate).toHaveBeenCalledWith({
+        groupKey: 'Filter1Key',
+        previousCandidate: undefined,
+        previousMapping: mapping,
+        sourceKey: mapping.sourceKey,
+        type: 'ManualNone',
+      });
+    });
+  });
+
+  test('hides the bulk action when there are no unmapped options', () => {
+    renderTable({ mappableItems: testFilterOptions.slice(1) });
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Set unmapped filter options to "No mapping"',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('hides the bulk action when the table is read-only', () => {
+    renderTable({ readOnly: true });
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Set unmapped filter options to "No mapping"',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   test('hides the buttons if there is a pending update for the mapping', () => {
     renderTable({
       pendingUpdates: [
@@ -194,6 +247,12 @@ describe('ApiDataSetMappableTable', () => {
         user: testAnalystUser,
       },
     );
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Set unmapped filter options to "No mapping"',
+      }),
+    ).not.toBeInTheDocument();
 
     const rows = within(screen.getByRole('table')).getAllByRole('row');
     expect(rows).toHaveLength(5);
