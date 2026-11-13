@@ -23,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Events;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -425,16 +424,7 @@ public class ThemeServiceTests
                 adminEventRaiser.Assert.OnPublicationDeletedWasRaised(
                     publication.Id,
                     publication.Slug,
-                    publication.LatestPublishedReleaseVersion != null
-                        ? new LatestPublishedReleaseInfo
-                        {
-                            LatestPublishedReleaseId = publication.LatestPublishedReleaseVersion.ReleaseId,
-                            LatestPublishedReleaseVersionId = publication.LatestPublishedReleaseVersion.Id,
-                        }
-                        : null,
-                    // Every Release id has to travel on the event, as the searchable document for any of
-                    // them is unreachable once the Publication is gone.
-                    publication.Releases.Select(release => release.Id).ToList()
+                    [.. publication.Releases.Select(release => release.Id)]
                 );
             }
         }
@@ -1028,6 +1018,57 @@ public class ThemeServiceTests
             var remainingPublication = Assert.Single(await context.Publications.ToListAsync());
             Assert.Equal(supersededPublication.Id, remainingPublication.Id);
             Assert.Null(remainingPublication.SupersededById);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteThemes_ReleaseIsRolloverSourceForReleaseInRetainedTheme_RolloverSourceReleaseIdCleared()
+    {
+        Theme themeToDelete = _fixture.DefaultTheme();
+        Theme themeToRetain = _fixture.DefaultTheme();
+
+        Publication publicationToDelete = _fixture.DefaultPublication().WithTheme(themeToDelete);
+
+        Release sourceRelease = _fixture.DefaultRelease().WithPublication(publicationToDelete).Generate();
+
+        Publication publicationToRetain = _fixture.DefaultPublication().WithTheme(themeToRetain);
+
+        Release rolloverRelease = _fixture
+            .DefaultRelease()
+            .WithPublication(publicationToRetain)
+            .WithRolloverSourceRelease(sourceRelease)
+            .Generate();
+
+        using var fixture = new SqliteContentDbContextFixture();
+
+        await using (var context = fixture.CreateContext())
+        {
+            context.Publications.AddRange(publicationToDelete, publicationToRetain);
+            context.Releases.AddRange(sourceRelease, rolloverRelease);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(s => s.TaxonomyChanged(CancellationToken.None)).ReturnsAsync(Unit.Instance);
+
+            var service = SetupThemeService(contentDbContext: context, publishingService: publishingService.Object);
+
+            var result = await service.DeleteThemes([themeToDelete.Id]);
+
+            VerifyAllMocks(publishingService);
+            result.AssertRight();
+        }
+
+        await using (var context = fixture.CreateContext())
+        {
+            // The rollover Release belongs to a Theme that was not deleted, so it must survive with its
+            // reference to the deleted source Release cleared. SQL Server cannot do this for us, as it
+            // rejects cascading actions on self-referencing foreign keys.
+            var remainingRelease = Assert.Single(await context.Releases.ToListAsync());
+            Assert.Equal(rolloverRelease.Id, remainingRelease.Id);
+            Assert.Null(remainingRelease.RolloverSourceReleaseId);
         }
     }
 

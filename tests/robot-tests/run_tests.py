@@ -155,13 +155,11 @@ def run():
     test_run_index = 0
 
     # Created before the arguments are parsed so that a failure to parse or validate them
-    # is still reported. Slack is enabled by an argument, so it can only join afterwards.
-    notifier = UiTestNotifier.create(enable_slack=False)
+    # is still reported.
+    notifier = UiTestNotifier.create()
 
     try:
         args = args_and_variables.initialise()
-
-        notifier = UiTestNotifier.create(enable_slack=args.enable_slack_notifications)
 
         # Setting up the run is inside this boundary so that a failure to install
         # chromedriver, unzip the data files or generate the local release files is

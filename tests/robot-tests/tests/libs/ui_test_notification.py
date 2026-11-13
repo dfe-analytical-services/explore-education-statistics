@@ -2,8 +2,7 @@
 Notifications sent by the UI test runner at the end of a test run.
 
 Each notification is defined once, independently of any chat service, and is
-rendered into a Slack Block Kit message and a Teams Adaptive Card, so that both
-channels receive the same message.
+rendered into a Teams Adaptive Card.
 """
 
 from dataclasses import dataclass
@@ -11,7 +10,7 @@ from typing import Optional
 
 from tests.libs.run_results import RunResults
 
-# Adaptive Card colours. Slack headings cannot be coloured, so these apply to Teams only.
+# Adaptive Card colours.
 GOOD = "good"
 WARNING = "warning"
 ATTENTION = "attention"
@@ -48,7 +47,6 @@ def shorten_suite_sources(sources: tuple[Optional[str], ...]) -> tuple[str, ...]
 @dataclass(frozen=True)
 class UiTestNotification:
     title: str
-    # Slack renders at most 10 fields in a section, so keep this under that limit.
     facts: tuple[tuple[str, str], ...] = ()
     details_title: Optional[str] = None
     details: tuple[str, ...] = ()
@@ -57,49 +55,6 @@ class UiTestNotification:
     colour: str = "default"
     link_url: Optional[str] = None
     link_text: Optional[str] = None
-    # Slack uploads the test results archive beneath the message when this is set. Teams
-    # incoming webhooks cannot accept files, so the Teams card links to the pipeline
-    # artifacts instead.
-    results_archive_name: Optional[str] = None
-
-    def to_slack_blocks(self) -> list[dict]:
-        blocks: list[dict] = [
-            {"type": "header", "text": {"type": "plain_text", "text": self.title}},
-            {
-                "type": "section",
-                "fields": [{"type": "mrkdwn", "text": f"*{name}*\n{value}"} for name, value in self.facts],
-            },
-        ]
-
-        if self.details:
-            blocks += [
-                {"type": "divider"},
-                {
-                    "type": "section",
-                    "text": {"type": "mrkdwn", "text": f"*{self.details_title}* ({len(self.details)})"},
-                },
-                {
-                    "type": "rich_text",
-                    "elements": [
-                        {
-                            "type": "rich_text_list",
-                            "style": "bullet",
-                            "elements": [
-                                {"type": "rich_text_section", "elements": [{"type": "text", "text": detail}]}
-                                for detail in self.details
-                            ],
-                        }
-                    ],
-                },
-            ]
-
-        if self.body:
-            blocks += [
-                {"type": "divider"},
-                {"type": "section", "text": {"type": "mrkdwn", "text": f"*{self.body_title}*\n{self.body}"}},
-            ]
-
-        return blocks
 
     def to_teams_card(self) -> dict:
         body: list[dict] = [
@@ -180,7 +135,6 @@ def ui_test_report(results: RunResults, artifacts_url: Optional[str] = None) -> 
         details=shorten_suite_sources(results.failed_suites),
         link_url=artifacts_url,
         link_text="View test results" if artifacts_url else None,
-        results_archive_name=results.archive_name if results.attach_archive else None,
     )
 
 

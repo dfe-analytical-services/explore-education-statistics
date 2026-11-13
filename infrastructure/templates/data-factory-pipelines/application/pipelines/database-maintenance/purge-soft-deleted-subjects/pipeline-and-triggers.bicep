@@ -7,9 +7,6 @@ param keyVaultName string
 @description('Name of the Statistics database linked service.')
 param statisticsDbLinkedServiceName string
 
-@description('Slack channel to post Azure alerts to.')
-param slackAlertsChannel string
-
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
@@ -23,8 +20,6 @@ module pipelineModule 'pipeline.bicep' = {
   params: {
     dataFactoryName: dataFactoryName
     statisticsDbLinkedServiceName: statisticsDbLinkedServiceName
-    slackAlertsChannel: slackAlertsChannel
-    slackAppToken: keyVault.getSecret('ees-alerts-slackapptoken')
     teamsPowerAutomateWebhookUrl: keyVault.getSecret('ees-alerts-teamswebhookurl')
     removeSoftDeletedSubjectsObservationLimit: removeSoftDeletedSubjectsObservationLimit
     removeSoftDeletedSubjectsObservationCommitBatchSize: removeSoftDeletedSubjectsObservationCommitBatchSize

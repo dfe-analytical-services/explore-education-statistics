@@ -64,7 +64,7 @@ jobs:
 
             # The Basic Auth secrets only exist in environments with Basic Auth enabled. Azure DevOps renders the
             # boolean parameter as "True" or "False", hence the lowercasing with ",,".
-            secretsFilter="ees-alerts-slackapptoken,ees-alerts-teams-uitests-webhookurl"
+            secretsFilter="ees-alerts-teams-uitests-webhookurl"
             if [ "${BASIC_AUTH_ENABLED,,}" = "true" ]; then
               secretsFilter="$secretsFilter,$basicAuthUsernameSecret,$basicAuthPasswordSecret"
             fi
@@ -118,9 +118,8 @@ jobs:
             python -m pip install --upgrade pip
             pip install pipenv
             pipenv install
-            pipenv run python run_tests.py --env "${{ parameters.testEnvironment }}" --file "tests/general_public" --processes 4 --rerun-attempts 1 --ci --enable-slack-notifications
+            pipenv run python run_tests.py --env "${{ parameters.testEnvironment }}" --file "tests/general_public" --processes 4 --rerun-attempts 1 --ci
         env:
-          SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
           TEAMS_UI_TESTS_WEBHOOK_URL: $(ees-alerts-teams-uitests-webhookurl)
           ${{ if eq(parameters.publicSiteBasicAuthEnabled, true) }}:
             PUBLIC_AUTH_USER: $(publicSiteBasicAuthUsername)

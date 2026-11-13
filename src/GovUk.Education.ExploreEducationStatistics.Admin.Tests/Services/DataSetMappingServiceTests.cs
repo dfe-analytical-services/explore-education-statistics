@@ -5,9 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -19,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataSetMappingServiceTests
 {
+    private static readonly DataFixture DataFixture = new();
+
     [Fact]
     public async Task UpdateIndicatorMapping_Success()
     {
@@ -38,7 +42,7 @@ public class DataSetMappingServiceTests
         var replacementIndicator5Id = Guid.NewGuid();
         var replacementIndicator6Id = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -323,7 +327,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -378,7 +382,7 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMappings_OriginalDataFile_NotFound()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
 
@@ -420,7 +424,7 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateIndicatorMappings_ReplacementDataFile_NotFound()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
 
@@ -477,7 +481,7 @@ public class DataSetMappingServiceTests
 
         var indicatorDoesNotExistId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -560,7 +564,7 @@ public class DataSetMappingServiceTests
 
         var replacementIndicatorAlreadyMappedId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -650,7 +654,7 @@ public class DataSetMappingServiceTests
 
         var replacementIndicatorId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -771,7 +775,7 @@ public class DataSetMappingServiceTests
         var displacedReplacementLocId = Guid.NewGuid();
         var loc3ReplacementId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
 
         var mapping = new DataSetMapping
         {
@@ -950,7 +954,7 @@ public class DataSetMappingServiceTests
 
         var replacementLocId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1074,7 +1078,7 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_NoDataSetMapping_NotFound()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1100,7 +1104,7 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_OriginalDataFile_NotFound()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
@@ -1143,7 +1147,7 @@ public class DataSetMappingServiceTests
     [Fact]
     public async Task UpdateLocationMappings_ReplacementDataFile_NotFound()
     {
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalDataFileId = Guid.NewGuid();
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
@@ -1197,7 +1201,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
 
         var mapping = new DataSetMapping
         {
@@ -1261,7 +1265,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1330,7 +1334,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1441,7 +1445,7 @@ public class DataSetMappingServiceTests
         var previouslyMappedReplacementFilter2Group1Id = Guid.NewGuid();
         var previouslyMappedReplacementFilter2Group1Item1Id = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1682,7 +1686,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1904,7 +1908,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -1963,7 +1967,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2029,7 +2033,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2105,7 +2109,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2193,7 +2197,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2307,7 +2311,7 @@ public class DataSetMappingServiceTests
         var oldReplacementFilterGroup2Id = Guid.NewGuid();
         var oldReplacementFilterGroup2Item1Id = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2513,7 +2517,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2694,7 +2698,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2760,7 +2764,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -2859,7 +2863,7 @@ public class DataSetMappingServiceTests
         var newReplacementFilterItem1Id = Guid.NewGuid();
         var oldReplacementFilterItem2Id = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -3039,7 +3043,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -3206,7 +3210,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -3272,7 +3276,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,
@@ -3378,7 +3382,7 @@ public class DataSetMappingServiceTests
         var replacementDataFileId = Guid.NewGuid();
         var replacementSubjectId = Guid.NewGuid();
 
-        var releaseVersion = new ReleaseVersion { Id = Guid.NewGuid() };
+        ReleaseVersion releaseVersion = DataFixture.DefaultReleaseVersion().WithRelease(DataFixture.DefaultRelease());
         var originalReleaseFile = new ReleaseFile
         {
             ReleaseVersionId = releaseVersion.Id,

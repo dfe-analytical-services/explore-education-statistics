@@ -45,8 +45,7 @@ steps:
           --parameters ${{ parameters.paramFile }} \
           --parameters \
               environmentIdentifier='$(subscription)' \
-              deployedAt="$deployedAt" \
-              ${{ parameters.additionalParameters }}
+              deployedAt="$deployedAt" ${{ parameters.additionalParameters }}
 
   - template: ../../../../common/ci/tasks/bicep-output-variables.yml
     parameters:

@@ -9,9 +9,10 @@ param contentApiUrl = 'https://content.dev.explore-education-statistics.service.
 param publicApiApplicationGatewayFqdn = 'dev.statistics.api.education.gov.uk'
 param publicApiPublicUrl = 'https://pp-api.education.gov.uk/statistics-dev'
 
-param sqlServerPublicNetworkAccess = 'Disabled'
-
 param blobDeleteRetentionDays = 35
+
+// No cross-region restore for Backup Vault backups outside production environments.
+param backupVaultCrossRegionRestore = false
 
 param contentDbConfig = {
   sku: {

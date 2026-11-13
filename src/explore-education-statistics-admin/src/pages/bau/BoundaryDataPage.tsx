@@ -11,7 +11,10 @@ import boundaryTypesMap from '@common/utils/boundaryTypesMap';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
-import { administrationBoundaryDataUploadRoute } from '@admin/routes/administrationRoutes';
+import {
+  administrationBoundaryDataUploadRoute,
+  administrationIndexRoute,
+} from '@admin/routes/administrationRoutes';
 import styles from './BoundaryDataPage.module.scss';
 
 const BoundaryDataPage = () => {
@@ -24,7 +27,10 @@ const BoundaryDataPage = () => {
       caption="Manage Boundary data"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Boundary data' },
       ]}
     >
@@ -65,39 +71,17 @@ const BoundaryDataPage = () => {
         </Details>
 
         <InsetText>
-          <h2>New data uploads: before you start</h2>
           <p>
-            If the GeoJSON file has been downloaded direcly from the Open
-            Geography Portal then the coordinate system may need converting from
-            EPSG:27700 to EPSG:4326 (WGS84) before using this tool. The file can
-            be converted using "mapshaper", following the below steps:
+            Boundary files should be downloaded directly from the{' '}
+            <a
+              target="_blank"
+              rel="noreferrer noopener nofollow"
+              href="https://geoportal.statistics.gov.uk/search?sort=Title%7Ctitle%7Casc&tags=Boundaries"
+            >
+              Open Geography Portal (opens in new tab)
+            </a>{' '}
+            and should be in BUC / GeoJSON format.
           </p>
-          <ol>
-            <li>
-              Visit{' '}
-              <a
-                href="https://mapshaper.org/"
-                target="_blank"
-                rel="noreferrer noopener nofollow"
-              >
-                https://mapshaper.org/ (opens in new tab)
-              </a>
-            </li>
-            <li>Import the original GeoJSON file</li>
-            <li>Select "Console" from the navigation options</li>
-            <li>
-              Enter "<code>-proj from=EPSG:27700 crs=EPSG:4326</code>" and press
-              ENTER
-            </li>
-            <li>Select "Export" from the navigation options</li>
-            <li>
-              Ensure the "GeoJSON" option is selected, then click "Export" to
-              save the file to your local machine
-            </li>
-            <li>
-              Rename the downloaded file's extension from .json to .geojson
-            </li>
-          </ol>
         </InsetText>
 
         <Link
@@ -129,9 +113,7 @@ const BoundaryDataPage = () => {
                       </FormattedDate>
                     </td>
                     <td>
-                      <Link
-                        to={`boundary-data/boundary-level/${boundaryLevel.id}`}
-                      >
+                      <Link to={`boundary-level/${boundaryLevel.id}`}>
                         Edit
                       </Link>
                     </td>

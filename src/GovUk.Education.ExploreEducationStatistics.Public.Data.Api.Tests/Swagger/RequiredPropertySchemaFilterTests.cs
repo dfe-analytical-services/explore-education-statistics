@@ -10,15 +10,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Swagg
 
 public class RequiredPropertySchemaFilterTests
 {
+    private static readonly SchemaGeneratorOptions SchemaGeneratorOptions = new()
+    {
+        UseAllOfToExtendReferenceSchemas = true,
+        SchemaFilters = [new RequiredPropertySchemaFilter()],
+        SupportNonNullableReferenceTypes = true,
+    };
+
     private readonly SchemaGenerator _schemaGenerator = new(
-        new SchemaGeneratorOptions
-        {
-            UseAllOfToExtendReferenceSchemas = true,
-            SchemaFilters = [new RequiredPropertySchemaFilter()],
-            SupportNonNullableReferenceTypes = true,
-        },
+        SchemaGeneratorOptions,
         new JsonSerializerDataContractResolver(
-            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase },
+            SchemaGeneratorOptions
         )
     );
 

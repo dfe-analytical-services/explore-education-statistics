@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import AccordionToggleButton from '@common/components/AccordionToggleButton';
@@ -90,7 +91,7 @@ const ReleaseExploreDataPage = ({
       } available for download`}
       actions={
         <Link
-          to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+          to={`${getPublicEnv('CONTENT_API_BASE_URL')}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
           onClick={() => {
             logEvent({
               category: 'Downloads',
@@ -200,7 +201,7 @@ const ReleaseExploreDataPage = ({
           description={file.summary}
           actions={
             <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
+              to={`${getPublicEnv('CONTENT_API_BASE_URL')}/releases/${releaseVersionSummary.id}/files/${file.fileId}`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
@@ -244,7 +245,7 @@ const ReleaseExploreDataPage = ({
             {(hasDataSets || hasSupportingFiles || hasDataGuidance) && (
               <>
                 <Link
-                  to={`${process.env.CONTENT_API_BASE_URL}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
+                  to={`${getPublicEnv('CONTENT_API_BASE_URL')}/releases/${releaseVersionSummary.id}/files?fromPage=ReleaseDownloads`}
                   onClick={() => {
                     logEvent({
                       category: 'Downloads',

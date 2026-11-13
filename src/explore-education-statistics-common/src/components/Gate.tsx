@@ -38,7 +38,10 @@ const Gate = ({
 }: GateProps) => {
   const previousCondition = usePrevious(condition);
 
-  const [passed, setPassed] = useState(false);
+  // A boolean condition can be checked straight away, including on the server.
+  const [passed, setPassed] = useState(
+    typeof condition === 'boolean' ? condition : false,
+  );
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>();
 

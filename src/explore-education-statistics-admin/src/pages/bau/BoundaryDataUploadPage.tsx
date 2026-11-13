@@ -20,6 +20,10 @@ import Yup from '@common/validation/yup';
 import { SelectOption } from '@common/components/form/FormSelect';
 import { ObjectSchema } from 'yup';
 import { useNavigate } from 'react-router';
+import {
+  administrationBoundaryDataRoute,
+  administrationIndexRoute,
+} from '@admin/routes/administrationRoutes';
 
 export default function BoundaryDataUploadPage() {
   interface FormValues {
@@ -67,8 +71,14 @@ export default function BoundaryDataUploadPage() {
       caption="Upload boundary data"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
-        { name: 'Boundary data', link: '/administration/boundary-data' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
+        {
+          name: 'Boundary data',
+          link: administrationBoundaryDataRoute.fullPath,
+        },
         { name: 'Upload boundary data' },
       ]}
     >

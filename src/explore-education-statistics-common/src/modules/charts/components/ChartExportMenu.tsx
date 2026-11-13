@@ -1,10 +1,10 @@
-import React, { RefObject, useCallback, useEffect } from 'react';
-import downloadFile from '@common/utils/file/downloadFile';
+import React, { RefObject, useCallback } from 'react';
 import logger from '@common/services/logger';
 import useCurrentPng from '@common/components/ChartsToPNG';
 import ButtonText from '@common/components/ButtonText';
 import ExportMenu from '@common/components/ExportMenu';
-import useToggle from '@common/hooks/useToggle';
+import useCopySuccess from '@common/hooks/useCopySuccess';
+import usePngDownload from '@common/hooks/usePngDownload';
 
 interface Props {
   chartRef: RefObject<HTMLElement | null>;
@@ -13,28 +13,12 @@ interface Props {
 
 export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
   const [getClipboardPng] = useCurrentPng({ ref: chartRef });
-  const [copySuccess, setCopySuccess] = useToggle(false);
+  const [copySuccess, showCopySuccess] = useCopySuccess();
 
-  useEffect(() => {
-    const resetTimeout = setTimeout(setCopySuccess.off, 5000);
-
-    return () => {
-      if (copySuccess) {
-        clearTimeout(resetTimeout);
-      }
-    };
-  }, [copySuccess, setCopySuccess]);
-
-  const handlePngDownload = useCallback(async () => {
-    const png = await getClipboardPng();
-    if (png) {
-      downloadFile({
-        file: png,
-        extension: 'png',
-        fileName: `${chartTitle || 'Chart'}`,
-      });
-    }
-  }, [chartTitle, getClipboardPng]);
+  const handlePngDownload = usePngDownload(
+    getClipboardPng,
+    chartTitle || 'Chart',
+  );
 
   const handleCopyToClipboard = useCallback(async () => {
     try {
@@ -58,11 +42,11 @@ export default function ChartExportMenu({ chartRef, chartTitle }: Props) {
         }),
       ]);
 
-      setCopySuccess.on();
+      showCopySuccess();
     } catch (error) {
       logger.error(error);
     }
-  }, [getClipboardPng, setCopySuccess]);
+  }, [getClipboardPng, showCopySuccess]);
 
   return (
     <ExportMenu title={chartTitle || 'chart'}>

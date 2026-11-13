@@ -184,7 +184,7 @@ cd robot-tests
 pipenv run python scripts/create_snapshots.py
 ```
 
-These snapshot files are used by the test suite `tests/general_public/check_snapshots.robot`. If the snapshot doesn't match the current page, the test case fails, and an alert is sent to Slack.
+These snapshot files are used by the test suite `tests/general_public/check_snapshots.robot`. If the snapshot doesn't match the current page, the test case fails, and an alert is sent to Teams.
 
 ## Guidelines for people writing UI tests
 

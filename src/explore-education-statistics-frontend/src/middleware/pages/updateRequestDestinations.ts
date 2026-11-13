@@ -1,6 +1,7 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import {
   NextFetchEvent,
-  NextMiddleware,
+  NextProxy,
   NextRequest,
   NextResponse,
   URLPattern,
@@ -23,7 +24,7 @@ const destinationUpdates: DestinationUpdate[] = [
       pathname: '/data-catalogue/data-set/:dataSetFileId/csv',
     }),
     destination: ({ pathname }) =>
-      `${process.env.CONTENT_API_BASE_URL}/data-set-files/${pathname.groups.dataSetFileId}/download`,
+      `${getPublicEnv('CONTENT_API_BASE_URL')}/data-set-files/${pathname.groups.dataSetFileId}/download`,
     type: 'temporary-redirect',
   },
 ];
@@ -31,7 +32,7 @@ const destinationUpdates: DestinationUpdate[] = [
 export default function updateRequestDestination(
   request: NextRequest,
   event: NextFetchEvent,
-  middleware: NextMiddleware,
+  middleware: NextProxy,
 ) {
   const { nextUrl } = request;
 

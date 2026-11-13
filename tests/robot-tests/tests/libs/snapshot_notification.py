@@ -2,8 +2,7 @@
 Notifications sent by the public frontend snapshot validation script.
 
 Each notification is defined once, independently of any chat service, and is
-rendered into a Slack Block Kit message and a Teams Adaptive Card, so that both
-channels receive the same message.
+rendered into a Teams Adaptive Card.
 """
 
 from dataclasses import dataclass
@@ -11,7 +10,7 @@ from typing import Optional
 
 PULL_REQUESTS_URL = "https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt"
 
-# Adaptive Card colours. Slack headings cannot be coloured, so these apply to Teams only.
+# Adaptive Card colours.
 WARNING = "warning"
 ATTENTION = "attention"
 
@@ -30,19 +29,6 @@ class SnapshotNotification:
         Bodies without a link may be arbitrary text such as an exception message.
         """
         return self.body.format(link=link) if self.link_url else self.body
-
-    def to_slack_blocks(self) -> list[dict]:
-        body = self._body_with_link(f"<{self.link_url}|{self.link_text}>")
-
-        return [
-            {"type": "header", "text": {"type": "plain_text", "text": self.title}},
-            {
-                "type": "section",
-                # Links are only recognised in mrkdwn, but leave link-free bodies as
-                # plain text so that they cannot be misinterpreted as mrkdwn.
-                "text": {"type": "mrkdwn" if self.link_url else "plain_text", "text": body},
-            },
-        ]
 
     def to_teams_card(self) -> dict:
         body = self._body_with_link(f"[{self.link_text}]({self.link_url})")

@@ -597,6 +597,25 @@ required variables and consequently needs to be in sync with any changes.
 
 No secrets/keys etc. should be added to these environment variables.
 
+#### Public frontend variables
+
+The public frontend is built once and the same Docker image is deployed to every environment, so
+its environment variables are read at runtime rather than inlined at build time. Don't use
+`NEXT_PUBLIC_` variables or next.config.js `env` for anything that differs between environments.
+
+To add a variable:
+
+1. Add a default for local development to `src/explore-education-statistics-frontend/.env`.
+2. Add the deployed values to the public site's app settings in
+   `infrastructure/templates/main-app-release/appsettings/public-site/public-site-appsettings.bicep`.
+3. Decide where it's needed:
+   - **Server only** (`getServerSideProps`, API routes, middleware): read it with `process.env.MY_VAR`
+     and declare it in `src/explore-education-statistics-frontend/src/types/env.d.ts`.
+   - **Browser** (components, client-side requests): add it to the `PublicEnv` interface and
+     `publicEnvKeys` in `src/explore-education-statistics-frontend/src/utils/publicEnv.ts`, and read
+     it with `getPublicEnv('MY_VAR')`. Don't use `process.env` for these, as it isn't populated in the
+     browser. `_document` renders these values into every page, so never add secrets or keys here.
+
 ### Dependency management with PNPM
 
 The project currently uses [PNPM](https://pnpm.io) and [PNPM workspaces](https://pnpm.io/workspaces) to handle dependencies as we have

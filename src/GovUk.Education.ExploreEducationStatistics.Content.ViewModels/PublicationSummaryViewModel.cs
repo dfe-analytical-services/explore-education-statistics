@@ -30,6 +30,6 @@ public record PublicationSummaryViewModel
         Id = publication.Id;
         Title = publication.Title;
         Slug = publication.Slug;
-        Contact = hasContact ? new ContactViewModel(publication.Contact) : null;
+        Contact = hasContact ? ContactViewModel.FromModel(publication.Contact) : null;
     }
 }

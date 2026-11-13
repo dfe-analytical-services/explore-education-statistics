@@ -1,17 +1,21 @@
 import { IpRange } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage account, which sets its redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('Location for all resources.')
 param location string
 
 @description('Storage container names for search documents. A container for each value will be created in the Search storage account.')
 param searchStorageDocumentContainers object = {
-  searchDocuments: 'searchable-documents'
-  nlSearchDatasetDocuments: 'nl-search-dataset-documents'
-  nlSearchFilterDocuments: 'nl-search-filter-documents'
+  releaseDocuments: 'searchable-documents'
+  dataSetDocuments: 'nl-search-dataset-documents'
+  filterDocuments: 'nl-search-filter-documents'
 }
 
 @description('Indicates whether API keys are permitted for authentication to the Azure AI Search service in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
@@ -85,7 +89,7 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
     }
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
-    sku: 'Standard_LRS'
+    sku: storageAccountSku
     kind: 'StorageV2'
     alerts: {
       availability: true

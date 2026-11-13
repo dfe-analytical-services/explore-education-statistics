@@ -1,20 +1,72 @@
+import base64
+import datetime
 import json
 import os.path
+import re
+import time
+import urllib.parse
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+MSAL_TOKEN_KEYS_PATTERN = r"^msal\.\d+\.token\.keys\.(.+)$"
+
+
+def wait_until_access_token_in_browser_local_storage(driver, timeout_seconds: int = 30):
+    # MSAL can write the access token to local storage after the Dashboard has rendered.
+    # The token itself is encrypted, but MSAL's index of token keys ("msal.<schema>.token.keys.<clientId>")
+    # isn't, so wait until that lists an access token before capturing local storage.
+    max_time = time.time() + timeout_seconds
+    while time.time() < max_time:
+        has_access_token = driver.execute_script(
+            """
+            const pattern = new RegExp(arguments[0]);
+            return Object.keys(window.localStorage)
+                .filter(key => pattern.test(key))
+                .some(key => {
+                    try {
+                        return JSON.parse(window.localStorage.getItem(key)).accessToken?.length > 0;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+            """,
+            MSAL_TOKEN_KEYS_PATTERN,
+        )
+        if has_access_token:
+            return
+        time.sleep(0.5)
+    raise RuntimeError(f"Timed out after {timeout_seconds}s waiting for an MSAL access token in browser local storage")
 
 
 def get_local_storage_json_from_browser(driver) -> dict:
-    local_storage_string = driver.execute_script("""
-        return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
-          try {
-            acc[key] = JSON.parse(value);
-          } catch (e) {
-            acc[key] = value;
-          }
-          return acc;
-        }, {}));
-        """)
+    wait_until_access_token_in_browser_local_storage(driver)
 
-    return json.loads(local_storage_string)
+    local_storage_string = driver.execute_script("""
+         return JSON.stringify(Object.entries(window.localStorage).reduce((acc, [key, value]) => {
+             try {
+                 acc[key] = JSON.parse(value);
+             } catch (e) {
+                 acc[key] = value;
+             }
+             return acc;
+         }, {}));
+         """)
+
+    local_storage_json = json.loads(local_storage_string)
+    encryption_cookie = driver.get_cookie("msal.cache.encryption")
+    expires = datetime.datetime.now() + datetime.timedelta(minutes=15)
+    local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE"] = encryption_cookie["value"]
+    local_storage_json["ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES"] = expires.isoformat()
+
+    return local_storage_json
+
+
+def clear_browser_local_storage(driver):
+    driver.execute_script("""
+        window.localStorage.clear();
+    """)
 
 
 def get_local_storage_filename_for_user(user: str) -> str:
@@ -59,35 +111,71 @@ def clear_local_storage_file(user: str):
         os.remove(local_storage_filename)
 
 
-def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
+def _base64url_decode(value: str) -> bytes:
+    return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+
+
+def _get_msal_token_keys(local_storage_json: dict) -> tuple[str, dict]:
+    # MSAL indexes its token keys under "msal.<schema>.token.keys.<clientId>"
     for key, value in local_storage_json.items():
-        # If value is already a dict, check it directly
-        if isinstance(value, dict):
-            if value.get("credentialType") == "AccessToken":
-                return value["secret"]
-            continue
+        match = re.match(MSAL_TOKEN_KEYS_PATTERN, key)
+        if match:
+            return match.group(1), value
 
-        # Skip if value isn't a string (though in local storage they usually are)
-        if not isinstance(value, str):
-            continue
+    raise RuntimeError("Unable to find MSAL token keys in local storage JSON")
 
-        try:
-            # Try to turn the string value into a dictionary
-            entry_data = json.loads(value)
 
-            if isinstance(entry_data, dict):
-                # Check if this dictionary is the AccessToken we want
-                if entry_data.get("credentialType") == "AccessToken":
-                    return entry_data["secret"]
+def _decrypt_msal_cache_entry(key: str, entry: dict, base_key: bytes, client_id: str) -> dict:
+    """
+    Mirrors msal-browser's (v4+) LocalStorage decryption: an AES-256-GCM key is derived per
+    entry using HKDF-SHA256 with the entry's nonce as salt and the client id as context.
+    """
+    context = client_id if client_id in key else ""
+    derived_key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=_base64url_decode(entry["nonce"]),
+        info=context.encode(),
+    ).derive(base_key)
 
-        except (json.JSONDecodeError, TypeError):
-            # If the string isn't JSON (like "msal.version": "3.30.0"), just skip it
-            continue
+    plaintext = AESGCM(derived_key).decrypt(bytes(12), _base64url_decode(entry["data"]), None)
+    return json.loads(plaintext)
 
-    # If we get here, we've exhausted the loop
+
+def get_access_token_from_local_storage_json(local_storage_json: dict) -> str:
+    encryption_cookie = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE")
+
+    if not encryption_cookie:
+        raise RuntimeError("Unable to find MSAL encryption cookie in local storage JSON")
+
+    cookie = json.loads(urllib.parse.unquote(encryption_cookie))
+    base_key = _base64url_decode(cookie["key"])
+    client_id, token_keys = _get_msal_token_keys(local_storage_json)
+
+    for key in token_keys.get("accessToken", []):
+        entry = local_storage_json.get(key)
+
+        # Entries encrypted with a different key are from a previous session
+        if entry and entry.get("id") == cookie["id"]:
+            return _decrypt_msal_cache_entry(key, entry, base_key, client_id)["secret"]
+
     raise RuntimeError("Unable to find access token from local storage JSON")
 
 
 def get_access_token_from_file(user: str) -> str:
     local_storage_json = read_local_storage_json_from_file(user)
     return get_access_token_from_local_storage_json(local_storage_json)
+
+
+def has_encryption_cookie_expired(usr: str) -> bool:
+    local_storage_json = read_local_storage_json_from_file(usr)
+    expires = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE_EXPIRES")
+    if expires:
+        return datetime.datetime.now() > datetime.datetime.fromisoformat(expires)
+    return True
+
+
+def write_auth_encryption_to_cookie(local_storage_json: dict, driver):
+    encryption_cookie = local_storage_json.get("ROBOT_ENCRYPTION_COOKIE_VALUE")
+
+    driver.add_cookie({"name": "msal.cache.encryption", "value": encryption_cookie})

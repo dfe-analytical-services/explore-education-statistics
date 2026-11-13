@@ -19,7 +19,7 @@ module Notification
                      else
                        "in #{age} days"
                      end
-      "- <#{page.url}|#{page.title}> (#{expires_when})"
+      "- [#{page.title}](#{page.url}) (#{expires_when})"
     end
 
     def singular_message

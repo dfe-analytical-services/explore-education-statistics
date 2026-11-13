@@ -1,0 +1,44 @@
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
+using Microsoft.Extensions.Options;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
+
+public class ReleaseDocumentChecker(
+    IBlobNameLister blobNameLister,
+    IReleaseVersionSummaryRetriever releaseVersionSummaryRetriever,
+    IOptions<AppOptions> appOptions
+)
+{
+    public async Task<ReleaseDocumentsCheckReport> RunCheck(CancellationToken cancellationToken = default)
+    {
+        // Get a list of all blobs
+        var blobNames = await blobNameLister.ListBlobsInContainer(
+            appOptions.Value.ReleaseDocumentsContainerName,
+            cancellationToken
+        );
+
+        // Retrieve the latest published release version summaries for the latest published releases of all published publications
+        var releaseVersionSummaries = await releaseVersionSummaryRetriever.GetAllPublishedReleaseVersionSummaries(
+            cancellationToken
+        );
+
+        var expectedReleaseIds = releaseVersionSummaries.Select(rs => rs.ReleaseId).ToArray();
+
+        // Compare the list of release id's with the list of blob names
+        var (leftOnly, both, rightOnly) = expectedReleaseIds.Diff(blobNames);
+
+        return new ReleaseDocumentsCheckReport
+        {
+            OkBlobCount = both.Length,
+            TotalBlobCount = blobNames.Count,
+            TotalPublicationCount = releaseVersionSummaries.Count,
+            MissingBlobs = leftOnly,
+            ExtraneousBlobs = rightOnly,
+            MissingBlobSummaries = leftOnly
+                .Select(id => releaseVersionSummaries.First(rs => rs.ReleaseId == id))
+                .Select(ReleaseVersionSummaryViewModel.FromModel)
+                .ToArray(),
+        };
+    }
+}

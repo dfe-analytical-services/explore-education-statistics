@@ -6,13 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public interface IContentApiClient
 {
     /// <summary>
-    /// Retrieve the latest release for the specified publication in a searchable document format.
+    /// Retrieve the latest release for the specified publication as a release document.
     /// </summary>
     /// <param name="publicationSlug">the publication slug</param>
     /// <param name="cancellationToken">cancellation token</param>
-    /// <returns>The latest release for the publication in searchable document format</returns>
-    /// <exception cref="UnableToGetPublicationLatestReleaseSearchViewModelException">Thrown if the call to the API was unsuccessful</exception>
-    Task<ReleaseSearchableDocument> GetPublicationLatestReleaseSearchableDocument(
+    /// <returns>The latest release for the publication as a release document</returns>
+    /// <exception cref="UnableToGetPublicationLatestReleaseDocumentException">Thrown if the call to the API was unsuccessful</exception>
+    Task<ReleaseDocument> GetPublicationLatestReleaseDocument(
         string publicationSlug,
         CancellationToken cancellationToken = default
     );
@@ -61,4 +61,13 @@ public interface IContentApiClient
         string releaseSlug,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Retrieves the keys of all the data set documents that are expected to exist. There is one per data file in the
+    /// latest published version of each release.
+    /// </summary>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>An array of data set document keys.</returns>
+    /// <exception cref="UnableToGetDataSetDocumentKeysException">Thrown if the call to the API was unsuccessful</exception>
+    Task<DataSetDocumentKey[]> GetDataSetDocumentKeys(CancellationToken cancellationToken = default);
 }

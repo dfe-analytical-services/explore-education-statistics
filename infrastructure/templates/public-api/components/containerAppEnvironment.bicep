@@ -9,6 +9,9 @@ param subnetId string
 @description('Specifies whether or not this Container App Environment is internal-only or will be provisioned with a Public IP address')
 param internal bool = true
 
+@description('Whether to spread the Container App Environment across availability zones.')
+param zoneRedundant bool = false
+
 @description('Specifies the name of the Log Analytics workspace responsible for capturing logging from this resource')
 param logAnalyticsWorkspaceName string
 
@@ -40,7 +43,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
 resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: containerAppEnvironmentName
   location: location
-  properties: {
+  properties: union({
     vnetConfiguration: {
       infrastructureSubnetId: subnetId
       internal: internal
@@ -59,7 +62,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' 
      }],
      workloadProfiles
     )
-  }
+  }, zoneRedundant ? { zoneRedundant: true } : {})
   tags: tagValues
 
   resource azureFileStorage 'storages@2022-03-01' = [for storage in azureFileStorages: {

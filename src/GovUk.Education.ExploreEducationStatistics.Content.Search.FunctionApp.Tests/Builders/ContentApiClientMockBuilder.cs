@@ -8,21 +8,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 internal class ContentApiClientMockBuilder
 {
     private readonly Mock<IContentApiClient> _mock = new(MockBehavior.Strict);
-    private readonly ReleaseSearchableDocumentBuilder _releaseSearchableDocumentBuilder = new();
-    private ReleaseSearchableDocument? _releaseSearchableDocument;
+    private readonly ReleaseDocumentBuilder _releaseDocumentBuilder = new();
+    private ReleaseDocument? _releaseDocument;
     private PublicationInfo[]? _publicationsForTheme;
     private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
+    private DataSetDocumentKey[]? _dataSetDocumentKeys;
 
     public ContentApiClientMockBuilder()
     {
         Assert = new Asserter(_mock);
 
         _mock
-            .Setup(m =>
-                m.GetPublicationLatestReleaseSearchableDocument(It.IsAny<string>(), It.IsAny<CancellationToken>())
-            )
-            .ReturnsAsync(() => _releaseSearchableDocument ?? _releaseSearchableDocumentBuilder.Build());
+            .Setup(m => m.GetDataSetDocumentKeys(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _dataSetDocumentKeys ?? []);
+
+        _mock
+            .Setup(m => m.GetPublicationLatestReleaseDocument(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _releaseDocument ?? _releaseDocumentBuilder.Build());
 
         _mock
             .Setup(m => m.GetPublicationsForTheme(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
@@ -58,19 +61,17 @@ internal class ContentApiClientMockBuilder
         return _mock.Object;
     }
 
-    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        ReleaseSearchableDocument releaseSearchableDocument
-    )
+    public ContentApiClientMockBuilder WhereReleaseDocumentIs(ReleaseDocument releaseDocument)
     {
-        _releaseSearchableDocument = releaseSearchableDocument;
+        _releaseDocument = releaseDocument;
         return this;
     }
 
-    public ContentApiClientMockBuilder WhereReleaseSearchViewModelIs(
-        Func<ReleaseSearchableDocumentBuilder, ReleaseSearchableDocumentBuilder> modifyReleaseSearchViewModel
+    public ContentApiClientMockBuilder WhereReleaseDocumentIs(
+        Func<ReleaseDocumentBuilder, ReleaseDocumentBuilder> modifyReleaseDocument
     )
     {
-        modifyReleaseSearchViewModel(_releaseSearchableDocumentBuilder);
+        modifyReleaseDocument(_releaseDocumentBuilder);
         return this;
     }
 
@@ -89,6 +90,12 @@ internal class ContentApiClientMockBuilder
     public ContentApiClientMockBuilder WhereHasPublications(params PublicationInfo[] publications)
     {
         _publications = publications;
+        return this;
+    }
+
+    public ContentApiClientMockBuilder WhereHasDataSetDocumentKeys(params DataSetDocumentKey[] dataSetDocumentKeys)
+    {
+        _dataSetDocumentKeys = dataSetDocumentKeys;
         return this;
     }
 
@@ -131,7 +138,7 @@ internal class ContentApiClientMockBuilder
         public void ContentWasLoadedFor(string publicationSlug)
         {
             mock.Verify(
-                m => m.GetPublicationLatestReleaseSearchableDocument(publicationSlug, It.IsAny<CancellationToken>()),
+                m => m.GetPublicationLatestReleaseDocument(publicationSlug, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }

@@ -32,7 +32,8 @@ public class DataSetMappingService(
     )
     {
         return await contentDbContext
-            .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Where(rv => rv.Id == releaseVersionId)
             .SingleOrNotFound()
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
@@ -148,7 +149,8 @@ public class DataSetMappingService(
     )
     {
         return await contentDbContext
-            .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Where(rv => rv.Id == releaseVersionId)
             .SingleOrNotFound()
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
@@ -200,7 +202,8 @@ public class DataSetMappingService(
     )
     {
         return await contentDbContext
-            .ReleaseVersions.Where(rv => rv.Id == releaseVersionId)
+            .ReleaseVersions.Include(rv => rv.Release)
+            .Where(rv => rv.Id == releaseVersionId)
             .SingleOrNotFound()
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>

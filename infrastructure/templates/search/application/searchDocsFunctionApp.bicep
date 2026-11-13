@@ -1,9 +1,16 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
+import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
 param contentApiUrl string
+
+@description('Storage container name for data set documents in the Search storage account.')
+param dataSetDocumentsContainerName string
+
+@description('Name of the indexer associated with the \'Data set\' index in Azure AI Search.')
+param dataSetIndexerName string
 
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
@@ -11,8 +18,8 @@ param functionAppFirewallRules FirewallRule[]
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
-@description('Name of the indexer associated with the \'Search\' index in Azure AI Search.')
-param searchServiceSearchIndexerName string
+@description('Name of the indexer associated with the \'Release\' index in Azure AI Search.')
+param releaseIndexerName string
 
 @description('Specifies the Azure AI Search service name.')
 param searchServiceName string
@@ -24,14 +31,17 @@ param searchStorageAccountName string
 @secure()
 param searchStorageAccountConnectionStringSecretName string
 
-@description('Storage container name for search documents in the Search storage account.')
-param searchDocumentsContainerName string
+@description('Storage container name for release documents in the Search storage account.')
+param releaseDocumentsContainerName string
 
 @description('The IP address ranges that can access the Search Docs Function App storage account.')
 param storageFirewallRules IpRange[]
 
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
+
+@description('SKU of the storage accounts, which sets their redundancy.')
+param storageAccountSku StorageAccountSku
 
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
@@ -43,12 +53,12 @@ param storageQueueNames SearchStorageQueueNames = {
   publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
-  refreshSearchableDocument: 'refresh-searchable-document-queue'
+  refreshReleaseDocument: 'refresh-release-document-queue'
+  releaseDocumentCreated: 'release-document-created-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
-  removePublicationSearchableDocuments: 'remove-publication-searchable-documents-queue'
-  removeSearchableDocument: 'remove-searchable-document-queue'
-  searchableDocumentCreated: 'search-document-created-queue'
+  removePublicationReleaseDocuments: 'remove-publication-release-documents-queue'
+  removeReleaseDocument: 'remove-release-document-queue'
   themeUpdated: 'theme-updated-queue'
 }
 
@@ -82,9 +92,14 @@ resource searchBlobStorage 'Microsoft.Storage/storageAccounts/blobServices@2023-
   parent: searchStorageAccount
 }
 
-resource searchDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+resource releaseDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
   parent: searchBlobStorage
-  name: searchDocumentsContainerName
+  name: releaseDocumentsContainerName
+}
+
+resource dataSetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+  parent: searchBlobStorage
+  name: dataSetDocumentsContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -103,16 +118,24 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
       }
       {
-        name: 'App__SearchDocumentsContainerName'
-        value: searchDocumentsContainer.name
+        name: 'App__ReleaseDocumentsContainerName'
+        value: releaseDocumentsContainer.name
+      }
+      {
+        name: 'App__DataSetDocumentsContainerName'
+        value: dataSetDocumentsContainer.name
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
         value: searchService.properties.endpoint
       }
       {
-        name: 'AzureSearch__IndexerName'
-        value: searchServiceSearchIndexerName
+        name: 'AzureSearch__ReleaseIndexerName'
+        value: releaseIndexerName
+      }
+      {
+        name: 'AzureSearch__DataSetIndexerName'
+        value: dataSetIndexerName
       }
       {
         name: 'ContentApi__Url'
@@ -139,8 +162,12 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.publicationRestored
       }
       {
-        name: 'RefreshSearchableDocumentQueueName'
-        value: storageQueueNames.refreshSearchableDocument
+        name: 'RefreshReleaseDocumentQueueName'
+        value: storageQueueNames.refreshReleaseDocument
+      }
+      {
+        name: 'ReleaseDocumentCreatedQueueName'
+        value: storageQueueNames.releaseDocumentCreated
       }
       {
         name: 'ReleaseSlugChangedQueueName'
@@ -151,16 +178,12 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.releaseVersionPublished
       }
       {
-        name: 'RemovePublicationSearchableDocumentsQueueName'
-        value: storageQueueNames.removePublicationSearchableDocuments
+        name: 'RemovePublicationReleaseDocumentsQueueName'
+        value: storageQueueNames.removePublicationReleaseDocuments
       }
       {
-        name: 'RemoveSearchableDocumentQueueName'
-        value: storageQueueNames.removeSearchableDocument
-      }
-      {
-        name: 'SearchableDocumentCreatedQueueName'
-        value: storageQueueNames.searchableDocumentCreated
+        name: 'RemoveReleaseDocumentQueueName'
+        value: storageQueueNames.removeReleaseDocument
       }
       {
         name: 'ThemeUpdatedQueueName'
@@ -189,6 +212,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     deployQueueRoleAssignment: true
     diagnosticSettingsLogAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     storageAccountName: resourceNames.searchDocs.functionStorageAccount
+    storageAccountSku: storageAccountSku
     storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.searchDocsStorageAccountConnectionString
     storageAccountPublicNetworkAccessEnabled: false
     publicNetworkAccessEnabled: true

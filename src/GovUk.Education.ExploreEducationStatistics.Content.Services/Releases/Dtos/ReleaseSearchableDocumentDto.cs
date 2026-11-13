@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Organisations.Dtos;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Releases.Dtos;
 
@@ -132,13 +133,4 @@ public record ReleaseSearchableDocumentDto
 
     private static string? RemoveComments(string? input) =>
         string.IsNullOrEmpty(input) ? input : ContentFilterUtils.CommentsRegex().Replace(input, string.Empty);
-}
-
-public record SearchableDocumentPublishingOrganisationDto
-{
-    public required Guid Id { get; init; }
-    public required string Title { get; init; }
-
-    public static SearchableDocumentPublishingOrganisationDto FromOrganisation(Organisation organisation) =>
-        new() { Id = organisation.Id, Title = organisation.Title };
 }
