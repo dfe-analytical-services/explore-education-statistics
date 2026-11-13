@@ -38,6 +38,9 @@ param databaseAuditBlobRetentionDays int = 365
 @description('Name of the storage account that database audit logs and vulnerability assessment scans are written to.')
 param loggingStorageAccountName string
 
+@description('Whether auditing and vulnerability assessment write to the logging storage account with the SQL Server\'s system-assigned identity, rather than with the account\'s access key.')
+param identityBasedAuditStorage bool = false
+
 @description('Configuration for the Statistics database geo-replica.')
 param statisticsDbConfig AzureSqlDatabaseConfig
 
@@ -85,6 +88,7 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountName
+    identityBasedAuditStorage: identityBasedAuditStorage
     databases: [
       {
         name: 'statistics'
