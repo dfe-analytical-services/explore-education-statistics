@@ -117,54 +117,53 @@ public class DataGuidanceDataSetServiceTests
         var subject1Footnote1 = new SubjectFootnote
         {
             Subject = subject1,
-            Footnote = new Footnote { Content = "Subject 1 Footnote 1", Order = 0 },
+            Footnote = new Footnote
+            {
+                Content = "Subject 1 Footnote 1",
+                Order = 0,
+                ReleaseVersion = releaseVersion,
+            },
         };
         var subject1Footnote2 = new FilterFootnote
         {
             Filter = subject1Filter,
-            Footnote = new Footnote { Content = "Subject 1 Footnote 2", Order = 1 },
+            Footnote = new Footnote
+            {
+                Content = "Subject 1 Footnote 2",
+                Order = 1,
+                ReleaseVersion = releaseVersion,
+            },
         };
         var subject1Footnote3 = new FilterGroupFootnote
         {
             FilterGroup = new FilterGroup { Filter = subject1Filter },
-            Footnote = new Footnote { Content = "Subject 1 Footnote 3", Order = 2 },
+            Footnote = new Footnote
+            {
+                Content = "Subject 1 Footnote 3",
+                Order = 2,
+                ReleaseVersion = releaseVersion,
+            },
         };
 
         var subject2Footnote1 = new FilterItemFootnote
         {
             FilterItem = new FilterItem { FilterGroup = new FilterGroup { Filter = subject2Filter } },
-            Footnote = new Footnote { Content = "Subject 2 Footnote 1", Order = 0 },
+            Footnote = new Footnote
+            {
+                Content = "Subject 2 Footnote 1",
+                Order = 0,
+                ReleaseVersion = releaseVersion,
+            },
         };
         var subject2Footnote2 = new IndicatorFootnote
         {
             Indicator = subject2IndicatorGroup.Indicators[0],
-            Footnote = new Footnote { Content = "Subject 2 Footnote 2", Order = 1 },
-        };
-
-        var releaseFootnote1 = new ReleaseFootnote
-        {
-            Footnote = subject1Footnote1.Footnote,
-            ReleaseVersion = releaseVersion,
-        };
-        var releaseFootnote2 = new ReleaseFootnote
-        {
-            Footnote = subject1Footnote2.Footnote,
-            ReleaseVersion = releaseVersion,
-        };
-        var releaseFootnote3 = new ReleaseFootnote
-        {
-            Footnote = subject1Footnote3.Footnote,
-            ReleaseVersion = releaseVersion,
-        };
-        var releaseFootnote4 = new ReleaseFootnote
-        {
-            Footnote = subject2Footnote1.Footnote,
-            ReleaseVersion = releaseVersion,
-        };
-        var releaseFootnote5 = new ReleaseFootnote
-        {
-            Footnote = subject2Footnote2.Footnote,
-            ReleaseVersion = releaseVersion,
+            Footnote = new Footnote
+            {
+                Content = "Subject 2 Footnote 2",
+                Order = 1,
+                ReleaseVersion = releaseVersion,
+            },
         };
 
         var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -189,13 +188,6 @@ public class DataGuidanceDataSetServiceTests
             statisticsDbContext.FilterGroupFootnote.AddRange(subject1Footnote3);
             statisticsDbContext.FilterItemFootnote.AddRange(subject2Footnote1);
             statisticsDbContext.IndicatorFootnote.AddRange(subject2Footnote2);
-            statisticsDbContext.ReleaseFootnote.AddRange(
-                releaseFootnote1,
-                releaseFootnote2,
-                releaseFootnote3,
-                releaseFootnote4,
-                releaseFootnote5
-            );
             await statisticsDbContext.SaveChangesAsync();
         }
 
