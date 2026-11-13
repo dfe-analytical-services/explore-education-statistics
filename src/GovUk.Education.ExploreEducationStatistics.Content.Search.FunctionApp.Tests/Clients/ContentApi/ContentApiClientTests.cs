@@ -233,6 +233,101 @@ public class ContentApiClientTests(ITestOutputHelper output)
         }
     }
 
+    public class GetDataSetDocumentPublicationsTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        private IContentApiClient GetSut(
+            HttpStatusCode statusCode,
+            string json,
+            Action<HttpRequestMessage>? onRequest = null
+        ) =>
+            GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (request, _) =>
+                    {
+                        onRequest?.Invoke(request);
+                        return Task.FromResult(
+                            new HttpResponseMessage(statusCode)
+                            {
+                                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                            }
+                        );
+                    }
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+        [Fact]
+        public async Task ValidJsonResponse_ReturnsDataSetDocumentPublications()
+        {
+            string? requestedPath = null;
+            var sut = GetSut(
+                HttpStatusCode.OK,
+                """
+                [
+                  {
+                    "publicationId": "11111111-1111-1111-1111-111111111111",
+                    "publicationSlug": "publication-1"
+                  },
+                  {
+                    "publicationId": "22222222-2222-2222-2222-222222222222",
+                    "publicationSlug": "publication-2"
+                  }
+                ]
+                """,
+                onRequest: request => requestedPath = request.RequestUri?.AbsolutePath
+            );
+
+            var result = await sut.GetDataSetDocumentPublications(CancellationToken.None);
+
+            Assert.Equal("/api/data-sets/searchable/publications", requestedPath);
+            Assert.Equal(
+                [
+                    new DataSetDocumentPublication
+                    {
+                        PublicationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                        PublicationSlug = "publication-1",
+                    },
+                    new DataSetDocumentPublication
+                    {
+                        PublicationId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                        PublicationSlug = "publication-2",
+                    },
+                ],
+                result
+            );
+        }
+
+        [Fact]
+        public async Task EmptyResponse_ReturnsNoDataSetDocumentPublications()
+        {
+            var sut = GetSut(HttpStatusCode.OK, "[]");
+
+            var result = await sut.GetDataSetDocumentPublications(CancellationToken.None);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task PublicationWithoutSlug_ThrowsException()
+        {
+            var sut = GetSut(HttpStatusCode.OK, """[{ "publicationId": "11111111-1111-1111-1111-111111111111" }]""");
+
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                sut.GetDataSetDocumentPublications(CancellationToken.None)
+            );
+        }
+
+        [Fact]
+        public async Task UnsuccessfulResponse_ThrowsException()
+        {
+            var sut = GetSut(HttpStatusCode.InternalServerError, "");
+
+            await Assert.ThrowsAsync<UnableToGetDataSetDocumentPublicationsException>(() =>
+                sut.GetDataSetDocumentPublications(CancellationToken.None)
+            );
+        }
+    }
+
     public class DataSetDocumentsTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         private const string DataSetDocumentsJson = """

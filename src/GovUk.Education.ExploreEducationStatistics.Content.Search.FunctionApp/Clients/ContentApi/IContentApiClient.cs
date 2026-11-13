@@ -72,6 +72,15 @@ public interface IContentApiClient
     Task<DataSetDocumentKey[]> GetDataSetDocumentKeys(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Retrieves the publications which have data set documents. This includes archived publications, which keep
+    /// their data set documents.
+    /// </summary>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>An array of publications which have data set documents.</returns>
+    /// <exception cref="UnableToGetDataSetDocumentPublicationsException">Thrown if the call to the API was unsuccessful</exception>
+    Task<DataSetDocumentPublication[]> GetDataSetDocumentPublications(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Retrieves the data set documents for the latest published version of the specified release. There is one per
     /// data file.
     /// </summary>

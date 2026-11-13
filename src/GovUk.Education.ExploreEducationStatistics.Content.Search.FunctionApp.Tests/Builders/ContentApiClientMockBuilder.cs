@@ -14,6 +14,7 @@ internal class ContentApiClientMockBuilder
     private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
     private DataSetDocumentKey[]? _dataSetDocumentKeys;
+    private DataSetDocumentPublication[]? _dataSetDocumentPublications;
     private DataSetDocument[]? _releaseDataSetDocuments;
     private DataSetDocument[]? _publicationDataSetDocuments;
 
@@ -24,6 +25,10 @@ internal class ContentApiClientMockBuilder
         _mock
             .Setup(m => m.GetDataSetDocumentKeys(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _dataSetDocumentKeys ?? []);
+
+        _mock
+            .Setup(m => m.GetDataSetDocumentPublications(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _dataSetDocumentPublications ?? []);
 
         _mock
             .Setup(m =>
@@ -108,6 +113,26 @@ internal class ContentApiClientMockBuilder
     public ContentApiClientMockBuilder WhereHasDataSetDocumentKeys(params DataSetDocumentKey[] dataSetDocumentKeys)
     {
         _dataSetDocumentKeys = dataSetDocumentKeys;
+        return this;
+    }
+
+    public ContentApiClientMockBuilder WhereHasDataSetDocumentPublications(
+        params DataSetDocumentPublication[] dataSetDocumentPublications
+    )
+    {
+        _dataSetDocumentPublications = dataSetDocumentPublications;
+        return this;
+    }
+
+    public ContentApiClientMockBuilder WhereGetDataSetDocumentPublicationsThrows()
+    {
+        _mock
+            .Setup(m => m.GetDataSetDocumentPublications(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(
+                new UnableToGetDataSetDocumentPublicationsException(
+                    "This is a test exception. GetDataSetDocumentPublications error."
+                )
+            );
         return this;
     }
 

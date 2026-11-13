@@ -28,6 +28,8 @@ internal class ContentApiClient(HttpClient httpClient, ILogger<ContentApiClient>
 
     private const string GetDataSetDocumentKeysEndpoint = "/api/data-sets/searchable/keys";
 
+    private const string GetDataSetDocumentPublicationsEndpoint = "/api/data-sets/searchable/publications";
+
     private const string GetReleaseDataSetDocumentsEndpointFormat =
         "/api/publications/{0}/releases/{1}/data-sets/searchable";
 
@@ -180,6 +182,22 @@ internal class ContentApiClient(HttpClient httpClient, ILogger<ContentApiClient>
             response,
             onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
             onError: errorMessage => new UnableToGetDataSetDocumentKeysException(errorMessage)
+        );
+    }
+
+    public async Task<DataSetDocumentPublication[]> GetDataSetDocumentPublications(
+        CancellationToken cancellationToken = default
+    )
+    {
+        var response = await Get<DataSetDocumentPublicationDto[]>(
+            GetDataSetDocumentPublicationsEndpoint,
+            cancellationToken
+        );
+
+        return Process(
+            response,
+            onSuccess: dtos => dtos.Select(dto => dto.ToModel()).ToArray(),
+            onError: errorMessage => new UnableToGetDataSetDocumentPublicationsException(errorMessage)
         );
     }
 
