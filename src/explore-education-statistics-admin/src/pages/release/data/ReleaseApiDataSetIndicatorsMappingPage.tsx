@@ -298,7 +298,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 renderSource={(source, mapping) => (
                   <>
                     {source.label}
-                    <ApiDataSetColumnName column={mapping.sourceKey} />
+                    {renderColumnName({ key: mapping.sourceKey })}
                   </>
                 )}
                 renderSourceDetailsStart={renderSourceColumnSummary}
@@ -375,7 +375,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     renderSource={(source, mapping) => (
                       <>
                         {source.label}
-                        <ApiDataSetColumnName column={mapping.sourceKey} />
+                        {renderColumnName({ key: mapping.sourceKey })}
                       </>
                     )}
                     renderSourceDetailsStart={renderSourceColumnSummary}
