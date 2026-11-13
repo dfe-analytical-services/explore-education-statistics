@@ -808,6 +808,7 @@ public class TableBuilderServiceTests
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
+                        It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject.SubjectId),
                         query,
                         It.IsAny<CancellationToken>()
                     )
@@ -1094,6 +1095,7 @@ public class TableBuilderServiceTests
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
+                        It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject.SubjectId),
                         query,
                         It.IsAny<CancellationToken>()
                     )
@@ -1232,6 +1234,7 @@ public class TableBuilderServiceTests
                             rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                             && rs.SubjectId == releaseSubject.SubjectId
                         ),
+                        It.Is<IStorageDataSet>(ds => ds.SubjectId == releaseSubject.SubjectId),
                         query,
                         It.IsAny<CancellationToken>()
                     )
