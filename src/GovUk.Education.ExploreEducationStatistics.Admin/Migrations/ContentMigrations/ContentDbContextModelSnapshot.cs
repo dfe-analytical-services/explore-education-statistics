@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1274,6 +1274,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("RolloverSourceReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(51)
@@ -1291,6 +1294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RolloverSourceReleaseId");
 
                     b.HasIndex("PublicationId", "Year", "TimePeriodCoverage", "Label")
                         .IsUnique();
@@ -1318,6 +1323,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
+
+                    b.Property<string>("PairedIndicators")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("PublicApiCompatible")
                         .HasColumnType("bit");
@@ -2424,7 +2432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "RolloverSourceRelease")
+                        .WithMany()
+                        .HasForeignKey("RolloverSourceReleaseId");
+
                     b.Navigation("Publication");
+
+                    b.Navigation("RolloverSourceRelease");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFile", b =>

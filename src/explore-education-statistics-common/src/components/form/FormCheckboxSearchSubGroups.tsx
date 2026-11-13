@@ -13,7 +13,7 @@ import styles from '@common/components/form/FormCheckboxSearchSubGroups.module.s
 import FormTextSearchInput from '@common/components/form//FormTextSearchInput';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useMounted from '@common/hooks/useMounted';
-import { OmitStrict } from '@common/types';
+import { Dictionary, OmitStrict } from '@common/types';
 import React, {
   MouseEvent,
   MouseEventHandler,
@@ -34,6 +34,12 @@ export interface FormCheckboxSearchSubGroupsProps extends OmitStrict<
   'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
 > {
   groupLabel?: string;
+  /**
+   * Option values to keep visible when searching, keyed by option value.
+   * An option is shown if its own label or any linked option's label
+   * matches the search term.
+   */
+  linkedOptionValues?: Dictionary<string[]>;
   options: OptionGroup[];
   searchLabel?: string;
   onAllChange?: (
@@ -49,6 +55,7 @@ export interface FormCheckboxSearchSubGroupsProps extends OmitStrict<
 }
 
 const FormCheckboxSearchSubGroups = ({
+  linkedOptionValues = {},
   searchLabel,
   onAllChange,
   onSubGroupAllChange,
@@ -90,21 +97,27 @@ const FormCheckboxSearchSubGroups = ({
   if (searchTerm) {
     const lowercaseSearchTerm = searchTerm.toLowerCase();
 
+    const matchingValues = new Set(
+      options
+        .flatMap(optionGroup => optionGroup.options)
+        .filter(option =>
+          option.label.toLowerCase().includes(lowercaseSearchTerm),
+        )
+        .map(option => option.value),
+    );
+
+    const isVisible = (option: CheckboxOption) =>
+      value.indexOf(option.value) > -1 ||
+      matchingValues.has(option.value) ||
+      (linkedOptionValues[option.value] ?? []).some(linkedValue =>
+        matchingValues.has(linkedValue),
+      );
+
     filteredOptions = options
-      .filter(optionGroup =>
-        optionGroup.options.some(
-          option =>
-            value.indexOf(option.value) > -1 ||
-            option.label.toLowerCase().includes(lowercaseSearchTerm),
-        ),
-      )
+      .filter(optionGroup => optionGroup.options.some(isVisible))
       .map(optionGroup => ({
         ...optionGroup,
-        options: optionGroup.options.filter(
-          option =>
-            value.indexOf(option.value) > -1 ||
-            option.label.toLowerCase().includes(lowercaseSearchTerm),
-        ),
+        options: optionGroup.options.filter(isVisible),
       }));
   }
 
@@ -113,25 +126,40 @@ const FormCheckboxSearchSubGroups = ({
     [options],
   );
 
-  const totalFilteredOptions = useMemo(
-    () => filteredOptions.reduce((acc, group) => acc + group.options.length, 0),
+  // Disabled options can't be selected on their own, so are left out of select all
+  const selectableFilteredOptions = useMemo(
+    () =>
+      filteredOptions.map(group => ({
+        ...group,
+        options: group.options.filter(option => !option.disabled),
+      })),
     [filteredOptions],
+  );
+
+  const totalFilteredOptions = useMemo(
+    () =>
+      selectableFilteredOptions.reduce(
+        (acc, group) => acc + group.options.length,
+        0,
+      ),
+    [selectableFilteredOptions],
   );
 
   const isAllChecked = useMemo(
     () =>
-      filteredOptions.every(group =>
+      totalFilteredOptions > 0 &&
+      selectableFilteredOptions.every(group =>
         group.options.every(option => value.includes(option.value)),
       ),
-    [filteredOptions, value],
+    [selectableFilteredOptions, totalFilteredOptions, value],
   );
 
   const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> =
     useCallback(
       event => {
-        onAllChange?.(event, isAllChecked, filteredOptions);
+        onAllChange?.(event, isAllChecked, selectableFilteredOptions);
       },
-      [isAllChecked, onAllChange, filteredOptions],
+      [isAllChecked, onAllChange, selectableFilteredOptions],
     );
 
   const renderCheckboxes = () => {
@@ -163,8 +191,8 @@ const FormCheckboxSearchSubGroups = ({
                     <VisuallyHidden>{` for ${optionGroup.legend}`}</VisuallyHidden>
                   </>
                 )}
-                onAllChange={(event, checked) => {
-                  onSubGroupAllChange?.(event, checked, optionGroup.options);
+                onAllChange={(event, checked, selectableOptions) => {
+                  onSubGroupAllChange?.(event, checked, selectableOptions);
                 }}
               />
             ))}
@@ -182,8 +210,8 @@ const FormCheckboxSearchSubGroups = ({
             }
             value={value}
             selectAll
-            onAllChange={(event, checked) => {
-              onSubGroupAllChange?.(event, checked, filteredOptions[0].options);
+            onAllChange={(event, checked, selectableOptions) => {
+              onSubGroupAllChange?.(event, checked, selectableOptions);
             }}
           />
         )}

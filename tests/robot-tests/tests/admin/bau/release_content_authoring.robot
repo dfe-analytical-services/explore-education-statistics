@@ -103,10 +103,10 @@ Switch to bau1 to add review comments for first text block
     ${editor}=    get editor    ${block}
     user sets focus to element    ${editor}
 
-    # Selects the rest of the line
     sleep    1    # Prevent intermittent failure where hitting END does not move to end
-    user presses keys    END    END    END    RETURN    Block 1 another sentence    SHIFT+HOME
-    sleep    0.1    # Prevent intermittent failure where toolbar button is disabled
+    user presses keys    END
+    sleep    1    # Prevent intermittent failure where RETURN is handled before the caret has moved to the end
+    user presses keys    RETURN    Block 1 another sentence    SHIFT+HOME
     user adds comment to selected text    ${block}    Test comment 2
 
     user checks list has x items    testid:comments-unresolved    2    ${block}

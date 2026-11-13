@@ -11,6 +11,7 @@ import composeProviders from '@common/hocs/composeProviders';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
+import getPublicEnv from '@frontend/utils/publicEnv';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -52,10 +53,10 @@ export default function App({ Component, pageProps, cookies }: Props) {
   const { getCookie } = useCookies(cookies);
 
   useMounted(() => {
-    if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
+    if (getPublicEnv('GA_TRACKING_ID') && getCookie('disableGA') !== 'true') {
       import('@frontend/services/googleAnalyticsService').then(
         ({ initGoogleAnalytics, logPageView }) => {
-          initGoogleAnalytics(process.env.GA_TRACKING_ID);
+          initGoogleAnalytics(getPublicEnv('GA_TRACKING_ID'));
 
           logPageView();
 
@@ -104,7 +105,7 @@ function ApplicationInsightsContextProvider({
 }) {
   return (
     <BaseApplicationInsightsContextProvider
-      instrumentationKey={process.env.APPINSIGHTS_INSTRUMENTATIONKEY}
+      instrumentationKey={getPublicEnv('APPINSIGHTS_INSTRUMENTATIONKEY')}
     >
       {children}
     </BaseApplicationInsightsContextProvider>

@@ -6,11 +6,11 @@ import { SearchStorageQueueNames } from '../types.bicep'
 @description('The URL of the Content API.')
 param contentApiUrl string
 
-@description('Storage container name for dataset documents in the Search storage account.')
-param datasetDocumentsContainerName string
+@description('Storage container name for data set documents in the Search storage account.')
+param dataSetDocumentsContainerName string
 
-@description('Name of the indexer associated with the \'Dataset\' index in Azure AI Search.')
-param datasetIndexerName string
+@description('Name of the indexer associated with the \'Data set\' index in Azure AI Search.')
+param dataSetIndexerName string
 
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
@@ -97,9 +97,9 @@ resource releaseDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServic
   name: releaseDocumentsContainerName
 }
 
-resource datasetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+resource dataSetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
   parent: searchBlobStorage
-  name: datasetDocumentsContainerName
+  name: dataSetDocumentsContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -122,8 +122,8 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: releaseDocumentsContainer.name
       }
       {
-        name: 'App__DatasetDocumentsContainerName'
-        value: datasetDocumentsContainer.name
+        name: 'App__DataSetDocumentsContainerName'
+        value: dataSetDocumentsContainer.name
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
@@ -134,8 +134,8 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: releaseIndexerName
       }
       {
-        name: 'AzureSearch__DatasetIndexerName'
-        value: datasetIndexerName
+        name: 'AzureSearch__DataSetIndexerName'
+        value: dataSetIndexerName
       }
       {
         name: 'ContentApi__Url'

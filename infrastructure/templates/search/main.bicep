@@ -39,14 +39,14 @@ param dataApiUrl string
 @description('Name of the \'Filter\' index in Azure AI Search.')
 param searchServiceFilterIndexName string = ''
 
-@description('Name of the \'Dataset\' index in Azure AI Search.')
-param searchServiceDatasetIndexName string = ''
+@description('Name of the \'Data set\' index in Azure AI Search.')
+param searchServiceDataSetIndexName string = ''
 
 @description('Name of the indexer associated with the \'Release\' index in Azure AI Search.')
 param searchServiceReleaseIndexerName string = ''
 
-@description('Name of the indexer associated with the \'Dataset\' index in Azure AI Search.')
-param searchServiceDatasetIndexerName string = ''
+@description('Name of the indexer associated with the \'Data set\' index in Azure AI Search.')
+param searchServiceDataSetIndexerName string = ''
 
 @description('Indicates whether API keys are permitted for authentication to Azure AI Search in addition to role-based access control (RBAC). Disabling API keys forces all clients to use RBAC only.')
 param searchServiceLocalAuthEnabled bool = false
@@ -101,7 +101,7 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchServiceFilterIndexName: searchServiceFilterIndexName
-    searchServiceDatasetIndexName: searchServiceDatasetIndexName
+    searchServiceDataSetIndexName: searchServiceDataSetIndexName
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
@@ -114,8 +114,8 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     contentApiUrl: contentApiUrl
-    datasetDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.datasetDocuments
-    datasetIndexerName: searchServiceDatasetIndexerName
+    dataSetDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.dataSetDocuments
+    dataSetIndexerName: searchServiceDataSetIndexerName
     functionAppFirewallRules: union(
       [
         {
@@ -168,5 +168,5 @@ output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceE
 output searchStorageAccountManagedIdentityConnectionString string = searchServiceModule.outputs.searchStorageAccountManagedIdentityConnectionString
 output releaseDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.releaseDocuments
 output nlSearchFunctionAppUrl string = nlSearchFunctionAppModule.outputs.functionAppUrl
-output datasetDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.datasetDocuments
+output dataSetDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.dataSetDocuments
 output filterDocumentsContainerName string = searchServiceModule.outputs.searchStorageDocumentContainers.filterDocuments

@@ -283,6 +283,49 @@ describe('FormCheckboxSearchSubGroups', () => {
     expect(checkboxes[0]).toHaveAttribute('value', '2');
   });
 
+  test('providing a search term also renders checkboxes linked to matching checkboxes', async () => {
+    render(
+      <FormCheckboxSearchSubGroups
+        name="testCheckboxes"
+        id="test-checkboxes"
+        legend="Choose options"
+        searchLabel="Search options"
+        value={[]}
+        linkedOptionValues={{ '1': ['3'], '3': ['1'] }}
+        options={[
+          {
+            legend: 'Group A',
+            options: [
+              { label: 'Checkbox 1', value: '1' },
+              { label: 'Checkbox 2', value: '2' },
+            ],
+          },
+          {
+            legend: 'Group B',
+            options: [
+              { label: 'Checkbox 3', value: '3' },
+              { label: 'Checkbox 4', value: '4' },
+            ],
+          },
+        ]}
+      />,
+    );
+
+    await userEvent.type(screen.getByLabelText('Search options'), '3');
+
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 2')).not.toBeInTheDocument(),
+    );
+
+    const checkboxes = screen.getAllByLabelText(
+      /Checkbox/,
+    ) as HTMLInputElement[];
+
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).toHaveAttribute('value', '1');
+    expect(checkboxes[1]).toHaveAttribute('value', '3');
+  });
+
   test('does not throw error if search term that is invalid regex is used', async () => {
     render(
       <FormCheckboxSearchSubGroups

@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class AzureSearchHealthCheckStrategyTests
 {
     private const string ReleaseIndexerName = "release-indexer-name";
-    private const string DatasetIndexerName = "dataset-indexer-name";
+    private const string DataSetIndexerName = "dataset-indexer-name";
 
     private readonly SearchIndexClientMockBuilder _searchIndexClientMockBuilder = new();
 
@@ -16,7 +16,7 @@ public class AzureSearchHealthCheckStrategyTests
     {
         SearchServiceEndpoint = "https://example.search.windows.net/",
         ReleaseIndexerName = ReleaseIndexerName,
-        DatasetIndexerName = DatasetIndexerName,
+        DataSetIndexerName = DataSetIndexerName,
     };
 
     private AzureSearchHealthCheckStrategy GetSut() =>
@@ -45,14 +45,14 @@ public class AzureSearchHealthCheckStrategyTests
             healthCheckResult.Message
         );
         Assert.Contains(
-            $"Connection to Dataset Azure Search Indexer '{DatasetIndexerName}':OK.",
+            $"Connection to Data Set Azure Search Indexer '{DataSetIndexerName}':OK.",
             healthCheckResult.Message
         );
     }
 
     [Theory]
     [InlineData(ReleaseIndexerName, "Release")]
-    [InlineData(DatasetIndexerName, "Dataset")]
+    [InlineData(DataSetIndexerName, "Data Set")]
     public async Task WhenIndexerNotFound_ThenShouldRespondIsUnhealthy(string indexerName, string description)
     {
         // ARRANGE
@@ -80,7 +80,7 @@ public class AzureSearchHealthCheckStrategyTests
         // ASSERT
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            $"Connection to Dataset Azure Search Indexer '{DatasetIndexerName}':OK.",
+            $"Connection to Data Set Azure Search Indexer '{DataSetIndexerName}':OK.",
             healthCheckResult.Message
         );
     }
@@ -89,7 +89,7 @@ public class AzureSearchHealthCheckStrategyTests
     public async Task WhenIndexerCheckThrows_ThenShouldRespondIsUnhealthy()
     {
         // ARRANGE
-        _searchIndexClientMockBuilder.WhereIndexerExistsThrowsFor(DatasetIndexerName);
+        _searchIndexClientMockBuilder.WhereIndexerExistsThrowsFor(DataSetIndexerName);
         var sut = GetSut();
 
         // ACT
@@ -98,7 +98,7 @@ public class AzureSearchHealthCheckStrategyTests
         // ASSERT
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            $"Error occurred whilst trying to run health check for Dataset Azure Search Indexer '{DatasetIndexerName}': Indexer exists check failed",
+            $"Error occurred whilst trying to run health check for Data Set Azure Search Indexer '{DataSetIndexerName}': Indexer exists check failed",
             healthCheckResult.Message
         );
     }
@@ -110,7 +110,7 @@ public class AzureSearchHealthCheckStrategyTests
         _azureSearchOptions = new AzureSearchOptions
         {
             SearchServiceEndpoint = _azureSearchOptions.SearchServiceEndpoint,
-            DatasetIndexerName = DatasetIndexerName,
+            DataSetIndexerName = DataSetIndexerName,
         };
         var sut = GetSut();
 
@@ -123,7 +123,7 @@ public class AzureSearchHealthCheckStrategyTests
     }
 
     [Fact]
-    public async Task WhenDatasetIndexerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
+    public async Task WhenDataSetIndexerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
     {
         // ARRANGE
         _azureSearchOptions = new AzureSearchOptions
@@ -138,6 +138,6 @@ public class AzureSearchHealthCheckStrategyTests
 
         // ASSERT
         Assert.False(healthCheckResult.IsHealthy);
-        Assert.Contains("Azure Search Dataset Indexer Name is not configured.", healthCheckResult.Message);
+        Assert.Contains("Azure Search Data Set Indexer Name is not configured.", healthCheckResult.Message);
     }
 }

@@ -676,7 +676,8 @@ user adds comment to selected text
     [Arguments]    ${block}    ${text}
     ${toolbar}=    get editor toolbar    ${block}
     ${button}=    user gets button element    Add comment    ${toolbar}
-    user checks element does not have class    ${button}    ck-disabled
+    wait until keyword succeeds    %{WAIT_SMALL}    0.2s
+    ...    user checks element does not have class    ${button}    ck-disabled
     user clicks element    ${button}
 
     ${comments}=    get comments sidebar    ${block}

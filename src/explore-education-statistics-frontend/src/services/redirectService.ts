@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import { Dictionary } from '@common/types';
 
 export interface Redirects {
@@ -13,7 +14,7 @@ interface Redirect {
   toSlug: string;
 }
 
-const contentApiUrl = process.env.CONTENT_API_BASE_URL;
+const contentApiUrl = getPublicEnv('CONTENT_API_BASE_URL');
 
 const redirectService = {
   async list(): Promise<Redirects> {

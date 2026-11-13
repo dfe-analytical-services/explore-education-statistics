@@ -31,14 +31,14 @@ jobs:
         value: 'default'
       - name: searchServiceReleaseIndexerOutputFieldMappingsFilePath
         value: $(templateDirectory)/application/indexer-output-field-mappings/search/${{ variables.searchServiceReleaseIndexName }}.json
-      # 'Dataset' variables
-      - name: searchServiceDatasetIndexName
+      # 'Data set' variables
+      - name: searchServiceDataSetIndexName
         value: 'nl-search-dataset-index'
-      - name: searchServiceDatasetIndexDefinitionFilePath
-        value: $(templateDirectory)/application/indexes/nl-search/${{ variables.searchServiceDatasetIndexName }}.json
-      - name: searchServiceDatasetIndexerName
-        value: ${{ variables.searchServiceDatasetIndexName }}-indexer
-      - name: searchServiceDatasetIndexerParsingMode
+      - name: searchServiceDataSetIndexDefinitionFilePath
+        value: $(templateDirectory)/application/indexes/nl-search/${{ variables.searchServiceDataSetIndexName }}.json
+      - name: searchServiceDataSetIndexerName
+        value: ${{ variables.searchServiceDataSetIndexName }}-indexer
+      - name: searchServiceDataSetIndexerParsingMode
         value: 'json'
       # 'Filter' variables
       - name: searchServiceFilterIndexName
@@ -68,9 +68,9 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
                 searchServiceFilterIndexName: ${{ variables.searchServiceFilterIndexName }}
-                searchServiceDatasetIndexName: ${{ variables.searchServiceDatasetIndexName }}
+                searchServiceDataSetIndexName: ${{ variables.searchServiceDataSetIndexName }}
                 searchServiceReleaseIndexerName: ${{ variables.searchServiceReleaseIndexerName }}
-                searchServiceDatasetIndexerName: ${{ variables.searchServiceDatasetIndexerName }}
+                searchServiceDataSetIndexerName: ${{ variables.searchServiceDataSetIndexerName }}
 
             - template: ../tasks/deploy-bicep.yml
               parameters:
@@ -79,9 +79,9 @@ jobs:
                 serviceConnection: ${{ parameters.serviceConnection }}
                 parameterFile: $(paramFile)
                 searchServiceFilterIndexName: ${{ variables.searchServiceFilterIndexName }}
-                searchServiceDatasetIndexName: ${{ variables.searchServiceDatasetIndexName }}
+                searchServiceDataSetIndexName: ${{ variables.searchServiceDataSetIndexName }}
                 searchServiceReleaseIndexerName: ${{ variables.searchServiceReleaseIndexerName }}
-                searchServiceDatasetIndexerName: ${{ variables.searchServiceDatasetIndexerName }}
+                searchServiceDataSetIndexerName: ${{ variables.searchServiceDataSetIndexerName }}
 
             - template: ../../../../common/ci/tasks/bicep-output-variables.yml
               parameters:
@@ -103,7 +103,7 @@ jobs:
                 indexerParsingMode: ${{ variables.searchServiceReleaseIndexerParsingMode }}
                 searchServiceEndpoint: $(searchServiceEndpoint)
 
-            # Deploy Azure AI Search index/indexer/data source configuration for 'Dataset' documents
+            # Deploy Azure AI Search index/indexer/data source configuration for 'Data set' documents
             - template: ../tasks/deploy-search-service-config.yml
               parameters:
                 serviceConnection: ${{ parameters.serviceConnection }}
@@ -111,11 +111,11 @@ jobs:
                   - $(publicSiteUrl)
                   - 'http://localhost:3000'
                 dataSourceConnectionString: $(searchStorageAccountManagedIdentityConnectionString)
-                dataSourceContainerName: $(datasetDocumentsContainerName)
-                indexName: ${{ variables.searchServiceDatasetIndexName }}
-                indexDefinitionFilePath: ${{ variables.searchServiceDatasetIndexDefinitionFilePath }}
-                indexerName: ${{ variables.searchServiceDatasetIndexerName }}
-                indexerParsingMode: ${{ variables.searchServiceDatasetIndexerParsingMode }}
+                dataSourceContainerName: $(dataSetDocumentsContainerName)
+                indexName: ${{ variables.searchServiceDataSetIndexName }}
+                indexDefinitionFilePath: ${{ variables.searchServiceDataSetIndexDefinitionFilePath }}
+                indexerName: ${{ variables.searchServiceDataSetIndexerName }}
+                indexerParsingMode: ${{ variables.searchServiceDataSetIndexerParsingMode }}
                 searchServiceEndpoint: $(searchServiceEndpoint)
 
             # Deploy Azure AI Search index/indexer/data source configuration for 'Filter' documents
