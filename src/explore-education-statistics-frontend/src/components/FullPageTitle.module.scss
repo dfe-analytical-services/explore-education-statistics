@@ -1,6 +1,6 @@
 @use '~govuk-frontend/dist/govuk/base' as *;
 
-.releasePageTitle {
+.dataSetPageTitle {
   flex: 1 1 80%;
 
   @include govuk-media-query($from: tablet) {

@@ -1,36 +1,57 @@
 @use '~govuk-frontend/dist/govuk/base' as *;
 
-.info {
-  background-color: govuk-colour('black', $variant: 'tint-95');
-  margin-bottom: govuk-spacing(4);
-  padding: govuk-spacing(3);
+.titleWrap {
+  display: flex;
+  justify-content: space-between;
+  gap: govuk-spacing(2);
+  margin-bottom: govuk-spacing(1);
 
   @include govuk-media-query($from: tablet) {
-    align-items: center;
-    display: flex;
+    margin-bottom: govuk-spacing(6);
   }
 }
 
-.infoSectionHeading {
-  color: govuk-colour('black', $variant: 'tint-25');
-  display: block;
+.infoRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  row-gap: govuk-spacing(4);
+  column-gap: govuk-spacing(5);
+  margin-bottom: govuk-spacing(5);
+}
+
+.infoContainer {
+  background-color: govuk-colour('blue', $variant: 'tint-95');
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: govuk-spacing(6);
+  row-gap: govuk-spacing(4);
+  margin-bottom: govuk-spacing(8);
+  padding: govuk-spacing(4);
 
   @include govuk-media-query($until: tablet) {
-    margin-top: govuk-spacing(2);
+    @include govuk-font-size($size: 16);
+    margin-bottom: govuk-spacing(5);
   }
 }
 
-.infoDownloadButton {
-  margin-left: auto;
-
-  @include govuk-media-query($until: tablet) {
-    margin-top: govuk-spacing(2);
-  }
+.infoList {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: govuk-spacing(6);
+  row-gap: govuk-spacing(3);
+  margin-block: 0;
 }
 
-.subscribeContainer {
-  @include govuk-media-query($from: tablet) {
-    align-items: flex-start;
-    display: flex;
-  }
+.infoListItemTerm {
+  font-weight: normal;
+  color: govuk-functional-colour(secondary-text);
+}
+
+.infoListItemDefinition {
+  margin: 0;
 }

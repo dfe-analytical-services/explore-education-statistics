@@ -1,47 +1,45 @@
-import Button from '@common/components/Button';
-import PlainTextContent from '@common/components/PlainTextContent';
 import FormattedDate from '@common/components/FormattedDate';
 import PageNav, { NavItem } from '@common/components/PageNav';
-import SectionBreak from '@common/components/SectionBreak';
 import Tag from '@common/components/Tag';
+import WarningMessage from '@common/components/WarningMessage';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
-import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
+import downloadService from '@common/services/downloadService';
+import logger from '@common/services/logger';
 import { PublicationSummary } from '@common/services/publicationService';
+import { ApiDataSetVersionChanges } from '@common/services/types/apiDataSetChanges';
 import { Dictionary } from '@common/types';
+import isPatchVersion from '@common/utils/isPatchVersion';
+import FullPageTitle from '@frontend/components/FullPageTitle';
 import Page from '@frontend/components/Page';
-import SubscribeLink from '@frontend/components/SubscribeLink';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import DataSetFileApiChangelog from '@frontend/modules/data-catalogue/components/DataSetFileApiChangelog';
 import DataSetFileApiQuickStart from '@frontend/modules/data-catalogue/components/DataSetFileApiQuickStart';
 import DataSetFileApiVersionHistory from '@frontend/modules/data-catalogue/components/DataSetFileApiVersionHistory';
+import DataSetFileContact from '@frontend/modules/data-catalogue/components/DataSetFileContact';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
 import DataSetFileFootnotes from '@frontend/modules/data-catalogue/components/DataSetFileFootnotes';
 import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
+import DataSetFileQuickLinks from '@frontend/modules/data-catalogue/components/DataSetFileQuickLinks';
 import DataSetFileUsage from '@frontend/modules/data-catalogue/components/DataSetFileUsage';
 import DataSetFileVariables from '@frontend/modules/data-catalogue/components/DataSetFileVariables';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import getDataSetFileMetaCSVW from '@frontend/modules/data-catalogue/utils/getDataSetFileMetaCSVW';
-import DataSetFileContact from '@frontend/modules/data-catalogue/components/DataSetFileContact';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import apiDataSetQueries from '@frontend/queries/apiDataSetQueries';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
+import publicationQueries from '@frontend/queries/publicationQueries';
 import {
   ApiDataSet,
   ApiDataSetVersion,
 } from '@frontend/services/apiDataSetService';
-import downloadService from '@common/services/downloadService';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import publicationQueries from '@frontend/queries/publicationQueries';
 import { dehydrate, QueryClient } from '@tanstack/react-query';
-import classNames from 'classnames';
-import { GetServerSideProps } from 'next';
-import isPatchVersion from '@common/utils/isPatchVersion';
-import React, { useEffect, useMemo, useState } from 'react';
 import omit from 'lodash/omit';
-import WarningMessage from '@common/components/WarningMessage';
-import logger from '@common/services/logger';
+import { GetServerSideProps } from 'next';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 
 export const pageBaseSections = {
   dataSetDetails: 'Data set details',
@@ -66,6 +64,28 @@ export const pageSections = {
 export type PageSections = typeof pageSections;
 export type PageSectionId = keyof PageSections;
 
+interface InfoListItemProps {
+  children: ReactNode;
+  term: string;
+}
+
+const InfoListItem = ({ children, term }: InfoListItemProps) => {
+  return (
+    <div className={styles.infoListItem} data-testid={term}>
+      <dt className={styles.infoListItemTerm} data-testid={`${term}-key`}>
+        {term}
+      </dt>
+
+      <dd
+        className={styles.infoListItemDefinition}
+        data-testid={`${term}-value`}
+      >
+        {children}
+      </dd>
+    </div>
+  );
+};
+
 interface Props {
   apiDataSet?: ApiDataSet;
   apiDataSetVersion?: ApiDataSetVersion;
@@ -81,6 +101,8 @@ export default function DataSetFilePage({
   dataSetFile,
   publicationSummary,
 }: Props) {
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
   const [activeSection, setActiveSection] =
     useState<PageSectionId>('dataSetDetails');
   const [fullScreenPreview, toggleFullScreenPreview] = useToggle(false);
@@ -169,17 +191,37 @@ export default function DataSetFilePage({
   if (!dataSetFile) {
     return <NotFoundPage />;
   }
+
   const { file, release, summary, title } = dataSetFile;
+
+  const tableToolLink = `/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`;
 
   return (
     <Page
       title={title}
-      caption={`Data set from ${release.publication.title}`}
       breadcrumbs={[{ name: 'Data catalogue', link: '/data-catalogue' }]}
-      width={fullScreenPreview ? 'full' : undefined}
+      width={fullScreenPreview ? 'full' : 'wide'}
       pageMeta={{
         additionalMeta: [getDataSetFileMetaCSVW({ dataSetFile })],
       }}
+      pageTitleComponent={
+        <div className={styles.titleWrap}>
+          <FullPageTitle
+            caption={`Data set from ${release.publication.title}`}
+            summary={summary}
+            title={title}
+          />
+
+          {/* TODO needs test checking rendering */}
+          {!isMobileMedia && (
+            <DataSetFileQuickLinks
+              subscribeFileId={apiDataSet ? dataSetFile.id : undefined}
+              handleDownload={handleDownload}
+              tableToolLink={tableToolLink}
+            />
+          )}
+        </div>
+      }
     >
       {fullScreenPreview ? (
         <DataSetFilePreview
@@ -189,56 +231,54 @@ export default function DataSetFilePage({
         />
       ) : (
         <>
-          <div className={styles.info} data-testid="data-set-file-info">
+          <div className={styles.infoRow} data-testid="data-set-file-info-row">
             {release.isLatestPublishedRelease && !release.isSuperseded ? (
-              <Tag className="govuk-!-margin-right-5">Latest data</Tag>
+              <Tag>Latest data</Tag>
             ) : (
-              <Tag className="govuk-!-margin-right-5" colour="orange">
-                Not the latest data
-              </Tag>
+              <Tag colour="orange">Not the latest data</Tag>
             )}
-            {apiDataSetVersion && (
-              <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
-                <span className={styles.infoSectionHeading}>
-                  API data set version
-                </span>{' '}
-                {apiDataSetVersion.version}
-              </div>
-            )}
-            <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
-              <span className={styles.infoSectionHeading}>Published</span>{' '}
-              <FormattedDate format="d MMMM yyyy">
-                {release.published}
-              </FormattedDate>
-            </div>
-            <div className="govuk-!-font-size-16 govuk-!-margin-right-5">
-              <span className={styles.infoSectionHeading}>Last updated</span>{' '}
-              <FormattedDate format="d MMMM yyyy">
-                {release.lastUpdated}
-              </FormattedDate>
-            </div>
 
-            <Button
-              className={classNames(
-                'govuk-!-margin-bottom-0',
-                styles.infoDownloadButton,
-              )}
-              onClick={handleDownload}
-            >
-              Download data set (ZIP)
-            </Button>
+            {/* TODO needs test adding */}
+            {apiDataSet && (
+              <a
+                href="#apiVersionHistory"
+                className="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
+              >
+                API data set versions
+              </a>
+            )}
           </div>
 
-          <div className={styles.subscribeContainer}>
-            <PlainTextContent className="dfe-flex-grow--1" text={summary} />
-            {apiDataSet && (
-              <SubscribeLink
-                url={`/api-subscriptions/new-subscription/${dataSetFile.id}`}
+          <div
+            data-testid="data-set-file-info-container"
+            className={styles.infoContainer}
+          >
+            <dl className={styles.infoList}>
+              {apiDataSetVersion && (
+                <InfoListItem term="API data set version">
+                  {apiDataSetVersion.version}
+                </InfoListItem>
+              )}
+              <InfoListItem term="Published">
+                <FormattedDate format="d MMMM yyyy">
+                  {release.published}
+                </FormattedDate>
+              </InfoListItem>
+              <InfoListItem term="Last updated">
+                <FormattedDate format="d MMMM yyyy">
+                  {release.lastUpdated}
+                </FormattedDate>
+              </InfoListItem>
+            </dl>
+
+            {isMobileMedia && (
+              <DataSetFileQuickLinks
+                subscribeFileId={apiDataSet ? dataSetFile.id : undefined}
+                handleDownload={handleDownload}
+                tableToolLink={tableToolLink}
               />
             )}
           </div>
-
-          <SectionBreak size="l" />
 
           <div className="govuk-grid-row">
             <PageNav
@@ -273,7 +313,7 @@ export default function DataSetFilePage({
               <DataSetFileUsage
                 dataSetFileId={dataSetFile.id}
                 hasApiDataSet={!!apiDataSet}
-                tableToolLink={`/data-tables/${release.publication.slug}/${release.slug}?subjectId=${file.subjectId}`}
+                tableToolLink={tableToolLink}
                 onDownload={handleDownload}
               />
 
