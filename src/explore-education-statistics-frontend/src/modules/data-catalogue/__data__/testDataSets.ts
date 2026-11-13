@@ -212,6 +212,15 @@ export const testDataSetFile: DataSetFile = {
       themeTitle: 'Theme 1',
       title: 'Publication 1',
     },
+    publishingOrganisations: [
+      {
+        id: 'organisation-1',
+        title: 'Department for Education',
+        url: 'https://www.gov.uk/government/organisations/department-for-education',
+        useGISLogo: true,
+        logoFileName: 'dfe-logo.png',
+      },
+    ],
     published: new Date('2024-01-01'),
     lastUpdated: '2023-12-01',
     slug: 'release-1-slug',

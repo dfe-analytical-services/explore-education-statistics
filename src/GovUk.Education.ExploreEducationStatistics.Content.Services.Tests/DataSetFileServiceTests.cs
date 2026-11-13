@@ -433,6 +433,13 @@ public class DataSetFileServiceTests
 
             var releaseVersion = publication.Releases[0].Versions[0];
 
+            // Added in non-alphabetical order to check that DfE is ordered first
+            Organisation skillsEngland = _dataFixture.DefaultOrganisation().WithTitle("Skills England");
+            Organisation departmentForEducation = _dataFixture
+                .DefaultOrganisation()
+                .WithTitle(Organisation.DepartmentForEducationTitle);
+            releaseVersion.PublishingOrganisations = [skillsEngland, departmentForEducation];
+
             ReleaseFile releaseFile = _dataFixture
                 .DefaultReleaseFile()
                 .WithReleaseVersion(releaseVersion)
@@ -516,6 +523,10 @@ public class DataSetFileServiceTests
                 Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
                 Assert.Equal(publication.Theme.Title, viewModel.Release.Publication.ThemeTitle);
 
+                Assert.Equal(2, viewModel.Release.PublishingOrganisations.Count);
+                AssertOrganisation(departmentForEducation, viewModel.Release.PublishingOrganisations[0]);
+                AssertOrganisation(skillsEngland, viewModel.Release.PublishingOrganisations[1]);
+
                 Assert.Equal(releaseFile.FileId, viewModel.File.Id);
                 Assert.Equal(releaseFile.File.Filename, viewModel.File.Name);
                 Assert.Equal(releaseFile.File.DisplaySize(), viewModel.File.Size);
@@ -566,6 +577,76 @@ public class DataSetFileServiceTests
                 Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api.Id);
                 Assert.Equal("2.1", viewModel.Api.Version);
             }
+        }
+
+        [Fact]
+        public async Task NoPublishingOrganisations_ReturnsEmptyList()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)])
+                .WithTheme(_dataFixture.DefaultTheme());
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(releaseVersion)
+                .WithFile(_dataFixture.DefaultFile(FileType.Data));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
+            releaseVersionRepository
+                .Setup(s => s.IsLatestPublishedReleaseVersion(releaseVersion.Id, CancellationToken.None))
+                .ReturnsAsync(true);
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(MockBehavior.Strict);
+            releaseFileBlobService
+                .Setup(s =>
+                    s.GetDownloadStream(It.Is<ReleaseFile>(rf => rf.Id == releaseFile.Id), CancellationToken.None)
+                )
+                .ReturnsAsync("col_1\n1".ToStream());
+
+            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+            footnoteRepository
+                .Setup(s => s.GetFootnotes(releaseVersion.Id, releaseFile.File.SubjectId))
+                .ReturnsAsync([]);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupService(
+                    contentDbContext,
+                    releaseVersionRepository: releaseVersionRepository.Object,
+                    releaseFileBlobService: releaseFileBlobService.Object,
+                    footnoteRepository: footnoteRepository.Object
+                );
+
+                var result = await service.GetDataSetFile(
+                    releaseFile.File.DataSetFileId!.Value,
+                    CancellationToken.None
+                );
+
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel.Release.PublishingOrganisations);
+            }
+        }
+
+        private static void AssertOrganisation(Organisation expected, DataSetFileOrganisationViewModel actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.UseGISLogo, actual.UseGISLogo);
+            Assert.Equal(expected.GISLogoHexCode, actual.GISLogoHexCode);
+            Assert.Equal(expected.LogoFileName, actual.LogoFileName);
         }
 
         [Fact]

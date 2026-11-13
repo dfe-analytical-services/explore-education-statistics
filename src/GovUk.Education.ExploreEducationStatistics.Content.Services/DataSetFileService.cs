@@ -196,6 +196,7 @@ public class DataSetFileService(
         var releaseFile = await contentDbContext
             .ReleaseFiles.Include(rf => rf.ReleaseVersion.Release.Publication.Theme)
             .Include(rf => rf.ReleaseVersion.Release.Publication.SupersededBy)
+            .Include(rf => rf.ReleaseVersion.PublishingOrganisations)
             .Include(rf => rf.File.DataSetFileVersionGeographicLevels)
             .Where(rf =>
                 rf.File.DataSetFileId == dataSetFileId
@@ -257,6 +258,10 @@ public class DataSetFileService(
                     Slug = releaseFile.ReleaseVersion.Release.Publication.Slug,
                     ThemeTitle = releaseFile.ReleaseVersion.Release.Publication.Theme.Title,
                 },
+                PublishingOrganisations = releaseFile
+                    .ReleaseVersion.PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
+                    .Select(DataSetFileOrganisationViewModel.FromOrganisation)
+                    .ToList(),
             },
             File = new DataSetFileFileViewModel
             {

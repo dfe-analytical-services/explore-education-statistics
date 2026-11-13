@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -1880,6 +1881,8 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
         [Fact]
         public async Task FetchDataSetDetails_Success()
         {
+            Organisation publishingOrganisation = DataFixture.DefaultOrganisation().WithTitle("Skills England");
+
             Publication publication = DataFixture
                 .DefaultPublication()
                 .WithReleases([
@@ -1889,7 +1892,8 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
                             DataFixture
                                 .DefaultReleaseVersion()
                                 .WithPublished(DateTimeOffset.Parse("2026-01-01T09:30:00 +00:00"))
-                                .WithPublishedDisplayDate(DateTimeOffset.Parse("2025-02-15T09:30:00 +00:00")),
+                                .WithPublishedDisplayDate(DateTimeOffset.Parse("2025-02-15T09:30:00 +00:00"))
+                                .WithPublishingOrganisations([publishingOrganisation]),
                         ]),
                 ])
                 .WithTheme(DataFixture.DefaultTheme());
@@ -1944,6 +1948,17 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             var response = await GetDataSetFile(releaseFile.File.DataSetFileId!.Value);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
 
+            // Check the raw JSON property names, as the frontend relies on this casing
+            // and deserialising into the view model is case-insensitive
+            var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+            var organisationJson = Assert.IsType<JObject>(
+                Assert.Single(Assert.IsType<JArray>(json["release"]?["publishingOrganisations"]))
+            );
+            Assert.Equal(
+                ["id", "title", "url", "useGISLogo", "gisLogoHexCode", "logoFileName"],
+                organisationJson.Properties().Select(p => p.Name).ToArray()
+            );
+
             Assert.Equal(releaseFile.Name, viewModel.Title);
             Assert.Equal(releaseFile.Summary, viewModel.Summary);
 
@@ -1966,6 +1981,14 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
             Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
             Assert.Equal(publication.Theme.Title, viewModel.Release.Publication.ThemeTitle);
+
+            var organisation = Assert.Single(viewModel.Release.PublishingOrganisations);
+            Assert.Equal(publishingOrganisation.Id, organisation.Id);
+            Assert.Equal(publishingOrganisation.Title, organisation.Title);
+            Assert.Equal(publishingOrganisation.Url, organisation.Url);
+            Assert.Equal(publishingOrganisation.UseGISLogo, organisation.UseGISLogo);
+            Assert.Equal(publishingOrganisation.GISLogoHexCode, organisation.GISLogoHexCode);
+            Assert.Equal(publishingOrganisation.LogoFileName, organisation.LogoFileName);
 
             Assert.NotNull(viewModel.Api);
             Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api.Id);

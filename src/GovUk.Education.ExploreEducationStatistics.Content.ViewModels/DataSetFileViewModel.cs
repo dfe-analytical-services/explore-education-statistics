@@ -54,6 +54,34 @@ public record DataSetFileReleaseViewModel
     public DateTime LastUpdated { get; init; }
 
     public required DataSetFilePublicationViewModel Publication { get; init; }
+
+    public required List<DataSetFileOrganisationViewModel> PublishingOrganisations { get; init; } = [];
+}
+
+public record DataSetFileOrganisationViewModel
+{
+    public required Guid Id { get; init; }
+
+    public required string Title { get; init; }
+
+    public required string Url { get; init; }
+
+    public required bool UseGISLogo { get; init; }
+
+    public string? GISLogoHexCode { get; init; }
+
+    public required string LogoFileName { get; init; }
+
+    public static DataSetFileOrganisationViewModel FromOrganisation(Organisation organisation) =>
+        new()
+        {
+            Id = organisation.Id,
+            Title = organisation.Title,
+            Url = organisation.Url,
+            UseGISLogo = organisation.UseGISLogo,
+            GISLogoHexCode = organisation.GISLogoHexCode,
+            LogoFileName = organisation.LogoFileName,
+        };
 }
 
 public record DataSetFileFileViewModel

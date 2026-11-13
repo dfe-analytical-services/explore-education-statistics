@@ -5,13 +5,14 @@ export default function OfficialStatisticsInDevelopmentSection({
   publishingOrganisations,
   showHeading = true,
 }: ReleaseTypeSectionProps) {
-  const isSkillsEngland = !!publishingOrganisations.find(
-    org => org.title === 'Skills England',
-  );
+  const isSkillsEnglandOnlyPublisher =
+    publishingOrganisations.length === 1 &&
+    publishingOrganisations[0].title === 'Skills England';
+
   return (
     <>
       {showHeading && <h3>Official statistics in development</h3>}
-      {isSkillsEngland ? (
+      {isSkillsEnglandOnlyPublisher ? (
         <p>
           These statistics are undergoing a development. They have been
           developed by Skills England under the guidance of Skills England Lead
@@ -44,7 +45,7 @@ export default function OfficialStatisticsInDevelopmentSection({
         <li>well explained and readily accessible</li>
       </ul>
 
-      {isSkillsEngland ? (
+      {isSkillsEnglandOnlyPublisher ? (
         <p>
           Find out more about the standards we follow to produce these
           statistics through our{' '}
