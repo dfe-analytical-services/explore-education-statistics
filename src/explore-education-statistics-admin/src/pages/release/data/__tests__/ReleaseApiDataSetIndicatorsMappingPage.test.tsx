@@ -219,6 +219,155 @@ describe('ReleaseApiDataSetIndicatorsMappingPage', () => {
     );
   });
 
+  test('renders column names in the mappings tables', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    // Mappable indicators
+    const mappableRows = within(
+      screen.getByTestId('mappable-table-default'),
+    ).getAllByRole('row');
+
+    const mappedRowCells = within(mappableRows[1]).getAllByRole('cell');
+    expect(mappedRowCells[0]).toHaveTextContent(
+      'Indicator 2Column: Indicator2',
+    );
+    expect(mappedRowCells[1]).toHaveTextContent(
+      'Indicator 2 column name updatedColumn: Indicator2Updated',
+    );
+
+    const unmappedRowCells = within(mappableRows[3]).getAllByRole('cell');
+    expect(unmappedRowCells[0]).toHaveTextContent(
+      'Indicator 4Column: Indicator4Deleted',
+    );
+
+    // New indicators
+    const newRowCells = within(
+      within(screen.getByTestId('new-items-table-default')).getAllByRole(
+        'row',
+      )[1],
+    ).getAllByRole('cell');
+    expect(newRowCells[1]).toHaveTextContent(
+      'Indicator 6 newColumn: Indicator6New',
+    );
+
+    // Auto-mapped indicators
+    const autoMappedRowCells = within(
+      within(screen.getByTestId('auto-mapped-table-default')).getAllByRole(
+        'row',
+      )[1],
+    ).getAllByRole('cell');
+    expect(autoMappedRowCells[0]).toHaveTextContent(
+      'Indicator 1Column: Indicator1',
+    );
+    expect(autoMappedRowCells[1]).toHaveTextContent(
+      'Indicator 1 label updatedColumn: Indicator1',
+    );
+  });
+
+  test('renders column names in the mapping modal', async () => {
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue(
+      testIndicatorsMapping,
+    );
+
+    const { user } = renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Map indicator for Indicator 2' }),
+    );
+
+    const modal = within(await screen.findByRole('dialog'));
+
+    // Current data set summary - column is listed first
+    const terms = modal.getAllByRole('term');
+    expect(terms).toHaveLength(3);
+    expect(terms[0]).toHaveTextContent('Column');
+    expect(terms[1]).toHaveTextContent('Label');
+    expect(terms[2]).toHaveTextContent('Identifier');
+
+    expect(modal.getByTestId('Column')).toHaveTextContent('Indicator2');
+    expect(modal.getByTestId('Label')).toHaveTextContent('Indicator 2');
+    expect(modal.getByTestId('Identifier')).toHaveTextContent(
+      'indicator-2-public-id',
+    );
+
+    // Radio options - current candidate and new indicators
+    expect(
+      modal.getByLabelText('Indicator 2 column name updated'),
+    ).toHaveAccessibleDescription('Column: Indicator2Updated');
+    expect(modal.getByLabelText('Indicator 6 new')).toHaveAccessibleDescription(
+      'Column: Indicator6New',
+    );
+  });
+
+  test('searching auto mapped indicators by column name', async () => {
+    // The search bar is only shown when there are more
+    // auto mapped items than fit on a single page (10).
+    const columns = Array.from(
+      { length: 11 },
+      (_, index) => `indicator_column_${index + 1}`,
+    );
+
+    apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
+    apiDataSetVersionService.getIndicatorsMapping.mockResolvedValue({
+      candidates: Object.fromEntries(
+        columns.map((column, index) => [
+          column,
+          { label: `Indicator ${index + 1}` },
+        ]),
+      ),
+      mappings: Object.fromEntries(
+        columns.map((column, index) => [
+          column,
+          {
+            candidateKey: column,
+            publicId: `indicator-${index + 1}-public-id`,
+            source: { label: `Indicator ${index + 1}` },
+            type: 'AutoMapped',
+          },
+        ]),
+      ),
+    });
+
+    const { user } = renderPage();
+
+    expect(await screen.findByText('Data set title')).toBeInTheDocument();
+
+    const autoMappedTable = screen.getByTestId('auto-mapped-table-default');
+    expect(within(autoMappedTable).getAllByRole('row')).toHaveLength(11);
+
+    await user.type(
+      screen.getByLabelText(/Search auto mapped indicators/),
+      'indicator_column_2',
+    );
+
+    await waitFor(() => {
+      expect(
+        within(screen.getByTestId('auto-mapped-table-default')).getAllByRole(
+          'row',
+        ),
+      ).toHaveLength(2);
+    });
+
+    const rowCells = within(
+      within(screen.getByTestId('auto-mapped-table-default')).getAllByRole(
+        'row',
+      )[1],
+    ).getAllByRole('cell');
+    expect(rowCells[0]).toHaveTextContent(
+      'Indicator 2Column: indicator_column_2',
+    );
+  });
+
   test('renders the navigation correctly', async () => {
     apiDataSetService.getDataSet.mockResolvedValue(testDataSet);
     apiDataSetVersionService.getFiltersMapping.mockResolvedValue(
