@@ -35,6 +35,9 @@ param connectionStringSecret {
 @description('Whether the storage account is accessible from the public internet')
 param publicNetworkAccessEnabled bool = false
 
+@description('Whether the storage account accepts its account keys and SAS tokens signed with them. Turn this off when everything connects with a managed identity or user delegation SAS. The portal then uses Entra ID sign-in by default too.')
+param sharedKeyAccessEnabled bool = true
+
 @description('Private endpoint subnets')
 param privateEndpointSubnetIds StorageAccountPrivateEndpoints?
 
@@ -59,7 +62,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   sku: {
     name: sku
   }
-  properties: {
+  properties: union({
     accessTier: accessTier
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
@@ -77,7 +80,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
         action: 'Allow'
       })
     } : null
-  }
+  }, sharedKeyAccessEnabled ? {} : {
+    allowSharedKeyAccess: false
+    defaultToOAuthAuthentication: true
+  })
   tags: tagValues
 }
 

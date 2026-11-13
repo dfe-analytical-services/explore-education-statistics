@@ -93,6 +93,10 @@ param adminUsesUserAssignedIdentity bool = false
 @description('Whether the Data Processor connects to storage accounts with its managed identity, rather than with connection strings.')
 param dataProcessorIdentityBasedStorageConnections bool = false
 
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the Data Processor\'s management storage account accepts its account keys. In ELZ the Data Processor connects to it with its managed identity, so the param files in "parameters/elz" turn this off.')
+param dataProcessorManagementStorageSharedKeyAccessEnabled bool = true
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -323,6 +327,7 @@ module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep'
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
     identityBasedStorageConnections: dataProcessorIdentityBasedStorageConnections
+    managementStorageSharedKeyAccessEnabled: dataProcessorManagementStorageSharedKeyAccessEnabled
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     storageAccountSku: storageAccountSku
     location: location

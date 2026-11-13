@@ -4,6 +4,7 @@ type StorageAccountRole =
   | 'Storage Blob Data Owner'
   | 'Storage Blob Data Reader'
   | 'Storage Queue Data Contributor'
+  | 'Storage Queue Data Message Sender'
   | 'Storage Table Data Contributor'
   | 'Storage Account Backup Contributor'
 
@@ -29,6 +30,7 @@ var rolesToRoleIds = {
   'Storage Blob Data Owner': 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
   'Storage Blob Data Reader': '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
   'Storage Queue Data Contributor': '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
+  'Storage Queue Data Message Sender': 'c6a89b2d-59bc-44d0-9896-0f6e12d7b80a'
   'Storage Table Data Contributor': '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
   'Storage Account Backup Contributor': 'e5e2a7ff-d759-4cd2-bb51-3152d37e2eb1'
 }
