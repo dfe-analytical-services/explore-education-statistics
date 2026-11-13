@@ -36,14 +36,13 @@ public class SubjectCsvMetaServicePermissionTests
 
                 var query = new FullTableQuery { SubjectId = SubjectId };
 
-                return await service.GetSubjectCsvMeta(ReleaseSubject, query);
+                return await service.GetSubjectCsvMeta(ReleaseSubject, Mock.Of<IStorageDataSet>(Strict), query);
             });
     }
 
     private static SubjectCsvMetaService BuildService(
         IUserService userService,
         ContentDbContext? contentDbContext = null,
-        IStorageDataSetResolver? storageDataSetResolver = null,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
     {
@@ -51,7 +50,6 @@ public class SubjectCsvMetaServicePermissionTests
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
             contentDbContext: contentDbContext ?? Mock.Of<ContentDbContext>(),
             userService: userService,
-            storageDataSetResolver: storageDataSetResolver ?? Mock.Of<IStorageDataSetResolver>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }
