@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.DataMovement;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -142,10 +141,20 @@ public interface IBlobStorageService
 
     public class CopyDirectoryOptions
     {
+        /// <summary>
+        /// The storage account to copy to, if not the same as the source.
+        /// </summary>
         public string? DestinationConnectionString { get; set; }
-        public SetAttributesCallbackAsync? SetAttributesCallbackAsync { get; set; }
-        public ShouldTransferCallbackAsync? ShouldTransferCallbackAsync { get; set; }
-        public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
+
+        /// <summary>
+        /// Decides from a source blob's path whether to copy it. Every blob is copied if not set.
+        /// </summary>
+        public Func<string, bool>? ShouldCopyBlob { get; set; }
+
+        /// <summary>
+        /// Whether to overwrite blobs that already exist at the destination, rather than skip them.
+        /// </summary>
+        public bool OverwriteExistingBlobs { get; set; }
     }
 
     Task<List<BlobInfo>> CopyDirectory(
@@ -158,10 +167,16 @@ public interface IBlobStorageService
 
     public class MoveDirectoryOptions
     {
+        /// <summary>
+        /// The storage account to move to, if not the same as the source.
+        /// </summary>
         public string? DestinationConnectionString { get; set; }
-        public SetAttributesCallbackAsync? SetAttributesCallbackAsync { get; set; }
-        public ShouldTransferCallbackAsync? ShouldTransferCallbackAsync { get; set; }
-        public ShouldOverwriteCallbackAsync? ShouldOverwriteCallbackAsync { get; set; }
+
+        /// <summary>
+        /// Decides from a source blob's path whether to copy it before the source directory is deleted. Every blob is
+        /// copied if not set.
+        /// </summary>
+        public Func<string, bool>? ShouldCopyBlob { get; set; }
     }
 
     Task MoveDirectory(
