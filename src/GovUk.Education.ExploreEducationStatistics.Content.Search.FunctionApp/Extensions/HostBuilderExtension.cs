@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Serv
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,6 +71,7 @@ public static class HostBuilderExtension
                     // Data set documents
                     .AddTransient<IDataSetDocumentCreator, DataSetDocumentCreator>()
                     .AddTransient<IDataSetDocumentRemover, DataSetDocumentRemover>()
+                    .AddTransient<IFullDataSetDocumentResetter, FullDataSetDocumentResetter>()
                     // Release documents
                     .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
                     .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
