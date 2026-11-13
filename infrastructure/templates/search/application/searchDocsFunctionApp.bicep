@@ -48,15 +48,19 @@ param applicationInsightsConnectionString string = ''
 
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
+  dataSetDocumentsChanged: 'data-set-documents-changed-queue'
   publicationArchived: 'publication-archived-queue'
   publicationChanged: 'publication-changed-queue'
   publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
+  refreshPublicationDataSetDocuments: 'refresh-publication-data-set-documents-queue'
+  refreshReleaseDataSetDocuments: 'refresh-release-data-set-documents-queue'
   refreshReleaseDocument: 'refresh-release-document-queue'
   releaseDocumentCreated: 'release-document-created-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
+  removeDataSetDocuments: 'remove-data-set-documents-queue'
   removePublicationReleaseDocuments: 'remove-publication-release-documents-queue'
   removeReleaseDocument: 'remove-release-document-queue'
   themeUpdated: 'theme-updated-queue'
@@ -142,6 +146,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: contentApiUrl
       }
       {
+        name: 'DataSetDocumentsChangedQueueName'
+        value: storageQueueNames.dataSetDocumentsChanged
+      }
+      {
         name: 'PublicationArchivedQueueName'
         value: storageQueueNames.publicationArchived
       }
@@ -162,6 +170,14 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.publicationRestored
       }
       {
+        name: 'RefreshPublicationDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshPublicationDataSetDocuments
+      }
+      {
+        name: 'RefreshReleaseDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshReleaseDataSetDocuments
+      }
+      {
         name: 'RefreshReleaseDocumentQueueName'
         value: storageQueueNames.refreshReleaseDocument
       }
@@ -176,6 +192,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       {
         name: 'ReleaseVersionPublishedQueueName'
         value: storageQueueNames.releaseVersionPublished
+      }
+      {
+        name: 'RemoveDataSetDocumentsQueueName'
+        value: storageQueueNames.removeDataSetDocuments
       }
       {
         name: 'RemovePublicationReleaseDocumentsQueueName'

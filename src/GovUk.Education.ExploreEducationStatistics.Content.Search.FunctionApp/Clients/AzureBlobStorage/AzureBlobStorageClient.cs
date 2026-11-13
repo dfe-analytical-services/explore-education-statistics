@@ -76,7 +76,7 @@ public class AzureBlobStorageClient(BlobServiceClient blobServiceClient, ILogger
     public async Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default)
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        var blobNames = await GetAllBlobNames(blobContainerClient, cancellationToken);
+        var blobNames = await GetBlobNames(blobContainerClient, prefix: null, cancellationToken);
 
         await Task.WhenAll(
             blobNames.Select(blobName =>
@@ -87,19 +87,21 @@ public class AzureBlobStorageClient(BlobServiceClient blobServiceClient, ILogger
 
     public async Task<IList<string>> ListBlobsInContainer(
         string containerName,
+        string? prefix = null,
         CancellationToken cancellationToken = default
     )
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
-        return await GetAllBlobNames(blobContainerClient, cancellationToken);
+        return await GetBlobNames(blobContainerClient, prefix, cancellationToken);
     }
 
-    private static async Task<IList<string>> GetAllBlobNames(
+    private static async Task<IList<string>> GetBlobNames(
         BlobContainerClient blobContainerClient,
+        string? prefix,
         CancellationToken cancellationToken
     )
     {
-        var asyncPageable = blobContainerClient.GetBlobsAsync(cancellationToken: cancellationToken);
+        var asyncPageable = blobContainerClient.GetBlobsAsync(prefix: prefix, cancellationToken: cancellationToken);
         var blobNames = new List<string>();
         await foreach (var blobItem in asyncPageable)
         {

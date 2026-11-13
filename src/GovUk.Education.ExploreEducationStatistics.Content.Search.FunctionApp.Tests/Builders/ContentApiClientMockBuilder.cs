@@ -14,6 +14,8 @@ internal class ContentApiClientMockBuilder
     private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
     private DataSetDocumentKey[]? _dataSetDocumentKeys;
+    private DataSetDocument[]? _releaseDataSetDocuments;
+    private DataSetDocument[]? _publicationDataSetDocuments;
 
     public ContentApiClientMockBuilder()
     {
@@ -22,6 +24,16 @@ internal class ContentApiClientMockBuilder
         _mock
             .Setup(m => m.GetDataSetDocumentKeys(It.IsAny<CancellationToken>()))
             .ReturnsAsync(() => _dataSetDocumentKeys ?? []);
+
+        _mock
+            .Setup(m =>
+                m.GetReleaseDataSetDocuments(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(() => _releaseDataSetDocuments ?? []);
+
+        _mock
+            .Setup(m => m.GetPublicationDataSetDocuments(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _publicationDataSetDocuments ?? []);
 
         _mock
             .Setup(m => m.GetPublicationLatestReleaseDocument(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -99,6 +111,18 @@ internal class ContentApiClientMockBuilder
         return this;
     }
 
+    public ContentApiClientMockBuilder WhereReleaseHasDataSetDocuments(params DataSetDocument[] dataSetDocuments)
+    {
+        _releaseDataSetDocuments = dataSetDocuments;
+        return this;
+    }
+
+    public ContentApiClientMockBuilder WherePublicationHasDataSetDocuments(params DataSetDocument[] dataSetDocuments)
+    {
+        _publicationDataSetDocuments = dataSetDocuments;
+        return this;
+    }
+
     public ContentApiClientMockBuilder WhereGetReleaseVersionSummaryReturns(
         string publicationSlug,
         string releaseSlug,
@@ -151,6 +175,22 @@ internal class ContentApiClientMockBuilder
         public void ReleaseIdsRequestedForPublication(string publicationSlug)
         {
             mock.Verify(m => m.GetPublicationReleaseIds(publicationSlug, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        public void DataSetDocumentsRequestedForRelease(string publicationSlug, string releaseSlug)
+        {
+            mock.Verify(
+                m => m.GetReleaseDataSetDocuments(publicationSlug, releaseSlug, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
+        }
+
+        public void DataSetDocumentsRequestedForPublication(string publicationSlug)
+        {
+            mock.Verify(
+                m => m.GetPublicationDataSetDocuments(publicationSlug, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
 
         public void ReleaseVersionSummaryRequestedForPublication(string publicationSlug, string releaseSlug)

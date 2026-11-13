@@ -11,6 +11,7 @@ internal class AzureBlobStorageClientMockBuilder
     private bool _deleteBlobIsSuccessful = true;
     private readonly List<string> _containersNotFound = [];
     private string? _containerExistsThrowsFor;
+    private readonly List<string> _blobNames = [];
 
     public IAzureBlobStorageClient Build()
     {
@@ -54,6 +55,17 @@ internal class AzureBlobStorageClientMockBuilder
             .Setup(mock => mock.ContainerExists(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((string containerName, CancellationToken _) => !_containersNotFound.Contains(containerName));
 
+        _mock
+            .Setup(mock =>
+                mock.ListBlobsInContainer(It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(
+                (string _, string? prefix, CancellationToken _) =>
+                    _blobNames
+                        .Where(blobName => prefix is null || blobName.StartsWith(prefix, StringComparison.Ordinal))
+                        .ToList()
+            );
+
         if (_containerExistsThrowsFor is not null)
         {
             _mock
@@ -73,6 +85,12 @@ internal class AzureBlobStorageClientMockBuilder
     public AzureBlobStorageClientMockBuilder WhereContainerExistsThrowsFor(string containerName)
     {
         _containerExistsThrowsFor = containerName;
+        return this;
+    }
+
+    public AzureBlobStorageClientMockBuilder WhereContainerHasBlobs(params string[] blobNames)
+    {
+        _blobNames.AddRange(blobNames);
         return this;
     }
 
@@ -107,6 +125,29 @@ internal class AzureBlobStorageClientMockBuilder
             );
         }
 
+        public void BlobsWereListed(string? containerName = null, string? prefix = null)
+        {
+            mock.Verify(
+                m =>
+                    m.ListBlobsInContainer(
+                        It.Is<string>(actualContainerName =>
+                            containerName == null || actualContainerName == containerName
+                        ),
+                        prefix,
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+        }
+
+        public void BlobWasNotDeleted(string blobName)
+        {
+            mock.Verify(
+                m => m.DeleteBlobIfExists(It.IsAny<string>(), blobName, It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
         public void NoBlobsDeleted()
         {
             mock.Verify(
@@ -138,6 +179,22 @@ internal class AzureBlobStorageClientMockBuilder
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Once
+            );
+        }
+
+        public void NoBlobsUploaded()
+        {
+            mock.Verify(
+                m =>
+                    m.UploadBlob(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<Blob>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string?>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
             );
         }
 

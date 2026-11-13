@@ -19,4 +19,23 @@ public class DataSetDocumentKeyTests
             key.BlobName
         );
     }
+
+    [Fact]
+    public void BlobNamePrefix_ForPublication_IsPublicationId()
+    {
+        var prefix = DataSetDocumentKey.BlobNamePrefix(Guid.Parse("11111111-1111-1111-1111-111111111111"));
+
+        Assert.Equal("11111111-1111-1111-1111-111111111111/", prefix);
+    }
+
+    [Fact]
+    public void BlobNamePrefix_ForRelease_IsPublicationIdThenReleaseId()
+    {
+        var prefix = DataSetDocumentKey.BlobNamePrefix(
+            Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            Guid.Parse("22222222-2222-2222-2222-222222222222")
+        );
+
+        Assert.Equal("11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/", prefix);
+    }
 }
