@@ -25,6 +25,9 @@ param useUserAssignedIdentity bool = false
 @description('Whether to create a content share for the Function App, which is used to store its code in Consumption and Elastic plans.')
 param deployContentShare bool = true
 
+@description('Whether to store the storage account\'s connection string in Key Vault, for the apps that connect to it with a connection string rather than a managed identity.')
+param storeStorageAccountConnectionString bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -102,7 +105,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountName: resourceNames.notifier.storageAccount
     storageAccountSku: storageAccountSku
     deployContentShare: deployContentShare
-    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
+    storageAccountConnectionStringSecretName: storeStorageAccountConnectionString
+      ? resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
+      : null
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true

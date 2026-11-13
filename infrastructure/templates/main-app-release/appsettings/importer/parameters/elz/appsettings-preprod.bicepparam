@@ -4,3 +4,6 @@ using '../../importer-appsettings.bicep'
 extends '../appsettings-preprod.bicepparam'
 
 param elz = true
+
+// Connect to storage accounts with the app's managed identity rather than connection strings from Key Vault.
+param identityBasedStorageConnections = true

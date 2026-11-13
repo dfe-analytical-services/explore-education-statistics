@@ -28,6 +28,13 @@ func publicDataDbConnectionString(postgreSqlServerName string, managedIdentityNa
   'Server=${postgreSqlServerName}.postgres.database.azure.com;Database=public_data;Port=5432;User Id=${managedIdentityName}'
 
 @export()
+@description('''
+Builds a storage account connection string with no key. The apps' storage client factories connect with this using the
+app's managed identity, rather than with an account key.
+''')
+func keylessStorageConnectionString(storageAccountName string) string => 'AccountName=${storageAccountName};'
+
+@export()
 func keyVaultRef(vaultUri string, secretName string) string =>
   '@Microsoft.KeyVault(SecretUri=${vaultUri}secrets/${secretName}/)'
 
