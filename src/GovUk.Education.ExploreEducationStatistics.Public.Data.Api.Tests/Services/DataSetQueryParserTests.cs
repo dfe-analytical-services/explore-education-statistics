@@ -882,6 +882,180 @@ public abstract class DataSetQueryParserTests
 
             Assert.Equal(queryLocations, warningDetail.Items);
         }
+
+        [Theory]
+        [InlineData("Eq", "data.locations_sch_id IN (?, ?)")]
+        [InlineData("NotEq", "data.locations_sch_id NOT IN (?, ?)")]
+        [InlineData("In", "data.locations_sch_id IN (?, ?)")]
+        [InlineData("NotIn", "data.locations_sch_id NOT IN (?, ?)")]
+        public async Task AllComparators_SchoolUrnMatchesMultipleOptions(string comparator, string expectedSql)
+        {
+            // Same school (URN) with different names across time periods
+            // results in multiple location options sharing the same URN.
+            var locationOptions = _dataFixture
+                .DefaultParquetLocationOption(GeographicLevel.School)
+                .WithUrn("137791")
+                .GenerateList(2);
+
+            List<IDataSetQueryLocation> queryLocations = [new DataSetQueryLocationSchoolUrn { Urn = "137791" }];
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync(locationOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaFacets
+            {
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations),
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Equal(expectedSql, parsed.Sql);
+            Assert.Equal(2, parsed.SqlParameters.Count);
+            Assert.NotEqual(locationOptions[0].Id, locationOptions[1].Id);
+            Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[1].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Theory]
+        [InlineData("Eq", "data.locations_la_id IN (?, ?)")]
+        [InlineData("NotEq", "data.locations_la_id NOT IN (?, ?)")]
+        public async Task EqComparators_LocalAuthorityCodeMatchesMultipleOptions(string comparator, string expectedSql)
+        {
+            var locationOptions = _dataFixture
+                .DefaultParquetLocationOption(GeographicLevel.LocalAuthority)
+                .WithCode("E08000001")
+                .GenerateList(2);
+
+            List<IDataSetQueryLocation> queryLocations =
+            [
+                new DataSetQueryLocationLocalAuthorityCode { Code = "E08000001" },
+            ];
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync(locationOptions);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaFacets
+            {
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations),
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Equal(expectedSql, parsed.Sql);
+            Assert.Equal(2, parsed.SqlParameters.Count);
+            Assert.NotEqual(locationOptions[0].Id, locationOptions[1].Id);
+            Assert.Equal(locationOptions[0].Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(locationOptions[1].Id, parsed.SqlParameters[1].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Theory]
+        [InlineData(
+            "In",
+            """
+                (data.locations_nat_id IN (?)
+                 OR data.locations_sch_id IN (?, ?))
+                """
+        )]
+        [InlineData(
+            "NotIn",
+            """
+                (data.locations_nat_id NOT IN (?)
+                 AND data.locations_sch_id NOT IN (?, ?))
+                """
+        )]
+        public async Task InComparators_SchoolUrnMatchesMultipleOptionsWithOtherLocations(
+            string comparator,
+            string expectedSql
+        )
+        {
+            var countryOption = _dataFixture.DefaultParquetLocationOption().Generate();
+
+            var schoolOptions = _dataFixture
+                .DefaultParquetLocationOption(GeographicLevel.School)
+                .WithUrn("137791")
+                .GenerateList(2);
+
+            List<IDataSetQueryLocation> queryLocations =
+            [
+                MapOptionToQueryLocation(countryOption),
+                new DataSetQueryLocationSchoolUrn { Urn = "137791" },
+            ];
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync([countryOption, .. schoolOptions]);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaFacets
+            {
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations),
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Equal(expectedSql, parsed.Sql);
+            Assert.Equal(3, parsed.SqlParameters.Count);
+            Assert.NotEqual(schoolOptions[0].Id, schoolOptions[1].Id);
+            Assert.Equal(countryOption.Id, parsed.SqlParameters[0].Argument);
+            Assert.Equal(schoolOptions[0].Id, parsed.SqlParameters[1].Argument);
+            Assert.Equal(schoolOptions[1].Id, parsed.SqlParameters[2].Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
+
+        [Theory]
+        [InlineData("In", "data.locations_sch_id IN (?)")]
+        [InlineData("NotIn", "data.locations_sch_id NOT IN (?)")]
+        public async Task InComparators_DifferentIdentifiersForSameOption_DeduplicatesIds(
+            string comparator,
+            string expectedSql
+        )
+        {
+            var schoolOption = _dataFixture.DefaultParquetLocationOption(GeographicLevel.School).Generate();
+
+            List<IDataSetQueryLocation> queryLocations =
+            [
+                new DataSetQueryLocationSchoolUrn { Urn = schoolOption.Urn! },
+                new DataSetQueryLocationSchoolLaEstab { LaEstab = schoolOption.LaEstab! },
+            ];
+
+            _locationRepository
+                .Setup(r => r.ListOptions(_dataSetVersion, queryLocations.ToHashSet(), default))
+                .ReturnsAsync([schoolOption]);
+
+            var service = BuildService();
+
+            var queryState = new QueryState();
+            var criteria = new DataSetQueryCriteriaFacets
+            {
+                Locations = DataSetQueryCriteriaLocations.Create(comparator, queryLocations),
+            };
+
+            var parsed = await service.ParseCriteria(criteria, _dataSetVersion, queryState);
+
+            Assert.Equal(expectedSql, parsed.Sql);
+            Assert.Equal(schoolOption.Id, Assert.Single(parsed.SqlParameters).Argument);
+
+            Assert.Empty(queryState.Errors);
+            Assert.Empty(queryState.Warnings);
+        }
     }
 
     public class ParseCriteriaTimePeriodsTests : DataSetQueryParserTests

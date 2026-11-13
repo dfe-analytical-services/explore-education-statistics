@@ -2010,7 +2010,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A provider (identified by its UKPRN) to filter results by."
+        "description": "A provider (identified by its UKPRN) to filter results by.\r\n            \r\nNote that a UKPRN may correspond to multiple locations (e.g. where a provider's name has changed over time)."
       },
       "DataSetQueryLocationSchoolLaEstab": {
         "required": [
@@ -2034,7 +2034,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A school (identified by its LAESTAB) to filter results by."
+        "description": "A school (identified by its LAESTAB) to filter results by.\r\n            \r\nNote that a LAESTAB may correspond to multiple locations (e.g. where a school's name has changed over time)."
       },
       "DataSetQueryLocationSchoolUrn": {
         "required": [
@@ -2063,7 +2063,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A school (identified by its URN) to filter results by."
+        "description": "A school (identified by its URN) to filter results by.\r\n            \r\nNote that a URN may correspond to multiple locations (e.g. where a school's name has changed over time)."
       },
       "DataSetQueryPaginatedResultsViewModel": {
         "required": [
