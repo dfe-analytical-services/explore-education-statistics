@@ -130,7 +130,7 @@ function HomePage() {
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a
-              href="https://www.find-compare-schools-college.service.gov.uk/"
+              href="https://find-compare-schools-colleges.service.gov.uk/"
               rel="noopener noreferrer nofollow"
               target="_blank"
               onClick={() =>
