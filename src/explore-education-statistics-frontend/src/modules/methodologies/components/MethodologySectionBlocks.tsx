@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import glossaryService from '@frontend/services/glossaryService';
 import InsetText from '@common/components/InsetText';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
@@ -14,7 +15,7 @@ interface Props {
 const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
   const transformImageAttributes = useMethodologyImageAttributeTransformer({
     methodologyId,
-    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+    rootUrl: getPublicEnv('CONTENT_API_BASE_URL').replace('/api', ''),
   });
   return blocks.length > 0 ? (
     <>

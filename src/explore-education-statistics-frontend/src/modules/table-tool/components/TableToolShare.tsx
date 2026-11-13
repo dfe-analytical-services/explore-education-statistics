@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import ButtonText from '@common/components/ButtonText';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -50,7 +51,9 @@ const TableToolShare = ({ tableHeaders, query, isCropped }: Props) => {
         },
       });
 
-      setPermalinkUrl(`${process.env.PUBLIC_URL}/data-tables/permalink/${id}`);
+      setPermalinkUrl(
+        `${getPublicEnv('PUBLIC_URL')}/data-tables/permalink/${id}`,
+      );
 
       setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);
     } catch (err) {

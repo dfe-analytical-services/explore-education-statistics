@@ -3021,6 +3021,12 @@ public class ReplacementServiceTests
             ),
         };
 
+        // Pair the original indicators, which is expected to be carried forward to the replacement indicators
+        originalReleaseFile.PairedIndicators =
+        [
+            new PairedIndicatorEntry(ParentIndicatorId: originalIndicatorA.Id, ChildIndicatorId: originalIndicatorB.Id),
+        ];
+
         var replacementIndicatorA = new Indicator
         {
             Id = Guid.NewGuid(),
@@ -3160,6 +3166,11 @@ public class ReplacementServiceTests
             Assert.Equal(2, groupA.ChildSequence.Count);
             Assert.Equal(replacementGroups[0].Indicators[1].Id, groupA.ChildSequence[0]);
             Assert.Equal(replacementGroups[0].Indicators[0].Id, groupA.ChildSequence[1]);
+
+            // Verify the paired indicators have been mapped to the replacement indicators
+            var pairedIndicator = Assert.Single(replacedReleaseFile.PairedIndicators!);
+            Assert.Equal(replacementIndicatorA.Id, pairedIndicator.ParentIndicatorId);
+            Assert.Equal(replacementIndicatorB.Id, pairedIndicator.ChildIndicatorId);
         }
     }
 

@@ -13,10 +13,15 @@ internal class ContentApiClientMockBuilder
     private PublicationInfo[]? _publicationsForTheme;
     private Guid[]? _publicationReleaseIds;
     private PublicationInfo[]? _publications;
+    private DataSetDocumentKey[]? _dataSetDocumentKeys;
 
     public ContentApiClientMockBuilder()
     {
         Assert = new Asserter(_mock);
+
+        _mock
+            .Setup(m => m.GetDataSetDocumentKeys(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _dataSetDocumentKeys ?? []);
 
         _mock
             .Setup(m => m.GetPublicationLatestReleaseDocument(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -85,6 +90,12 @@ internal class ContentApiClientMockBuilder
     public ContentApiClientMockBuilder WhereHasPublications(params PublicationInfo[] publications)
     {
         _publications = publications;
+        return this;
+    }
+
+    public ContentApiClientMockBuilder WhereHasDataSetDocumentKeys(params DataSetDocumentKey[] dataSetDocumentKeys)
+    {
+        _dataSetDocumentKeys = dataSetDocumentKeys;
         return this;
     }
 

@@ -15,5 +15,4 @@ export default chain([
 
 export const config = {
   matcher: ['/((?!_next/).*)'],
-  runtime: 'nodejs', // Required while we are using react 18 (can remove if using react 19)
 };

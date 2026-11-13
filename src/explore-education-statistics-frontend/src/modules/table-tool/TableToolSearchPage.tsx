@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import Details from '@common/components/Details';
 import ErrorMessage from '@common/components/ErrorMessage';
 import InsetText from '@common/components/InsetText';
@@ -345,7 +346,7 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
 export const getServerSideProps: GetServerSideProps<
   TableToolSearchPageProps
 > = async ({ query }) => {
-  if (process.env.APP_ENV === 'Production' && query.prototype !== 'true') {
+  if (getPublicEnv('APP_ENV') === 'Production' && query.prototype !== 'true') {
     return {
       notFound: true,
     };

@@ -4,6 +4,8 @@ This project was bootstrapped with [Create Next App](https://nextjs.org/docs/api
 
 1. A `.env` file is included by default with required values needed to run the frontend project locally. You can create a `.env.local` file to change environment variables without commiting these changes to the repository.
 
+   Variables needed in the browser must be read with `getPublicEnv` (`src/utils/publicEnv.ts`), not `process.env`. See [Public frontend variables](../../README.md#public-frontend-variables) in the root README for how to add new variables.
+
 
 ## Data API and Content API
 

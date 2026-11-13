@@ -61,4 +61,13 @@ public interface IContentApiClient
         string releaseSlug,
         CancellationToken cancellationToken = default
     );
+
+    /// <summary>
+    /// Retrieves the keys of all the data set documents that are expected to exist. There is one per data file in the
+    /// latest published version of each release.
+    /// </summary>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>An array of data set document keys.</returns>
+    /// <exception cref="UnableToGetDataSetDocumentKeysException">Thrown if the call to the API was unsuccessful</exception>
+    Task<DataSetDocumentKey[]> GetDataSetDocumentKeys(CancellationToken cancellationToken = default);
 }

@@ -9,29 +9,8 @@ const path = require('path');
 const nextConfig = {
   compress: false,
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER ?? '',
-  },
-  publicRuntimeConfig: {
-    APP_ENV: process.env.APP_ENV,
-    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
-    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
-    PUBLIC_API_BASE_URL: process.env.PUBLIC_API_BASE_URL,
-    PUBLIC_API_DOCS_URL: process.env.PUBLIC_API_DOCS_URL,
-    NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
-    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
-    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-    PUBLIC_URL: process.env.PUBLIC_URL,
-  },
-  serverRuntimeConfig: {
-    AZURE_SEARCH_QUERY_KEY: process.env.AZURE_SEARCH_QUERY_KEY,
-    AZURE_SEARCH_ENDPOINT: process.env.AZURE_SEARCH_ENDPOINT,
-    AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
-    AZURE_DATASETS_SEARCH_INDEX: process.env.AZURE_DATASETS_SEARCH_INDEX,
-    DEFAULT_CACHE_MAX_AGE_SECONDS: process.env.DEFAULT_CACHE_MAX_AGE_SECONDS,
   },
   async redirects() {
     return [
@@ -66,6 +45,14 @@ const nextConfig = {
           typescript: {
             configFile: path.resolve(__dirname, 'tsconfig.json'),
           },
+          issue: {
+            // Next generates types into `.next/types` (build) and
+            // `.next/dev/types` (dev), and both are in tsconfig's `include`.
+            // Leftover generated files from a previous build can reference
+            // routes that no longer exist, so don't report issues in them.
+            // `pnpm tsc` and `next build` check freshly generated types.
+            exclude: [{ file: '**/.next/**' }],
+          },
         }),
       );
 
@@ -82,6 +69,7 @@ const nextConfig = {
 
         config.plugins.push(
           new StylelintPlugin({
+            files: 'src/**/*.{css,scss}',
             // Next doesn't play nicely with emitted errors
             // so we'll just display warnings instead
             emitErrors: false,
