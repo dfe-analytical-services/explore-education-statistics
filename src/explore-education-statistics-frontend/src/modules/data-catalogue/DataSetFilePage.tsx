@@ -237,7 +237,7 @@ export default function DataSetFilePage({
               <Tag colour="orange">Not the latest data</Tag>
             )}
 
-            {apiDataSet && (
+            {apiDataSet && apiDataSetVersion && (
               <a
                 href="#apiVersionHistory"
                 className="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"

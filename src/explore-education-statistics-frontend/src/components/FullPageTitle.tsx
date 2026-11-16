@@ -25,7 +25,9 @@ const FullPageTitle = ({ caption, summary, title }: Props) => {
         {title}
       </h1>
       {!isMobileMedia && (
-        <p className="govuk-body-l govuk-!-margin-bottom-0">{summary}</p>
+        <p className="govuk-body-l govuk-!-margin-bottom-0 dfe-white-space--pre-wrap">
+          {summary}
+        </p>
       )}
     </div>
   );
