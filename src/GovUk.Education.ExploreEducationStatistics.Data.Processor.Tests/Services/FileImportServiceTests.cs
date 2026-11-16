@@ -46,23 +46,27 @@ public class FileImportServiceTests
             GeographicLevels = [GeographicLevel.Country, GeographicLevel.School],
         };
 
+        var dataSet = Mock.Of<IStorageDataSet>(Strict);
+
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+
         var dataImportService = new Mock<IDataImportService>(Strict);
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-        dataImportService.Setup(s => s.WriteDataSetFileMeta(import)).Returns(Task.CompletedTask);
+        dataImportService
+            .Setup(s => s.WriteDataSetFileMeta(import, dataSet, dataSetWriter.Object))
+            .Returns(Task.CompletedTask);
 
         var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
         dataSetMappingService
             .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
             .Returns(Task.CompletedTask);
 
-        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
-        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
-
         var service = BuildFileImportService(
             dataImportService: dataImportService.Object,
             dataSetMappingService: dataSetMappingService.Object
         );
-        await service.CompleteImport(import, dataSetWriter.Object);
+        await service.CompleteImport(import, dataSet, dataSetWriter.Object);
 
         VerifyAllMocks(dataImportService, dataSetWriter);
     }
@@ -91,7 +95,7 @@ public class FileImportServiceTests
         dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSetWriter.Object);
+        await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict), dataSetWriter.Object);
 
         VerifyAllMocks(dataImportService, dataSetWriter);
     }
@@ -127,7 +131,7 @@ public class FileImportServiceTests
         dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-        await service.CompleteImport(import, dataSetWriter.Object);
+        await service.CompleteImport(import, Mock.Of<IStorageDataSet>(Strict), dataSetWriter.Object);
 
         VerifyAllMocks(dataImportService, dataSetWriter);
     }
@@ -156,7 +160,11 @@ public class FileImportServiceTests
                 };
 
                 var service = BuildFileImportService();
-                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
+                await service.CompleteImport(
+                    import,
+                    Mock.Of<IStorageDataSet>(Strict),
+                    Mock.Of<IStorageDataSetWriter>(Strict)
+                );
             });
     }
 
@@ -190,7 +198,11 @@ public class FileImportServiceTests
                     .Returns(Task.CompletedTask);
 
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
+                await service.CompleteImport(
+                    import,
+                    Mock.Of<IStorageDataSet>(Strict),
+                    Mock.Of<IStorageDataSetWriter>(Strict)
+                );
 
                 VerifyAllMocks(dataImportService);
             });

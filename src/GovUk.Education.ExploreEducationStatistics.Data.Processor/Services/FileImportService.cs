@@ -74,7 +74,7 @@ public class FileImportService(
         await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, dataSetWriter);
     }
 
-    public async Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter)
+    public async Task CompleteImport(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter)
     {
         if (import.Status.IsFinished())
         {
@@ -119,16 +119,16 @@ public class FileImportService(
             return;
         }
 
-        await FinalImportTasks(import);
+        await FinalImportTasks(import, dataSet, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
-    private async Task FinalImportTasks(DataImport import)
+    private async Task FinalImportTasks(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter)
     {
         try
         {
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await dataImportService.WriteDataSetFileMeta(import);
+            await dataImportService.WriteDataSetFileMeta(import, dataSet, dataSetWriter);
         }
         catch (Exception e)
         {
