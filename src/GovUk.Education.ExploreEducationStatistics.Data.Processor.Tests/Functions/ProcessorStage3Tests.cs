@@ -173,15 +173,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -402,15 +394,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -551,15 +535,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -715,15 +691,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -868,15 +836,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -1051,15 +1011,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -1208,15 +1160,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -1337,15 +1281,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -1506,15 +1442,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
@@ -1694,15 +1622,7 @@ public class ProcessorStage3Tests
 
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(InMemoryStatisticsDbContext(_statisticsDbContextId), databaseHelper),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,

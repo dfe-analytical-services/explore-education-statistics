@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -284,7 +283,15 @@ public class DataImportServiceTests
             ],
         };
 
-        await service.WriteDataSetFileMeta(import);
+        await service.WriteDataSetFileMeta(
+            import,
+            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
+            BuildStatisticsDbDataSetWriterFactory(
+                    InMemoryStatisticsDbContext(statisticsDbContextId),
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -425,7 +432,15 @@ public class DataImportServiceTests
             GeographicLevels = [GeographicLevel.Country],
         };
 
-        await service.WriteDataSetFileMeta(import);
+        await service.WriteDataSetFileMeta(
+            import,
+            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
+            BuildStatisticsDbDataSetWriterFactory(
+                    InMemoryStatisticsDbContext(statisticsDbContextId),
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -741,18 +756,8 @@ public class DataImportServiceTests
         contentDbContextId ??= Guid.NewGuid().ToString();
         statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
-
         return new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(contentDbContextId),
-                InMemoryStatisticsDbContext(statisticsDbContextId)
-            ),
-            BuildStorageDataSetWriterResolver(
-                InMemoryStatisticsDbContext(statisticsDbContextId),
-                new InMemoryDatabaseHelper(dbContextSupplier)
-            ),
+            new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId),
             Mock.Of<ILogger<DataImportService>>(Strict)
         );
     }
