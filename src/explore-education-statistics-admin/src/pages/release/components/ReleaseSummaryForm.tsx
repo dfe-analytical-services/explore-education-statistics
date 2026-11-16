@@ -27,7 +27,7 @@ import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import Yup from '@common/validation/yup';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 
@@ -88,10 +88,6 @@ export default function ReleaseSummaryForm({
   onCancel,
   onCreationModeChange,
 }: Props) {
-  const [liveCreationMode, setLiveCreationMode] = useState(
-    initialValues.creationMode,
-  );
-
   const {
     value: timePeriodCoverageGroups,
     isLoading: timePeriodCoverageGroupsLoading,
@@ -202,10 +198,12 @@ export default function ReleaseSummaryForm({
       initialValues={initialValuesWithDefaults}
       validationSchema={validationSchema}
     >
-      {({ getValues }) => {
+      {({ getValues, watch }) => {
         const timePeriodLabel =
           findTimePeriodCoverageGroup(getValues('timePeriodCoverageCode'))
             ?.category.label ?? '';
+
+        const liveCreationMode = watch('creationMode');
 
         const copiedFromHint =
           rolloverSource && liveCreationMode !== 'blank'
@@ -221,7 +219,6 @@ export default function ReleaseSummaryForm({
                 order={[]}
                 onChange={event => {
                   const mode = event.target.value as ReleaseCreationMode;
-                  setLiveCreationMode(mode);
                   onCreationModeChange?.(mode);
                 }}
                 options={[

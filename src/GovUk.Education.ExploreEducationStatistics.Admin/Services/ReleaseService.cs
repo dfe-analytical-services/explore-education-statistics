@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -184,14 +185,8 @@ public class ReleaseService(
             );
         }
 
-        releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-        releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(ContentSectionType.KeyStatisticsSecondary);
-        releaseVersion.RelatedDashboardsSection = CreateContentSection(ContentSectionType.RelatedDashboards);
-        releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-        releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
+        ContentSectionUtils.InitialiseBaseContentSections(releaseVersion);
     }
-
-    private static ContentSection CreateContentSection(ContentSectionType type) => new() { Type = type };
 
     private async Task<List<ContentSection>> CreateGenericContentFromTemplate(
         Guid templateReleaseVersionId,

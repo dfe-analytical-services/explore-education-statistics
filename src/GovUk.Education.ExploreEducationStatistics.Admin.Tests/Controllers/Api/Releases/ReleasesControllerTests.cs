@@ -45,8 +45,34 @@ public class ReleasesControllerUnitTests
 
         var controller = BuildController(releaseService.Object);
 
-        var result = await controller.CreateRelease(new ReleaseCreateRequest());
+        var result = await controller.CreateRelease(new ReleaseCreateRequest { PublicationId = Guid.NewGuid() });
         VerifyAllMocks(releaseService);
+
+        result.AssertOkResult(returnedViewModel);
+    }
+
+    [Fact]
+    public async Task Create_ReleaseRollover_Returns_Ok()
+    {
+        var returnedViewModel = new ReleaseVersionViewModel();
+
+        var releaseRolloverService = new Mock<IReleaseRolloverService>(Strict);
+
+        releaseRolloverService
+            .Setup(s => s.CreateReleaseRollover(It.IsAny<ReleaseRolloverCreateRequest>()))
+            .ReturnsAsync(returnedViewModel);
+
+        var controller = BuildController(releaseRolloverService: releaseRolloverService.Object);
+
+        var result = await controller.CreateReleaseRollover(
+            new ReleaseRolloverCreateRequest
+            {
+                PublicationId = Guid.NewGuid(),
+                RolloverSourceReleaseId = Guid.NewGuid(),
+                Mode = RolloverMode.WithData,
+            }
+        );
+        VerifyAllMocks(releaseRolloverService);
 
         result.AssertOkResult(returnedViewModel);
     }

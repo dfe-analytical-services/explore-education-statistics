@@ -121,11 +121,7 @@ public record ReleaseVersionViewModel
             Amendment = releaseVersion.Amendment,
             PreviousVersionId = releaseVersion.PreviousVersionId,
             UpdatePublishedDisplayDate = releaseVersion.UpdatePublishedDisplayDate,
-            RolloverSourceReleaseLabel = releaseVersion.Release.RolloverSourceRelease is { } sourceRelease
-                ? string.IsNullOrEmpty(sourceRelease.Label)
-                    ? sourceRelease.YearTitle
-                    : $"{sourceRelease.YearTitle} - {sourceRelease.Label}"
-                : null,
+            RolloverSourceReleaseLabel = releaseVersion.Release.RolloverSourceRelease?.Title,
         };
 }
 

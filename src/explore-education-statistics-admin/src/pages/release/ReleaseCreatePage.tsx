@@ -33,7 +33,7 @@ type MatchProps = {
 };
 
 type QueryParams = {
-  sourceReleaseId?: string;
+  sourceReleaseVersionId?: string;
 };
 
 interface RolloverSource {
@@ -55,13 +55,16 @@ interface Model {
 
 const ReleaseCreatePage = () => {
   const { publicationId } = useParams<MatchProps>() as MatchProps;
-  const { sourceReleaseId } = useQueryParams<QueryParams>();
+  const { sourceReleaseVersionId } = useQueryParams<QueryParams>();
   const { enableReleaseRollover } = useConfig();
   const navigate = useNavigate();
 
-  const [creationMode, setCreationMode] = useState<ReleaseCreationMode>(
-    sourceReleaseId ? 'WithData' : 'blank',
-  );
+  const defaultCreationMode: ReleaseCreationMode = sourceReleaseVersionId
+    ? 'WithData'
+    : 'blank';
+
+  const [creationMode, setCreationMode] =
+    useState<ReleaseCreationMode>(defaultCreationMode);
 
   const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
     if (!enableReleaseRollover) {
@@ -79,22 +82,23 @@ const ReleaseCreatePage = () => {
       } as Model;
     }
 
-    const [publication, timePeriodCoverageGroups] = await Promise.all([
-      publicationService.getPublication(publicationId),
-      metaService.getTimePeriodCoverageGroups(),
-    ]);
+    const [publication, timePeriodCoverageGroups, releaseTemplate] =
+      await Promise.all([
+        publicationService.getPublication(publicationId),
+        metaService.getTimePeriodCoverageGroups(),
+        sourceReleaseVersionId
+          ? Promise.resolve(undefined)
+          : publicationService
+              .getPublicationReleaseTemplate(publicationId)
+              .catch(() => undefined),
+      ]);
 
-    const sourceReleaseVersionId =
-      sourceReleaseId ??
-      (
-        await publicationService
-          .getPublicationReleaseTemplate(publicationId)
-          .catch(() => undefined)
-      )?.id;
+    const effectiveSourceReleaseVersionId =
+      sourceReleaseVersionId ?? releaseTemplate?.id;
 
-    const sourceReleaseVersion = sourceReleaseVersionId
+    const sourceReleaseVersion = effectiveSourceReleaseVersionId
       ? await releaseVersionService
-          .getReleaseVersion(sourceReleaseVersionId)
+          .getReleaseVersion(effectiveSourceReleaseVersionId)
           .catch(() => undefined)
       : undefined;
 
@@ -114,7 +118,7 @@ const ReleaseCreatePage = () => {
         : undefined,
       timePeriodCoverageGroups,
     } as Model;
-  }, [publicationId, sourceReleaseId, enableReleaseRollover]);
+  }, [publicationId, sourceReleaseVersionId, enableReleaseRollover]);
 
   const isRolloverTitle =
     Boolean(model?.rolloverSource) && creationMode === 'WithData';
@@ -201,8 +205,11 @@ const ReleaseCreatePage = () => {
               ? String(model.rolloverSource.year + 1)
               : '',
             templateReleaseId: '',
-            creationMode: model?.rolloverSource ? creationMode : 'blank',
-            releaseType: model?.rolloverSource?.type,
+            creationMode: model?.rolloverSource ? defaultCreationMode : 'blank',
+            releaseType:
+              model?.rolloverSource?.type !== 'ExperimentalStatistics'
+                ? model?.rolloverSource?.type
+                : undefined,
             releaseLabel: '',
             publishingOrganisations:
               model?.rolloverSource?.publishingOrganisations.map(

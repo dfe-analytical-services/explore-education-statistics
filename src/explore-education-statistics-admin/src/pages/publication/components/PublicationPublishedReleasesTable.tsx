@@ -70,88 +70,99 @@ export default function PublicationPublishedReleasesTable({
             </tr>
           </thead>
           <tbody>
-            {releases.map(release => {
-              const isFocused = focusReleaseId === release.id;
+            {releases.map(releaseVersion => {
+              const isFocused = focusReleaseId === releaseVersion.id;
 
               return (
                 <tr
                   className={styles.row}
-                  key={release.id}
+                  key={releaseVersion.id}
                   ref={isFocused ? rowRef : undefined}
                   tabIndex={isFocused ? -1 : undefined}
                 >
                   <td>
                     <Link
-                      to={`${publicAppUrl}/find-statistics/${publication.slug}/${release.slug}`}
+                      to={`${publicAppUrl}/find-statistics/${publication.slug}/${releaseVersion.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {release.title} (opens in new tab)
+                      {releaseVersion.title} (opens in new tab)
                     </Link>
                   </td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
                   <td>
-                    {release.publishedDisplayDate && (
+                    {releaseVersion.publishedDisplayDate && (
                       <FormattedDate usingUkTime>
-                        {release.publishedDisplayDate}
+                        {releaseVersion.publishedDisplayDate}
                       </FormattedDate>
                     )}
                   </td>
                   <td>
-                    {release.lastPublished && (
+                    {releaseVersion.lastPublished && (
                       <FormattedDate usingUkTime>
-                        {release.lastPublished}
+                        {releaseVersion.lastPublished}
                       </FormattedDate>
                     )}
                   </td>
                   <td>
                     <div className={styles.actionsColumn}>
-                      {release.permissions.canViewReleaseVersion ? (
+                      {releaseVersion.permissions.canViewReleaseVersion ? (
                         <Link
                           to={generatePath(releaseSummaryRoute.fullPath, {
                             publicationId: publication.id,
-                            releaseVersionId: release.id,
+                            releaseVersionId: releaseVersion.id,
                           })}
                         >
-                          View<VisuallyHidden> {release.title}</VisuallyHidden>
+                          View
+                          <VisuallyHidden>
+                            {' '}
+                            {releaseVersion.title}
+                          </VisuallyHidden>
                         </Link>
                       ) : (
                         <>
                           No permission
-                          <VisuallyHidden> {release.title}</VisuallyHidden>
+                          <VisuallyHidden>
+                            {' '}
+                            {releaseVersion.title}
+                          </VisuallyHidden>
                         </>
                       )}
-                      {release.permissions.canUpdateRelease && (
+                      {releaseVersion.permissions.canUpdateRelease && (
                         <ReleaseLabelEditModal
-                          currentReleaseSlug={release.slug}
+                          currentReleaseSlug={releaseVersion.slug}
                           publicationSlug={publication.slug}
-                          initialValues={{ label: release.label }}
+                          initialValues={{ label: releaseVersion.label }}
                           triggerButton={
                             <ButtonText>
                               Edit release label
                               <VisuallyHidden>
                                 {' '}
-                                for {release.title}
+                                for {releaseVersion.title}
                               </VisuallyHidden>
                             </ButtonText>
                           }
                           onSubmit={formValues =>
-                            onEdit(release.releaseId, formValues)
+                            onEdit(releaseVersion.releaseId, formValues)
                           }
                         />
                       )}
-                      {release.permissions.canMakeAmendmentOfReleaseVersion && (
+                      {releaseVersion.permissions
+                        .canMakeAmendmentOfReleaseVersion && (
                         <ModalConfirm
                           title="Confirm you want to amend this published release"
                           triggerButton={
                             <ButtonText>
                               Amend
-                              <VisuallyHidden> {release.title}</VisuallyHidden>
+                              <VisuallyHidden>
+                                {' '}
+                                {releaseVersion.title}
+                              </VisuallyHidden>
                             </ButtonText>
                           }
-                          onConfirm={async () => onAmend(release.id)}
+                          onConfirm={async () => onAmend(releaseVersion.id)}
                         >
                           <p>
                             Please note, any changes made to this published
@@ -167,11 +178,14 @@ export default function PublicationPublishedReleasesTable({
                               generatePath(releaseCreateRoute.fullPath, {
                                 publicationId: publication.id,
                               }),
-                              { sourceReleaseId: release.id },
+                              { sourceReleaseVersionId: releaseVersion.id },
                             )}
                           >
                             Create release rollover
-                            <VisuallyHidden> of {release.title}</VisuallyHidden>
+                            <VisuallyHidden>
+                              {' '}
+                              of {releaseVersion.title}
+                            </VisuallyHidden>
                           </Link>
                         )}
                     </div>

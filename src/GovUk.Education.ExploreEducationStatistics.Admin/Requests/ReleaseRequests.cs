@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record ReleaseCreateRequest
 {
-    public Guid PublicationId { get; set; }
+    public required Guid PublicationId { get; init; }
 
     public ReleaseType? Type { get; init; }
 
@@ -31,6 +31,8 @@ public record ReleaseCreateRequest
     {
         public Validator()
         {
+            RuleFor(request => request.PublicationId).NotEmpty();
+
             RuleFor(request => request.Type).NotNull().NotEqual(ReleaseType.ExperimentalStatistics);
 
             RuleFor(request => request.Year).InclusiveBetween(1000, 9999);

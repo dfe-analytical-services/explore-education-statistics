@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Options;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -11,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -75,11 +75,12 @@ public class ReleaseRolloverService(
                     Release = release,
                     Type = request.Type!.Value,
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
+                    PublicationId = release.PublicationId,
                     PublishingOrganisations = [.. publishingOrganisations],
                     CreatedById = userService.GetUserId(),
                 };
 
-                InitialiseContentSections(newReleaseVersion);
+                ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
 
                 context.ReleaseVersions.Add(newReleaseVersion);
 
@@ -122,13 +123,9 @@ public class ReleaseRolloverService(
             return ValidationActionResult(RolloverSourceReleaseMustBeInSamePublication);
         }
 
-        var hasPublishedVersion = await context
-            .ReleaseVersions.LatestReleaseVersions(
-                publicationId: sourceRelease.PublicationId,
-                releaseSlug: sourceRelease.Slug,
-                publishedOnly: true
-            )
-            .AnyAsync();
+        var hasPublishedVersion = await context.ReleaseVersions.AnyAsync(rv =>
+            rv.ReleaseId == sourceRelease.Id && rv.Published != null
+        );
 
         if (!hasPublishedVersion)
         {
@@ -136,17 +133,5 @@ public class ReleaseRolloverService(
         }
 
         return sourceRelease;
-    }
-
-    private static void InitialiseContentSections(ReleaseVersion releaseVersion)
-    {
-        releaseVersion.HeadlinesSection = new ContentSection { Type = ContentSectionType.Headlines };
-        releaseVersion.KeyStatisticsSecondarySection = new ContentSection
-        {
-            Type = ContentSectionType.KeyStatisticsSecondary,
-        };
-        releaseVersion.RelatedDashboardsSection = new ContentSection { Type = ContentSectionType.RelatedDashboards };
-        releaseVersion.SummarySection = new ContentSection { Type = ContentSectionType.ReleaseSummary };
-        releaseVersion.WarningSection = new ContentSection { Type = ContentSectionType.Warning };
     }
 }
