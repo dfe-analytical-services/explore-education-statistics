@@ -103,6 +103,8 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         CancellationToken cancellationToken = default
     )
     {
+        ValidateColumnNames(filters, indicators);
+
         Directory.CreateDirectory(pathResolver.DirectoryPath(subjectId));
 
         if (resumeFromCsvRow is null)
@@ -143,6 +145,9 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         }
     }
 
+    // @MarkFix This opens and closes a DuckDB file connection to the staging db for every batch (about 3,300 times for a
+    // 10 million row import, each close flushing over the Azure Files mount), and the export path does the same every
+    // 10,000 rows. Measure it, then hold one connection between StartStaging and Complete/CleanUp.
     public async Task AppendObservations(
         Guid subjectId,
         IReadOnlyList<Filter> filters,
@@ -765,7 +770,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         var columnNames = filters.Select(filter => filter.Name).Concat(indicators.Select(indicator => indicator.Name));
 
         var invalidColumnNames = columnNames
-            .GroupBy(name => name)
+            .GroupBy(name => name, StringComparer.OrdinalIgnoreCase)
             .Where(group => group.Count() > 1 || DataTable.IsReservedColumn(group.Key))
             .Select(group => group.Key)
             .ToList();

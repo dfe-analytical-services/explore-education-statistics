@@ -354,6 +354,34 @@ public abstract class ParquetDataSetWriterTests : IDisposable
         }
 
         [Fact]
+        public async Task FilterColumnIsReservedWithDifferentCase_Throws()
+        {
+            _testDataSet.NcYear.Name = "Time_Period_Id";
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _testDataSet.Write());
+            Assert.Contains("Time_Period_Id", exception.Message);
+        }
+
+        [Fact]
+        public async Task ColumnsDifferOnlyByCase_ThrowsWhenStartingStaging()
+        {
+            _testDataSet.NcYear.Name = _testDataSet
+                .Filters.First(filter => filter != _testDataSet.NcYear)
+                .Name.ToUpper();
+
+            var writer = _testDataSet.BuildWriter();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                writer.StartStaging(
+                    _testDataSet.SubjectId,
+                    _testDataSet.Filters,
+                    _testDataSet.Indicators,
+                    resumeFromCsvRow: null
+                )
+            );
+        }
+
+        [Fact]
         public async Task StagedObservationLocationNotWritten_Throws()
         {
             var writer = _testDataSet.BuildWriter();
