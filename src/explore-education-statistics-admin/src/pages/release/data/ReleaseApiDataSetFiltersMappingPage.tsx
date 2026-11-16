@@ -483,6 +483,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
               <Accordion
                 id={`${sectionIds.newFilterOptions}-accordion`}
                 testId={`${sectionIds.newFilterOptions}-accordion`}
+                showOpenAll={false}
                 {...accordionControls.getAccordionProps(newSectionIds)}
               >
                 {Object.keys(newFilterOptions).map(filterKey => {
@@ -550,7 +551,7 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
 
                       return (
                         <AccordionSection
-                          backToTop={false}
+                          backToTop
                           caption={
                             <>
                               <strong>Column:</strong> <code>{filterKey}</code>
@@ -594,7 +595,6 @@ export default function ReleaseApiDataSetFiltersMappingPage() {
                             }
                             onUpdate={handleUpdateMapping}
                           />
-                          <BackToTopLink />
                         </AccordionSection>
                       );
                     }

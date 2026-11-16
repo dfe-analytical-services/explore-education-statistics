@@ -499,6 +499,7 @@ export default function ReleaseApiDataSetLocationsMappingPage() {
               <Accordion
                 id={`${sectionIds.newLocations}-accordion`}
                 testId={`${sectionIds.newLocations}-accordion`}
+                showOpenAll={false}
                 {...accordionControls.getAccordionProps(newSectionIds)}
               >
                 {typedKeys(newLocations).map(level => {

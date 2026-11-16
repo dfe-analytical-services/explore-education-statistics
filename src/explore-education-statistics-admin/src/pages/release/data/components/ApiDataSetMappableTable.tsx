@@ -70,7 +70,7 @@ export default function ApiDataSetMappableTable({
   const tableId = mappableTableId(groupKey ?? 'default');
 
   const setAllNoMapping = useCallback(async () => {
-    const updateRequestItems = Object.values(mappableItems)
+    const updateRequestItems = mappableItems
       .filter(item => item.mapping.type === 'AutoNone')
       .map(({ candidate, mapping }) => ({
         groupKey,
