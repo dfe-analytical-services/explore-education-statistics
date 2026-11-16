@@ -123,6 +123,8 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
       // @MarkFix Nothing in the Public API reads the data files share yet, but this gives it read access to every EES
       // data set including unpublished ones (it has no StatsDB access). The data processor mounts it read-write too.
       // Drop both mounts, ParquetV1DataFiles__BasePath and the share in containerAppEnvironment.bicep until needed.
+      // Nothing reads a ParquetV1DataFiles section either: DataFilesOptions binds to DataFiles, which here is the
+      // Public API's own share.
       {
         name: 'data-files-file-share-mount'
         storageType: 'AzureFile'

@@ -27,13 +27,16 @@ public static class DataTable
             $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
     }
 
+    /// <summary>
+    /// DuckDB identifiers are case-insensitive, so reserved column names are compared case-insensitively.
+    /// </summary>
     public static bool IsReservedColumn(string column) =>
-        column
+        column.ToLowerInvariant()
             is Cols.Id
                 or Cols.GeographicLevel
                 or Cols.TimePeriodId
                 or Cols.ObservationId
                 or Cols.LocationId
                 or Cols.CsvRow
-        || EnumUtil.GetEnums<GeographicLevel>().Any(level => Cols.LocationOptionId(level) == column);
+        || EnumUtil.GetEnums<GeographicLevel>().Any(level => Cols.LocationOptionId(level) == column.ToLowerInvariant());
 }

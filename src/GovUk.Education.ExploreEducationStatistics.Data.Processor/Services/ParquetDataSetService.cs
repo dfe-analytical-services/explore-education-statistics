@@ -108,6 +108,9 @@ public class ParquetDataSetService(
 
         await dataSetWriter.Complete(cancellationToken);
 
+        // @MarkFix The file stays DataStorageVersion.StatsDB, so deleting or replacing it only runs
+        // StatisticsDbDataSet.Delete, which removes the SQL rows and leaves data-files/{subjectId} on the file share.
+        // Delete the parquet directory too when a StatsDB data set with HasParquet is deleted.
         file.HasParquet = true;
         await contentDbContext.SaveChangesAsync(cancellationToken);
 

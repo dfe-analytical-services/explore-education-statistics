@@ -635,6 +635,9 @@ public class ParquetV1DataSet(Guid subjectId, IParquetDataSetPathResolver pathRe
         return _indicators;
     }
 
+    // @MarkFix This selects every current Location attribute column by name, so adding an attribute to Location makes
+    // every locations.parquet written before the change unreadable. Read only the columns present in the file, or pin
+    // an explicit V1 column list (see LocationsTable.AttributeColumns, which is derived by reflection).
     private async Task<Dictionary<Guid, Location>> GetLocations(CancellationToken cancellationToken)
     {
         if (_locations is not null)

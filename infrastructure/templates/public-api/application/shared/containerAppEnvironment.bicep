@@ -27,6 +27,9 @@ resource publicApiStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' 
   name: resourceNames.publicApi.storage.storageAccount
 }
 
+// @MarkFix The account is created by the importer module in the main infrastructure release, a separate pipeline, so
+// this fails with NotFound if the Public API pipeline runs in an environment before that release. Nothing in the
+// Public API uses the share yet: drop this reference (see the @MarkFix in publicApiApp.bicep).
 resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.dataFiles.storage.storageAccountName
 }
