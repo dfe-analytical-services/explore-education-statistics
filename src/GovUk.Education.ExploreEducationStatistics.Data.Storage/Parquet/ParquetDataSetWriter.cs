@@ -194,8 +194,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
             File.Move(TempPath(path), path, overwrite: true);
         }
 
-        DeleteStagingDb(subjectId);
-
         logger.LogInformation("Wrote parquet files for subject {SubjectId}", subjectId);
     }
 
@@ -204,7 +202,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         await connection
             .SqlBuilder(
                 $"""
-                CREATE TABLE {TimePeriodsTable.TableName:raw}(
+                CREATE OR REPLACE TABLE {TimePeriodsTable.TableName:raw}(
                     {TimePeriodsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                     {TimePeriodsTable.Cols.Period:raw} VARCHAR,
                     {TimePeriodsTable.Cols.Identifier:raw} VARCHAR,
@@ -271,7 +269,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         await connection
             .SqlBuilder(
                 $"""
-                CREATE TABLE {FiltersTable.TableName:raw}(
+                CREATE OR REPLACE TABLE {FiltersTable.TableName:raw}(
                     {FiltersTable.Cols.Id:raw} UUID PRIMARY KEY,
                     {FiltersTable.Cols.PublicId:raw} VARCHAR,
                     {FiltersTable.Cols.Column:raw} VARCHAR,
@@ -289,7 +287,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         await connection
             .SqlBuilder(
                 $"""
-                CREATE TABLE {FilterOptionsTable.TableName:raw}(
+                CREATE OR REPLACE TABLE {FilterOptionsTable.TableName:raw}(
                     {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                     {FilterOptionsTable.Cols.Label:raw} VARCHAR,
                     {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
@@ -361,7 +359,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         await connection
             .SqlBuilder(
                 $"""
-                CREATE TABLE {IndicatorsTable.TableName:raw}(
+                CREATE OR REPLACE TABLE {IndicatorsTable.TableName:raw}(
                     {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
                     {IndicatorsTable.Cols.Column:raw} VARCHAR,
                     {IndicatorsTable.Cols.Label:raw} VARCHAR,
@@ -418,7 +416,9 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         ];
 
         await connection
-            .SqlBuilder($"CREATE TABLE {LocationsTable.TableName:raw} ({locationColumns.JoinToString(", "):raw})")
+            .SqlBuilder(
+                $"CREATE OR REPLACE TABLE {LocationsTable.TableName:raw} ({locationColumns.JoinToString(", "):raw})"
+            )
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         using (var appender = connection.CreateAppender(LocationsTable.TableName))
@@ -456,7 +456,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         await connection
             .SqlBuilder(
                 $"""
-                CREATE TABLE {LocationOptionsTable.TableName:raw}(
+                CREATE OR REPLACE TABLE {LocationOptionsTable.TableName:raw}(
                     {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                     {LocationOptionsTable.Cols.Label:raw} VARCHAR,
                     {LocationOptionsTable.Cols.Level:raw} VARCHAR,
@@ -506,7 +506,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         ];
 
         await connection
-            .SqlBuilder($"CREATE TABLE {LocationLinksTableName:raw} ({linkColumns.JoinToString(", "):raw})")
+            .SqlBuilder($"CREATE OR REPLACE TABLE {LocationLinksTableName:raw} ({linkColumns.JoinToString(", "):raw})")
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         using (var appender = connection.CreateAppender(LocationLinksTableName))
@@ -556,7 +556,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         ];
 
         await connection
-            .SqlBuilder($"CREATE TABLE {DataTable.TableName:raw} ({columns.JoinToString(",\n"):raw})")
+            .SqlBuilder($"CREATE OR REPLACE TABLE {DataTable.TableName:raw} ({columns.JoinToString(",\n"):raw})")
             .ExecuteAsync(cancellationToken: cancellationToken);
 
         // Rows are ordered in the same way as the Public API's data files.
@@ -660,7 +660,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         return connection;
     }
 
-    private void DeleteStagingDb(Guid subjectId)
+    public void DeleteStagingDb(Guid subjectId)
     {
         var stagingDbPath = pathResolver.StagingDbPath(subjectId);
         File.Delete(stagingDbPath);

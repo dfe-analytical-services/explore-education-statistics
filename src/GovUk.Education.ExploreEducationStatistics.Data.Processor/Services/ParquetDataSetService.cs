@@ -74,6 +74,9 @@ public class ParquetDataSetService(
 
         await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
+        // @MarkFix This isn't streamed. The context's retrying execution strategy makes EF buffer the whole result set,
+        // which is a row per observation filter item for the entire data set. Page it by observation id instead, or
+        // run it on a context without the retrying strategy.
         var observations = statisticsDbContext
             .Observation.AsNoTracking()
             .Include(observation => observation.FilterItems)
@@ -107,5 +110,7 @@ public class ParquetDataSetService(
 
         file.HasParquet = true;
         await contentDbContext.SaveChangesAsync(cancellationToken);
+
+        await dataSetWriter.CleanUp(cancellationToken);
     }
 }

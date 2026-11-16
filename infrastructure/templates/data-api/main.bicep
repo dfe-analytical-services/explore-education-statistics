@@ -138,6 +138,8 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
     allowedOrigins: allowedOrigins
+    // @MarkFix App Service mounts the data files share read-write, so this public-facing app could change or delete any
+    // data set's files, published or not. Its StatsDB access is read-only. Find a read-only option.
     azureFileShares: concat(
       [
         {

@@ -253,6 +253,8 @@ public class ImporterService : IImporterService
         var filters = subjectMeta.Filters.Select(meta => meta.Filter).ToList();
         var indicators = subjectMeta.Indicators.Select(meta => meta.Indicator).ToList();
 
+        // @MarkFix Test that both StatsDB and parquet imports resume seamlessly when the importer goes down half way
+        // through an import.
         // Rows are numbered from 2 in the CSV, after the header row.
         await dataSetWriter.StartObservations(
             filters,
