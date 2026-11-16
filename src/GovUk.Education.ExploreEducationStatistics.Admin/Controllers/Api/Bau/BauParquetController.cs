@@ -66,6 +66,10 @@ public class BauParquetController(ContentDbContext contentDbContext, IDataProces
         CancellationToken cancellationToken = default
     )
     {
+        // @MarkFix Nothing records that a file's export is queued or running, so calling this again before earlier
+        // exports finish queues the same files again. Two exports of one file share a staging DB, and
+        // ParquetDataSetService.ExportStatsDbDataSet sets HasParquet without comparing the staged row count with
+        // StatsDB. Record queued/running exports and skip them here, and fail an export whose row counts differ.
         var query = contentDbContext
             .Files.Where(f =>
                 f.Type == FileType.Data

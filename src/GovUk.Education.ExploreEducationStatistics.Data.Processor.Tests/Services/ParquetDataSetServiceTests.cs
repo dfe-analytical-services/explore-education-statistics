@@ -60,6 +60,8 @@ public abstract class ParquetDataSetServiceTests : IDisposable
                 Assert.Equal(DataStorageVersion.StatsDB, savedFile.DataStorageVersion);
             }
 
+            Assert.False(System.IO.File.Exists(_testDataSet.PathResolver.StagingDbPath(_testDataSet.SubjectId)));
+
             var observations = await _testDataSet.BuildDataSet().ListObservations([], [], null);
 
             Assert.Equal(_testDataSet.Observations.Count, observations.Count);

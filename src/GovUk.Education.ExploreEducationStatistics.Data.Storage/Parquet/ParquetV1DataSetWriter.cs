@@ -126,4 +126,10 @@ public class ParquetV1DataSetWriter(
             cancellationToken
         );
     }
+
+    public Task CleanUp(CancellationToken cancellationToken = default)
+    {
+        parquetDataSetWriter.DeleteStagingDb(SubjectId);
+        return Task.CompletedTask;
+    }
 }

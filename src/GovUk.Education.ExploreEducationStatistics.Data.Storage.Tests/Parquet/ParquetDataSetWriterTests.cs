@@ -19,7 +19,7 @@ public abstract class ParquetDataSetWriterTests : IDisposable
     public class WriteTests : ParquetDataSetWriterTests
     {
         [Fact]
-        public async Task WritesParquetFilesAndRemovesStagingDb()
+        public async Task WritesParquetFilesAndKeepsStagingDb()
         {
             await _testDataSet.Write();
 
@@ -33,7 +33,7 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             Assert.True(File.Exists(PathResolver.LocationsPath(subjectId)));
             Assert.True(File.Exists(PathResolver.TimePeriodsPath(subjectId)));
 
-            Assert.False(File.Exists(PathResolver.StagingDbPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.StagingDbPath(subjectId)));
             Assert.Empty(Directory.GetFiles(PathResolver.DirectoryPath(subjectId), "*.tmp"));
         }
 
@@ -54,6 +54,39 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             await writer.WriteFilters(subjectId, _testDataSet.Filters);
 
             Assert.True(writer.HasFilters(subjectId));
+        }
+
+        [Fact]
+        public async Task TimePeriodsAndDataWrittenAgain_ReplacesParquetFiles()
+        {
+            await _testDataSet.Write();
+
+            await _testDataSet
+                .BuildWriter()
+                .WriteTimePeriodsAndData(
+                    _testDataSet.SubjectId,
+                    _testDataSet.Filters,
+                    _testDataSet.Indicators,
+                    _testDataSet.Locations
+                );
+
+            var observations = await _testDataSet.BuildDataSet().ListObservations([], [], null);
+
+            Assert.Equal(_testDataSet.Observations.Count, observations.Count);
+            Assert.Empty(Directory.GetFiles(PathResolver.DirectoryPath(_testDataSet.SubjectId), "*.tmp"));
+        }
+
+        [Fact]
+        public async Task DeleteStagingDb_RemovesStagingDb()
+        {
+            await _testDataSet.Write();
+
+            var subjectId = _testDataSet.SubjectId;
+
+            _testDataSet.BuildWriter().DeleteStagingDb(subjectId);
+
+            Assert.False(File.Exists(PathResolver.StagingDbPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.DataPath(subjectId)));
         }
 
         [Fact]

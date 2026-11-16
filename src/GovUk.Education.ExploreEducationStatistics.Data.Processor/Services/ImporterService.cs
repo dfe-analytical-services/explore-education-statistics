@@ -228,6 +228,8 @@ public class ImporterService : IImporterService
         var filterValuesReader = new FilterValuesReader(csvHeaders, filters);
         var indicatorValuesReader = new IndicatorValuesReader(csvHeaders, indicators);
 
+        // @MarkFix Test that both StatsDB and parquet imports resume seamlessly when the importer goes down half way
+        // through an import.
         // Rows are numbered from 2 in the CSV, after the header row.
         await dataSetWriter.StartObservations(
             filters,

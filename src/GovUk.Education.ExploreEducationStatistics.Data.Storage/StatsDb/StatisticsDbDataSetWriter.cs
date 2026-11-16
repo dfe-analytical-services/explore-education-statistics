@@ -171,4 +171,9 @@ public class StatisticsDbDataSetWriter(
     {
         return Task.CompletedTask;
     }
+
+    public Task CleanUp(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
 }

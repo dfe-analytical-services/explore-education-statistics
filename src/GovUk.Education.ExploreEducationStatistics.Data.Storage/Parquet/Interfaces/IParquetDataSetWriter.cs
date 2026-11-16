@@ -10,7 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interf
 /// The indicators, filters and locations files are each written as soon as their data is known. Observations are
 /// appended to a staging DuckDB database in the data set's directory, which allows an import to resume after a
 /// restart. <see cref="WriteTimePeriodsAndData" /> then builds the time periods and data files from the staged
-/// observations and the files already written, and removes the staging database.
+/// observations and the files already written. The staging database is kept so that
+/// <see cref="WriteTimePeriodsAndData" /> can be run again, until <see cref="DeleteStagingDb" /> removes it.
 /// </remarks>
 public interface IParquetDataSetWriter
 {
@@ -82,7 +83,7 @@ public interface IParquetDataSetWriter
 
     /// <summary>
     /// Writes the time periods and data files from the staged observations and the filter options and location
-    /// options files, and removes the staging database.
+    /// options files, replacing any written by an earlier attempt.
     /// </summary>
     /// <param name="subjectId">The data set's subject id.</param>
     /// <param name="filters">All filters for the data set, as written by <see cref="WriteFilters" />.</param>
@@ -96,4 +97,6 @@ public interface IParquetDataSetWriter
         IReadOnlyList<Location> locations,
         CancellationToken cancellationToken = default
     );
+
+    void DeleteStagingDb(Guid subjectId);
 }

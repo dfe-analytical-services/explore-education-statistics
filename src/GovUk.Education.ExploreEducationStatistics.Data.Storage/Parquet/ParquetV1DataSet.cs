@@ -713,6 +713,9 @@ public class ParquetV1DataSet(Guid subjectId, IParquetDataSetPathResolver pathRe
         return _timePeriods;
     }
 
+    // @MarkFix These connections can read any file the process can reach. Restrict them to this data set's directory
+    // (DuckDB's allowed_directories / enable_external_access, then lock_configuration) so a query bug can't read
+    // another data set's files.
     private static DuckDbConnection OpenConnection()
     {
         var connection = new DuckDbConnection();

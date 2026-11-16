@@ -100,7 +100,14 @@ public interface IStorageDataSetWriter
     Task<List<GeographicLevel>> ListGeographicLevels(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Finishes writing the data set once all of its observations have been written.
+    /// Finishes writing the data set once all of its observations have been written. Can be run again if an
+    /// earlier attempt was interrupted, until <see cref="CleanUp" /> is called.
     /// </summary>
     Task Complete(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes anything kept so that <see cref="Complete" /> could be run again, once the data set has been
+    /// recorded as complete.
+    /// </summary>
+    Task CleanUp(CancellationToken cancellationToken = default);
 }
