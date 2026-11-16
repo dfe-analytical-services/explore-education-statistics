@@ -71,7 +71,15 @@ export default function ApiDataSetMappableTable({
 
   const setAllNoMapping = useCallback(async () => {
     const updateRequestItems = mappableItems
-      .filter(item => item.mapping.type === 'AutoNone')
+      .filter(
+        item =>
+          item.mapping.type === 'AutoNone' &&
+          !pendingUpdates.some(
+            update =>
+              update.groupKey === groupKey &&
+              update.sourceKey === item.mapping.sourceKey,
+          ),
+      )
       .map(({ candidate, mapping }) => ({
         groupKey,
         previousCandidate: candidate,
@@ -80,7 +88,7 @@ export default function ApiDataSetMappableTable({
         type: 'ManualNone' as MappingType,
       }));
     await Promise.all(updateRequestItems.map(item => onUpdate(item)));
-  }, [groupKey, mappableItems, onUpdate]);
+  }, [groupKey, mappableItems, onUpdate, pendingUpdates]);
 
   return (
     <div className="table-container">
