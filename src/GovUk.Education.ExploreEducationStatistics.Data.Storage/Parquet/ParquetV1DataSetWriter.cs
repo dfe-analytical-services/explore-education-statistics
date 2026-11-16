@@ -132,4 +132,10 @@ public class ParquetV1DataSetWriter(
 
         await parquetDataSetWriter.WriteParquetFiles(SubjectId, filters, indicatorGroups, locations, cancellationToken);
     }
+
+    public Task CleanUp(CancellationToken cancellationToken = default)
+    {
+        parquetDataSetWriter.DeleteStagingDb(SubjectId);
+        return Task.CompletedTask;
+    }
 }

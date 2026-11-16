@@ -9,7 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interf
 /// <remarks>
 /// Observations are first appended to a staging DuckDB database in the data set's directory, which allows an
 /// import to resume after a restart. <see cref="WriteParquetFiles" /> then builds each table from the staged
-/// observations and the data set's meta, exports them as parquet files and removes the staging database.
+/// observations and the data set's meta and exports them as parquet files. The staging database is kept so that
+/// <see cref="WriteParquetFiles" /> can be run again, until <see cref="DeleteStagingDb" /> removes it.
 /// </remarks>
 public interface IParquetDataSetWriter
 {
@@ -46,7 +47,7 @@ public interface IParquetDataSetWriter
     Task<List<Guid>> ListStagedLocationIds(Guid subjectId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes the parquet files from the staged observations and removes the staging database.
+    /// Writes the parquet files from the staged observations, replacing any written by an earlier attempt.
     /// </summary>
     /// <param name="subjectId">The data set's subject id.</param>
     /// <param name="filters">All filters for the data set, including their groups and items.</param>
@@ -60,4 +61,6 @@ public interface IParquetDataSetWriter
         IReadOnlyList<Location> locations,
         CancellationToken cancellationToken = default
     );
+
+    void DeleteStagingDb(Guid subjectId);
 }

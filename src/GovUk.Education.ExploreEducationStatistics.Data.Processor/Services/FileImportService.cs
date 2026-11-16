@@ -122,6 +122,7 @@ public class FileImportService(
 
         await FinalImportTasks(import, dataSet, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
+        await dataSetWriter.CleanUp();
     }
 
     private async Task FinalImportTasks(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter)
