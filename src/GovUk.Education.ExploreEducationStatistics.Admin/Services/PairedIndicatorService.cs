@@ -11,8 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class PairedIndicatorService(
     ContentDbContext contentDbContext,
-    StatisticsDbContext statisticsDbContext,
+    IStorageDataSetResolver storageDataSetResolver,
     IUserService userService,
     IDataImportService dataImportService,
     IPrivateBlobCacheService privateBlobCacheService
@@ -48,7 +48,7 @@ public class PairedIndicatorService(
         return await FindDataReleaseFile(releaseVersionId, subjectId, cancellationToken)
             .OnSuccessDo(releaseFile => userService.CheckCanUpdateReleaseVersion(releaseFile.ReleaseVersion))
             .OnSuccessDo(releaseFile => CheckImportComplete(releaseFile.FileId))
-            .OnSuccessDo(() => CheckIndicatorsBelongToSubject(subjectId, request, cancellationToken))
+            .OnSuccessDo(releaseFile => CheckIndicatorsBelongToSubject(releaseFile, request, cancellationToken))
             .OnSuccess(async releaseFile =>
             {
                 // The list is reassigned rather than modified in place, as the column has no value comparer
@@ -102,7 +102,7 @@ public class PairedIndicatorService(
     }
 
     private async Task<Either<ActionResult, Unit>> CheckIndicatorsBelongToSubject(
-        Guid subjectId,
+        ReleaseFile releaseFile,
         PairedIndicatorsUpdateRequest request,
         CancellationToken cancellationToken
     )
@@ -116,13 +116,10 @@ public class PairedIndicatorService(
             return Unit.Instance;
         }
 
-        var matchingIndicatorCount = await statisticsDbContext
-            .Indicator.Where(indicator =>
-                indicator.IndicatorGroup.SubjectId == subjectId && requestedIndicatorIds.Contains(indicator.Id)
-            )
-            .CountAsync(cancellationToken);
+        var dataSet = storageDataSetResolver.Resolve(releaseFile.File);
+        var matchingIndicators = await dataSet.ListIndicators(requestedIndicatorIds, cancellationToken);
 
-        return matchingIndicatorCount == requestedIndicatorIds.Count
+        return matchingIndicators.Count == requestedIndicatorIds.Count
             ? Unit.Instance
             : ValidationResult(ValidationMessages.GenerateErrorPairedIndicatorsIndicatorNotForSubject());
     }
