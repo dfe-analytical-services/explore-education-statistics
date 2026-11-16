@@ -236,12 +236,7 @@ public class ProcessorStage2Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            Mock.Of<IStorageDataSetResolver>(Strict),
-            Mock.Of<IStorageDataSetWriterResolver>(Strict),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,

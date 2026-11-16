@@ -13,12 +13,8 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataImportService(
-    IDbContextSupplier dbContextSupplier,
-    IStorageDataSetResolver storageDataSetResolver,
-    IStorageDataSetWriterResolver storageDataSetWriterResolver,
-    ILogger<DataImportService> logger
-) : IDataImportService
+public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
+    : IDataImportService
 {
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
@@ -133,15 +129,17 @@ public class DataImportService(
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(DataImport import)
+    public async Task WriteDataSetFileMeta(
+        DataImport import,
+        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter
+    )
     {
         var subjectId = import.SubjectId;
 
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
-        var dataSet = storageDataSetResolver.Resolve(file);
-        var dataSetWriter = storageDataSetWriterResolver.Resolve(file);
 
         var importedGeographicLevels = await dataSetWriter.ListGeographicLevels();
 

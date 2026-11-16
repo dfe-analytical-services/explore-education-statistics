@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 
@@ -25,5 +26,5 @@ public interface IDataImportService
         int? lastProcessedRowIndex = null
     );
 
-    Task WriteDataSetFileMeta(DataImport import);
+    Task WriteDataSetFileMeta(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter);
 }
