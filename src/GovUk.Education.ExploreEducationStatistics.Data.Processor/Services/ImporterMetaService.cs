@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
@@ -129,7 +130,10 @@ public class ImporterMetaService : IImporterMetaService
 
         var indicatorGroups = indicatorRows
             .GroupBy(row => row.IndicatorGrouping!)
-            .ToDictionary(rows => rows.Key, rows => dataSetIndicatorGroups.Single(ig => ig.Label == rows.Key));
+            .ToDictionary(
+                rows => rows.Key,
+                rows => dataSetIndicatorGroups.Single(ig => string.Equals(ig.Label, rows.Key, CurrentCultureIgnoreCase))
+            );
 
         return indicatorRows
             .Select(row =>
@@ -138,7 +142,7 @@ public class ImporterMetaService : IImporterMetaService
 
                 return (
                     indicator: indicatorGroup.Indicators.Single(i =>
-                        i.Label == row.Label && i.Unit == row.IndicatorUnit
+                        string.Equals(i.Label, row.Label, CurrentCultureIgnoreCase) && i.Unit == row.IndicatorUnit
                     ),
                     column: row.ColumnName
                 );
