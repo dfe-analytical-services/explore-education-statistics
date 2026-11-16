@@ -1,4 +1,7 @@
-import { DataSetUpload } from '@admin/services/releaseDataFileService';
+import {
+  DataSetUpload,
+  DataSetUploadScreeningStatus,
+} from '@admin/services/releaseDataFileService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -15,13 +18,23 @@ import {
 interface Props {
   releaseVersionId: string;
   dataSetUpload: DataSetUpload;
+  screeningStatus: DataSetUploadScreeningStatus;
 }
 
 export default function DataSetUploadSummaryList({
   releaseVersionId,
   dataSetUpload,
+  screeningStatus,
 }: Props) {
   const uploadedByUrl = `mailto:${dataSetUpload.uploadedBy}`;
+
+  const isScreening = screeningStatus === 'Screening';
+
+  const renderScreeningTag = () => (
+    <Tag colour={getDataSetUploadScreeningStatusColour(screeningStatus)}>
+      {getDataSetUploadScreeningStatusLabel(screeningStatus)}
+    </Tag>
+  );
 
   return (
     <SummaryList testId="Data file details">
@@ -61,15 +74,7 @@ export default function DataSetUploadSummaryList({
       <SummaryListItem term="Size">
         {dataSetUpload.dataFileSize}
       </SummaryListItem>
-      <SummaryListItem term="Status">
-        <Tag
-          colour={getDataSetUploadScreeningStatusColour(
-            dataSetUpload.screeningStatus,
-          )}
-        >
-          {getDataSetUploadScreeningStatusLabel(dataSetUpload.screeningStatus)}
-        </Tag>
-      </SummaryListItem>{' '}
+      <SummaryListItem term="Status">{renderScreeningTag()}</SummaryListItem>
       <SummaryListItem term="Uploaded by">
         <a href={uploadedByUrl}>{dataSetUpload.uploadedBy}</a>
       </SummaryListItem>
@@ -79,9 +84,13 @@ export default function DataSetUploadSummaryList({
         </FormattedDate>
       </SummaryListItem>
       <SummaryListItem term="API compatible">
-        <ApiCompatibilityTag
-          isCompatible={dataSetUpload?.publicApiCompatible}
-        />
+        {isScreening ? (
+          renderScreeningTag()
+        ) : (
+          <ApiCompatibilityTag
+            isCompatible={dataSetUpload.publicApiCompatible}
+          />
+        )}
       </SummaryListItem>
     </SummaryList>
   );
