@@ -94,18 +94,18 @@ public class ReleaseDataSetService(
             return;
         }
 
-        dataSet ??= await storageDataSetResolver.TryResolve(subjectId);
-        if (dataSet != null)
-        {
-            await dataSet.Delete(softDelete: softDelete);
-        }
-
         if (softDelete)
         {
             subject.SoftDeleted = true;
         }
         else
         {
+            dataSet ??= await storageDataSetResolver.TryResolve(subjectId);
+            if (dataSet != null)
+            {
+                await dataSet.Delete();
+            }
+
             statisticsDbContext.Subject.Remove(subject);
         }
 

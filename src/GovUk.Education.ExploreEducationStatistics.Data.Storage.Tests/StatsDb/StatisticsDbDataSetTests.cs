@@ -1090,39 +1090,6 @@ public abstract class StatisticsDbDataSetTests
         }
     }
 
-    public class DeleteTests : StatisticsDbDataSetTests
-    {
-        [Fact]
-        public async Task SoftDelete_SoftDeletesOnlyThisDataSetsSubject()
-        {
-            var subject = new Subject { Id = Guid.NewGuid() };
-            var otherSubject = new Subject { Id = Guid.NewGuid() };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                statisticsDbContext.Subject.AddRange(subject, otherSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var dataSet = BuildDataSet(statisticsDbContext, subjectId: subject.Id);
-
-                await dataSet.Delete(softDelete: true);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToDictionary(s => s.Id);
-
-                Assert.True(subjects[subject.Id].SoftDeleted);
-                Assert.False(subjects[otherSubject.Id].SoftDeleted);
-            }
-        }
-    }
-
     private static StatisticsDbDataSet BuildDataSet(
         StatisticsDbContext statisticsDbContext,
         Guid subjectId,
