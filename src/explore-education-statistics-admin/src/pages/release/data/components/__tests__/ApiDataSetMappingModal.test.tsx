@@ -3,6 +3,7 @@ import {
   LocationMappingWithKey,
   LocationCandidateWithKey,
 } from '@admin/pages/release/data/utils/getApiDataSetLocationMappings';
+import SummaryListItem from '@common/components/SummaryListItem';
 import render from '@common-test/render';
 import { screen, waitFor, within } from '@testing-library/react';
 
@@ -60,6 +61,53 @@ describe('ApiDataSetMappingModal', () => {
     expect(modal.getByRole('group', { name: 'Next data set location' }));
     expect(modal.getByRole('button', { name: 'Update location mapping' }));
     expect(modal.getByRole('button', { name: 'Cancel' }));
+  });
+
+  test('renders `renderSourceDetailsStart` before the label in the current data set summary', async () => {
+    const { user } = render(
+      <ApiDataSetMappingModal
+        groupKey="region"
+        itemLabel="location"
+        mapping={testMapping}
+        newItems={testNewLocations}
+        renderSourceDetailsStart={mapping => (
+          <SummaryListItem term="Column">{mapping.sourceKey}</SummaryListItem>
+        )}
+        onSubmit={Promise.resolve}
+      />,
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Map location for Location 1' }),
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+    expect(modal.getByTestId('Column')).toHaveTextContent('Location1Key');
+
+    const terms = modal.getAllByRole('term');
+    expect(terms).toHaveLength(3);
+    expect(terms[0]).toHaveTextContent('Column');
+    expect(terms[1]).toHaveTextContent('Label');
+    expect(terms[2]).toHaveTextContent('Identifier');
+  });
+
+  test('does not render additional summary items when `renderSourceDetailsStart` is not provided', async () => {
+    const { user } = render(
+      <ApiDataSetMappingModal
+        groupKey="region"
+        itemLabel="location"
+        mapping={testMapping}
+        newItems={testNewLocations}
+        onSubmit={Promise.resolve}
+      />,
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Map location for Location 1' }),
+    );
+
+    const terms = within(screen.getByRole('dialog')).getAllByRole('term');
+    expect(terms).toHaveLength(2);
+    expect(terms[0]).toHaveTextContent('Label');
+    expect(terms[1]).toHaveTextContent('Identifier');
   });
 
   test('submitting the form calls `onSubmit` and closes the modal', async () => {

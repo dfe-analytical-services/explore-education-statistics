@@ -36,10 +36,16 @@ Upload datafiles
     user uploads subject and waits until complete    ${SUBJECT_NAME_2}    tiny-two-filters.csv
     ...    tiny-two-filters.meta.csv    ${PUBLIC_API_FILES_DIR}
 
-Add data guidance to subjects
+Verify API status column shows N/A for unlinked data files
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
+    user waits until page contains data uploads table
 
+    user checks table column heading contains    1    4    API Status    testid:Data files table
+    user waits until data file API status contains    ${SUBJECT_NAME_1}    N/A
+    user waits until data file API status contains    ${SUBJECT_NAME_2}    N/A
+
+Add data guidance to subjects
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
     user adds main data guidance content
@@ -88,6 +94,16 @@ Verify the contents inside the 'Draft API data sets' table
     user checks table cell contains    1    1    v1.0    testid:draft-api-data-sets
     user checks table cell contains    1    3    Ready    testid:draft-api-data-sets
 
+Verify API status shows API Ready for the 2nd data file
+    user clicks link    Data uploads
+    user waits until page contains data uploads table
+
+    user waits until data file API status contains    ${SUBJECT_NAME_2}    API Ready
+    user waits until data file API status contains    ${SUBJECT_NAME_1}    N/A
+
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
 Click on 'cancel' button while attempting to remove draft API data set
     user clicks button in table cell    1    4    Remove draft    testid:draft-api-data-sets
 
@@ -115,12 +131,29 @@ Remove draft API data set
     user waits until modal is not visible    Remove this draft API data set version
     user waits until h2 is visible    API data sets
 
+Verify API status shows N/A for the 2nd data file after removing its draft API data set
+    user clicks link    Data uploads
+    user waits until page contains data uploads table
+
+    user waits until data file API status contains    ${SUBJECT_NAME_2}    N/A
+
+    user clicks link    API data sets
+    user waits until h2 is visible    API data sets
+
 User creates API data set again
     user creates API data set and opens details    ${SUBJECT_NAME_1}
 
 User waits until the 1st API data set status changes to 'Ready'
     user waits until h3 is visible    Draft version details
     user waits until draft API data set status contains    Ready
+
+Verify API status shows API Ready for the 1st data file
+    user clicks link    Back to API data sets
+    user clicks link    Data uploads
+    user waits until page contains data uploads table
+
+    user waits until data file API status contains    ${SUBJECT_NAME_1}    API Ready
+    user waits until data file API status contains    ${SUBJECT_NAME_2}    N/A
 
 Add headline text block to Content page
     user navigates to content page    ${PUBLICATION_NAME}
@@ -149,3 +182,11 @@ Search for API data set
     user clicks radio    Newest
     user checks page contains link    ${SUBJECT_NAME_1}
     user checks list item contains    testid:data-set-file-list    1    ${SUBJECT_NAME_1}
+
+Verify API status shows API Live for the 1st data file after publishing
+    user navigates to published release page from dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+    user clicks link    Data and files
+    user waits until page contains data uploads table
+
+    user waits until data file API status contains    ${SUBJECT_NAME_1}    API Live
+    user waits until data file API status contains    ${SUBJECT_NAME_2}    N/A

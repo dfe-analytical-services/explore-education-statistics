@@ -33,8 +33,12 @@ interface Props {
   readOnly?: boolean;
   renderCandidate: (candidate: CandidateWithKey) => ReactNode;
   renderCaptionEnd?: ReactNode;
-  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSource: (
+    source: MappableSourceItem,
+    mapping: MappingWithKey,
+  ) => ReactNode;
   renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetailsStart?: (mapping: MappingWithKey) => ReactNode;
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -53,6 +57,7 @@ export default function ApiDataSetMappableTable({
   renderCaptionEnd,
   renderSource,
   renderSourceDetails,
+  renderSourceDetailsStart,
   onUpdate,
 }: Props) {
   const isReadOnly = useIsMappingActionsReadOnly(readOnly);
@@ -118,7 +123,7 @@ export default function ApiDataSetMappableTable({
                   'rowHighlight--alert': mapping.type === 'AutoNone',
                 })}
               >
-                <td>{renderSource(mapping.source)}</td>
+                <td>{renderSource(mapping.source, mapping)}</td>
                 <td>
                   {!candidate ? (
                     <>
@@ -179,6 +184,7 @@ export default function ApiDataSetMappableTable({
                           mapping={mapping}
                           newItems={newItems}
                           renderSourceDetails={renderSourceDetails}
+                          renderSourceDetailsStart={renderSourceDetailsStart}
                           onSubmit={onUpdate}
                         />
                       </>

@@ -30,10 +30,4 @@ public interface IFootnoteRepository
     Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId);
 
     Task DeleteFootnotesBySubject(Guid releaseVersionId, Guid subjectId);
-
-    Task DeleteFootnotesByReleaseVersion(Guid releaseVersionId);
-
-    Task<bool> IsFootnoteExclusiveToRelease(Guid releaseVersionId, Guid footnoteId);
-
-    Task DeleteReleaseFootnoteLink(Guid releaseVersionId, Guid footnoteId);
 }

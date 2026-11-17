@@ -19,7 +19,10 @@ public class BoundaryLevelService(IBoundaryLevelRepository boundaryLevelReposito
         CancellationToken cancellationToken = default
     )
     {
-        return await context.BoundaryLevel.ToListAsync(cancellationToken);
+        return await context
+            .BoundaryLevel.OrderBy(i => i.Level)
+            .ThenBy(i => i.Published)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Either<ActionResult, BoundaryLevel>> GetBoundaryLevel(

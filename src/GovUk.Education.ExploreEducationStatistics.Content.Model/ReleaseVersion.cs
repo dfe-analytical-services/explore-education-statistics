@@ -34,6 +34,25 @@ public class ReleaseVersion : ICreatedTimestamp<DateTime>
     [NotMapped]
     public bool Amendment => Version > 0 && !Live;
 
+    [NotMapped]
+    public bool Rollover
+    {
+        get
+        {
+            if (Version != 0)
+            {
+                return false;
+            }
+
+            if (Release == null)
+            {
+                throw new ArgumentException("ReleaseVersion must be hydrated with Release to test if it is a rollover");
+            }
+
+            return Release.RolloverSourceReleaseId != null;
+        }
+    }
+
     [Obsolete("Use ReleaseVersion.Release.PublicationId. This will be removed in EES-5818")]
     public Guid PublicationId { get; set; }
 
