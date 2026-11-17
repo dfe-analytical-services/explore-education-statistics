@@ -1,7 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 /// <summary>
-/// Identifies a data set document. There is one per data file in the latest published version of each release.
+/// Identifies a data set document.
+/// There is one data set document per data file in the latest published version of each release.
 /// </summary>
 public record DataSetDocumentKey
 {

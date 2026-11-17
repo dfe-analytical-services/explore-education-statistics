@@ -9,13 +9,13 @@ public class DataSetDocumentKeyTests
     {
         var key = new DataSetDocumentKey
         {
-            PublicationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            ReleaseId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            FileId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            PublicationId = Guid.Parse("e20a2dd9-98d3-47bc-af5e-4818f3e0e692"),
+            ReleaseId = Guid.Parse("0ad33459-9eab-447d-a43e-23ffb680e9e5"),
+            FileId = Guid.Parse("be210a75-81fc-4be5-bfd7-dfeb73ef7297"),
         };
 
         Assert.Equal(
-            "11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/33333333-3333-3333-3333-333333333333.json",
+            "e20a2dd9-98d3-47bc-af5e-4818f3e0e692/0ad33459-9eab-447d-a43e-23ffb680e9e5/be210a75-81fc-4be5-bfd7-dfeb73ef7297.json",
             key.BlobName
         );
     }

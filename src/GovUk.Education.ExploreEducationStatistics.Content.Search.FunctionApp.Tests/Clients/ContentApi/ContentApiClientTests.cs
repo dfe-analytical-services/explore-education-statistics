@@ -176,14 +176,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 """
                 [
                   {
-                    "publicationId": "11111111-1111-1111-1111-111111111111",
-                    "releaseId": "22222222-2222-2222-2222-222222222222",
-                    "fileId": "33333333-3333-3333-3333-333333333333"
+                    "publicationId": "e20a2dd9-98d3-47bc-af5e-4818f3e0e692",
+                    "releaseId": "0ad33459-9eab-447d-a43e-23ffb680e9e5",
+                    "fileId": "be210a75-81fc-4be5-bfd7-dfeb73ef7297"
                   },
                   {
-                    "publicationId": "44444444-4444-4444-4444-444444444444",
-                    "releaseId": "55555555-5555-5555-5555-555555555555",
-                    "fileId": "66666666-6666-6666-6666-666666666666"
+                    "publicationId": "ab545ac3-bccd-4318-a5bf-0b91df9ffba0",
+                    "releaseId": "3fba773a-2947-46e0-a508-ad82150e4628",
+                    "fileId": "879f551e-3fa3-4d0c-a14c-b11c04300254"
                   }
                 ]
                 """,
@@ -197,15 +197,15 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 [
                     new DataSetDocumentKey
                     {
-                        PublicationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        ReleaseId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                        FileId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                        PublicationId = Guid.Parse("e20a2dd9-98d3-47bc-af5e-4818f3e0e692"),
+                        ReleaseId = Guid.Parse("0ad33459-9eab-447d-a43e-23ffb680e9e5"),
+                        FileId = Guid.Parse("be210a75-81fc-4be5-bfd7-dfeb73ef7297"),
                     },
                     new DataSetDocumentKey
                     {
-                        PublicationId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                        ReleaseId = Guid.Parse("55555555-5555-5555-5555-555555555555"),
-                        FileId = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                        PublicationId = Guid.Parse("ab545ac3-bccd-4318-a5bf-0b91df9ffba0"),
+                        ReleaseId = Guid.Parse("3fba773a-2947-46e0-a508-ad82150e4628"),
+                        FileId = Guid.Parse("879f551e-3fa3-4d0c-a14c-b11c04300254"),
                     },
                 ],
                 result
