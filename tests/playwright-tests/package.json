@@ -1,0 +1,17 @@
+{
+  "name": "explore-education-statistics-playwright-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:browsers": "playwright install chromium",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "tsc": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.20.4",
+    "typescript": "^6.0.3"
+  }
+}
