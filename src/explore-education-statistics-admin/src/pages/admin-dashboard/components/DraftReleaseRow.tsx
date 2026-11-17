@@ -17,7 +17,7 @@ import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { generatePath } from 'react-router';
 import CancelAmendmentModal from './CancelAmendmentModal';
@@ -38,6 +38,7 @@ const DraftReleaseRow = ({
   showMethodology,
   onChangeRelease,
 }: Props) => {
+  const queryClient = useQueryClient();
   const {
     data: methodologyVersions,
     isError: isMethodologyError,
@@ -178,6 +179,16 @@ const DraftReleaseRow = ({
                     await releaseVersionService.deleteReleaseVersion(
                       deleteReleasePlan.releaseVersionId,
                     );
+
+                    // Cancelling an amendment sets any methodologies scheduled
+                    // with it back to draft, so other rows' statuses are stale.
+                    if (deleteReleasePlan.scheduledMethodologies.length > 0) {
+                      queryClient.invalidateQueries({
+                        queryKey:
+                          methodologyQueries.listLatestMethodologyVersions._def,
+                      });
+                    }
+
                     setDeleteReleasePlan(undefined);
                     onChangeRelease();
                   }

@@ -7,7 +7,7 @@ import _releaseVersionService, {
   DashboardReleaseVersionSummary,
 } from '@admin/services/releaseVersionService';
 import render from '@common-test/render';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { useState } from 'react';
 import { MemoryRouter } from 'react-router';
@@ -753,9 +753,11 @@ describe('DraftReleasesTable', () => {
     );
     const { user } = renderTable({ releases: testReleases26 });
 
-    expect(
-      await screen.findByRole('link', { name: /View methodology/ }),
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole('link', { name: /View methodology/ }),
+      ).toHaveLength(25),
+    );
     expect(
       releaseVersionService.getReleaseVersionChecklist,
     ).toHaveBeenCalledTimes(25);
@@ -816,6 +818,137 @@ describe('DraftReleasesTable', () => {
       'release-2',
     );
     expect(onChangeRelease).toHaveBeenCalled();
+  });
+
+  describe('cancelling an amendment with methodology status shown', () => {
+    const amendmentRelease = createRelease(
+      'release-amendment',
+      'publication-1',
+      'Publication 1',
+      2021,
+      {
+        amendment: true,
+        permissions: {
+          canViewReleaseVersion: true,
+          canUpdateRelease: true,
+          canUpdateReleaseVersion: true,
+          canDeleteReleaseVersion: true,
+          canMakeAmendmentOfReleaseVersion: false,
+        },
+      },
+    );
+    const otherRelease = createRelease(
+      'release-other',
+      'publication-1',
+      'Publication 1',
+      2020,
+    );
+
+    const TestTable = ({
+      onChangeRelease,
+    }: {
+      onChangeRelease: () => void;
+    }) => {
+      const [releases, setReleases] = useState([
+        amendmentRelease,
+        otherRelease,
+      ]);
+      return (
+        <MemoryRouter>
+          <DraftReleasesTable
+            showIssues={false}
+            showMethodology
+            releases={releases}
+            onChangeRelease={() => {
+              onChangeRelease();
+              setReleases([otherRelease]);
+            }}
+          />
+        </MemoryRouter>
+      );
+    };
+
+    const getMethodologyStatusCell = (releaseTitle: string) =>
+      within(
+        screen
+          .getByRole('rowheader', { name: releaseTitle })
+          .closest('tr') as HTMLElement,
+      ).getAllByRole('cell')[1];
+
+    const cancelAmendment = async (user: ReturnType<typeof render>['user']) => {
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Cancel amendment for Release release-amendment',
+        }),
+      );
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: 'Confirm',
+        }),
+      );
+    };
+
+    test('refreshes methodology statuses when scheduled methodologies are reset', async () => {
+      const onChangeRelease = jest.fn();
+      releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
+        scheduledMethodologies: [
+          { id: 'methodology-1', title: 'Methodology 1' },
+        ],
+      });
+      methodologyService.listLatestMethodologyVersions
+        .mockResolvedValueOnce([testMethodology])
+        .mockResolvedValue([{ ...testMethodology, status: 'Draft' }]);
+
+      const { user } = render(<TestTable onChangeRelease={onChangeRelease} />);
+
+      await waitFor(() =>
+        expect(
+          getMethodologyStatusCell('Release release-other'),
+        ).toHaveTextContent('Approved'),
+      );
+
+      await cancelAmendment(user);
+
+      await waitFor(() =>
+        expect(
+          getMethodologyStatusCell('Release release-other'),
+        ).toHaveTextContent('Draft'),
+      );
+      expect(onChangeRelease).toHaveBeenCalled();
+      expect(
+        methodologyService.listLatestMethodologyVersions,
+      ).toHaveBeenCalledTimes(2);
+    });
+
+    test('does not refresh methodology statuses when no methodologies were scheduled', async () => {
+      const onChangeRelease = jest.fn();
+      releaseVersionService.getDeleteReleaseVersionPlan.mockResolvedValue({
+        scheduledMethodologies: [],
+      });
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([
+        testMethodology,
+      ]);
+
+      const { user } = render(<TestTable onChangeRelease={onChangeRelease} />);
+
+      await waitFor(() =>
+        expect(
+          getMethodologyStatusCell('Release release-other'),
+        ).toHaveTextContent('Approved'),
+      );
+
+      await cancelAmendment(user);
+
+      await waitFor(() => expect(onChangeRelease).toHaveBeenCalled());
+      expect(
+        screen.queryByRole('rowheader', {
+          name: 'Release release-amendment',
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        methodologyService.listLatestMethodologyVersions,
+      ).toHaveBeenCalledTimes(1);
+    });
   });
 
   test('renders the empty state without pagination', () => {
