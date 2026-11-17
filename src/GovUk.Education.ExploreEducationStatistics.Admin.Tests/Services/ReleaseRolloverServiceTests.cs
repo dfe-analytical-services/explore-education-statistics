@@ -105,12 +105,8 @@ public abstract class ReleaseRolloverServiceTests
 
                 Assert.Equal(publication.Id, actualRelease.PublicationId);
 
-                // The gotcha this specifically guards against: ReleaseVersion.PublicationId is a separate,
-                // required FK from Release.PublicationId - missing it was the original bug this test missed.
                 Assert.Equal(publication.Id, actualReleaseVersion.PublicationId);
 
-                // The gotcha this guards against: the request's RolloverSourceReleaseId must end up
-                // stamped as-is on the new Release - it must be a Release id, not a ReleaseVersion id.
                 Assert.Equal(sourceRelease.Id, actualRelease.RolloverSourceReleaseId);
                 Assert.NotEqual(sourceReleaseVersion.Id, actualRelease.RolloverSourceReleaseId);
 
