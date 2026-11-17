@@ -1,16 +1,16 @@
 import {
   AuthenticationResult,
   Configuration,
+  LogLevel,
   ProtocolMode,
   PublicClientApplication,
-  LogLevel,
 } from '@azure/msal-browser';
 import { OidcConfig } from '@admin/config';
 import logger from '@common/services/logger';
 import {
   dashboardRoute,
-  signInRoute,
   signedOutRoute,
+  signInRoute,
 } from '@admin/routes/routes';
 
 const msalLoggingEnabled = false;
@@ -29,10 +29,9 @@ export async function createMsalInstance(
     auth: {
       clientId: config.clientId,
       authority: config.authority,
-      redirectUri: dashboardRoute.fullPath,
+      redirectUri: `${process.env.PUBLIC_URL}/redirect`,
       postLogoutRedirectUri: signedOutRoute.fullPath,
       knownAuthorities: config.knownAuthorities,
-      protocolMode: ProtocolMode.OIDC,
       authorityMetadata:
         config.authorityMetadata &&
         JSON.stringify({
@@ -46,9 +45,9 @@ export async function createMsalInstance(
     },
     cache: {
       cacheLocation: 'localStorage',
-      storeAuthStateInCookie: false,
     },
     system: {
+      protocolMode: ProtocolMode.OIDC,
       loggerOptions: {
         logLevel: LogLevel.Verbose,
         loggerCallback: (level, message, containsPii) => {
@@ -78,8 +77,8 @@ export async function createMsalInstance(
 
   adminApiScope = config.adminApiScope;
   msalInstance = new PublicClientApplication(msalConfig);
-
   await msalInstance.initialize();
+
   return msalInstance;
 }
 
@@ -101,7 +100,7 @@ export function handleLogin(returnUrl?: string) {
   getMsalInstance()
     .loginRedirect({
       scopes: [adminApiScope],
-      redirectUri: dashboardRoute.fullPath,
+      redirectUri: `${process.env.PUBLIC_URL}/redirect`,
       redirectStartPage: dashboardRoute.fullPath,
       state: JSON.stringify(postLoginState),
     })
@@ -117,6 +116,7 @@ export function handleLogin(returnUrl?: string) {
 export function handleLogout() {
   getMsalInstance()
     .logoutRedirect({
+      idTokenHint: getMsalInstance().getAllAccounts()[0].idToken,
       account: getMsalInstance().getAllAccounts()[0],
       postLogoutRedirectUri: signedOutRoute.fullPath,
     })
@@ -130,13 +130,13 @@ export function handleLogout() {
     });
 }
 
-export function acquireTokenSilent(): Promise<AuthenticationResult> {
+export async function acquireTokenSilent(): Promise<AuthenticationResult> {
   const instance = getMsalInstance();
   const accounts = instance.getAllAccounts();
 
   if (!accounts || accounts.length === 0) {
     handleLogin(window.location.pathname);
-    return Promise.reject(new Error('No account available'));
+    throw new Error('No account available');
   }
 
   return instance.acquireTokenSilent({

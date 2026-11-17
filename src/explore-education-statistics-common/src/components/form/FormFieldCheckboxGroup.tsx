@@ -53,8 +53,8 @@ export default function FormFieldCheckboxGroup<
       inputRef={inputRef}
       options={options}
       value={selectedValues}
-      onAllChange={(event, checked) => {
-        onAllChange?.(event, checked, options);
+      onAllChange={(event, checked, selectableOptions) => {
+        onAllChange?.(event, checked, selectableOptions);
 
         if (event.isDefaultPrevented()) {
           return;
@@ -63,7 +63,7 @@ export default function FormFieldCheckboxGroup<
         handleAllCheckboxChange({
           checked,
           name,
-          options,
+          options: selectableOptions,
           selectedValues,
           setValue,
           trigger,

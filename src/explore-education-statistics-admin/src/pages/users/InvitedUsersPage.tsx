@@ -7,6 +7,10 @@ import userInvitesService, {
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';
+import {
+  administrationIndexRoute,
+  administrationUserInviteRoute,
+} from '@admin/routes/administrationRoutes';
 
 interface Model {
   pendingInvites: PendingInvite[];
@@ -40,17 +44,26 @@ const InvitedUsersPage = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Pending invites' },
       ]}
       title="Pending invites"
       caption="Manage invites to the service"
     >
-      <Link to="/administration/users/invites/create" className="govuk-button">
+      <Link
+        to={administrationUserInviteRoute.fullPath}
+        className="govuk-button"
+      >
         Invite a new user
       </Link>
       <p>
-        <Link to="/administration/" className="govuk-back-link">
+        <Link
+          to={administrationIndexRoute.fullPath}
+          className="govuk-back-link"
+        >
           Back
         </Link>
       </p>

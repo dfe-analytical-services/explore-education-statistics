@@ -1,6 +1,7 @@
 import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import ApiDataSetMappableTable from '@admin/pages/release/data/components/ApiDataSetMappableTable';
 import { GlobalPermissions } from '@admin/services/authService';
+import SummaryListItem from '@common/components/SummaryListItem';
 import render from '@common-test/render';
 import { screen, within } from '@testing-library/react';
 import React, { ComponentProps } from 'react';
@@ -229,6 +230,42 @@ describe('ApiDataSetMappableTable', () => {
         name: 'Map filter option for Filter Option 2',
       }),
     ).not.toBeInTheDocument();
+  });
+
+  test('passes the mapping to `renderSource`', () => {
+    renderTable({
+      renderSource: (source, mapping) =>
+        `${source.label} (${mapping.sourceKey})`,
+    });
+
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+
+    expect(within(rows[1]).getAllByRole('cell')[0]).toHaveTextContent(
+      'Filter Option 1 (FilterOption1SourceKey)',
+    );
+    expect(within(rows[2]).getAllByRole('cell')[0]).toHaveTextContent(
+      'Filter Option 2 (FilterOption2SourceKey)',
+    );
+  });
+
+  test('passes `renderSourceDetailsStart` to the mapping modal', async () => {
+    const { user } = renderTable({
+      renderSourceDetailsStart: mapping => (
+        <SummaryListItem term="Column">{mapping.sourceKey}</SummaryListItem>
+      ),
+    });
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Map filter option for Filter Option 1',
+      }),
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+    expect(modal.getByTestId('Column')).toHaveTextContent(
+      'FilterOption1SourceKey',
+    );
+    expect(modal.getAllByRole('term')[0]).toHaveTextContent('Column');
   });
 
   function renderTable(

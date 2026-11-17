@@ -8,6 +8,7 @@ import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { ReactNode, useCallback } from 'react';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 
 export interface DeleteDraftVersionButtonProps {
   children: ReactNode;
@@ -34,9 +35,14 @@ export default function DeleteDraftVersionButton({
     queryClient.removeQueries({
       queryKey: apiDataSetQueries.get(dataSet.id).queryKey,
     });
-    await queryClient.invalidateQueries({
-      queryKey: apiDataSetQueries.list._def,
-    });
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: apiDataSetQueries.list._def,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: releaseDataFileQueries.list._def,
+      }),
+    ]);
   }, [dataSet.id, dataSetVersion.id, onDeleted, queryClient]);
 
   return (

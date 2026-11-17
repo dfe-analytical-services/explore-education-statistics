@@ -1,10 +1,14 @@
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
-import { KeyStatistic } from '@common/services/publicationService';
+import {
+  DataBlockViewModel,
+  KeyStatistic,
+} from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import prefetchSsrDataBlocks from '@frontend/modules/find-statistics/utils/prefetchSsrDataBlocks';
 import { DehydratedState } from '@tanstack/react-query';
+import logger from '@common/services/logger';
 import noop from 'lodash/noop';
 
 jest.mock('@common/services/tableBuilderService');
@@ -12,6 +16,10 @@ jest.mock('@common/services/tableBuilderService');
 const tableBuilderService = jest.mocked(_tableBuilderService);
 
 describe('prefetchSsrDataBlocks', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   const releaseVersionId = 'release-version-1';
 
   const keyStatistics: KeyStatistic[] = [
@@ -27,7 +35,27 @@ describe('prefetchSsrDataBlocks', () => {
     },
   ];
 
-  // Only the parts `tableBuilderQueries.getKeyStat` reads.
+  const testHomeContent = ({
+    content = [],
+    keyStatistics: testKeyStatistics = [],
+  }: {
+    content?: DataBlockViewModel[];
+    keyStatistics?: KeyStatistic[];
+  }) => ({
+    content: [{ id: 'section-1', heading: 'Section 1', content }],
+    keyStatistics: testKeyStatistics,
+    keyStatisticsSecondarySection: { id: 'secondary-section', content: [] },
+  });
+
+  const testDataBlock = (dataBlockId: string): DataBlockViewModel => ({
+    id: `content-block-${dataBlockId}`,
+    type: 'DataBlockVersionLink',
+    dataBlockVersion: {
+      dataBlockId,
+      table: {},
+    } as DataBlockViewModel['dataBlockVersion'],
+  });
+
   const testTableData = (value: string) =>
     ({
       subjectMeta: {
@@ -47,6 +75,11 @@ describe('prefetchSsrDataBlocks', () => {
   const keyStatKey = (dataBlockId: string) =>
     tableBuilderQueries.getKeyStat(releaseVersionId, dataBlockId).queryKey;
 
+  // The same key `DataBlockTabs` reads, so it renders from the cache.
+  const tableKey = (dataBlockId: string) =>
+    tableBuilderQueries.getDataBlockTable(releaseVersionId, dataBlockId)
+      .queryKey;
+
   const getQueryKeys = (state: DehydratedState) =>
     state.queries.map(query => query.queryKey);
 
@@ -56,7 +89,7 @@ describe('prefetchSsrDataBlocks', () => {
       .mockResolvedValueOnce(testTableData('2000'));
 
     const state = await prefetchSsrDataBlocks({
-      homeContent: { keyStatistics },
+      homeContent: testHomeContent({ keyStatistics }),
       releaseVersionId,
     });
 
@@ -79,6 +112,46 @@ describe('prefetchSsrDataBlocks', () => {
     });
   });
 
+  test('returns the fetched data block tables', async () => {
+    const tableData = testTableData('1000');
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(tableData);
+
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({
+        content: [testDataBlock('data-block-1')],
+      }),
+      releaseVersionId,
+    });
+
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledWith(
+      releaseVersionId,
+      'data-block-1',
+    );
+
+    expect(getQueryKeys(state)).toEqual([tableKey('data-block-1')]);
+    expect(state.queries[0].state.data).toEqual(tableData);
+  });
+
+  test('returns key stats and tables together', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableData('1000'),
+    );
+
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({
+        content: [testDataBlock('data-block-3')],
+        keyStatistics,
+      }),
+      releaseVersionId,
+    });
+
+    expect(getQueryKeys(state)).toEqual([
+      keyStatKey('data-block-1'),
+      keyStatKey('data-block-2'),
+      tableKey('data-block-3'),
+    ]);
+  });
+
   test('does not throw or return a key stat whose fetch fails', async () => {
     const error = new Error('Something went wrong');
 
@@ -91,7 +164,7 @@ describe('prefetchSsrDataBlocks', () => {
 
     try {
       const state = await prefetchSsrDataBlocks({
-        homeContent: { keyStatistics },
+        homeContent: testHomeContent({ keyStatistics }),
         releaseVersionId,
       });
 
@@ -103,22 +176,67 @@ describe('prefetchSsrDataBlocks', () => {
   });
 
   test('stops waiting after the timeout, and does not return pending key stats', async () => {
+    const logWarning = jest.spyOn(logger, 'warn');
+
     tableBuilderService.getDataBlockTableData
       .mockResolvedValueOnce(testTableData('1000'))
       .mockReturnValueOnce(new Promise(noop));
 
     const state = await prefetchSsrDataBlocks({
-      homeContent: { keyStatistics },
+      homeContent: testHomeContent({ keyStatistics }),
       releaseVersionId,
       timeoutMs: 10,
     });
 
     expect(getQueryKeys(state)).toEqual([keyStatKey('data-block-1')]);
+    expect(logWarning).toHaveBeenCalledWith(
+      `Timed out prefetching SSR data blocks for release ${releaseVersionId} after 10ms`,
+    );
   });
 
-  test('does not fetch anything when there are no data block key stats', async () => {
+  test('logs genuine API failures without failing the page', async () => {
+    const testError = new Error('API unavailable');
+    const logError = jest.spyOn(logger, 'error');
+    jest.spyOn(console, 'error').mockImplementation(noop);
+    tableBuilderService.getDataBlockTableData.mockRejectedValue(testError);
+
     const state = await prefetchSsrDataBlocks({
-      homeContent: {
+      homeContent: testHomeContent({
+        content: [testDataBlock('data-block-1')],
+      }),
+      releaseVersionId,
+    });
+
+    expect(state.queries).toEqual([]);
+    expect(logError).toHaveBeenCalledWith(testError);
+  });
+
+  test('clears the timeout when the data blocks load in time', async () => {
+    jest.useFakeTimers();
+    const logWarning = jest.spyOn(logger, 'warn');
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableData('1000'),
+    );
+
+    try {
+      const state = await prefetchSsrDataBlocks({
+        homeContent: testHomeContent({ keyStatistics }),
+        releaseVersionId,
+        timeoutMs: 10,
+      });
+
+      jest.advanceTimersByTime(10);
+
+      expect(state.queries).toHaveLength(2);
+      expect(logWarning).not.toHaveBeenCalled();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test('does not fetch anything when there are no data blocks', async () => {
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({
         keyStatistics: [
           {
             type: 'KeyStatisticText',
@@ -127,7 +245,7 @@ describe('prefetchSsrDataBlocks', () => {
             statistic: '100',
           },
         ],
-      },
+      }),
       releaseVersionId,
     });
 

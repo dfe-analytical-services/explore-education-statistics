@@ -50,6 +50,9 @@ param enableThemeDeletion bool = false
 @description('Whether or not to enable published Education In Numbers pages deletion in this environment.')
 param enableEinPublishedPageDeletion bool = false
 
+@description('Whether or not to enable the release rollover feature in this environment.')
+param enableReleaseRollover bool = false
+
 @description('Pre-release start time as number of minutes before a release is scheduled to be published.')
 param preReleaseMinutesBeforeStart int = 870
 
@@ -120,6 +123,7 @@ output appSettings object = {
   App__EnableSwagger: enableSwagger
   App__EnableThemeDeletion: enableThemeDeletion
   App__EnableEinPublishedPageDeletion: enableEinPublishedPageDeletion
+  App__EnableReleaseRollover: enableReleaseRollover
   Azure__SignalR__ConnectionString: secretRefs[resourceNames.keyVault.secrets.admin.adminSignalrConnectionString]
   EventGrid__EventTopics__0__Key: 'PublicationChangedEvent'
   EventGrid__EventTopics__0__TopicEndpoint: reference(

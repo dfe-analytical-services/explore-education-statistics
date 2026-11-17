@@ -32,6 +32,10 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DateTime? Updated { get; set; }
 
+    public Guid? RolloverSourceReleaseId { get; set; }
+
+    public Release? RolloverSourceRelease { get; set; }
+
     public string TimePeriod =>
         TimePeriodLabelFormatter.Format(Year, TimePeriodCoverage, TimePeriodLabelFormat.FullLabelBeforeYear);
 
@@ -62,6 +66,12 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
                 })
                 .IsUnique()
                 .HasFilter(null);
+
+            builder
+                .HasOne(r => r.RolloverSourceRelease)
+                .WithMany()
+                .HasForeignKey(r => r.RolloverSourceReleaseId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

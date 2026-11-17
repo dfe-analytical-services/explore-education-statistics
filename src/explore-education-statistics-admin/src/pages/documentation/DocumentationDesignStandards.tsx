@@ -2,6 +2,7 @@ import Page from '@admin/components/Page';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
+import { documentationIndexRoute } from '@admin/routes/documentationRoutes';
 import imageInvertedPyramid from './images/guidance/guidance-design-standards-inverted-pyramid.png';
 
 const DocumentationDesignStandards = () => {
@@ -9,7 +10,10 @@ const DocumentationDesignStandards = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Content design standards guide' },
       ]}
       title="Content design standards guide"

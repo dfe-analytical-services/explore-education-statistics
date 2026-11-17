@@ -19,7 +19,7 @@ internal record ReleaseSearchableDocumentDto
     public required ReleaseSearchableDocumentPublishingOrganisationDto[] PublishingOrganisations { get; init; }
     public required string HtmlContent { get; init; }
 
-    public ReleaseSearchableDocument ToModel() =>
+    public ReleaseDocument ToModel() =>
         new()
         {
             ReleaseId = ReleaseId,

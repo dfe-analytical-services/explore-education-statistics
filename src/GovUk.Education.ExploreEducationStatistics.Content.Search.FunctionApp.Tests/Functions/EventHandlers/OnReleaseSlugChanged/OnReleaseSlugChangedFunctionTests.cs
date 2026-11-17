@@ -17,7 +17,7 @@ public class OnReleaseSlugChangedFunctionTests
 
     [Theory]
     [MemberData(nameof(TheoryDatas.Blank.Bools), MemberType = typeof(TheoryDatas.Blank))]
-    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshSearchableDocumentMessageDtoReturned(
+    public async Task GivenEvent_WhenPayloadContainsPublicationSlug_ThenRefreshReleaseDocumentMessageDtoReturned(
         bool? isPublicationArchived
     )
     {

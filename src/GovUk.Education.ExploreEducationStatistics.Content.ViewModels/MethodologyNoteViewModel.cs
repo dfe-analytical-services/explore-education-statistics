@@ -1,10 +1,20 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record MethodologyNoteViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Content { get; set; } = null!;
+    public required string Content { get; init; }
 
-    public DateTime DisplayDate { get; set; }
+    public required DateTime DisplayDate { get; init; }
+
+    public static MethodologyNoteViewModel FromModel(MethodologyNote methodologyNote) =>
+        new()
+        {
+            Id = methodologyNote.Id,
+            Content = methodologyNote.Content,
+            DisplayDate = methodologyNote.DisplayDate,
+        };
 }

@@ -1,6 +1,11 @@
 import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
+import {
+  documentationConfigureChartsRoute,
+  documentationIndexRoute,
+  documentationManageDataBlockRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageDataTab from './images/guidance/guidance-data-tab.png';
@@ -32,7 +37,10 @@ const DocumentationManageContent = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Managing data' },
       ]}
       title="Managing data"
@@ -331,7 +339,7 @@ const DocumentationManageContent = () => {
               <p>
                 For detailed guidance on how to use your data to create data
                 blocks, tables and charts for your release -{' '}
-                <Link to="/documentation/manage-data-block">
+                <Link to={documentationManageDataBlockRoute.fullPath}>
                   Managing data blocks and creating tables and charts: step by
                   step.
                 </Link>
@@ -630,7 +638,7 @@ const DocumentationManageContent = () => {
               <p>
                 For more detailed guidance on how to create data blocks, tables
                 and charts for your release -{' '}
-                <Link to="/documentation/manage-data-block">
+                <Link to={documentationManageDataBlockRoute.fullPath}>
                   Managing data blocks and creating tables and charts: step by
                   step.
                 </Link>
@@ -638,7 +646,7 @@ const DocumentationManageContent = () => {
               <p>
                 For more detailed guidance on how to configure charts within
                 your release -{' '}
-                <Link to="/documentation/configure-charts">
+                <Link to={documentationConfigureChartsRoute.fullPath}>
                   Configuring charts: step by step.
                 </Link>
               </p>

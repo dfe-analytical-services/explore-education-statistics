@@ -1,12 +1,26 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public class ContentSectionViewModel
+public record ContentSectionViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public int Order { get; set; }
+    public required int Order { get; init; }
 
-    public string Heading { get; set; } = string.Empty;
+    public required string Heading { get; init; }
 
-    public List<IContentBlockViewModel> Content { get; set; } = new();
+    public required List<IContentBlockViewModel> Content { get; init; }
+
+    public static ContentSectionViewModel FromModel(ContentSection contentSection) =>
+        new()
+        {
+            Id = contentSection.Id,
+            Order = contentSection.Order,
+            Heading = contentSection.Heading ?? string.Empty,
+            Content = contentSection
+                .Content.OrderBy(contentBlock => contentBlock.Order)
+                .Select(IContentBlockViewModel.FromModel)
+                .ToList(),
+        };
 }

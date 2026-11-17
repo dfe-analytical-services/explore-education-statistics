@@ -5,6 +5,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
 
 public class AllMethodologiesThemeViewModelTests
 {
+    private static readonly MethodologyVersionSummaryViewModel _methodology = new()
+    {
+        Id = Guid.NewGuid(),
+        Slug = "methodology-slug",
+        Title = "Methodology title",
+    };
+
     [Fact]
     public void RemovePublicationNodesWithoutMethodologiesAndSort_RemovesPublicationsWithoutMethodologies()
     {
@@ -21,7 +28,7 @@ public class AllMethodologiesThemeViewModelTests
                 new AllMethodologiesPublicationViewModel
                 {
                     Title = "PublicationWithMethodology",
-                    Methodologies = [new()],
+                    Methodologies = [_methodology],
                 },
             ],
         };
@@ -40,9 +47,9 @@ public class AllMethodologiesThemeViewModelTests
             Title = "ThemeWithPublications",
             Publications =
             [
-                new AllMethodologiesPublicationViewModel { Title = "Publication C", Methodologies = [new()] },
-                new AllMethodologiesPublicationViewModel { Title = "Publication A", Methodologies = [new()] },
-                new AllMethodologiesPublicationViewModel { Title = "Publication B", Methodologies = [new()] },
+                new AllMethodologiesPublicationViewModel { Title = "Publication C", Methodologies = [_methodology] },
+                new AllMethodologiesPublicationViewModel { Title = "Publication A", Methodologies = [_methodology] },
+                new AllMethodologiesPublicationViewModel { Title = "Publication B", Methodologies = [_methodology] },
             ],
         };
 

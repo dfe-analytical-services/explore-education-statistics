@@ -100,6 +100,7 @@ const PublicationReleaseHeadlinesSection = ({
             ...secondaryKeyStatsDataBlock.dataBlockVersion,
           }}
           dataBlockStaleTime={Infinity}
+          lazy={false}
           firstTabs={
             <TabsSection title="Summary" id="releaseHeadlines-summary">
               {summaryTab}

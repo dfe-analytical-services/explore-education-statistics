@@ -13,8 +13,14 @@ param sku AppServicePlanSku
 @description('The operating system to use to host App Services.')
 param operatingSystem 'Windows' | 'Linux'
 
-@description('The kind of plan to create. Use "app,linux,container" and "Linux" for the "operatingSystem" param for App Services for Docker.')
-param kind 'app' | 'app,linux,container'
+@description('''The kind of plan to create. Use "app" with the "Windows" operating system for code on Windows, "app,linux"
+with "Linux" for code on Linux, and "app,linux,container" with "Linux" for Docker.''')
+param kind 'app' | 'app,linux' | 'app,linux,container'
+
+@description('''Whether to spread the plan's instances across availability zones. Needs a Premium v2 to v4 SKU, and runs at
+least 2 instances. Azure enforces that minimum itself when the SKU gives no capacity, so a capacity isn't set here, which
+would also reset autoscaled instance counts on every deploy.''')
+param zoneRedundant bool = false
 
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param alerts {
@@ -37,9 +43,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
       ServiceType: 'App Service plan'
     }
   ) 
-  properties: {
+  properties: union({
     reserved: operatingSystem == 'Linux'
-  }
+  }, zoneRedundant ? { zoneRedundant: true } : {})
 }
 
 module cpuPercentageAlert '../alerts/dynamicMetricAlert.bicep' = if (alerts != null && alerts!.cpuPercentage) {

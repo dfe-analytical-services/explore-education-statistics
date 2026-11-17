@@ -60,7 +60,11 @@ def user_signs_in_as(user: str):
             identity_provider=os.getenv("IDENTITY_PROVIDER"),
         )
 
+        # MSAL 5 generates randomly named storage items, so will create multiple identities if we just add
+        # local storage instead of clearing it first
+        local_storage_helper.clear_browser_local_storage(sl().driver)
         local_storage_helper.write_local_storage_json_to_local_storage(local_storage_json, sl().driver)
+        local_storage_helper.write_auth_encryption_to_cookie(local_storage_json=local_storage_json, driver=sl().driver)
 
         sl().go_to(admin_url)
     except Exception as e:

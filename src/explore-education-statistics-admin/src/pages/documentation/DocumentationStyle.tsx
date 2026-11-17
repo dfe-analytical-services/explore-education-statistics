@@ -2,13 +2,17 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
 import Page from '@admin/components/Page';
+import { documentationIndexRoute } from '@admin/routes/documentationRoutes';
 
 const DocumentationGlossary = () => {
   return (
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Style guide' },
       ]}
       title="Style guide"

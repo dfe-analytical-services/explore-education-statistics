@@ -16,6 +16,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { useQuery, useQueryClient, Updater } from '@tanstack/react-query';
 import React, { useCallback, useMemo } from 'react';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import { ApiUploadStatusValue } from './data-files/ApiUploadStatus';
 import DataFilesTable from './DataFilesTable';
 import DataUploadsGuidance from './DataUploadsGuidance';
 import DataFileUploadForm from './DataFileUploadForm';
@@ -62,6 +64,57 @@ export default function ReleaseDataUploadsSection({
     isLoading: isLoadingUploads,
     refetch: refetchDataSetUploads,
   } = useQuery(releaseDataFileQueries.listUploads(releaseVersionId));
+
+  const hasLinkedApiDataFiles = importStageDataFiles.some(
+    file => !!file.publicApiDataSetId,
+  );
+
+  const { data: apiDataSets = [] } = useQuery({
+    ...apiDataSetQueries.list(publicationId),
+    enabled: hasLinkedApiDataFiles,
+    refetchInterval: 20_000, // 20 seconds
+  });
+
+  // Derive a status mapping without changing the DataFile objects.
+  const dataFileApiStatuses = useMemo(() => {
+    const statuses: Record<string, ApiUploadStatusValue> = {};
+
+    importStageDataFiles.forEach(dataFile => {
+      const { publicApiDataSetId, publicApiDataSetVersion } = dataFile;
+
+      if (!publicApiDataSetId || !publicApiDataSetVersion) {
+        return;
+      }
+
+      const dataSet = apiDataSets.find(item => item.id === publicApiDataSetId);
+
+      const draft = dataSet?.draftVersion;
+
+      if (draft?.version === publicApiDataSetVersion) {
+        if (draft.status === 'Draft') {
+          statuses[dataFile.id] = 'API READY';
+        } else if (
+          draft.status === 'Processing' ||
+          draft.status === 'Mapping' ||
+          draft.status === 'Finalising'
+        ) {
+          statuses[dataFile.id] = 'API DRAFT';
+        }
+
+        return;
+      }
+
+      // Previously published versions remain accessible in the API.
+      if (
+        dataSet?.latestLiveVersion &&
+        dataSet.latestLiveVersion.status !== 'Withdrawn'
+      ) {
+        statuses[dataFile.id] = 'API LIVE';
+      }
+    });
+
+    return statuses;
+  }, [importStageDataFiles, apiDataSets]);
 
   const newDataSetUploads = useMemo(
     () => preImportDataSetUploads.filter(upload => !upload.replacingFileId),
@@ -267,6 +320,7 @@ export default function ReleaseDataUploadsSection({
                     permissions={permissions}
                     caption="Data files"
                     dataFiles={dataFilesWithoutImportedReplacements}
+                    dataFilesApiStatus={dataFileApiStatuses}
                     dataSetUploads={newDataSetUploads}
                     publicationId={publicationId}
                     releaseVersionId={releaseVersionId}

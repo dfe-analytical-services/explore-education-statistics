@@ -1,10 +1,20 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record MethodologyVersionSummaryViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Slug { get; set; } = string.Empty;
+    public required string Slug { get; init; }
 
-    public string Title { get; set; } = string.Empty;
+    public required string Title { get; init; }
+
+    public static MethodologyVersionSummaryViewModel FromModel(MethodologyVersion methodologyVersion) =>
+        new()
+        {
+            Id = methodologyVersion.Id,
+            Slug = methodologyVersion.Slug,
+            Title = methodologyVersion.Title,
+        };
 }

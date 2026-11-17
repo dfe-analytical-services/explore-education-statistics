@@ -280,6 +280,57 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox3).not.toBeChecked();
   });
 
+  test('selecting and unselecting all options leaves disabled options unchanged', async () => {
+    const { user } = render(
+      <FormProvider
+        initialValues={{
+          test: ['3'],
+        }}
+      >
+        <FormFieldCheckboxGroup
+          name="test"
+          id="checkboxes"
+          legend="Test checkboxes"
+          selectAll
+          options={[
+            { id: 'checkbox-1', value: '1', label: 'Checkbox 1' },
+            { id: 'checkbox-2', value: '2', label: 'Checkbox 2' },
+            {
+              id: 'checkbox-3',
+              value: '3',
+              label: 'Checkbox 3',
+              disabled: true,
+            },
+            {
+              id: 'checkbox-4',
+              value: '4',
+              label: 'Checkbox 4',
+              disabled: true,
+            },
+          ]}
+        />
+      </FormProvider>,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Select all 2 options' }),
+    );
+
+    expect(screen.getByLabelText('Checkbox 1')).toBeChecked();
+    expect(screen.getByLabelText('Checkbox 2')).toBeChecked();
+    expect(screen.getByLabelText('Checkbox 3')).toBeChecked();
+    expect(screen.getByLabelText('Checkbox 4')).not.toBeChecked();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Unselect all 2 options' }),
+    );
+
+    expect(screen.getByLabelText('Checkbox 1')).not.toBeChecked();
+    expect(screen.getByLabelText('Checkbox 2')).not.toBeChecked();
+    expect(screen.getByLabelText('Checkbox 3')).toBeChecked();
+    expect(screen.getByLabelText('Checkbox 4')).not.toBeChecked();
+  });
+
   test('checking all options renders the `Unselect all 3 options` button', async () => {
     const { user } = render(
       <FormProvider

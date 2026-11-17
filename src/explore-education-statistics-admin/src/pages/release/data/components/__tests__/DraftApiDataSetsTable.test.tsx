@@ -593,6 +593,7 @@ describe('DraftApiDataSetsTable', () => {
       publicAppUrl: 'http://localhost',
       publicApiUrl: 'http://public-api',
       publicApiDocsUrl: 'http://public-api-docs',
+      enableReleaseRollover: false,
       permittedEmbedUrlDomains: [
         'https://department-for-education.shinyapps.io',
       ],

@@ -15,6 +15,10 @@ import boundaryDataQueries from '@admin/queries/boundaryDataQueries';
 import Yup from '@common/validation/yup';
 import { ObjectSchema } from 'yup';
 import { useNavigate, useParams } from 'react-router';
+import {
+  administrationBoundaryDataRoute,
+  administrationIndexRoute,
+} from '@admin/routes/administrationRoutes';
 
 export default function BoundaryLevelEditPage() {
   interface FormValues {
@@ -56,8 +60,14 @@ export default function BoundaryLevelEditPage() {
       caption="Edit boundary level"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
-        { name: 'Boundary data', link: '/administration/boundary-data' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
+        {
+          name: 'Boundary data',
+          link: administrationBoundaryDataRoute.fullPath,
+        },
         { name: 'Boundary level' },
       ]}
     >

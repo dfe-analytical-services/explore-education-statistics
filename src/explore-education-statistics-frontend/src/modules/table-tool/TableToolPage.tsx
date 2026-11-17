@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import TableToolWizard, {
   InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';
@@ -6,6 +7,11 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import {
+  addMissingParentIndicators,
+  getPairedIndicatorChildIds,
+  normalisePairedIndicators,
+} from '@common/modules/table-tool/utils/pairedIndicators';
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
@@ -389,30 +395,45 @@ export const getServerSideProps: GetServerSideProps<
   let subjectMeta: SubjectMeta | undefined;
   let selectedSubjectId: string | undefined;
 
-  const urlObj = new URL(req.url || '', process.env.PUBLIC_URL);
+  const urlObj = new URL(req.url || '', getPublicEnv('PUBLIC_URL'));
 
   // Check if the user has come from table tool search (with compressed query string)
   const hasCompressedQuery = urlObj.searchParams.has('fromSearch');
   if (hasCompressedQuery) {
     try {
       const decodedQuery = decodeParamsToFullTableQuery(urlObj.searchParams);
-      initialQuery = {
+      const fetchedSubjectMeta = await tableBuilderService.getSubjectMeta(
+        decodedQuery.subjectId,
+        selectedReleaseVersion.id,
+      );
+
+      // The search query skips the filters step, so add any paired indicators
+      // here for the table to match the form and its summary. Search can ask
+      // for a child indicator on its own, so add its parent first rather than
+      // let normalising drop the requested indicator.
+      const childIdsByParentId = getPairedIndicatorChildIds(
+        Object.values(fetchedSubjectMeta.indicators),
+      );
+      const searchQuery = {
         ...decodedQuery,
+        indicators: normalisePairedIndicators(
+          addMissingParentIndicators(
+            decodedQuery.indicators,
+            childIdsByParentId,
+          ),
+          childIdsByParentId,
+        ),
+      };
+      initialQuery = {
+        ...searchQuery,
         releaseVersionId: selectedReleaseVersion.id,
         publicationId: selectedPublication.id,
       };
-      const [fetchedSubjectMeta, fetchedTableData] = await Promise.all([
-        tableBuilderService.getSubjectMeta(
-          decodedQuery.subjectId,
-          selectedReleaseVersion.id,
-        ),
-        tableBuilderService.getTableData(
-          decodedQuery,
-          selectedReleaseVersion.id,
-        ),
-      ]);
       subjectMeta = fetchedSubjectMeta;
-      initialTableData = fetchedTableData;
+      initialTableData = await tableBuilderService.getTableData(
+        searchQuery,
+        selectedReleaseVersion.id,
+      );
       selectedSubjectId = decodedQuery.subjectId;
     } catch (e) {
       logger.error(e);

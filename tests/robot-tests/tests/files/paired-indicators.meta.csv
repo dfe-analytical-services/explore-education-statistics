@@ -1,0 +1,9 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+school_type,Filter,School type,,,,,
+enrolments,Indicator,Number of pupil enrolments,Enrolments,,0,,
+sess_overall,Indicator,Overall absence sessions,Absence sessions,,0,,
+sess_authorised,Indicator,Authorised absence sessions,Absence sessions,,0,,
+sess_unauthorised,Indicator,Unauthorised absence sessions,Absence sessions,,0,,
+sess_overall_percent,Indicator,Overall absence rate,Absence rates,%,2,,
+sess_authorised_percent,Indicator,Authorised absence rate,Absence rates,%,2,,
+sess_unauthorised_percent,Indicator,Unauthorised absence rate,Absence rates,%,2,,

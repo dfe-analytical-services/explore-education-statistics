@@ -65,6 +65,11 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithPublicationId(this Generator<Release> generator, Guid publicationId) =>
         generator.ForInstance(s => s.SetPublicationId(publicationId));
 
+    public static Generator<Release> WithRolloverSourceRelease(
+        this Generator<Release> generator,
+        Release rolloverSourceRelease
+    ) => generator.ForInstance(s => s.SetRolloverSourceRelease(rolloverSourceRelease));
+
     public static Generator<Release> WithVersions(
         this Generator<Release> generator,
         Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions
@@ -195,6 +200,14 @@ public static class ReleaseGeneratorExtensions
         this InstanceSetters<Release> setters,
         Guid publicationId
     ) => setters.Set(p => p.PublicationId, publicationId);
+
+    public static InstanceSetters<Release> SetRolloverSourceRelease(
+        this InstanceSetters<Release> setters,
+        Release rolloverSourceRelease
+    ) =>
+        setters
+            .Set(p => p.RolloverSourceRelease, rolloverSourceRelease)
+            .Set(p => p.RolloverSourceReleaseId, rolloverSourceRelease.Id);
 
     public static InstanceSetters<Release> SetVersions(
         this InstanceSetters<Release> setters,

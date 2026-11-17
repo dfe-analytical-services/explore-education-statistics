@@ -638,6 +638,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
+        services.AddTransient<IPairedIndicatorService, PairedIndicatorService>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IOrganisationsService, OrganisationsService>();

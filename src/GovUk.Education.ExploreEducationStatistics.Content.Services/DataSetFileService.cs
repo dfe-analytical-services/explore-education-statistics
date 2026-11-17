@@ -348,8 +348,8 @@ public class DataSetFileService(
                 From = meta.TimePeriodRange.Start.ToLabel(),
                 To = meta.TimePeriodRange.End.ToLabel(),
             },
-            Filters = GetOrderedFilters(meta.Filters, filterSequence),
-            Indicators = GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
+            Filters = DataSetFileMetaUtils.GetOrderedFilters(meta.Filters, filterSequence),
+            Indicators = DataSetFileMetaUtils.GetOrderedIndicators(meta.Indicators, indicatorGroupSequence),
         };
     }
 
@@ -407,39 +407,6 @@ public class DataSetFileService(
             indicator.ColumnName
         ));
         return filterVariables.Concat(indicatorVariables).OrderBy(variable => variable.Value).ToList();
-    }
-
-    private static List<string> GetOrderedFilters(
-        List<FilterMeta> filters,
-        List<FilterSequenceEntry>? filterSequence
-    ) =>
-        MetaViewModelBuilderUtils
-            .OrderBySequenceOrLabel(
-                filters,
-                idSelector: value => value.Id,
-                labelSelector: value => value.Label,
-                sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
-                resultSelector: value => value.Value.Label,
-                filterSequence
-            )
-            .ToList();
-
-    private static List<string> GetOrderedIndicators(
-        List<IndicatorMeta> indicators,
-        List<IndicatorGroupSequenceEntry>? indicatorGroupSequence
-    )
-    {
-        var indicatorSequence = indicatorGroupSequence?.SelectMany(seq => seq.ChildSequence);
-        return MetaViewModelBuilderUtils
-            .OrderBySequenceOrLabel(
-                indicators,
-                idSelector: value => value.Id,
-                labelSelector: value => value.Label,
-                sequenceIdSelector: sequenceEntry => sequenceEntry,
-                resultSelector: value => value.Value.Label,
-                indicatorSequence
-            )
-            .ToList();
     }
 
     private static DataSetFileApiViewModel? BuildDataSetFileApiViewModel(ReleaseFile releaseFile)

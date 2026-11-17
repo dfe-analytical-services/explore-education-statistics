@@ -19,6 +19,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { useParams } from 'react-router';
+import { educationInNumbersListRoute } from '@admin/routes/routes';
 
 const EducationInNumbersPage = () => {
   const { educationInNumbersPageId } =
@@ -45,7 +46,10 @@ const EducationInNumbersPage = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: 'Manage Education in Numbers', link: '/education-in-numbers' },
+        {
+          name: 'Manage Education in Numbers',
+          link: educationInNumbersListRoute.fullPath,
+        },
         { name: 'Edit Education in Numbers page' },
       ]}
     >

@@ -34,9 +34,10 @@ public static class ServiceCollectionExtensions
             .AddTransient<Func<IAzureBlobStorageClient>>(sp => sp.GetRequiredService<IAzureBlobStorageClient>)
             .AddTransient<Func<ISearchIndexerClient>>(sp => sp.GetRequiredService<ISearchIndexerClient>);
 
-    public static IServiceCollection AddSearchDocumentChecker(this IServiceCollection serviceCollection) =>
+    public static IServiceCollection AddDocumentCheckers(this IServiceCollection serviceCollection) =>
         serviceCollection
-            .AddTransient<SearchableDocumentChecker>()
+            .AddTransient<ReleaseDocumentChecker>()
+            .AddTransient<DataSetDocumentChecker>()
             .AddTransient<IReleaseVersionSummaryRetriever, ReleaseVersionSummaryRetriever>()
             .AddTransient<IBlobNameLister, BlobNameLister>();
 

@@ -2,6 +2,7 @@ import Page from '@admin/components/Page';
 import React, { useState } from 'react';
 import Button from '@common/components/Button';
 import glossaryService from '@admin/services/glossaryService';
+import { administrationIndexRoute } from '@admin/routes/administrationRoutes';
 import styles from './GlossaryPage.module.scss';
 
 const GlossaryPage = () => {
@@ -23,7 +24,10 @@ const GlossaryPage = () => {
       caption="Manage glossary"
       wide
       breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
+        {
+          name: 'Platform administration',
+          link: administrationIndexRoute.fullPath,
+        },
         { name: 'Glossary' },
       ]}
     >

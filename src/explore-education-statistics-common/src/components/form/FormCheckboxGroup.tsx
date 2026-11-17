@@ -86,19 +86,28 @@ export const BaseFormCheckboxGroup = ({
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Disabled options can't be selected on their own, so are left out of select all
+  const selectableOptions = useMemo(
+    () => options.filter(option => !option.disabled),
+    [options],
+  );
+
   const isAllChecked = useMemo(() => {
-    return options.every(
-      option => option.value && value.includes(option.value),
+    return (
+      selectableOptions.length > 0 &&
+      selectableOptions.every(
+        option => option.value && value.includes(option.value),
+      )
     );
-  }, [options, value]);
+  }, [selectableOptions, value]);
 
   const handleAllChange: MouseEventHandler<HTMLButtonElement> = useCallback(
     event => {
       if (onAllChange) {
-        onAllChange(event, isAllChecked, options);
+        onAllChange(event, isAllChecked, selectableOptions);
       }
     },
-    [isAllChecked, onAllChange, options],
+    [isAllChecked, onAllChange, selectableOptions],
   );
 
   return (
@@ -108,7 +117,7 @@ export const BaseFormCheckboxGroup = ({
       })}
       ref={ref}
     >
-      {options.length > 1 && selectAll && (
+      {selectableOptions.length > 1 && selectAll && (
         <ButtonText
           id={`${id}-all`}
           onClick={handleAllChange}
@@ -116,10 +125,10 @@ export const BaseFormCheckboxGroup = ({
           underline={false}
         >
           {selectAllText ? (
-            selectAllText(isAllChecked, options)
+            selectAllText(isAllChecked, selectableOptions)
           ) : (
             <>
-              {getDefaultSelectAllText(isAllChecked, options.length)}
+              {getDefaultSelectAllText(isAllChecked, selectableOptions.length)}
               {groupLabel && (
                 <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
               )}

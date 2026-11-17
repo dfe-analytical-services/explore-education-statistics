@@ -1,32 +1,33 @@
 #nullable enable
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Screener;
-using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Screener;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
-using DataBlockVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockVersionViewModel;
-using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
-using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
-using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
-using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
-using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 
 /// <summary>
 /// AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
 /// </summary>
-public class MappingProfiles : CommonMappingProfile
+/// <remarks>
+/// Note that we are gradually moving away from AutoMapper, and it has already been removed from every other
+/// project in this solution except for Admin. See EES-6647 and decision D24.
+///
+/// To help with this, avoid adding new type maps here. Instead, map explicitly, for example with a
+/// static FromModel method on the response type.
+///
+/// When changing code that relies on one of these type maps, consider whether it's a good
+/// opportunity to replace it with an explicit mapping and remove the type map.
+/// </remarks>
+public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
@@ -40,10 +41,10 @@ public class MappingProfiles : CommonMappingProfile
         CreateMap<MethodologyVersion, IdTitleViewModel>();
 
         CreateMap<Theme, IdTitleViewModel>();
-        CreateMap<Publication, PublicationSummaryViewModel>();
         CreateMap<Publication, PublicationViewModel>().ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
         CreateMap<Publication, PublicationCreateViewModel>()
-            .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme));
+            .ForMember(dest => dest.Theme, m => m.MapFrom(p => p.Theme))
+            .ForMember(dest => dest.Contact, m => m.MapFrom(p => ContactViewModel.FromModel(p.Contact)));
 
         CreateContentBlockMap();
         CreateMap<DataBlockCreateRequest, DataBlockVersion>()

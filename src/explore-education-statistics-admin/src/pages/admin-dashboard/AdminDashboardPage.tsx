@@ -18,6 +18,7 @@ import methodologyQueries from '@admin/queries/methodologyQueries';
 import { handleLogout } from '@admin/auth/msal';
 import ButtonText from '@common/components/ButtonText';
 import { useLocation } from 'react-router';
+import { contactUsRoute, themesRoute } from '@admin/routes/routes';
 
 const dashboardTabs = {
   publications: { id: 'publications', title: 'Your publications' },
@@ -115,7 +116,7 @@ const AdminDashboardPage = () => {
           {isBauUser && (
             <ul className="govuk-!-margin-bottom-6">
               <li>
-                <Link to="/themes">manage themes</Link>
+                <Link to={themesRoute.fullPath}>manage themes</Link>
               </li>
             </ul>
           )}
@@ -125,7 +126,7 @@ const AdminDashboardPage = () => {
           <RelatedInformation heading="Help and guidance">
             <ul className="govuk-list">
               <li>
-                <Link to="/contact-us" target="_blank">
+                <Link to={contactUsRoute.fullPath} target="_blank">
                   Contact us
                   <VisuallyHidden> about general enquiries</VisuallyHidden>{' '}
                   (opens in new tab)

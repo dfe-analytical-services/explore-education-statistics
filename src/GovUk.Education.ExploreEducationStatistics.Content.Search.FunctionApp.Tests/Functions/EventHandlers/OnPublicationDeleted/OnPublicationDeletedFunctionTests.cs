@@ -1,4 +1,4 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveSearchableDocument.Dto;
+﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RemoveReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationDeleted.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
@@ -27,7 +27,7 @@ public class OnPublicationDeletedFunctionTests
         var response = await GetSut().OnPublicationDeleted(eventGridEvent, new FunctionContextMockBuilder().Build());
 
         var expected = releaseIds
-            .Select(releaseId => new RemoveSearchableDocumentDto { ReleaseId = releaseId })
+            .Select(releaseId => new RemoveReleaseDocumentMessageDto { ReleaseId = releaseId })
             .ToArray();
 
         Assert.Equal(expected, response);

@@ -395,7 +395,7 @@ Verify that the Data and Files are unchanged
     user checks table cell contains    1    2    17 Kb    testid:Data files table
     user checks table cell contains    1    3    Complete    testid:Data files table
 
-    user clicks button in table cell    1    4    View details    testid:Data files table
+    user clicks button in table cell    1    5    View details    testid:Data files table
     user waits until h2 is visible    Data file details
 
     user checks summary list contains    Title    Dates test subject    testid:Data file details

@@ -9,6 +9,8 @@ internal class AzureBlobStorageClientMockBuilder
     private readonly Mock<IAzureBlobStorageClient> _mock = new(MockBehavior.Strict);
     private string? _deleteBlobFailsForBlobName;
     private bool _deleteBlobIsSuccessful = true;
+    private readonly List<string> _containersNotFound = [];
+    private string? _containerExistsThrowsFor;
 
     public IAzureBlobStorageClient Build()
     {
@@ -48,7 +50,30 @@ internal class AzureBlobStorageClientMockBuilder
             .Setup(mock => mock.DeleteAllBlobsFromContainer(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+        _mock
+            .Setup(mock => mock.ContainerExists(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((string containerName, CancellationToken _) => !_containersNotFound.Contains(containerName));
+
+        if (_containerExistsThrowsFor is not null)
+        {
+            _mock
+                .Setup(mock => mock.ContainerExists(_containerExistsThrowsFor, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Container exists check failed"));
+        }
+
         return _mock.Object;
+    }
+
+    public AzureBlobStorageClientMockBuilder WhereContainerIsNotFound(string containerName)
+    {
+        _containersNotFound.Add(containerName);
+        return this;
+    }
+
+    public AzureBlobStorageClientMockBuilder WhereContainerExistsThrowsFor(string containerName)
+    {
+        _containerExistsThrowsFor = containerName;
+        return this;
     }
 
     public AzureBlobStorageClientMockBuilder WhereDeleteBlobFails()

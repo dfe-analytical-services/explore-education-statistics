@@ -139,6 +139,95 @@ public class ContentApiClientTests(ITestOutputHelper output)
         }
     }
 
+    public class GetDataSetDocumentKeysTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        private IContentApiClient GetSut(
+            HttpStatusCode statusCode,
+            string json,
+            Action<HttpRequestMessage>? onRequest
+        ) =>
+            GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (request, _) =>
+                    {
+                        onRequest?.Invoke(request);
+                        return Task.FromResult(
+                            new HttpResponseMessage(statusCode)
+                            {
+                                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                            }
+                        );
+                    }
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010")
+            );
+
+        [Fact]
+        public async Task ValidJsonResponse_ReturnsDataSetDocumentKeys()
+        {
+            string? requestedPath = null;
+            var sut = GetSut(
+                HttpStatusCode.OK,
+                """
+                [
+                  {
+                    "publicationId": "11111111-1111-1111-1111-111111111111",
+                    "releaseId": "22222222-2222-2222-2222-222222222222",
+                    "fileId": "33333333-3333-3333-3333-333333333333"
+                  },
+                  {
+                    "publicationId": "44444444-4444-4444-4444-444444444444",
+                    "releaseId": "55555555-5555-5555-5555-555555555555",
+                    "fileId": "66666666-6666-6666-6666-666666666666"
+                  }
+                ]
+                """,
+                onRequest: request => requestedPath = request.RequestUri?.AbsolutePath
+            );
+
+            var result = await sut.GetDataSetDocumentKeys(CancellationToken.None);
+
+            Assert.Equal("/api/data-sets/searchable/keys", requestedPath);
+            Assert.Equal(
+                [
+                    new DataSetDocumentKey
+                    {
+                        PublicationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                        ReleaseId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                        FileId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                    },
+                    new DataSetDocumentKey
+                    {
+                        PublicationId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                        ReleaseId = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                        FileId = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                    },
+                ],
+                result
+            );
+        }
+
+        [Fact]
+        public async Task EmptyResponse_ReturnsNoDataSetDocumentKeys()
+        {
+            var sut = GetSut(HttpStatusCode.OK, "[]", onRequest: null);
+
+            var result = await sut.GetDataSetDocumentKeys(CancellationToken.None);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task UnsuccessfulResponse_ThrowsException()
+        {
+            var sut = GetSut(HttpStatusCode.InternalServerError, "", onRequest: null);
+
+            await Assert.ThrowsAsync<UnableToGetDataSetDocumentKeysException>(() =>
+                sut.GetDataSetDocumentKeys(CancellationToken.None)
+            );
+        }
+    }
+
     public abstract class LocalDevelopmentIntegrationTests(ITestOutputHelper output) : ContentApiClientTests(output)
     {
         /// <summary>
@@ -157,11 +246,11 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
                 // ACT
-                var actual = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
+                var actual = await sut.GetPublicationLatestReleaseDocument(publicationSlug);
 
                 // ASSERT
                 Assert.NotNull(actual);
-                var expected = new ReleaseSearchableDocument
+                var expected = new ReleaseDocument
                 {
                     ReleaseId = new Guid("2ae1f7b1-0088-4fd1-c78a-08dec542c3bb"),
                     ReleaseVersionId = new Guid("90f5ae5d-0eec-4029-f805-08dec542c394"),
@@ -197,14 +286,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
 
                 // ACT
                 var exception = await Record.ExceptionAsync(() =>
-                    sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug)
+                    sut.GetPublicationLatestReleaseDocument(publicationSlug)
                 );
 
                 // ASSERT
                 Assert.NotNull(exception);
-                var unableToGetPublicationLatestReleaseSearchViewModelException =
-                    Assert.IsType<UnableToGetPublicationLatestReleaseSearchViewModelException>(exception);
-                Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseSearchViewModelException.Message);
+                var unableToGetPublicationLatestReleaseDocumentException =
+                    Assert.IsType<UnableToGetPublicationLatestReleaseDocumentException>(exception);
+                Assert.Contains(publicationSlug, unableToGetPublicationLatestReleaseDocumentException.Message);
             }
         }
     }
@@ -277,15 +366,15 @@ public class ContentApiClientTests(ITestOutputHelper output)
             Print($"ErrorMessage: {result.ErrorMessage ?? "<null>"}");
         }
 
-        [Fact(Skip = "Call Content API to get a searchable document")]
-        public async Task GetSearchableDocument()
+        [Fact(Skip = "Call Content API to get a release document")]
+        public async Task GetReleaseDocument()
         {
             // ARRANGE
             var sut = GetSut();
             const string publicationSlug = "seed-publication-permanent-fixed-period-exclusions-in-england";
 
             // ACT
-            var result = await sut.GetPublicationLatestReleaseSearchableDocument(publicationSlug);
+            var result = await sut.GetPublicationLatestReleaseDocument(publicationSlug);
 
             // ASSERT
             PrintAsJson(result);

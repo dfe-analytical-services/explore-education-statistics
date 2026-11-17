@@ -87,10 +87,13 @@ def send_request_with_retry_on_auth_failure(session, method, endpoint, body, fai
     if not local_storage_helper.local_storage_json_file_exists("ADMIN"):
         setup_bau_authentication(clear_existing=True)
 
-    response = send_authenticated_api_request(session, method, endpoint, body)
+    try:
+        response = send_authenticated_api_request(session, method, endpoint, body)
+        if response.status_code not in {401, 403}:
+            return response
 
-    if response.status_code not in {401, 403}:
-        return response
+    except RuntimeError:
+        logger.error("Exception occurred in initial authentication request.")
 
     logger.info("Attempting re-authentication...")
 

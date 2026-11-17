@@ -680,7 +680,7 @@ public class MethodologyService(
             Slug = publication.Slug,
             LatestReleaseSlug = publication.LatestPublishedReleaseVersion?.Release.Slug,
             Owner = publicationMethodology.Owner,
-            Contact = new ContactViewModel(publication.Contact),
+            Contact = ContactViewModel.FromModel(publication.Contact),
         };
     }
 

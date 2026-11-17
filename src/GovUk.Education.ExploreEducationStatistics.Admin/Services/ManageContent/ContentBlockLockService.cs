@@ -119,6 +119,8 @@ public class ContentBlockLockService(
             contentBlockId,
             q =>
                 q.Include(block => block.ContentSection)
+                        .ThenInclude(contentSection => contentSection!.ReleaseVersion)
+                            .ThenInclude(releaseVersion => releaseVersion.Release)
                     .Include(contentBlock => contentBlock.ReleaseVersion)
                         .ThenInclude(releaseVersion => releaseVersion.Release)
                     .Include(block => block.LockedBy)

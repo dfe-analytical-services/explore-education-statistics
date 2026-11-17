@@ -22,6 +22,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router';
+import { contactUsRoute } from '@admin/routes/routes';
 
 const PublicationPageContainer = () => {
   const { publicationId } =
@@ -90,7 +91,7 @@ const PublicationPageContainer = () => {
               <RelatedInformation heading="Help and guidance">
                 <ul className="govuk-list">
                   <li>
-                    <Link to="/contact-us" target="_blank">
+                    <Link to={contactUsRoute.fullPath} target="_blank">
                       Contact us
                       <VisuallyHidden> about general enquiries</VisuallyHidden>
                     </Link>

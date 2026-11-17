@@ -9,11 +9,17 @@ param location string = resourceGroup().location
 @description('Whether or not to create role assignments necessary for performing certain backup actions.')
 param deployBackupVaultReaderRoleAssignment bool
 
+@description('Whether Backup Vault backups can be restored in the paired region. Only PostgreSQL backups support this.')
+param backupVaultCrossRegionRestore bool
+
 @description('Whether or not to create or update Recovery Services Vault and policies.')
 param deployRecoveryServicesVault bool
 
 @description('Should the Recovery Services Vault be set to immutable?')
 param recoveryServicesVaultImmutable bool
+
+@description('Whether file share backups are copied to the vault, rather than kept only as snapshots in the storage account.')
+param vaultedFileShareBackups bool
 
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -24,6 +30,7 @@ module backupVaultModule 'backup-vault.bicep' = {
     location: location
     vaultName: backupsNames.backupVault
     deployBackupVaultReaderRoleAssignment: deployBackupVaultReaderRoleAssignment
+    crossRegionRestoreEnabled: backupVaultCrossRegionRestore
     tagValues: tagValues
   }
 }
@@ -50,6 +57,7 @@ module recoveryServicesVaultModule 'recovery-services-vault.bicep' = if (deployR
     location: location
     vaultName: backupsNames.recoveryServicesVault
     immutable: recoveryServicesVaultImmutable
+    vaultedFileShareBackups: vaultedFileShareBackups
     tagValues: tagValues
   }
 }

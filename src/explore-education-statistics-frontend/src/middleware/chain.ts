@@ -1,7 +1,7 @@
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import {
   NextFetchEvent,
-  NextMiddleware,
+  NextProxy,
   NextRequest,
   NextResponse,
 } from 'next/server';
@@ -9,12 +9,10 @@ import {
 export type ChainedMiddleware = (
   request: NextRequest,
   event: NextFetchEvent,
-  next: NextMiddleware,
+  next: NextProxy,
 ) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
 
-export default function chain(
-  middlewares: ChainedMiddleware[],
-): NextMiddleware {
+export default function chain(middlewares: ChainedMiddleware[]): NextProxy {
   const [current, ...remaining] = middlewares;
 
   if (current) {

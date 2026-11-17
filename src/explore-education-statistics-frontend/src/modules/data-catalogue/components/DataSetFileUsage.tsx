@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import ButtonText from '@common/components/ButtonText';
 import ChevronCard from '@common/components/ChevronCard';
 import ChevronGrid from '@common/components/ChevronGrid';
@@ -26,7 +27,7 @@ export default function DataSetFileUsage({
 }: Props) {
   const downloadUrl = new URL(
     `/data-catalogue/data-set/${dataSetFileId}/csv`,
-    process.env.PUBLIC_URL,
+    getPublicEnv('PUBLIC_URL'),
   ).href;
 
   return (

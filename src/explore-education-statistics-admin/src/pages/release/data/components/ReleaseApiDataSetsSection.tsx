@@ -12,12 +12,14 @@ import apiDataSetService from '@admin/services/apiDataSetService';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 
 export default function ReleaseApiDataSetsSection() {
   const { releaseVersion } = useReleaseVersionContext();
   const { user } = useAuthContext();
+  const queryClient = useQueryClient();
 
   const {
     data: dataSets = [],
@@ -83,7 +85,14 @@ export default function ReleaseApiDataSetsSection() {
                   await apiDataSetService.createDataSet({
                     releaseFileId,
                   });
-                  refetch();
+
+                  await Promise.all([
+                    refetch(),
+                    queryClient.invalidateQueries({
+                      queryKey: releaseDataFileQueries.list(releaseVersion.id)
+                        .queryKey,
+                    }),
+                  ]);
                 }}
               />
             ) : (

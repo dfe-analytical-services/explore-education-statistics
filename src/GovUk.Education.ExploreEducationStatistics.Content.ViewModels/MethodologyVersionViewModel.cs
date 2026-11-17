@@ -1,20 +1,47 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record MethodologyVersionViewModel
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; init; }
 
-    public string Title { get; set; } = string.Empty;
+    public required string Title { get; init; }
 
-    public string Slug { get; set; } = string.Empty;
+    public required string Slug { get; init; }
 
-    public DateTime? Published { get; set; }
+    public required DateTime? Published { get; init; }
 
-    public List<ContentSectionViewModel> Content { get; set; } = new();
+    public required List<ContentSectionViewModel> Content { get; init; }
 
-    public List<ContentSectionViewModel> Annexes { get; set; } = new();
+    public required List<ContentSectionViewModel> Annexes { get; init; }
 
-    public List<MethodologyNoteViewModel> Notes { get; set; } = new();
+    public required List<MethodologyNoteViewModel> Notes { get; init; }
 
-    public List<PublicationSummaryViewModel> Publications { get; set; } = new();
+    public required List<PublicationSummaryViewModel> Publications { get; init; }
+
+    public static MethodologyVersionViewModel FromModel(
+        MethodologyVersion methodologyVersion,
+        List<PublicationSummaryViewModel> publications
+    ) =>
+        new()
+        {
+            Id = methodologyVersion.Id,
+            Title = methodologyVersion.Title,
+            Slug = methodologyVersion.Slug,
+            Published = methodologyVersion.Published,
+            Content = methodologyVersion
+                .MethodologyContent.Content.OrderBy(contentSection => contentSection.Order)
+                .Select(ContentSectionViewModel.FromModel)
+                .ToList(),
+            Annexes = methodologyVersion
+                .MethodologyContent.Annexes.OrderBy(annexSection => annexSection.Order)
+                .Select(ContentSectionViewModel.FromModel)
+                .ToList(),
+            Notes = methodologyVersion
+                .Notes.OrderByDescending(note => note.DisplayDate)
+                .Select(MethodologyNoteViewModel.FromModel)
+                .ToList(),
+            Publications = publications,
+        };
 }

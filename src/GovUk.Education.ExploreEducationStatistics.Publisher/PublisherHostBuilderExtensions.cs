@@ -13,11 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Publications;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Events.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -213,7 +210,6 @@ public static class PublisherHostBuilderExtensions
                 // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.
                 services
-                    .AddAutoMapper(typeof(MappingProfiles))
                     .AddScoped<Content.Services.Interfaces.IMethodologyService, Content.Services.MethodologyService>()
                     .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
                     .AddScoped<IPublicationsTreeService, PublicationsTreeService>();

@@ -13,6 +13,10 @@ param publicApiPublicUrl = 'https://api.education.gov.uk/statistics'
 
 param recoveryServicesVaultImmutable = true
 
+// TODO EES-7502 - remove once migrated to the ELZ. Keeps cross-region restore off for the Backup Vault in the
+// current subscription, so that it stays unchanged. The ELZ param files turn it back on.
+param backupVaultCrossRegionRestore = false
+
 param contentDbConfig = {
   sku: {
     name: 'GP_S_Gen5'

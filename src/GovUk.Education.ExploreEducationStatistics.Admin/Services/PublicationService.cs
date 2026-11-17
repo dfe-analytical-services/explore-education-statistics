@@ -122,7 +122,10 @@ public class PublicationService(
                 await context.SaveChangesAsync();
 
                 return await persistenceHelper
-                    .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
+                    .CheckEntityExists<Publication>(
+                        saved.Entity.Id,
+                        query => query.Include(p => p.Theme).Include(p => p.Contact)
+                    )
                     .OnSuccess(GeneratePublicationCreateViewModel);
             });
     }
@@ -177,10 +180,12 @@ public class PublicationService(
                 var previousSlug = publication.Slug;
                 var previousSummary = publication.Summary;
                 var previousSupersededById = publication.SupersededById;
+                var previousThemeId = publication.ThemeId;
 
                 var titleChanged = previousTitle != updatedPublication.Title;
                 var slugChanged = previousSlug != updatedPublication.Slug;
                 var summaryChanged = previousSummary != updatedPublication.Summary;
+                var themeChanged = previousThemeId != updatedPublication.ThemeId;
 
                 if (slugChanged)
                 {
@@ -251,11 +256,11 @@ public class PublicationService(
                     }
 
                     await RaiseEventIfSupersededByChanged(publication, previousSupersededById);
-                }
 
-                if (publication.Live && (titleChanged || slugChanged || summaryChanged))
-                {
-                    await adminEventRaiser.OnPublicationChanged(publication);
+                    if (titleChanged || slugChanged || summaryChanged || themeChanged)
+                    {
+                        await adminEventRaiser.OnPublicationChanged(publication);
+                    }
                 }
 
                 return await GetPublication(publication.Id);
@@ -383,7 +388,7 @@ public class PublicationService(
         return await persistenceHelper
             .CheckEntityExists<Publication>(publicationId, query => query.Include(p => p.Contact))
             .OnSuccessDo(userService.CheckCanViewPublication)
-            .OnSuccess(publication => mapper.Map<ContactViewModel>(publication.Contact));
+            .OnSuccess(publication => ContactViewModel.FromModel(publication.Contact));
     }
 
     public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(
@@ -404,7 +409,7 @@ public class PublicationService(
                 publication.Contact.TeamEmail = updatedContact.TeamEmail;
                 await context.SaveChangesAsync();
 
-                return mapper.Map<ContactViewModel>(publication.Contact);
+                return ContactViewModel.FromModel(publication.Contact);
             });
     }
 

@@ -1,5 +1,5 @@
 ﻿using Azure.Messaging.EventGrid;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshSearchableDocument.Dto;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.EventHandlers.OnPublicationRestored.Dtos;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using Microsoft.Azure.Functions.Worker;
@@ -9,19 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class OnPublicationRestoredFunction(IEventGridEventHandler eventGridEventHandler)
 {
     [Function(nameof(OnPublicationRestored))]
-    [QueueOutput("%RefreshSearchableDocumentQueueName%")]
-    public async Task<RefreshSearchableDocumentMessageDto[]> OnPublicationRestored(
+    [QueueOutput("%RefreshReleaseDocumentQueueName%")]
+    public async Task<RefreshReleaseDocumentMessageDto[]> OnPublicationRestored(
         [QueueTrigger("%PublicationRestoredQueueName%")] EventGridEvent eventDto,
         FunctionContext context
     ) =>
-        await eventGridEventHandler.Handle<PublicationRestoredEventDto, RefreshSearchableDocumentMessageDto[]>(
+        await eventGridEventHandler.Handle<PublicationRestoredEventDto, RefreshReleaseDocumentMessageDto[]>(
             context,
             eventDto,
             (payload, _) =>
-                Task.FromResult<RefreshSearchableDocumentMessageDto[]>(
+                Task.FromResult<RefreshReleaseDocumentMessageDto[]>(
                     string.IsNullOrEmpty(payload.PublicationSlug)
                         ? []
-                        : [new RefreshSearchableDocumentMessageDto { PublicationSlug = payload.PublicationSlug }]
+                        : [new RefreshReleaseDocumentMessageDto { PublicationSlug = payload.PublicationSlug }]
                 )
         );
 }

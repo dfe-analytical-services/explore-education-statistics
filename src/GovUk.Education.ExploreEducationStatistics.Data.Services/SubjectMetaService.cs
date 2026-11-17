@@ -78,7 +78,11 @@ public class SubjectMetaService(
                 return new SubjectMetaViewModel
                 {
                     Filters = await GetFilters(releaseSubject.SubjectId, releaseFile.FilterSequence),
-                    Indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence),
+                    Indicators = await GetIndicators(
+                        releaseSubject.SubjectId,
+                        releaseFile.IndicatorSequence,
+                        releaseFile.PairedIndicators
+                    ),
                     Locations = await GetLocations(releaseSubject.SubjectId),
                     TimePeriod = await GetTimePeriods(releaseSubject.SubjectId),
                     FilterHierarchies = BuildFilterHierarchyViewModel(releaseFile.File.FilterHierarchies!),
@@ -225,7 +229,11 @@ public class SubjectMetaService(
                 logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
 
-                var indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence);
+                var indicators = await GetIndicators(
+                    releaseSubject.SubjectId,
+                    releaseFile.IndicatorSequence,
+                    releaseFile.PairedIndicators
+                );
                 logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                 return new SubjectMetaViewModel
@@ -302,11 +310,12 @@ public class SubjectMetaService(
 
     private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(
         Guid subjectId,
-        List<IndicatorGroupSequenceEntry>? indicatorSequence
+        List<IndicatorGroupSequenceEntry>? indicatorSequence,
+        List<PairedIndicatorEntry>? pairedIndicators
     )
     {
         var indicators = await indicatorGroupRepository.GetIndicatorGroups(subjectId);
-        return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators, indicatorSequence);
+        return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators, indicatorSequence, pairedIndicators);
     }
 
     private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(

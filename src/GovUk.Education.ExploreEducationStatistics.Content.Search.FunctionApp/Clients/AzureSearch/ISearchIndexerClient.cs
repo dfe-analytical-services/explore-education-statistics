@@ -2,8 +2,8 @@
 
 public interface ISearchIndexerClient
 {
-    Task RunIndexer(CancellationToken cancellationToken = default);
+    Task RunIndexer(string indexerName, CancellationToken cancellationToken = default);
     Task<bool> IsIndexerRunning(string indexerName, CancellationToken cancellationToken = default);
-    Task ResetIndexer(CancellationToken cancellationToken = default);
-    Task<bool> IndexerExists(CancellationToken cancellationToken = default);
+    Task ResetIndexer(string indexerName, CancellationToken cancellationToken = default);
+    Task<bool> IndexerExists(string indexerName, CancellationToken cancellationToken = default);
 }

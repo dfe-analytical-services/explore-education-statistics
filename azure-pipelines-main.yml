@@ -17,6 +17,11 @@ parameters:
 
 variables:
   - group: EES - Build
+  # The Azure DevOps instance for the DfE Enterprise Landing Zone (ELZ) subscriptions sets "elz" to "true" in its
+  # "EES - Build" variable group, as its App Services run on Linux. Otherwise, the .NET App Services are built for the
+  # legacy Windows ones.
+  - name: AppServicePublishArguments
+    value: $[ iif(eq(variables['elz'], 'true'), '--self-contained false -r linux-x64', '--self-contained true -r win-x64') ]
   - name: BuildConfiguration
     value: Release
   - name: IsBranchDeployable
@@ -174,7 +179,7 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
+          arguments: $(AppServicePublishArguments) --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/data-api
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
@@ -190,7 +195,7 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
+          arguments: $(AppServicePublishArguments) --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/content-api
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
@@ -369,7 +374,7 @@ jobs:
           command: publish
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: --self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/admin
+          arguments: $(AppServicePublishArguments) --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/admin
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1

@@ -1,6 +1,14 @@
 import React from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
+import {
+  documentationContentStandardsRoute,
+  documentationIndexRoute,
+  documentationManageContentRoute,
+  documentationManageDataBlockRoute,
+  documentationManageDataRoute,
+  documentationStyleGuideRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageReleaseFind from './images/guidance/guidance-edit-release-find.png';
@@ -20,7 +28,10 @@ const DocumentationCreateNewRelease = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Editing a release and updating release status' },
       ]}
       title="Editing a release and updating release status"
@@ -169,12 +180,15 @@ const DocumentationCreateNewRelease = () => {
                 <p>
                   For detailed guidance on how to upload data and files and add
                   footnotes to your release -{' '}
-                  <Link to="./manage-data">Managing data: step by step</Link>.
+                  <Link to={documentationManageDataRoute.fullPath}>
+                    Managing data: step by step
+                  </Link>
+                  .
                 </p>
                 <p>
                   For detailed guidance on how to create data blocks, tables and
                   charts for your release -{' '}
-                  <Link to="./manage-data-block">
+                  <Link to={documentationManageDataBlockRoute.fullPath}>
                     Managing data blocks and creating tables and charts: step by
                     step
                   </Link>
@@ -183,7 +197,7 @@ const DocumentationCreateNewRelease = () => {
                 <p>
                   For detailed guidance on how to view and edit content and add,
                   view and review comments -{' '}
-                  <Link to="./manage-content">
+                  <Link to={documentationManageContentRoute.fullPath}>
                     Managing content: step by step
                   </Link>
                   .
@@ -212,11 +226,14 @@ const DocumentationCreateNewRelease = () => {
                   <p>
                     Make sure your content is written and formatted to the
                     standards set out in our{' '}
-                    <Link to="./content-design-standards-guide">
+                    <Link to={documentationContentStandardsRoute.fullPath}>
                       Content design standards guide
                     </Link>{' '}
                     and{' '}
-                    <Link to="./style-guide">Content design style guide</Link>.
+                    <Link to={documentationStyleGuideRoute.fullPath}>
+                      Content design style guide
+                    </Link>
+                    .
                   </p>
                   <p>
                     These guides will help you create clear and consistent
@@ -257,7 +274,7 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <Link to="./manage-content">
+                <Link to={documentationManageContentRoute.fullPath}>
                   Managing content: step by step
                 </Link>
                 .

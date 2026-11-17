@@ -22,7 +22,19 @@ public class MethodologyControllerTests
 
         methodologyService
             .Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
-            .ReturnsAsync(new MethodologyVersionViewModel { Id = methodologyId });
+            .ReturnsAsync(
+                new MethodologyVersionViewModel
+                {
+                    Id = methodologyId,
+                    Title = "Methodology title",
+                    Slug = "test-slug",
+                    Published = DateTime.UtcNow,
+                    Content = [],
+                    Annexes = [],
+                    Notes = [],
+                    Publications = [],
+                }
+            );
 
         var controller = new MethodologyController(methodologyService.Object);
 

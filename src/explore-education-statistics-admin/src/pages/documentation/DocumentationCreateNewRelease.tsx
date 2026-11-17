@@ -1,6 +1,15 @@
 import React from 'react';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
+import {
+  documentationContentStandardsRoute,
+  documentationEditReleaseRoute,
+  documentationIndexRoute,
+  documentationManageContentRoute,
+  documentationManageDataBlockRoute,
+  documentationManageDataRoute,
+  documentationStyleGuideRoute,
+} from '@admin/routes/documentationRoutes';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageChoosePublication from './images/guidance/guidance-publication-select.png';
@@ -23,7 +32,10 @@ const DocumentationCreateNewRelease = () => {
     <Page
       wide
       breadcrumbs={[
-        { name: "Administrator's guide", link: '/documentation' },
+        {
+          name: "Administrator's guide",
+          link: documentationIndexRoute.fullPath,
+        },
         { name: 'Creating a new release' },
       ]}
       title="'Creating a new release"
@@ -51,10 +63,13 @@ const DocumentationCreateNewRelease = () => {
             </li>
             <li>
               content is written and formatted to the standards set out in our{' '}
-              <Link to="./content-design-standards-guide">
+              <Link to={documentationContentStandardsRoute.fullPath}>
                 Content design standards guide
               </Link>{' '}
-              and <Link to="style-guide">Content design style guide</Link>
+              and{' '}
+              <Link to={documentationStyleGuideRoute.fullPath}>
+                Content design style guide
+              </Link>
             </li>
           </ul>
           <StepNav>
@@ -320,7 +335,9 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 For detailed guidance on how to upload data and files and add
                 footnotes to your release -{' '}
-                <Link to="./manage-data">Managing data: step by step.</Link>
+                <Link to={documentationManageDataRoute.fullPath}>
+                  Managing data: step by step.
+                </Link>
               </p>
             </StepNavItem>
             <StepNavItem
@@ -388,7 +405,10 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 You can upload more later under the ‘Manage data’ tab. For
                 detailed guidance on how to add data to your release -{' '}
-                <Link to="./manage-data">Managing data: step by step</Link>.
+                <Link to={documentationManageDataRoute.fullPath}>
+                  Managing data: step by step
+                </Link>
+                .
               </p>
               <h3>Help and support</h3>
               <p>
@@ -406,7 +426,7 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 For detailed guidance on how to create data blocks, tables and
                 charts for your release -{' '}
-                <Link to="./manage-data-block">
+                <Link to={documentationManageDataBlockRoute.fullPath}>
                   Managing data blocks and creating tables and charts: step by
                   step
                 </Link>
@@ -415,7 +435,7 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 For detailed guidance on how to configure charts for your
                 release -{' '}
-                <Link to="./manage-data-block">
+                <Link to={documentationManageDataBlockRoute.fullPath}>
                   Configure charts: step by step
                 </Link>
                 .
@@ -429,7 +449,7 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 Make sure your content is written and formatted to the standards
                 set out in our{' '}
-                <Link to="./content-design-standards-guide">
+                <Link to={documentationContentStandardsRoute.fullPath}>
                   Content design standards guide
                 </Link>{' '}
                 and <a href="style-guide">Content design style guide</a>{' '}
@@ -477,7 +497,7 @@ const DocumentationCreateNewRelease = () => {
               <p>
                 For detailed guidance on how to view and edit content and add,
                 view and resolve comments -{' '}
-                <Link to="./manage-content">
+                <Link to={documentationManageContentRoute.fullPath}>
                   Managing content: step by step
                 </Link>
                 .
@@ -501,7 +521,7 @@ const DocumentationCreateNewRelease = () => {
               <h3>Next steps</h3>
               <p>
                 For detailed guidance on how to update release status -{' '}
-                <Link to="./edit-release">
+                <Link to={documentationEditReleaseRoute.fullPath}>
                   Editing a release and updating release status: step by step
                 </Link>
                 .

@@ -1,9 +1,44 @@
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Details from '../Details';
 
 describe('Details', () => {
+  test('preserves generated IDs when hydrating successive server renders', () => {
+    const ui = (
+      <>
+        <Details summary="First summary">First content</Details>
+        <Details summary="Second summary">Second content</Details>
+      </>
+    );
+    const firstMarkup = renderToString(ui);
+    expect(renderToString(ui)).toBe(firstMarkup);
+
+    const container = document.createElement('div');
+    container.innerHTML = firstMarkup;
+    document.body.appendChild(container);
+    const firstId = container.querySelector('details')?.id;
+    const onRecoverableError = jest.fn();
+
+    render(ui, {
+      container,
+      hydrate: true,
+      onRecoverableError,
+      wrapper: ({ children }) => children,
+    });
+
+    expect(container.querySelector('details')).toHaveAttribute('id', firstId);
+    expect(
+      screen.getByRole('button', { name: 'First summary' }),
+    ).toHaveAttribute(
+      'aria-controls',
+      expect.stringContaining('details-content-'),
+    );
+    expect(onRecoverableError).not.toHaveBeenCalled();
+  });
+
   test('renders correctly', () => {
     const { container } = render(
       <Details summary="Test summary" id="test-details">

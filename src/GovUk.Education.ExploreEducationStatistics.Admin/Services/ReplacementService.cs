@@ -130,6 +130,10 @@ public class ReplacementService(
                     mapping,
                     cancellationToken
                 );
+                replacementReleaseFile.PairedIndicators = ReplacementServiceHelper.ReplacePairedIndicators(
+                    originalReleaseFile.PairedIndicators,
+                    mapping
+                );
                 replacementReleaseFile.Summary = originalReleaseFile.Summary; // Set Data guidance
 
                 // To remove original, we first unlink the files. If we don't do this,

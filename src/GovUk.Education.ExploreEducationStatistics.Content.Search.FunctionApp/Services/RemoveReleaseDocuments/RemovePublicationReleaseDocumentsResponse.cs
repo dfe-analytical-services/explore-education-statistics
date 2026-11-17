@@ -1,0 +1,3 @@
+﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
+
+public record RemovePublicationReleaseDocumentsResponse(IReadOnlyDictionary<Guid, bool> ReleaseIdToDeletionResult);

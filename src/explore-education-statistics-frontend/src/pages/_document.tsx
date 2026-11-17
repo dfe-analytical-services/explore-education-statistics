@@ -1,3 +1,8 @@
+import {
+  getPublicEnvPayload,
+  publicEnvElementId,
+  serialisePublicEnvPayload,
+} from '@frontend/utils/publicEnv';
 import BaseDocument, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 
@@ -32,6 +37,20 @@ class Document extends BaseDocument {
           <meta
             property="og:image"
             content="/assets/images/govuk-opengraph-image.png"
+          />
+
+          {/*
+            Public env vars from the server's runtime environment, read in
+            the browser by `getPublicEnv`. Rendered per request so that one
+            build can be deployed to every environment.
+          */}
+          <script
+            id={publicEnvElementId}
+            type="application/json"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: serialisePublicEnvPayload(getPublicEnvPayload()),
+            }}
           />
         </Head>
 

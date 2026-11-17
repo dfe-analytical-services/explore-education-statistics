@@ -1,12 +1,15 @@
 #nullable enable
+using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -558,6 +561,52 @@ public class ContentBlockLockServiceTests
     }
 
     [Fact]
+    public async Task LockContentBlock_NoPermission()
+    {
+        var (contextId, contentBlockId, sectionReleaseVersion) =
+            await SetupContentBlockWithDifferentSectionReleaseVersion();
+
+        var userService = new Mock<IUserService>(Strict);
+        userService.Setup(s => s.GetUserId()).Returns(_defaultUserId);
+
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>(userService)
+            .SetupResourceCheckToFailWithMatcher(
+                ReleaseVersionWithReleaseLoaded(sectionReleaseVersion),
+                CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var service = BuildService(contentDbContext, userService: userService.Object);
+                return await service.LockContentBlock(contentBlockId);
+            });
+    }
+
+    [Fact]
+    public async Task UnlockContentBlock_NoPermission()
+    {
+        var (contextId, contentBlockId, sectionReleaseVersion) =
+            await SetupContentBlockWithDifferentSectionReleaseVersion();
+
+        var userService = new Mock<IUserService>(Strict);
+        userService.Setup(s => s.GetUserId()).Returns(_defaultUserId);
+
+        await PermissionTestUtils
+            .PolicyCheckBuilder<SecurityPolicies>(userService)
+            .SetupResourceCheckToFailWithMatcher(
+                ReleaseVersionWithReleaseLoaded(sectionReleaseVersion),
+                CanUpdateSpecificReleaseVersion
+            )
+            .AssertForbidden(async userService =>
+            {
+                await using var contentDbContext = InMemoryContentDbContext(contextId);
+                var service = BuildService(contentDbContext, userService: userService.Object);
+                return await service.UnlockContentBlock(contentBlockId);
+            });
+    }
+
+    [Fact]
     public async Task UnlockContentBlock()
     {
         ReleaseVersion releaseVersion = _dataFixture.DefaultReleaseVersion().WithRelease(_dataFixture.DefaultRelease());
@@ -884,6 +933,49 @@ public class ContentBlockLockServiceTests
             result.AssertNotFound();
         }
     }
+
+    /// <summary>
+    /// Creates a content block whose section belongs to a different release version from the block itself.
+    /// This stops EF relationship fix-up from populating the section's release version via the block's own
+    /// include, so the permission check only gets a loaded release version if the service includes it explicitly.
+    /// </summary>
+    private async Task<(
+        string ContextId,
+        Guid ContentBlockId,
+        ReleaseVersion SectionReleaseVersion
+    )> SetupContentBlockWithDifferentSectionReleaseVersion()
+    {
+        ReleaseVersion sectionReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease());
+        ReleaseVersion blockReleaseVersion = _dataFixture
+            .DefaultReleaseVersion()
+            .WithRelease(_dataFixture.DefaultRelease());
+
+        var contentBlock = new HtmlBlock
+        {
+            ContentSection = new ContentSection { ReleaseVersion = sectionReleaseVersion },
+            ReleaseVersion = blockReleaseVersion,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using var contentDbContext = InMemoryContentDbContext(contextId);
+        contentDbContext.ContentBlocks.Add(contentBlock);
+        await contentDbContext.SaveChangesAsync();
+
+        return (contextId, contentBlock.Id, sectionReleaseVersion);
+    }
+
+    // The UpdateSpecificReleaseVersion authorization handler reads ReleaseVersion.Release.PublicationId for users
+    // without the UpdateAllReleases claim (e.g. analysts), so the Release must be loaded before the policy check.
+    private static Expression<Func<ReleaseVersion, bool>> ReleaseVersionWithReleaseLoaded(
+        ReleaseVersion releaseVersion
+    ) =>
+        rv =>
+            rv.Id == releaseVersion.Id
+            && rv.Release != null
+            && rv.Release.PublicationId == releaseVersion.Release.PublicationId;
 
     private ContentBlockLockService BuildService(
         ContentDbContext contentDbContext,

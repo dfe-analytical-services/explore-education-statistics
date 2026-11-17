@@ -12,4 +12,6 @@ public class AppOptions
     public bool EnableThemeDeletion { get; init; }
 
     public bool EnableEinPublishedPageDeletion { get; init; }
+
+    public bool EnableReleaseRollover { get; init; }
 }
