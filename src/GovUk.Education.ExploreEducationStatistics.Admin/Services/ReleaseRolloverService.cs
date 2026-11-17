@@ -17,7 +17,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -59,36 +58,17 @@ public class ReleaseRolloverService(
             {
                 var (publication, sourceRelease, publishingOrganisations) = publicationSourceReleaseAndOrganisations;
 
-                var release = new Release
-                {
-                    PublicationId = request.PublicationId,
-                    Year = request.Year,
-                    TimePeriodCoverage = request.TimePeriodCoverage,
-                    Slug = request.Slug,
-                    Label = FormatReleaseLabel(request.Label),
-                    RolloverSourceReleaseId = sourceRelease.Id,
-                };
-
-                var newReleaseVersion = new ReleaseVersion
-                {
-                    Id = guidGenerator.NewGuid(),
-                    Release = release,
-                    Type = request.Type!.Value,
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    PublicationId = release.PublicationId,
-                    PublishingOrganisations = [.. publishingOrganisations],
-                    CreatedById = userService.GetUserId(),
-                };
+                var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
+                    context: context,
+                    guidGenerator: guidGenerator,
+                    userService: userService,
+                    publication: publication,
+                    releaseCreateRequest: request,
+                    publishingOrganisations: publishingOrganisations,
+                    rolloverSourceReleaseId: sourceRelease.Id
+                );
 
                 ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
-
-                context.ReleaseVersions.Add(newReleaseVersion);
-
-                publication.ReleaseSeries.Insert(
-                    0,
-                    new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = release.Id }
-                );
-                context.Publications.Update(publication);
 
                 switch (request.Mode)
                 {

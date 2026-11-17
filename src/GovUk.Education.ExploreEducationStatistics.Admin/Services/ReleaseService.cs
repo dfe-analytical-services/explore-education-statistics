@@ -73,35 +73,17 @@ public class ReleaseService(
             .OnSuccess(async publicationAndPublishingOrganisations =>
             {
                 var (publication, publishingOrganisations) = publicationAndPublishingOrganisations;
-                var release = new Release
-                {
-                    PublicationId = request.PublicationId,
-                    Year = request.Year,
-                    TimePeriodCoverage = request.TimePeriodCoverage,
-                    Slug = request.Slug,
-                    Label = FormatReleaseLabel(request.Label),
-                };
 
-                var newReleaseVersion = new ReleaseVersion
-                {
-                    Id = guidGenerator.NewGuid(),
-                    Release = release,
-                    Type = request.Type!.Value,
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    PublicationId = release.PublicationId,
-                    PublishingOrganisations = [.. publishingOrganisations],
-                    CreatedById = userService.GetUserId(),
-                };
+                var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
+                    context: context,
+                    guidGenerator: guidGenerator,
+                    userService: userService,
+                    publication: publication,
+                    releaseCreateRequest: request,
+                    publishingOrganisations: publishingOrganisations
+                );
 
                 await InitialiseContentSections(newReleaseVersion, request.TemplateReleaseId);
-
-                context.ReleaseVersions.Add(newReleaseVersion);
-
-                publication.ReleaseSeries.Insert(
-                    0,
-                    new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = release.Id }
-                );
-                context.Publications.Update(publication);
 
                 await context.SaveChangesAsync();
                 return await releaseVersionService.GetRelease(newReleaseVersion.Id);

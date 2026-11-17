@@ -24,6 +24,8 @@ public record ReleaseRolloverCreateRequest : ReleaseCreateRequest
             RuleFor(request => request.RolloverSourceReleaseId).NotEmpty();
 
             RuleFor(request => request.Mode).IsInEnum();
+
+            RuleFor(request => request.TemplateReleaseId).Null();
         }
     }
 }

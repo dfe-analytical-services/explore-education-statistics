@@ -51,6 +51,9 @@ public abstract class ReleaseRolloverServiceTests
                 .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
                 .Generate();
 
+            var publishingOrganisations = _dataFixture.DefaultOrganisation().GenerateList(2);
+            _organisationsValidator.WhereHasOrganisations([.. publishingOrganisations]);
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -70,6 +73,13 @@ public abstract class ReleaseRolloverServiceTests
                 .ReturnsAsync(releaseVersionViewModel)
                 .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
 
+            var request = ValidRequest(publication.Id, sourceRelease.Id) with
+            {
+                Mode = mode,
+                Label = "  initial   release   label  ",
+                PublishingOrganisations = publishingOrganisations.Select(org => org.Id).ToArray(),
+            };
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var sut = BuildService(
@@ -77,12 +87,7 @@ public abstract class ReleaseRolloverServiceTests
                     releaseVersionService: releaseVersionServiceMock.Object
                 );
 
-                var result = await sut.CreateReleaseRollover(
-                    ValidRequest(publication.Id, sourceRelease.Id) with
-                    {
-                        Mode = mode,
-                    }
-                );
+                var result = await sut.CreateReleaseRollover(request);
 
                 var viewModel = result.AssertRight();
                 Assert.Equal(releaseVersionViewModel, viewModel);
@@ -91,13 +96,18 @@ public abstract class ReleaseRolloverServiceTests
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var actualReleaseVersion = await context
-                    .ReleaseVersions.Include(rv => rv.Release)
+                    .ReleaseVersions.Include(rv => rv.Release.Publication)
                     .Include(rv => rv.PublishingOrganisations)
+                    .Include(rv => rv.Content)
                     .SingleAsync(rv => rv.Id == newReleaseVersionId);
 
                 var actualRelease = actualReleaseVersion.Release;
 
                 Assert.Equal(publication.Id, actualRelease.PublicationId);
+
+                // The gotcha this specifically guards against: ReleaseVersion.PublicationId is a separate,
+                // required FK from Release.PublicationId - missing it was the original bug this test missed.
+                Assert.Equal(publication.Id, actualReleaseVersion.PublicationId);
 
                 // The gotcha this guards against: the request's RolloverSourceReleaseId must end up
                 // stamped as-is on the new Release - it must be a Release id, not a ReleaseVersion id.
@@ -106,12 +116,38 @@ public abstract class ReleaseRolloverServiceTests
 
                 Assert.Equal(2024, actualRelease.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualRelease.TimePeriodCoverage);
+                Assert.Equal(request.Slug, actualRelease.Slug);
+
+                // FormatReleaseLabel trims and collapses internal whitespace.
+                Assert.Equal("initial release label", actualRelease.Label);
 
                 Assert.Equal(ReleaseType.OfficialStatistics, actualReleaseVersion.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actualReleaseVersion.ApprovalStatus);
                 Assert.Equal(0, actualReleaseVersion.Version);
                 Assert.True(actualReleaseVersion.Rollover);
-                Assert.Empty(actualReleaseVersion.PublishingOrganisations);
+                Assert.Equal(UserId, actualReleaseVersion.CreatedById);
+
+                Assert.Equal(2, actualReleaseVersion.PublishingOrganisations.Count);
+                Assert.All(
+                    publishingOrganisations,
+                    expected =>
+                        Assert.Contains(
+                            actualReleaseVersion.PublishingOrganisations,
+                            actual => actual.Id == expected.Id
+                        )
+                );
+
+                Assert.NotNull(actualReleaseVersion.HeadlinesSection);
+                Assert.NotNull(actualReleaseVersion.KeyStatisticsSecondarySection);
+                Assert.NotNull(actualReleaseVersion.RelatedDashboardsSection);
+                Assert.NotNull(actualReleaseVersion.SummarySection);
+                Assert.NotNull(actualReleaseVersion.WarningSection);
+
+                var releaseSeriesItem = Assert.Single(
+                    actualRelease.Publication.ReleaseSeries,
+                    item => item.ReleaseId == actualRelease.Id
+                );
+                Assert.NotEqual(Guid.Empty, releaseSeriesItem.Id);
             }
         }
 

@@ -18,7 +18,7 @@ import releaseService from '@admin/services/releaseService';
 import releaseVersionService from '@admin/services/releaseVersionService';
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { Organisation } from '@common/services/types/organisation';
 import { ReleaseType } from '@common/services/types/releaseType';
 import React, { useState } from 'react';
@@ -66,12 +66,14 @@ const ReleaseCreatePage = () => {
   const [creationMode, setCreationMode] =
     useState<ReleaseCreationMode>(defaultCreationMode);
 
-  const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
+  const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     if (!enableReleaseRollover) {
       const [publication, templateRelease, timePeriodCoverageGroups] =
         await Promise.all([
           publicationService.getPublication(publicationId),
-          publicationService.getPublicationReleaseTemplate(publicationId),
+          publicationService
+            .getPublicationReleaseTemplate(publicationId)
+            .catch(() => undefined),
           metaService.getTimePeriodCoverageGroups(),
         ]);
 
@@ -97,9 +99,9 @@ const ReleaseCreatePage = () => {
       sourceReleaseVersionId ?? releaseTemplate?.id;
 
     const sourceReleaseVersion = effectiveSourceReleaseVersionId
-      ? await releaseVersionService
-          .getReleaseVersion(effectiveSourceReleaseVersionId)
-          .catch(() => undefined)
+      ? await releaseVersionService.getReleaseVersion(
+          effectiveSourceReleaseVersionId,
+        )
       : undefined;
 
     return {
