@@ -195,6 +195,8 @@ public record DataSetQueryLocationCode : IDataSetQueryLocation
 
 /// <summary>
 /// A local authority (identified by its ONS code) to filter results by.
+///
+/// Note that an ONS code may correspond to multiple locations (e.g. where a local authority's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
 {
@@ -233,6 +235,8 @@ public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
 
 /// <summary>
 /// A local authority (identified by its old code) to filter results by.
+///
+/// Note that an old code may correspond to multiple locations (e.g. where a local authority's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationLocalAuthorityOldCode : IDataSetQueryLocation
 {
