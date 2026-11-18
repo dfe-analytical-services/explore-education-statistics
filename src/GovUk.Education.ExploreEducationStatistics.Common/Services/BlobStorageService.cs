@@ -666,7 +666,10 @@ public abstract partial class BlobStorageService(
         string path
     )
     {
-        var blobClient = await GetBlobClient(containerName, path);
+        // Unlike GetBlobClient, this doesn't create the container if it's missing, as it's only used for
+        // reading. Creating it would need write access to the storage account, and so services needing use
+        // of this method just for read access would need overly-elevated permissions.
+        var blobClient = client.GetBlobContainerClient(GetContainerName(containerName)).GetBlobClient(path);
         if (await blobClient.ExistsAsync())
         {
             return blobClient;
@@ -706,7 +709,7 @@ public abstract partial class BlobStorageService(
 
     private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
     {
-        var containerName = IsDevelopmentStorageAccount(client) ? container.EmulatedName : container.Name;
+        var containerName = GetContainerName(container);
 
         var containerClient = client.GetBlobContainerClient(containerName);
 
@@ -718,6 +721,11 @@ public abstract partial class BlobStorageService(
         );
 
         return containerClient;
+    }
+
+    private string GetContainerName(IBlobContainer container)
+    {
+        return IsDevelopmentStorageAccount(client) ? container.EmulatedName : container.Name;
     }
 
     private static bool IsDevelopmentStorageAccount(BlobServiceClient client)
