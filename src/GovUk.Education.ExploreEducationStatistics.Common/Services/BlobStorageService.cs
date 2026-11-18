@@ -54,7 +54,7 @@ public abstract partial class BlobStorageService(
     )
         : this(
             connectionString,
-            new BlobServiceClient(connectionString),
+            StorageClientFactory.CreateBlobServiceClient(connectionString),
             logger,
             new StorageInstanceCreationUtil(),
             blobSasService
@@ -629,12 +629,13 @@ public abstract partial class BlobStorageService(
 
     /// <summary>
     /// Copies one file during a directory copy. Azure Storage copies the data itself, so the file isn't downloaded
-    /// and re-uploaded by this app. A failed or skipped copy is logged rather than thrown, so the rest of the directory
-    /// is still copied.
+    /// and re-uploaded by this app. A copy skipped because the destination already exists is logged rather than
+    /// thrown. A failed copy is thrown, failing the directory copy, so that callers don't carry on as if every file
+    /// was copied, e.g. MoveDirectory deleting the source files.
     ///
     /// This method is use within a parallel operation so that multiple blobs can be copied at once.
     /// </summary>
-    /// <returns>Whether the file was copied.</returns>
+    /// <returns>Whether the file was copied, rather than skipped.</returns>
     private async Task<bool> CopyBlobInDirectory(
         BlobContainerClient sourceContainer,
         string sourceBlobName,
@@ -683,23 +684,23 @@ public abstract partial class BlobStorageService(
         }
         catch (Exception e) when (e is not OperationCanceledException)
         {
-            logger.LogInformation(
-                "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
+            logger.LogError(
+                e,
+                "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
                 sourceContainer.Name,
                 sourceBlobName,
                 destinationBlob.BlobContainerName,
-                destinationBlob.Name,
-                e.Message
+                destinationBlob.Name
             );
 
-            return false;
+            throw;
         }
     }
 
     /// <summary>
     /// Gets a URI from which the destination of a server-side copy can read a source blob. It carries a short-lived,
-    /// read-only SAS, as the destination may be in another storage account, or this client may connect with a managed
-    /// identity, which a copy's source can't be authorised with directly.
+    /// read-only SAS for just that blob, as the destination may be in another storage account, or this client may
+    /// connect with a managed identity, which a copy's source can't be authorised with directly.
     /// </summary>
     private async Task<Uri> GetCopySourceUri(
         BlobContainerClient sourceContainer,
@@ -707,14 +708,12 @@ public abstract partial class BlobStorageService(
         CancellationToken cancellationToken
     )
     {
-        var containerSasUri = await blobSasService.CreateContainerReadSasUri(
+        return await blobSasService.CreateBlobReadSasUri(
             blobServiceClient: client,
-            containerClient: sourceContainer,
+            blobClient: sourceContainer.GetBlobClient(sourceBlobName),
             expiryDuration: CopySourceSasExpiryDuration,
             cancellationToken: cancellationToken
         );
-
-        return new BlobUriBuilder(containerSasUri) { BlobName = sourceBlobName }.ToUri();
     }
 
     /// <summary>

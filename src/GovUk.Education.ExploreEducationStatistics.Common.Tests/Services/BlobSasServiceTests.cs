@@ -380,9 +380,9 @@ public abstract class BlobSasServiceTests
         }
     }
 
-    public class CreateContainerReadSasUriTests : BlobSasServiceTests
+    public class CreateBlobReadSasUriTests : BlobSasServiceTests
     {
-        private static readonly Uri ContainerUri = new("https://testaccount.blob.core.windows.net/a-container");
+        private static readonly Uri BlobUri = new("https://testaccount.blob.core.windows.net/a-container/a/blob.csv");
 
         [Fact]
         public async Task AccountKey_SignsWithAccountKey()
@@ -390,32 +390,25 @@ public abstract class BlobSasServiceTests
             var now = DateTime.UtcNow;
             var expiryDuration = TimeSpan.FromHours(1);
 
-            var containerClient = new Mock<BlobContainerClient>(Strict);
-            containerClient.SetupGet(client => client.Name).Returns("a-container");
-            containerClient.SetupGet(client => client.Uri).Returns(ContainerUri);
-            containerClient.SetupGet(client => client.CanGenerateSasUri).Returns(true);
-            containerClient
-                .Setup(client =>
-                    client.GenerateSasUri(
-                        It.Is<BlobSasBuilder>(builder =>
-                            builder.BlobContainerName == "a-container"
-                            && builder.Resource == "c"
-                            && builder.Permissions == "r"
-                            && builder.ExpiresOn == now.Add(expiryDuration)
-                        )
-                    )
-                )
-                .Returns(new Uri($"{ContainerUri}?sig=signed-with-key"));
+            var blobClient = MockBlobClient(name: "a/blob.csv");
+            blobClient.SetupGet(client => client.BlobContainerName).Returns("a-container");
+            blobClient.SetupCanGenerateSasUri(true);
+            blobClient.SetupGenerateReadonlySasUri(
+                expectedExpiry: now.Add(expiryDuration),
+                expectedContainerName: "a-container",
+                expectedBlobName: "a/blob.csv",
+                uriToReturn: $"{BlobUri}?sig=signed-with-key"
+            );
 
             var service = BuildService(dateTimeProvider: new DateTimeProvider(now));
 
-            var uri = await service.CreateContainerReadSasUri(
+            var uri = await service.CreateBlobReadSasUri(
                 blobServiceClient: Mock.Of<BlobServiceClient>(Strict),
-                containerClient: containerClient.Object,
+                blobClient: blobClient.Object,
                 expiryDuration: expiryDuration
             );
 
-            Assert.Equal(new Uri($"{ContainerUri}?sig=signed-with-key"), uri);
+            Assert.Equal(new Uri($"{BlobUri}?sig=signed-with-key"), uri);
         }
 
         [Fact]
@@ -423,10 +416,10 @@ public abstract class BlobSasServiceTests
         {
             var now = DateTime.UtcNow;
 
-            var containerClient = new Mock<BlobContainerClient>(Strict);
-            containerClient.SetupGet(client => client.Name).Returns("a-container");
-            containerClient.SetupGet(client => client.Uri).Returns(ContainerUri);
-            containerClient.SetupGet(client => client.CanGenerateSasUri).Returns(false);
+            var blobClient = MockBlobClient(name: "a/blob.csv");
+            blobClient.SetupGet(client => client.BlobContainerName).Returns("a-container");
+            blobClient.SetupGet(client => client.Uri).Returns(BlobUri);
+            blobClient.SetupCanGenerateSasUri(false);
 
             var blobServiceClient = new Mock<BlobServiceClient>(Strict);
             blobServiceClient.SetupGet(client => client.AccountName).Returns("testaccount");
@@ -441,16 +434,17 @@ public abstract class BlobSasServiceTests
 
             var service = BuildService(dateTimeProvider: new DateTimeProvider(now));
 
-            var uri = await service.CreateContainerReadSasUri(
+            var uri = await service.CreateBlobReadSasUri(
                 blobServiceClient: blobServiceClient.Object,
-                containerClient: containerClient.Object,
+                blobClient: blobClient.Object,
                 expiryDuration: TimeSpan.FromHours(1)
             );
 
             var sas = HttpUtility.ParseQueryString(uri.Query);
 
-            Assert.Equal(ContainerUri.AbsolutePath, uri.AbsolutePath);
-            Assert.Equal("c", sas["sr"]);
+            // A read-only SAS for just this blob, appended to the blob's URI.
+            Assert.Equal(BlobUri.AbsolutePath, uri.AbsolutePath);
+            Assert.Equal("b", sas["sr"]);
             Assert.Equal("r", sas["sp"]);
             Assert.Equal(UserDelegationKeyObjectId, sas["skoid"]);
         }

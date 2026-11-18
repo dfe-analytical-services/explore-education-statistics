@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -104,7 +106,7 @@ public class BlobStorageServiceCopyTests(BlobStorageServiceCopyTests.AzuriteFixt
     }
 
     [Fact]
-    public async Task CopyDirectory_DestinationConnectionString_CopiesWithThatConnection()
+    public async Task CopyDirectory_DestinationConnectionString_CopiesToThatAccount()
     {
         await UploadBlob(PrivateMethodologyFiles, $"{_directory}/image.png", "image", "image/png");
 
@@ -117,12 +119,21 @@ public class BlobStorageServiceCopyTests(BlobStorageServiceCopyTests.AzuriteFixt
             destinationDirectoryPath: $"{_directory}/",
             options: new IBlobStorageService.CopyDirectoryOptions
             {
-                DestinationConnectionString = fixture.ConnectionString,
+                DestinationConnectionString = fixture.DestinationAccountConnectionString,
             }
         );
 
         Assert.Equal([$"{_directory}/image.png"], copied.Select(blob => blob.Path));
-        Assert.Equal("image", await ReadBlob(GetBlob(PublicMethodologyFiles, $"{_directory}/image.png")));
+
+        // The destination account isn't the development account, so its container has the non-emulated name.
+        var destinationContainer = new BlobServiceClient(
+            fixture.DestinationAccountConnectionString
+        ).GetBlobContainerClient(PublicMethodologyFiles.Name);
+
+        Assert.Equal("image", await ReadBlob(destinationContainer.GetBlobClient($"{_directory}/image.png")));
+
+        // Nothing was copied to the source account's own destination container.
+        Assert.Empty(await ListBlobs(PublicMethodologyFiles, _directory));
     }
 
     [Fact]
@@ -146,6 +157,37 @@ public class BlobStorageServiceCopyTests(BlobStorageServiceCopyTests.AzuriteFixt
             await ListBlobs(PrivateReleaseFiles, _directory)
         );
         Assert.Equal("new", await ReadBlob(GetBlob(PrivateReleaseFiles, $"{_directory}/destination/existing.csv")));
+    }
+
+    [Fact]
+    public async Task MoveDirectory_FailedCopy_ThrowsAndKeepsSource()
+    {
+        await UploadBlob(PrivateReleaseFiles, $"{_directory}/source/leased.csv", "new", "text/csv");
+        await UploadBlob(PrivateReleaseFiles, $"{_directory}/source/new.csv", "new", "text/csv");
+        await UploadBlob(PrivateReleaseFiles, $"{_directory}/destination/leased.csv", "old", "text/csv");
+
+        // A destination blob with a lease can't be overwritten without the lease ID, so its copy request will fail.
+        await GetBlob(PrivateReleaseFiles, $"{_directory}/destination/leased.csv")
+            .GetBlobLeaseClient()
+            .AcquireAsync(BlobLeaseClient.InfiniteLeaseDuration);
+
+        var service = BuildService();
+
+        await Assert.ThrowsAsync<RequestFailedException>(() =>
+            service.MoveDirectory(
+                sourceContainerName: PrivateReleaseFiles,
+                sourceDirectoryPath: $"{_directory}/source",
+                destinationContainerName: PrivateReleaseFiles,
+                destinationDirectoryPath: $"{_directory}/destination"
+            )
+        );
+
+        // The source files aren't deleted, so the file that didn't copy isn't lost.
+        Assert.Equal(
+            [$"{_directory}/source/leased.csv", $"{_directory}/source/new.csv"],
+            (await ListBlobs(PrivateReleaseFiles, _directory)).Where(path => path.Contains("/source/"))
+        );
+        Assert.Equal("old", await ReadBlob(GetBlob(PrivateReleaseFiles, $"{_directory}/destination/leased.csv")));
     }
 
     [Fact]
@@ -229,17 +271,28 @@ public class BlobStorageServiceCopyTests(BlobStorageServiceCopyTests.AzuriteFixt
         // maps a random host port instead, so the container is set up here directly.
         private static readonly int BlobPort = GetFreePort();
 
+        // The well-known Azurite development account key, also used for a second account to copy across accounts to.
+        private const string AccountKey =
+            "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+
+        private const string DestinationAccountName = "destinationaccount";
+
         private readonly IContainer _azurite = new ContainerBuilder("mcr.microsoft.com/azure-storage/azurite:3.35.0")
             .WithCommand("azurite-blob", "--blobHost", "0.0.0.0", "--blobPort", $"{BlobPort}", "--skipApiVersionCheck")
+            .WithEnvironment("AZURITE_ACCOUNTS", $"devstoreaccount1:{AccountKey};{DestinationAccountName}:{AccountKey}")
             .WithPortBinding(BlobPort, BlobPort)
             .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(BlobPort))
             .Build();
 
-        // The well-known Azurite development account and key.
-        public string ConnectionString =>
-            "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
-            + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-            + $"BlobEndpoint=http://127.0.0.1:{BlobPort}/devstoreaccount1;";
+        // The well-known Azurite development account.
+        public string ConnectionString => BuildConnectionString("devstoreaccount1");
+
+        // A second account, standing in for a separate storage account such as public storage.
+        public string DestinationAccountConnectionString => BuildConnectionString(DestinationAccountName);
+
+        private static string BuildConnectionString(string accountName) =>
+            $"DefaultEndpointsProtocol=http;AccountName={accountName};AccountKey={AccountKey};"
+            + $"BlobEndpoint=http://127.0.0.1:{BlobPort}/{accountName};";
 
         public Task InitializeAsync() => _azurite.StartAsync();
 
