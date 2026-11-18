@@ -80,11 +80,20 @@ public class ReleaseRolloverService(
                                 templateReleaseVersionId: sourceReleaseVersion.Id,
                                 newReleaseVersionId: newReleaseVersion.Id
                             );
-                            // M1.5-M1.8 copy content, featured tables/key stats, data files and footnotes,
+                            await CopyContent(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersion: newReleaseVersion,
+                                dataBlockVersionMap: dataBlockVersionsByTemplateId
+                            );
+                            // M1.6-M1.8 copy featured tables/key stats, data files and footnotes,
                             // using dataBlockVersionsByTemplateId.
                             break;
                         case RolloverMode.StructureOnly:
-                            // M1.5 copies content sections/layout only, with no data-block id-map.
+                            await CopyContent(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersion: newReleaseVersion,
+                                dataBlockVersionMap: null
+                            );
                             break;
                     }
 
@@ -163,5 +172,96 @@ public class ReleaseRolloverService(
         await context.SaveChangesAsync();
 
         return newDataBlockVersionsByTemplateId;
+    }
+
+    private async Task CopyContent(
+        Guid templateReleaseVersionId,
+        ReleaseVersion newReleaseVersion,
+        Dictionary<Guid, DataBlockVersion>? dataBlockVersionMap
+    )
+    {
+        var templateSections = await context
+            .ContentSections.Where(section => section.ReleaseVersionId == templateReleaseVersionId)
+            .Include(section => section.Content)
+            .ToListAsync();
+
+        foreach (var templateSection in templateSections)
+        {
+            ContentSection destinationSection;
+
+            if (templateSection.Type == ContentSectionType.Generic)
+            {
+                destinationSection = new ContentSection
+                {
+                    Id = guidGenerator.NewGuid(),
+                    ReleaseVersionId = newReleaseVersion.Id,
+                    Type = ContentSectionType.Generic,
+                    Heading = templateSection.Heading,
+                    Order = templateSection.Order,
+                };
+
+                newReleaseVersion.Content.Add(destinationSection);
+                context.ContentSections.Add(destinationSection);
+            }
+            else
+            {
+                // The 5 standard sections already exist, created empty by InitialiseBaseContentSections - copy
+                // content into them rather than creating new rows.
+                destinationSection = newReleaseVersion.Content.Single(section => section.Type == templateSection.Type);
+            }
+
+            foreach (var templateBlock in templateSection.Content)
+            {
+                if (templateBlock is HtmlBlock templateHtmlBlock)
+                {
+                    var newHtmlBlock = new HtmlBlock
+                    {
+                        Id = guidGenerator.NewGuid(),
+                        ReleaseVersionId = newReleaseVersion.Id,
+                        ContentSectionId = destinationSection.Id,
+                        Order = templateHtmlBlock.Order,
+                        Body = "",
+                    };
+
+                    destinationSection.Content.Add(newHtmlBlock);
+                    context.ContentBlocks.Add(newHtmlBlock);
+
+                    continue;
+                }
+
+                if (templateBlock is DataBlockVersionLink templateLink)
+                {
+                    if (dataBlockVersionMap is null)
+                    {
+                        // StructureOnly - no data blocks were copied, so there's nothing to link to.
+                        continue;
+                    }
+
+                    var newDataBlockVersion = dataBlockVersionMap[templateLink.DataBlockVersionId];
+
+                    var newDataBlockVersionLink = new DataBlockVersionLink
+                    {
+                        // Shares its Id with the DataBlockVersion it points at. This isn't an EF-enforced shared
+                        // key - it's a convention: FeaturedTable/KeyStatisticDataBlock only store a
+                        // DataBlockVersionId, and use it to find the ContentBlock that displays that version by
+                        // looking up a DataBlockVersionLink with that same value as its own Id. A fresh, unrelated
+                        // Id here would break that lookup.
+                        Id = newDataBlockVersion.Id,
+                        DataBlockVersionId = newDataBlockVersion.Id,
+                        ReleaseVersionId = newReleaseVersion.Id,
+                        ContentSectionId = destinationSection.Id,
+                        Order = templateLink.Order,
+                        Created = DateTime.UtcNow,
+                    };
+
+                    destinationSection.Content.Add(newDataBlockVersionLink);
+                    context.ContentBlocks.Add(newDataBlockVersionLink);
+
+                    continue;
+                }
+
+                // Dropped: EmbedBlockLink (never carried over).
+            }
+        }
     }
 }
