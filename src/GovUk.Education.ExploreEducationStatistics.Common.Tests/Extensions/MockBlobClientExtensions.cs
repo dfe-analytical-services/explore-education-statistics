@@ -103,6 +103,7 @@ public static class MockBlobClientExtensions
         this Mock<BlobClient> blobClient,
         DateTimeOffset expectedExpiry,
         string expectedContainerName,
+        string expectedBlobName,
         string uriToReturn
     )
     {
@@ -111,8 +112,9 @@ public static class MockBlobClientExtensions
                 c.GenerateSasUri(
                     It.Is<BlobSasBuilder>(builder =>
                         builder.BlobContainerName == expectedContainerName
+                        && builder.BlobName == expectedBlobName
                         && builder.Permissions == "r"
-                        && builder.Resource == "c"
+                        && builder.Resource == "b"
                         && builder.ExpiresOn == expectedExpiry
                     )
                 )
