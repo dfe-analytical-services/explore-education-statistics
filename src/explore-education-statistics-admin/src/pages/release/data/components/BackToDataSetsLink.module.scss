@@ -1,11 +1,71 @@
-// The GOV.UK back link styles are for links, so reset the browser's button
-// styles. Left padding is kept, as govuk-back-link uses it for the chevron.
+@use 'sass:string';
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+// Looks like the GOV.UK back link, but on a button, as these screens switch
+// views using state rather than routes. Following the GOV.UK guidance on
+// modifying components, this is our own class built from the Frontend
+// helpers, rather than overriding govuk-back-link.
+// Based on govuk-frontend/dist/govuk/components/back-link/_mixin.scss
+
+$font-size: 16;
+$chevron-size: govuk-em(7px, $font-size);
+$chevron-border-min-width: 1px;
+$chevron-border-width: govuk-em($chevron-border-min-width, $font-size);
+
 .backLink {
+  @include govuk-font-size($size: $font-size);
+  @include govuk-link-common;
+  @include govuk-link-style-text;
+
   background: none;
   border: 0;
+  // The link styles only colour :link, :visited and :active, which don't apply to buttons
+  color: govuk-functional-colour(text);
   cursor: pointer;
-  font-family: inherit;
-  padding-bottom: 0;
-  padding-right: 0;
-  padding-top: 0;
+  display: inline-block;
+  margin-bottom: govuk-spacing(3);
+  margin-top: govuk-spacing(3);
+  // Allow space for the chevron
+  padding: 0 0 0 govuk-em(14px, $font-size);
+  position: relative;
+
+  // Left pointing chevron
+  &::before {
+    border: solid;
+    border-color: govuk-functional-colour(secondary-text);
+    border-width: $chevron-border-min-width $chevron-border-min-width 0 0;
+    bottom: 0;
+    content: '';
+    display: block;
+    height: $chevron-size;
+    left: govuk-em(3px, $font-size);
+    margin: auto 0;
+    position: absolute;
+    top: 0;
+    transform: rotate(225deg);
+    width: $chevron-size;
+
+    @supports (border-width: string.unquote('max(0px)')) {
+      $border-width-eval: 'max(#{$chevron-border-min-width}, #{$chevron-border-width})';
+
+      // Ensure that the chevron never gets smaller than 16px
+      border-width: string.unquote($border-width-eval)
+        string.unquote($border-width-eval) 0 0;
+      font-size: string.unquote('max(#{$font-size * 1px}, 1em)');
+    }
+  }
+
+  &:focus::before {
+    border-color: govuk-functional-colour(focus-text);
+  }
+
+  // Larger click target, as on the GOV.UK back link
+  &::after {
+    bottom: -14px;
+    content: '';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: -14px;
+  }
 }

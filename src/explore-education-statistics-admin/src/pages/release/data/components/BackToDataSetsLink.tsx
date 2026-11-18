@@ -1,6 +1,5 @@
 import styles from '@admin/pages/release/data/components/BackToDataSetsLink.module.scss';
 import ModalConfirm from '@common/components/ModalConfirm';
-import classNames from 'classnames';
 import React, { useState } from 'react';
 
 interface Props {
@@ -9,9 +8,9 @@ interface Props {
 }
 
 /**
- * GOV.UK back link for leaving the Manage filters and indicators screens,
- * which switch views using state rather than routes. Asks to confirm first
- * if there are unsaved changes.
+ * Back link styled like the GOV.UK one, for leaving the Manage filters and
+ * indicators screens. These switch views using state rather than routes, so
+ * it's a button. Asks to confirm first if there are unsaved changes.
  */
 export default function BackToDataSetsLink({
   hasUnsavedChanges = false,
@@ -23,7 +22,7 @@ export default function BackToDataSetsLink({
     <>
       <button
         type="button"
-        className={classNames('govuk-back-link', styles.backLink)}
+        className={styles.backLink}
         onClick={() => {
           if (hasUnsavedChanges) {
             setShowConfirm(true);
