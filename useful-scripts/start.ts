@@ -350,11 +350,12 @@ async function startDockerServices() {
       servicesToStart.includes('admin') ||
       servicesToStart.includes('dataScreener')
     ) {
-      // Forcibly remove any running Screener container. We do this rather than
-      // using "docker compose down" because that command will remove the network as
+      // Stop and remove any existing Screener container ("--stop", as "rm" on its
+      // own only removes stopped containers). We do this rather than using
+      // "docker compose down" because that command will remove the network as
       // well if nothing else is connected to it, causing startup failures the next
       // time any other existing containers are being used.
-      await $$`docker compose rm -f data-screener`;
+      await $$`docker compose rm --stop --force data-screener`;
 
       cloneRequiredRepository(
         screenerRepositoryName,
