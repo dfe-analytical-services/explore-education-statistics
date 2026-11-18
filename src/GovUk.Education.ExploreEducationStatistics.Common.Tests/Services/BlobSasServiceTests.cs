@@ -44,6 +44,7 @@ public abstract class BlobSasServiceTests
             blobClient.SetupGenerateReadonlySasUri(
                 expectedExpiry: now.Add(expiryDuration),
                 expectedContainerName: container.Name,
+                expectedBlobName: path,
                 uriToReturn: "https://sasurl?param1=1&param2=2"
             );
 
@@ -138,12 +139,105 @@ public abstract class BlobSasServiceTests
 
             var token = HttpUtility.ParseQueryString(result.AssertRight().Token);
 
-            // A read-only container SAS, signed by the user delegation key's identity.
-            Assert.Equal("c", token["sr"]);
+            // A read-only SAS for just this blob, signed by the user delegation key's identity.
+            Assert.Equal("b", token["sr"]);
             Assert.Equal("r", token["sp"]);
             Assert.Equal(UserDelegationKeyObjectId, token["skoid"]);
             Assert.Equal(new DateTimeOffset(now.Add(expiryDuration)).ToString("yyyy-MM-ddTHH:mm:ssZ"), token["se"]);
             Assert.NotEmpty(token["sig"]!);
+        }
+
+        [Fact]
+        public async Task NoAccountKey_SasOnlyValidForRequestedBlob()
+        {
+            var now = DateTime.UtcNow;
+            var container = BlobContainers.PublicContent;
+
+            // Tokens for two blobs in the same container, signed by the same key at the same time.
+            async Task<string> CreateSignature(string path)
+            {
+                var (blobServiceClient, _) = MockIdentityBlobServiceClient(container, path);
+
+                blobServiceClient
+                    .Setup(client =>
+                        client.GetUserDelegationKeyAsync(
+                            It.IsAny<BlobGetUserDelegationKeyOptions>(),
+                            CancellationToken.None
+                        )
+                    )
+                    .ReturnsAsync(Response.FromValue(UserDelegationKey(expiresOn: now.AddDays(1)), null!));
+
+                var result = await BuildService(dateTimeProvider: new DateTimeProvider(now))
+                    .CreateBlobDownloadToken(
+                        blobServiceClient: blobServiceClient.Object,
+                        container: container,
+                        filename: "test.pdf",
+                        path: path,
+                        expiryDuration: TimeSpan.FromMinutes(5),
+                        cancellationToken: CancellationToken.None
+                    );
+
+                return HttpUtility.ParseQueryString(result.AssertRight().Token)["sig"]!;
+            }
+
+            // The signature covers the blob's path, so changing the path in a token invalidates it.
+            Assert.NotEqual(await CreateSignature("path/to/test.pdf"), await CreateSignature("path/to/other.pdf"));
+        }
+
+        [Fact]
+        public async Task NoAccountKey_ConcurrentRequestsShareOneUserDelegationKeyRequest()
+        {
+            const string path = "path/to/test.pdf";
+            var now = DateTime.UtcNow;
+            var container = BlobContainers.PublicContent;
+
+            var (blobServiceClient, _) = MockIdentityBlobServiceClient(container, path);
+
+            // Hold the key request open until all the token requests have started.
+            var userDelegationKeyResponse = new TaskCompletionSource<Response<UserDelegationKey>>();
+
+            blobServiceClient
+                .Setup(client =>
+                    client.GetUserDelegationKeyAsync(
+                        It.IsAny<BlobGetUserDelegationKeyOptions>(),
+                        CancellationToken.None
+                    )
+                )
+                .Returns(() => userDelegationKeyResponse.Task);
+
+            var service = BuildService(dateTimeProvider: new DateTimeProvider(now));
+
+            var tokenRequests = Enumerable
+                .Range(0, 5)
+                .Select(_ =>
+                    service.CreateBlobDownloadToken(
+                        blobServiceClient: blobServiceClient.Object,
+                        container: container,
+                        filename: "test.pdf",
+                        path: path,
+                        expiryDuration: TimeSpan.FromMinutes(5),
+                        cancellationToken: CancellationToken.None
+                    )
+                )
+                .ToList();
+
+            userDelegationKeyResponse.SetResult(
+                Response.FromValue(UserDelegationKey(expiresOn: now.AddDays(1)), null!)
+            );
+
+            foreach (var result in await Task.WhenAll(tokenRequests))
+            {
+                result.AssertRight();
+            }
+
+            blobServiceClient.Verify(
+                client =>
+                    client.GetUserDelegationKeyAsync(
+                        It.IsAny<BlobGetUserDelegationKeyOptions>(),
+                        CancellationToken.None
+                    ),
+                Times.Once
+            );
         }
 
         [Fact]

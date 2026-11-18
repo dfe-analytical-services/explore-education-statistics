@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -25,6 +26,9 @@ public class BlobSasService(
 
     // User delegation keys by storage account name, reused until they'd expire before the SAS they sign.
     private readonly ConcurrentDictionary<string, UserDelegationKey> _userDelegationKeys = new();
+
+    // Locks by storage account name, so that concurrent requests needing a new key share one request for it.
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> _userDelegationKeyLocks = new();
 
     public Task<Either<ActionResult, BlobDownloadToken>> CreateBlobDownloadToken(
         BlobServiceClient blobServiceClient,
@@ -90,15 +94,17 @@ public class BlobSasService(
         CancellationToken cancellationToken
     )
     {
-        // Create a SAS token that's valid for a very short time.
+        // Create a read-only SAS token for just this blob that's valid for a very short time. It's scoped to the blob,
+        // not the container, so that the token can't be used to read any other blob in the container.
         var sasBuilder = new BlobSasBuilder
         {
             BlobContainerName = containerName,
-            Resource = "c",
+            BlobName = client.Name,
+            Resource = "b",
             ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
         };
 
-        sasBuilder.SetPermissions(BlobContainerSasPermissions.Read);
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
         // A client authorised with the account key signs the SAS with that key.
         if (client.CanGenerateSasUri)
@@ -128,25 +134,49 @@ public class BlobSasService(
         CancellationToken cancellationToken
     )
     {
-        // A SAS stops working when the key that signed it expires, so only reuse a key that outlasts the SAS.
-        if (
-            _userDelegationKeys.TryGetValue(blobServiceClient.AccountName, out var cachedKey)
-            && cachedKey.SignedExpiresOn >= sasExpiresOn
-        )
+        var accountName = blobServiceClient.AccountName;
+
+        if (TryGetCachedUserDelegationKey(accountName, sasExpiresOn, out var cachedKey))
         {
             return cachedKey;
         }
 
-        var keyExpiresOn = new DateTimeOffset(dateTimeProvider.UtcNow.Add(UserDelegationKeyLifetime));
+        var keyLock = _userDelegationKeyLocks.GetOrAdd(accountName, _ => new SemaphoreSlim(1, 1));
+        await keyLock.WaitAsync(cancellationToken);
 
-        UserDelegationKey userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync(
-            new BlobGetUserDelegationKeyOptions(keyExpiresOn > sasExpiresOn ? keyExpiresOn : sasExpiresOn),
-            cancellationToken
-        );
+        try
+        {
+            // Check again, as another request may have fetched a new key while this one waited for the lock.
+            if (TryGetCachedUserDelegationKey(accountName, sasExpiresOn, out cachedKey))
+            {
+                return cachedKey;
+            }
 
-        _userDelegationKeys[blobServiceClient.AccountName] = userDelegationKey;
+            var keyExpiresOn = new DateTimeOffset(dateTimeProvider.UtcNow.Add(UserDelegationKeyLifetime));
 
-        return userDelegationKey;
+            UserDelegationKey userDelegationKey = await blobServiceClient.GetUserDelegationKeyAsync(
+                new BlobGetUserDelegationKeyOptions(keyExpiresOn > sasExpiresOn ? keyExpiresOn : sasExpiresOn),
+                cancellationToken
+            );
+
+            _userDelegationKeys[accountName] = userDelegationKey;
+
+            return userDelegationKey;
+        }
+        finally
+        {
+            keyLock.Release();
+        }
+    }
+
+    private bool TryGetCachedUserDelegationKey(
+        string accountName,
+        DateTimeOffset sasExpiresOn,
+        [NotNullWhen(true)] out UserDelegationKey? cachedKey
+    )
+    {
+        // A SAS stops working when the key that signed it expires, so only reuse a key that outlasts the SAS.
+        return _userDelegationKeys.TryGetValue(accountName, out cachedKey) && cachedKey.SignedExpiresOn >= sasExpiresOn;
     }
 
     private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
