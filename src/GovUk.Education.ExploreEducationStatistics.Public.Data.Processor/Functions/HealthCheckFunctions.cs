@@ -92,10 +92,14 @@ public class HealthCheckFunctions(
         {
             var connectionString = appOptions.Value.PrivateStorageConnectionString;
             var blobClient = StorageClientFactory.CreateBlobServiceClient(connectionString);
-            var response = await blobClient.GetAccountInfoAsync();
-            return response.HasValue
-                ? HealthCheckSummary.Healthy()
-                : HealthCheckSummary.Unhealthy("Could not retrieve Core Storage account info");
+
+            // Test blob storage connection by retrieving a minimal list of blob containers.
+            await foreach (var _ in blobClient.GetBlobContainersAsync().AsPages(pageSizeHint: 1))
+            {
+                break;
+            }
+
+            return HealthCheckSummary.Healthy();
         }
         catch (Exception e)
         {

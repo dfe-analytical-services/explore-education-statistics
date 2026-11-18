@@ -24,21 +24,12 @@ public static class StorageClientFactory
     private static readonly string[] CredentialKeys = ["AccountKey", "SharedAccessSignature", "UseDevelopmentStorage"];
 
     // Shared so that every client reuses the same cached tokens.
-    private static readonly Lazy<TokenCredential> ManagedIdentityCredential = new(() =>
-    {
-        var clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
-        return new DefaultAzureCredential(
-            new DefaultAzureCredentialOptions
-            {
-                ManagedIdentityClientId = string.IsNullOrEmpty(clientId) ? null : clientId,
-            }
-        );
-    });
+    private static readonly Lazy<TokenCredential> IdentityCredential = new(() => new DefaultAzureCredential());
 
     public static BlobServiceClient CreateBlobServiceClient(string connectionString, BlobClientOptions? options = null)
     {
         return UsesManagedIdentity(connectionString)
-            ? new BlobServiceClient(GetServiceUri(connectionString, "blob"), ManagedIdentityCredential.Value, options)
+            ? new BlobServiceClient(GetServiceUri(connectionString, "blob"), IdentityCredential.Value, options)
             : new BlobServiceClient(connectionString, options);
     }
 
@@ -48,7 +39,7 @@ public static class StorageClientFactory
     )
     {
         return UsesManagedIdentity(connectionString)
-            ? new QueueServiceClient(GetServiceUri(connectionString, "queue"), ManagedIdentityCredential.Value, options)
+            ? new QueueServiceClient(GetServiceUri(connectionString, "queue"), IdentityCredential.Value, options)
             : new QueueServiceClient(connectionString, options);
     }
 
@@ -67,7 +58,7 @@ public static class StorageClientFactory
     )
     {
         return UsesManagedIdentity(connectionString)
-            ? new TableServiceClient(GetServiceUri(connectionString, "table"), ManagedIdentityCredential.Value, options)
+            ? new TableServiceClient(GetServiceUri(connectionString, "table"), IdentityCredential.Value, options)
             : new TableServiceClient(connectionString, options);
     }
 
