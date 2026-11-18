@@ -1,4 +1,4 @@
-import BackToDataSetsLink from '@admin/pages/release/data/components/BackToDataSetsLink';
+import BackToDataFilesLink from '@admin/pages/release/data/components/BackToDataFilesLink';
 import {
   PairedIndicator,
   PairedIndicators,
@@ -159,7 +159,7 @@ export default function PairedIndicatorsForm({
     >
       {({ formState }) => (
         <>
-          <BackToDataSetsLink
+          <BackToDataFilesLink
             hasUnsavedChanges={formState.isDirty}
             onBack={onBack}
           />

@@ -1,4 +1,4 @@
-import BackToDataSetsLink from '@admin/pages/release/data/components/BackToDataSetsLink';
+import BackToDataFilesLink from '@admin/pages/release/data/components/BackToDataFilesLink';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -163,7 +163,7 @@ export default function ReorderFiltersList({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <BackToDataSetsLink
+      <BackToDataFilesLink
         hasUnsavedChanges={!isEqual(filters, initialFilters)}
         onBack={onCancel}
       />

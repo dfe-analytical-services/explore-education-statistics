@@ -381,7 +381,7 @@ describe('PairedIndicatorsForm', () => {
     );
 
     await user.click(
-      await screen.findByRole('button', { name: 'Back to data sets' }),
+      await screen.findByRole('button', { name: 'Back to data files' }),
     );
 
     expect(onBack).toHaveBeenCalledTimes(1);
@@ -411,7 +411,9 @@ describe('PairedIndicatorsForm', () => {
       within(pair).getByLabelText('Paired indicator'),
       'indicator-3',
     );
-    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
 
     expect(
       await screen.findByText('You have unsaved changes'),

@@ -135,7 +135,7 @@ Follow the link to manage paired indicators
     user waits until h2 is visible    Manage filters and indicators
     user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
     user checks table body has x rows    3    id:reordering
-    user clicks button    Back to data sets    id:reordering
+    user clicks button    Back to data files    id:reordering
 
 Confirm data replacement
     # Confirming also shows that dropped pairs don't block the replacement

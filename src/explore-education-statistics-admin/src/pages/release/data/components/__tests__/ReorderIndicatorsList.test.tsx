@@ -249,7 +249,9 @@ describe('ReorderIndicatorsList', () => {
 
     await screen.findByText('Reorder indicators for Subject Name');
 
-    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
 
     expect(handleBack).toHaveBeenCalledTimes(1);
     expect(
@@ -276,7 +278,9 @@ describe('ReorderIndicatorsList', () => {
     await user.click(
       screen.getByRole('button', { name: 'Move Category 2 down' }),
     );
-    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
 
     expect(
       await screen.findByText('You have unsaved changes'),

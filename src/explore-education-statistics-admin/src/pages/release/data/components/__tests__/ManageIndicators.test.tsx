@@ -282,7 +282,7 @@ describe('ManageIndicators', () => {
     ).toBeAriaDisabled();
   });
 
-  test('the back link and the Back to data sets button both call onBack', async () => {
+  test('the back link and the Back to data files button both call onBack', async () => {
     const onBack = jest.fn();
 
     const { user } = render(
@@ -294,7 +294,7 @@ describe('ManageIndicators', () => {
     );
 
     const backButtons = await screen.findAllByRole('button', {
-      name: 'Back to data sets',
+      name: 'Back to data files',
     });
     expect(backButtons).toHaveLength(2);
 
@@ -304,7 +304,7 @@ describe('ManageIndicators', () => {
     expect(onBack).toHaveBeenCalledTimes(2);
   });
 
-  test('the back link on the reorder screen leaves to the data sets', async () => {
+  test('the back link on the reorder screen leaves to the data files', async () => {
     const onBack = jest.fn();
 
     const { user } = render(
@@ -322,12 +322,14 @@ describe('ManageIndicators', () => {
       await screen.findByText('Reorder indicators for Subject name'),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
 
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  test('the back link on the pairing screen leaves to the data sets', async () => {
+  test('the back link on the pairing screen leaves to the data files', async () => {
     const onBack = jest.fn();
 
     const { user } = render(
@@ -347,7 +349,9 @@ describe('ManageIndicators', () => {
       }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
 
     expect(onBack).toHaveBeenCalledTimes(1);
   });
