@@ -76,6 +76,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={noop}
       />,
@@ -108,6 +109,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={noop}
       />,
@@ -125,6 +127,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={noop}
       />,
@@ -151,6 +154,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={noop}
       />,
@@ -178,6 +182,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={noop}
       />,
@@ -200,6 +205,7 @@ describe('ReorderIndicatorsList', () => {
       <ReorderIndicatorsList
         releaseVersionId="release-1"
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={handleSave}
       />,
@@ -225,5 +231,60 @@ describe('ReorderIndicatorsList', () => {
     ];
 
     expect(handleSave).toHaveBeenCalledWith(testSubject.id, expectedRequest);
+  });
+
+  test('the back link goes back straight away when the order is unchanged', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    const handleBack = jest.fn();
+
+    const { user } = render(
+      <ReorderIndicatorsList
+        releaseVersionId="release-1"
+        subject={testSubject}
+        onBack={handleBack}
+        onCancel={noop}
+        onSave={noop}
+      />,
+    );
+
+    await screen.findByText('Reorder indicators for Subject Name');
+
+    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+
+    expect(handleBack).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByText('You have unsaved changes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('the back link asks to confirm after the order has changed', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    const handleBack = jest.fn();
+
+    const { user } = render(
+      <ReorderIndicatorsList
+        releaseVersionId="release-1"
+        subject={testSubject}
+        onBack={handleBack}
+        onCancel={noop}
+        onSave={noop}
+      />,
+    );
+
+    await screen.findByText('Reorder indicators for Subject Name');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Move Category 2 down' }),
+    );
+    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+
+    expect(
+      await screen.findByText('You have unsaved changes'),
+    ).toBeInTheDocument();
+    expect(handleBack).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Discard changes' }));
+
+    await waitFor(() => expect(handleBack).toHaveBeenCalledTimes(1));
   });
 });

@@ -1,3 +1,4 @@
+import BackToDataSetsLink from '@admin/pages/release/data/components/BackToDataSetsLink';
 import PairedIndicatorsForm from '@admin/pages/release/data/components/PairedIndicatorsForm';
 import ReorderIndicatorsList, {
   UpdateIndicatorsRequest,
@@ -97,6 +98,7 @@ export default function ManageIndicators({
       <ReorderIndicatorsList
         releaseVersionId={releaseVersionId}
         subject={subject}
+        onBack={onBack}
         onCancel={() => setMode('view')}
         onSave={handleSaveOrder}
       />
@@ -109,6 +111,7 @@ export default function ManageIndicators({
         indicatorGroups={indicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={subject}
+        onBack={onBack}
         onCancel={() => setMode('view')}
         onSave={handleSavePairs}
       />
@@ -117,6 +120,7 @@ export default function ManageIndicators({
 
   return (
     <>
+      <BackToDataSetsLink onBack={onBack} />
       <h3>{`Manage indicators for ${subject.name}`}</h3>
 
       <LoadingSpinner loading={isLoading}>
@@ -195,7 +199,7 @@ export default function ManageIndicators({
       </LoadingSpinner>
 
       <Button variant="secondary" onClick={onBack}>
-        Back to data files
+        Back to data sets
       </Button>
     </>
   );

@@ -1,3 +1,4 @@
+import BackToDataSetsLink from '@admin/pages/release/data/components/BackToDataSetsLink';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,6 +12,7 @@ import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import reorder from '@common/utils/reorder';
+import isEqual from 'lodash/isEqual';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 
@@ -44,6 +46,9 @@ export default function ReorderFiltersList({
   );
 
   const [filters, setFilters] = useState<ReorderableListItem[]>([]);
+  const [initialFilters, setInitialFilters] = useState<ReorderableListItem[]>(
+    [],
+  );
 
   useEffect(() => {
     if (isLoading || !subjectMeta) {
@@ -76,6 +81,7 @@ export default function ReorderFiltersList({
     });
 
     setFilters(formattedFilters);
+    setInitialFilters(formattedFilters);
   }, [isLoading, subjectMeta]);
 
   const handleReorder = ({
@@ -157,6 +163,10 @@ export default function ReorderFiltersList({
 
   return (
     <LoadingSpinner loading={isLoading}>
+      <BackToDataSetsLink
+        hasUnsavedChanges={!isEqual(filters, initialFilters)}
+        onBack={onCancel}
+      />
       {filters.length === 0 ? (
         <>
           <p>No filters available.</p>

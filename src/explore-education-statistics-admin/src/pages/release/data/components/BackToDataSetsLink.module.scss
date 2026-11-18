@@ -1,0 +1,9 @@
+// The GOV.UK back link styles are for links, so reset the browser's button styles
+.backLink {
+  background: none;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  cursor: pointer;
+  font-family: inherit;
+}

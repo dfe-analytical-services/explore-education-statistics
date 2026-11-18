@@ -1,3 +1,4 @@
+import BackToDataSetsLink from '@admin/pages/release/data/components/BackToDataSetsLink';
 import {
   PairedIndicator,
   PairedIndicators,
@@ -118,6 +119,7 @@ interface Props {
   indicatorGroups: SubjectMeta['indicators'][string][];
   pairedIndicators: PairedIndicator[];
   subject: Subject;
+  onBack: () => void;
   onCancel: () => void;
   onSave: (subjectId: string, request: PairedIndicators) => Promise<void>;
 }
@@ -126,6 +128,7 @@ export default function PairedIndicatorsForm({
   indicatorGroups,
   pairedIndicators,
   subject,
+  onBack,
   onCancel,
   onSave,
 }: Props) {
@@ -149,14 +152,18 @@ export default function PairedIndicatorsForm({
   );
 
   return (
-    <>
-      <h3>{`Pair indicators for ${subject.name}`}</h3>
-      <FormProvider
-        errorMappings={errorMappings}
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-      >
-        {({ formState }) => (
+    <FormProvider
+      errorMappings={errorMappings}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+    >
+      {({ formState }) => (
+        <>
+          <BackToDataSetsLink
+            hasUnsavedChanges={formState.isDirty}
+            onBack={onBack}
+          />
+          <h3>{`Pair indicators for ${subject.name}`}</h3>
           <Form<FormValues>
             id={formId}
             onSubmit={async values => {
@@ -178,9 +185,9 @@ export default function PairedIndicatorsForm({
               </Button>
             </ButtonGroup>
           </Form>
-        )}
-      </FormProvider>
-    </>
+        </>
+      )}
+    </FormProvider>
   );
 }
 

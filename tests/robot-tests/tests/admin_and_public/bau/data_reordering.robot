@@ -199,7 +199,7 @@ Save reordered indicator groups and indicators
     user clicks button    Save order
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
     user waits until h3 is visible    Manage indicators for ${SUBJECT_NAME}
-    user clicks button    Back to data files    id:reordering
+    user clicks button    Back to data sets    id:reordering
 
 Check the saved order of indicator groups
     user clicks button in table cell    1    2    Manage indicators    id:reordering

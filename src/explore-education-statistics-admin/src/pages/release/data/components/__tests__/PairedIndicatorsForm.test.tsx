@@ -52,6 +52,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={jest.fn()}
       />,
@@ -75,6 +76,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={jest.fn()}
       />,
@@ -99,6 +101,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={onSave}
       />,
@@ -145,6 +148,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={onSave}
       />,
@@ -210,6 +214,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={onSave}
       />,
@@ -237,6 +242,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={onSave}
       />,
@@ -277,6 +283,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={onSave}
       />,
@@ -302,6 +309,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={[]}
         subject={testSubject}
+        onBack={noop}
         onCancel={noop}
         onSave={jest.fn()}
       />,
@@ -322,6 +330,7 @@ describe('PairedIndicatorsForm', () => {
         indicatorGroups={testIndicatorGroups}
         pairedIndicators={pairedIndicators}
         subject={testSubject}
+        onBack={noop}
         onCancel={onCancel}
         onSave={jest.fn()}
       />,
@@ -330,5 +339,94 @@ describe('PairedIndicatorsForm', () => {
     await user.click(await screen.findByRole('button', { name: 'Cancel' }));
 
     expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('clicking Cancel after a change discards it without a warning', async () => {
+    const onCancel = jest.fn();
+
+    const { user } = render(
+      <PairedIndicatorsForm
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={[]}
+        subject={testSubject}
+        onBack={noop}
+        onCancel={onCancel}
+        onSave={jest.fn()}
+      />,
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Add pair' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByText('You have unsaved changes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('the back link goes back straight away when nothing has changed', async () => {
+    const onBack = jest.fn();
+
+    const { user } = render(
+      <PairedIndicatorsForm
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={[
+          { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+        ]}
+        subject={testSubject}
+        onBack={onBack}
+        onCancel={noop}
+        onSave={jest.fn()}
+      />,
+    );
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Back to data sets' }),
+    );
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByText('You have unsaved changes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('the back link asks to confirm after a pair has changed', async () => {
+    const onBack = jest.fn();
+
+    const { user } = render(
+      <PairedIndicatorsForm
+        indicatorGroups={testIndicatorGroups}
+        pairedIndicators={[
+          { parentIndicatorId: 'indicator-1', childIndicatorId: 'indicator-2' },
+        ]}
+        subject={testSubject}
+        onBack={onBack}
+        onCancel={noop}
+        onSave={jest.fn()}
+      />,
+    );
+
+    const pair = await screen.findByRole('group', { name: 'Pair 1' });
+    await user.selectOptions(
+      within(pair).getByLabelText('Paired indicator'),
+      'indicator-3',
+    );
+    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+
+    expect(
+      await screen.findByText('You have unsaved changes'),
+    ).toBeInTheDocument();
+    expect(onBack).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('You have unsaved changes'),
+      ).not.toBeInTheDocument(),
+    );
+    expect(within(pair).getByLabelText('Paired indicator')).toHaveValue(
+      'indicator-3',
+    );
   });
 });

@@ -282,7 +282,29 @@ describe('ManageIndicators', () => {
     ).toBeAriaDisabled();
   });
 
-  test('clicking Back to data files calls onBack', async () => {
+  test('the back link and the Back to data sets button both call onBack', async () => {
+    const onBack = jest.fn();
+
+    const { user } = render(
+      <ManageIndicators
+        releaseVersionId="release-version-id"
+        subject={testSubject}
+        onBack={onBack}
+      />,
+    );
+
+    const backButtons = await screen.findAllByRole('button', {
+      name: 'Back to data sets',
+    });
+    expect(backButtons).toHaveLength(2);
+
+    await user.click(backButtons[0]);
+    await user.click(backButtons[1]);
+
+    expect(onBack).toHaveBeenCalledTimes(2);
+  });
+
+  test('the back link on the reorder screen leaves to the data sets', async () => {
     const onBack = jest.fn();
 
     const { user } = render(
@@ -294,8 +316,38 @@ describe('ManageIndicators', () => {
     );
 
     await user.click(
-      await screen.findByRole('button', { name: 'Back to data files' }),
+      await screen.findByRole('button', { name: 'Reorder indicators' }),
     );
+    expect(
+      await screen.findByText('Reorder indicators for Subject name'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
+
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  test('the back link on the pairing screen leaves to the data sets', async () => {
+    const onBack = jest.fn();
+
+    const { user } = render(
+      <ManageIndicators
+        releaseVersionId="release-version-id"
+        subject={testSubject}
+        onBack={onBack}
+      />,
+    );
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Edit paired indicators' }),
+    );
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Pair indicators for Subject name',
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Back to data sets' }));
 
     expect(onBack).toHaveBeenCalledTimes(1);
   });

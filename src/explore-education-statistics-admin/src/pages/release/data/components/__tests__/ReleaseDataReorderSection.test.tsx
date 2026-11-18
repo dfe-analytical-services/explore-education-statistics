@@ -150,7 +150,7 @@ describe('ReleaseDataReorderSection', () => {
     ).not.toBeInTheDocument();
 
     await user.click(
-      screen.getByRole('button', { name: 'Back to data files' }),
+      screen.getAllByRole('button', { name: 'Back to data sets' })[0],
     );
 
     expect(
@@ -206,7 +206,7 @@ describe('ReleaseDataReorderSection', () => {
     );
 
     await user.click(
-      await screen.findByRole('button', { name: 'Back to data files' }),
+      (await screen.findAllByRole('button', { name: 'Back to data sets' }))[0],
     );
 
     expect(
