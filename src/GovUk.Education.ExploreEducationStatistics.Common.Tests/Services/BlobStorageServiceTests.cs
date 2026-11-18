@@ -162,6 +162,59 @@ public class BlobStorageServiceTests
     }
 
     [Fact]
+    public async Task DownloadToStream_DoesNotCreateContainer()
+    {
+        const string path = "path/to/test.pdf";
+
+        var blobClient = MockBlobClient(name: path);
+
+        blobClient.SetupDownloadToAsync("Test content");
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        // Strict, so the test fails if the service tries to create the container, which needs write access.
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: Mock.Of<IStorageInstanceCreationUtil>(Strict)
+        );
+
+        await using var targetStream = new MemoryStream();
+        var result = await service.DownloadToStream(
+            containerName: PublicReleaseFiles,
+            path: path,
+            targetStream: targetStream
+        );
+
+        result.AssertRight();
+        Assert.Equal("Test content", targetStream.ReadToEnd());
+    }
+
+    [Fact]
+    public async Task GetDownloadStream_DoesNotCreateContainer()
+    {
+        const string path = "path/to/test.csv";
+
+        var blobClient = MockBlobClient(name: path);
+
+        blobClient.SetupGetDownloadStreamAsync(content: "Test content");
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        // Strict, so the test fails if the service tries to create the container, which needs write access.
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: Mock.Of<IStorageInstanceCreationUtil>(Strict)
+        );
+
+        var result = await service.GetDownloadStream(containerName: PublicReleaseFiles, path: path, decompress: false);
+
+        await using var stream = result.AssertRight();
+        Assert.Equal("Test content", stream.ReadToEnd());
+    }
+
+    [Fact]
     public async Task GetBlobDownloadToken_Success()
     {
         const string filename = "test.pdf";
@@ -672,14 +725,15 @@ public class BlobStorageServiceTests
 
     private static TestBlobStorageService SetupTestBlobStorageService(
         BlobServiceClient? blobServiceClient = null,
-        IBlobSasService? blobSasService = null
+        IBlobSasService? blobSasService = null,
+        IStorageInstanceCreationUtil? storageInstanceCreationUtil = null
     )
     {
         return new TestBlobStorageService(
             connectionString: "",
             blobServiceClient ?? Mock.Of<BlobServiceClient>(),
             Mock.Of<ILogger<BlobStorageService>>(),
-            Mock.Of<IStorageInstanceCreationUtil>(),
+            storageInstanceCreationUtil ?? Mock.Of<IStorageInstanceCreationUtil>(),
             blobSasService ?? Mock.Of<IBlobSasService>(Strict)
         );
     }
