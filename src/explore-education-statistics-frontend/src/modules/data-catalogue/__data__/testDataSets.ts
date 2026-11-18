@@ -216,9 +216,6 @@ export const testDataSetFile: DataSetFile = {
       {
         id: 'organisation-1',
         title: 'Department for Education',
-        url: 'https://www.gov.uk/government/organisations/department-for-education',
-        useGISLogo: true,
-        logoFileName: 'dfe-logo.png',
       },
     ],
     published: new Date('2024-01-01'),

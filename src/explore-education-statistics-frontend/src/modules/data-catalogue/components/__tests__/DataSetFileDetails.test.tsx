@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import { Organisation } from '@common/services/types/organisation';
+import { DataSetFileOrganisation } from '@frontend/services/dataSetFileService';
 import { testDataSetFile } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import DataSetFileDetails from '@frontend/modules/data-catalogue/components/DataSetFileDetails';
 import { screen, within } from '@testing-library/react';
@@ -107,19 +107,16 @@ describe('DataSetFileDetails', () => {
   });
 
   describe('official statistics in development release type', () => {
-    const skillsEngland: Organisation = {
+    const skillsEngland: DataSetFileOrganisation = {
       id: 'organisation-skills-england',
       title: 'Skills England',
-      url: 'https://www.gov.uk/government/organisations/skills-england',
-      useGISLogo: true,
-      logoFileName: 'skills-england-logo.png',
     };
 
     const [departmentForEducation] =
       testDataSetFile.release.publishingOrganisations;
 
     async function renderAndOpenReleaseTypeModal(
-      publishingOrganisations: Organisation[],
+      publishingOrganisations: DataSetFileOrganisation[],
     ) {
       const { user } = render(
         <DataSetFileDetails
@@ -191,7 +188,7 @@ describe('DataSetFileDetails', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('shows the default text when Skills England is not the only publishing organisation', async () => {
+    test('shows the Skills England text when Skills England is one of several publishing organisations', async () => {
       const modal = await renderAndOpenReleaseTypeModal([
         departmentForEducation,
         skillsEngland,
@@ -199,21 +196,21 @@ describe('DataSetFileDetails', () => {
 
       expect(
         modal.getByText(
-          /They have been developed under the guidance of the Head of Profession for Statistics/,
+          /They have been developed by Skills England under the guidance of Skills England Lead Official for Statistics/,
         ),
       ).toBeInTheDocument();
       expect(
         modal.getByRole('link', {
-          name: 'Standards for official statistics published by DfE guidance (opens in new tab)',
+          name: 'Standards for official statistics published by Skills England guidance (opens in new tab)',
         }),
       ).toBeInTheDocument();
 
       expect(
-        modal.queryByText(/Skills England Lead Official for Statistics/),
+        modal.queryByText(/Head of Profession for Statistics/),
       ).not.toBeInTheDocument();
       expect(
         modal.queryByRole('link', {
-          name: 'Standards for official statistics published by Skills England guidance (opens in new tab)',
+          name: 'Standards for official statistics published by DfE guidance (opens in new tab)',
         }),
       ).not.toBeInTheDocument();
     });

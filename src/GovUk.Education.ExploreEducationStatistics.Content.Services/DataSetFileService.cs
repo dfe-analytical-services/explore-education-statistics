@@ -260,7 +260,7 @@ public class DataSetFileService(
                 },
                 PublishingOrganisations = releaseFile
                     .ReleaseVersion.PublishingOrganisations.OrderByTitleWithDepartmentForEducationFirst()
-                    .Select(DataSetFileOrganisationViewModel.FromOrganisation)
+                    .Select(DataSetFileOrganisationViewModel.FromModel)
                     .ToList(),
             },
             File = new DataSetFileFileViewModel

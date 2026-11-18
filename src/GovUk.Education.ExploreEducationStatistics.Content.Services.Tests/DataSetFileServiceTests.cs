@@ -643,10 +643,6 @@ public class DataSetFileServiceTests
         {
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Title, actual.Title);
-            Assert.Equal(expected.Url, actual.Url);
-            Assert.Equal(expected.UseGISLogo, actual.UseGISLogo);
-            Assert.Equal(expected.GISLogoHexCode, actual.GISLogoHexCode);
-            Assert.Equal(expected.LogoFileName, actual.LogoFileName);
         }
 
         [Fact]

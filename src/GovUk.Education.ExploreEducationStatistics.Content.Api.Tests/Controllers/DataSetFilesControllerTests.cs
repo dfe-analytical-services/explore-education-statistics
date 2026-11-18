@@ -1954,10 +1954,7 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             var organisationJson = Assert.IsType<JObject>(
                 Assert.Single(Assert.IsType<JArray>(json["release"]?["publishingOrganisations"]))
             );
-            Assert.Equal(
-                ["id", "title", "url", "useGISLogo", "gisLogoHexCode", "logoFileName"],
-                organisationJson.Properties().Select(p => p.Name).ToArray()
-            );
+            Assert.Equal(["id", "title"], organisationJson.Properties().Select(p => p.Name).ToArray());
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
             Assert.Equal(releaseFile.Summary, viewModel.Summary);
@@ -1985,10 +1982,6 @@ public abstract class DataSetFilesControllerTests(DataSetFilesControllerTestsFix
             var organisation = Assert.Single(viewModel.Release.PublishingOrganisations);
             Assert.Equal(publishingOrganisation.Id, organisation.Id);
             Assert.Equal(publishingOrganisation.Title, organisation.Title);
-            Assert.Equal(publishingOrganisation.Url, organisation.Url);
-            Assert.Equal(publishingOrganisation.UseGISLogo, organisation.UseGISLogo);
-            Assert.Equal(publishingOrganisation.GISLogoHexCode, organisation.GISLogoHexCode);
-            Assert.Equal(publishingOrganisation.LogoFileName, organisation.LogoFileName);
 
             Assert.NotNull(viewModel.Api);
             Assert.Equal(releaseFile.PublicApiDataSetId, viewModel.Api.Id);

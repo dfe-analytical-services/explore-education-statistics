@@ -20,6 +20,8 @@ export interface DataSetFootnote {
   label: string;
 }
 
+export type DataSetFileOrganisation = Pick<Organisation, 'id' | 'title'>;
+
 export interface DataSetFile {
   id: string;
   title: string;
@@ -53,7 +55,7 @@ export interface DataSetFile {
       themeTitle: string;
       title: string;
     };
-    publishingOrganisations: Organisation[];
+    publishingOrganisations: DataSetFileOrganisation[];
     published: Date;
     lastUpdated: string;
     slug: string;

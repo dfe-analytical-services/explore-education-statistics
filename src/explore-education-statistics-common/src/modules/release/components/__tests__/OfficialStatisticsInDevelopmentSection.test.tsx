@@ -73,7 +73,7 @@ describe('OfficialStatisticsInDevelopmentSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the default text when Skills England is not the only publishing organisation', () => {
+  test('renders the Skills England text when Skills England is one of several publishing organisations', () => {
     render(
       <OfficialStatisticsInDevelopmentSection
         publishingOrganisations={[testOrganisation, skillsEngland]}
@@ -82,23 +82,23 @@ describe('OfficialStatisticsInDevelopmentSection', () => {
 
     expect(
       screen.getByText(
-        /They have been developed under the guidance of the Head of Profession for Statistics/,
+        /They have been developed by Skills England under the guidance of Skills England Lead Official for Statistics/,
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', {
-        name: 'Standards for official statistics published by DfE guidance (opens in new tab)',
+        name: 'Standards for official statistics published by Skills England guidance (opens in new tab)',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.queryByText(
-        /They have been developed by Skills England under the guidance of Skills England Lead Official for Statistics/,
+        /They have been developed under the guidance of the Head of Profession for Statistics/,
       ),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('link', {
-        name: 'Standards for official statistics published by Skills England guidance (opens in new tab)',
+        name: 'Standards for official statistics published by DfE guidance (opens in new tab)',
       }),
     ).not.toBeInTheDocument();
   });
