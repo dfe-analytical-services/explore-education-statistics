@@ -4,24 +4,21 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
 
 /// <summary>
-/// This service stores each data set document as a JSON blob, and removes the blobs of data set documents that no
-/// longer exist.
+/// Stores the data set documents of a release or publication as JSON blobs.
 /// </summary>
 internal class DataSetDocumentCreator(
     IContentApiClient contentApiClient,
     IAzureBlobStorageClient azureBlobStorageClient,
-    IDataSetDocumentRemover dataSetDocumentRemover,
     IOptions<AppOptions> appOptions
 ) : IDataSetDocumentCreator
 {
-    public async Task<RefreshDataSetDocumentsResponse> RefreshReleaseDataSetDocuments(
-        RefreshReleaseDataSetDocumentsRequest request,
+    public async Task<CreateDataSetDocumentsResponse> CreateReleaseDataSetDocuments(
+        CreateReleaseDataSetDocumentsRequest request,
         CancellationToken cancellationToken = default
     )
     {
@@ -31,7 +28,7 @@ internal class DataSetDocumentCreator(
             cancellationToken
         );
 
-        // Guard against removing the documents of one release while uploading those of another
+        // Guard against uploading the documents of another release
         if (
             dataSetDocuments.Any(dataSetDocument =>
                 dataSetDocument.PublicationId != request.PublicationId || dataSetDocument.ReleaseId != request.ReleaseId
@@ -45,23 +42,11 @@ internal class DataSetDocumentCreator(
             );
         }
 
-        var keys = await UploadDataSetDocuments(dataSetDocuments, cancellationToken);
-
-        var removed = await dataSetDocumentRemover.RemoveDataSetDocuments(
-            new RemoveDataSetDocumentsRequest
-            {
-                PublicationId = request.PublicationId,
-                ReleaseId = request.ReleaseId,
-                Except = keys,
-            },
-            cancellationToken
-        );
-
-        return BuildResponse(keys, removed);
+        return new CreateDataSetDocumentsResponse(await UploadDataSetDocuments(dataSetDocuments, cancellationToken));
     }
 
-    public async Task<RefreshDataSetDocumentsResponse> RefreshPublicationDataSetDocuments(
-        RefreshPublicationDataSetDocumentsRequest request,
+    public async Task<CreateDataSetDocumentsResponse> CreatePublicationDataSetDocuments(
+        CreatePublicationDataSetDocumentsRequest request,
         CancellationToken cancellationToken = default
     )
     {
@@ -70,7 +55,7 @@ internal class DataSetDocumentCreator(
             cancellationToken
         );
 
-        // Guard against removing the documents of one publication while uploading those of another
+        // Guard against uploading the documents of another publication
         if (dataSetDocuments.Any(dataSetDocument => dataSetDocument.PublicationId != request.PublicationId))
         {
             throw new InvalidOperationException(
@@ -80,14 +65,7 @@ internal class DataSetDocumentCreator(
             );
         }
 
-        var keys = await UploadDataSetDocuments(dataSetDocuments, cancellationToken);
-
-        var removed = await dataSetDocumentRemover.RemoveDataSetDocuments(
-            new RemoveDataSetDocumentsRequest { PublicationId = request.PublicationId, Except = keys },
-            cancellationToken
-        );
-
-        return BuildResponse(keys, removed);
+        return new CreateDataSetDocumentsResponse(await UploadDataSetDocuments(dataSetDocuments, cancellationToken));
     }
 
     private async Task<DataSetDocumentKey[]> UploadDataSetDocuments(
@@ -109,9 +87,4 @@ internal class DataSetDocumentCreator(
 
         return [.. dataSetDocuments.Select(dataSetDocument => dataSetDocument.GetKey())];
     }
-
-    private static RefreshDataSetDocumentsResponse BuildResponse(
-        DataSetDocumentKey[] keys,
-        RemoveDataSetDocumentsResponse removed
-    ) => new([.. keys.Select(key => key.BlobName)], removed.RemovedBlobNames);
 }

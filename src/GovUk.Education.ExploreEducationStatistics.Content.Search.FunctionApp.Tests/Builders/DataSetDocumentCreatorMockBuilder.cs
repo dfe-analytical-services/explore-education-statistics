@@ -6,34 +6,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class DataSetDocumentCreatorMockBuilder
 {
     private readonly Mock<IDataSetDocumentCreator> _mock = new(MockBehavior.Strict);
-    private RefreshDataSetDocumentsResponse? _response;
+    private CreateDataSetDocumentsResponse? _response;
+    private Exception? _exception;
 
     public IDataSetDocumentCreator Build()
     {
         _mock
             .Setup(m =>
-                m.RefreshReleaseDataSetDocuments(
-                    It.IsAny<RefreshReleaseDataSetDocumentsRequest>(),
+                m.CreateReleaseDataSetDocuments(
+                    It.IsAny<CreateReleaseDataSetDocumentsRequest>(),
                     It.IsAny<CancellationToken>()
                 )
             )
-            .ReturnsAsync(() => _response ?? new RefreshDataSetDocumentsResponse([], []));
+            .Returns(GetResponse);
 
         _mock
             .Setup(m =>
-                m.RefreshPublicationDataSetDocuments(
-                    It.IsAny<RefreshPublicationDataSetDocumentsRequest>(),
+                m.CreatePublicationDataSetDocuments(
+                    It.IsAny<CreatePublicationDataSetDocumentsRequest>(),
                     It.IsAny<CancellationToken>()
                 )
             )
-            .ReturnsAsync(() => _response ?? new RefreshDataSetDocumentsResponse([], []));
+            .Returns(GetResponse);
 
         return _mock.Object;
     }
 
-    public DataSetDocumentCreatorMockBuilder WhereResponseIs(RefreshDataSetDocumentsResponse response)
+    private Task<CreateDataSetDocumentsResponse> GetResponse() =>
+        _exception is null
+            ? Task.FromResult(_response ?? new CreateDataSetDocumentsResponse([]))
+            : Task.FromException<CreateDataSetDocumentsResponse>(_exception);
+
+    public DataSetDocumentCreatorMockBuilder WhereResponseIs(CreateDataSetDocumentsResponse response)
     {
         _response = response;
+        return this;
+    }
+
+    public DataSetDocumentCreatorMockBuilder WhereThrows(Exception exception)
+    {
+        _exception = exception;
         return this;
     }
 
@@ -41,42 +53,40 @@ public class DataSetDocumentCreatorMockBuilder
 
     public class Asserter(Mock<IDataSetDocumentCreator> mock)
     {
-        public void RefreshReleaseDataSetDocumentsCalledFor(RefreshReleaseDataSetDocumentsRequest expectedRequest)
+        public void CreateReleaseDataSetDocumentsCalledFor(CreateReleaseDataSetDocumentsRequest expectedRequest)
         {
             mock.Verify(
-                m => m.RefreshReleaseDataSetDocuments(expectedRequest, It.IsAny<CancellationToken>()),
+                m => m.CreateReleaseDataSetDocuments(expectedRequest, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }
 
-        public void RefreshReleaseDataSetDocumentsNotCalled()
+        public void CreateReleaseDataSetDocumentsNotCalled()
         {
             mock.Verify(
                 m =>
-                    m.RefreshReleaseDataSetDocuments(
-                        It.IsAny<RefreshReleaseDataSetDocumentsRequest>(),
+                    m.CreateReleaseDataSetDocuments(
+                        It.IsAny<CreateReleaseDataSetDocumentsRequest>(),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Never
             );
         }
 
-        public void RefreshPublicationDataSetDocumentsCalledFor(
-            RefreshPublicationDataSetDocumentsRequest expectedRequest
-        )
+        public void CreatePublicationDataSetDocumentsCalledFor(CreatePublicationDataSetDocumentsRequest expectedRequest)
         {
             mock.Verify(
-                m => m.RefreshPublicationDataSetDocuments(expectedRequest, It.IsAny<CancellationToken>()),
+                m => m.CreatePublicationDataSetDocuments(expectedRequest, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }
 
-        public void RefreshPublicationDataSetDocumentsNotCalled()
+        public void CreatePublicationDataSetDocumentsNotCalled()
         {
             mock.Verify(
                 m =>
-                    m.RefreshPublicationDataSetDocuments(
-                        It.IsAny<RefreshPublicationDataSetDocumentsRequest>(),
+                    m.CreatePublicationDataSetDocuments(
+                        It.IsAny<CreatePublicationDataSetDocumentsRequest>(),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Never

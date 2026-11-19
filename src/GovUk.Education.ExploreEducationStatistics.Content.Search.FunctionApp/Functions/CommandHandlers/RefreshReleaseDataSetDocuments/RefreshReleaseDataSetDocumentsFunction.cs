@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class RefreshReleaseDataSetDocumentsFunction(
     ILogger<RefreshReleaseDataSetDocumentsFunction> logger,
     IDataSetDocumentCreator dataSetDocumentCreator,
+    IDataSetDocumentRemover dataSetDocumentRemover,
     ICommandHandler commandHandler
 )
 {
@@ -36,8 +38,8 @@ public class RefreshReleaseDataSetDocumentsFunction(
             return [];
         }
 
-        var response = await dataSetDocumentCreator.RefreshReleaseDataSetDocuments(
-            new RefreshReleaseDataSetDocumentsRequest
+        var created = await dataSetDocumentCreator.CreateReleaseDataSetDocuments(
+            new CreateReleaseDataSetDocumentsRequest
             {
                 PublicationId = message.PublicationId.Value,
                 PublicationSlug = message.PublicationSlug,
@@ -47,14 +49,28 @@ public class RefreshReleaseDataSetDocumentsFunction(
             cancellationToken
         );
 
-        logger.LogInformation(
-            """Refreshed data set documents for release "{ReleaseSlug}" of publication "{PublicationSlug}". Response: {@response}""",
-            message.ReleaseSlug,
-            message.PublicationSlug,
-            response
+        // Remove the data set documents which the release should no longer have
+        var removed = await dataSetDocumentRemover.RemoveDataSetDocuments(
+            new RemoveDataSetDocumentsRequest
+            {
+                PublicationId = message.PublicationId.Value,
+                ReleaseId = message.ReleaseId.Value,
+                Except = created.Keys,
+            },
+            cancellationToken
         );
 
-        if (response.UploadedBlobNames.Count == 0 && response.RemovedBlobNames.Count == 0)
+        var uploadedBlobNames = created.Keys.Select(key => key.BlobName).ToList();
+
+        logger.LogInformation(
+            """Refreshed data set documents for release "{ReleaseSlug}" of publication "{PublicationSlug}". Uploaded: {@UploadedBlobNames}. Removed: {@RemovedBlobNames}""",
+            message.ReleaseSlug,
+            message.PublicationSlug,
+            uploadedBlobNames,
+            removed.RemovedBlobNames
+        );
+
+        if (uploadedBlobNames.Count == 0 && removed.RemovedBlobNames.Count == 0)
         {
             return [];
         }
