@@ -7,5 +7,6 @@ param prepareScheduledReleaseVersionsFunctionCronSchedule = '0 0 * * * *'
 param publishScheduledReleaseVersionsFunctionCronSchedule = '0 30 * * * *'
 
 param enableThemeDeletion = true
+param enableReleaseRollover = true
 
 param publicApiUrl = 'pp-api.education.gov.uk/statistics-test'
