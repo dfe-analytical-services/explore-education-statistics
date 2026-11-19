@@ -465,6 +465,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseSlugValidator, ReleaseSlugValidator>();
         services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
         services.AddTransient<IReleaseService, ReleaseService>();
+        services.AddTransient<IReleaseRolloverService, ReleaseRolloverService>();
         services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
         services.AddTransient<IUserResourceRoleNotificationService, UserResourceRoleNotificationService>();
         services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
