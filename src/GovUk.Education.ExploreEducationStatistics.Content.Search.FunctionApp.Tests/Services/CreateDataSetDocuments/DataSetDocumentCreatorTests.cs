@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Doma
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.CreateDataSetDocuments;
@@ -28,7 +27,6 @@ public class DataSetDocumentCreatorTests
 
     private readonly ContentApiClientMockBuilder _contentApiClientMockBuilder = new();
     private readonly AzureBlobStorageClientMockBuilder _azureBlobStorageClientMockBuilder = new();
-    private readonly DataSetDocumentRemoverMockBuilder _dataSetDocumentRemoverMockBuilder = new();
 
     private readonly AppOptions _appOptions = new() { DataSetDocumentsContainerName = DataSetDocumentsContainerName };
 
@@ -36,7 +34,6 @@ public class DataSetDocumentCreatorTests
         new(
             _contentApiClientMockBuilder.Build(),
             _azureBlobStorageClientMockBuilder.Build(),
-            _dataSetDocumentRemoverMockBuilder.Build(),
             Microsoft.Extensions.Options.Options.Create(_appOptions)
         );
 
@@ -53,9 +50,9 @@ public class DataSetDocumentCreatorTests
         public void CanInstantiateSut() => Assert.NotNull(GetSut());
     }
 
-    public class RefreshReleaseDataSetDocumentsTests : DataSetDocumentCreatorTests
+    public class CreateReleaseDataSetDocumentsTests : DataSetDocumentCreatorTests
     {
-        private readonly RefreshReleaseDataSetDocumentsRequest _request = new()
+        private readonly CreateReleaseDataSetDocumentsRequest _request = new()
         {
             PublicationId = PublicationId,
             PublicationSlug = PublicationSlug,
@@ -63,7 +60,7 @@ public class DataSetDocumentCreatorTests
             ReleaseSlug = ReleaseSlug,
         };
 
-        public RefreshReleaseDataSetDocumentsTests()
+        public CreateReleaseDataSetDocumentsTests()
         {
             _contentApiClientMockBuilder.WhereReleaseHasDataSetDocuments(DataSetDocument1, DataSetDocument2);
         }
@@ -71,7 +68,7 @@ public class DataSetDocumentCreatorTests
         [Fact]
         public async Task ShouldRequestDataSetDocumentsOfReleaseFromContentApi()
         {
-            await GetSut().RefreshReleaseDataSetDocuments(_request);
+            await GetSut().CreateReleaseDataSetDocuments(_request);
 
             _contentApiClientMockBuilder.Assert.DataSetDocumentsRequestedForRelease(PublicationSlug, ReleaseSlug);
         }
@@ -79,7 +76,7 @@ public class DataSetDocumentCreatorTests
         [Fact]
         public async Task ShouldUploadEachDataSetDocumentAsJsonWithFileIdMetadata()
         {
-            await GetSut().RefreshReleaseDataSetDocuments(_request);
+            await GetSut().CreateReleaseDataSetDocuments(_request);
 
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
                 containerName: DataSetDocumentsContainerName,
@@ -96,71 +93,44 @@ public class DataSetDocumentCreatorTests
         }
 
         [Fact]
-        public async Task ShouldRemoveOtherDataSetDocumentsOfRelease()
+        public async Task ShouldReturnKeysOfUploadedDataSetDocuments()
         {
-            await GetSut().RefreshReleaseDataSetDocuments(_request);
+            var response = await GetSut().CreateReleaseDataSetDocuments(_request);
 
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
-                request.PublicationId == PublicationId
-                && request.ReleaseId == ReleaseId
-                && request.FileId == null
-                && request.Except.SequenceEqual([DataSetDocument1.GetKey(), DataSetDocument2.GetKey()])
-            );
+            Assert.Equal([DataSetDocument1.GetKey(), DataSetDocument2.GetKey()], response.Keys);
         }
 
         [Fact]
-        public async Task WhenReleaseHasNoDataSetDocuments_ShouldRemoveAllDataSetDocumentsOfRelease()
+        public async Task WhenReleaseHasNoDataSetDocuments_ShouldUploadNothingAndReturnNoKeys()
         {
             _contentApiClientMockBuilder.WhereReleaseHasDataSetDocuments();
 
-            await GetSut().RefreshReleaseDataSetDocuments(_request);
+            var response = await GetSut().CreateReleaseDataSetDocuments(_request);
 
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsUploaded();
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
-                request.PublicationId == PublicationId
-                && request.ReleaseId == ReleaseId
-                && request.FileId == null
-                && request.Except.Count == 0
-            );
+            Assert.Empty(response.Keys);
         }
 
         [Fact]
-        public async Task ShouldReturnUploadedAndRemovedBlobNames()
-        {
-            _dataSetDocumentRemoverMockBuilder.WhereResponseIs(new RemoveDataSetDocumentsResponse(["removed-blob"]));
-
-            var response = await GetSut().RefreshReleaseDataSetDocuments(_request);
-
-            Assert.Equal(
-                [DataSetDocument1.GetKey().BlobName, DataSetDocument2.GetKey().BlobName],
-                response.UploadedBlobNames
-            );
-            Assert.Equal(["removed-blob"], response.RemovedBlobNames);
-        }
-
-        [Fact]
-        public async Task WhenDataSetDocumentBelongsToAnotherRelease_ShouldThrowWithoutChangingBlobs()
+        public async Task WhenDataSetDocumentBelongsToAnotherRelease_ShouldThrowWithoutUploading()
         {
             _contentApiClientMockBuilder.WhereReleaseHasDataSetDocuments(DataSetDocument1, OtherReleaseDataSetDocument);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetSut().RefreshReleaseDataSetDocuments(_request)
-            );
+            await Assert.ThrowsAsync<InvalidOperationException>(() => GetSut().CreateReleaseDataSetDocuments(_request));
 
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsUploaded();
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
         }
     }
 
-    public class RefreshPublicationDataSetDocumentsTests : DataSetDocumentCreatorTests
+    public class CreatePublicationDataSetDocumentsTests : DataSetDocumentCreatorTests
     {
-        private readonly RefreshPublicationDataSetDocumentsRequest _request = new()
+        private readonly CreatePublicationDataSetDocumentsRequest _request = new()
         {
             PublicationId = PublicationId,
             PublicationSlug = PublicationSlug,
         };
 
-        public RefreshPublicationDataSetDocumentsTests()
+        public CreatePublicationDataSetDocumentsTests()
         {
             _contentApiClientMockBuilder.WherePublicationHasDataSetDocuments(
                 DataSetDocument1,
@@ -171,7 +141,7 @@ public class DataSetDocumentCreatorTests
         [Fact]
         public async Task ShouldRequestDataSetDocumentsOfPublicationFromContentApi()
         {
-            await GetSut().RefreshPublicationDataSetDocuments(_request);
+            await GetSut().CreatePublicationDataSetDocuments(_request);
 
             _contentApiClientMockBuilder.Assert.DataSetDocumentsRequestedForPublication(PublicationSlug);
         }
@@ -179,7 +149,7 @@ public class DataSetDocumentCreatorTests
         [Fact]
         public async Task ShouldUploadDataSetDocumentsOfEveryRelease()
         {
-            await GetSut().RefreshPublicationDataSetDocuments(_request);
+            await GetSut().CreatePublicationDataSetDocuments(_request);
 
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
                 containerName: DataSetDocumentsContainerName,
@@ -197,50 +167,26 @@ public class DataSetDocumentCreatorTests
         }
 
         [Fact]
-        public async Task ShouldRemoveOtherDataSetDocumentsOfPublication()
+        public async Task ShouldReturnKeysOfUploadedDataSetDocuments()
         {
-            await GetSut().RefreshPublicationDataSetDocuments(_request);
+            var response = await GetSut().CreatePublicationDataSetDocuments(_request);
 
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
-                request.PublicationId == PublicationId
-                && request.ReleaseId == null
-                && request.FileId == null
-                && request.Except.SequenceEqual([DataSetDocument1.GetKey(), OtherReleaseDataSetDocument.GetKey()])
-            );
+            Assert.Equal([DataSetDocument1.GetKey(), OtherReleaseDataSetDocument.GetKey()], response.Keys);
         }
 
         [Fact]
-        public async Task WhenPublicationHasNoDataSetDocuments_ShouldRemoveAllDataSetDocumentsOfPublication()
+        public async Task WhenPublicationHasNoDataSetDocuments_ShouldUploadNothingAndReturnNoKeys()
         {
             _contentApiClientMockBuilder.WherePublicationHasDataSetDocuments();
 
-            await GetSut().RefreshPublicationDataSetDocuments(_request);
+            var response = await GetSut().CreatePublicationDataSetDocuments(_request);
 
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsUploaded();
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
-                request.PublicationId == PublicationId
-                && request.ReleaseId == null
-                && request.FileId == null
-                && request.Except.Count == 0
-            );
+            Assert.Empty(response.Keys);
         }
 
         [Fact]
-        public async Task ShouldReturnUploadedAndRemovedBlobNames()
-        {
-            _dataSetDocumentRemoverMockBuilder.WhereResponseIs(new RemoveDataSetDocumentsResponse(["removed-blob"]));
-
-            var response = await GetSut().RefreshPublicationDataSetDocuments(_request);
-
-            Assert.Equal(
-                [DataSetDocument1.GetKey().BlobName, OtherReleaseDataSetDocument.GetKey().BlobName],
-                response.UploadedBlobNames
-            );
-            Assert.Equal(["removed-blob"], response.RemovedBlobNames);
-        }
-
-        [Fact]
-        public async Task WhenDataSetDocumentBelongsToAnotherPublication_ShouldThrowWithoutChangingBlobs()
+        public async Task WhenDataSetDocumentBelongsToAnotherPublication_ShouldThrowWithoutUploading()
         {
             _contentApiClientMockBuilder.WherePublicationHasDataSetDocuments(
                 DataSetDocument1,
@@ -248,11 +194,10 @@ public class DataSetDocumentCreatorTests
             );
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                GetSut().RefreshPublicationDataSetDocuments(_request)
+                GetSut().CreatePublicationDataSetDocuments(_request)
             );
 
             _azureBlobStorageClientMockBuilder.Assert.NoBlobsUploaded();
-            _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
         }
     }
 }

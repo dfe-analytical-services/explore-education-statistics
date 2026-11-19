@@ -1,7 +1,9 @@
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.TheoryDataHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,17 +20,26 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
         ReleaseSlug = "release-slug",
     };
 
+    private static readonly DataSetDocumentKey CreatedKey = new()
+    {
+        PublicationId = Message.PublicationId!.Value,
+        ReleaseId = Message.ReleaseId!.Value,
+        FileId = Guid.NewGuid(),
+    };
+
     private readonly DataSetDocumentCreatorMockBuilder _dataSetDocumentCreatorMockBuilder = new();
+    private readonly DataSetDocumentRemoverMockBuilder _dataSetDocumentRemoverMockBuilder = new();
 
     public RefreshReleaseDataSetDocumentsFunctionTests()
     {
-        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new RefreshDataSetDocumentsResponse(["uploaded-blob"], []));
+        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new CreateDataSetDocumentsResponse([CreatedKey]));
     }
 
     private RefreshReleaseDataSetDocumentsFunction GetSut() =>
         new(
             new NullLogger<RefreshReleaseDataSetDocumentsFunction>(),
             _dataSetDocumentCreatorMockBuilder.Build(),
+            _dataSetDocumentRemoverMockBuilder.Build(),
             new TestableCommandHandler()
         );
 
@@ -36,12 +47,12 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
     public void CanInstantiateSut() => Assert.NotNull(GetSut());
 
     [Fact]
-    public async Task WhenMessageIdentifiesRelease_ThenDataSetDocumentsOfReleaseRefreshed()
+    public async Task WhenMessageIdentifiesRelease_ThenDataSetDocumentsOfReleaseCreated()
     {
         await GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
 
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshReleaseDataSetDocumentsCalledFor(
-            new RefreshReleaseDataSetDocumentsRequest
+        _dataSetDocumentCreatorMockBuilder.Assert.CreateReleaseDataSetDocumentsCalledFor(
+            new CreateReleaseDataSetDocumentsRequest
             {
                 PublicationId = Message.PublicationId!.Value,
                 PublicationSlug = "publication-slug",
@@ -49,6 +60,46 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
                 ReleaseSlug = "release-slug",
             }
         );
+    }
+
+    [Fact]
+    public async Task WhenMessageIdentifiesRelease_ThenOtherDataSetDocumentsOfReleaseRemoved()
+    {
+        await GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
+
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
+            request.PublicationId == Message.PublicationId
+            && request.ReleaseId == Message.ReleaseId
+            && request.FileId == null
+            && request.Except.SequenceEqual([CreatedKey])
+        );
+    }
+
+    [Fact]
+    public async Task WhenReleaseHasNoDataSetDocuments_ThenAllDataSetDocumentsOfReleaseRemoved()
+    {
+        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new CreateDataSetDocumentsResponse([]));
+
+        await GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
+
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsCalledFor(request =>
+            request.PublicationId == Message.PublicationId
+            && request.ReleaseId == Message.ReleaseId
+            && request.FileId == null
+            && request.Except.Count == 0
+        );
+    }
+
+    [Fact]
+    public async Task WhenCreatingDataSetDocumentsFails_ThenNoDataSetDocumentsRemoved()
+    {
+        _dataSetDocumentCreatorMockBuilder.WhereThrows(new InvalidOperationException());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build())
+        );
+
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
     }
 
     [Fact]
@@ -71,7 +122,8 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
     [Fact]
     public async Task WhenDataSetDocumentsRemoved_ThenDataSetDocumentsChangedMessageReturned()
     {
-        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new RefreshDataSetDocumentsResponse([], ["removed-blob"]));
+        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new CreateDataSetDocumentsResponse([]));
+        _dataSetDocumentRemoverMockBuilder.WhereResponseIs(new RemoveDataSetDocumentsResponse(["removed-blob"]));
 
         var response = await GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
 
@@ -81,7 +133,7 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
     [Fact]
     public async Task WhenNoDataSetDocumentsUploadedOrRemoved_ThenNoMessageReturned()
     {
-        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new RefreshDataSetDocumentsResponse([], []));
+        _dataSetDocumentCreatorMockBuilder.WhereResponseIs(new CreateDataSetDocumentsResponse([]));
 
         var response = await GetSut().RefreshReleaseDataSetDocuments(Message, new FunctionContextMockBuilder().Build());
 
@@ -102,7 +154,8 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
             );
 
         Assert.Empty(response);
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentCreatorMockBuilder.Assert.CreateReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
     }
 
     [Theory]
@@ -119,7 +172,8 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
             );
 
         Assert.Empty(response);
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentCreatorMockBuilder.Assert.CreateReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
     }
 
     [Theory]
@@ -136,7 +190,8 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
             );
 
         Assert.Empty(response);
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentCreatorMockBuilder.Assert.CreateReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
     }
 
     [Theory]
@@ -153,6 +208,7 @@ public class RefreshReleaseDataSetDocumentsFunctionTests
             );
 
         Assert.Empty(response);
-        _dataSetDocumentCreatorMockBuilder.Assert.RefreshReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentCreatorMockBuilder.Assert.CreateReleaseDataSetDocumentsNotCalled();
+        _dataSetDocumentRemoverMockBuilder.Assert.RemoveDataSetDocumentsNotCalled();
     }
 }

@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.ReindexDataSetDocuments.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public class RefreshPublicationDataSetDocumentsFunction(
     ILogger<RefreshPublicationDataSetDocumentsFunction> logger,
     IDataSetDocumentCreator dataSetDocumentCreator,
+    IDataSetDocumentRemover dataSetDocumentRemover,
     ICommandHandler commandHandler
 )
 {
@@ -32,8 +34,8 @@ public class RefreshPublicationDataSetDocumentsFunction(
             return [];
         }
 
-        var response = await dataSetDocumentCreator.RefreshPublicationDataSetDocuments(
-            new RefreshPublicationDataSetDocumentsRequest
+        var created = await dataSetDocumentCreator.CreatePublicationDataSetDocuments(
+            new CreatePublicationDataSetDocumentsRequest
             {
                 PublicationId = message.PublicationId.Value,
                 PublicationSlug = message.PublicationSlug,
@@ -41,13 +43,22 @@ public class RefreshPublicationDataSetDocumentsFunction(
             cancellationToken
         );
 
-        logger.LogInformation(
-            """Refreshed data set documents for publication "{PublicationSlug}". Response: {@response}""",
-            message.PublicationSlug,
-            response
+        // Remove the data set documents which the publication should no longer have
+        var removed = await dataSetDocumentRemover.RemoveDataSetDocuments(
+            new RemoveDataSetDocumentsRequest { PublicationId = message.PublicationId.Value, Except = created.Keys },
+            cancellationToken
         );
 
-        if (response.UploadedBlobNames.Count == 0 && response.RemovedBlobNames.Count == 0)
+        var uploadedBlobNames = created.Keys.Select(key => key.BlobName).ToList();
+
+        logger.LogInformation(
+            """Refreshed data set documents for publication "{PublicationSlug}". Uploaded: {@UploadedBlobNames}. Removed: {@RemovedBlobNames}""",
+            message.PublicationSlug,
+            uploadedBlobNames,
+            removed.RemovedBlobNames
+        );
+
+        if (uploadedBlobNames.Count == 0 && removed.RemovedBlobNames.Count == 0)
         {
             return [];
         }
