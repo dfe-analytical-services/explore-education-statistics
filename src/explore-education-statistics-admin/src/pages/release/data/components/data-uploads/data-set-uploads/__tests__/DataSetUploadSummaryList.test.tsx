@@ -23,7 +23,6 @@ describe('DataSetUploadSummaryList', () => {
       <DataSetUploadSummaryList
         releaseVersionId="release-version-1"
         dataSetUpload={testDataSetUpload}
-        screeningStatus="PendingImport"
       />,
     );
 
@@ -52,7 +51,6 @@ describe('DataSetUploadSummaryList', () => {
           screeningStatus: 'Screening',
           publicApiCompatible: false,
         }}
-        screeningStatus="Screening"
       />,
     );
 
@@ -71,8 +69,11 @@ describe('DataSetUploadSummaryList', () => {
       render(
         <DataSetUploadSummaryList
           releaseVersionId="release-version-1"
-          dataSetUpload={{ ...testDataSetUpload, publicApiCompatible }}
-          screeningStatus="PendingReview"
+          dataSetUpload={{
+            ...testDataSetUpload,
+            screeningStatus: 'PendingReview',
+            publicApiCompatible,
+          }}
         />,
       );
 

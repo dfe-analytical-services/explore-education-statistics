@@ -180,7 +180,6 @@ export default function DataSetUploadDetailsModal({
           <DataSetUploadSummaryList
             releaseVersionId={releaseVersionId}
             dataSetUpload={dataSetUpload}
-            screeningStatus={screeningStatus}
           />
         </TabsSection>
       </Tabs>

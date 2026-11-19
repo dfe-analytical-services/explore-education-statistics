@@ -1,7 +1,4 @@
-import {
-  DataSetUpload,
-  DataSetUploadScreeningStatus,
-} from '@admin/services/releaseDataFileService';
+import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -18,16 +15,15 @@ import {
 interface Props {
   releaseVersionId: string;
   dataSetUpload: DataSetUpload;
-  screeningStatus: DataSetUploadScreeningStatus;
 }
 
 export default function DataSetUploadSummaryList({
   releaseVersionId,
   dataSetUpload,
-  screeningStatus,
 }: Props) {
   const uploadedByUrl = `mailto:${dataSetUpload.uploadedBy}`;
 
+  const { screeningStatus } = dataSetUpload;
   const isScreening = screeningStatus === 'Screening';
 
   const renderScreeningTag = () => (
