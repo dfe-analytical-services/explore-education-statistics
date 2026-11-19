@@ -195,6 +195,8 @@ public record DataSetQueryLocationCode : IDataSetQueryLocation
 
 /// <summary>
 /// A local authority (identified by its ONS code) to filter results by.
+///
+/// Note that an ONS code may correspond to multiple locations (e.g. where a local authority's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
 {
@@ -233,6 +235,8 @@ public record DataSetQueryLocationLocalAuthorityCode : IDataSetQueryLocation
 
 /// <summary>
 /// A local authority (identified by its old code) to filter results by.
+///
+/// Note that an old code may correspond to multiple locations (e.g. where a local authority's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationLocalAuthorityOldCode : IDataSetQueryLocation
 {
@@ -270,6 +274,8 @@ public record DataSetQueryLocationLocalAuthorityOldCode : IDataSetQueryLocation
 
 /// <summary>
 /// A provider (identified by its UKPRN) to filter results by.
+///
+/// Note that a UKPRN may correspond to multiple locations (e.g. where a provider's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationProviderUkprn : IDataSetQueryLocation
 {
@@ -307,6 +313,8 @@ public record DataSetQueryLocationProviderUkprn : IDataSetQueryLocation
 
 /// <summary>
 /// A school (identified by its URN) to filter results by.
+///
+/// Note that a URN may correspond to multiple locations (e.g. where a school's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationSchoolUrn : IDataSetQueryLocation
 {
@@ -344,6 +352,8 @@ public record DataSetQueryLocationSchoolUrn : IDataSetQueryLocation
 
 /// <summary>
 /// A school (identified by its LAESTAB) to filter results by.
+///
+/// Note that a LAESTAB may correspond to multiple locations (e.g. where a school's name has changed over time).
 /// </summary>
 public record DataSetQueryLocationSchoolLaEstab : IDataSetQueryLocation
 {

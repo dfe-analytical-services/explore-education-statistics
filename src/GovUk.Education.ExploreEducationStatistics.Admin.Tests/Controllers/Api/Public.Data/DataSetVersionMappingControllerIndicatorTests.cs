@@ -1,5 +1,6 @@
 #nullable enable
 using System.Security.Claims;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture.Optimised;
@@ -65,11 +66,17 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
                         .DefaultIndicatorMappingPlan()
                         .AddIndicatorMapping(
                             "indicator-1-key",
-                            DataFixture.DefaultIndicatorMapping().WithAutoMapped("indicator-1-key")
+                            DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator())
+                                .WithAutoMapped("indicator-1-key")
                         )
                         .AddIndicatorMapping(
                             "indicator-2-key",
-                            DataFixture.DefaultIndicatorMapping().WithAutoMapped("indicator-2-key")
+                            DataFixture
+                                .DefaultIndicatorMapping()
+                                .WithSource(DataFixture.DefaultMappableIndicator())
+                                .WithAutoMapped("indicator-2-key")
                         )
                 );
 
@@ -138,6 +145,59 @@ public abstract class DataSetVersionMappingControllerIndicatorTests(
             // correctness of the returned mapping plan is already covered by BauUser_Success.
             response.AssertOk<IndicatorMappingPlan>();
         }
+
+        [Fact]
+        public async Task BauUser_Success_OrderedByLabel()
+        {
+            var (initialDataSetVersion, nextDataSetVersion) = await CreateInitialAndNextDataSetVersion(
+                fixture.GetPublicDataDbContext(),
+                fixture.GetContentDbContext()
+            );
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(initialDataSetVersion.Id)
+                .WithTargetDataSetVersionId(nextDataSetVersion.Id)
+                .WithIndicatorMappingPlan(
+                    DataFixture
+                        .DefaultIndicatorMappingPlan()
+                        .AddIndicatorMapping("indicator-1-key", IndicatorMapping("Pupil count"))
+                        .AddIndicatorMapping("indicator-2-key", IndicatorMapping("Attainment 8"))
+                        .AddIndicatorMapping("indicator-3-key", IndicatorMapping("Entries"))
+                        .AddIndicatorCandidate(
+                            "indicator-1-key",
+                            DataFixture.DefaultMappableIndicator().WithLabel("Pupil count")
+                        )
+                        .AddIndicatorCandidate(
+                            "indicator-2-key",
+                            DataFixture.DefaultMappableIndicator().WithLabel("Attainment 8")
+                        )
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            var response = await GetIndicatorMappings(nextDataSetVersionId: nextDataSetVersion.Id);
+
+            var plan = await ReadJson(response);
+
+            Assert.Equal(["indicator-2-key", "indicator-3-key", "indicator-1-key"], Keys(plan.GetProperty("mappings")));
+            Assert.Equal(["indicator-2-key", "indicator-1-key"], Keys(plan.GetProperty("candidates")));
+        }
+
+        private static IndicatorMapping IndicatorMapping(string label) =>
+            DataFixture
+                .DefaultIndicatorMapping()
+                .WithSource(DataFixture.DefaultMappableIndicator().WithLabel(label))
+                .WithAutoNone();
+
+        private static async Task<JsonElement> ReadJson(HttpResponseMessage response)
+        {
+            response.AssertOk();
+            return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+        }
+
+        private static string[] Keys(JsonElement element) =>
+            element.EnumerateObject().Select(property => property.Name).ToArray();
 
         [Fact]
         public async Task NotBauUserAndNotOnPublicationTeam_Returns403()

@@ -70,6 +70,8 @@ public class ReleaseVersionService(
         return await context
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
+            .Include(rv => rv.Release)
+                .ThenInclude(r => r.RolloverSourceRelease)
             .Include(rv => rv.PublishingOrganisations)
             .Include(rv => rv.ReleaseStatuses)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)

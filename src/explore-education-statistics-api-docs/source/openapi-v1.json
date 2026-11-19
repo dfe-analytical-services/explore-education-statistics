@@ -1954,7 +1954,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A local authority (identified by its ONS code) to filter results by."
+        "description": "A local authority (identified by its ONS code) to filter results by.\r\n            \r\nNote that an ONS code may correspond to multiple locations (e.g. where a local authority's name has changed over time)."
       },
       "DataSetQueryLocationLocalAuthorityOldCode": {
         "required": [
@@ -1981,7 +1981,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A local authority (identified by its old code) to filter results by."
+        "description": "A local authority (identified by its old code) to filter results by.\r\n            \r\nNote that an old code may correspond to multiple locations (e.g. where a local authority's name has changed over time)."
       },
       "DataSetQueryLocationProviderUkprn": {
         "required": [
@@ -2010,7 +2010,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A provider (identified by its UKPRN) to filter results by."
+        "description": "A provider (identified by its UKPRN) to filter results by.\r\n            \r\nNote that a UKPRN may correspond to multiple locations (e.g. where a provider's name has changed over time)."
       },
       "DataSetQueryLocationSchoolLaEstab": {
         "required": [
@@ -2034,7 +2034,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A school (identified by its LAESTAB) to filter results by."
+        "description": "A school (identified by its LAESTAB) to filter results by.\r\n            \r\nNote that a LAESTAB may correspond to multiple locations (e.g. where a school's name has changed over time)."
       },
       "DataSetQueryLocationSchoolUrn": {
         "required": [
@@ -2063,7 +2063,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A school (identified by its URN) to filter results by."
+        "description": "A school (identified by its URN) to filter results by.\r\n            \r\nNote that a URN may correspond to multiple locations (e.g. where a school's name has changed over time)."
       },
       "DataSetQueryPaginatedResultsViewModel": {
         "required": [
