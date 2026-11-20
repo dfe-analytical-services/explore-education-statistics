@@ -14,11 +14,11 @@ public interface IFootnoteRepository
         int order
     );
 
-    Task<List<Footnote>> GetFilteredFootnotes(
+    Task<List<Footnote>> GetFootnotesForSelection(
         Guid releaseVersionId,
         Guid subjectId,
-        IEnumerable<Guid> filterItemIds,
-        IEnumerable<Guid> indicatorIds
+        IList<FilterItem> filterItems,
+        IReadOnlyCollection<Guid> indicatorIds
     );
 
     Task<Footnote> GetFootnote(Guid footnoteId);

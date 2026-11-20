@@ -349,8 +349,8 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<FilterFootnote>()
-            .HasOne(filterFootnote => filterFootnote.Filter)
-            .WithMany(filter => filter.Footnotes)
+            .HasOne<Filter>()
+            .WithMany()
             .HasForeignKey(filterFootnote => filterFootnote.FilterId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -370,8 +370,8 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<FilterGroupFootnote>()
-            .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-            .WithMany(filterGroup => filterGroup.Footnotes)
+            .HasOne<FilterGroup>()
+            .WithMany()
             .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -391,8 +391,8 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<FilterItemFootnote>()
-            .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
-            .WithMany(filterItem => filterItem.Footnotes)
+            .HasOne<FilterItem>()
+            .WithMany()
             .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -420,8 +420,8 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<IndicatorFootnote>()
-            .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
-            .WithMany(indicator => indicator.Footnotes)
+            .HasOne<Indicator>()
+            .WithMany()
             .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId)
             .OnDelete(DeleteBehavior.Cascade);
 

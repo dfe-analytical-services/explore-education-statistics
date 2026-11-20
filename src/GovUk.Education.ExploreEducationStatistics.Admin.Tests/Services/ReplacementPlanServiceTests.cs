@@ -361,7 +361,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter",
             filterFootnotes: new List<FilterFootnote>
             {
-                new() { Filter = originalFilter, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterId = originalFilter.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -370,7 +370,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter group",
             filterGroupFootnotes: new List<FilterGroupFootnote>
             {
-                new() { FilterGroup = originalFilterGroup, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterGroupId = originalFilterGroup.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -379,7 +379,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             filterItemFootnotes: new List<FilterItemFootnote>
             {
-                new() { FilterItem = originalFilterItem, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterItemId = originalFilterItem.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -388,7 +388,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -2087,7 +2087,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter",
             filterFootnotes: new List<FilterFootnote>
             {
-                new() { Filter = originalDefaultFilter, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterId = originalDefaultFilter.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -2096,7 +2096,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter group",
             filterGroupFootnotes: new List<FilterGroupFootnote>
             {
-                new() { FilterGroup = originalDefaultFilterGroup, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterGroupId = originalDefaultFilterGroup.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -2105,7 +2105,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             filterItemFootnotes: new List<FilterItemFootnote>
             {
-                new() { FilterItem = originalDefaultFilterItem, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { FilterItemId = originalDefaultFilterItem.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -2114,7 +2114,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicator, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicator.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -2710,7 +2710,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicatorA, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicatorA.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
@@ -3006,7 +3006,7 @@ public class ReplacementPlanServiceTests
             "Test footnote for Filter item",
             indicatorFootnotes: new List<IndicatorFootnote>
             {
-                new() { Indicator = originalIndicatorA, SubjectId = originalReleaseSubject.Subject.Id },
+                new() { IndicatorId = originalIndicatorA.Id, SubjectId = originalReleaseSubject.Subject.Id },
             }
         );
 
