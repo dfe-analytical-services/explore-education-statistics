@@ -38,4 +38,9 @@ public class DataSetSearchableDocumentsController(IDataSetSearchableDocumentsSer
     public async Task<DataSetSearchableDocumentKeyDto[]> GetDataSetSearchableDocumentKeys(
         CancellationToken cancellationToken = default
     ) => await dataSetSearchableDocumentsService.GetDataSetSearchableDocumentKeys(cancellationToken);
+
+    [HttpGet("data-sets/searchable/publications")]
+    public async Task<DataSetSearchableDocumentPublicationDto[]> GetDataSetSearchableDocumentPublications(
+        CancellationToken cancellationToken = default
+    ) => await dataSetSearchableDocumentsService.GetDataSetSearchableDocumentPublications(cancellationToken);
 }

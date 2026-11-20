@@ -72,6 +72,7 @@ public static class HostBuilderExtension
                     .AddTransient<IDataSetDocumentCreator, DataSetDocumentCreator>()
                     .AddTransient<IDataSetDocumentRemover, DataSetDocumentRemover>()
                     .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
+                    .AddTransient<IFullDataSetDocumentResetter, FullDataSetDocumentResetter>()
                     .AddDocumentCheckers()
                     // Functions
                     .AddTransient<IEventGridEventHandler, EventGridEventHandler>()

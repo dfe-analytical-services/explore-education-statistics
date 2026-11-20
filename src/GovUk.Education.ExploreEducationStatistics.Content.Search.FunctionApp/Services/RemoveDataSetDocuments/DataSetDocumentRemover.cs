@@ -44,6 +44,23 @@ internal class DataSetDocumentRemover(IAzureBlobStorageClient azureBlobStorageCl
         return new RemoveDataSetDocumentsResponse(successfullyRemovedBlobNames);
     }
 
+    public async Task<RemoveDataSetDocumentsResponse> RemoveAllDataSetDocuments(
+        CancellationToken cancellationToken = default
+    )
+    {
+        var blobNames = await azureBlobStorageClient.ListBlobsInContainer(
+            appOptions.Value.DataSetDocumentsContainerName,
+            cancellationToken: cancellationToken
+        );
+
+        await azureBlobStorageClient.DeleteAllBlobsFromContainer(
+            appOptions.Value.DataSetDocumentsContainerName,
+            cancellationToken
+        );
+
+        return new RemoveDataSetDocumentsResponse([.. blobNames]);
+    }
+
     private async Task<IList<string>> GetBlobNames(
         RemoveDataSetDocumentsRequest request,
         CancellationToken cancellationToken
