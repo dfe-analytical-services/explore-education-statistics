@@ -16,6 +16,9 @@ const DraftReleasesTab = ({
   releases,
   onChangeRelease,
 }: Props) => {
+  const showIssues = !isBauUser;
+  const showMethodology = !isBauUser;
+
   return (
     <>
       <div className="govuk-grid-row">
@@ -24,9 +27,14 @@ const DraftReleasesTab = ({
           <p>
             Here you can view and edit any of your releases that are currently
             in 'Draft' or 'In review' and also 'Amendments' that are being made
-            to a published release. You can also view a summary of any
-            outstanding issues that may need to be resolved.
+            to a published release.
           </p>
+          {showIssues && (
+            <p>
+              You can also view a summary of any outstanding issues that may
+              need to be resolved.
+            </p>
+          )}
         </div>
       </div>
       <LoadingSpinner
@@ -35,7 +43,8 @@ const DraftReleasesTab = ({
         text="Loading draft releases"
       >
         <DraftReleasesTable
-          isBauUser={isBauUser}
+          showIssues={showIssues}
+          showMethodology={showMethodology}
           releases={releases}
           onChangeRelease={onChangeRelease}
         />
