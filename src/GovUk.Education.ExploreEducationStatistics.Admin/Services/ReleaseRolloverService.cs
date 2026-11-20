@@ -55,42 +55,44 @@ public class ReleaseRolloverService(
                     path: nameof(ReleaseRolloverCreateRequest.PublishingOrganisations).ToLowerFirst()
                 )
             )
-            .OnSuccess(async publicationSourceReleaseVersionAndOrganisations =>
-            {
-                var (publication, sourceReleaseVersion, publishingOrganisations) =
-                    publicationSourceReleaseVersionAndOrganisations;
-
-                var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
-                    context: context,
-                    guidGenerator: guidGenerator,
-                    userService: userService,
-                    publication: publication,
-                    releaseCreateRequest: request,
-                    publishingOrganisations: publishingOrganisations,
-                    rolloverSourceReleaseId: sourceReleaseVersion.ReleaseId
-                );
-
-                ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
-
-                switch (request.Mode)
+            .OnSuccess(publicationSourceReleaseVersionAndOrganisations =>
+                context.RequireTransaction(async () =>
                 {
-                    case RolloverMode.WithData:
-                        var dataBlockVersionsByTemplateId = await CopyDataBlocks(
-                            templateReleaseVersionId: sourceReleaseVersion.Id,
-                            newReleaseVersionId: newReleaseVersion.Id
-                        );
-                        // M1.5-M1.8 copy content, featured tables/key stats, data files and footnotes,
-                        // using dataBlockVersionsByTemplateId.
-                        break;
-                    case RolloverMode.StructureOnly:
-                        // M1.5 copies content sections/layout only, with no data-block id-map.
-                        break;
-                }
+                    var (publication, sourceReleaseVersion, publishingOrganisations) =
+                        publicationSourceReleaseVersionAndOrganisations;
 
-                await context.SaveChangesAsync();
+                    var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
+                        context: context,
+                        guidGenerator: guidGenerator,
+                        userService: userService,
+                        publication: publication,
+                        releaseCreateRequest: request,
+                        publishingOrganisations: publishingOrganisations,
+                        rolloverSourceReleaseId: sourceReleaseVersion.ReleaseId
+                    );
 
-                return await releaseVersionService.GetRelease(newReleaseVersion.Id);
-            });
+                    ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
+
+                    switch (request.Mode)
+                    {
+                        case RolloverMode.WithData:
+                            var dataBlockVersionsByTemplateId = await CopyDataBlocks(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id
+                            );
+                            // M1.5-M1.8 copy content, featured tables/key stats, data files and footnotes,
+                            // using dataBlockVersionsByTemplateId.
+                            break;
+                        case RolloverMode.StructureOnly:
+                            // M1.5 copies content sections/layout only, with no data-block id-map.
+                            break;
+                    }
+
+                    await context.SaveChangesAsync();
+
+                    return await releaseVersionService.GetRelease(newReleaseVersion.Id);
+                })
+            );
     }
 
     private async Task<Either<ActionResult, ReleaseVersion>> ValidateSourceRelease(ReleaseRolloverCreateRequest request)
