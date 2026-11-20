@@ -1267,6 +1267,67 @@ public abstract class ReleaseVersionServiceTests
                 Assert.True(viewModel.Live);
                 Assert.False(viewModel.Amendment);
                 Assert.False(viewModel.PreReleaseUsersOrInvitesAdded);
+                Assert.Null(viewModel.RolloverSourceReleaseLabel);
+            }
+
+            VerifyAllMocks(userPreReleaseRoleRepository);
+        }
+
+        [Fact]
+        public async Task Success_RolloverSourceReleaseLabel()
+        {
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithTimePeriodCoverage(TimeIdentifier.AcademicYear)
+                .WithYear(2023)
+                .WithLabel("Interim");
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(_ =>
+                    [
+                        _dataFixture
+                            .DefaultRelease()
+                            .WithRolloverSourceRelease(sourceRelease)
+                            .WithVersions(_ =>
+                                [
+                                    _dataFixture
+                                        .DefaultReleaseVersion()
+                                        .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                                        .WithPublished(DateTimeOffset.UtcNow)
+                                        .WithPublishedDisplayDate(DateTimeOffset.UtcNow)
+                                        .WithPublishScheduled(DateTimeOffset.UtcNow),
+                                ]
+                            ),
+                    ]
+                );
+
+            var releaseVersion = publication.Releases[0].Versions[0];
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(releaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var userPreReleaseRoleRepository = new Mock<IUserPreReleaseRoleRepository>(Strict);
+            userPreReleaseRoleRepository.SetupQuery(ResourceRoleFilter.AllButExpired, []);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseVersionService = BuildService(
+                    context,
+                    userPreReleaseRoleRepository: userPreReleaseRoleRepository.Object
+                );
+
+                var result = await releaseVersionService.GetRelease(releaseVersion.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(sourceRelease.Title, viewModel.RolloverSourceReleaseLabel);
             }
 
             VerifyAllMocks(userPreReleaseRoleRepository);
@@ -2606,10 +2667,6 @@ public abstract class ReleaseVersionServiceTests
                 .Setup(mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData))
                 .Returns(Task.CompletedTask);
 
-            footnoteRepository
-                .Setup(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id))
-                .Returns(Task.CompletedTask);
-
             releasePublishingStatusRepository
                 .Setup(mock => mock.RemovePublisherReleaseStatuses(new List<Guid> { releaseVersion.Id }))
                 .Returns(Task.CompletedTask);
@@ -2681,8 +2738,6 @@ public abstract class ReleaseVersionServiceTests
                     mock => mock.DeleteAllReleaseSubjects(releaseVersion.Id, !forceDeleteRelatedData),
                     Times.Once
                 );
-
-                footnoteRepository.Verify(mock => mock.DeleteFootnotesByReleaseVersion(releaseVersion.Id), Times.Once);
 
                 VerifyAllMocks(
                     privateCacheService,

@@ -5,6 +5,7 @@ import {
   AutoMappedItem,
   CandidateWithKey,
   MappableSourceItem,
+  MappingWithKey,
 } from '@admin/pages/release/data/utils/mappingTypes';
 import Tag from '@common/components/Tag';
 import ButtonText from '@common/components/ButtonText';
@@ -32,8 +33,12 @@ interface Props {
   pendingUpdates?: PendingMappingUpdate[];
   readOnly?: boolean;
   renderCandidate: (candidate: CandidateWithKey) => ReactNode;
-  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSource: (
+    source: MappableSourceItem,
+    mapping: MappingWithKey,
+  ) => ReactNode;
   renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetailsStart?: (mapping: MappingWithKey) => ReactNode;
   searchFilter: (searchTerm: string) => AutoMappedItem[];
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
@@ -51,6 +56,7 @@ export default function ApiDataSetAutoMappedTable({
   renderCandidate,
   renderSource,
   renderSourceDetails,
+  renderSourceDetailsStart,
   searchFilter,
   onUpdate,
 }: Props) {
@@ -149,7 +155,7 @@ export default function ApiDataSetAutoMappedTable({
                   );
                   return (
                     <tr key={`mapping-${mapping.sourceKey}`}>
-                      <td>{renderSource(mapping.source)}</td>
+                      <td>{renderSource(mapping.source, mapping)}</td>
                       <td>{renderCandidate(candidate)}</td>
                       <td>
                         <Tag colour="grey">Minor</Tag>
@@ -173,6 +179,9 @@ export default function ApiDataSetAutoMappedTable({
                               mapping={mapping}
                               newItems={newItems}
                               renderSourceDetails={renderSourceDetails}
+                              renderSourceDetailsStart={
+                                renderSourceDetailsStart
+                              }
                               onSubmit={onUpdate}
                             />
                           )}

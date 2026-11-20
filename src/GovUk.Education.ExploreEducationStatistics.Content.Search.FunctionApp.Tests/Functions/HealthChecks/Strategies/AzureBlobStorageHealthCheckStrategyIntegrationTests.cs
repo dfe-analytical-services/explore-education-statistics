@@ -18,7 +18,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     private static AzureBlobStorageHealthCheckStrategy GetSUT(
         string? searchStorageConnectionString = null,
         string? releaseDocumentsContainerName = null,
-        string? datasetDocumentsContainerName = null
+        string? dataSetDocumentsContainerName = null
     ) =>
         new(
             CreateAzureBlobStorageClientFactory(),
@@ -29,7 +29,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
                     SearchStorageConnectionString =
                         searchStorageConnectionString ?? IntegrationTestStorageAccountConnectionString,
                     ReleaseDocumentsContainerName = releaseDocumentsContainerName ?? IntegrationTestContainerName,
-                    DatasetDocumentsContainerName = datasetDocumentsContainerName ?? IntegrationTestContainerName,
+                    DataSetDocumentsContainerName = dataSetDocumentsContainerName ?? IntegrationTestContainerName,
                 }
             )
         );
@@ -74,10 +74,10 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     }
 
     [Fact(Skip = "Complete StorageAccountName and StorageAccountAccessKey to run this integration test")]
-    public async Task WhenDatasetDocumentsContainerNotFound_ThenShouldRespondIsUnhealthy()
+    public async Task WhenDataSetDocumentsContainerNotFound_ThenShouldRespondIsUnhealthy()
     {
         //  ARRANGE
-        var sut = GetSUT(datasetDocumentsContainerName: "some-unknown-container-name");
+        var sut = GetSUT(dataSetDocumentsContainerName: "some-unknown-container-name");
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);
@@ -86,7 +86,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.NotNull(healthCheckResult);
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            "Dataset Documents Azure Blob Storage container 'some-unknown-container-name' is not found",
+            "Data Set Documents Azure Blob Storage container 'some-unknown-container-name' is not found",
             healthCheckResult.Message
         );
     }
@@ -110,10 +110,10 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
     }
 
     [Fact]
-    public async Task WhenDatasetDocumentsContainerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
+    public async Task WhenDataSetDocumentsContainerNameIsMissingFromConfig_ThenShouldRespondAsUnhealthy()
     {
         //  ARRANGE
-        var sut = GetSUT(datasetDocumentsContainerName: string.Empty);
+        var sut = GetSUT(dataSetDocumentsContainerName: string.Empty);
 
         // ACT
         var healthCheckResult = await sut.Run(CancellationToken.None);
@@ -122,7 +122,7 @@ public class AzureBlobStorageHealthCheckStrategyIntegrationTests
         Assert.NotNull(healthCheckResult);
         Assert.False(healthCheckResult.IsHealthy);
         Assert.Contains(
-            "Dataset Documents Azure Blob Storage container name is not configured.",
+            "Data Set Documents Azure Blob Storage container name is not configured.",
             healthCheckResult.Message
         );
     }

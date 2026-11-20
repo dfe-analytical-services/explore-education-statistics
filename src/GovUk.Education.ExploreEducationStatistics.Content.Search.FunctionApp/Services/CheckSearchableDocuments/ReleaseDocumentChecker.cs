@@ -1,16 +1,22 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CheckSearchableDocuments;
 
 public class ReleaseDocumentChecker(
     IBlobNameLister blobNameLister,
-    IReleaseVersionSummaryRetriever releaseVersionSummaryRetriever
+    IReleaseVersionSummaryRetriever releaseVersionSummaryRetriever,
+    IOptions<AppOptions> appOptions
 )
 {
     public async Task<ReleaseDocumentsCheckReport> RunCheck(CancellationToken cancellationToken = default)
     {
         // Get a list of all blobs
-        var blobNames = await blobNameLister.ListBlobsInContainer(cancellationToken);
+        var blobNames = await blobNameLister.ListBlobsInContainer(
+            appOptions.Value.ReleaseDocumentsContainerName,
+            cancellationToken
+        );
 
         // Retrieve the latest published release version summaries for the latest published releases of all published publications
         var releaseVersionSummaries = await releaseVersionSummaryRetriever.GetAllPublishedReleaseVersionSummaries(

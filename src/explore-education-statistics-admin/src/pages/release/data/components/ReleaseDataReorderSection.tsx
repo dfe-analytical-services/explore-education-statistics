@@ -1,9 +1,7 @@
+import ManageIndicators from '@admin/pages/release/data/components/ManageIndicators';
 import ReorderFiltersList, {
   UpdateFiltersRequest,
 } from '@admin/pages/release/data/components/ReorderFiltersList';
-import ReorderIndicatorsList, {
-  UpdateIndicatorsRequest,
-} from '@admin/pages/release/data/components/ReorderIndicatorsList';
 import styles from '@admin/pages/release/data/components/ReleaseDataReorderSection.module.scss';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import tableBuilderService, {
@@ -17,7 +15,9 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import adminTableBuilderService from '@admin/services/tableBuilderService';
 
-import React, { useState } from 'react';
+import useQueryParams from '@admin/hooks/useQueryParams';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 interface Props {
   releaseVersionId: string;
@@ -36,6 +36,30 @@ const ReleaseDataReorderSection = ({
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 
+  // Allows linking straight to managing a data set's indicators,
+  // e.g. from the data replacement page.
+  const { manageIndicators } = useQueryParams<{ manageIndicators?: string }>();
+
+  useEffect(() => {
+    const subject = subjects?.find(s => s.id === manageIndicators);
+
+    if (subject) {
+      setReorderingIndicators(subject);
+    }
+  }, [subjects, manageIndicators]);
+
+  const navigate = useNavigate();
+  const { pathname, hash } = useLocation();
+
+  const handleBackFromIndicators = () => {
+    setReorderingIndicators(undefined);
+
+    // Drop the link's query param so the data set isn't opened again
+    if (manageIndicators) {
+      navigate({ pathname, hash }, { replace: true });
+    }
+  };
+
   const handleSaveFilters = async (
     subjectId: string,
     updatedFilters: UpdateFiltersRequest,
@@ -48,21 +72,9 @@ const ReleaseDataReorderSection = ({
     setReorderingFilters(undefined);
   };
 
-  const handleSaveIndicators = async (
-    subjectId: string,
-    updatedIndicators: UpdateIndicatorsRequest,
-  ) => {
-    await adminTableBuilderService.updateIndicators(
-      releaseVersionId,
-      subjectId,
-      updatedIndicators,
-    );
-    setReorderingIndicators(undefined);
-  };
-
   return (
     <>
-      <h2>Reorder filters and indicators</h2>
+      <h2>Manage filters and indicators</h2>
       <InsetText>
         <h3>Before you start</h3>
         <p>
@@ -71,7 +83,12 @@ const ReleaseDataReorderSection = ({
           each item.
         </p>
         <p>
-          This order will be reflected in the table tool on the public website.
+          You can also pair indicators so that a paired indicator is always
+          selected with its main indicator.
+        </p>
+        <p>
+          These changes will be reflected in the table tool on the public
+          website.
         </p>
       </InsetText>
 
@@ -92,7 +109,7 @@ const ReleaseDataReorderSection = ({
                     <table className={styles.table}>
                       <caption className="govuk-visually-hidden">
                         Table showing data files in this release and buttons for
-                        reordering data file filters and indicators.
+                        managing data file filters and indicators.
                       </caption>
                       <thead>
                         <tr>
@@ -118,7 +135,7 @@ const ReleaseDataReorderSection = ({
                                       setReorderingFilters(subject)
                                     }
                                   >
-                                    Reorder filters
+                                    Manage filters
                                     <VisuallyHidden>
                                       {` for ${subject.name}`}
                                     </VisuallyHidden>
@@ -128,7 +145,7 @@ const ReleaseDataReorderSection = ({
                                       setReorderingIndicators(subject)
                                     }
                                   >
-                                    Reorder indicators
+                                    Manage indicators
                                     <VisuallyHidden>
                                       {` for ${subject.name}`}
                                     </VisuallyHidden>
@@ -154,11 +171,10 @@ const ReleaseDataReorderSection = ({
               />
             )}
             {reorderingIndicators && (
-              <ReorderIndicatorsList
+              <ManageIndicators
                 releaseVersionId={releaseVersionId}
                 subject={reorderingIndicators}
-                onCancel={() => setReorderingIndicators(undefined)}
-                onSave={handleSaveIndicators}
+                onBack={handleBackFromIndicators}
               />
             )}
           </div>

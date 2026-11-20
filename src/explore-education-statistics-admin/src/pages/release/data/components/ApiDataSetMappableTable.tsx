@@ -13,7 +13,7 @@ import ButtonText from '@common/components/ButtonText';
 import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import classNames from 'classnames';
 import useIsMappingActionsReadOnly from '@admin/pages/release/data/hooks/useIsMappingActionsReadOnly';
 
@@ -33,8 +33,12 @@ interface Props {
   readOnly?: boolean;
   renderCandidate: (candidate: CandidateWithKey) => ReactNode;
   renderCaptionEnd?: ReactNode;
-  renderSource: (source: MappableSourceItem) => ReactNode;
+  renderSource: (
+    source: MappableSourceItem,
+    mapping: MappingWithKey,
+  ) => ReactNode;
   renderSourceDetails?: (source: MappableSourceItem) => ReactNode;
+  renderSourceDetailsStart?: (mapping: MappingWithKey) => ReactNode;
   onUpdate: (update: PendingMappingUpdate) => Promise<void>;
 }
 
@@ -53,6 +57,7 @@ export default function ApiDataSetMappableTable({
   renderCaptionEnd,
   renderSource,
   renderSourceDetails,
+  renderSourceDetailsStart,
   onUpdate,
 }: Props) {
   const isReadOnly = useIsMappingActionsReadOnly(readOnly);
@@ -64,8 +69,36 @@ export default function ApiDataSetMappableTable({
 
   const tableId = mappableTableId(groupKey ?? 'default');
 
+  const setAllNoMapping = useCallback(async () => {
+    const updateRequestItems = mappableItems
+      .filter(
+        item =>
+          item.mapping.type === 'AutoNone' &&
+          !pendingUpdates.some(
+            update =>
+              update.groupKey === groupKey &&
+              update.sourceKey === item.mapping.sourceKey,
+          ),
+      )
+      .map(({ candidate, mapping }) => ({
+        groupKey,
+        previousCandidate: candidate,
+        previousMapping: mapping,
+        sourceKey: mapping.sourceKey,
+        type: 'ManualNone' as MappingType,
+      }));
+    await Promise.all(updateRequestItems.map(item => onUpdate(item)));
+  }, [groupKey, mappableItems, onUpdate, pendingUpdates]);
+
   return (
     <div className="table-container">
+      {totalUnmapped > 0 && !isReadOnly && (
+        <p>
+          <ButtonText onClick={setAllNoMapping}>
+            Set unmapped {itemPluralLabel} to "No mapping"
+          </ButtonText>
+        </p>
+      )}
       <table
         className="dfe-table--vertical-align-middle dfe-table--row-highlights"
         id={tableId}
@@ -118,7 +151,7 @@ export default function ApiDataSetMappableTable({
                   'rowHighlight--alert': mapping.type === 'AutoNone',
                 })}
               >
-                <td>{renderSource(mapping.source)}</td>
+                <td>{renderSource(mapping.source, mapping)}</td>
                 <td>
                   {!candidate ? (
                     <>
@@ -179,6 +212,7 @@ export default function ApiDataSetMappableTable({
                           mapping={mapping}
                           newItems={newItems}
                           renderSourceDetails={renderSourceDetails}
+                          renderSourceDetailsStart={renderSourceDetailsStart}
                           onSubmit={onUpdate}
                         />
                       </>
@@ -204,6 +238,7 @@ function getUpdateTagText(type: MappingType, isMajorMapping: boolean): string {
       return 'N/A';
   }
 }
+
 function getUpdateTagColour(
   type: MappingType,
   isMajorMapping: boolean,

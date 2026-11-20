@@ -11,26 +11,26 @@ const eesRequestSourceInterceptor: RequestInterceptor = {
   },
 };
 
+// Base URLs aren't set here, as they differ between apps.
+// Each app configures them at startup (e.g. the frontend's
+// `configureApiClients` and the admin's `configureAxios`).
+
 export const contentApi = new Client({
-  baseURL: process.env.CONTENT_API_BASE_URL,
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });
 
 export const dataApi = new Client({
-  baseURL: process.env.DATA_API_BASE_URL,
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });
 
 export const frontendApi = new Client({
-  baseURL: `${process.env.PUBLIC_URL}/api`,
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });
 
 export const publicApi = new Client({
-  baseURL: `${process.env.PUBLIC_API_BASE_URL}/v1`,
   requestInterceptors: [
     eesRequestSourceInterceptor,
     networkActivityRequestInterceptor,

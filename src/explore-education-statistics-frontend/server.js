@@ -61,6 +61,9 @@ const app = next({
   dev,
   hostname: url.hostname,
   port,
+  // Next 16 defaults to Turbopack, but we still rely on our custom
+  // webpack config in next.config.js.
+  webpack: true,
 });
 const handleRequest = app.getRequestHandler();
 

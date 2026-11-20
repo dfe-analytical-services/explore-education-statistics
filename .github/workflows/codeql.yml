@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - dev
+  workflow_dispatch:
 jobs:
   analyze:
     name: Analyze
@@ -10,12 +11,26 @@ jobs:
     permissions:
       actions: read
       contents: read
+      # Each GitHub Packages package must also grant this repository read access
+      # under 'Package settings' > 'Manage Actions access'.
+      packages: read
       security-events: write
     strategy:
       fail-fast: false
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
+
+    # Credentials are written to a NuGet config outside the checkout, which NuGet picks up
+    # from the parent directory hierarchy.
+    - name: Install .NET and authenticate with GitHub Packages
+      uses: actions/setup-dotnet@v6
+      with:
+        global-json-file: global.json
+        source-url: https://nuget.pkg.github.com/dfe-analytical-services/index.json
+        config-file: src/nuget.config
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4

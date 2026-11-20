@@ -7,11 +7,9 @@ import 'urlpattern-polyfill';
 
 loadEnvConfig(process.cwd());
 
-// Mirror the normalisation that `src/loadEnv.ts` applies at runtime, so tests
-// see the same PUBLIC_URL as the running app.
-if (process.env.PUBLIC_URL) {
-  process.env.PUBLIC_URL = process.env.PUBLIC_URL.replace(/\/+$/, '');
-}
+// Configure the API clients as the app does at startup. This must be
+// required after `loadEnvConfig` so the env vars are available.
+require('@frontend/loadEnv');
 
 jest.setTimeout(10000);
 

@@ -180,10 +180,12 @@ public class PublicationService(
                 var previousSlug = publication.Slug;
                 var previousSummary = publication.Summary;
                 var previousSupersededById = publication.SupersededById;
+                var previousThemeId = publication.ThemeId;
 
                 var titleChanged = previousTitle != updatedPublication.Title;
                 var slugChanged = previousSlug != updatedPublication.Slug;
                 var summaryChanged = previousSummary != updatedPublication.Summary;
+                var themeChanged = previousThemeId != updatedPublication.ThemeId;
 
                 if (slugChanged)
                 {
@@ -254,11 +256,11 @@ public class PublicationService(
                     }
 
                     await RaiseEventIfSupersededByChanged(publication, previousSupersededById);
-                }
 
-                if (publication.Live && (titleChanged || slugChanged || summaryChanged))
-                {
-                    await adminEventRaiser.OnPublicationChanged(publication);
+                    if (titleChanged || slugChanged || summaryChanged || themeChanged)
+                    {
+                        await adminEventRaiser.OnPublicationChanged(publication);
+                    }
                 }
 
                 return await GetPublication(publication.Id);

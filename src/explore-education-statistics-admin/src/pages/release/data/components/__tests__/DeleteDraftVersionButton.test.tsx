@@ -1,9 +1,13 @@
 import DeleteDraftVersionButton, {
   DeleteDraftVersionButtonProps,
 } from '@admin/pages/release/data/components/DeleteDraftVersionButton';
+import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import _apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import render from '@common-test/render';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { screen, within, waitFor } from '@testing-library/react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/apiDataSetVersionService');
 
@@ -119,5 +123,46 @@ describe('DeleteDraftVersionButton', () => {
     });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test('confirming the deletion invalidates the API data set and data file queries', async () => {
+    const queryClient = new QueryClient();
+    const invalidateQueries = jest.spyOn(queryClient, 'invalidateQueries');
+
+    const { user } = render(
+      <DeleteDraftVersionButton
+        dataSet={testDataSet}
+        dataSetVersion={testDataSetVersion}
+      >
+        Remove draft version
+      </DeleteDraftVersionButton>,
+      {
+        wrapper: ({ children }: { children?: ReactNode }) => (
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        ),
+      },
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Remove draft version' }),
+    );
+
+    const modal = within(screen.getByRole('dialog'));
+
+    await user.click(
+      modal.getByRole('button', { name: 'Remove this API data set version' }),
+    );
+
+    await waitFor(() => {
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: apiDataSetQueries.list._def,
+      });
+    });
+
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: releaseDataFileQueries.list._def,
+    });
   });
 });

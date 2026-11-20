@@ -70,6 +70,8 @@ public class ReleaseVersionService(
         return await context
             .ReleaseVersions.Include(rv => rv.Release)
                 .ThenInclude(r => r.Publication)
+            .Include(rv => rv.Release)
+                .ThenInclude(r => r.RolloverSourceRelease)
             .Include(rv => rv.PublishingOrganisations)
             .Include(rv => rv.ReleaseStatuses)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
@@ -245,12 +247,6 @@ public class ReleaseVersionService(
 
                 if (forceDeleteRelatedData)
                 {
-                    // DeleteAllReleaseSubjects only deletes Footnotes that are reachable from a Subject of
-                    // this ReleaseVersion, so any Footnote left linked to it solely by its ReleaseFootnote
-                    // has to be removed before deleting the statistics ReleaseVersion cascades that link
-                    // away and strands the Footnote row.
-                    await footnoteRepository.DeleteFootnotesByReleaseVersion(releaseVersion.Id);
-
                     var statsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
                         statsReleaseVersion => statsReleaseVersion.Id == releaseVersion.Id,
                         cancellationToken

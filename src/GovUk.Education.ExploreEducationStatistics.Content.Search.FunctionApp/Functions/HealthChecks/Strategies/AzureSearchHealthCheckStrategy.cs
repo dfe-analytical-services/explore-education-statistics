@@ -28,7 +28,7 @@ internal class AzureSearchHealthCheckStrategy(
         (string Description, string IndexerName)[] indexers =
         [
             ("Release", azureSearchOptions.Value.ReleaseIndexerName),
-            ("Dataset", azureSearchOptions.Value.DatasetIndexerName),
+            ("Data Set", azureSearchOptions.Value.DataSetIndexerName),
         ];
 
         var client = searchIndexerClientFactory();

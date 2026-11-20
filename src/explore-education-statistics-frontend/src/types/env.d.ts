@@ -1,15 +1,10 @@
 declare namespace NodeJS {
+  /**
+   * Public env vars needed in the browser are not declared here.
+   * Use `getPublicEnv` from `@frontend/utils/publicEnv` for those.
+   */
   interface ProcessEnv {
-    APP_ENV: 'Production' | 'Pre-Production' | 'Test' | 'Development' | 'Local';
-    APPINSIGHTS_INSTRUMENTATIONKEY: string;
     BUILD_NUMBER: string;
-    CONTENT_API_BASE_URL: string;
-    DATA_API_BASE_URL: string;
-    GA_TRACKING_ID: string;
-    NOTIFICATION_API_BASE_URL: string;
-    PUBLIC_API_DOCS_URL: string;
-    PUBLIC_API_BASE_URL: string;
-    PUBLIC_URL: string;
     DEFAULT_CACHE_MAX_AGE_SECONDS: string;
   }
 }

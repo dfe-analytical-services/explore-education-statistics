@@ -19,6 +19,10 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import {
+  getPairedIndicatorChildIds,
+  normalisePairedIndicators,
+} from '@common/modules/table-tool/utils/pairedIndicators';
+import {
   FullTableQuery,
   Subject,
   SubjectMeta,
@@ -32,7 +36,9 @@ import {
 import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
-import React, { useCallback, useMemo, useState } from 'react';
+import xor from 'lodash/xor';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 import FilterHierarchy from './FilterHierarchy';
 import getFilterHierarchyLabelsMap, {
@@ -132,13 +138,24 @@ export default function FiltersForm({
     [hierarchiedFilters],
   );
 
+  const pairedIndicatorChildIds = useMemo(
+    () => getPairedIndicatorChildIds(Object.values(subjectMeta.indicators)),
+    [subjectMeta.indicators],
+  );
+
   const initialFormValues: FiltersFormValues = useMemo(() => {
-    // Automatically select indicator when one indicator group with one option
-    const indicatorValues = Object.values(subjectMeta.indicators);
-    const indicators =
-      indicatorValues.length === 1 && indicatorValues[0].options.length === 1
-        ? [indicatorValues[0].options[0].value]
-        : (initialValues?.indicators ?? []);
+    // Automatically select indicator when there is only one indicator that can be selected,
+    // ignoring paired child indicators as they're selected automatically with their parent
+    const selectableIndicators = Object.values(subjectMeta.indicators)
+      .flatMap(group => group.options)
+      .filter(option => !option.parentIndicatorId);
+
+    const indicators = normalisePairedIndicators(
+      selectableIndicators.length === 1
+        ? [selectableIndicators[0].value]
+        : (initialValues?.indicators ?? []),
+      pairedIndicatorChildIds,
+    );
 
     const filters = mapValues(Object.fromEntries(simpleFilters), filter => {
       const filterGroupOptions = Object.values(filter.options);
@@ -187,14 +204,29 @@ export default function FiltersForm({
       indicators,
       filterHierarchies: initialFilterHierarchyValues,
     };
-  }, [initialValues, subjectMeta, simpleFilters, filterHierarchies]);
+  }, [
+    initialValues,
+    subjectMeta,
+    simpleFilters,
+    filterHierarchies,
+    pairedIndicatorChildIds,
+  ]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>{stepTitle}</WizardStepHeading>
   );
 
   const handleSubmit = useCallback(
-    async (values: FiltersFormValues) => {
+    async (formValues: FiltersFormValues) => {
+      // Ensure paired child indicators are always queried with their parent indicators
+      const values: FiltersFormValues = {
+        ...formValues,
+        indicators: normalisePairedIndicators(
+          formValues.indicators,
+          pairedIndicatorChildIds,
+        ),
+      };
+
       setPreviousValues({ ...values });
 
       try {
@@ -230,6 +262,7 @@ export default function FiltersForm({
       goToNextStep,
       onSubmit,
       onTableQueryError,
+      pairedIndicatorChildIds,
       selectedPublication?.title,
       subject?.name,
     ],
@@ -247,9 +280,56 @@ export default function FiltersForm({
 
   const allFiltersOpen = openFilterGroups.length === allFilterGroupKeys.length;
 
-  const orderedIndicators = orderBy(
-    Object.values(subjectMeta.indicators),
-    'order',
+  const indicatorOptionGroups = useMemo(() => {
+    const indicatorLabels = Object.fromEntries(
+      Object.values(subjectMeta.indicators)
+        .flatMap(group => group.options)
+        .map(option => [option.value, option.label]),
+    );
+
+    return orderBy(Object.values(subjectMeta.indicators), 'order').map(
+      group => ({
+        legend: group.label,
+        // Keep the order set by analysts, even if a child indicator isn't next to its parent
+        options: group.options.map(option => {
+          if (option.parentIndicatorId) {
+            return {
+              ...option,
+              disabled: true,
+              hint: `Selected automatically with ${
+                indicatorLabels[option.parentIndicatorId] ??
+                'its paired indicator'
+              }`,
+            };
+          }
+
+          const childId = pairedIndicatorChildIds[option.value];
+
+          return childId
+            ? {
+                ...option,
+                hint: `Also selects ${
+                  indicatorLabels[childId] ?? 'a paired indicator'
+                }`,
+              }
+            : option;
+        }),
+      }),
+    );
+  }, [subjectMeta.indicators, pairedIndicatorChildIds]);
+
+  // Show both paired indicators when searching for either of them
+  const pairedIndicatorLinks = useMemo(
+    () =>
+      Object.entries(pairedIndicatorChildIds).reduce<Dictionary<string[]>>(
+        (acc, [parentId, childId]) => {
+          acc[parentId] = [childId];
+          acc[childId] = [parentId];
+          return acc;
+        },
+        {},
+      ),
+    [pairedIndicatorChildIds],
   );
 
   const validationSchema = useMemo<ObjectSchema<FiltersFormValues>>(() => {
@@ -333,12 +413,13 @@ export default function FiltersForm({
                       </>
                     }
                     legendSize="m"
+                    linkedOptionValues={pairedIndicatorLinks}
                     name="indicators"
-                    options={orderedIndicators.map(group => ({
-                      legend: group.label,
-                      options: group.options,
-                    }))}
+                    options={indicatorOptionGroups}
                     order={[]}
+                  />
+                  <PairedIndicatorsSync
+                    childIdsByParentId={pairedIndicatorChildIds}
                   />
 
                   {simpleFilters.length + hierarchiedFilterIds.length > 0 && (
@@ -492,7 +573,7 @@ export default function FiltersForm({
                   itemName="indicator"
                   itemNamePlural="indicators"
                 >
-                  {orderedIndicators
+                  {indicatorOptionGroups
                     .flatMap(group => group.options)
                     .filter(indicator =>
                       values.indicators.includes(indicator.value),
@@ -605,4 +686,40 @@ export default function FiltersForm({
       }}
     </FormProvider>
   );
+}
+
+/**
+ * Keeps paired child indicators selected with their parent indicators.
+ *
+ * Child indicator checkboxes are disabled, so react-hook-form leaves them out
+ * when reading the checkbox values on change. Rather than intercepting the
+ * change (which would stop the browser toggling the clicked checkbox),
+ * we correct the selection after each change.
+ */
+function PairedIndicatorsSync({
+  childIdsByParentId,
+}: {
+  childIdsByParentId: Dictionary<string>;
+}) {
+  const { setValue } = useFormContext<FiltersFormValues>();
+  const indicators = useWatch<FiltersFormValues, 'indicators'>({
+    name: 'indicators',
+  });
+
+  useEffect(() => {
+    if (!indicators) {
+      return;
+    }
+
+    const normalisedIndicators = normalisePairedIndicators(
+      indicators,
+      childIdsByParentId,
+    );
+
+    if (xor(indicators, normalisedIndicators).length > 0) {
+      setValue('indicators', normalisedIndicators, { shouldValidate: true });
+    }
+  }, [indicators, childIdsByParentId, setValue]);
+
+  return null;
 }

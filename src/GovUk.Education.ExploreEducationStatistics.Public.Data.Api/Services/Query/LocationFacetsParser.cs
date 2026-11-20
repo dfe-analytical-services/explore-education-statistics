@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -70,14 +69,28 @@ internal class LocationFacetsParser : IFacetsParser
     {
         var builder = new DuckDbSqlBuilder();
 
-        if (!TryGetLocationOption(location, out var option))
+        var options = GetLocationOptions(location);
+
+        if (options.Count == 0)
         {
             _queryState.Warnings.Add(CreateNotFoundWarning([location], path));
 
             return builder.AppendLiteral(negate ? "true" : "false").Build();
         }
 
-        builder += $"{DataTable.Ref().LocationId(location.ParsedLevel()):raw} {(negate ? "!=" : "="):raw} {option.Id}";
+        var column = DataTable.Ref().LocationId(location.ParsedLevel());
+
+        // Non-unique identifiers (e.g. a school URN where the school name
+        // changed over time) can match multiple location options.
+        if (options.Count == 1)
+        {
+            builder += $"{column:raw} {(negate ? "!=" : "="):raw} {options[0].Id}";
+        }
+        else
+        {
+            var ids = options.Select(o => o.Id);
+            builder += $"{column:raw} {(negate ? "NOT IN" : "IN"):raw} ({ids})";
+        }
 
         return builder.Build();
     }
@@ -91,13 +104,15 @@ internal class LocationFacetsParser : IFacetsParser
 
         foreach (var location in locations)
         {
-            if (TryGetLocationOption(location, out var option))
+            var matchingOptions = GetLocationOptions(location);
+
+            if (matchingOptions.Count == 0)
             {
-                options.Add(option);
+                notFoundLocations.Add(location);
                 continue;
             }
 
-            notFoundLocations.Add(location);
+            options.AddRange(matchingOptions);
         }
 
         if (notFoundLocations.Count != 0)
@@ -111,6 +126,7 @@ internal class LocationFacetsParser : IFacetsParser
         }
 
         var fragments = options
+            .DistinctBy(l => l.Id)
             .GroupBy(l => l.Level)
             .Select(group =>
             {
@@ -131,29 +147,10 @@ internal class LocationFacetsParser : IFacetsParser
                 .Build();
     }
 
-    private bool TryGetLocationOption(
-        IDataSetQueryLocation queryLocation,
-        [MaybeNullWhen(false)] out ParquetLocationOption locationOption
-    )
-    {
-        locationOption = null;
-
-        if (!_allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel(), out var options))
-        {
-            return false;
-        }
-
-        var matchingOption = options.FirstOrDefault(option => IsMatchingLocationOption(option, queryLocation));
-
-        if (matchingOption is null)
-        {
-            return false;
-        }
-
-        locationOption = matchingOption;
-
-        return true;
-    }
+    private List<ParquetLocationOption> GetLocationOptions(IDataSetQueryLocation queryLocation) =>
+        _allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel(), out var options)
+            ? options.Where(option => IsMatchingLocationOption(option, queryLocation)).ToList()
+            : [];
 
     private static bool IsMatchingLocationOption(ParquetLocationOption option, IDataSetQueryLocation queryLocation) =>
         queryLocation switch

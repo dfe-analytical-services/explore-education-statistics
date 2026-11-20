@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import {
   networkActivityRequestInterceptor,
   networkActivityResponseInterceptor,
@@ -5,7 +6,7 @@ import {
 import Client from '@common/services/api/Client';
 
 const notificationApi = new Client({
-  baseURL: process.env.NOTIFICATION_API_BASE_URL,
+  baseURL: getPublicEnv('NOTIFICATION_API_BASE_URL'),
   requestInterceptors: [networkActivityRequestInterceptor],
   responseInterceptors: [networkActivityResponseInterceptor],
 });

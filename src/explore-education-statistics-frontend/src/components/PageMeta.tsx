@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -25,7 +26,7 @@ const PageMeta = ({
   // Generate canonical link
   const router = useRouter();
   const { asPath } = router; // Full path including query params
-  const url = new URL(asPath, process.env.PUBLIC_URL);
+  const url = new URL(asPath, getPublicEnv('PUBLIC_URL'));
   const pageParam = url.searchParams.get('page');
   url.hash = '';
   url.search = pageParam ? `page=${pageParam}` : '';
@@ -51,13 +52,13 @@ const PageMeta = ({
         rel="canonical"
         href={
           canonicalPathOverride
-            ? `${process.env.PUBLIC_URL}${canonicalPathOverride}`
+            ? `${getPublicEnv('PUBLIC_URL')}${canonicalPathOverride}`
             : canonicalLink
         }
         key="canonical"
       />
 
-      {process.env.APP_ENV !== 'Production' && (
+      {getPublicEnv('APP_ENV') !== 'Production' && (
         <meta name="robots" content="noindex,nofollow" />
       )}
       {/* <!-- Open Graph / Facebook --> */}
@@ -65,7 +66,10 @@ const PageMeta = ({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       {imgUrl && (
-        <meta property="og:image" content={process.env.PUBLIC_URL + imgUrl} />
+        <meta
+          property="og:image"
+          content={getPublicEnv('PUBLIC_URL') + imgUrl}
+        />
       )}
 
       {/* <!-- Twitter --> */}
@@ -75,7 +79,7 @@ const PageMeta = ({
       {imgUrl && (
         <meta
           property="twitter:image"
-          content={process.env.PUBLIC_URL + imgUrl}
+          content={getPublicEnv('PUBLIC_URL') + imgUrl}
         />
       )}
 

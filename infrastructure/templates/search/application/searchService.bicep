@@ -14,7 +14,7 @@ param location string
 @description('Storage container names for search documents. A container for each value will be created in the Search storage account.')
 param searchStorageDocumentContainers object = {
   releaseDocuments: 'searchable-documents'
-  datasetDocuments: 'nl-search-dataset-documents'
+  dataSetDocuments: 'nl-search-dataset-documents'
   filterDocuments: 'nl-search-filter-documents'
 }
 

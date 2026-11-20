@@ -9,15 +9,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 
 public class FullResetFunction(IFullReleaseDocumentResetter fullReleaseDocumentResetter, ICommandHandler commandHandler)
 {
-    [Function(nameof(FullSearchableDocumentsReset))]
+    [Function(nameof(FullReleaseDocumentsReset))]
     [QueueOutput("%RefreshReleaseDocumentQueueName%")]
-    public async Task<RefreshReleaseDocumentMessageDto[]> FullSearchableDocumentsReset(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullSearchableDocumentsReset))]
+    public async Task<RefreshReleaseDocumentMessageDto[]> FullReleaseDocumentsReset(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = nameof(FullReleaseDocumentsReset))]
             HttpRequest ignored, //  The binding name _ is invalid
         FunctionContext context
-    ) => await commandHandler.Handle(ResetSearchableDocument, context.CancellationToken);
+    ) => await commandHandler.Handle(ResetReleaseDocument, context.CancellationToken);
 
-    private async Task<RefreshReleaseDocumentMessageDto[]> ResetSearchableDocument(CancellationToken cancellationToken)
+    private async Task<RefreshReleaseDocumentMessageDto[]> ResetReleaseDocument(CancellationToken cancellationToken)
     {
         var response = await fullReleaseDocumentResetter.PerformReset(cancellationToken);
 

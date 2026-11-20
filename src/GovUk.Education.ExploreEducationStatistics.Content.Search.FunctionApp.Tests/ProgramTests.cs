@@ -19,7 +19,7 @@ public class ProgramTests
              "App": {
                  "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
                  "ReleaseDocumentsContainerName": "release-documents-container-name",
-                 "DatasetDocumentsContainerName": "dataset-documents-container-name"
+                 "DataSetDocumentsContainerName": "dataset-documents-container-name"
              },
              "ContentApi": {
                  "Url": "http://contentapi.test.url:8123"
@@ -167,7 +167,7 @@ public class ProgramTests
                        "App": {
                             "SearchStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=mystorageaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://mystorageaccount.blob.core.windows.net/;FileEndpoint=https://mystorageaccount.file.core.windows.net/;QueueEndpoint=https://mystorageaccount.queue.core.windows.net/;TableEndpoint=https://mystorageaccount.table.core.windows.net/",
                             "ReleaseDocumentsContainerName": "release-documents-container-name",
-                            "DatasetDocumentsContainerName": "dataset-documents-container-name"
+                            "DataSetDocumentsContainerName": "dataset-documents-container-name"
                        }
                     }
                     """
@@ -196,7 +196,7 @@ public class ProgramTests
                            "App": {
                                 "SearchStorageConnectionString": null,
                                 "ReleaseDocumentsContainerName": "release-documents-container-name",
-                                "DatasetDocumentsContainerName": "dataset-documents-container-name"
+                                "DataSetDocumentsContainerName": "dataset-documents-container-name"
                            }
                         }
                         """
@@ -222,7 +222,7 @@ public class ProgramTests
                            "App": {
                                 "SearchStorageConnectionString": "UseDevelopmentStorage=true",
                                 "ReleaseDocumentsContainerName": null,
-                                "DatasetDocumentsContainerName": "dataset-documents-container-name"
+                                "DataSetDocumentsContainerName": "dataset-documents-container-name"
                            }
                         }
                         """
@@ -279,7 +279,7 @@ public class ProgramTests
                 Assert.Equal(string.Empty, options.Value.SearchServiceEndpoint);
                 Assert.Null(options.Value.SearchServiceAccessKey);
                 Assert.Equal(string.Empty, options.Value.ReleaseIndexerName);
-                Assert.Equal(string.Empty, options.Value.DatasetIndexerName);
+                Assert.Equal(string.Empty, options.Value.DataSetIndexerName);
             }
         }
 

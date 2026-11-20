@@ -1,3 +1,5 @@
+import useMappingAccordionControls from '@admin/pages/release/data/hooks/useMappingAccordionControls';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import { useImmer } from 'use-immer';
 import getApiDataSetIndicatorMappings, {
   AutoMappedIndicator,
@@ -28,15 +30,32 @@ import compact from 'lodash/compact';
 import ButtonLink from '@admin/components/ButtonLink';
 import NotificationBanner from '@common/components/NotificationBanner';
 import getUnmappedIndicatorErrors from '@admin/pages/release/data/utils/getUnmappedIndicatorErrors';
+import insertSortedByLabel from '@admin/pages/release/data/utils/insertSortedByLabel';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import apiDataSetVersionService from '@admin/services/apiDataSetVersionService';
 import omit from 'lodash/omit';
+import BackToTopLink from '@common/components/BackToTopLink';
+import ApiDataSetColumnName from '@admin/pages/release/data/components/ApiDataSetColumnName';
+import SummaryListItem from '@common/components/SummaryListItem';
+import { MappingWithKey } from '@admin/pages/release/data/utils/mappingTypes';
 
 export const sectionIds = {
   mappableIndicators: 'mappable-indicators',
   newIndicators: 'new-indicators',
   autoMappedIndicators: 'auto-mapped-indicators',
 } as const;
+
+// Indicator mapping keys (source keys and candidate keys) are the
+// indicator column names (see MappingKeyGenerators.IndicatorMeta).
+const renderColumnName = ({ key }: { key: string }) => (
+  <ApiDataSetColumnName column={key} />
+);
+
+const renderSourceColumnSummary = (mapping: MappingWithKey) => (
+  <SummaryListItem term="Column">
+    <code>{mapping.sourceKey}</code>
+  </SummaryListItem>
+);
 
 export default function ReleaseApiDataSetIndicatorsMappingPage() {
   const [autoMappedIndicators, updateAutoMappedIndicators] = useImmer<
@@ -68,6 +87,13 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
     ),
     enabled: !!dataSet?.draftVersion?.id,
   });
+
+  const autoMappedSectionIds = autoMappedIndicators.length
+    ? [sectionIds.autoMappedIndicators]
+    : [];
+  const accordionControls = useMappingAccordionControls([
+    ...autoMappedSectionIds.map(id => ({ id, open: false })),
+  ]);
 
   const canUpdateMappings = dataSet?.draftVersion?.status === 'Mapping';
   const isFinalised = dataSet?.draftVersion?.status === 'Draft';
@@ -113,10 +139,14 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
             if (previousMapping.type === 'AutoMapped') {
               const updated = draft ?? [];
-              updated.push({
-                candidate,
-                mapping: { ...previousMapping, candidateKey, type },
-              });
+              insertSortedByLabel(
+                updated,
+                {
+                  candidate,
+                  mapping: { ...previousMapping, candidateKey, type },
+                },
+                indicator => indicator.mapping.source.label,
+              );
             } else {
               const indicatorToUpdate = draft.find(
                 indicator => indicator.mapping.sourceKey === sourceKey,
@@ -146,7 +176,11 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               });
             } else if (previousCandidate) {
               const updated = draftNewIndicators ?? [];
-              updated.push(previousCandidate);
+              insertSortedByLabel(
+                updated,
+                previousCandidate,
+                indicator => indicator.label,
+              );
             }
           });
         });
@@ -228,6 +262,7 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
           <div className="govuk-grid-column-three-quarters">
             <span className="govuk-caption-l">Map indicators</span>
             <h2>{dataSet?.title}</h2>
+
             {isFinalised && (
               <InsetText>
                 These mappings cannot be edited because this data set version
@@ -259,6 +294,16 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               become new indicators in the API data set.
             </p>
 
+            {accordionControls.hasSections && (
+              <div className="govuk-!-margin-bottom-4">
+                <AccordionToggleButton
+                  expanded={accordionControls.allExpanded}
+                  label={`${accordionControls.allExpanded ? 'Collapse' : 'Expand'} all sections`}
+                  onClick={accordionControls.toggleAll}
+                />
+              </div>
+            )}
+
             <h3 className="govuk-heading-l" id={sectionIds.mappableIndicators}>
               Indicators not found in new data set ({mappableIndicators.length})
             </h3>
@@ -273,13 +318,27 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                 newItems={newIndicators}
                 pendingUpdates={pendingUpdates}
                 readOnly={!canUpdateMappings}
-                renderCandidate={candidate => candidate.label}
-                renderSource={source => source.label}
+                candidateHint={renderColumnName}
+                renderCandidate={candidate => (
+                  <>
+                    {candidate.label}
+                    {renderColumnName(candidate)}
+                  </>
+                )}
+                renderSource={(source, mapping) => (
+                  <>
+                    {source.label}
+                    {renderColumnName({ key: mapping.sourceKey })}
+                  </>
+                )}
+                renderSourceDetailsStart={renderSourceColumnSummary}
                 onUpdate={handleUpdateMapping}
               />
             ) : (
               <p>No mappable indicators.</p>
             )}
+
+            <BackToTopLink />
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
@@ -293,11 +352,18 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
               <ApiDataSetNewItemsTable
                 itemPluralLabel="indicators"
                 newItems={newIndicators}
-                renderItem={item => item.label}
+                renderItem={item => (
+                  <>
+                    {item.label}
+                    {renderColumnName(item)}
+                  </>
+                )}
               />
             ) : (
               <p>No new indicators.</p>
             )}
+
+            <BackToTopLink />
 
             <h3
               className="govuk-heading-l govuk-!-margin-top-8"
@@ -309,13 +375,13 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
 
             {autoMappedIndicators.length > 0 ? (
               <Accordion
+                {...accordionControls.getAccordionProps(autoMappedSectionIds)}
                 id={`${sectionIds.autoMappedIndicators}-accordion`}
                 showOpenAll={false}
                 testId={`${sectionIds.autoMappedIndicators}-accordion`}
               >
-                return (
                 <AccordionSection
-                  backToTop={false}
+                  backToTop
                   caption={
                     <p>
                       These indicators have been mapped automatically.{' '}
@@ -334,15 +400,29 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     newItems={newIndicators}
                     pendingUpdates={pendingUpdates}
                     readOnly={!canUpdateMappings}
-                    renderCandidate={candidate => candidate.label}
-                    renderSource={source => source.label}
+                    candidateHint={renderColumnName}
+                    renderCandidate={candidate => (
+                      <>
+                        {candidate.label}
+                        {renderColumnName(candidate)}
+                      </>
+                    )}
+                    renderSource={(source, mapping) => (
+                      <>
+                        {source.label}
+                        {renderColumnName({ key: mapping.sourceKey })}
+                      </>
+                    )}
+                    renderSourceDetailsStart={renderSourceColumnSummary}
                     searchFilter={searchTerm =>
                       autoMappedIndicators.filter(item => {
                         const { candidate, mapping } = item;
 
                         const searchFields = compact([
                           candidate.label,
+                          candidate.key,
                           mapping.source.label,
+                          mapping.sourceKey,
                         ]);
 
                         return searchFields.some(field => {
@@ -353,7 +433,6 @@ export default function ReleaseApiDataSetIndicatorsMappingPage() {
                     onUpdate={handleUpdateMapping}
                   />
                 </AccordionSection>
-                );
               </Accordion>
             ) : (
               <p>No indicators found in both.</p>

@@ -42,7 +42,7 @@ param publicSiteConfigParam = {
 // publisher, notifier) keep the default Minimum > 0 rule.
 param http5xxAlerts = {
   publicSite: {
-    threshold: 10
+    threshold: 50
     aggregation: 'Total'
     windowSize: 'PT15M'
     evaluationFrequency: 'PT5M'

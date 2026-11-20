@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import Page from '@frontend/components/Page';
 import React from 'react';
 import { allowedCookies } from '@frontend/hooks/useCookies';
@@ -5,7 +6,7 @@ import Link from '@frontend/components/Link';
 import { NextPage } from 'next';
 
 const CookiesPage: NextPage = () => {
-  const trackingId = process.env.GA_TRACKING_ID.replace('G-', '');
+  const trackingId = getPublicEnv('GA_TRACKING_ID').replace('G-', '');
   return (
     <Page
       title="Details about cookies"

@@ -12,7 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Relea
 [Route("api")]
 [ApiController]
 [Authorize]
-public class ReleasesController(IReleaseService releaseService) : ControllerBase
+public class ReleasesController(IReleaseService releaseService, IReleaseRolloverService releaseRolloverService)
+    : ControllerBase
 {
     /// <summary>
     /// Provides a list of releases that are available within the service
@@ -29,6 +30,12 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
     public async Task<ActionResult<ReleaseVersionViewModel>> CreateRelease(ReleaseCreateRequest request)
     {
         return await releaseService.CreateRelease(request).HandleFailuresOrOk();
+    }
+
+    [HttpPost("releases/rollover")]
+    public async Task<ActionResult<ReleaseVersionViewModel>> CreateReleaseRollover(ReleaseRolloverCreateRequest request)
+    {
+        return await releaseRolloverService.CreateReleaseRollover(request).HandleFailuresOrOk();
     }
 
     [HttpPatch("releases/{releaseId:guid}")]

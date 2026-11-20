@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -770,7 +771,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
   resolvedUrl,
 }) => {
-  if (process.env.APP_ENV === 'Production' && query.prototype !== 'true') {
+  if (getPublicEnv('APP_ENV') === 'Production' && query.prototype !== 'true') {
     return {
       notFound: true,
     };

@@ -465,6 +465,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<IReleaseSlugValidator, ReleaseSlugValidator>();
         services.AddTransient<IReleaseVersionService, ReleaseVersionService>();
         services.AddTransient<IReleaseService, ReleaseService>();
+        services.AddTransient<IReleaseRolloverService, ReleaseRolloverService>();
         services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
         services.AddTransient<IUserResourceRoleNotificationService, UserResourceRoleNotificationService>();
         services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
@@ -638,6 +639,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddTransient<ILocationRepository, LocationRepository>();
         services.AddTransient<IDataGuidanceService, DataGuidanceService>();
         services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
+        services.AddTransient<IPairedIndicatorService, PairedIndicatorService>();
         services.AddTransient<IObservationService, ObservationService>();
         services.AddTransient<IMatchingObservationsQueryGenerator, MatchingObservationsQueryGenerator>();
         services.AddTransient<IOrganisationsService, OrganisationsService>();

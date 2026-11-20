@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import ChevronCard from '@common/components/ChevronCard';
 import ChevronGrid from '@common/components/ChevronGrid';
 import Link from '@frontend/components/Link';
@@ -29,7 +30,9 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
           The documentation provides full guidance and examples on how to make the most from our data sets."
           headingSize="m"
           link={
-            <Link to={process.env.PUBLIC_API_DOCS_URL}>API documentation</Link>
+            <Link to={getPublicEnv('PUBLIC_API_DOCS_URL')}>
+              API documentation
+            </Link>
           }
         />
         <ChevronCard
@@ -39,7 +42,7 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
           headingSize="m"
           link={
             <Link
-              to={`${process.env.PUBLIC_API_DOCS_URL}/getting-started/building-api-integrations/`}
+              to={`${getPublicEnv('PUBLIC_API_DOCS_URL')}/getting-started/building-api-integrations/`}
             >
               Building API integrations
             </Link>
@@ -50,8 +53,8 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
         dataSetId={id}
         dataSetName={name}
         dataSetVersion={version}
-        publicApiBaseUrl={process.env.PUBLIC_API_BASE_URL}
-        publicApiDocsUrl={process.env.PUBLIC_API_DOCS_URL}
+        publicApiBaseUrl={getPublicEnv('PUBLIC_API_BASE_URL')}
+        publicApiDocsUrl={getPublicEnv('PUBLIC_API_DOCS_URL')}
         renderLink={linkProps => <Link {...linkProps} />}
       />
     </DataSetFilePageSection>

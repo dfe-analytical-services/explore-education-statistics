@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import { NextApiRequest, NextApiResponse } from 'next';
 import withMethods from '@frontend/middleware/api/withMethods';
@@ -15,7 +16,7 @@ export default withMethods({
     const { fileName } = req.query;
 
     const response = await fetch(
-      `${process.env.CONTENT_API_BASE_URL}/asset/${AssetType.Image}/${fileName}`,
+      `${getPublicEnv('CONTENT_API_BASE_URL')}/asset/${AssetType.Image}/${fileName}`,
     );
 
     if (!response.ok || !response.body) {

@@ -29,7 +29,7 @@ internal class AzureBlobStorageHealthCheckStrategy(
         (string Description, string ContainerName)[] containers =
         [
             ("Release Documents", appOptions.Value.ReleaseDocumentsContainerName),
-            ("Dataset Documents", appOptions.Value.DatasetDocumentsContainerName),
+            ("Data Set Documents", appOptions.Value.DataSetDocumentsContainerName),
         ];
 
         var azureBlobStorageClient = azureBlobStorageClientFactory();

@@ -1,3 +1,4 @@
+import getPublicEnv from '@frontend/utils/publicEnv';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
@@ -27,7 +28,7 @@ const PublicationSectionBlocks = ({
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseVersionId,
-    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+    rootUrl: getPublicEnv('CONTENT_API_BASE_URL').replace('/api', ''),
   });
 
   return blocks.length > 0 ? (

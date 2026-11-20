@@ -6,11 +6,11 @@ import { SearchStorageQueueNames } from '../types.bicep'
 @description('The URL of the Content API.')
 param contentApiUrl string
 
-@description('Storage container name for dataset documents in the Search storage account.')
-param datasetDocumentsContainerName string
+@description('Storage container name for data set documents in the Search storage account.')
+param dataSetDocumentsContainerName string
 
-@description('Name of the indexer associated with the \'Dataset\' index in Azure AI Search.')
-param datasetIndexerName string
+@description('Name of the indexer associated with the \'Data set\' index in Azure AI Search.')
+param dataSetIndexerName string
 
 @description('The IP address ranges that can access the Search Docs Function App endpoints.')
 param functionAppFirewallRules FirewallRule[]
@@ -48,15 +48,19 @@ param applicationInsightsConnectionString string = ''
 
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
+  dataSetDocumentsChanged: 'data-set-documents-changed-queue'
   publicationArchived: 'publication-archived-queue'
   publicationChanged: 'publication-changed-queue'
   publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
+  refreshPublicationDataSetDocuments: 'refresh-publication-data-set-documents-queue'
+  refreshReleaseDataSetDocuments: 'refresh-release-data-set-documents-queue'
   refreshReleaseDocument: 'refresh-release-document-queue'
   releaseDocumentCreated: 'release-document-created-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
+  removeDataSetDocuments: 'remove-data-set-documents-queue'
   removePublicationReleaseDocuments: 'remove-publication-release-documents-queue'
   removeReleaseDocument: 'remove-release-document-queue'
   themeUpdated: 'theme-updated-queue'
@@ -97,9 +101,9 @@ resource releaseDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServic
   name: releaseDocumentsContainerName
 }
 
-resource datasetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+resource dataSetDocumentsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
   parent: searchBlobStorage
-  name: datasetDocumentsContainerName
+  name: dataSetDocumentsContainerName
 }
 
 resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
@@ -122,8 +126,8 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: releaseDocumentsContainer.name
       }
       {
-        name: 'App__DatasetDocumentsContainerName'
-        value: datasetDocumentsContainer.name
+        name: 'App__DataSetDocumentsContainerName'
+        value: dataSetDocumentsContainer.name
       }
       {
         name: 'AzureSearch__SearchServiceEndpoint'
@@ -134,12 +138,16 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: releaseIndexerName
       }
       {
-        name: 'AzureSearch__DatasetIndexerName'
-        value: datasetIndexerName
+        name: 'AzureSearch__DataSetIndexerName'
+        value: dataSetIndexerName
       }
       {
         name: 'ContentApi__Url'
         value: contentApiUrl
+      }
+      {
+        name: 'DataSetDocumentsChangedQueueName'
+        value: storageQueueNames.dataSetDocumentsChanged
       }
       {
         name: 'PublicationArchivedQueueName'
@@ -162,6 +170,14 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.publicationRestored
       }
       {
+        name: 'RefreshPublicationDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshPublicationDataSetDocuments
+      }
+      {
+        name: 'RefreshReleaseDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshReleaseDataSetDocuments
+      }
+      {
         name: 'RefreshReleaseDocumentQueueName'
         value: storageQueueNames.refreshReleaseDocument
       }
@@ -176,6 +192,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       {
         name: 'ReleaseVersionPublishedQueueName'
         value: storageQueueNames.releaseVersionPublished
+      }
+      {
+        name: 'RemoveDataSetDocumentsQueueName'
+        value: storageQueueNames.removeDataSetDocuments
       }
       {
         name: 'RemovePublicationReleaseDocumentsQueueName'

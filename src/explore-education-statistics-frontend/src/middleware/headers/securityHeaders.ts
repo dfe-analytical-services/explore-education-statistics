@@ -1,13 +1,9 @@
-import {
-  type NextFetchEvent,
-  type NextMiddleware,
-  NextRequest,
-} from 'next/server';
+import { type NextFetchEvent, type NextProxy, NextRequest } from 'next/server';
 
 export default async function securityHeaders(
   req: NextRequest,
   event: NextFetchEvent,
-  middleware: NextMiddleware,
+  middleware: NextProxy,
 ) {
   const res = await middleware(req, event);
 
