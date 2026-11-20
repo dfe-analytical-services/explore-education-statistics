@@ -79,7 +79,7 @@ export default function DataSetFileDetails({
             }
           >
             <ReleaseTypeSection
-              publishingOrganisations={[]}
+              publishingOrganisations={release.publishingOrganisations}
               showHeading={false}
               type={release.type}
             />

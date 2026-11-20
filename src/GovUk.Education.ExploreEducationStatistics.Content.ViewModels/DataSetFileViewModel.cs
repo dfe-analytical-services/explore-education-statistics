@@ -54,6 +54,18 @@ public record DataSetFileReleaseViewModel
     public DateTime LastUpdated { get; init; }
 
     public required DataSetFilePublicationViewModel Publication { get; init; }
+
+    public required List<DataSetFileOrganisationViewModel> PublishingOrganisations { get; init; }
+}
+
+public record DataSetFileOrganisationViewModel
+{
+    public required Guid Id { get; init; }
+
+    public required string Title { get; init; }
+
+    public static DataSetFileOrganisationViewModel FromModel(Organisation organisation) =>
+        new() { Id = organisation.Id, Title = organisation.Title };
 }
 
 public record DataSetFileFileViewModel
