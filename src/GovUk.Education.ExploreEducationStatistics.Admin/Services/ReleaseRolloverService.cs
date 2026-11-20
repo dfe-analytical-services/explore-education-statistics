@@ -89,8 +89,17 @@ public class ReleaseRolloverService(
                                 newReleaseVersion: newReleaseVersion,
                                 dataBlockVersionMap: dataBlockVersionsByTemplateId
                             );
-                            // M1.6-M1.8 copy featured tables/key stats, data files and footnotes,
-                            // using dataBlockVersionsByTemplateId.
+                            await CopyFeaturedTables(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id,
+                                dataBlockVersionMap: dataBlockVersionsByTemplateId
+                            );
+                            await CopyKeyStatisticDataBlocks(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id,
+                                dataBlockVersionMap: dataBlockVersionsByTemplateId
+                            );
+                            // M1.7-M1.8 copy data files and footnotes, using dataBlockVersionsByTemplateId.
                             break;
                         case RolloverMode.StructureOnly:
                             CopyContent(
@@ -177,6 +186,69 @@ public class ReleaseRolloverService(
         await context.SaveChangesAsync();
 
         return newDataBlockVersionsByTemplateId;
+    }
+
+    private async Task CopyFeaturedTables(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId,
+        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
+    )
+    {
+        var templateFeaturedTables = await context
+            .FeaturedTables.Where(featuredTable => featuredTable.ReleaseVersionId == templateReleaseVersionId)
+            .ToListAsync();
+
+        var newFeaturedTables = templateFeaturedTables.Select(templateFeaturedTable =>
+        {
+            var newDataBlockVersion = dataBlockVersionMap[templateFeaturedTable.DataBlockVersionId];
+
+            return new FeaturedTable
+            {
+                Id = guidGenerator.NewGuid(),
+                ReleaseVersionId = newReleaseVersionId,
+                DataBlockVersionId = newDataBlockVersion.Id,
+                DataBlockId = newDataBlockVersion.DataBlockId,
+                Name = templateFeaturedTable.Name,
+                Description = templateFeaturedTable.Description,
+                Order = templateFeaturedTable.Order,
+                Created = DateTime.UtcNow,
+                CreatedById = userService.GetUserId(),
+            };
+        });
+
+        context.FeaturedTables.AddRange(newFeaturedTables);
+    }
+
+    private async Task CopyKeyStatisticDataBlocks(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId,
+        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
+    )
+    {
+        var templateKeyStatisticDataBlocks = await context
+            .KeyStatisticsDataBlock.Where(keyStatistic => keyStatistic.ReleaseVersionId == templateReleaseVersionId)
+            .ToListAsync();
+
+        var newKeyStatisticDataBlocks = templateKeyStatisticDataBlocks.Select(templateKeyStatisticDataBlock =>
+        {
+            var newDataBlockVersion = dataBlockVersionMap[templateKeyStatisticDataBlock.DataBlockVersionId];
+
+            return new KeyStatisticDataBlock
+            {
+                Id = guidGenerator.NewGuid(),
+                ReleaseVersionId = newReleaseVersionId,
+                DataBlockVersionId = newDataBlockVersion.Id,
+                DataBlockId = newDataBlockVersion.DataBlockId,
+                Trend = templateKeyStatisticDataBlock.Trend,
+                GuidanceTitle = templateKeyStatisticDataBlock.GuidanceTitle,
+                GuidanceText = templateKeyStatisticDataBlock.GuidanceText,
+                Order = templateKeyStatisticDataBlock.Order,
+                Created = DateTime.UtcNow,
+                CreatedById = userService.GetUserId(),
+            };
+        });
+
+        context.KeyStatisticsDataBlock.AddRange(newKeyStatisticDataBlocks);
     }
 
     // Creates every ContentSection the new release needs - the 5 standard ones (always) plus one new row per
