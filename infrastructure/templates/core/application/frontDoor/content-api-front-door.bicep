@@ -24,6 +24,9 @@ param contentApiOriginHostName string
 @description('Name of the existing Publisher Function App granted permission to purge cached ZIPs.')
 param publisherFunctionName string
 
+@description('Whether to grant the Publisher Function App\'s system-assigned identity its roles here.')
+param deployPublisherRoleAssignments bool
+
 resource frontDoor 'Microsoft.Cdn/profiles@2025-04-15' existing = {
   name: frontDoorProfileName
 }
@@ -37,7 +40,10 @@ resource publisherFunction 'Microsoft.Web/sites@2024-04-01' existing = {
   name: publisherFunctionName
 }
 
-module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = {
+// TODO EES-7502 - remove this grant, the publisherFunction lookup and the publisherFunctionName and
+// deployPublisherRoleAssignments params once every environment has moved to the ELZ, where the release pipeline grants
+// this role to the Publisher's user-assigned identity instead.
+module publisherFrontDoorRoleAssignment '../../../common/components/front-door/afd-endpoint-role-assignment.bicep' = if (deployPublisherRoleAssignments) {
   name: 'contentApiPublisherRoleAssignmentModuleDeploy'
   params: {
     frontDoorProfileName: frontDoorProfileName
