@@ -14,6 +14,9 @@ param adminUsesUserAssignedIdentity bool = false
 @description('Whether the Data Processor connects to storage accounts with its managed identity, rather than with connection strings.')
 param identityBasedStorageConnections bool = false
 
+@description('Whether the Data Processor\'s management storage account accepts its account keys.')
+param managementStorageSharedKeyAccessEnabled bool = true
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -124,6 +127,7 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
       clientId: dataProcessorFunctionAppManagedIdentity.properties.clientId
     }
     identityBasedStorageConnections: identityBasedStorageConnections
+    managementStorageSharedKeyAccessEnabled: managementStorageSharedKeyAccessEnabled
     processorProdAppSettings: processorProdAppSettings
     processorStagingAppSettings: processorStagingAppSettings
     keyVaultName: resourceNames.keyVault.keyVault

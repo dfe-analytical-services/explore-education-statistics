@@ -78,6 +78,9 @@ param userAssignedManagedIdentityParams {
 @description('Whether the Function App host and Durable Functions connect to their storage accounts with the user-assigned managed identity, rather than with connection strings. The code file shares still use connection strings, as Elastic Premium plans need them.')
 param identityBasedStorageConnections bool = false
 
+@description('Whether the management storage account accepts its account keys. Can only be turned off with identityBasedStorageConnections, as nothing else uses them. The slot accounts keep theirs for their content shares.')
+param managementStorageSharedKeyAccessEnabled bool = true
+
 @description('An existing App Registration registered with Entra ID that will be used to control access to this Function App')
 param entraIdAuthentication EntraIdAuthentication?
 
@@ -200,6 +203,7 @@ module manamementStorageAccountModule '../../common/components/storage/storage-a
   params: {
     storageAccountName: managementStorageAccountName
     sku: storageAccountSku
+    sharedKeyAccessEnabled: managementStorageSharedKeyAccessEnabled
     connectionStringSecret: identityBasedStorageConnections
       ? null
       : {

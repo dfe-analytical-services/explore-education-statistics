@@ -58,6 +58,9 @@ param storageAccountConnectionStringSecretName string?
 @description('Whether to create a file share in the storage account for the Function App\'s content, and point the Function App at it. Elastic Premium and Consumption plans need one, but Dedicated plans don\'t, as they keep the content in the App Service plan\'s own storage.')
 param deployContentShare bool = true
 
+@description('Whether the storage account accepts its account keys. Can only be turned off without a content share, when the host and app code connect with a managed identity.')
+param storageAccountSharedKeyAccessEnabled bool = true
+
 @description('Storage Account SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
@@ -275,6 +278,7 @@ module storageAccountModule '../storage/storage-account.bicep' = {
       queue: privateEndpoints!.storageAccounts
     } : {}
     publicNetworkAccessEnabled: storageAccountPublicNetworkAccessEnabled
+    sharedKeyAccessEnabled: storageAccountSharedKeyAccessEnabled
     alerts: storageAlerts
     tagValues: tagValues
   }
