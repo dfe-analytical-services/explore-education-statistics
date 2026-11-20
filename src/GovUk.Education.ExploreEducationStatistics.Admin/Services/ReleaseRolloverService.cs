@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -54,46 +55,54 @@ public class ReleaseRolloverService(
                     path: nameof(ReleaseRolloverCreateRequest.PublishingOrganisations).ToLowerFirst()
                 )
             )
-            .OnSuccess(async publicationSourceReleaseAndOrganisations =>
-            {
-                var (publication, sourceRelease, publishingOrganisations) = publicationSourceReleaseAndOrganisations;
-
-                var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
-                    context: context,
-                    guidGenerator: guidGenerator,
-                    userService: userService,
-                    publication: publication,
-                    releaseCreateRequest: request,
-                    publishingOrganisations: publishingOrganisations,
-                    rolloverSourceReleaseId: sourceRelease.Id
-                );
-
-                ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
-
-                switch (request.Mode)
+            .OnSuccess(publicationSourceReleaseVersionAndOrganisations =>
+                context.RequireTransaction(async () =>
                 {
-                    case RolloverMode.WithData:
-                        // M1.4-M1.8 copy data blocks, content, featured tables/key stats, data files and footnotes.
-                        break;
-                    case RolloverMode.StructureOnly:
-                        // M1.5 copies content sections/layout only, with no data-block id-map.
-                        break;
-                }
+                    var (publication, sourceReleaseVersion, publishingOrganisations) =
+                        publicationSourceReleaseVersionAndOrganisations;
 
-                await context.SaveChangesAsync();
+                    var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
+                        context: context,
+                        guidGenerator: guidGenerator,
+                        userService: userService,
+                        publication: publication,
+                        releaseCreateRequest: request,
+                        publishingOrganisations: publishingOrganisations,
+                        rolloverSourceReleaseId: sourceReleaseVersion.ReleaseId
+                    );
 
-                return await releaseVersionService.GetRelease(newReleaseVersion.Id);
-            });
+                    ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
+
+                    switch (request.Mode)
+                    {
+                        case RolloverMode.WithData:
+                            var dataBlockVersionsByTemplateId = await CopyDataBlocks(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id
+                            );
+                            // M1.5-M1.8 copy content, featured tables/key stats, data files and footnotes,
+                            // using dataBlockVersionsByTemplateId.
+                            break;
+                        case RolloverMode.StructureOnly:
+                            // M1.5 copies content sections/layout only, with no data-block id-map.
+                            break;
+                    }
+
+                    await context.SaveChangesAsync();
+
+                    return await releaseVersionService.GetRelease(newReleaseVersion.Id);
+                })
+            );
     }
 
-    private async Task<Either<ActionResult, Release>> ValidateSourceRelease(ReleaseRolloverCreateRequest request)
+    private async Task<Either<ActionResult, ReleaseVersion>> ValidateSourceRelease(ReleaseRolloverCreateRequest request)
     {
         return await context
             .Releases.SingleOrNotFoundAsync(r => r.Id == request.RolloverSourceReleaseId)
             .OnSuccess(sourceRelease => CheckSourceReleaseIsEligible(sourceRelease, request.PublicationId));
     }
 
-    private async Task<Either<ActionResult, Release>> CheckSourceReleaseIsEligible(
+    private async Task<Either<ActionResult, ReleaseVersion>> CheckSourceReleaseIsEligible(
         Release sourceRelease,
         Guid publicationId
     )
@@ -103,15 +112,56 @@ public class ReleaseRolloverService(
             return ValidationActionResult(RolloverSourceReleaseMustBeInSamePublication);
         }
 
-        var hasPublishedVersion = await context.ReleaseVersions.AnyAsync(rv =>
-            rv.ReleaseId == sourceRelease.Id && rv.Published != null
-        );
+        var latestPublishedReleaseVersion = await context
+            .ReleaseVersions.LatestReleaseVersion(releaseId: sourceRelease.Id, publishedOnly: true)
+            .SingleOrDefaultAsync();
 
-        if (!hasPublishedVersion)
+        if (latestPublishedReleaseVersion is null)
         {
             return ValidationActionResult(RolloverSourceReleaseMustBePublished);
         }
 
-        return sourceRelease;
+        return latestPublishedReleaseVersion;
+    }
+
+    private async Task<Dictionary<Guid, DataBlockVersion>> CopyDataBlocks(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId
+    )
+    {
+        var templateDataBlockVersions = await context
+            .DataBlockVersions.Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == templateReleaseVersionId)
+            .ToListAsync();
+
+        var newDataBlockVersionsByTemplateId = templateDataBlockVersions.ToDictionary(
+            templateDataBlockVersion => templateDataBlockVersion.Id,
+            templateDataBlockVersion => new DataBlockVersion
+            {
+                Id = guidGenerator.NewGuid(),
+                DataBlock = new DataBlock { Id = guidGenerator.NewGuid() },
+                ReleaseVersionId = newReleaseVersionId,
+                Version = 0,
+                Heading = templateDataBlockVersion.Heading,
+                Name = templateDataBlockVersion.Name,
+                Source = templateDataBlockVersion.Source,
+                Query = templateDataBlockVersion.Query,
+                Charts = templateDataBlockVersion.Charts,
+                Table = templateDataBlockVersion.Table,
+                Created = DateTime.UtcNow,
+                Updated = null,
+                Published = null,
+            }
+        );
+
+        context.DataBlockVersions.AddRange(newDataBlockVersionsByTemplateId.Values);
+        await context.SaveChangesAsync();
+
+        foreach (var newDataBlockVersion in newDataBlockVersionsByTemplateId.Values)
+        {
+            newDataBlockVersion.DataBlock.LatestDraftVersionId = newDataBlockVersion.Id;
+        }
+        await context.SaveChangesAsync();
+
+        return newDataBlockVersionsByTemplateId;
     }
 }

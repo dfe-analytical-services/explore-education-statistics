@@ -341,6 +341,365 @@ public abstract class ReleaseRolloverServiceTests
         }
 
         [Fact]
+        public async Task GivenWithDataMode_CopiesDataBlocksFromTemplateReleaseAsNewDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context
+                    .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlock)
+                    .SingleAsync(dataBlockVersion => dataBlockVersion.ReleaseVersionId == newReleaseVersionId);
+
+                // A brand-new DataBlock and DataBlockVersion in their own right, not sharing ids with the template.
+                Assert.NotEqual(templateDataBlockVersion.Id, newDataBlockVersion.Id);
+                Assert.NotEqual(templateDataBlockVersion.DataBlockId, newDataBlockVersion.DataBlockId);
+
+                Assert.Equal(0, newDataBlockVersion.Version);
+                Assert.Equal(templateDataBlockVersion.Heading, newDataBlockVersion.Heading);
+                Assert.Equal(templateDataBlockVersion.Name, newDataBlockVersion.Name);
+                Assert.Equal(templateDataBlockVersion.Source, newDataBlockVersion.Source);
+                Assert.Equal(templateDataBlockVersion.Query.SubjectId, newDataBlockVersion.Query.SubjectId);
+                Assert.Null(newDataBlockVersion.Updated);
+                Assert.Null(newDataBlockVersion.Published);
+
+                // The new DataBlock's LatestDraftVersion points at the new DataBlockVersion, not the template's.
+                Assert.Equal(newDataBlockVersion.Id, newDataBlockVersion.DataBlock.LatestDraftVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task GivenSourceReleaseHasPublishedVersionAndDraftAmendment_CopiesOnlyThePublishedVersionsDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion publishedSourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(0)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            // An unpublished amendment of the source release - must NOT be the one copied from.
+            ReleaseVersion draftAmendmentReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(1)
+                .WithPreviousVersion(publishedSourceReleaseVersion)
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .Generate();
+
+            DataBlockVersion publishedDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(publishedSourceReleaseVersion)
+                .WithName("Published version's data block")
+                .Generate();
+
+            DataBlock publishedDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(publishedDataBlockVersion)
+                .Generate();
+
+            DataBlockVersion draftAmendmentDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(draftAmendmentReleaseVersion)
+                .WithName("Draft amendment's data block")
+                .Generate();
+
+            DataBlock draftAmendmentDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(draftAmendmentDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.AddRange(publishedSourceReleaseVersion, draftAmendmentReleaseVersion);
+                context.DataBlocks.AddRange(publishedDataBlock, draftAmendmentDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // SingleAsync also proves the draft amendment's data block was NOT also copied.
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.Equal(publishedDataBlockVersion.Name, newDataBlockVersion.Name);
+            }
+        }
+
+        [Fact]
+        public async Task GivenSourceReleaseHasTwoPublishedVersions_CopiesDataBlocksFromTheLatestVersion()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion originalPublishedReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(0)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-60))
+                .Generate();
+
+            ReleaseVersion latestPublishedReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(1)
+                .WithPreviousVersion(originalPublishedReleaseVersion)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-10))
+                .Generate();
+
+            DataBlockVersion originalDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(originalPublishedReleaseVersion)
+                .WithName("Original published version's data block")
+                .Generate();
+
+            DataBlock originalDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(originalDataBlockVersion)
+                .Generate();
+
+            DataBlockVersion latestDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(latestPublishedReleaseVersion)
+                .WithName("Latest published version's data block")
+                .Generate();
+
+            DataBlock latestDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(latestDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.AddRange(originalPublishedReleaseVersion, latestPublishedReleaseVersion);
+                context.DataBlocks.AddRange(originalDataBlock, latestDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // SingleAsync also proves the original version's data block was NOT also copied.
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.Equal(latestDataBlockVersion.Name, newDataBlockVersion.Name);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                Assert.False(
+                    await context.DataBlockVersions.AnyAsync(dataBlockVersion =>
+                        dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
         public async Task GivenReleaseRolloverDisabled_ReturnsForbid()
         {
             Publication publication = _dataFixture.DefaultPublication();
