@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,12 @@ public interface ITableBuilderService
     );
 
     Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
+        Guid releaseVersionId,
+        FullTableQuery query,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<Either<ActionResult, (TableBuilderResultViewModel Result, List<Location> Locations)>> QueryWithLocations(
         Guid releaseVersionId,
         FullTableQuery query,
         CancellationToken cancellationToken = default

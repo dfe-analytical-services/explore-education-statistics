@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
@@ -85,9 +86,19 @@ public class PermalinkService : IPermalinkService
         ).OnSuccess(releaseVersionId =>
         {
             return _tableBuilderService
-                .Query(releaseVersionId, request.Query.AsFullTableQuery(allowCropping: true), cancellationToken)
-                .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
+                .QueryWithLocations(
+                    releaseVersionId,
+                    request.Query.AsFullTableQuery(allowCropping: true),
+                    cancellationToken
+                )
+                .OnSuccess<
+                    ActionResult,
+                    (TableBuilderResultViewModel Result, List<Location> Locations),
+                    PermalinkViewModel
+                >(async queryResult =>
                 {
+                    var (tableResult, locations) = queryResult;
+
                     var frontendTableTask = _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
@@ -99,6 +110,7 @@ public class PermalinkService : IPermalinkService
                         : await _permalinkCsvMetaService.GetCsvMeta(
                             request.Query.SubjectId,
                             tableResult.SubjectMeta,
+                            locations,
                             cancellationToken
                         );
 

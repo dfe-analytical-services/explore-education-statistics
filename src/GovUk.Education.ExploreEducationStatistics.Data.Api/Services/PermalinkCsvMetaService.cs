@@ -1,8 +1,6 @@
 #nullable enable
-using System.Collections.Immutable;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
@@ -11,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,21 +19,18 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 {
     private readonly ILogger<PermalinkCsvMetaService> _logger;
     private readonly ContentDbContext _contentDbContext;
-    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseSubjectService _releaseSubjectService;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public PermalinkCsvMetaService(
         ILogger<PermalinkCsvMetaService> logger,
         ContentDbContext contentDbContext,
-        IStorageDataSetResolver storageDataSetResolver,
         IReleaseSubjectService releaseSubjectService,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
         _contentDbContext = contentDbContext;
-        _storageDataSetResolver = storageDataSetResolver;
         _releaseSubjectService = releaseSubjectService;
         _releaseFileBlobService = releaseFileBlobService;
     }
@@ -44,6 +38,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
     public async Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
         Guid subjectId,
         SubjectResultMetaViewModel tableResultMeta,
+        IReadOnlyList<Location> locations,
         CancellationToken cancellationToken = default
     )
     {
@@ -51,8 +46,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
-        var dataSet = await _storageDataSetResolver.TryResolve(subjectId, cancellationToken);
-        var locations = await GetLocations(dataSet, tableResultMeta.Locations, cancellationToken);
+        var csvLocations = locations.ToDictionary(location => location.Id, location => location.GetCsvValues());
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
             filter => filter.Name,
@@ -67,11 +61,11 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         // Prefer using the data file stream over the table meta locations to generate the headers
         var headers = csvStream is not null
             ? await ListCsvHeaders(csvStream, csvFilters, csvIndicators)
-            : ListCsvHeaders(csvFilters, csvIndicators, locations);
+            : ListCsvHeaders(csvFilters, csvIndicators, csvLocations);
 
         return new PermalinkCsvMetaViewModel
         {
-            Locations = locations,
+            Locations = csvLocations,
             Filters = csvFilters,
             Indicators = csvIndicators,
             Headers = headers,
@@ -160,112 +154,4 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         return filteredHeaders;
     }
-
-    private static async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        IStorageDataSet? dataSet,
-        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy,
-        CancellationToken cancellationToken
-    )
-    {
-        var locationAttributePaths = locationsHierarchy
-            .SelectMany(pair =>
-                GetLocationAttributePaths(
-                    attributes: pair.Value,
-                    rootLevel: Enum.Parse<GeographicLevel>(pair.Key, ignoreCase: true)
-                )
-            )
-            .ToList();
-
-        var locationIds = locationAttributePaths.Select(location => location.Id).ToHashSet();
-
-        // If possible, use the locations from the data set as these contain
-        // all the attributes from when it was originally created.
-        var locations = dataSet is null
-            ? new Dictionary<Guid, Location>()
-            : (await dataSet.ListLocations(locationIds, cancellationToken)).ToDictionary(location => location.Id);
-
-        // For any locations that no longer exist (or if the data set itself has been deleted), fallback
-        // to using the permalink's location hierarchy metadata. It should be noted that this meta
-        // doesn't provide the full set of location attributes so the location will
-        // most likely be missing columns that existed in the original CSV.
-        return locationAttributePaths.ToDictionary(
-            location => location.Id,
-            location =>
-                locations.ContainsKey(location.Id)
-                    ? locations[location.Id].GetCsvValues()
-                    : location
-                        .Path.SelectMany(node => ParseLocationAttribute(node).CsvValues)
-                        .ToDictionary(colValue => colValue.Key, colValue => colValue.Value)
-        );
-    }
-
-    private static List<LocationAttributePath> GetLocationAttributePaths(
-        List<LocationAttributeViewModel> attributes,
-        GeographicLevel rootLevel,
-        List<LocationAttributePath>? leafPaths = null,
-        ImmutableList<LocationAttributeViewModel>? currentPath = null
-    )
-    {
-        leafPaths ??= new List<LocationAttributePath>();
-        currentPath ??= new List<LocationAttributeViewModel>().ToImmutableList();
-
-        foreach (var attribute in attributes)
-        {
-            var nextPath = currentPath.Add(attribute with { Level = attribute.Level ?? rootLevel });
-
-            if (attribute.Options is null)
-            {
-                if (!attribute.Id.HasValue)
-                {
-                    throw new Exception($"Leaf attribute has missing property {nameof(attribute.Id)}");
-                }
-
-                // This is a leaf node, so we can terminate the path.
-                leafPaths.Add(new LocationAttributePath(attribute.Id.Value, nextPath));
-                continue;
-            }
-
-            GetLocationAttributePaths(attribute.Options, rootLevel, leafPaths, nextPath);
-        }
-
-        return leafPaths;
-    }
-
-    private static LocationAttribute ParseLocationAttribute(LocationAttributeViewModel viewModel)
-    {
-        return viewModel.Level switch
-        {
-            GeographicLevel.Country => new Country(viewModel.Value, viewModel.Label),
-            GeographicLevel.EnglishDevolvedArea => new EnglishDevolvedArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalAuthority => new LocalAuthority(viewModel.Value, null, viewModel.Label),
-            GeographicLevel.LocalAuthorityDistrict => new LocalAuthorityDistrict(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalEnterprisePartnership => new LocalEnterprisePartnership(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.LocalSkillsImprovementPlanArea => new LocalSkillsImprovementPlanArea(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.Institution => new Institution(viewModel.Value, viewModel.Label),
-            GeographicLevel.MayoralCombinedAuthority => new MayoralCombinedAuthority(viewModel.Value, viewModel.Label),
-            GeographicLevel.MultiAcademyTrust => new MultiAcademyTrust(viewModel.Value, viewModel.Label),
-            GeographicLevel.OpportunityArea => new OpportunityArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.ParliamentaryConstituency => new ParliamentaryConstituency(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.PlanningArea => new PlanningArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.Provider => new Provider(viewModel.Value, viewModel.Label),
-            GeographicLevel.Region => new Region(viewModel.Value, viewModel.Label),
-            GeographicLevel.RscRegion => new RscRegion(viewModel.Value),
-            GeographicLevel.School => new School(viewModel.Value, viewModel.Label),
-            GeographicLevel.Sponsor => new Sponsor(viewModel.Value, viewModel.Label),
-            GeographicLevel.Ward => new Ward(viewModel.Value, viewModel.Label),
-            GeographicLevel.PoliceForceArea => new PoliceForceArea(viewModel.Value, viewModel.Label),
-            _ => throw new ArgumentOutOfRangeException(),
-        };
-    }
-
-    private record LocationAttributePath(Guid Id, IList<LocationAttributeViewModel> Path);
 }

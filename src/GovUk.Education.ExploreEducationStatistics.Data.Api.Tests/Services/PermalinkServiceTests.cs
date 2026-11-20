@@ -339,7 +339,7 @@ public class PermalinkServiceTests
         var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
         permalinkCsvMetaService
-            .Setup(s => s.GetCsvMeta(subject.Id, tableResult.SubjectMeta, It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetCsvMeta(subject.Id, tableResult.SubjectMeta, locations, It.IsAny<CancellationToken>()))
             .ReturnsAsync(csvMeta);
 
         var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
@@ -350,13 +350,13 @@ public class PermalinkServiceTests
 
         tableBuilderService
             .Setup(s =>
-                s.Query(
+                s.QueryWithLocations(
                     releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
                     CancellationToken.None
                 )
             )
-            .ReturnsAsync(tableResult);
+            .ReturnsAsync((tableResult, locations));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -585,20 +585,20 @@ public class PermalinkServiceTests
         var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
         permalinkCsvMetaService
-            .Setup(s => s.GetCsvMeta(subject.Id, tableResult.SubjectMeta, It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetCsvMeta(subject.Id, tableResult.SubjectMeta, locations, It.IsAny<CancellationToken>()))
             .ReturnsAsync(csvMeta);
 
         var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
         tableBuilderService
             .Setup(s =>
-                s.Query(
+                s.QueryWithLocations(
                     releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
                     CancellationToken.None
                 )
             )
-            .ReturnsAsync(tableResult);
+            .ReturnsAsync((tableResult, locations));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -771,13 +771,13 @@ public class PermalinkServiceTests
 
         tableBuilderService
             .Setup(s =>
-                s.Query(
+                s.QueryWithLocations(
                     releaseVersion.Id,
                     It.Is<FullTableQuery>(ctx => ctx.Equals(request.Query.AsFullTableQuery(true, false))),
                     CancellationToken.None
                 )
             )
-            .ReturnsAsync(tableResult);
+            .ReturnsAsync((tableResult, locations));
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

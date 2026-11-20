@@ -86,31 +86,43 @@ public class TableBuilderService : ITableBuilderService
         CancellationToken cancellationToken = default
     )
     {
+        return await QueryWithLocations(releaseVersionId, query, cancellationToken)
+            .OnSuccess(queryResult => queryResult.Result);
+    }
+
+    public async Task<
+        Either<ActionResult, (TableBuilderResultViewModel Result, List<Location> Locations)>
+    > QueryWithLocations(Guid releaseVersionId, FullTableQuery query, CancellationToken cancellationToken = default)
+    {
         return await CheckReleaseSubjectExists(subjectId: query.SubjectId, releaseVersionId: releaseVersionId)
             .OnSuccess(_userService.CheckCanViewSubjectData)
             .OnSuccess(() => ListQueryObservations(query, cancellationToken))
-            .OnSuccess(async queryObservations =>
-            {
-                var (observations, isCroppedTable) = queryObservations;
-
-                if (!observations.Any())
+            .OnSuccess<ActionResult, (List<Observation>, bool), (TableBuilderResultViewModel, List<Location>)>(
+                async queryObservations =>
                 {
-                    return new TableBuilderResultViewModel();
-                }
+                    var (observations, isCroppedTable) = queryObservations;
 
-                return await _subjectResultMetaService
-                    .GetSubjectMeta(releaseVersionId, query, observations, isCroppedTable)
-                    .OnSuccess(subjectMetaViewModel =>
+                    if (!observations.Any())
                     {
-                        return new TableBuilderResultViewModel
+                        return (new TableBuilderResultViewModel(), []);
+                    }
+
+                    return await _subjectResultMetaService
+                        .GetSubjectMeta(releaseVersionId, query, observations, isCroppedTable)
+                        .OnSuccess(subjectMetaViewModel =>
                         {
-                            SubjectMeta = subjectMetaViewModel,
-                            Results = observations.Select(observation =>
-                                ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)
-                            ),
-                        };
-                    });
-            });
+                            var result = new TableBuilderResultViewModel
+                            {
+                                SubjectMeta = subjectMetaViewModel,
+                                Results = observations.Select(observation =>
+                                    ObservationViewModelBuilder.BuildObservation(observation, query.Indicators)
+                                ),
+                            };
+
+                            return (result, observations.Select(o => o.Location).Distinct().ToList());
+                        });
+                }
+            );
     }
 
     public async Task<Either<ActionResult, Dictionary<string, List<LocationAttributeViewModel>>>> QueryForBoundaryLevel(

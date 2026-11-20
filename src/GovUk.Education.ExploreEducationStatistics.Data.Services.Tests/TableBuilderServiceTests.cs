@@ -340,7 +340,7 @@ public class TableBuilderServiceTests
     }
 
     [Fact]
-    public async Task Query_ReleaseId()
+    public async Task QueryWithLocations_ReleaseId()
     {
         Publication publication = _fixture
             .DefaultPublication()
@@ -496,11 +496,13 @@ public class TableBuilderServiceTests
                 tableBuilderQueryOptimiser: tableBuilderQueryOptimiser.Object
             );
 
-            var result = await service.Query(releaseSubject.ReleaseVersionId, query);
+            var result = await service.QueryWithLocations(releaseSubject.ReleaseVersionId, query);
 
             VerifyAllMocks(observationService, subjectResultMetaService, tableBuilderQueryOptimiser);
 
-            var observationResults = result.AssertRight().Results.ToList();
+            var (tableResult, locations) = result.AssertRight();
+
+            var observationResults = tableResult.Results.ToList();
 
             Assert.Equal(2, observationResults.Count);
 
@@ -521,7 +523,9 @@ public class TableBuilderServiceTests
             Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
             Assert.Equal([observations[2].FilterItems.ToList()[0].FilterItemId], observationResults[1].Filters);
 
-            Assert.Equal(subjectMeta, result.Right.SubjectMeta);
+            Assert.Equal(subjectMeta, tableResult.SubjectMeta);
+
+            Assert.Equal([location1Id, location3Id], locations.Select(location => location.Id));
         }
     }
 
