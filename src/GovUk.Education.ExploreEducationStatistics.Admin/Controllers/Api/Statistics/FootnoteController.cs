@@ -58,7 +58,7 @@ public class FootnoteController : ControllerBase
                 footnote.Indicators,
                 footnote.Subjects
             )
-            .OnSuccess(GatherAndBuildFootnoteViewModel)
+            .OnSuccess(BuildFootnoteViewModel)
             .HandleFailuresOrOk();
     }
 
@@ -75,7 +75,7 @@ public class FootnoteController : ControllerBase
     {
         return await _footnoteService
             .GetFootnote(releaseVersionId: releaseVersionId, footnoteId: footnoteId)
-            .OnSuccess(GatherAndBuildFootnoteViewModel)
+            .OnSuccess(BuildFootnoteViewModel)
             .HandleFailuresOrOk();
     }
 
@@ -84,7 +84,7 @@ public class FootnoteController : ControllerBase
     {
         return await _footnoteService
             .GetFootnotes(releaseVersionId)
-            .OnSuccess(footnotes => footnotes.Select(GatherAndBuildFootnoteViewModel))
+            .OnSuccess(footnotes => footnotes.Select(BuildFootnoteViewModel))
             .HandleFailuresOrOk();
     }
 
@@ -106,7 +106,7 @@ public class FootnoteController : ControllerBase
                 indicatorIds: footnote.Indicators,
                 subjectIds: footnote.Subjects
             )
-            .OnSuccess(GatherAndBuildFootnoteViewModel)
+            .OnSuccess(BuildFootnoteViewModel)
             .HandleFailuresOrOk();
     }
 
@@ -194,196 +194,78 @@ public class FootnoteController : ControllerBase
         };
     }
 
-    private static FootnoteViewModel GatherAndBuildFootnoteViewModel(Footnote footnote)
+    private static FootnoteViewModel BuildFootnoteViewModel(Footnote footnote)
     {
-        var filterItemsGroupByFilterGroup = footnote
-            .FilterItems.GroupBy(
-                filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup,
-                filterItemFootnote => filterItemFootnote.FilterItemId
-            )
-            .ToList();
+        var subjects = new Dictionary<Guid, FootnoteSubjectViewModel>();
 
-        var filterItemsGroupByFilter = footnote
-            .FilterItems.GroupBy(
-                filterItemFootnote => filterItemFootnote.FilterItem.FilterGroup.Filter,
-                filterItemFootnote => filterItemFootnote.FilterItemId
-            )
-            .ToList();
-
-        var filterGroupsGroupByFilter = footnote
-            .FilterGroups.GroupBy(
-                filterGroupFootnote => filterGroupFootnote.FilterGroup.Filter,
-                filterGroupFootnote => filterGroupFootnote.FilterGroupId
-            )
-            .ToList();
-
-        var filterItemsByFilterGroup = filterItemsGroupByFilterGroup.ToDictionary(
-            grouping => grouping.Key.Id,
-            grouping => grouping.ToList()
-        );
-
-        var filterGroupsByFilter = filterGroupsGroupByFilter.ToDictionary(
-            grouping => grouping.Key.Id,
-            grouping => grouping.ToList()
-        );
-
-        // There can be more than one indicator belonging to the same subject in each group so we add Distinct here.
-        var indicatorGroupsBySubject = footnote
-            .Indicators.GroupBy(
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroup.SubjectId,
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId
-            )
-            .ToDictionary(grouping => grouping.Key, grouping => grouping.Distinct().ToList());
-
-        var indicatorsByIndicatorGroup = footnote
-            .Indicators.GroupBy(
-                indicatorFootnote => indicatorFootnote.Indicator.IndicatorGroupId,
-                indicatorFootnote => indicatorFootnote.IndicatorId
-            )
-            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
-
-        var filtersBySubject = footnote
-            .Filters.GroupBy(
-                filterFootnote => filterFootnote.Filter.SubjectId,
-                filterFootnote => filterFootnote.FilterId
-            )
-            .ToDictionary(grouping => grouping.Key, grouping => grouping.ToList());
-
-        // Index filter groups related to the filter items
-        AppendFilterGroups(filterItemsGroupByFilterGroup.Select(group => group.Key), filterGroupsByFilter);
-
-        // Index filters related to the filter groups
-        AppendFilters(filterGroupsGroupByFilter.Select(group => group.Key), filtersBySubject);
-
-        // Index filters related to the filter items
-        AppendFilters(filterItemsGroupByFilter.Select(group => group.Key), filtersBySubject);
-
-        var selectedSubjects = footnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
-        var selectedFilters = footnote.Filters.Select(filterFootnote => filterFootnote.FilterId);
-        var selectedFilterGroups = footnote.FilterGroups.Select(groupFootnote => groupFootnote.FilterGroupId);
-
-        var subjectIds = selectedSubjects
-            .Concat(filtersBySubject.Keys)
-            .Concat(indicatorGroupsBySubject.Keys)
-            .Distinct();
-
-        return BuildFootnoteViewModel(
-            footnote,
-            subjectIds,
-            filtersBySubject,
-            filterGroupsByFilter,
-            filterItemsByFilterGroup,
-            indicatorGroupsBySubject,
-            indicatorsByIndicatorGroup,
-            selectedSubjects,
-            selectedFilters,
-            selectedFilterGroups
-        );
-    }
-
-    private static void AppendFilterGroups(
-        IEnumerable<FilterGroup> filterGroups,
-        IDictionary<Guid, List<Guid>> filterGroupsByFilter
-    )
-    {
-        foreach (var filterGroup in filterGroups)
+        foreach (var subjectFootnote in footnote.Subjects)
         {
-            if (!filterGroupsByFilter.TryGetValue(filterGroup.FilterId, out var idList))
-            {
-                idList = new List<Guid>();
-                filterGroupsByFilter.Add(filterGroup.FilterId, idList);
-            }
-
-            if (!idList.Contains(filterGroup.Id))
-            {
-                idList.Add(filterGroup.Id);
-            }
+            GetOrAddSubject(subjects, subjectFootnote.SubjectId).Selected = true;
         }
-    }
 
-    private static void AppendFilters(IEnumerable<Filter> filters, IDictionary<Guid, List<Guid>> filtersBySubject)
-    {
-        foreach (var filter in filters)
+        foreach (var filterFootnote in footnote.Filters)
         {
-            if (!filtersBySubject.TryGetValue(filter.SubjectId, out var idList))
-            {
-                idList = new List<Guid>();
-                filtersBySubject.Add(filter.SubjectId, idList);
-            }
-
-            if (!idList.Contains(filter.Id))
-            {
-                idList.Add(filter.Id);
-            }
+            GetOrAddFilter(subjects, filterFootnote.SubjectId, filterFootnote.FilterId).Selected = true;
         }
-    }
 
-    private static FootnoteViewModel BuildFootnoteViewModel(
-        Footnote footnote,
-        IEnumerable<Guid> subjectIds,
-        IReadOnlyDictionary<Guid, List<Guid>> filtersBySubject,
-        IReadOnlyDictionary<Guid, List<Guid>> filterGroupsByFilter,
-        IReadOnlyDictionary<Guid, List<Guid>> filterItemsByFilterGroup,
-        IReadOnlyDictionary<Guid, List<Guid>> indicatorGroupsBySubject,
-        IReadOnlyDictionary<Guid, List<Guid>> indicatorsByIndicatorGroup,
-        IEnumerable<Guid> selectedSubjects,
-        IEnumerable<Guid> selectedFilters,
-        IEnumerable<Guid> selectedFilterGroups
-    )
-    {
+        foreach (var filterGroupFootnote in footnote.FilterGroups)
+        {
+            GetOrAddFilterGroup(
+                subjects,
+                filterGroupFootnote.SubjectId,
+                filterGroupFootnote.FilterId,
+                filterGroupFootnote.FilterGroupId
+            ).Selected = true;
+        }
+
+        foreach (var filterItemFootnote in footnote.FilterItems)
+        {
+            GetOrAddFilterGroup(
+                subjects,
+                filterItemFootnote.SubjectId,
+                filterItemFootnote.FilterId,
+                filterItemFootnote.FilterGroupId
+            )
+                .FilterItems.Add(filterItemFootnote.FilterItemId.ToString());
+        }
+
+        foreach (var indicatorFootnote in footnote.Indicators)
+        {
+            GetOrAddSubject(subjects, indicatorFootnote.SubjectId)
+                .IndicatorGroups.GetOrSet(
+                    indicatorFootnote.IndicatorGroupId,
+                    () => new FootnoteIndicatorGroupViewModel { Indicators = [] }
+                )
+                .Indicators.Add(indicatorFootnote.IndicatorId.ToString());
+        }
+
         return new FootnoteViewModel
         {
             Id = footnote.Id,
             Content = footnote.Content,
-            Subjects = subjectIds.ToDictionary(
-                subjectId => subjectId,
-                subjectId => new FootnoteSubjectViewModel
-                {
-                    Filters =
-                        filtersBySubject
-                            .GetValueOrDefault(subjectId)
-                            ?.ToDictionary(
-                                filterId => filterId,
-                                filterId => new FootnoteFilterViewModel
-                                {
-                                    FilterGroups =
-                                        filterGroupsByFilter
-                                            .GetValueOrDefault(filterId)
-                                            ?.ToDictionary(
-                                                filterGroupId => filterGroupId,
-                                                filterGroupId => new FootnoteFilterGroupViewModel
-                                                {
-                                                    FilterItems =
-                                                        filterItemsByFilterGroup
-                                                            .GetValueOrDefault(filterGroupId)
-                                                            ?.Select(filterItemId => filterItemId.ToString())
-                                                        ?? new List<string>(),
-                                                    Selected = selectedFilterGroups.Contains(filterGroupId),
-                                                }
-                                            )
-                                        ?? new Dictionary<Guid, FootnoteFilterGroupViewModel>(),
-                                    Selected = selectedFilters.Contains(filterId),
-                                }
-                            )
-                        ?? new Dictionary<Guid, FootnoteFilterViewModel>(),
-                    IndicatorGroups =
-                        indicatorGroupsBySubject
-                            .GetValueOrDefault(subjectId)
-                            ?.ToDictionary(
-                                indicatorGroupId => indicatorGroupId,
-                                indicatorGroupId => new FootnoteIndicatorGroupViewModel
-                                {
-                                    Indicators =
-                                        indicatorsByIndicatorGroup
-                                            .GetValueOrDefault(indicatorGroupId)
-                                            ?.Select(indicatorId => indicatorId.ToString())
-                                        ?? new List<string>(),
-                                }
-                            )
-                        ?? new Dictionary<Guid, FootnoteIndicatorGroupViewModel>(),
-                    Selected = selectedSubjects.Contains(subjectId),
-                }
-            ),
+            Subjects = subjects,
         };
+
+        static FootnoteSubjectViewModel GetOrAddSubject(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId
+        ) => subjects.GetOrSet(subjectId, () => new FootnoteSubjectViewModel { Filters = [], IndicatorGroups = [] });
+
+        static FootnoteFilterViewModel GetOrAddFilter(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId,
+            Guid filterId
+        ) =>
+            GetOrAddSubject(subjects, subjectId)
+                .Filters.GetOrSet(filterId, () => new FootnoteFilterViewModel { FilterGroups = [] });
+
+        static FootnoteFilterGroupViewModel GetOrAddFilterGroup(
+            Dictionary<Guid, FootnoteSubjectViewModel> subjects,
+            Guid subjectId,
+            Guid filterId,
+            Guid filterGroupId
+        ) =>
+            GetOrAddFilter(subjects, subjectId, filterId)
+                .FilterGroups.GetOrSet(filterGroupId, () => new FootnoteFilterGroupViewModel { FilterItems = [] });
     }
 }
